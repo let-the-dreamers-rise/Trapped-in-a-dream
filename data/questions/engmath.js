@@ -1658,3 +1658,162 @@ window.GATE_DATA.questions['engmath'].topics.find(function(t){return t.id==='eng
   explanation: "The generalized binomial series gives 1/(1-x)^k = sum_{n=0}^{infinity} C(n+k-1, k-1) x^n. Here k=3, so the coefficient of x^n is C(n+2, 2). For n=5: coefficient = C(5+2, 2) = C(7,2) = 21. This matches option A exactly. This generating function identity is the standard tool for counting the number of ways to write n as an ordered sum of 3 non-negative integer parts (equivalently, distributing n identical items into 3 distinct bins), which is exactly C(n+2,2) by stars-and-bars - so this question is really testing the same stars-and-bars count, just phrased through the generating-function lens rather than a distribution word problem. Recognizing 1/(1-x)^k as the generating function for C(n+k-1,k-1) is a frequently tested GATE shortcut."
 }
 );
+
+window.GATE_DATA.questions['engmath'].topics.find(function(t){return t.id==='engmath-linear-algebra';}).questions.push(
+{
+  id: 'engmath-linear-algebra-x1',
+  q: 'A matrix A is 5 x 7 with rank 4. What is the dimension of the null space of A (nullity)?',
+  options: ['1', '2', '3', '4'],
+  answer: 2,
+  marks: 1,
+  difficulty: 'easy',
+  type: 'numerical',
+  explanation: "The Rank-Nullity Theorem states rank(A) + nullity(A) = n, where n is the number of COLUMNS of A (since the null space consists of vectors x, of length equal to the column count, satisfying Ax=0). Here A is 5x7, so n=7 (number of columns), and rank(A)=4. Nullity = n - rank = 7 - 4 = 3. Note that the number of rows (5) does not directly enter this formula - it only bounds the maximum possible rank (rank <= min(rows, columns) = 5), which rank=4 satisfies comfortably. A common error is to subtract from the row count instead of the column count; always remember nullity concerns solutions x to Ax=0, so its dimension relates to the column space of A."
+},
+{
+  id: 'engmath-linear-algebra-x2',
+  q: 'For the system of equations x + y + z = 6, 2x + 2y + 2z = 12, x - y + z = 2, which describes the solution set?',
+  options: ['Unique solution', 'No solution (inconsistent)', 'Infinitely many solutions', 'Exactly two solutions'],
+  answer: 2,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'numerical',
+  explanation: "The coefficient matrix is [[1,1,1],[2,2,2],[1,-1,1]] with augmented column [6,12,2]. Notice row 2 = 2 * row 1 exactly, both in the coefficient part (2,2,2 = 2*(1,1,1)) and the constant part (12 = 2*6) - so row 2 is entirely redundant, contributing no new information. This leaves effectively 2 independent equations (x+y+z=6 and x-y+z=2) in 3 unknowns. Row-reducing: rank(A) = 2 (rows 1 and 3 are independent; row 2 is a multiple of row 1) and rank([A|b]) = 2 as well (since row 2's redundancy extends to the augmented column too). Since rank(A) = rank([A|b]) = 2 < 3 (number of unknowns), the system is consistent with 3-2=1 free parameter, giving infinitely many solutions. If row 2's constant had been anything other than 12 (e.g. 13), the system would instead have been inconsistent (no solution)."
+},
+{
+  id: 'engmath-linear-algebra-x3',
+  q: 'A 3x3 idempotent matrix A (satisfying A^2 = A) has rank 2. What are its eigenvalues (with multiplicity)?',
+  options: ['0, 0, 0', '1, 1, 1', '1, 1, 0', '2, 1, 0'],
+  answer: 2,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'concept',
+  explanation: "For an idempotent matrix, every eigenvalue lambda must satisfy lambda^2 = lambda (since if Av = lambda*v, then A^2 v = lambda^2 v, but A^2=A means A^2 v = Av = lambda*v, so lambda^2 = lambda), forcing lambda to be exactly 0 or 1 - no other values are possible for an idempotent matrix. The rank of an idempotent (also called a projection) matrix equals the number of eigenvalues equal to 1 counted with multiplicity (this is because idempotent matrices are always diagonalizable, with the 1-eigenspace being exactly the range/column space of the matrix). Since rank(A) = 2, there are exactly two eigenvalues equal to 1, and since A is 3x3 there must be one remaining eigenvalue, which is 0 (to satisfy trace and the total count of 3 eigenvalues). So the eigenvalues are 1, 1, 0, matching option C."
+},
+{
+  id: 'engmath-linear-algebra-x4',
+  q: 'A 4x4 matrix A has all diagonal entries equal to 3 and is upper triangular. What is det(A)?',
+  options: ['3', '12', '64', '81'],
+  answer: 3,
+  marks: 1,
+  difficulty: 'easy',
+  type: 'numerical',
+  explanation: "For any triangular matrix (upper or lower), the determinant equals the product of the diagonal entries - this follows directly from cofactor expansion, since every term in the full determinant expansion except the product of diagonal entries involves at least one entry below (for upper triangular) the diagonal, which is zero. Here all 4 diagonal entries equal 3, so det(A) = 3*3*3*3 = 3^4 = 81. This shortcut avoids any need for row reduction or full cofactor expansion - simply read off and multiply the diagonal. It is also consistent with the eigenvalue fact that eigenvalues of a triangular matrix are its diagonal entries, and det(A) equals the product of eigenvalues: here all four eigenvalues are 3, so det = 3^4 = 81 as well, confirming the answer via a second method."
+},
+{
+  id: 'engmath-linear-algebra-x5',
+  q: 'Matrix A has eigenvalues 2 (with algebraic multiplicity 1) and 3 (with algebraic multiplicity 2), and A is known to have only 2 linearly independent eigenvectors total. Which statement is correct?',
+  options: ['A is diagonalizable because it has distinct eigenvalues', 'A is diagonalizable regardless of multiplicities', 'A is NOT diagonalizable because eigenvalue 3\'s geometric multiplicity (1, from the single independent eigenvector it contributes) falls short of its algebraic multiplicity (2)', 'A cannot have repeated eigenvalues if it is a real matrix'],
+  answer: 2,
+  marks: 2,
+  difficulty: 'hard',
+  type: 'concept',
+  explanation: "A matrix is diagonalizable if and only if for EVERY eigenvalue, its geometric multiplicity (dimension of its eigenspace, i.e. number of linearly independent eigenvectors for that eigenvalue) equals its algebraic multiplicity (multiplicity as a root of the characteristic polynomial). Here eigenvalue 2 contributes 1 eigenvector (matching its algebraic multiplicity of 1, fine), but the total independent eigenvector count is only 2, meaning eigenvalue 3 (algebraic multiplicity 2) contributes only 1 independent eigenvector - its geometric multiplicity (1) is strictly less than its algebraic multiplicity (2). This shortfall means A is DEFECTIVE and cannot be diagonalized; it would instead require a Jordan block for the repeated eigenvalue. This directly refutes option A's flawed reasoning: having some repeated eigenvalues does not by itself block diagonalizability, but only when the geometric multiplicity actually falls short, as verified here by explicit eigenvector counting."
+}
+);
+
+window.GATE_DATA.questions['engmath'].topics.find(function(t){return t.id==='engmath-calculus';}).questions.push(
+{
+  id: 'engmath-calculus-x1',
+  q: 'Does the improper integral from 1 to infinity of 1/x^2 dx converge, and if so to what value?',
+  options: ['Diverges to infinity', 'Converges to 1', 'Converges to 1/2', 'Converges to 0'],
+  answer: 1,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'numerical',
+  explanation: "Evaluate as a limit: integral_1^infinity x^-2 dx = lim_{b->infinity} integral_1^b x^-2 dx = lim_{b->infinity} [-1/x]_1^b = lim_{b->infinity} (-1/b - (-1/1)) = lim_{b->infinity} (1 - 1/b) = 1 - 0 = 1. This converges to 1. This is a specific case of the general p-integral test: integral_1^infinity 1/x^p dx converges if and only if p > 1 (and diverges for p <= 1). Here p=2 > 1, so convergence is guaranteed even before computing the exact value; contrast with p=1 (integral of 1/x), which diverges (equals lim ln(b) = infinity), a frequently tested boundary case GATE likes to contrast against convergent p>1 examples like this one."
+},
+{
+  id: 'engmath-calculus-x2',
+  q: 'A rectangular sheet of cardboard of dimensions 12 cm by 12 cm has equal squares of side x cut from each corner, and the sides are folded up to form an open box. What value of x maximizes the box\'s volume?',
+  options: ['2', '3', '4', '6'],
+  answer: 0,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'numerical',
+  explanation: "After cutting squares of side x from each corner and folding up, the box has base side (12-2x) and height x, so volume V(x) = x(12-2x)^2 for 0 < x < 6. Expand: V(x) = x(144 - 48x + 4x^2) = 144x - 48x^2 + 4x^3. Differentiate: V'(x) = 144 - 96x + 12x^2. Set V'(x)=0: 12x^2 - 96x + 144 = 0, divide by 12: x^2 - 8x + 12 = 0, factor: (x-2)(x-6)=0, giving x=2 or x=6. Since x=6 makes the base side (12-12)=0 (degenerate, zero volume - a boundary minimum, not a valid maximum), the maximizing value is x=2. Verify via second derivative: V''(x) = -96 + 24x; at x=2, V''(2) = -96+48 = -48 < 0, confirming a local maximum. Maximum volume = V(2) = 2*(12-4)^2 = 2*64 = 128 cubic cm."
+},
+{
+  id: 'engmath-calculus-x3',
+  q: 'Given that f is an odd, continuous function on [-3,3] and integral_0^3 f(x) dx = 5, what is integral_{-3}^{3} (f(x) + 2) dx?',
+  options: ['5', '10', '12', '17'],
+  answer: 2,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'numerical',
+  explanation: "Split the integral using linearity: integral_{-3}^{3} (f(x)+2) dx = integral_{-3}^{3} f(x) dx + integral_{-3}^{3} 2 dx. Since f is odd, integral_{-3}^{3} f(x) dx = 0 automatically (positive and negative contributions cancel exactly by symmetry) - this holds REGARDLESS of the given value integral_0^3 f(x) dx=5, which is actually a distractor value not needed at all once oddness is recognized (in fact if f is genuinely odd, integral_0^3 f(x) dx and integral_{-3}^0 f(x) dx must be negatives of each other, so the given 5 only tells us about half the domain, consistent with the odd-function cancellation). The second piece: integral_{-3}^{3} 2 dx = 2 * (3-(-3)) = 2*6 = 12. Total = 0 + 12 = 12. The key insight GATE tests here is recognizing the odd-function symmetry shortcut immediately eliminates the f(x) term over the full symmetric interval, regardless of any specific numeric detail about f given elsewhere in the problem."
+},
+{
+  id: 'engmath-calculus-x4',
+  q: 'For which values of p does the improper integral integral_0^1 1/x^p dx converge?',
+  options: ['p > 1', 'p < 1', 'p >= 1', 'All real p'],
+  answer: 1,
+  marks: 2,
+  difficulty: 'hard',
+  type: 'concept',
+  explanation: "This is the integral near a singularity at x=0 (as opposed to the more familiar infinite-upper-limit case). Evaluate integral_epsilon^1 x^-p dx = [x^(1-p)/(1-p)]_epsilon^1 for p != 1, giving (1/(1-p)) - (epsilon^(1-p)/(1-p)). As epsilon -> 0+, the term epsilon^(1-p) tends to 0 only when the exponent (1-p) is POSITIVE, i.e. p < 1; if p > 1, then 1-p is negative, making epsilon^(1-p) = 1/epsilon^(p-1) blow up to infinity as epsilon->0. For p=1 exactly, the integral becomes integral of 1/x, giving -ln(epsilon), which also diverges to infinity as epsilon->0. So convergence happens exactly when p < 1 - the OPPOSITE condition from the integral_1^infinity 1/x^p dx case (which converges for p>1). This inversion is a classic GATE trap: near-zero singularities and near-infinity tails have exactly opposite convergence conditions on p, and mixing them up is the single most common error on this topic."
+},
+{
+  id: 'engmath-calculus-x5',
+  q: 'What is the value of integral_0^{pi/2} sin(x) - cos(x) dx?',
+  options: ['-1', '0', '1', '2'],
+  answer: 1,
+  marks: 1,
+  difficulty: 'easy',
+  type: 'numerical',
+  explanation: "Split and integrate each term: integral_0^{pi/2} sin(x) dx = [-cos(x)]_0^{pi/2} = -cos(pi/2) - (-cos(0)) = -0 - (-1) = 1. integral_0^{pi/2} cos(x) dx = [sin(x)]_0^{pi/2} = sin(pi/2) - sin(0) = 1 - 0 = 1. So integral_0^{pi/2} (sin(x)-cos(x)) dx = 1 - 1 = 0. This makes intuitive sense too: sin(x) and cos(x) are reflections of each other about x=pi/4 on this interval, so the area where sin exceeds cos (right half) exactly cancels the area where cos exceeds sin (left half), giving zero net signed area - a symmetry-based sanity check confirming the computed value without needing to redo the antiderivatives."
+}
+);
+
+window.GATE_DATA.questions['engmath'].topics.find(function(t){return t.id==='engmath-probability';}).questions.push(
+{
+  id: 'engmath-probability-x1',
+  q: 'A fair six-sided die is rolled once. Let X be the outcome shown. What is E[X | X > 3]?',
+  options: ['4', '4.5', '5', '5.5'],
+  answer: 3,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'numerical',
+  explanation: "Conditioning on X > 3 restricts the sample space to the outcomes {4, 5, 6}, each equally likely under the fair die (each retains equal conditional probability 1/3, since they were equally likely unconditionally). The conditional expectation is then just the plain average of these restricted outcomes: E[X | X>3] = (4+5+6)/3 = 15/3 = 5.5. This matches option D. The general rule is E[X|A] = sum over x in A of x * P(X=x | A), and when the underlying distribution is uniform, conditioning on a subset simply averages the values within that subset - a fast shortcut that avoids writing out the full conditional PMF explicitly when the base distribution is already uniform."
+},
+{
+  id: 'engmath-probability-x2',
+  q: 'The lifetime of a certain electronic component (in years) follows an Exponential distribution with mean 4 years. Given that the component has already survived 3 years, what is the probability it survives at least 2 more years?',
+  options: ['P(X > 2)', 'P(X > 5)', 'P(X > 3) * P(X > 2)', 'Cannot be determined without more information'],
+  answer: 0,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'concept',
+  explanation: "The Exponential distribution is the unique continuous memoryless distribution: P(X > s+t | X > s) = P(X > t) for all s, t >= 0. Here s=3 (years already survived) and t=2 (additional years), so P(X > 5 | X > 3) = P(X > 2) exactly - the component's remaining lifetime distribution, given it has survived this long, is identical to a fresh component's lifetime distribution. This is precisely why the Exponential is used to model failure processes with a constant hazard rate (no aging or wear-out effect built in). Concretely, with mean 4 (rate lambda = 1/4), P(X>2) = e^(-2/4) = e^(-0.5), but the question only asks to identify the correct memoryless simplification, not compute the numeric value. Option B looks tempting but is only equal to P(X>2) here specifically because of memorylessness - it is not generally true that P(X>s+t|X>s) equals the unconditional P(X>s+t) for other distributions."
+},
+{
+  id: 'engmath-probability-x3',
+  q: 'A joint distribution of discrete random variables X and Y is given by the table: P(X=0,Y=0)=0.1, P(X=0,Y=1)=0.2, P(X=1,Y=0)=0.3, P(X=1,Y=1)=0.4. What is the marginal probability P(X=1)?',
+  options: ['0.3', '0.4', '0.6', '0.7'],
+  answer: 2,
+  marks: 1,
+  difficulty: 'easy',
+  type: 'numerical',
+  explanation: "The marginal probability P(X=1) is obtained by summing the joint probabilities over all values of Y while holding X=1 fixed: P(X=1) = P(X=1,Y=0) + P(X=1,Y=1) = 0.3 + 0.4 = 0.7, matching option D. First confirm the table is a valid joint distribution: all four entries sum to 0.1+0.2+0.3+0.4 = 1.0, as required. This is the standard marginalization procedure: to get the marginal distribution of one variable from a joint table, sum (integrate, for continuous variables) over all values of the other variable. As a sanity check, P(X=0) = 0.1+0.2 = 0.3, and P(X=0)+P(X=1) = 0.3+0.7 = 1.0 as required for a valid marginal distribution."
+},
+{
+  id: 'engmath-probability-x4',
+  q: 'X and Y are independent random variables with Var(X) = 4 and Var(Y) = 9. What is the standard deviation of (X - Y)?',
+  options: ['sqrt(5)', 'sqrt(13)', '5', '13'],
+  answer: 1,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'numerical',
+  explanation: "For independent random variables, variances of a sum OR a difference both ADD (the subtraction does not subtract variances): Var(X - Y) = Var(X) + Var(-Y) = Var(X) + (-1)^2 * Var(Y) = Var(X) + Var(Y), since Var(cY) = c^2 * Var(Y) and (-1)^2 = 1. So Var(X-Y) = 4 + 9 = 13. Standard deviation = sqrt(Var(X-Y)) = sqrt(13). This matches option B. The most common error here is assuming Var(X-Y) = Var(X) - Var(Y) = 4 - 9 = -5, which is not only wrong but would be nonsensical (variance can never be negative) - the minus sign in X-Y gets squared away when computing variance, exactly like it does for standard deviation scaling, so independence-based variance addition applies identically whether combining via + or -."
+},
+{
+  id: 'engmath-probability-x5',
+  q: 'A random variable X is normally distributed with mean 50 and standard deviation 5. Using the standard normal transformation Z = (X - mu)/sigma, express P(X > 60) in terms of the standard normal CDF Phi.',
+  options: ['Phi(2)', '1 - Phi(2)', 'Phi(-2)', '1 - Phi(-2)'],
+  answer: 1,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'concept',
+  explanation: "Standardize: Z = (X - mu)/sigma = (60 - 50)/5 = 10/5 = 2. So P(X > 60) = P(Z > 2). By definition, the standard normal CDF Phi(z) = P(Z <= z), so P(Z > 2) = 1 - P(Z <= 2) = 1 - Phi(2). This matches option B. Options C and D involve Phi(-2), which by the symmetry of the standard normal equals 1 - Phi(2) as well (since Phi(-z) = 1 - Phi(z) for the symmetric standard normal) - so option D, '1 - Phi(-2)', actually simplifies to 1 - (1-Phi(2)) = Phi(2), which is a DIFFERENT (and wrong) value, illustrating why it's important to carefully track the direction of the inequality and the sign of z rather than pattern-matching superficially similar expressions."
+}
+);
