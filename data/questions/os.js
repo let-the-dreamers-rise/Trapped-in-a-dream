@@ -968,6 +968,167 @@ window.GATE_DATA.questions['os'] = {
           explanation: 'A page fault triggers a well-defined recovery sequence: the hardware traps into the operating system (switching to kernel mode), the OS determines which page was being referenced and locates it on secondary storage (or determines the reference was actually invalid, in which case the process is terminated instead), finds a free frame or selects and evicts a victim page if none is free, reads the required page into that frame from disk, updates the page table entry to reflect the new mapping, and finally restarts the very instruction that originally caused the fault (which now succeeds, since the required page is present). Terminating the process immediately, restarting before the page is actually loaded, or silently returning a default value would all produce an incorrect or crashing program, since the instruction genuinely needs that page\\u2019s actual data to proceed.'
         }
       ]
+    },
+    {
+      id: 'os-file-disk',
+      name: 'File Systems & Disk Scheduling',
+      theory: {
+        intro: 'This topic covers how files are physically laid out on disk and how the OS decides the order in which pending disk I/O requests are serviced. GATE\\u2019s file-allocation questions revolve around computing the maximum possible file size supported by an inode-style indexed allocation scheme (direct, single-, double-, and triple-indirect blocks) and understanding free-space-management structures like bitmaps, whose own size must sometimes be computed from the disk and block size. Disk-scheduling questions are pure computation: given a queue of cylinder requests and a starting head position, compute the total head movement (in cylinders) under FCFS, SSTF, SCAN, C-SCAN, and LOOK, and compare the results. These numericals are extremely mechanical once the algorithm\\u2019s rule is clear, and they show up almost every year in some form, often worth two marks each since a full trace is required.',
+        core: 'File allocation methods decide how a file\\u2019s data blocks are physically arranged on disk. Contiguous allocation stores a file as one unbounded run of consecutive blocks -- fast sequential AND direct access, but suffers external fragmentation and requires knowing the file\\u2019s final size in advance (or costly relocation to grow it). Linked allocation stores a file as a chain of blocks, each holding a pointer to the next; there is no external fragmentation and files can grow easily, but random/direct access is slow (must traverse the chain from the start) and reliability suffers if any single pointer is corrupted, breaking the entire chain from that point onward, and each block wastes a few bytes on the pointer itself. Indexed allocation gives each file one (or more) index block containing pointers to all of the file\\u2019s data blocks, supporting fast direct access without contiguous placement; the classic Unix inode extends this using direct pointers for small files plus single-, double-, and triple-indirect pointers to scale up to very large files without wasting a huge index block on small files.\n\nMaximum file size under an inode scheme: if a block holds B bytes and each pointer occupies P bytes, then one block can hold B/P pointers. With d direct pointers, one single-indirect pointer, one double-indirect pointer, and one triple-indirect pointer, the maximum file size is d x B (direct) + (B/P) x B (single indirect) + (B/P)^2 x B (double indirect) + (B/P)^3 x B (triple indirect). Because (B/P) is typically a large number (often 1024 for common block/pointer sizes), each successive indirection level scales the addressable space by roughly another factor of 1000, so the triple-indirect term dominates the total maximum file size overwhelmingly, while the direct blocks primarily exist to make small-file access fast (no indirection needed at all).\n\nThe FAT (File Allocation Table) method is a variant of linked allocation where the "next block" pointers for every file are collected into one single table (the FAT) kept in a reserved area of the disk, rather than scattered a few bytes inside each individual data block; this lets the OS traverse or cache the whole allocation chain in memory without repeatedly reading scattered blocks on disk, somewhat improving random-access performance over pure linked allocation while retaining the no-external-fragmentation benefit.\n\nFree space on disk must itself be tracked; common structures include: a bitmap (one bit per block, 1 = allocated / 0 = free -- compact and fast to scan for contiguous runs, but its own size scales with total disk capacity: total blocks / 8 bytes); a linked list of free blocks (no wasted space proportional to disk size beyond the list itself, but slow to find a contiguous run and consumes a pointer per free block); grouping (the first free block stores addresses of several other free blocks, forming a chain of chunks, speeding up finding many free blocks at once); and counting (since blocks are often freed and allocated in contiguous groups, store a starting block address plus a count of contiguous free blocks, compactly representing a whole run).\n\nDisk scheduling decides the ORDER in which a queue of pending cylinder requests is serviced, aiming to minimise total head movement (seek time is usually the dominant cost). FCFS services requests strictly in arrival order -- simple and fair but can produce long, erratic head movements. SSTF (Shortest Seek Time First) always services whichever pending request is closest to the current head position -- much better average movement than FCFS, but can cause starvation of far-away requests if closer requests keep arriving. SCAN moves the head in one direction, servicing every request it passes, all the way to the physical end of the disk (even if no request lies exactly there), then reverses direction and sweeps back. C-SCAN (Circular SCAN) also sweeps in one direction servicing requests, but upon reaching the end, it does NOT reverse and service on the way back; instead, it jumps immediately back to the opposite end of the disk and starts a fresh sweep in the same original direction, giving more uniform wait times since every cylinder is revisited via the same one-directional pattern. LOOK is a practical refinement of SCAN: instead of travelling all the way to the physical end of the disk, it reverses direction as soon as it has serviced the LAST request in the current direction, saving the wasted movement to and from the disk boundary that plain SCAN incurs.',
+        strategy: 'For file-allocation-size numericals, first compute B/P (pointers per block), since every subsequent term in the formula is a power of this same number -- get this one ratio right and the rest of the computation is just repeated multiplication. Recognise immediately that the triple-indirect term dominates the total by many orders of magnitude, so if a question only asks for an approximate maximum size, you can often ignore the direct and single-indirect contributions entirely and just compute (B/P)^3 x B. For disk-scheduling numericals, always begin by writing the request queue sorted by cylinder number as well as in original arrival order -- FCFS needs the arrival order, while SSTF, SCAN, C-SCAN, and LOOK are all easier to trace correctly once you can see the sorted layout relative to the current head position. For SCAN and C-SCAN, explicitly decide (or note the direction stated in the question) whether the head is moving toward increasing or decreasing cylinder numbers first, and remember that SCAN/C-SCAN travel all the way to the disk\\u2019s physical boundary (0 or the maximum cylinder) even if no pending request sits exactly there, while LOOK stops exactly at the last request in that direction. For C-SCAN specifically, be explicit about whether the return jump back to the starting boundary is counted in total head movement or treated as free (different textbooks/questions vary this convention) -- state the assumption you are using if the question does not make it explicit, since the final numeric answer depends entirely on this choice. Worked mini-example: head at 50, disk 0-199, pending requests 20, 45, 60, 90, 150, 175, moving up first. LOOK services 60, 90, 150, 175 (total movement so far 125), then reverses down through 45, 20 (another 155), for a total of 280 -- noticeably less than SCAN\\u2019s 328 for the identical queue, precisely because LOOK skips the unnecessary trip all the way out to cylinder 199 and back to 0.'
+      },
+      questions: [
+        {
+          id: 'os-file-disk-q1',
+          q: 'Which file allocation method allows the fastest direct (random) access to any block of a file while avoiding the requirement that the file occupy strictly consecutive disk blocks?',
+          options: ['Indexed allocation, using an index block of pointers to the file\\u2019s data blocks', 'Linked allocation, using a pointer stored in every data block', 'Contiguous allocation only', 'None of these methods support direct access'],
+          answer: 0,
+          marks: 1,
+          difficulty: 'easy',
+          type: 'concept',
+          explanation: 'Indexed allocation dedicates a separate index block to each file, holding the disk addresses (pointers) of every one of the file\\u2019s actual data blocks. To access any block of the file directly, the OS simply reads the index block once and then jumps straight to the correct data block using the appropriate pointer -- no traversal of a chain is needed, and the data blocks themselves need not be contiguous. Linked allocation, by contrast, requires walking the chain of pointers from the very first block to reach any later block, making random access slow. Contiguous allocation does support fast direct access too, but only because it forces the file into consecutive blocks, which is the very constraint the question asks to avoid, so indexed allocation is the better match.'
+        },
+        {
+          id: 'os-file-disk-q2',
+          q: 'A Unix-style inode has 10 direct block pointers, one single-indirect pointer, one double-indirect pointer, and one triple-indirect pointer. The block size is 4 KB and each pointer occupies 4 bytes, so exactly 1024 pointers fit in one block. Which component contributes the overwhelming majority of the maximum supported file size, and roughly how large is that maximum?',
+          options: ['The triple-indirect block, giving a maximum file size on the order of 4 TB', 'The direct blocks, giving a maximum file size on the order of 40 KB', 'The single-indirect block, giving a maximum file size on the order of 4 MB', 'The double-indirect block, giving a maximum file size on the order of 4 GB'],
+          answer: 0,
+          marks: 2,
+          difficulty: 'hard',
+          type: 'numerical',
+          explanation: 'Direct blocks contribute 10 x 4 KB = 40 KB. The single-indirect block contributes 1024 x 4 KB = 4 MB (1024 pointers, each pointing to a 4 KB block). The double-indirect block contributes 1024 x 4 MB = 4 GB (1024 single-indirect blocks worth). The triple-indirect block contributes 1024 x 4 GB = 4 TB (1024 double-indirect blocks worth). Summing all four gives approximately 4 TB + 4 GB + 4 MB + 40 KB, but since each level is roughly 1024 times larger than the one before it, the triple-indirect term of about 4 TB utterly dwarfs all the other contributions combined -- so the maximum file size is dominated overwhelmingly by the triple-indirect block, and the direct blocks exist mainly to make small-file access fast without any indirection overhead, not to contribute meaningfully to the maximum size.'
+        },
+        {
+          id: 'os-file-disk-q3',
+          q: 'What is the defining characteristic of the FAT (File Allocation Table) file-allocation method compared to plain linked allocation?',
+          options: ['The "next block" pointers for all files are collected into one central table stored in a reserved disk area, rather than embedded a few bytes inside each individual data block', 'FAT allocates every file as one strictly contiguous run of blocks', 'FAT requires every file to declare its final size in advance, like contiguous allocation', 'FAT eliminates the need for any free-space management structure'],
+          answer: 0,
+          marks: 1,
+          difficulty: 'medium',
+          type: 'concept',
+          explanation: 'FAT is fundamentally a variant of linked allocation: it still represents each file as a chain of blocks. The key difference is where the "next block" pointer information is stored -- instead of embedding a pointer inside each individual data block (as in classic linked allocation, wasting a few bytes per block and requiring a disk read of the data block itself just to find the next pointer), FAT collects every file\\u2019s complete chain of next-block pointers into one single, centralized table located in a reserved area of the disk. This table can be read into memory and cached, letting the OS traverse or even randomly jump through a file\\u2019s block chain without needing to read each data block on disk one at a time purely to discover the next pointer, somewhat improving performance while retaining linked allocation\\u2019s freedom from external fragmentation.'
+        },
+        {
+          id: 'os-file-disk-q4',
+          q: 'Which of the following is a standard technique for tracking free (unallocated) disk blocks?',
+          options: ['A bitmap with one bit per block (1 = allocated, 0 = free)', 'Storing the entire file system permanently in RAM to avoid needing free-space tracking', 'Recompiling the operating system whenever disk space changes', 'Using the file\\u2019s inode number as the only indicator of free space'],
+          answer: 0,
+          marks: 1,
+          difficulty: 'easy',
+          type: 'concept',
+          explanation: 'A bitmap (or bit vector) is one of the most common free-space-management structures: it dedicates exactly one bit to every block on the disk, with the bit set to 1 if that block is currently allocated and 0 if it is free. This representation is compact, and it is particularly convenient for quickly finding several contiguous free blocks by scanning for a run of consecutive 0 bits. Other standard techniques include a linked list of free blocks, a grouping scheme (where one free block stores the addresses of several other free blocks), and a counting scheme (storing a starting address plus a count of contiguous free blocks). Keeping the entire file system in RAM or tying free-space tracking to inode numbers are not real or standard techniques used by any actual file system.'
+        },
+        {
+          id: 'os-file-disk-q5',
+          q: 'A disk has a total capacity of 1 TB (2^40 bytes) and a block size of 4 KB (2^12 bytes). Using a bitmap with one bit per block, what is the total size of the bitmap needed to track free space on this entire disk?',
+          options: ['32 MB', '128 MB', '1 MB', '8 MB'],
+          answer: 0,
+          marks: 2,
+          difficulty: 'medium',
+          type: 'numerical',
+          explanation: 'The number of blocks on the disk is total capacity divided by block size: 2^40 / 2^12 = 2^28 blocks (about 268.4 million blocks). Since the bitmap uses exactly one bit per block, it needs 2^28 bits in total. Converting bits to bytes (dividing by 8, since 1 byte = 8 bits = 2^3 bits): 2^28 / 2^3 = 2^25 bytes. Since 2^20 bytes is defined as 1 MB, 2^25 bytes = 2^5 x 2^20 = 32 x 1 MB = 32 MB. So a 1 TB disk with 4 KB blocks requires a 32 MB bitmap purely to track which of its blocks are free or allocated -- illustrating why bitmap size itself becomes a real, non-negligible design consideration as disk capacities grow into the terabyte range.'
+        },
+        {
+          id: 'os-file-disk-q6',
+          q: 'A disk with cylinders numbered 0 to 199 has its head currently at cylinder 50. Pending requests arrive, and must be serviced strictly in this arrival order: 45, 90, 150, 60, 20, 175. Using FCFS disk scheduling, what is the total head movement (in cylinders)?',
+          options: ['395', '355', '410', '325'],
+          answer: 0,
+          marks: 2,
+          difficulty: 'medium',
+          type: 'numerical',
+          explanation: 'FCFS services requests strictly in the order they arrive, regardless of physical distance. Starting at 50: to 45 is |45-50| = 5; to 90 is |90-45| = 45; to 150 is |150-90| = 60; to 60 is |60-150| = 90; to 20 is |20-60| = 40; to 175 is |175-20| = 155. Summing these individual movements: 5 + 45 + 60 + 90 + 40 + 155 = 395 total cylinders of head movement. Notice how the erratic order (jumping from 150 down to 60, then further down to 20, then all the way up to 175) produces substantial wasted back-and-forth movement -- this inefficiency purely due to arrival order, regardless of physical proximity, is exactly the weakness that motivates smarter algorithms like SSTF, SCAN, and LOOK.'
+        },
+        {
+          id: 'os-file-disk-q7',
+          q: 'Using the same setup -- disk cylinders 0-199, head starting at 50, pending requests 45, 90, 150, 60, 20, 175 -- what is the total head movement under SSTF (Shortest Seek Time First) scheduling?',
+          options: ['290', '270', '310', '250'],
+          answer: 0,
+          marks: 2,
+          difficulty: 'medium',
+          type: 'numerical',
+          explanation: 'SSTF always picks whichever pending request is currently closest to the head. From 50, the closest is 45 (distance 5); move there. From 45, the closest remaining is 60 (distance 15); move there. From 60, the closest remaining is 90 (distance 30); move there. From 90, the closest remaining is 150 (distance 60); move there. From 150, the closest remaining is 175 (distance 25); move there. Finally, only 20 remains, at distance |175-20| = 155. Total movement: 5 + 15 + 30 + 60 + 25 + 155 = 290. Notice SSTF greedily grabs nearby requests first, leaving the lone far-away request (20) stranded until the very end, producing one large final jump -- this is exactly the mechanism by which SSTF can starve distant requests if new nearby requests kept arriving instead.'
+        },
+        {
+          id: 'os-file-disk-q8',
+          q: 'Using the same setup -- disk cylinders 0-199, head at 50, requests 45, 90, 150, 60, 20, 175 -- and assuming the head moves toward INCREASING cylinder numbers first, what is the total head movement under SCAN scheduling?',
+          options: ['328', '298', '348', '280'],
+          answer: 0,
+          marks: 2,
+          difficulty: 'hard',
+          type: 'numerical',
+          explanation: 'Moving upward from 50, SCAN services every request it passes in increasing order (60, 90, 150, 175), then continues all the way to the physical end of the disk at cylinder 199, even though no request sits exactly there. This upward leg covers 199 - 50 = 149 cylinders. SCAN then reverses direction and sweeps all the way down, servicing the remaining requests below the starting point (45, then 20) along the way, continuing conceptually to cylinder 0 as SCAN\\u2019s definition requires reaching the boundary -- but here the relevant movement is simply the distance from 199 down to the lowest request, 20, without needing to continue further since no requests exist below 20. This downward leg covers 199 - 20 = 179 cylinders. Total: 149 + 179 = 328 cylinders.'
+        },
+        {
+          id: 'os-file-disk-q9',
+          q: 'Using the same setup -- disk cylinders 0-199, head at 50, requests 45, 90, 150, 60, 20, 175 -- and assuming the head moves toward INCREASING cylinder numbers first, with the return jump distance counted as part of head movement, what is the total head movement under C-SCAN scheduling?',
+          options: ['393', '373', '413', '349'],
+          answer: 0,
+          marks: 2,
+          difficulty: 'hard',
+          type: 'numerical',
+          explanation: 'Moving upward from 50, C-SCAN services 60, 90, 150, and 175 along the way, then continues to the physical end of the disk at cylinder 199 -- this leg covers 199 - 50 = 149 cylinders. Unlike SCAN, C-SCAN does not reverse and service on the way back; instead, it jumps immediately back to the opposite end of the disk, cylinder 0, without servicing anything during this jump -- this repositioning covers the full disk width, 199 cylinders (counting this return jump as part of total head movement, per this question\\u2019s stated convention). From cylinder 0, C-SCAN then resumes moving in its original (increasing) direction, servicing the two remaining lower requests, 20 and then 45, along the way -- this final leg covers 45 - 0 = 45 cylinders. Total: 149 + 199 + 45 = 393 cylinders.'
+        },
+        {
+          id: 'os-file-disk-q10',
+          q: 'Using the same setup -- disk cylinders 0-199, head at 50, requests 45, 90, 150, 60, 20, 175 -- and assuming the head moves toward INCREASING cylinder numbers first, what is the total head movement under LOOK scheduling?',
+          options: ['280', '328', '260', '300'],
+          answer: 0,
+          marks: 2,
+          difficulty: 'medium',
+          type: 'numerical',
+          explanation: 'LOOK behaves exactly like SCAN except that it reverses direction as soon as it services the LAST pending request in the current direction, rather than continuing all the way to the disk\\u2019s physical boundary. Moving upward from 50, LOOK services 60, 90, 150, and finally 175 -- the last request in the upward direction -- covering 175 - 50 = 125 cylinders, and then immediately reverses (no need to continue up to 199, since there are no pending requests beyond 175). Moving downward from 175, LOOK services 45 and then 20 -- the last request in the downward direction -- covering 175 - 20 = 155 cylinders. Total: 125 + 155 = 280 cylinders, noticeably less than SCAN\\u2019s 328 for this identical request queue, precisely because LOOK avoids the wasted trips out to cylinders 199 and 0 that plain SCAN would make.'
+        },
+        {
+          id: 'os-file-disk-q11',
+          q: 'What is the main practical drawback of SSTF (Shortest Seek Time First) disk scheduling, despite its generally low average head movement?',
+          options: ['It can cause starvation of requests that are physically far from the current head position, if closer requests keep arriving continuously', 'It always produces strictly higher total head movement than FCFS', 'It requires the disk head to always start at cylinder 0', 'It cannot be implemented in software, only in disk-controller hardware'],
+          answer: 0,
+          marks: 1,
+          difficulty: 'medium',
+          type: 'concept',
+          explanation: 'SSTF greedily always chooses whichever pending request is currently nearest to the head, which minimises the seek distance for each individual step and generally yields a good average total head movement. However, if requests keep arriving in a cluster near the current head position, SSTF will keep servicing those nearby requests indefinitely, continually postponing any request that happens to be located far away -- in the worst case, such a far-away request could be delayed for an extremely long time or effectively "starved". This is precisely why algorithms like SCAN, C-SCAN, and LOOK, which sweep methodically across the whole disk in a bounded pattern, are often preferred in systems needing more predictable, bounded worst-case wait times, even though they may have slightly higher average movement than SSTF.'
+        },
+        {
+          id: 'os-file-disk-q12',
+          q: 'What is the key behavioural difference between SCAN and C-SCAN (Circular SCAN) disk scheduling?',
+          options: ['SCAN reverses direction and services requests on the way back after reaching the disk\\u2019s end; C-SCAN instead jumps back to the starting boundary without servicing anything during the jump, then sweeps again in the same original direction', 'SCAN only services requests below the current head position; C-SCAN only services requests above it', 'C-SCAN never reaches the physical end of the disk, unlike SCAN', 'SCAN and C-SCAN are identical algorithms with different names'],
+          answer: 0,
+          marks: 1,
+          difficulty: 'easy',
+          type: 'concept',
+          explanation: 'SCAN sweeps the head in one direction, servicing every request encountered along the way, all the way to the disk\\u2019s physical boundary, and then reverses course, sweeping back in the opposite direction and servicing requests it missed on the first pass. C-SCAN also sweeps in one direction servicing requests up to the boundary, but instead of reversing and servicing on the way back, it treats the disk as circular: it jumps immediately (without servicing any request during this jump) back to the opposite boundary, and then begins a fresh sweep in the SAME original direction as before. This circular, one-directional pattern gives C-SCAN much more uniform waiting times across all cylinders, since a request just missed by the head always waits roughly one full sweep, rather than sometimes waiting almost two full sweeps as can happen under plain SCAN.'
+        },
+        {
+          id: 'os-file-disk-q13',
+          q: 'How does LOOK differ from SCAN?',
+          options: ['LOOK reverses direction as soon as it services the last pending request in the current direction, without travelling all the way to the disk\\u2019s physical boundary; SCAN always travels all the way to the boundary regardless of where the last request lies', 'LOOK always travels further than SCAN for the same request queue', 'LOOK can only move in one fixed direction and never reverses', 'LOOK and SCAN differ only in which resource (CPU vs disk) they schedule'],
+          answer: 0,
+          marks: 1,
+          difficulty: 'medium',
+          type: 'concept',
+          explanation: 'SCAN, by definition, always sweeps the head all the way out to the disk\\u2019s physical boundary (cylinder 0 or the maximum cylinder number) before reversing direction, even if the last actual pending request in that direction was serviced well before reaching that boundary -- this trailing movement to and from the boundary is essentially wasted, since no request is being serviced during it. LOOK is a practical optimisation: it "looks ahead" at the remaining request queue and reverses direction immediately once it has serviced the LAST pending request in the current direction, never actually travelling all the way to the boundary unless a request genuinely exists there. This makes LOOK\\u2019s total head movement less than or equal to SCAN\\u2019s for any given request queue, as demonstrated numerically in questions 8 and 10 above (328 for SCAN versus 280 for LOOK on the identical queue).'
+        },
+        {
+          id: 'os-file-disk-q14',
+          q: 'Based on the computations in questions 7 and 10 above -- for the identical request queue (disk 0-199, head at 50, requests 45, 90, 150, 60, 20, 175) -- how does LOOK\\u2019s total head movement compare with SSTF\\u2019s total head movement?',
+          options: ['LOOK (280) is slightly less than SSTF (290) for this particular request queue', 'LOOK is always exactly equal to SSTF for any request queue', 'SSTF is always strictly better than LOOK for any request queue', 'LOOK is always worse than SSTF because it must reach the disk boundary'],
+          answer: 0,
+          marks: 2,
+          difficulty: 'hard',
+          type: 'numerical',
+          explanation: 'From the earlier traces, SSTF produces a total head movement of 290 cylinders on this request queue, greedily grabbing nearby requests but leaving cylinder 20 stranded for one large final jump of 155 cylinders. LOOK, sweeping methodically up to the last request in each direction (175, then 20) without any wasted detour to the disk boundary, produces a total of 280 cylinders. So for this SPECIFIC queue, LOOK slightly outperforms SSTF. This is not a general law, however -- there is no algorithm among SSTF, SCAN, C-SCAN, and LOOK that is universally best for every possible request queue and head position; each algorithm\\u2019s relative performance depends entirely on the specific spatial distribution of pending requests, which is exactly why GATE numericals require a full trace rather than relying on a memorised ranking.'
+        },
+        {
+          id: 'os-file-disk-q15',
+          q: 'What is a significant drawback of linked file allocation, where each data block stores a pointer to the next block of the file?',
+          options: ['Direct (random) access to a specific block requires sequentially traversing the chain from the very first block, and a single corrupted pointer breaks the chain for every block after it', 'It always causes severe external fragmentation, just like contiguous allocation', 'It cannot support files larger than one single disk block', 'It requires the entire file to be loaded into memory before any block can be read'],
+          answer: 0,
+          marks: 1,
+          difficulty: 'easy',
+          type: 'concept',
+          explanation: 'In linked allocation, to reach any particular block of a file -- say, the 100th block -- the OS must start at the first block and follow the chain of "next block" pointers one at a time, reading 99 blocks purely to find the pointers before it can even access the desired 100th block; this makes direct/random access very slow compared to indexed or contiguous allocation. Additionally, because each block\\u2019s only link to the rest of the file is its single pointer to the next block, if that pointer becomes corrupted or unreadable due to a disk error, every block after that point in the chain becomes permanently unreachable, since there is no independent way to know which block should logically follow. Linked allocation actually AVOIDS external fragmentation (any free block can be used, since the file need not be contiguous), and it fully supports files spanning arbitrarily many blocks, so options B and C are incorrect, and option D describes no real file-allocation scheme.'
+        }
+      ]
     }
   ]
 };
