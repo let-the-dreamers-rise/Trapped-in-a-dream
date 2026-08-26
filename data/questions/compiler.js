@@ -1586,3 +1586,136 @@ window.GATE_DATA.questions['compiler'].topics.find(function(t){return t.id==='co
     explanation: 'For an "ordinary" procedure — fixed number of parameters, fixed number of simple local variables, no locals whose size depends on run-time data — the compiler knows exactly how many bytes each field of the activation record needs, so the whole frame size is a compile-time constant, baked directly into the generated prologue/epilogue code. This breaks down precisely when a local has a size that cannot be determined until execution reaches that declaration — the classic example is a local array declared with a bound that is itself a run-time expression (a variable-length array, as in C99, or certain dynamic-array declarations). In that case the activation record\'s size is only fixed at the point the procedure is actually invoked (or even partway through, once the bound is evaluated), not earlier at compile time. Simply having many locals, having parameters, or being recursive does not by itself prevent compile-time size computation — recursion only requires multiple same-sized frames, not variable-sized ones. Option 2 is correct.'
   }
 );
+
+window.GATE_DATA.questions['compiler'].topics.find(function(t){return t.id==='compiler-optimization';}).questions.push(
+  {
+    id: 'compiler-optimization-x1',
+    q: 'A compiler rewrites the source statement x = 3 + 4 * 2; directly as x = 11; by evaluating the arithmetic at compile time. This transformation is called:',
+    options: ['Constant folding', 'Copy propagation', 'Dead code elimination', 'Loop-invariant code motion'],
+    answer: 0,
+    marks: 1,
+    difficulty: 'easy',
+    type: 'concept',
+    explanation: 'Constant folding is precisely the optimization of evaluating expressions whose operands are all known constants at compile time, replacing the whole expression with its computed value so the runtime never has to perform that arithmetic at all. Here 4 * 2 folds to 8, and 3 + 8 folds to 11, letting the compiler emit x = 11 directly. Copy propagation would apply if a variable holding a known value were substituted for another variable, not when raw numeric literals are combined. Dead code elimination removes computations whose results are never used, and loop-invariant code motion relocates computations out of loops — neither applies to a single non-loop assignment of a constant expression. Option 1 is correct.'
+  },
+  {
+    id: 'compiler-optimization-x2',
+    q: 'Given the code a = b; c = a + d;, an optimizer rewrites the second statement as c = b + d; (and, if a is now unused, removes the first statement too). The rewriting of a to b in the second statement is an example of:',
+    options: ['Strength reduction', 'Copy propagation', 'Induction variable elimination', 'Loop unrolling'],
+    answer: 1,
+    marks: 1,
+    difficulty: 'easy',
+    type: 'concept',
+    explanation: 'After the copy assignment a = b, the values of a and b are guaranteed equal (until either is reassigned), so any later use of a can legally be replaced by b instead — this substitution is exactly copy propagation. Its typical payoff, seen here, is that once every use of a has been rewritten to use b directly, the original copy statement a = b becomes dead code (its result is never read) and can be deleted by a subsequent dead code elimination pass — copy propagation and dead code elimination are classic partners, each enabling more work for the other. Strength reduction replaces expensive operations with cheaper ones, induction variable elimination is specific to loop counters, and loop unrolling duplicates loop bodies — none of these describe substituting one variable name for another known-equal one. Option 2 is correct.'
+  },
+  {
+    id: 'compiler-optimization-x3',
+    q: 'Inside a loop where i increases by exactly 1 on every iteration, the statement t = i * 4; (recomputing the multiplication from scratch each time) is replaced by maintaining t across iterations and updating it with t = t + 4; instead, eliminating the multiplication entirely. This transformation is known as:',
+    options: ['Dead code elimination', 'Common subexpression elimination', 'Strength reduction', 'Constant propagation'],
+    answer: 2,
+    marks: 1,
+    difficulty: 'medium',
+    type: 'concept',
+    explanation: 'Strength reduction replaces a computation with an equivalent but cheaper one, exploiting a known relationship between values across loop iterations. Here, because i increases by exactly 1 each pass and t always equals i * 4, incrementing t by the constant 4 each iteration produces exactly the same sequence of values as recomputing i * 4 from scratch every time, but addition is typically far cheaper than multiplication on real hardware. This is the textbook strength-reduction pattern applied to an induction variable (t here is a derived induction variable tracking i). It is not dead code (t is actively used), not CSE (there is no repeated identical expression to merge), and not constant propagation (i and t are not compile-time constants). Option 3 is correct.'
+  },
+  {
+    id: 'compiler-optimization-x4',
+    q: 'In the sequence x = 5; x = 10; print(x); the first assignment x = 5; can safely be removed by the compiler because:',
+    options: ['x = 5 is a syntax error', 'The value 5 assigned to x is never read by any statement before x is overwritten by x = 10; hence that assignment is dead code', 'The compiler always removes the first assignment to any variable', 'x = 5 and x = 10 are computed in parallel, so only one survives arbitrarily'],
+    answer: 1,
+    marks: 1,
+    difficulty: 'easy',
+    type: 'concept',
+    explanation: 'A statement is dead code, safe to eliminate, precisely when the value it computes is never used along any execution path before being overwritten (or the program ends). Here, between x = 5 and the very next statement x = 10, there is no read of x anywhere, so the value 5 is completely discarded before anyone could observe it — removing x = 5 changes nothing about the program\'s observable behavior. Only the final value assigned before a use, here 10, matters, and it is what print(x) actually sees. This is a straightforward instance of dead-store elimination, a common special case of dead code elimination applied specifically to assignments. Option 2 is correct.'
+  },
+  {
+    id: 'compiler-optimization-x5',
+    q: 'In the loop: for (i = 0; i < n; i++) { t = a * b; arr[i] = t + i; } — assuming a and b are never modified inside the loop, the statement t = a * b; is a good candidate for:',
+    options: ['Dead code elimination, since t is never used', 'Loop-invariant code motion, hoisting t = a * b; to just before the loop begins, since it computes the same value on every iteration', 'Strength reduction, replacing the multiplication with repeated addition inside the loop', 'Induction variable elimination, since t behaves like a loop counter'],
+    answer: 1,
+    marks: 1,
+    difficulty: 'medium',
+    type: 'concept',
+    explanation: 'A computation is loop-invariant if none of the operands it depends on change during any iteration of the loop; here a and b are stated to be unmodified throughout, so a * b evaluates to the exact same value on every single pass, making it pure wasted redundant work to recompute it n times. Hoisting the statement t = a * b; to execute exactly once, immediately before the loop starts, produces an identical result on every iteration while doing the multiplication only once — this is loop-invariant code motion. t is certainly used (inside arr[i] = t + i), ruling out dead code elimination; there is no per-iteration relationship between t and the loop counter that would make strength reduction or induction-variable treatment relevant, since t does not change value across iterations at all. Option 2 is correct.'
+  },
+  {
+    id: 'compiler-optimization-x6',
+    q: 'Inside a loop, j is updated by j = j + 4; on every iteration in lockstep with i being updated by i = i + 1;, such that j always equals 4*i + constant throughout the loop\'s execution, and j is never used for anything except this bookkeeping. If i is otherwise unused inside the loop body except to drive this relationship, which optimization allows the compiler to eliminate i and its update entirely, retaining only j?',
+    options: ['Dead code elimination alone, with no relationship to i and j needed', 'Induction variable elimination, since j is a linear function of i and can be maintained on its own without ever needing i\'s actual value', 'Common subexpression elimination', 'Loop unrolling'],
+    answer: 1,
+    marks: 2,
+    difficulty: 'hard',
+    type: 'concept',
+    explanation: 'When one loop variable (j) is discovered to be an affine (linear) function of another (i) — here j = 4*i + constant, maintained consistently every iteration via j = j + 4 exactly matching i = i + 1 scaled by 4 — the compiler can recognize j as a derived induction variable and maintain it directly with cheap additive updates, without ever needing to compute or store i\'s actual value at all, as long as nothing else in the loop depends on i itself. If the only remaining purpose of i was to drive this relationship, i and its update can be deleted outright once j is self-sufficient — this combined recognition-and-removal is called induction variable elimination (which typically also relies on strength reduction to have set j up as an additive update in the first place). Plain dead code elimination alone would not discover that j substitutes for i; it merely removes unused writes once that substitution is already established. Option 2 is correct.'
+  },
+  {
+    id: 'compiler-optimization-x7',
+    q: 'Consider this three-address code listing (line numbers shown for reference):\n1: x = 0\n2: i = 1\n3: if i > 10 goto 7\n4: x = x + i\n5: i = i + 1\n6: goto 3\n7: print x\nHow many basic blocks does this code contain?',
+    options: ['3', '4', '5', '6'],
+    answer: 1,
+    marks: 2,
+    difficulty: 'hard',
+    type: 'numerical',
+    explanation: 'Apply the three leader rules. Rule 1: instruction 1 is a leader (first instruction). Rule 2 (jump targets are leaders): instruction 7 is the target of the conditional jump at line 3, and instruction 3 is the target of the unconditional jump at line 6 — both are leaders. Rule 3 (instruction right after any jump is a leader): instruction 4 immediately follows the conditional jump at line 3, so it is a leader (instruction 7, immediately following the goto at line 6, is already a leader from rule 2). The complete leader set is {1, 3, 4, 7}. Partitioning into blocks between consecutive leaders gives: B1 = {1, 2}, B2 = {3}, B3 = {4, 5, 6}, B4 = {7} — exactly 4 basic blocks. A common miscount is merging 1 and 3 (forgetting 3 is a jump target) or splitting 4,5,6 further (forgetting that only jump instructions and their targets create new blocks, not every instruction). Option 2 is correct.'
+  },
+  {
+    id: 'compiler-optimization-x8',
+    q: 'Consider the straight-line code: 1: a = b + c; 2: d = a * 2; 3: a = e - f; 4: print(d, a); — is the value of a computed by statement 1 still live immediately after statement 2 executes (i.e., in the gap just before statement 3 runs)?',
+    options: ['Yes, because a is used again later in the code, at statement 4', 'No, because the only use of statement 1\'s value of a is at statement 2, and statement 3 redefines a with a completely new value before any further use', 'Yes, because a is a global variable and globals are always considered live', 'It cannot be determined without seeing the rest of the program'],
+    answer: 1,
+    marks: 1,
+    difficulty: 'medium',
+    type: 'concept',
+    explanation: 'A variable\'s value is live at a program point if there exists some later use of that specific value along some execution path before it gets overwritten. The value of a produced by statement 1 (b + c) is used exactly once, by statement 2 (d = a * 2). Immediately after statement 2 runs, that particular value of a has no remaining uses ahead of it: the very next thing that happens to a is statement 3 completely overwriting it with e - f, and it is THAT new value which reaches statement 4\'s print. So the statement-1 value of a is dead right after statement 2, even though "the variable named a" is read again later — liveness tracks specific values reaching specific uses, not just whether the name a appears again. Option 2 is correct.'
+  },
+  {
+    id: 'compiler-optimization-x9',
+    q: 'In the loop: for (i = 0; i < n; i++) { x = a * b; y = arr[i] + x; z = c + d; } — assuming a, b, c, d are never assigned inside the loop, which statement(s) are loop-invariant and can be safely hoisted above the loop?',
+    options: ['Only y = arr[i] + x;', 'Both x = a * b; and z = c + d;, but not y = arr[i] + x;', 'All three statements are loop-invariant', 'None of the statements are loop-invariant'],
+    answer: 1,
+    marks: 2,
+    difficulty: 'hard',
+    type: 'concept',
+    explanation: 'A statement is loop-invariant if every operand it uses either never changes inside the loop, or is itself defined (once and only once, reaching this use) by another loop-invariant computation. x = a * b; depends only on a and b, both stated to be unmodified throughout the loop, so it computes the identical value on every iteration and is invariant. Similarly, z = c + d; depends only on c and d, also unmodified, so it too is invariant. In contrast, y = arr[i] + x; depends on arr[i], which changes value every iteration because the index i itself changes — this makes y genuinely different on each pass, so it cannot be hoisted regardless of x being invariant. Hoisting x and z out of the loop lets each be computed exactly once instead of n times, while y must remain inside since its value legitimately varies with i. Option 2 is correct.'
+  },
+  {
+    id: 'compiler-optimization-x10',
+    q: 'In the straight-line sequence: a = 1; b = 2; a = 3; c = a + b; print(c); how many of the statements can be removed by dead code elimination without changing the program\'s output?',
+    options: ['0', '1', '2', '3'],
+    answer: 1,
+    marks: 2,
+    difficulty: 'medium',
+    type: 'numerical',
+    explanation: 'Trace which assigned values actually get used. a = 1; assigns a value to a, but before a is ever read, it is immediately overwritten by a = 3; — so the value 1 is never observed by any later statement, making a = 1; a dead store that can be deleted with zero effect on behavior. b = 2; IS used, since c = a + b; reads b, so it must stay. a = 3; is also used, by that same statement c = a + b;, so it must stay. c = a + b; and print(c); are both needed to produce the visible output. Only one statement, a = 1;, is eliminable as dead code — removing it, and only it, leaves the program\'s behavior completely unchanged. Option 2 is correct.'
+  },
+  {
+    id: 'compiler-optimization-x11',
+    q: 'A loop repeatedly computes address = base + i * elementSize; where i is the loop counter incremented by 1 each iteration and base and elementSize never change. Replacing the per-iteration multiplication with an accumulating variable that is simply increased by elementSize each iteration (instead of recomputing i * elementSize from scratch) is a direct application of:',
+    options: ['Strength reduction', 'Dead code elimination', 'Global common subexpression elimination', 'Constant folding'],
+    answer: 0,
+    marks: 1,
+    difficulty: 'easy',
+    type: 'concept',
+    explanation: 'This is the textbook motivating example for strength reduction: address computation inside array-indexing loops. Since i increases by a fixed amount (1) each iteration, i * elementSize also increases by a fixed amount (elementSize) each iteration, so instead of performing a multiplication every single pass, the compiler can maintain a running total that starts at base and is simply incremented by elementSize on each iteration — trading an expensive multiply for a cheap add, with identical results. It is not dead code (the address is used), not CSE (there is no single repeated identical expression being merged across the code, just a per-iteration recomputation pattern), and not constant folding (elementSize and i are not both known at compile time in general). Option 1 is correct.'
+  },
+  {
+    id: 'compiler-optimization-x12',
+    q: 'Consider the loop: for (i = 0; i < n; i++) { x[i] = i * 5 + k; } where k is a variable never modified inside the loop. Which combination of optimizations best applies to efficiently compute i * 5 across all iterations, without touching how k is used?',
+    options: ['Loop-invariant code motion applied to i * 5, since it does not depend on the loop', 'Strength reduction / induction-variable optimization: introduce a new variable t, initialized to 0 before the loop and incremented by 5 each iteration, replacing i * 5 with t on each pass', 'Dead code elimination, since i * 5 is never actually used', 'Constant folding, since i * 5 can be computed once at compile time'],
+    answer: 1,
+    marks: 2,
+    difficulty: 'hard',
+    type: 'pyq-style',
+    explanation: 'i * 5 is NOT loop-invariant (it changes every iteration since i changes), so loop-invariant code motion does not apply — that rules out option 1. It is also clearly used (to compute x[i]), so dead code elimination is inapplicable, and i is not a compile-time constant, so constant folding cannot apply either. What does apply is strength reduction combined with induction-variable recognition: since i increases by 1 each iteration, i * 5 increases by exactly 5 each iteration, so a new induction variable t can be initialized to 0 (matching i=0 giving i*5=0) before the loop and simply incremented by 5 every iteration, replacing every use of i * 5 inside the loop with t — turning a per-iteration multiplication into a per-iteration addition while leaving k, which does not participate in this relationship, untouched. Option 2 is correct.'
+  },
+  {
+    id: 'compiler-optimization-x13',
+    q: 'A compiler simplifies the expression x = (2 * n) / 2; (where n is an arbitrary runtime variable, not a compile-time constant) directly to x = n; using the algebraic identity that multiplying then dividing by the same nonzero constant cancels out. This transformation is best classified as:',
+    options: ['Constant folding, since 2 and 2 are constants', 'Algebraic simplification (an identity-based simplification, distinct from constant folding since n itself is not a known constant)', 'Dead code elimination', 'Loop-invariant code motion'],
+    answer: 1,
+    marks: 1,
+    difficulty: 'medium',
+    type: 'concept',
+    explanation: 'Constant folding specifically evaluates expressions in which every operand is a known constant, collapsing them to a single computed constant value — but here n is an arbitrary runtime variable, so the expression as a whole cannot be folded down to one fixed number at compile time; the result x = n; still depends on a runtime value. What is actually happening is algebraic simplification: the compiler recognizes the mathematical identity (2 * n) / 2 = n (for the constant factor 2, ignoring edge-case concerns like integer overflow) and rewrites the expression into an equivalent, cheaper one, eliminating both the multiplication and the division entirely. This is a distinct, closely related sibling optimization to constant folding and strength reduction, applying general algebraic identities rather than either pure constant evaluation or an induction-variable-driven operator swap. Option 2 is correct.'
+  }
+);
