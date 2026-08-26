@@ -799,3 +799,166 @@ window.GATE_DATA.questions['coa'] = {
       ]
     }
 ]};
+
+window.GATE_DATA.questions['coa'].topics.find(function(t){return t.id==='coa-instructions';}).questions.push(
+  {
+    id: 'coa-instructions-x1',
+    q: 'In a three-address instruction ADD R1, R2, R3, what is the effect on the registers?',
+    options: ['R1 = R1 + R2, and R3 is unused', 'R3 = R1 + R2', 'R1 = R2 + R3', 'R2 = R1 + R3'],
+    answer: 2,
+    marks: 1,
+    difficulty: 'easy',
+    type: 'concept',
+    explanation: 'A three-address instruction names a separate destination and two separate sources, so none of the operands need to be destroyed to hold the result. The convention (matching GATE and most textbooks) lists the destination first, so ADD R1, R2, R3 means R1 = R2 + R3: R2 and R3 supply the operands and R1 receives the sum, both R2 and R3 remaining unchanged. This is why three-address code is the natural target for compilers generating intermediate representations — every temporary gets its own name. The wrong options either reuse an operand as destination (two-address behaviour) or place the destination in the wrong field.'
+  },
+  {
+    id: 'coa-instructions-x2',
+    q: 'A machine uses 16-bit instructions. Two-address instructions use two 5-bit address fields, leaving 6 bits for the opcode. If 40 of the 64 possible opcode patterns are used for two-address instructions, what is the maximum number of one-address instructions obtainable via expanding opcodes?',
+    options: ['640', '768', '384', '1024'],
+    answer: 1,
+    marks: 2,
+    difficulty: 'medium',
+    type: 'numerical',
+    explanation: 'The 6-bit opcode field gives 2^6 = 64 patterns. Two-address instructions consume 40, leaving 64 − 40 = 24 unused patterns. Each unused pattern can be extended into the next 5-bit address field to create new opcodes, so each yields 2^5 = 32 one-address instructions. Maximum count = 24 × 32 = 768. The remaining 5-bit field still serves as the single address of each new instruction. A common slip is multiplying by 64 instead of the freed field width (32), or forgetting to subtract the 40 already-used patterns before multiplying.'
+  },
+  {
+    id: 'coa-instructions-x3',
+    q: 'A 12-bit instruction format has two 4-bit address fields, leaving 4 bits for the opcode (16 patterns). 10 patterns are used for two-address instructions. Of the 6 remaining patterns, each expands to give a maximum of 16 one-address instructions using one freed 4-bit field; 80 of those possible one-address instructions are actually used, leaving the rest unused. What is the maximum number of zero-address instructions obtainable by expanding the unused one-address patterns into the last 4-bit field?',
+    options: ['96', '160', '256', '16'],
+    answer: 2,
+    marks: 2,
+    difficulty: 'hard',
+    type: 'numerical',
+    explanation: 'Six unused two-address opcode patterns each free 8 bits (two 4-bit fields), giving a maximum of 6 × 2^4 = 96 one-address opcodes. Of these 96, only 80 are used, leaving 96 − 80 = 16 unused one-address patterns. Each of those 16 patterns can absorb the second freed 4-bit field to create zero-address instructions, giving 16 × 2^4 = 256. This is a three-level expanding-opcode chain: two-address → one-address → zero-address, and each level multiplies the leftover count by 2^(bits of the next freed field). A frequent error is expanding all 96 one-address slots instead of only the 16 that remain unused.'
+  },
+  {
+    id: 'coa-instructions-x4',
+    q: 'For the expression X = A*B + C*D on a two-address machine (where an operation like MUL R,S computes R = R*S, overwriting R), using MOV, MUL, ADD, what is the minimum number of instructions needed, assuming two scratch registers are available?',
+    options: ['4', '5', '6', '7'],
+    answer: 2,
+    marks: 2,
+    difficulty: 'medium',
+    type: 'numerical',
+    explanation: 'Sequence: MOV R1,A; MUL R1,B (R1=A*B); MOV R2,C; MUL R2,D (R2=C*D); ADD R1,R2 (R1=A*B+C*D); MOV X,R1 — six instructions total. Two-address operations destroy one operand, so each product must first be loaded into its own register with a MOV before multiplying, and the final sum must be explicitly stored to X. Students commonly forget the initial MOVs (thinking MUL A,B is legal when A is a memory location, not a register) or forget the final store, undercounting to 4 or 5.'
+  },
+  {
+    id: 'coa-instructions-x5',
+    q: 'For the same expression X = A*B + C*D, on a one-address (accumulator) machine with LOAD, STORE, MUL, ADD (each combining the accumulator with a memory operand), what is the minimum number of instructions, given one temporary memory location T?',
+    options: ['5', '6', '7', '8'],
+    answer: 2,
+    marks: 2,
+    difficulty: 'medium',
+    type: 'numerical',
+    explanation: 'Sequence: LOAD A; MUL B (AC=A*B); STORE T; LOAD C; MUL D (AC=C*D); ADD T (AC=A*B+C*D); STORE X — seven instructions. An accumulator machine can hold only one running value, so the first product must be evicted to a temporary T before the second product is computed, and it is added back in afterward. This is one more instruction than the two-address version because there is no second register to hold the first product simultaneously — the extra STORE/LOAD-via-T pair reflects that limitation.'
+  },
+  {
+    id: 'coa-instructions-x6',
+    q: 'For the same expression X = A*B + C*D, on a zero-address (stack) machine using PUSH, POP, MUL, ADD, what is the minimum number of instructions required?',
+    options: ['6', '7', '8', '9'],
+    answer: 2,
+    marks: 2,
+    difficulty: 'hard',
+    type: 'numerical',
+    explanation: 'Sequence: PUSH A; PUSH B; MUL (pops A,B, pushes A*B); PUSH C; PUSH D; MUL (pushes C*D); ADD (pops both products, pushes their sum); POP X — eight instructions. Every operand needs an explicit PUSH since operators only work on the top of stack implicitly, and the final result must be explicitly popped out to X. This mirrors the pattern of stack evaluation of a postfix expression A B * C D * +, which has 7 symbols, plus the mandatory final POP to store the answer, giving 8 total instructions.'
+  },
+  {
+    id: 'coa-instructions-x7',
+    q: 'An instruction computes its effective address as EA = (contents of register R) + (constant offset in the instruction), where R itself is never modified by the instruction. Which addressing mode is this?',
+    options: ['Indexed addressing with an auto-incrementing index register', 'Base-register (displacement) addressing', 'PC-relative addressing', 'Register indirect addressing'],
+    answer: 1,
+    marks: 1,
+    difficulty: 'easy',
+    type: 'concept',
+    explanation: 'This is base-register addressing: a base register holds a fixed reference address (e.g., the start of an array or activation record) and a constant offset in the instruction selects a specific field or element, with the register itself unchanged from instruction to instruction. It is distinguished from indexed addressing, where the roles are reversed — the offset (base) stays constant across a loop while the index register is incremented on each iteration to walk through consecutive elements. PC-relative uses the program counter specifically as the register, not any general register, and register indirect uses no offset at all.'
+  },
+  {
+    id: 'coa-instructions-x8',
+    q: 'An instruction encodes a signed displacement that is added to the value of the program counter after the counter has already advanced past the instruction, to compute the branch target. Which addressing mode does this describe?',
+    options: ['Direct addressing', 'PC-relative addressing', 'Base addressing', 'Immediate addressing'],
+    answer: 1,
+    marks: 1,
+    difficulty: 'easy',
+    type: 'concept',
+    explanation: 'Adding a signed offset to the already-updated program counter to compute a target address is exactly PC-relative addressing, the standard mechanism for compact, position-independent branch instructions. Because the effective address is expressed relative to the current instruction rather than as an absolute value, the same object code runs correctly no matter where it is loaded in memory — a key requirement for relocatable code and shared libraries. Direct addressing would instead embed the full absolute target address; base addressing uses an arbitrary general register, not specifically the PC; and immediate addressing would use the offset itself as the final operand value, not as an address.'
+  },
+  {
+    id: 'coa-instructions-x9',
+    q: 'Which of the following is characteristic of a RISC instruction set architecture rather than a CISC one?',
+    options: ['A large number of complex, variable-length instructions and many addressing modes', 'Fixed-length instructions and a load-store architecture with a small number of addressing modes', 'Direct memory operands allowed for arithmetic instructions', 'Extensive use of microprogrammed control for most instructions'],
+    answer: 1,
+    marks: 1,
+    difficulty: 'medium',
+    type: 'concept',
+    explanation: 'RISC designs favour fixed-length, simple instructions and a load-store model where only LOAD and STORE touch memory; all arithmetic operates on registers. This regularity keeps the pipeline simple, since instruction decode and register-field extraction are uniform across all instructions. CISC, by contrast, packs richer functionality into each instruction — variable lengths, memory operands directly in arithmetic instructions, many addressing modes — which reduces code size and instruction count but complicates decoding and typically requires microprogrammed control. Options describing variable-length, memory-operand arithmetic, or heavy microcode use are hallmarks of CISC, the opposite of what the question asks.'
+  },
+  {
+    id: 'coa-instructions-x10',
+    q: 'Why do many CISC processors rely on a microprogrammed control unit rather than hardwired control?',
+    options: ['Microprogramming always executes faster than hardwired control', 'The large and irregular instruction set with many variable-format instructions is easier to implement and modify as stored microcode', 'Microprogrammed control eliminates the need for a control store', 'Hardwired control cannot generate more than one control signal per cycle'],
+    answer: 1,
+    marks: 1,
+    difficulty: 'medium',
+    type: 'concept',
+    explanation: 'CISC instruction sets typically include many complex, variable-length, and sometimes rarely used instructions. Implementing each as custom hardwired logic would be extremely complex to design, verify, and later modify. Microprogrammed control instead stores each instruction\'s control-signal sequence as microcode in a control store (ROM/PLA), so adding, fixing, or extending instructions mainly means rewriting microprogram entries rather than redesigning combinational logic. The trade-off is speed: microprogrammed control is generally slower than hardwired control because it must fetch and decode each microinstruction, which is why fast RISC processors overwhelmingly use hardwired control for their smaller instruction sets.'
+  },
+  {
+    id: 'coa-instructions-x11',
+    q: 'A processor architecture uses a three-address, register-to-register instruction format, has exactly 100 distinct opcodes and 32 general-purpose registers, and rounds instruction length up to the nearest multiple of 8 bits. What is the minimum instruction length?',
+    options: ['16 bits', '22 bits', '24 bits', '32 bits'],
+    answer: 2,
+    marks: 2,
+    difficulty: 'hard',
+    type: 'numerical',
+    explanation: 'Opcode bits needed = ceil(log2 100) = 7, since 2^6 = 64 is too small but 2^7 = 128 suffices. Each register field needs ceil(log2 32) = 5 bits, and a three-address register format has three such fields, needing 15 bits. Total = 7 + 15 = 22 bits. Rounding up to the next multiple of 8 gives 24 bits (3 bytes) — 22 bits is not byte-aligned, and hardware and memory systems overwhelmingly prefer byte-aligned instruction fetches, so the format is padded to 24 bits even though only 22 are functionally used. A common error is stopping at the unrounded 22 bits, ignoring the alignment requirement stated in the question.'
+  },
+  {
+    id: 'coa-instructions-x12',
+    q: 'An instruction set architecture must encode 300 distinct opcodes. What is the minimum number of bits needed for the opcode field?',
+    options: ['8', '9', '10', '50'],
+    answer: 1,
+    marks: 1,
+    difficulty: 'medium',
+    type: 'numerical',
+    explanation: 'The opcode field must have at least ceil(log2 300) bits. Since 2^8 = 256 is less than 300, 8 bits are insufficient; 2^9 = 512 comfortably covers 300 distinct codes, so 9 bits is the minimum. This ceil(log2 N) computation for "minimum bits to represent N distinct items" recurs throughout instruction-encoding and addressing questions — whether counting opcodes, registers, or addressable memory locations — and the recurring trap is rounding down instead of up, or confusing floor(log2 N) with ceil(log2 N) when N is not itself a power of two.'
+  },
+  {
+    id: 'coa-instructions-x13',
+    q: 'A processor has 20 general-purpose registers. What is the minimum number of bits required to specify one register in an instruction field?',
+    options: ['4', '5', '20', '10'],
+    answer: 1,
+    marks: 1,
+    difficulty: 'medium',
+    type: 'numerical',
+    explanation: 'To uniquely address 20 registers, the field needs ceil(log2 20) bits. Since 2^4 = 16 is fewer than 20 registers, 4 bits cannot distinguish all of them; 2^5 = 32 is enough room, so 5 bits is the minimum, leaving 12 patterns unused (which real designs often reserve for future registers or special encodings). The wrong option of 20 bits confuses "number of registers" with "bits needed to encode them" — a one-hot-style misunderstanding — while 10 bits vastly over-provisions when 5 already suffices.'
+  },
+  {
+    id: 'coa-instructions-x14',
+    q: 'An instruction format has a 6-bit opcode, two 2-bit addressing-mode fields (one per operand, since 4 modes are supported), and two 4-bit register fields (one per operand). What is the minimum total instruction length in bits?',
+    options: ['16', '18', '20', '24'],
+    answer: 1,
+    marks: 2,
+    difficulty: 'hard',
+    type: 'numerical',
+    explanation: 'Sum the fields: opcode 6 bits, plus two addressing-mode fields at 2 bits each = 4 bits, plus two register fields at 4 bits each = 8 bits. Total = 6 + 4 + 8 = 18 bits. Each field size is independently justified: 4 addressing modes need ceil(log2 4) = 2 bits, and each register field width is given directly as 4 bits in the problem. The trap is forgetting one of the four non-opcode fields (there are two mode fields and two register fields, one pair per operand, not just one of each), which yields an undercount of 14 or 16.'
+  },
+  {
+    id: 'coa-instructions-x15',
+    q: 'An instruction specifies a register that holds the address of an operand; after the operand is accessed, the register is automatically increased by the size (in bytes) of the operand just accessed. Which addressing mode is this?',
+    options: ['Register indirect addressing', 'Auto-increment addressing', 'Indexed addressing', 'Base addressing'],
+    answer: 1,
+    marks: 1,
+    difficulty: 'easy',
+    type: 'concept',
+    explanation: 'This is auto-increment addressing: like register indirect, the register supplies the effective address of the operand, but as a side effect of the access the register is bumped forward by the size of the datum just read or written. This makes it ideal for stepping sequentially through an array or a stack without a separate increment instruction. Plain register indirect leaves the register unchanged after access. Indexed addressing instead computes the address as a base plus a separately-specified index/offset rather than modifying the pointer register itself, and base addressing keeps its register fixed across accesses.'
+  },
+  {
+    id: 'coa-instructions-x16',
+    q: 'A fixed 32-bit instruction format reserves 6 bits for the opcode and splits the remaining bits equally between two memory-address fields. If the memory is word-addressable, what is the maximum number of memory words directly addressable by one such address field?',
+    options: ['4096', '8192', '16384', '65536'],
+    answer: 1,
+    marks: 2,
+    difficulty: 'medium',
+    type: 'numerical',
+    explanation: 'After removing the 6-bit opcode, 32 − 6 = 26 bits remain, split equally between the two address fields, giving 13 bits per field. With a word-addressable memory, a field of w bits can directly name 2^w distinct words, so each field addresses 2^13 = 8192 words. A common mistake is dividing 32 (not 26) by 2 to get 16 bits per field, forgetting to first subtract the opcode; another is computing 2^12 or 2^14 from an off-by-one slip in the bit count.'
+  }
+);

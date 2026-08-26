@@ -324,6 +324,167 @@ window.GATE_DATA.questions['os'] = {
           explanation: 'FCFS dispatches processes strictly in arrival order and, once a process is given the CPU, lets it run to completion (or until it voluntarily blocks for I/O); it never forcibly preempts a running process to give the CPU to another ready process. SRTF, by definition, preempts the currently running process the moment a ready process with a smaller remaining burst becomes available. Round Robin forcibly preempts a running process once its time quantum expires. Preemptive priority scheduling, by its very name, forcibly preempts a running process whenever a higher-priority process becomes ready. Hence FCFS is the odd one out as purely non-preemptive.'
         }
       ]
+    },
+    {
+      id: 'os-sync',
+      name: 'Process Synchronization',
+      theory: {
+        intro: 'Whenever multiple processes or threads share data, uncoordinated concurrent access can corrupt that data -- this is a race condition, and preventing it is the job of process synchronization. GATE builds a large fraction of its OS marks around this topic: the three formal requirements of a critical-section solution (mutual exclusion, progress, bounded waiting), Peterson\\u2019s two-process software algorithm traced instruction by instruction, and semaphores used both conceptually and numerically, where you must trace a sequence of wait() and signal() calls to find the semaphore\\u2019s value or determine which processes are blocked. Classical problems -- producer-consumer with a bounded buffer, readers-writers, and dining philosophers -- recur constantly, testing whether you can write or read a semaphore-based skeleton solution and reason about deadlock or starvation within it. Precision matters enormously here: a single misplaced wait() or signal() changes correctness entirely.',
+        core: 'A race condition occurs when two or more processes or threads access and manipulate shared data concurrently, and the final outcome depends on the particular, unpredictable order in which their instructions are interleaved by the scheduler. The region of code where shared data is accessed is called the critical section. Any correct solution to the critical-section problem must satisfy three requirements:\n• Mutual exclusion: no two processes may be executing in their critical sections at the same time.\n• Progress: if no process is in its critical section, and some processes wish to enter, only those not executing in their remainder section can participate in deciding who enters next, and this decision cannot be postponed indefinitely.\n• Bounded waiting: there exists a bound on the number of times other processes may enter their critical sections after a process has requested entry and before that request is granted, preventing indefinite postponement (starvation).\n\nPeterson\\u2019s algorithm is a classical software-only solution for two processes, using two shared variables: an array flag[2], where flag[i] indicates process i wants to enter its critical section, and an integer turn, indicating whose turn it is when both want to enter. Process i\\u2019s entry section sets flag[i] = true, then turn = j (the other process), then busy-waits while (flag[j] && turn == j). Because turn is a single shared variable, whichever process\\u2019s write to turn happens last is the one whose own busy-wait condition becomes true, so it waits, while the other process, seeing turn now pointing away from itself, proceeds immediately. Peterson\\u2019s algorithm provably satisfies all three critical-section requirements for two processes on architectures that preserve the program order of these memory operations, but it relies purely on busy waiting (wasting CPU cycles while blocked) and does not scale cleanly beyond two processes.\n\nSemaphores are integer variables accessed only through two atomic operations: wait() (also written P() or down()), which decrements the semaphore and blocks the calling process if the result would be negative, and signal() (also written V() or up()), which increments the semaphore and wakes one waiting process if any are blocked. A binary semaphore can only take the values 0 and 1 and is used exactly like a mutex lock for mutual exclusion. A counting semaphore can take a larger range of values and is used to manage a resource with multiple identical instances, or to enforce ordering constraints between processes (e.g., signalling that an item has become available). When a semaphore\\u2019s value is tracked including negative territory, a negative value\\u2019s magnitude conventionally equals the number of processes currently blocked waiting on it.\n\nThe classical producer-consumer (bounded-buffer) problem uses three semaphores: mutex (binary, initialised to 1) to protect the shared buffer during insertion or removal, empty (counting, initialised to the buffer capacity N) counting free slots, and full (counting, initialised to 0) counting occupied slots. A producer does wait(empty), wait(mutex), inserts an item, signal(mutex), signal(full); a consumer does wait(full), wait(mutex), removes an item, signal(mutex), signal(empty). The order of the two wait() calls in each (resource-counting semaphore before mutex) is essential to avoid deadlock.\n\nThe readers-writers problem allows multiple readers to access shared data simultaneously (since reading does not conflict with reading) but requires a writer to have exclusive access. The first readers-writers problem gives priority to readers (a writer may starve if readers keep arriving); the second gives priority to writers (readers may starve once a writer is waiting). The dining philosophers problem models N philosophers around a table with N forks, each philosopher needing both adjacent forks to eat; the naive solution where everyone picks up their left fork first and then reaches for the right can deadlock if every philosopher simultaneously holds their left fork and waits forever for their right, forming a circular wait among all N. Standard fixes include allowing at most N-1 philosophers to sit down at once, having one specific philosopher pick up forks in the opposite order, or acquiring forks only via a global ordering or a single controlling mutex.',
+        strategy: 'For semaphore-tracing questions, keep a running numeric value and, for each wait() and signal() in the given order, apply the rule directly: wait() decrements (and blocks if the result goes negative), signal() increments (and releases one blocked process if any are waiting). Do not shortcut by assuming an even balance of wait/signal calls; trace every single call in the exact sequence given, since GATE loves sequences where several waits happen consecutively before any signal, forcing several processes to queue up. For classical-problem skeletons (producer-consumer, readers-writers, dining philosophers), check three things fast: (1) is the resource-counting semaphore\\u2019s wait() always issued before the mutex\\u2019s wait() in each participant -- reversing this order is the single most common deadlock-inducing bug GATE plants in "spot the error" questions; (2) are mutex wait/signal pairs correctly balanced around the shared-data access only, not around the entire function; (3) for readers-writers, is a reader-count variable itself protected by its own mutex before it touches the shared writer-lock semaphore. For Peterson\\u2019s algorithm questions, always identify which process\\u2019s write to the shared turn variable happens last in the interleaving described -- that process is the one that ends up busy-waiting, while the other proceeds first; this one fact resolves almost every ordering question asked about it. For dining philosophers, remember the deadlock condition needs every one of the N philosophers to be holding exactly one fork with nobody able to get a second -- a partial subset holding forks cannot deadlock the whole table, since anyone lacking their left fork simply has not started yet. Worked mini-example: semaphore S starts at 1; P1 calls wait(S) (S becomes 0, P1 proceeds); P2 calls wait(S) (S becomes -1, P2 blocks); P1 calls signal(S) (S becomes 0, P2 is released and proceeds). Track the sign of S at each step rather than just its final number, since intermediate negativity is what the question is often really testing.'
+      },
+      questions: [
+        {
+          id: 'os-sync-q1',
+          q: 'A "race condition" in operating systems most precisely refers to a situation where:',
+          options: ['The final outcome of concurrently accessing shared data depends on the particular timing/order of execution', 'A process is scheduled using Round Robin instead of FCFS', 'A process is waiting indefinitely for a resource it will never receive', 'Two processes have identical priority values'],
+          answer: 0,
+          marks: 1,
+          difficulty: 'easy',
+          type: 'concept',
+          explanation: 'A race condition arises specifically when two or more processes or threads access and manipulate the same shared data concurrently, and the outcome of that access -- the final value left in the shared data, or which process reads a particular value -- depends on the precise, non-deterministic interleaving of their instructions chosen by the scheduler. Running the exact same program twice could produce different results purely due to timing differences, which is what makes race conditions notoriously hard to debug. This has nothing to do with the specific scheduling algorithm in use (option B), which describes CPU scheduling, not data races; indefinite waiting (option C) describes starvation, a different phenomenon; and equal priorities (option D) is just one possible contributing scenario, not the definition itself.'
+        },
+        {
+          id: 'os-sync-q2',
+          q: 'Which THREE conditions must a correct solution to the critical-section problem satisfy?',
+          options: ['Mutual exclusion, progress, and bounded waiting', 'Mutual exclusion, priority inheritance, and deadlock detection', 'Progress, fairness, and highest throughput', 'Bounded waiting, highest priority first, and preemption'],
+          answer: 0,
+          marks: 1,
+          difficulty: 'easy',
+          type: 'concept',
+          explanation: 'The three formally required properties of any critical-section solution are: mutual exclusion (no two processes execute in their critical sections simultaneously), progress (the decision of who enters next cannot be postponed indefinitely if some process wants to enter and none currently is inside), and bounded waiting (there is a finite bound on how many times other processes can enter before a waiting process\\u2019s turn is guaranteed, preventing starvation). Priority inheritance and deadlock detection are separate mechanisms used elsewhere in synchronization and resource management, not part of this specific three-condition definition; "fairness" and "highest throughput" are informal goals, not the precisely defined formal requirements that GATE tests.'
+        },
+        {
+          id: 'os-sync-q3',
+          q: 'In Peterson\\u2019s algorithm for two processes P0 and P1, both attempt to enter their critical sections at nearly the same time. In the resulting interleaving, P0 executes turn = 1 first, and then P1\\u2019s assignment turn = 0 executes afterward (overwriting it), before either checks its busy-wait condition. Which process enters the critical section first?',
+          options: ['P0', 'P1', 'Both enter simultaneously', 'Neither enters -- deadlock occurs'],
+          answer: 0,
+          marks: 2,
+          difficulty: 'hard',
+          type: 'numerical',
+          explanation: 'Since turn is a single shared variable, only the last write to it survives; here P1\\u2019s write (turn = 0) happens after P0\\u2019s (turn = 1), so turn ends up equal to 0. P0\\u2019s busy-wait condition is while (flag[1] && turn == 1); since turn is now 0, this condition is false immediately, so P0 proceeds straight into its critical section without waiting. P1\\u2019s busy-wait condition is while (flag[0] && turn == 0); both flag[0] (P0 wants to enter) and turn == 0 are true, so P1 must wait. The general rule: whichever process\\u2019s write to turn happens LAST ends up referencing itself in its own wait condition and is the one that blocks, letting the other process go first -- this is what guarantees mutual exclusion without a tie.'
+        },
+        {
+          id: 'os-sync-q4',
+          q: 'Which of the following statements about Peterson\\u2019s algorithm is correct?',
+          options: ['It satisfies mutual exclusion, progress, and bounded waiting for exactly two processes, using only busy waiting', 'It uses a hardware test-and-set instruction to guarantee atomicity', 'It works correctly for an arbitrary number of processes without modification', 'It avoids busy waiting entirely by blocking processes in a wait queue'],
+          answer: 0,
+          marks: 1,
+          difficulty: 'medium',
+          type: 'concept',
+          explanation: 'Peterson\\u2019s algorithm is a purely software-based solution designed specifically for exactly two competing processes, using only two shared variables (flag[2] and turn) and ordinary loads and stores -- no special hardware instruction is required, which is precisely what makes it a classical software solution rather than a hardware-assisted one. It is proven to satisfy all three critical-section requirements (mutual exclusion, progress, bounded waiting) for the two-process case, assuming memory operations execute in program order. It does not generalise directly to more than two processes without a different construction (such as the bakery algorithm), and it relies on active busy-waiting in its while loop rather than blocking the process and putting it to sleep, so options B, C, and D are all incorrect.'
+        },
+        {
+          id: 'os-sync-q5',
+          q: 'What is the key difference between a binary semaphore and a counting semaphore?',
+          options: ['A binary semaphore can only take values 0 or 1, while a counting semaphore can take a wider range of integer values to track multiple resource instances', 'A binary semaphore can be signalled by multiple processes, while a counting semaphore cannot', 'A counting semaphore only works in single-processor systems', 'A binary semaphore uses busy waiting, while a counting semaphore never does'],
+          answer: 0,
+          marks: 1,
+          difficulty: 'easy',
+          type: 'concept',
+          explanation: 'A binary semaphore is restricted to the two values 0 and 1, functioning essentially like a mutex lock to guard mutual exclusion for a single shared resource or critical section. A counting semaphore can take a broader range of non-negative integer values (or go negative in implementations that track blocked-process counts), making it suitable for controlling access to a resource that has multiple identical instances (its initial value equals the number of instances) or for signalling and ordering between processes, as in the producer-consumer problem\\u2019s empty and full semaphores. Both kinds can be signalled by any process holding a reference to them, both can be implemented with or without busy waiting depending on the OS, and neither is restricted to single-processor systems, so the other options are false.'
+        },
+        {
+          id: 'os-sync-q6',
+          q: 'A binary semaphore S is initialised to 1. The following operations occur strictly in this order: P1 calls wait(S); P2 calls wait(S); P1 calls signal(S). What is the value of S immediately after this sequence, and what is P2\\u2019s status?',
+          options: ['S = 0, and P2 has been released and is now executing', 'S = 0, and P2 is still blocked', 'S = 1, and P2 has been released and is now executing', 'S = -1, and P2 is still blocked'],
+          answer: 0,
+          marks: 1,
+          difficulty: 'medium',
+          type: 'numerical',
+          explanation: 'Starting at S = 1: P1\\u2019s wait(S) decrements S to 0, and since the result is not negative, P1 proceeds without blocking. P2\\u2019s wait(S) decrements S to -1; since this is negative, P2 blocks and joins the semaphore\\u2019s waiting list. P1\\u2019s signal(S) increments S from -1 to 0, and because the pre-increment value was negative (meaning at least one process was waiting), this signal also releases exactly one blocked process -- P2 -- allowing it to proceed. So after this full sequence, S = 0 and P2 is no longer blocked; it has been woken up and is now free to enter its critical section.'
+        },
+        {
+          id: 'os-sync-q7',
+          q: 'A counting semaphore S is initialised to 3. Five processes P1 through P5 call wait(S) one after another, strictly in that order, with no signal() calls occurring in between. How many of these five processes end up blocked, and what is the final value of S?',
+          options: ['2 processes blocked (P4 and P5); S = -2', '3 processes blocked; S = -3', '2 processes blocked; S = 0', '0 processes blocked; S = -2'],
+          answer: 0,
+          marks: 2,
+          difficulty: 'hard',
+          type: 'numerical',
+          explanation: 'Each wait(S) call decrements S by 1 regardless of whether the caller ends up blocked. Starting at S = 3: after P1, S = 2 (proceeds); after P2, S = 1 (proceeds); after P3, S = 0 (proceeds, since 0 is not negative); after P4, S = -1 (blocks, since the result is negative); after P5, S = -2 (blocks). So P1, P2, and P3 all successfully proceed (three instances of the resource were available), while P4 and P5, arriving after the resource was exhausted, are blocked. The final value of S is -2, and by convention its magnitude directly equals the number of currently blocked processes, which is 2 -- a useful cross-check on any semaphore trace answer.'
+        },
+        {
+          id: 'os-sync-q8',
+          q: 'In the standard bounded-buffer producer-consumer solution using three semaphores mutex, empty, and full for a buffer of capacity N, what are the correct initial values of these three semaphores?',
+          options: ['mutex = 1, empty = N, full = 0', 'mutex = 0, empty = 0, full = N', 'mutex = 1, empty = 0, full = N', 'mutex = N, empty = N, full = N'],
+          answer: 0,
+          marks: 1,
+          difficulty: 'medium',
+          type: 'concept',
+          explanation: 'mutex is a binary semaphore protecting the shared buffer during any single insertion or removal, so it must start at 1 (unlocked, available). empty counts the number of currently free slots in the buffer, and since the buffer starts completely empty, all N slots are free, so empty must start at N. full counts the number of slots currently holding a produced item waiting to be consumed, and since nothing has been produced yet, full must start at 0. Any other combination breaks the intended semantics: for instance, starting full at N would incorrectly claim the buffer is already completely full of unconsumed items before any production has occurred.'
+        },
+        {
+          id: 'os-sync-q9',
+          q: 'In the classical dining philosophers problem with N philosophers around a circular table and N forks (one between each adjacent pair), using the naive symmetric algorithm where every philosopher picks up their left fork and then attempts to pick up their right fork, what is the minimum number of philosophers that must simultaneously be holding exactly one fork (their left) to guarantee the entire system deadlocks?',
+          options: ['All N philosophers', 'N - 1 philosophers', 'Exactly half of N', 'Any 2 adjacent philosophers'],
+          answer: 0,
+          marks: 2,
+          difficulty: 'hard',
+          type: 'numerical',
+          explanation: 'Deadlock in the naive dining-philosophers algorithm requires a complete circular wait: every single philosopher must be holding their left fork and be stuck waiting for their right fork, which is always someone else\\u2019s left fork. If even one philosopher has not yet picked up a fork, that philosopher can either successfully acquire both forks and eat (breaking the cycle), or is simply not part of the wait cycle at all, so the deadlock cannot be total. Only when the count reaches all N philosophers simultaneously holding one fork each does every fork become unavailable to its neighbour, and every philosopher is stuck -- so the answer is N, not N-1 or any smaller subset, which would always leave at least one philosopher free to proceed and eventually release forks.'
+        },
+        {
+          id: 'os-sync-q10',
+          q: 'What is the key difference between the "first" and "second" readers-writers problems?',
+          options: ['The first gives priority to readers (a writer may starve); the second gives priority to writers (readers may starve)', 'The first uses semaphores; the second uses only mutex locks', 'The first allows only one reader at a time; the second allows unlimited readers and writers together', 'There is no meaningful difference -- both give equal priority to readers and writers'],
+          answer: 0,
+          marks: 1,
+          difficulty: 'medium',
+          type: 'concept',
+          explanation: 'In the first readers-writers problem, no reader should be kept waiting unless a writer has already obtained permission to use the shared object, which effectively gives readers priority: as long as readers keep arriving before a writer starts, a writer can be indefinitely postponed (starved). In the second readers-writers problem, once a writer is ready, it should perform its write as soon as possible, giving writers priority: newly arriving readers must wait behind an already-waiting writer, which can starve readers if writers keep arriving. Both variants are typically implemented with semaphores and reader-count variables, so option B is false, and neither variant permits a reader and a writer to access the shared data simultaneously, so option C is also false.'
+        },
+        {
+          id: 'os-sync-q11',
+          q: 'How does a mutex lock differ from a general counting semaphore, even though a binary semaphore is sometimes used to implement mutual exclusion in the same way?',
+          options: ['A mutex has an ownership concept -- typically only the thread that locked it may unlock it -- while a semaphore can be signalled by any process regardless of who called wait', 'A mutex can be incremented above the value 1, while a semaphore cannot', 'A mutex works only across multiple machines, while a semaphore works only within one process', 'A mutex requires no atomic operations, while a semaphore does'],
+          answer: 0,
+          marks: 1,
+          difficulty: 'medium',
+          type: 'concept',
+          explanation: 'A mutex (mutual exclusion lock) is specifically designed with an ownership discipline: the thread that successfully locks the mutex is expected to be the same one that unlocks it, and many implementations actively enforce or assume this. A semaphore has no such ownership notion -- any process or thread that has access to the semaphore variable may call signal() on it, even if it never called wait(), which makes semaphores more general and flexible but also more error-prone for pure mutual-exclusion use cases. A mutex is conceptually restricted to two states (locked/unlocked), the opposite of option B; both constructs require atomic underlying operations to be implemented correctly, contradicting option D; and neither is inherently limited to single-process or multi-machine scope as option C claims.'
+        },
+        {
+          id: 'os-sync-q12',
+          q: 'A bounded buffer has capacity 5, with semaphores initialised as empty = 5, full = 0, mutex = 1. Three producer insertions happen first (each doing wait(empty), insert, signal(full)), and then one consumer removal happens (doing wait(full), remove, signal(empty)). What are the final values of empty and full?',
+          options: ['empty = 3, full = 2', 'empty = 2, full = 3', 'empty = 4, full = 1', 'empty = 5, full = 0'],
+          answer: 0,
+          marks: 2,
+          difficulty: 'hard',
+          type: 'numerical',
+          explanation: 'Each producer insertion decrements empty by 1 and increments full by 1. After three insertions: empty = 5 - 3 = 2, and full = 0 + 3 = 3. Then one consumer removal decrements full by 1 and increments empty by 1: full = 3 - 1 = 2, and empty = 2 + 1 = 3. So the final values are empty = 3 and full = 2. As a sanity check, empty + full must always equal the buffer capacity (5) as long as no process is currently mid-operation, and indeed 3 + 2 = 5, confirming the trace is consistent. The mutex semaphore is not touched by this particular question since it always returns to 1 after each individual insert or remove completes.'
+        },
+        {
+          id: 'os-sync-q13',
+          q: 'What is "busy waiting" (also called a spinlock) in the context of process synchronization?',
+          options: ['A process repeatedly checks a condition in a tight loop, continuously consuming CPU cycles while waiting for it to become true', 'A process is moved to the waiting queue and put to sleep until explicitly woken by another process', 'A process waits only for a fixed, bounded amount of time before giving up', 'A process is terminated automatically if it waits too long for a resource'],
+          answer: 0,
+          marks: 1,
+          difficulty: 'easy',
+          type: 'concept',
+          explanation: 'Busy waiting means a process, instead of yielding the CPU or being put to sleep by the OS, keeps executing a loop that repeatedly re-checks some condition (such as Peterson\\u2019s while loop, or a spinlock\\u2019s check on a lock variable) until that condition finally becomes favourable, all the while occupying the CPU and doing no other useful work. This is efficient only when the expected wait is very short, since it avoids the overhead of a context switch, but wastes CPU cycles if the wait is long. This is fundamentally different from a blocking implementation, where the OS instead removes the waiting process from the ready queue entirely (option B) until it is explicitly signalled, which is how most real semaphore implementations avoid wasting CPU time for longer waits.'
+        },
+        {
+          id: 'os-sync-q14',
+          q: 'Why is simply disabling interrupts on the current CPU an insufficient solution to the critical-section problem on a multiprocessor (multi-core) system?',
+          options: ['Disabling interrupts only prevents preemption on that one CPU; other CPUs can still concurrently execute and access the shared variable', 'Disabling interrupts is impossible to implement in any operating system', 'Disabling interrupts always causes an immediate deadlock', 'Disabling interrupts only works for I/O-bound processes, never CPU-bound ones'],
+          answer: 0,
+          marks: 1,
+          difficulty: 'medium',
+          type: 'concept',
+          explanation: 'Disabling interrupts on a single CPU prevents that particular CPU from being preempted mid-critical-section by a timer or other interrupt, which is sufficient to guarantee mutual exclusion on a uniprocessor system, since only one process can ever be executing at any instant. On a multiprocessor system, however, disabling interrupts on the current core does nothing to stop a different core from simultaneously running another process that accesses the very same shared variable, since interrupts were never disabled on that other core. This is precisely why multiprocessor synchronization instead relies on hardware-provided atomic instructions, such as test-and-set or compare-and-swap, which are atomic across all cores via the memory bus/cache-coherence protocol, not just within a single core\\u2019s instruction stream.'
+        },
+        {
+          id: 'os-sync-q15',
+          q: 'For semaphore operations wait() and signal() to correctly enforce their intended mutual-exclusion and counting semantics, how must they themselves be implemented?',
+          options: ['As atomic (indivisible) operations, so the semaphore\\u2019s own internal value cannot be corrupted by concurrent access', 'Purely as busy-waiting loops, with no other implementation permitted', 'As recursive function calls only', 'Exclusively inside user-space thread libraries, never inside the kernel'],
+          answer: 0,
+          marks: 1,
+          difficulty: 'medium',
+          type: 'concept',
+          explanation: 'The entire purpose of wait() and signal() is to safely coordinate access to shared data between competing processes, but this only works if the semaphore\\u2019s own internal integer value cannot itself be corrupted by a race condition when two processes call wait() or signal() at the same moment. This requires wait() and signal() to be implemented as atomic, indivisible operations -- typically by briefly disabling interrupts on a uniprocessor, or using a hardware atomic instruction, or a short internal spinlock on a multiprocessor -- so that the semaphore\\u2019s value update itself is never interleaved. Whether the blocked process then busy-waits or is put to sleep is a separate implementation choice (contradicting option B), and semaphores can be implemented in either the kernel or user-space libraries, contradicting option D.'
+        }
+      ]
     }
   ]
 };
