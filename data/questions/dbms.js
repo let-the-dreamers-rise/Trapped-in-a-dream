@@ -801,5 +801,231 @@ window.GATE_DATA.questions['dbms'] = {
           explanation: 'Entries per index block: floor of 4096 over 16 = 256. First-level index: one entry per record (dense), so ceiling of 50000 over 256 = 196 blocks (195 x 256 = 49920 < 50000). Second level: ceiling of 196 over 256 = 1 block, so the multilevel index has 2 levels. A search reads one block per index level, top down: the single second-level block, then the correct first-level block, obtaining the record pointer, and finally the data block itself: 2 + 1 = 3 block accesses. Option 197 is the cost of binary-searching the first level plus data without building upper levels incorrectly scaled; actually binary search would cost ceiling of log2(196) = 8 plus 1 = 9. Option 2 forgets the data block, and option 4 invents a third index level that does not exist since level two already fits in one block.'
         }
       ]
+    },
+    {
+      id: 'dbms-transactions',
+      name: 'Transactions & Concurrency Control',
+      theory: {
+        intro: "A transaction is a unit of work that must appear to execute atomically and in isolation even though the DBMS actually interleaves many transactions' operations to keep the system responsive. GATE tests this topic through the ACID properties, through building and reading precedence graphs to judge conflict serializability, through the weaker but more permissive notion of view serializability, through the recoverability hierarchy (recoverable, cascadeless, strict) that governs how safely a system can handle aborts, and through the concurrency-control protocols - two-phase locking and timestamp ordering - that enforce serializability in practice. Almost every year produces at least one 'is this schedule serializable' question and one conceptual question distinguishing strict 2PL from plain 2PL or from timestamp ordering. The topic rewards a small number of precise mechanical procedures applied carefully rather than intuition.",
+        core: "ACID. Atomicity: a transaction's effects are all-or-nothing - implemented via logging and rollback/undo. Consistency: a transaction takes the database from one consistent state to another, preserving declared invariants (this is a property the application and constraints must guarantee, not the concurrency-control subsystem). Isolation: concurrently executing transactions must not observe each other's intermediate, uncommitted state - enforced by concurrency control. Durability: once committed, a transaction's effects survive any subsequent failure - implemented via write-ahead logging and stable storage.\n\n• Schedules and conflict serializability. A schedule is a specific interleaving of the operations of several transactions; a serial schedule runs transactions one after another with no interleaving at all and is trivially correct. Two operations conflict when they belong to different transactions, access the same data item, and at least one of them is a write. A schedule is conflict serializable if it can be transformed into some serial schedule by repeatedly swapping adjacent non-conflicting operations - equivalently, and far faster to check, if its precedence (serialization) graph has no cycle. Build the precedence graph by adding a node per transaction and, for every pair of conflicting operations where Ti's operation occurs before Tj's operation in the schedule, drawing an edge Ti -> Tj. If the graph is acyclic, any topological order of the nodes is an equivalent serial order; if it has a cycle, the schedule is not conflict serializable, full stop.\n\n• View serializability. This is a strictly weaker (more permissive) equivalence: schedules S1 and S2 are view equivalent if (a) for every data item, if a transaction reads the initial value in S1, it also reads the initial value in S2; (b) if Ti reads a value written by Tj in S1 (a 'reads-from' relationship), the same holds in S2; and (c) the transaction that performs the final write on each data item is the same in both schedules. Every conflict-serializable schedule is view serializable, but the converse fails specifically in the presence of blind writes (a write not preceded by a read of the same item by the same transaction) - a schedule with blind writes can satisfy all three view-equivalence conditions against some serial order while its precedence graph still contains a cycle. View serializability is rarely enforced in real systems because checking it is NP-hard in general, unlike the polynomial-time cycle check for conflict serializability.\n\n• Recoverability hierarchy. A schedule is recoverable if, whenever Tj reads a data item previously written by Ti, Ti commits before Tj commits - this ensures that once Tj commits, it can never need to be undone because Ti later aborted. A schedule is cascadeless (avoids cascading rollback) if Tj is only allowed to read an item written by Ti after Ti has already committed - stronger than mere recoverability, since it forbids dirty reads outright rather than merely ordering the commits afterward; every cascadeless schedule is recoverable but not vice versa. A schedule is strict if a transaction may neither read nor write a data item until the transaction that last wrote that item has committed or aborted - strict schedules are automatically cascadeless (and hence recoverable), and strictness additionally makes it trivial to undo an aborted transaction by simply restoring old values, since no other transaction could have built on top of its uncommitted writes.\n\n• Two-phase locking (2PL). Every transaction is divided into a growing phase, during which it may only acquire locks, and a shrinking phase, during which it may only release locks, with no acquisition allowed after the first release. 2PL guarantees conflict serializability (the resulting schedules always have an acyclic precedence graph) but does not by itself prevent cascading rollbacks and does not prevent deadlock. Strict 2PL strengthens this by holding all exclusive (write) locks until the transaction commits or aborts (shared locks may still be released early) - this guarantees both conflict serializability and cascadelessness, and is what most commercial systems implement. Rigorous 2PL goes further still, holding ALL locks (shared and exclusive alike) until commit or abort - this guarantees, as a bonus, that the transactions' serialization order exactly matches their commit order, which simplifies recovery and replication.\n\n• Timestamp ordering (TO). Each transaction T is assigned a unique timestamp TS(T) at start, and every data item Q keeps a read-timestamp R-TS(Q) and write-timestamp W-TS(Q) recording the timestamp of the youngest transaction that read or wrote it. Basic TO rule: a read by T on Q is rejected (T is rolled back and restarted with a new, larger timestamp) if TS(T) < W-TS(Q), since T would be reading a value that a 'younger' transaction has already overwritten, violating the timestamp order; otherwise the read proceeds and R-TS(Q) is updated to max(R-TS(Q), TS(T)). A write by T on Q is rejected if TS(T) < R-TS(Q) or TS(T) < W-TS(Q) (an 'older' transaction trying to overwrite a value already read or written by a 'younger' one); otherwise the write proceeds and W-TS(Q) is set to TS(T). The Thomas write rule relaxes this slightly: when TS(T) < W-TS(Q), the write is simply ignored (not applied, transaction not rolled back) since a younger write has already superseded it - this can permit some view-serializable-but-not-conflict-serializable schedules. TO guarantees serializability by construction (transactions are ordered by their timestamps) and is deadlock-free (no transaction ever waits for a lock), but it can cause more rollbacks/restarts than locking under some workloads and provides no recoverability guarantee on its own - commit-based commit rules are layered on top.\n\n• Concurrency anomalies without control. Lost update: T1 and T2 both read the same value, each computes a new value based on that stale read, and whichever writes second overwrites (silently loses) the other's update. Dirty read: T2 reads a value written by uncommitted T1; if T1 later aborts, T2 has used a value that never really existed. Unrepeatable read: T1 reads an item twice within its own execution, and a committed update by another transaction in between causes the two reads to return different values, violating T1's expectation of a stable view.",
+        strategy: "GATE's favorite pattern is a short schedule (typically two or three transactions, 6-10 operations, written inline like r1(A) w1(A) r2(A) w2(A)) followed by 'is this schedule conflict serializable, and if so what is an equivalent serial order.' The mechanical drill: list every data item, list the operations touching it in schedule order, mark every cross-transaction pair with at least one write, draw the directed edge, then hunt for a cycle - do not skip to intuition, because interleavings that 'look fine' frequently hide a cycle and vice versa. A second very common pattern gives a schedule with at least one blind write and asks to distinguish view serializable from conflict serializable - the tell is a write with no preceding read of the same item by the same transaction earlier in that transaction. A third pattern names a schedule and asks whether it is recoverable, cascadeless, both, or neither - trace exactly where each commit falls relative to the reads/writes that depend on it; recoverable only constrains commit order, cascadeless constrains reads directly against commits, and strict constrains both reads and writes against commits/aborts.\n\nWorked mini-example: S = r1(A) w2(A) r3(A) w1(B) r2(B) w3(B). On A: r1(A) before w2(A) gives T1->T2; w2(A) before r3(A) gives T2->T3. On B: w1(B) before r2(B) gives T1->T2; w1(B) before w3(B) gives T1->T3; r2(B) before w3(B) gives T2->T3. All edges are T1->T2, T2->T3, T1->T3 - acyclic, so S is conflict serializable, equivalent to the serial order T1, T2, T3.\n\nTraps to watch: two reads never conflict, so r-r pairs contribute no edge; operations within the same transaction never contribute an edge (order within a transaction is fixed anyway); 2PL guarantees serializability but NOT freedom from deadlock or cascading rollback - only strict/rigorous 2PL adds cascadelessness; and 'recoverable' does not imply 'cascadeless' - a schedule can commit transactions in the right relative order while still letting an uncommitted read of dirty data slip through in the middle."
+      },
+      questions: [
+        {
+          id: 'dbms-transactions-q1',
+          q: 'Which ACID property is primarily enforced by the concurrency-control subsystem of a DBMS?',
+          options: ['Atomicity', 'Consistency', 'Isolation', 'Durability'],
+          answer: 2,
+          marks: 1,
+          difficulty: 'easy',
+          type: 'concept',
+          explanation: "Isolation demands that concurrently running transactions behave as though they executed one at a time, never observing each other's uncommitted intermediate states - this is exactly what concurrency-control protocols such as two-phase locking and timestamp ordering are designed to guarantee by controlling the order and visibility of conflicting operations. Atomicity (all-or-nothing effects) is instead the job of the recovery/logging subsystem, which uses the log to undo a failed transaction's partial writes. Durability (committed effects survive crashes) is also a recovery-manager responsibility, achieved through write-ahead logging to stable storage. Consistency is largely an application-level guarantee - the DBMS enforces declared constraints, but preserving business-logic invariants is the transaction author's responsibility. Isolation, option C, is the one directly implemented by scheduling and locking."
+        },
+        {
+          id: 'dbms-transactions-q2',
+          q: 'Two operations in a schedule are said to conflict when',
+          options: [
+            'they belong to the same transaction and access different data items',
+            'they belong to different transactions, access the same data item, and at least one of them is a write',
+            'they belong to different transactions and both read the same data item',
+            'they access different data items regardless of transaction or operation type'
+          ],
+          answer: 1,
+          marks: 1,
+          difficulty: 'easy',
+          type: 'concept',
+          explanation: "Conflict is defined precisely to capture when the ORDER of two operations can change the outcome: two operations conflict exactly when they come from different transactions, touch the same data item, and at least one is a write - read-read pairs never conflict because reading twice in either order leaves the same value visible to both, and swapping their order changes nothing observable. Same-transaction pairs are irrelevant here because a transaction's own internal order is fixed by its program and never gets reordered. Different data items also never conflict since operations on unrelated items can always be reordered freely without affecting anything. Option B captures exactly the read-write, write-read, and write-write cases across transactions, which is the standard textbook definition used to build precedence graphs."
+        },
+        {
+          id: 'dbms-transactions-q3',
+          q: 'In the precedence (serialization) graph built from a schedule, an edge Ti -> Tj is drawn when',
+          options: [
+            'Ti and Tj access disjoint sets of data items',
+            'Ti has more operations in the schedule than Tj',
+            'an operation of Ti conflicts with a later operation of Tj on the same data item',
+            'Ti commits strictly before Tj starts'
+          ],
+          answer: 2,
+          marks: 1,
+          difficulty: 'easy',
+          type: 'concept',
+          explanation: "The precedence graph has one node per transaction, and a directed edge Ti -> Tj is added precisely when some operation of Ti appears earlier in the schedule than some conflicting operation of Tj on the same data item - meaning Ti's access had to 'happen first' for the interleaving to make sense, so any equivalent serial order must place Ti before Tj. Option A is irrelevant since disjoint data items never produce conflicts or edges. Option B (operation count) has nothing to do with conflicts. Option D describes commit ordering, which matters for recoverability, not for conflict serializability - the precedence graph is built purely from the relative order of conflicting reads and writes, regardless of when (or whether) each transaction eventually commits. The graph being acyclic is exactly the condition for conflict serializability."
+        },
+        {
+          id: 'dbms-transactions-q4',
+          q: 'T1 reads account balance A (value 100) and computes A - 20. T2, interleaved with T1, also reads A (value 100, before T1 writes) and computes A + 50. T1 writes A = 80 and commits; then T2 writes A = 150 and commits. What anomaly has occurred, and what is the final value of A?',
+          options: ['Dirty read; final A = 80', 'Lost update; final A = 150', 'Unrepeatable read; final A = 130', 'No anomaly; final A = 130'],
+          answer: 1,
+          marks: 2,
+          difficulty: 'easy',
+          type: 'concept',
+          explanation: "Both T1 and T2 read the same stale value of A (100) before either had written anything back, so each computed its new value from an outdated base rather than from the other's update. T1 writes 80, but then T2, oblivious to T1's write, overwrites A with 150 (100 + 50) - T1's decrement is completely wiped out and lost, even though both transactions committed successfully. This is the textbook lost update anomaly, and the final value in the database is 150, matching T2's write since it happened last - not 130, which would be the value only if the updates had been correctly composed as 100 - 20 + 50. Preventing this requires concurrency control (e.g., locking A for the read-modify-write duration) so that T2's read is forced to happen after T1's write, or is blocked until T1 finishes."
+        },
+        {
+          id: 'dbms-transactions-q5',
+          q: 'T1 writes X = 500 (not yet committed). T2 reads X and gets 500, then commits and uses that value to update another table. T1 subsequently aborts, rolling X back to its original value of 300. What has occurred?',
+          options: ['Lost update', 'Dirty read', 'Unrepeatable read', 'Phantom read'],
+          answer: 1,
+          marks: 1,
+          difficulty: 'easy',
+          type: 'concept',
+          explanation: "T2 read a value (500) that T1 had written but not yet committed - a 'dirty' value. Because T1 subsequently aborted, that value never actually became permanent; T2 has already committed based on data that turned out to be false, and since T2 has committed, this cannot even be fixed by cascading its rollback - the database is left inconsistent. This is precisely the dirty read anomaly, option B, and it is exactly what cascadeless (and strict) schedules are designed to prevent by never letting a transaction read a value written by an uncommitted transaction. Lost update (A) involves two transactions overwriting each other's work based on stale reads, not reading uncommitted data. Unrepeatable read (C) involves the SAME transaction re-reading and getting a different value after another transaction's COMMITTED write. Phantom read concerns new rows appearing under a range query, not a dirty value on an existing item."
+        },
+        {
+          id: 'dbms-transactions-q6',
+          q: 'Consider the schedule S = r1(A) r2(A) w1(A) r1(B) w2(A) w1(B) r2(B) w2(B), where transaction subscripts denote T1 and T2. Is S conflict serializable?',
+          options: [
+            'Yes, equivalent to the serial order T1, T2',
+            'Yes, equivalent to the serial order T2, T1',
+            'No, the precedence graph contains a cycle',
+            'Cannot be determined without knowing the actual data values'
+          ],
+          answer: 2,
+          marks: 2,
+          difficulty: 'medium',
+          type: 'concept',
+          explanation: "Focus on data item A alone, where the operations in order are r1(A), r2(A), w1(A), w2(A). The pair r1(A) before w2(A) gives an edge T1 -> T2. The pair r2(A) before w1(A) gives an edge T2 -> T1. Both edges already exist from data item A alone, so the precedence graph has a 2-cycle T1 -> T2 -> T1 regardless of what happens on B - no topological order can respect both edges simultaneously. Therefore S is NOT conflict serializable, and no serial order (neither T1,T2 nor T2,T1) is conflict-equivalent to it: option C. This schedule is the standard illustration of why you must check every conflicting pair on every shared data item rather than stopping after finding one edge - it also shows that interleavings that superficially resemble a serial execution on one item can still be irreparably tangled on another."
+        },
+        {
+          id: 'dbms-transactions-q7',
+          q: 'Consider the schedule S = r1(A) w2(A) r3(A) w1(B) r2(B) w3(B), where subscripts denote T1, T2, T3. Which serial order is conflict-equivalent to S?',
+          options: ['T1, T2, T3', 'T2, T1, T3', 'T3, T1, T2', 'T1 and T2 are not orderable relative to T3'],
+          answer: 0,
+          marks: 2,
+          difficulty: 'medium',
+          type: 'concept',
+          explanation: "On data item A (operations r1(A), w2(A), r3(A) in that order): r1(A) before w2(A) gives T1 -> T2; w2(A) before r3(A) gives T2 -> T3. On data item B (operations w1(B), r2(B), w3(B) in that order): w1(B) before r2(B) gives T1 -> T2; w1(B) before w3(B) gives T1 -> T3; r2(B) before w3(B) gives T2 -> T3. Collecting all edges: T1 -> T2, T2 -> T3, T1 -> T3 - every edge points 'forward' consistently, the graph is acyclic, and its unique topological order is T1, T2, T3, option A. Because the graph already has the direct edge T1 -> T3 in addition to the path through T2, there is no ambiguity about T1's and T3's relative order, ruling out option D. This schedule is a clean example of an interleaved-but-serializable execution with three participants."
+        },
+        {
+          id: 'dbms-transactions-q8',
+          q: 'Consider the schedule S = r1(A) w2(A) w1(A) w3(A), where T2 and T3 perform blind writes on A (a write with no prior read of A by that same transaction). Which of the following is true of S?',
+          options: [
+            'S is conflict serializable, equivalent to T1, T2, T3',
+            'S is view serializable but not conflict serializable',
+            'S is neither view serializable nor conflict serializable',
+            'S is conflict serializable but not view serializable'
+          ],
+          answer: 1,
+          marks: 2,
+          difficulty: 'hard',
+          type: 'concept',
+          explanation: "Check conflict serializability first via the precedence graph on A (order r1(A), w2(A), w1(A), w3(A)): r1(A) before w2(A) gives T1 -> T2; r1(A) before w3(A) gives T1 -> T3; w2(A) before w1(A) gives T2 -> T1; w2(A) before w3(A) gives T2 -> T3; w1(A) before w3(A) gives T1 -> T3. The pair T1 -> T2 and T2 -> T1 forms an immediate 2-cycle, so S is NOT conflict serializable. Now check view serializability against the candidate serial order T1, T2, T3: (a) reads-from - the only read is r1(A), which in S reads the initial value of A (nothing was written before it), and in the serial order T1,T2,T3, T1 also runs first and reads the initial value - matches. (b) final writer of A - in S the last write is w3(A) by T3; in the serial order T1,T2,T3, T3 also writes last - matches. Both view-equivalence conditions hold (there are no other reads to check), so S IS view serializable, equivalent to T1,T2,T3, even though it is not conflict serializable - option B. This is the standard minimal demonstration that view serializability strictly generalizes conflict serializability, with the gap opened exactly by the blind writes on T2 and T3."
+        },
+        {
+          id: 'dbms-transactions-q9',
+          q: 'Schedule S = w1(A) r2(A) c1 w2(B) c2 (ci denotes the commit of Ti). Which of the following correctly classifies S?',
+          options: [
+            'Recoverable and cascadeless',
+            'Recoverable but not cascadeless',
+            'Not recoverable',
+            'Strict but not recoverable'
+          ],
+          answer: 1,
+          marks: 2,
+          difficulty: 'medium',
+          type: 'concept',
+          explanation: "T2 reads A after T1 has written it but BEFORE T1 commits (r2(A) occurs before c1 in the schedule) - this is a dirty read, so S is not cascadeless: had T1 aborted instead of committing, T2 would already have consumed an uncommitted value and would need to be rolled back too (cascading rollback). However, recoverability only requires that if Tj reads data written by Ti, then Ti must COMMIT BEFORE Tj commits - and here c1 does occur before c2 in the schedule, so this weaker condition is satisfied: once T2 commits, T1 has already safely committed too, so T2's commit can never later be invalidated by T1 aborting. So S is recoverable (satisfying the weaker requirement on commit order) but not cascadeless (failing the stronger requirement on when reads may occur) - option B. It is certainly not strict either, since strictness would additionally forbid the read r2(A) entirely until T1 commits or aborts."
+        },
+        {
+          id: 'dbms-transactions-q10',
+          q: 'Schedule S = w1(A) r2(A) w2(B) c2 c1. Which of the following correctly classifies S?',
+          options: ['Recoverable', 'Not recoverable', 'Cascadeless', 'Strict'],
+          answer: 1,
+          marks: 2,
+          difficulty: 'medium',
+          type: 'concept',
+          explanation: "T2 reads A, a value written by T1, and then T2 COMMITS (c2) before T1 commits (c1 comes last in the schedule). This directly violates the recoverability condition, which requires Ti (the writer T1) to commit before Tj (the reader T2) commits. Because T2 has already committed - meaning its effects are now permanent and cannot be undone - if T1 subsequently aborts, there is no way to fix the database: T2's committed state depended on a value that turned out to never have existed. This is exactly the scenario recoverability is meant to rule out, so S is NOT recoverable, option B - and since recoverable is the weakest of the three properties in this hierarchy, failing it means S also fails to be cascadeless or strict (both of which imply recoverability). This schedule is the standard example motivating why real systems enforce at least strict, and usually strict 2PL, rather than allowing arbitrary recoverable-only interleavings."
+        },
+        {
+          id: 'dbms-transactions-q11',
+          q: 'Which of the following statements about two-phase locking (2PL) is CORRECT?',
+          options: [
+            'Plain 2PL guarantees both conflict serializability and freedom from deadlock',
+            'Plain 2PL guarantees conflict serializability but not freedom from deadlock or cascading rollback',
+            'Plain 2PL guarantees freedom from deadlock but not serializability',
+            'Plain 2PL guarantees cascadelessness but not serializability'
+          ],
+          answer: 1,
+          marks: 1,
+          difficulty: 'medium',
+          type: 'concept',
+          explanation: "The two-phase locking rule (no lock acquisition after the first lock release, per transaction) is precisely engineered to force the resulting precedence graph to be acyclic - it can be proven that any schedule legal under 2PL is conflict serializable. But 2PL says nothing about WHEN locks are released relative to commit: a transaction may release a lock, allowing another transaction to read or write that item, and only commit later - if the first transaction then aborts, the second may need a cascading rollback, so cascadelessness is not guaranteed. Nor does 2PL prevent deadlock: two transactions can each hold a lock the other needs and both be legally within their growing phase while waiting, producing a circular wait. So option B is the accurate, complete statement; options A, C, and D each attribute to plain 2PL a guarantee it does not provide on its own (those require strict or rigorous variants layered on top, or a separate deadlock prevention/detection scheme)."
+        },
+        {
+          id: 'dbms-transactions-q12',
+          q: 'How does strict two-phase locking differ from plain two-phase locking, and what does it additionally guarantee?',
+          options: [
+            'It requires read locks (only) to be held until commit; it guarantees freedom from deadlock',
+            'It requires all locks to be acquired at the very start of the transaction; it guarantees conflict serializability',
+            'It requires exclusive (write) locks to be held until the transaction commits or aborts; it guarantees cascadelessness in addition to conflict serializability',
+            'It removes the shrinking phase entirely; it guarantees strict serializability of reads only'
+          ],
+          answer: 2,
+          marks: 2,
+          difficulty: 'medium',
+          type: 'concept',
+          explanation: "Strict 2PL keeps the ordinary 2PL growing/shrinking structure but adds one extra rule: exclusive (write) locks specifically must not be released until the transaction commits or aborts (shared/read locks may still be released earlier, during the shrinking phase). Because no other transaction can read or overwrite a data item that a transaction has written until that writer finally commits or aborts, no transaction can ever build on top of another's uncommitted write - this is exactly what eliminates the possibility of a dirty read and hence the need for cascading rollback, giving cascadelessness on top of the conflict serializability plain 2PL already provides. Option A wrongly restricts the requirement to read locks (it is write locks that must be held). Option B describes conservative 2PL, a different variant aimed at deadlock avoidance, not strictness, and it does not by itself add cascadelessness. Option D is simply wrong terminology - strict 2PL retains the shrinking phase, it just delays it for exclusive locks until transaction end."
+        },
+        {
+          id: 'dbms-transactions-q13',
+          q: 'Under rigorous two-phase locking, which additional guarantee holds compared to strict two-phase locking?',
+          options: [
+            'Rigorous 2PL is deadlock-free, unlike strict 2PL',
+            'The order in which transactions commit exactly matches their conflict-serialization order',
+            'Rigorous 2PL no longer requires acquiring locks before accessing data',
+            'Rigorous 2PL allows a transaction to upgrade a shared lock to exclusive at any time, even during shrinking'
+          ],
+          answer: 1,
+          marks: 2,
+          difficulty: 'hard',
+          type: 'concept',
+          explanation: "Rigorous 2PL strengthens strict 2PL by requiring ALL locks - shared as well as exclusive - to be held until the transaction commits or aborts, not just the write locks. A consequence of this stronger discipline is that if Ti's operations must precede Tj's conflicting operations in the schedule (forcing an edge Ti -> Tj in the precedence graph), then Ti must still be holding the relevant lock when Tj first tries to access that item, which means Ti cannot have committed before Tj even STARTS conflicting with it in a way that would place Tj first - working through the implications, this forces transactions to commit in exactly the same relative order as their serialization (precedence-graph) order, which is a convenient guarantee for recovery and for replicated/distributed systems that want commit order to reflect logical order. It does not by itself grant deadlock freedom (option A is false - both variants can deadlock since both make transactions wait for locks); it does not relax lock acquisition (option C is backwards); and lock upgrades are unrelated to the strict-versus-rigorous distinction and would need to happen before shrinking begins in any 2PL variant, not 'at any time' (option D is false)."
+        },
+        {
+          id: 'dbms-transactions-q14',
+          q: 'T1 holds an exclusive lock on data item A and is waiting to acquire a lock on B. T2 holds an exclusive lock on data item B and is waiting to acquire a lock on A. Both transactions are following the two-phase locking protocol correctly. What is the situation, and what does 2PL alone do about it?',
+          options: [
+            'This is impossible under 2PL; 2PL prevents this configuration from arising',
+            'This is a deadlock; 2PL guarantees serializability but does not by itself prevent or resolve deadlock',
+            'This is a lost update; 2PL prevents it by aborting the older transaction automatically',
+            'This is fine as long as both transactions eventually commit in timestamp order'
+          ],
+          answer: 1,
+          marks: 2,
+          difficulty: 'medium',
+          type: 'concept',
+          explanation: "Each transaction is legitimately within its growing phase (still only acquiring locks, never having released one), so both are 2PL-compliant, yet T1 waits on a lock T2 holds and T2 waits on a lock T1 holds - a circular wait with no possible progress: a deadlock. Two-phase locking's proof of correctness only concerns the SHAPE of the resulting precedence graph when transactions do eventually complete; it says nothing about liveness, and by itself provides no mechanism to detect or break such a cycle. Real systems must layer a separate deadlock-handling scheme on top of 2PL: either detection (periodically build a wait-for graph over blocked transactions and abort one transaction on every cycle found) or prevention (timestamp-based schemes such as wait-die or wound-wait, which decide whether an older or younger transaction must abort before circular waiting can occur). Option A is false since this configuration is exactly what 2PL permits; options C and D misdescribe the anomaly and offer a fix 2PL does not provide."
+        },
+        {
+          id: 'dbms-transactions-q15',
+          q: 'Under the basic timestamp ordering protocol, data item Q currently has R-timestamp(Q) = 8 and W-timestamp(Q) = 6. Transaction T, with timestamp TS(T) = 5, requests a write on Q. What happens?',
+          options: [
+            'The write proceeds and W-timestamp(Q) is updated to 5',
+            'The write is rejected and T is rolled back, since TS(T) = 5 is less than R-timestamp(Q) = 8',
+            'The write is silently ignored, but T is allowed to continue (Thomas write rule applies automatically)',
+            'The write proceeds because TS(T) = 5 is greater than W-timestamp(Q) = 6 is false, so the check does not apply'
+          ],
+          answer: 1,
+          marks: 2,
+          difficulty: 'hard',
+          type: 'numerical',
+          explanation: "The basic timestamp-ordering write rule rejects (rolls back) T's write on Q whenever TS(T) is less than R-timestamp(Q) OR TS(T) is less than W-timestamp(Q) - because a transaction older than the youngest reader or writer of Q trying to write now would violate the timestamp order the protocol is enforcing (some younger transaction has already read or overwritten Q, so an older transaction's write must not be allowed to appear as if it happened earlier). Here TS(T) = 5 is less than R-timestamp(Q) = 8, so the rejection condition is triggered on the read-timestamp check alone (it does not even matter that TS(T) = 5 is also less than W-timestamp(Q) = 6, though that too would independently trigger rejection) - the write is rejected and T must be rolled back and restarted with a fresh, larger timestamp: option B. Option C would only apply under the Thomas write rule variant, which modifies the response specifically to the TS(T) < W-timestamp(Q) case by ignoring the obsolete write rather than aborting T - and even then, that variant does not override a violation triggered by the read-timestamp check, which still forces a rollback. Under plain basic TO (as stated in the question), the write is rejected outright."
+        },
+        {
+          id: 'dbms-transactions-q16',
+          q: 'Which of the following is a correct comparison between timestamp ordering (TO) and two-phase locking (2PL) for enforcing serializability?',
+          options: [
+            'TO can deadlock while 2PL cannot',
+            '2PL guarantees serializability by lock discipline and can deadlock; TO guarantees serializability by fixed transaction ordering and is inherently deadlock-free, since transactions never wait for one another',
+            'Both TO and 2PL require transactions to declare all data items they will access in advance',
+            'TO produces conflict-serializable schedules while 2PL only produces view-serializable schedules'
+          ],
+          answer: 1,
+          marks: 2,
+          difficulty: 'medium',
+          type: 'concept',
+          explanation: "2PL enforces serializability structurally, through the acquire-then-release lock discipline, but because transactions genuinely wait (block) for locks held by others, circular waiting - deadlock - is possible and must be handled separately by detection or a prevention scheme. Timestamp ordering takes a completely different approach: every transaction is assigned a timestamp up front, and the protocol simply refuses (rolls back) any operation that would violate the resulting fixed serialization order rather than making transactions wait for each other at all - since there is no waiting, there is no possibility of a circular wait, so TO is inherently deadlock-free, at the cost of potentially more rollbacks and restarted transactions under high contention. This makes option B the accurate comparison, and directly contradicts option A, which has the deadlock behavior backwards. Option C is false - advance declaration of the entire read/write set is a feature of conservative 2PL specifically, not of TO or of plain 2PL in general. Option D mischaracterizes both: TO produces conflict-serializable schedules by construction (transactions execute in an order consistent with their timestamps, which is itself a valid serial order), and 2PL likewise produces conflict-serializable schedules, not merely view-serializable ones."
+        }
+      ]
     }
 ]};

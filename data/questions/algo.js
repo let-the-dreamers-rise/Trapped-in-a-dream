@@ -829,3 +829,211 @@ window.GATE_DATA.questions['algo'] = {
       ]
     }
 ]};
+
+window.GATE_DATA.questions['algo'].topics.push({
+  id: 'algo-sorting-searching',
+  name: 'Sorting & Searching',
+  theory: {
+    intro: "Sorting and searching form the most concretely testable part of the algorithms syllabus: every algorithm has a name, a known best/worst/average time, and a known stability and space profile, so GATE can ask sharp, unambiguous questions about them. Two big ideas anchor this topic. First, comparison-based sorting has a provable Omega(n log n) worst-case lower bound — no comparison sort can ever beat this, which is why merge sort and heapsort at Theta(n log n) are considered asymptotically optimal, and why beating n log n (as counting, radix, and bucket sort do) requires abandoning pure comparisons in favor of exploiting known structure in the keys. Second, searching and selection (finding the kth smallest element) each have their own tight bounds: binary search needs about log2(n) comparisons, and selection can be done in linear time either on average (quickselect) or even in the worst case (median-of-medians). Expect 2-4 marks from this area most years, often as numerical questions.",
+    core: "The comparison-sort lower bound. Any correct sorting algorithm that only compares pairs of elements (never inspects their bit patterns or numeric value directly) can be modeled as a binary decision tree: each internal node is one comparison, each root-to-leaf path is one possible execution, and each leaf must correspond to a distinct final ordering of the input. Since there are n! possible permutations of n distinct elements, and the algorithm must be able to output every one of them for some input, the tree needs at least n! leaves. A binary tree with L leaves must have height at least log2(L) (since a tree of height h has at most 2^h leaves). So the worst-case number of comparisons is at least log2(n!), and by Stirling's approximation log2(n!) = Theta(n log n). This proves Omega(n log n) is unavoidable for ANY comparison-based sort — merge sort and heapsort, both Theta(n log n) in the worst case, are therefore asymptotically optimal comparison sorts, and no cleverness can produce a comparison sort that is, say, Theta(n) in the worst case.\n\n• Stability and in-place classification. A sort is STABLE if it preserves the relative order of elements with equal keys — important when sorting records by one field while wanting ties to keep their prior order (e.g. re-sorting an already-name-sorted list by department). A sort is IN-PLACE if it uses only O(1) (or O(log n), counting recursion stack) extra memory beyond the input array. Insertion sort, bubble sort: stable and in-place. Selection sort: in-place but NOT stable (its characteristic long-distance swap can jump an equal element past another equal one). Merge sort: stable but NOT in-place (needs Theta(n) auxiliary space for merging). Quicksort and heapsort: in-place but NOT stable. Counting sort and radix sort: stable, but NOT in-place (need auxiliary count/output arrays). Bucket sort: stable if a stable method sorts within each bucket, and also not in-place.\n\n• Best/worst/average cases. Insertion sort and bubble sort: best case O(n) (already sorted, with an early-exit check), worst and average O(n^2). Selection sort: O(n^2) in ALL cases — it always scans the remaining unsorted portion fully regardless of input order, so its performance doesn't depend on input arrangement. Merge sort and heapsort: Theta(n log n) in best, worst, AND average cases — their performance never depends on input arrangement. Quicksort: best and average case Theta(n log n), but worst case Theta(n^2), triggered when the chosen pivot is always the minimum or maximum remaining element (classically, a fixed first-element pivot on an already-sorted array).\n\n• Non-comparison sorts and their conditions. Counting sort assumes keys are integers in a known bounded range [0, k); it counts occurrences of each key value, then computes prefix sums to place elements directly, running in Theta(n + k) time and space. It is efficient only when k = O(n); if k is much larger than n (e.g. k = n^2), the k term dominates and it loses its advantage. Radix sort sorts multi-digit (or multi-character) keys by repeatedly applying a STABLE sort (typically counting sort) one digit position at a time, from least significant to most significant digit; for n keys with d digits each in base b, it runs in Theta(d(n + b)) time — if d is a small constant and b = O(n), this is Theta(n), beating the comparison-sort lower bound because it never directly compares two whole keys. Bucket sort assumes keys are roughly uniformly distributed over a known range (classically real numbers in [0,1)); it distributes elements into k buckets, sorts each bucket (often with insertion sort, since buckets are expected to be small), and concatenates — giving expected time Theta(n + k), but a worst case of Theta(n^2) if the distribution assumption fails and all elements land in a single bucket.\n\n• Binary search comparison counting. Searching a sorted array of n elements by repeatedly halving the search range takes at most floor(log2(n)) + 1 comparisons in the worst case (equivalently, ceil(log2(n+1))), since each comparison eliminates roughly half the remaining candidates.\n\n• Selection (finding the kth smallest). Quickselect (Hoare's selection algorithm), which partitions like quicksort but recurses into only the one side containing the target rank, achieves EXPECTED Theta(n) time with a randomly chosen pivot, but degrades to worst-case Theta(n^2) under adversarial pivot choices (mirroring quicksort's own worst case). The median-of-medians (BFPRT) algorithm removes this risk: it splits the array into groups of 5, finds each group's median by brute force, recursively finds the median of those medians, and uses that as the pivot — this guarantees the pivot always eliminates a constant fraction of the array, giving worst-case Theta(n) time via the recurrence T(n) = T(n/5) + T(7n/10) + O(n), which solves to Theta(n) because the two recursive fractions sum to 9/10 < 1."
+    ,
+    strategy: "GATE's sorting/searching questions repeat a small set of shapes every year. First, stability/in-place classification tables: memorize the six-way split (stable+in-place: insertion, bubble; in-place but unstable: selection, quick, heap; stable but not in-place: merge, counting, radix) cold, since questions often ask 'which of the following is NOT stable' or mix two properties in one option to trap you. Second, best/worst/average tables: the two facts worth memorizing hardest are that selection sort is Theta(n^2) unconditionally (input order never helps it) and that merge sort/heapsort are Theta(n log n) unconditionally (input order never hurts them) — quicksort is the only common sort whose case actually depends on the input AND the pivot rule. Third, counting/radix/bucket questions test whether you can identify the PRECONDITION (bounded integer range for counting sort, fixed digit count for radix sort, uniform distribution for bucket sort) that lets a sort beat the Omega(n log n) comparison lower bound — remember these sorts don't contradict the lower bound, since they never directly compare two full keys against each other. Fourth, binary search comparison-counting numericals: practice computing floor(log2 n) + 1 quickly for round numbers like n = 16, 32, 64, 100, 1000. Fifth, selection/quickselect questions testing the average-vs-worst-case gap, mirroring quicksort's own gap. Worked mini-example: for n = 1,000,000 keys, comparison sort needs at least log2(1000000!) ≈ Theta(n log n) ≈ 20 million comparisons in the worst case, while radix sort on, say, 7-digit decimal keys needs only Theta(d(n+b)) = Theta(7 × (1000000 + 10)), i.e. proportional to n, not n log n — the concrete payoff of exploiting key structure instead of pure comparison."
+  },
+  questions: [
+    {
+      id: 'algo-sorting-searching-q1',
+      q: "What is the tightest known worst-case lower bound on the number of comparisons required by ANY comparison-based sorting algorithm, for n distinct elements?",
+      options: ["Omega(n)", "Omega(n log n)", "Omega(n^2)", "Omega(log n)"],
+      answer: 1,
+      marks: 1,
+      difficulty: 'easy',
+      type: 'concept',
+      explanation: "Any sorting algorithm that determines order solely by pairwise comparisons must, in the worst case, be able to distinguish among all n! possible orderings of the input, which forces at least log2(n!) = Theta(n log n) comparisons via the decision-tree argument. So Omega(n log n) is the correct, tight lower bound — option B. Omega(n), option A, is far too weak; it would allow, say, Theta(n) sorts to exist for comparison-based methods, which is provably impossible. Omega(n^2), option C, is not a valid lower bound at all — merge sort and heapsort already achieve Theta(n log n) in the worst case, which is asymptotically faster than n^2, so no valid lower bound can exceed n log n. Omega(log n), option D, is even weaker than option A and does not reflect the actual information-theoretic requirement of distinguishing n! outcomes."
+    },
+    {
+      id: 'algo-sorting-searching-q2',
+      q: "The proof that comparison sorting requires Omega(n log n) comparisons models execution as a binary decision tree. Which statement correctly completes the proof?",
+      options: [
+        "The tree must have exactly n leaves, one per input element, giving height Omega(log n)",
+        "The tree must have at least n! leaves (one per possible output permutation), and a binary tree with L leaves has height at least log2(L), giving height Omega(n log n) by Stirling's approximation",
+        "The tree must have at least 2^n leaves because each comparison doubles the number of reachable states, giving height exactly n",
+        "The tree's height is irrelevant; only the number of internal nodes determines the running time"
+      ],
+      answer: 1,
+      marks: 2,
+      difficulty: 'hard',
+      type: 'concept',
+      explanation: "The correct argument: the algorithm must be able to correctly sort every one of the n! possible input permutations, and each distinct permutation must end at a distinct leaf of the decision tree (since a sorting algorithm cannot output the same fixed final arrangement for two different input orderings and still be correct in general — the leaf must record the specific rearrangement needed). So the tree needs at least n! leaves. Since a binary tree of height h has at most 2^h leaves, we need 2^h >= n!, i.e. h >= log2(n!), and Stirling's approximation gives log2(n!) = Theta(n log n). Option A undercounts drastically — n leaves would only be enough to identify n outcomes, not n! of them. Option C's '2^n leaves' claim is a common but wrong intuition; the tree's leaf count is driven by the number of DISTINCT OUTCOMES the algorithm must produce (n!), not by doubling per comparison in the abstract. Option D is wrong because the running time (worst-case comparisons) is exactly the tree's height, i.e. the longest root-to-leaf path, which is precisely what the argument bounds."
+    },
+    {
+      id: 'algo-sorting-searching-q3',
+      q: "Which of the following sorting algorithms is NOT stable in its standard textbook implementation?",
+      options: ["Insertion sort", "Bubble sort", "Quicksort (with in-place Lomuto or Hoare partitioning)", "Merge sort"],
+      answer: 2,
+      marks: 1,
+      difficulty: 'easy',
+      type: 'concept',
+      explanation: "Standard in-place quicksort partitioning swaps elements across potentially long distances in the array, and this can reorder two elements with equal keys relative to each other, so it is NOT stable — option C. Insertion sort only ever shifts elements past strictly SMALLER keys (never past an equal one), so equal keys retain their original relative order, making it stable. Bubble sort only swaps ADJACENT out-of-order elements and never swaps two elements it finds equal, so it too is stable. Merge sort is stable provided the merge step takes from the left sub-array whenever keys are equal, which is the standard convention. Quicksort CAN be made stable with extra auxiliary space (at the cost of losing its in-place property), but its standard, in-place form is unstable — this is the property GATE expects you to know."
+    },
+    {
+      id: 'algo-sorting-searching-q4',
+      q: "Which sorting algorithm is in-place (O(1) or O(log n) auxiliary space) but NOT stable?",
+      options: ["Merge sort", "Counting sort", "Heapsort", "Insertion sort"],
+      answer: 2,
+      marks: 1,
+      difficulty: 'medium',
+      type: 'concept',
+      explanation: "Heapsort builds a max-heap in the input array itself (using only O(1) extra space) and repeatedly swaps the root with the last unsorted element, but this repeated 'swap the max to the end' step can reorder equal-keyed elements relative to each other, so heapsort is in-place yet NOT stable — option C. Merge sort is the reverse profile: stable but needs Theta(n) auxiliary space for merging, so it is not in-place. Counting sort is stable but needs Theta(n+k) auxiliary space (a count array and an output array), so it is not in-place either. Insertion sort is both in-place AND stable, the opposite combination from what the question asks. This question specifically drills the 'in-place does not imply stable, and vice versa' independence of the two properties."
+    },
+    {
+      id: 'algo-sorting-searching-q5',
+      q: "What is the best-case running time of insertion sort when the input array is already fully sorted (with the standard early-exit inner loop)?",
+      options: ["O(n)", "O(n log n)", "O(n^2)", "O(log n)"],
+      answer: 0,
+      marks: 1,
+      difficulty: 'easy',
+      type: 'numerical',
+      explanation: "On an already-sorted array, insertion sort's inner loop compares each new element to its immediate left neighbor exactly once, finds it already in the correct position (not smaller), and stops immediately without any shifting. This happens for each of the n elements, giving Theta(n) total comparisons and no data movement — option A. It is NOT O(n log n) (option B), which is characteristic of merge sort or heapsort in any case, not insertion sort's best case. It is NOT O(n^2) (option C) — that is insertion sort's WORST case (reverse-sorted input), where every new element must be compared against and shifted past every previously sorted element. O(log n) (option D) is too fast for any algorithm that must at minimum look at every one of the n elements once."
+    },
+    {
+      id: 'algo-sorting-searching-q6',
+      q: "Standard (non-randomized) quicksort always picks the first element of the current sub-array as the pivot. What is its running time on an already-sorted input array of n distinct elements?",
+      options: ["Theta(n log n), same as the average case", "Theta(n^2), the worst case for this pivot rule", "Theta(n), since sorted input needs minimal work", "Theta(log n), since the array is already in order"],
+      answer: 1,
+      marks: 2,
+      difficulty: 'medium',
+      type: 'numerical',
+      explanation: "When the pivot is always chosen as the first element and the input is already sorted, each partition step produces a completely unbalanced split: the pivot is always the smallest remaining element, so one side of the partition is empty and the other contains all n-1 remaining elements. This produces a recursion of depth n, each level doing Theta(n) partitioning work, for total Theta(n^2) — quicksort's worst case, option B. This is precisely why production sorting libraries use randomized pivot selection or median-of-three heuristics: they make this Theta(n^2) worst-case pattern (already-sorted or reverse-sorted input) statistically improbable rather than guaranteed. Options A, C, and D all understate the actual cost; unlike merge sort or heapsort, quicksort's performance is highly sensitive to both input arrangement and the pivot-selection rule."
+    },
+    {
+      id: 'algo-sorting-searching-q7',
+      q: "Which statement correctly distinguishes merge sort's time-complexity behavior from quicksort's?",
+      options: [
+        "Merge sort's best, worst, and average cases are all Theta(n log n); quicksort's best and average cases are Theta(n log n) but its worst case is Theta(n^2)",
+        "Both merge sort and quicksort have Theta(n^2) worst cases, but merge sort has a better average case",
+        "Merge sort's worst case is Theta(n^2), while quicksort's worst case is always Theta(n log n) due to its in-place partitioning",
+        "Merge sort and quicksort have identical case-by-case behavior since both are divide-and-conquer algorithms"
+      ],
+      answer: 0,
+      marks: 1,
+      difficulty: 'easy',
+      type: 'concept',
+      explanation: "Merge sort always splits the array into two exactly-halved parts regardless of the data's values, so its recursion depth and per-level work are fixed by n alone: Theta(n log n) in every case, with no dependence on input arrangement. Quicksort's partition size instead depends on where the pivot lands relative to the data, so a good (roughly balanced) pivot gives Theta(n log n) (its best and average case with typical inputs or randomization) while a consistently bad pivot choice gives the unbalanced Theta(n^2) worst case. Option A captures this correctly. Option B is false — merge sort never degrades to Theta(n^2). Option C reverses the two algorithms' worst cases entirely. Option D ignores that being 'divide-and-conquer' says nothing about whether the split is guaranteed balanced (merge sort) or data-dependent (quicksort)."
+    },
+    {
+      id: 'algo-sorting-searching-q8',
+      q: "Counting sort is efficient (competitive with or better than comparison sorts) precisely when:",
+      options: [
+        "the array is nearly sorted already",
+        "the keys are integers drawn from a range [0, k) where k = O(n)",
+        "the number of distinct key VALUES k is much larger than n, e.g. k = n^2",
+        "the array contains only floating-point keys uniformly distributed in [0,1)"
+      ],
+      answer: 1,
+      marks: 1,
+      difficulty: 'medium',
+      type: 'concept',
+      explanation: "Counting sort runs in Theta(n + k) time and space, where k is the size of the key range. This beats the Omega(n log n) comparison-sort lower bound only when k is not too large relative to n — specifically when k = O(n), giving overall Theta(n) time, which is option B. 'Nearly sorted already' (option A) is a condition that helps insertion sort or adaptive comparison sorts, not counting sort, whose running time is entirely insensitive to how sorted the input already is. Option C describes exactly the failure condition: if k = n^2, the Theta(n+k) cost becomes Theta(n^2), worse than a Theta(n log n) comparison sort, so counting sort would be the WRONG choice there. Option D describes the precondition for BUCKET sort (uniformly distributed reals in a range), not counting sort, which requires the keys to be (bounded, small-range) integers, not arbitrary reals."
+    },
+    {
+      id: 'algo-sorting-searching-q9',
+      q: "For n input elements whose integer keys lie in the range [0, k-1], what are counting sort's time and additional space complexity?",
+      options: ["Time O(n log n), space O(1)", "Time O(n+k), space O(n+k)", "Time O(nk), space O(k)", "Time O(n+k), space O(1)"],
+      answer: 1,
+      marks: 1,
+      difficulty: 'medium',
+      type: 'numerical',
+      explanation: "Counting sort makes one pass over the input to tally occurrences of each key value into a count array of size k (Theta(k) space), then computes prefix sums over that count array (Theta(k) time), and finally makes a second pass placing each input element into its correct position in an output array of size n (Theta(n) time and space). Total time is Theta(n+k) and total additional space is also Theta(n+k) (count array plus output array), matching option B. Option A's O(n log n) time understates counting sort's actual linear-in-(n+k) behavior — it is NOT a comparison sort and doesn't pay the log n factor at all. Option C's O(nk) time is far too pessimistic; counting sort never does nested work proportional to both n and k together. Option D correctly states the time but wrongly claims O(1) space, ignoring the count and output arrays counting sort fundamentally requires."
+    },
+    {
+      id: 'algo-sorting-searching-q10',
+      q: "Radix sort sorts n keys, each having exactly d digits in base b, by applying a stable sort (such as counting sort) to one digit position at a time, from least to most significant digit. What is its overall time complexity?",
+      options: ["Theta(n log n) regardless of d and b", "Theta(d(n+b))", "Theta(dn^2)", "Theta(n+d) independent of b"],
+      answer: 1,
+      marks: 2,
+      difficulty: 'hard',
+      type: 'numerical',
+      explanation: "Each of the d digit-sorting passes uses a stable counting sort over a digit range of size b, and each such pass costs Theta(n+b). Repeating this d times (once per digit position) gives total time Theta(d(n+b)) — option B. This directly explains why radix sort can beat the Omega(n log n) comparison-sort bound: if d is a small constant (say, keys of fixed maximum digit-length) and b = O(n) (a base chosen comparable to n, such as base n itself), the total time collapses to Theta(n), because it never performs a single comparison between two whole keys. Option A wrongly assumes radix sort behaves like a comparison sort, which it fundamentally is not. Option C vastly overstates the cost by squaring n unnecessarily. Option D incorrectly drops the base b entirely, but the per-digit counting-sort pass explicitly depends on the digit range size b."
+    },
+    {
+      id: 'algo-sorting-searching-q11',
+      q: "Bucket sort distributes n keys, assumed roughly uniformly distributed over a known range, into k buckets and sorts each bucket individually. Which statement about its running time is correct?",
+      options: [
+        "It is always exactly Theta(n log n), regardless of the distribution assumption",
+        "Its expected running time is Theta(n+k) under the uniform-distribution assumption, but it degrades to Theta(n^2) in the worst case if most elements fall into the same bucket",
+        "It is Omega(n log n) in every case since it must eventually sort each bucket by comparison",
+        "It has no worst case worse than Theta(n) because buckets guarantee balanced splits"
+      ],
+      answer: 1,
+      marks: 2,
+      difficulty: 'medium',
+      type: 'concept',
+      explanation: "Bucket sort's efficiency depends entirely on its assumption holding: if keys are roughly uniformly spread across the k buckets, each bucket holds a small constant-expected number of elements, so sorting each bucket (typically with insertion sort) plus distributing all n elements takes expected Theta(n+k) time. But this is a probabilistic guarantee, not a worst-case one: an adversarial or skewed input can dump most or all n elements into a single bucket, in which case that one bucket's insertion sort alone costs Theta(n^2), which is bucket sort's true worst case — option B captures both halves correctly. Option A is wrong because bucket sort's performance is explicitly distribution-dependent, not a fixed Theta(n log n). Option C incorrectly claims a universal Omega(n log n) bound, ignoring that bucket sort's average case is linear precisely because it exploits the distribution assumption rather than relying purely on comparisons. Option D ignores the well-known skewed-input worst case."
+    },
+    {
+      id: 'algo-sorting-searching-q12',
+      q: "What is the maximum number of comparisons required by binary search in the worst case, searching a sorted array of 16 elements for a target value?",
+      options: ["4", "5", "8", "16"],
+      answer: 1,
+      marks: 1,
+      difficulty: 'easy',
+      type: 'numerical',
+      explanation: "Binary search's worst-case comparison count for n elements is floor(log2(n)) + 1. For n = 16, log2(16) = 4 exactly, so floor(4) + 1 = 5 — option B. Concretely: searching among 16 elements, after 1 comparison the range shrinks to 8, after 2 to 4, after 3 to 2, after 4 to 1 remaining candidate, and the 5th comparison confirms or rejects that final candidate — 5 comparisons total in the worst case. Option A, 4, undercounts by one — it's the number of HALVINGS needed to reach a single element, but one more comparison is still needed to check that element. Option C, 8, would be n/2, an unrelated quantity. Option D, 16, is n itself, the (irrelevant) cost of a linear scan, not binary search."
+    },
+    {
+      id: 'algo-sorting-searching-q13',
+      q: "What is the maximum number of comparisons binary search requires in the worst case on a sorted array of 100 elements?",
+      options: ["6", "7", "10", "50"],
+      answer: 1,
+      marks: 2,
+      difficulty: 'medium',
+      type: 'numerical',
+      explanation: "Using the formula floor(log2(n)) + 1 for n = 100: log2(100) ≈ 6.643856, so floor(6.643856) = 6, and 6 + 1 = 7 — option B. A quick sanity check via powers of 2: 2^6 = 64 and 2^7 = 128, and since 64 < 100 <= 128, binary search on 100 elements needs the same worst-case comparison count as it would need for up to 128 elements, namely 7. Option A, 6, is exactly floor(log2(100)) without the required '+1' final confirming comparison — a very common off-by-one error. Option C, 10, and option D, 50, both wildly overstate the cost; 50 in particular is what a naive linear scan through half the array might suggest, but binary search's whole advantage is that it needs only logarithmically many comparisons, not a constant fraction of n."
+    },
+    {
+      id: 'algo-sorting-searching-q14',
+      q: "Quickselect (Hoare's selection algorithm) finds the kth smallest element by partitioning like quicksort but recursing into only the side that contains the target rank. What are its expected and worst-case running times?",
+      options: [
+        "Expected Theta(n), worst-case Theta(n^2)",
+        "Expected Theta(n log n), worst-case Theta(n log n)",
+        "Expected Theta(n), worst-case Theta(n log n)",
+        "Expected Theta(log n), worst-case Theta(n)"
+      ],
+      answer: 0,
+      marks: 2,
+      difficulty: 'medium',
+      type: 'concept',
+      explanation: "With a randomly chosen pivot, quickselect's partition sizes shrink geometrically in expectation, giving an expected total work of n + n/2 + n/4 + ... = Theta(n) (a converging geometric series), just as it saves a full sort by discarding the unneeded side entirely at each step. But under an adversarial or unlucky pivot sequence (mirroring quicksort's own worst case, e.g. always picking the current minimum or maximum as pivot), each partition step only shrinks the problem by one element, giving Theta(n) + Theta(n-1) + ... = Theta(n^2) in the worst case — matching option A exactly. This expected-vs-worst-case gap is structurally identical to quicksort's own gap, which is intentional since quickselect is built from the same partitioning primitive. Options B, C, and D all misstate one or both bounds; notably, no correct variant of this argument produces an n log n term, since quickselect recurses into only ONE side, not both, unlike quicksort."
+    },
+    {
+      id: 'algo-sorting-searching-q15',
+      q: "The median-of-medians (BFPRT) selection algorithm guarantees worst-case linear time for finding the kth smallest element. What is the key idea that removes quickselect's Theta(n^2) worst case?",
+      options: [
+        "It always sorts the entire array first using merge sort, then indexes directly into position k",
+        "It picks the pivot as the median of group-medians (dividing the array into groups of 5, taking each group's median, then recursively finding the median of those medians), guaranteeing the pivot always discards a constant fraction of the array",
+        "It repeats quickselect multiple times with different random pivots and takes the majority answer",
+        "It avoids partitioning entirely by using a max-heap of size k"
+      ],
+      answer: 1,
+      marks: 2,
+      difficulty: 'hard',
+      type: 'concept',
+      explanation: "The median-of-medians pivot selection guarantees that the chosen pivot is provably greater than roughly 3/10 of the elements and less than roughly 3/10 of the elements (a constant fraction in both directions, derived from the group-of-5 structure), so every partition step is guaranteed to discard at least a constant fraction of the remaining array — never degrading to the 'discard only one element per step' pattern that causes quickselect's worst case. This yields the recurrence T(n) = T(n/5) + T(7n/10) + O(n) (T(n/5) for recursively finding the median of medians, T(7n/10) for the worst-case recursive call on the larger remaining side), which solves to Theta(n) because 1/5 + 7/10 = 9/10 < 1. Option A describes a completely different, slower O(n log n) approach (full sorting) that also defeats the purpose of a selection-specific algorithm. Option C's 'repeat and vote' scheme is not how median-of-medians works and would not give a deterministic worst-case guarantee anyway. Option D's heap-based approach can find the kth smallest in O(n + k log n) but is a different technique entirely, unrelated to median-of-medians pivoting."
+    },
+    {
+      id: 'algo-sorting-searching-q16',
+      q: "The median-of-medians selection algorithm satisfies the recurrence T(n) = T(n/5) + T(7n/10) + O(n). Why does this recurrence solve to Theta(n) rather than something larger like Theta(n log n)?",
+      options: [
+        "Because n/5 and 7n/10 are both smaller than n, and any recurrence with two smaller sub-calls automatically gives Theta(n log n)",
+        "Because the sum of the two fractional coefficients, 1/5 + 7/10 = 9/10, is strictly less than 1, so the total work across all recursion levels forms a convergent geometric series dominated by the O(n) term at the top level",
+        "Because the Master theorem case 1 always applies whenever there is more than one recursive call",
+        "Because T(7n/10) dominates and by itself already equals Theta(n) at every level, making the T(n/5) term irrelevant to the final bound"
+      ],
+      answer: 1,
+      marks: 2,
+      difficulty: 'hard',
+      type: 'numerical',
+      explanation: "When a recurrence splits into multiple recursive calls on FRACTIONS of n whose coefficients sum to strictly less than 1 (here 1/5 + 7/10 = 2/10 + 7/10 = 9/10 < 1), the total input size being processed shrinks by a constant factor at every level of recursion, exactly like a single-branch recurrence T(n) = T(cn) + O(n) with c < 1. Summing the O(n)-sized work across all levels gives a geometric series n(1 + 9/10 + (9/10)^2 + ...) that converges to Theta(n) (bounded by n / (1 - 9/10) = 10n), rather than growing with an extra log n factor. Option A is false in general — the coefficient sum mattering (specifically needing it to be less than 1) is the actual criterion, not simply 'more than one recursive call' (e.g. T(n) = 2T(n/2) + O(n) has coefficients summing to 1, and that DOES give Theta(n log n), the merge sort recurrence). Option C misstates the Master theorem, whose case selection depends on comparing the recursive branching against n^(log_b a), not on the mere presence of multiple calls. Option D is wrong because dropping the T(n/5) term is not valid reasoning — the correct justification requires accounting for BOTH terms' combined fractional contribution."
+    }
+  ]
+});
