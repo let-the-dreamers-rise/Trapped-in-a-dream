@@ -1706,3 +1706,201 @@ window.GATE_DATA.questions['dbms'].topics.find(function(t){return t.id==='dbms-i
   explanation: "Reaching the first qualifying leaf costs 3 block accesses (the tree's height), and that single access already reads the first leaf block, yielding up to 100 of the 850 qualifying records. The remaining qualifying records after that first leaf: 850 - 100 = 750. Each additional leaf block accessed via the leaf-chain linked list yields up to 100 more records, so the number of additional leaf blocks needed is ceil(750 / 100) = 8 (since 7 x 100 = 700 is short of 750, an 8th leaf block is required to cover the rest). Total block accesses = 3 (tree traversal down to and including the first leaf) + 8 (additional leaf blocks read via chaining) = 11. This calculation illustrates the core efficiency benefit of the B+-tree's linked leaf level for range queries: after paying the initial height-proportional cost once, every subsequent qualifying leaf costs just a single sequential access with no need to re-traverse the tree from the root."
 }
 );
+
+window.GATE_DATA.questions['dbms'].topics.find(function(t){return t.id==='dbms-transactions';}).questions.push(
+{
+  id: 'dbms-transactions-x1',
+  q: 'S1: R1(X), W2(X), R1(Y), W2(Y). S2: R1(X), R1(Y), W2(X), W2(Y). Are S1 and S2 conflict-equivalent?',
+  options: [
+    'Yes - the only conflicting operation pairs are (R1(X), W2(X)) and (R1(Y), W2(Y)), and both schedules order R1 before W2 in each case',
+    'No, because the operations occur in a different overall physical sequence',
+    'No, because W2(X) and W2(Y) both belong to the same transaction T2',
+    'Cannot be determined without knowing the actual values read and written'
+  ],
+  answer: 0,
+  marks: 1,
+  difficulty: 'easy',
+  type: 'concept',
+  explanation: "Two schedules are conflict-equivalent if they contain the same operations and order every pair of CONFLICTING operations (same data item, different transactions, at least one a write) the same way - operations that never conflict are free to appear in a different relative order without affecting equivalence. Here the only conflicting pairs are on X (R1(X) versus W2(X)) and on Y (R1(Y) versus W2(Y)), since R1 and W2 belong to different transactions and touch the same items. In S1, R1(X) precedes W2(X) and R1(Y) precedes W2(Y). In S2, despite the different overall interleaving (both reads grouped before both writes), R1(X) still precedes W2(X) and R1(Y) still precedes W2(Y). Since every conflicting pair is ordered identically in both schedules, S1 and S2 are conflict-equivalent, even though their literal operation sequences differ - option B mistakes surface-level sequence differences for conflict differences."
+},
+{
+  id: 'dbms-transactions-x2',
+  q: 'S1: R1(X), W1(X), W2(X). S2: W2(X), R1(X), W1(X). Are S1 and S2 conflict-equivalent?',
+  options: [
+    'Yes, since both schedules contain exactly the same set of operations',
+    'No - in S1, W1(X) precedes W2(X) and R1(X) precedes W2(X), but S2 reverses both of these conflicting pairs by placing W2(X) first',
+    'Yes, because only read-write conflicts matter for conflict equivalence, not write-write conflicts',
+    'Cannot be determined without more transactions'
+  ],
+  answer: 1,
+  marks: 1,
+  difficulty: 'easy',
+  type: 'concept',
+  explanation: "Conflict-equivalence requires the same relative order for every pair of conflicting operations - and write-write pairs on the same item by different transactions absolutely do conflict, contrary to option C's claim. In S1, the order is R1(X) then W1(X) then W2(X): the conflicting pair (R1(X), W2(X)) has R1 first, and the conflicting pair (W1(X), W2(X)) has W1 first. In S2, the order is W2(X) then R1(X) then W1(X): now W2(X) precedes BOTH R1(X) and W1(X) - both of the previously identified conflicting pairs are reversed. Since at least one conflicting pair's relative order differs between S1 and S2 (in fact both do here), the schedules are NOT conflict-equivalent. Having the same set of operations (option A) is a necessary but not sufficient condition for conflict-equivalence; the relative ordering of conflicts is what actually matters."
+},
+{
+  id: 'dbms-transactions-x3',
+  q: 'Schedule S has operations, in order: R1(X), W2(X), R2(Y), W3(Y), R3(X), W1(Y), across transactions T1, T2, T3. Build the precedence (serialization) graph and determine whether S is conflict-serializable.',
+  options: [
+    'Serializable; equivalent serial order T1, T2, T3',
+    'Serializable; equivalent serial order T2, T3, T1',
+    'Not serializable - the precedence graph contains the cycle T1 -> T2 -> T3 -> T1',
+    'Not serializable, because T1 and T3 share no direct conflict, leaving the graph disconnected'
+  ],
+  answer: 2,
+  marks: 2,
+  difficulty: 'hard',
+  type: 'numerical',
+  explanation: "Scan the operations left to right and add an edge Ti -> Tj whenever Ti's operation on some item precedes a conflicting operation by Tj on the same item. On X: R1(X) precedes W2(X), giving T1 -> T2; later W2(X) precedes R3(X), giving T2 -> T3. On Y: R2(Y) precedes W3(Y), giving T2 -> T3 again (same edge); and R2(Y) also precedes the later W1(Y), giving T2 -> T1; finally W3(Y) precedes W1(Y), giving T3 -> T1. Collecting all edges: T1 -> T2, T2 -> T3, T3 -> T1 (plus a redundant T2 -> T1). Following T1 -> T2 -> T3 -> T1 traces a complete cycle through all three nodes. A precedence graph with any cycle means no consistent linear (serial) ordering of the transactions can reproduce the same conflict order, so S is NOT conflict-serializable - options A and B propose serial orders that cannot actually exist here."
+},
+{
+  id: 'dbms-transactions-x4',
+  q: 'Schedule S has operations, in order: R1(A), W2(A), R3(A), R1(B), W3(B), across transactions T1, T2, T3. Build the precedence graph and determine a conflict-equivalent serial order, if one exists.',
+  options: [
+    'Not serializable - cycle T1 -> T2 -> T3 -> T1',
+    'Serializable; the edges T1 -> T2, T2 -> T3, and T1 -> T3 form a directed acyclic graph, giving the equivalent serial order T1, T2, T3',
+    'Serializable; equivalent order T3, T2, T1',
+    'Not serializable, since T1 conflicts with both T2 (on A) and T3 (on B) simultaneously'
+  ],
+  answer: 1,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'numerical',
+  explanation: "Track conflicts item by item. On A: R1(A) precedes W2(A), giving edge T1 -> T2; later W2(A) precedes R3(A), giving edge T2 -> T3. On B: R1(B) precedes W3(B), giving edge T1 -> T3. The complete edge set is {T1 -> T2, T2 -> T3, T1 -> T3} - no edge points back into T1 from either T2 or T3, so there is no cycle; this is a valid directed acyclic graph (DAG). A topological sort of this DAG must place T1 first (it has no incoming edges), then T2 (its only incoming edge is from the already-placed T1), then T3 last. This gives the unique consistent serial order T1, T2, T3, confirming S is conflict-serializable and equivalent to executing the three transactions one after another in exactly that order, with no interleaving."
+},
+{
+  id: 'dbms-transactions-x5',
+  q: 'T1 consists of R1(A), W1(A) and T2 consists of R2(A), W2(A), both operating on the same data item A. Considering all interleavings that preserve each transaction\'s own internal operation order, there are C(4,2) = 6 total possible schedules. How many of these 6 interleavings are conflict-serializable?',
+  options: ['2', '3', '4', '6'],
+  answer: 0,
+  marks: 2,
+  difficulty: 'hard',
+  type: 'numerical',
+  explanation: "Enumerate all 6 interleavings and check each for a cycle between T1 and T2 (the only two transactions, so a cycle can only be the trivial two-node cycle T1->T2 plus T2->T1 both present). (1) R1,W1,R2,W2: every conflicting pair (R1-W2, W1-R2, W1-W2) is ordered T1-before-T2 - only edge T1->T2, serializable as T1,T2. (2) R1,R2,W1,W2: R1 before W2 gives T1->T2, but R2 before W1 gives T2->T1 - both directions present, a cycle, NOT serializable. (3) R1,R2,W2,W1: similarly both T1->T2 (R1-W2) and T2->T1 (R2-W1, W2-W1) appear - NOT serializable. (4) R2,R1,W1,W2: both directions again - NOT serializable. (5) R2,R1,W2,W1: both directions again - NOT serializable. (6) R2,W2,R1,W1: every conflicting pair is ordered T2-before-T1 - only edge T2->T1, serializable as T2,T1. Only schedules (1) and (6), where one transaction's read AND write both fully precede the other's, avoid a cycle - exactly 2 out of the 6 total interleavings are conflict-serializable."
+},
+{
+  id: 'dbms-transactions-x6',
+  q: 'Transaction T1 acquires: lock(A) at time 1, lock(B) at time 3, unlock(A) at time 5, unlock(B) at time 8. Transaction T2 acquires: lock(C) at time 2, unlock(C) at time 4, lock(D) at time 6, unlock(D) at time 9. Which transaction(s) satisfy two-phase locking (2PL), and what is T1\'s lock point?',
+  options: [
+    'T1 is 2PL-compliant with lock point at time 3 (its last lock acquisition, before any release); T2 violates 2PL because it acquires lock(D) at time 6 after already releasing lock(C) at time 4',
+    'Both T1 and T2 are 2PL-compliant',
+    'Neither T1 nor T2 is 2PL-compliant',
+    'T2 is 2PL-compliant and T1 is not'
+  ],
+  answer: 0,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'numerical',
+  explanation: "Two-phase locking requires every lock acquisition to occur before the FIRST lock release (the growing phase), after which only releases may occur (the shrinking phase) - once a transaction releases even one lock, it may never acquire another. For T1: locks are acquired at times 1 and 3, and the first release happens at time 5 - both acquisitions occur strictly before the first release, so T1 is 2PL-compliant, with its lock point (the moment it holds its maximum number of locks, marking the growing-to-shrinking transition) at time 3, when lock(B) is acquired. For T2: it acquires lock(C) at time 2, releases it at time 4, and then acquires lock(D) at time 6 - this acquisition at time 6 happens AFTER a release at time 4, directly violating the two-phase rule (once shrinking begins, no more growing is allowed). So T2 is not 2PL-compliant, while T1 is."
+},
+{
+  id: 'dbms-transactions-x7',
+  q: 'Data item Q has R-timestamp(Q) = 10 and W-timestamp(Q) = 12. Transaction T with TS(T) = 11 requests a READ on Q. Under the basic timestamp-ordering protocol, what happens?',
+  options: [
+    'The read proceeds and R-timestamp(Q) is updated to max(10, 11) = 11',
+    'The read is rejected and T is rolled back, since TS(T) = 11 is less than W-timestamp(Q) = 12',
+    'The read proceeds because TS(T) = 11 is greater than R-timestamp(Q) = 10',
+    'The read is silently ignored, but T is allowed to continue'
+  ],
+  answer: 1,
+  marks: 2,
+  difficulty: 'hard',
+  type: 'numerical',
+  explanation: "The basic timestamp-ordering READ rule rejects (rolls back) T's read of Q whenever TS(T) is less than W-timestamp(Q), because that would mean T is trying to read Q as of a point in time BEFORE some other, 'younger' transaction already overwrote it - reading now would produce a value inconsistent with the timestamp order the protocol enforces, since a properly time-ordered execution would have had T's read happen before that later write, not after. Here TS(T) = 11 is indeed less than W-timestamp(Q) = 12, so the read is rejected outright and T must be rolled back and restarted with a fresh, larger timestamp. Note that TS(T) being greater than R-timestamp(Q) (option C's reasoning) is irrelevant to the READ rule - R-timestamp(Q) only gets compared against timestamps of transactions requesting to WRITE Q, never against another transaction's own read request."
+},
+{
+  id: 'dbms-transactions-x8',
+  q: 'Data item Q has W-timestamp(Q) = 15 and R-timestamp(Q) = 8. Transaction T with TS(T) = 10 requests a WRITE on Q. Under the Thomas Write Rule (a modification of basic timestamp ordering), what happens?',
+  options: [
+    'T is rolled back immediately, since TS(T) = 10 is less than W-timestamp(Q) = 15',
+    'The write is simply ignored (not physically performed), but T is allowed to continue normally, since TS(T) = 10 is not less than R-timestamp(Q) = 8, so no read has been violated - this is exactly the optimization the Thomas Write Rule adds over basic timestamp ordering',
+    'The write proceeds normally and W-timestamp(Q) is updated to 10',
+    'The write proceeds, and every transaction with a timestamp greater than 10 is rolled back'
+  ],
+  answer: 1,
+  marks: 2,
+  difficulty: 'hard',
+  type: 'numerical',
+  explanation: "First check the rule that Thomas Write Rule shares with basic TO: if TS(T) < R-timestamp(Q), the write must be rejected outright, because some transaction has already read a version of Q that this write would have needed to precede - here TS(T) = 10 is NOT less than R-timestamp(Q) = 8, so this rejection does not trigger. Next, under BASIC timestamp ordering, the check TS(T) < W-timestamp(Q) (10 < 15, true) would normally also force a rollback. The Thomas Write Rule specifically relaxes exactly this second case: since no read has been compromised (the first check already passed), the obsolete write is simply IGNORED - not physically applied, and W-timestamp(Q) is left unchanged at 15 - while T is allowed to proceed as if the write had happened, without being aborted. This 'ignore obsolete writes' optimization is the entire point of the Thomas Write Rule, and it can validate certain schedules as serializable that basic TO would needlessly abort."
+},
+{
+  id: 'dbms-transactions-x9',
+  q: 'Schedule S: R1(A), W1(A), R2(A), W2(A), C2, C1 - that is, T2 commits before T1 does, even though T2 read the value of A that T1 had written while T1 was still active (uncommitted). How should this schedule be classified with respect to recoverability?',
+  options: [
+    'Recoverable',
+    'Not recoverable, because T2 reads a value written by T1 and commits (C2) before T1 commits (C1)',
+    'Cascadeless',
+    'Strict'
+  ],
+  answer: 1,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'concept',
+  explanation: "A schedule is recoverable only if, whenever a transaction Tj reads a data item previously written by another transaction Ti, Tj's commit is delayed until AFTER Ti's commit - this guarantees that if Ti ends up aborting, Tj (which has not yet committed) can still be aborted too, undoing the effect of having read Ti's now-invalid data. In this schedule, T2 reads A at position R2(A) after T1's write W1(A) but before T1 has committed (T1's commit C1 comes last, after C2). T2 then commits at C2, which occurs BEFORE T1's commit C1. This violates the recoverability requirement directly: T2 has irrevocably committed based on data from T1, while T1's fate (commit or abort) is still undecided. If T1 were to abort after this point, there would be no way to undo T2's already-committed changes, producing a permanently inconsistent database - so this schedule is classified as NOT recoverable, and is therefore also neither cascadeless nor strict (both stronger properties)."
+},
+{
+  id: 'dbms-transactions-x10',
+  q: 'Schedule S: R1(A), W1(A), R2(A), W2(A), C1, C2. Classify this schedule with respect to recoverability.',
+  options: [
+    'Recoverable, but not cascadeless - T2 reads A after W1(A) but before C1 (a dirty read of uncommitted data), even though T1 happens to commit before T2 does in this particular execution',
+    'Not recoverable, since T2 read data that T1 had not yet committed',
+    'Strict, since all writes to A only become visible after a commit',
+    'Cascadeless, since only a single dirty read occurs in the whole schedule'
+  ],
+  answer: 0,
+  marks: 2,
+  difficulty: 'hard',
+  type: 'concept',
+  explanation: "Check recoverability first: T2 reads A (written by T1) at R2(A), and T2's commit C2 occurs after T1's commit C1 - this satisfies the recoverability requirement (the transaction that read another's uncommitted data commits only after that other transaction commits), so the schedule IS recoverable. But cascadelessness is a stricter, purely SYNTACTIC condition: a schedule is cascadeless only if every transaction reads exclusively values written by ALREADY-COMMITTED transactions - no dirty reads are permitted at all, regardless of what happens afterward. Here R2(A) occurs immediately after W1(A) but well before C1, meaning T2 read A while T1 was still uncommitted - a dirty read. Had T1 aborted instead of committing, T2 would have been forced to cascade-abort as well. The fact that T1 happened to commit successfully in this particular execution does not retroactively make the schedule cascadeless; the classification is based on the schedule's structure, not its eventual outcome. So S is recoverable but not cascadeless (and hence also not strict, since strict implies cascadeless)."
+},
+{
+  id: 'dbms-transactions-x11',
+  q: 'Schedule S: R1(A), W1(A), C1, R2(A), W2(A), C2. Classify this schedule with respect to recoverability, cascadelessness, and strictness.',
+  options: [
+    'Recoverable only',
+    'Recoverable and cascadeless, but not strict',
+    'Strict (and therefore also cascadeless and recoverable), since every access to A by T2 - both its read and its write - occurs only after T1\'s commit',
+    'Not recoverable'
+  ],
+  answer: 2,
+  marks: 1,
+  difficulty: 'medium',
+  type: 'concept',
+  explanation: "T2's operations on A - both R2(A) and W2(A) - occur strictly after T1's commit C1, with no access to A by T2 happening while T1 was still active. This satisfies the strongest of the three standard properties, strictness: a schedule is strict if no transaction reads OR writes an item until any transaction that previously wrote it has either committed or aborted. Since strictness is the strongest property in the hierarchy (strict implies cascadeless implies recoverable, but not conversely), and it holds here, all three properties automatically hold: the schedule is strict, hence also cascadeless (no dirty reads are possible, since access only happens post-commit) and recoverable (commits are trivially ordered correctly, since T2 could not even read T1's data before T1 committed). This is the ideal, safest case: T1's changes to A are only made visible to T2 once T1's outcome (commit) is finalized, eliminating any possibility of cascading rollback or unrecoverable state."
+},
+{
+  id: 'dbms-transactions-x12',
+  q: 'A precedence graph for three transactions T1, T2, T3 has exactly two edges: T1 -> T2 and T1 -> T3 (there is no edge between T2 and T3, meaning they never conflict with each other). How many distinct serial orders are conflict-equivalent to the original schedule, i.e., how many topological sorts does this graph admit?',
+  options: ['1', '2', '3', '6'],
+  answer: 1,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'numerical',
+  explanation: "A topological sort of a precedence graph is a linear ordering of the transactions consistent with every directed edge (the source must come before the target). Since T1 has edges pointing to both T2 and T3, and nothing points to T1, T1 must appear FIRST in any valid topological sort - there is no flexibility there. Since there is no edge in either direction between T2 and T3, their relative order is completely unconstrained: they can appear as T2-then-T3 or T3-then-T2, and either choice is consistent with the graph (T1 -> T2 and T1 -> T3 are satisfied either way, since T1 already precedes both). This gives exactly 2 valid topological sorts: (T1, T2, T3) and (T1, T3, T2). Both are legitimate conflict-equivalent serial orders for any schedule whose precedence graph looks like this - a reminder that a serializable schedule does not always correspond to a UNIQUE equivalent serial order when the precedence graph is not a straight-line total order."
+},
+{
+  id: 'dbms-transactions-x13',
+  q: 'Under basic timestamp ordering, item Q starts with R-timestamp(Q) = 0 and W-timestamp(Q) = 0. Three operations arrive in this order: W3(Q) with TS(T3) = 15, then W1(Q) with TS(T1) = 5, then R2(Q) with TS(T2) = 10. How many of these three operations are rejected (rolled back)?',
+  options: ['0', '1', '2', '3'],
+  answer: 2,
+  marks: 2,
+  difficulty: 'hard',
+  type: 'numerical',
+  explanation: "Process operations in arrival order, updating timestamps only when an operation actually succeeds. (1) W3(Q), TS=15: the write rule rejects only if TS(T) < R-timestamp(Q) or TS(T) < W-timestamp(Q); both are currently 0, and 15 is less than neither, so the write PROCEEDS, updating W-timestamp(Q) to 15 (R-timestamp(Q) stays 0). (2) W1(Q), TS=5: check 5 < R-timestamp(Q)=0? No. Check 5 < W-timestamp(Q)=15? Yes - the write is REJECTED and T1 is rolled back; W-timestamp(Q) remains unchanged at 15 since the rejected write is never applied. (3) R2(Q), TS=10: the read rule rejects if TS(T) < W-timestamp(Q); W-timestamp(Q) is still 15 (T1's write never took effect), and 10 < 15, so this read is also REJECTED and T2 is rolled back. Final tally: only T3's write succeeded; both T1's write and T2's read were rejected - exactly 2 of the 3 operations are rolled back."
+},
+{
+  id: 'dbms-transactions-x14',
+  q: 'Which of the following is guaranteed by STRICT two-phase locking (Strict 2PL) that plain (basic) two-phase locking does not necessarily guarantee?',
+  options: [
+    'Conflict-serializability of the resulting schedule',
+    'Freedom from deadlock',
+    'Strictness of the schedule (and hence also cascadelessness and recoverability), since Strict 2PL holds all exclusive locks until the transaction commits or aborts, preventing any other transaction from reading or overwriting an item until then',
+    'Freedom from transaction starvation'
+  ],
+  answer: 2,
+  marks: 1,
+  difficulty: 'medium',
+  type: 'concept',
+  explanation: "Both basic 2PL and Strict 2PL guarantee conflict-serializability (option A) purely from the two-phase lock discipline itself, and neither variant prevents deadlock or starvation (options B and D) - those require separate detection/prevention mechanisms layered on top, regardless of which locking discipline is used underneath. The distinguishing feature of STRICT 2PL specifically is holding all EXCLUSIVE (write) locks until the transaction actually commits or aborts, rather than releasing them as soon as the shrinking phase begins as basic 2PL permits. This guarantees that no other transaction can read or overwrite a data item that some transaction has written until that writer's fate (commit or abort) is finally decided - which is precisely the definition of a strict schedule. Since strict schedules are automatically cascadeless (no dirty reads are ever possible) and automatically recoverable (strict implies both), Strict 2PL delivers all three properties as a direct consequence of its stricter lock-holding policy, which basic 2PL alone does not ensure."
+}
+);
