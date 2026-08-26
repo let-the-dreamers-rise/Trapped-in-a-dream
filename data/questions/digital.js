@@ -1127,3 +1127,126 @@ window.GATE_DATA.questions['digital'].topics.find(function(t){return t.id==='dig
   explanation: "This is the exact dual of building an 8-to-1 MUX from 2-to-1 MUXes. The first level uses 1 DEMUX, splitting the single input into 2 branches based on the MSB select bit. The second level uses 2 DEMUXes (one per branch from level 1), splitting each branch further using the middle select bit, giving 4 branches. The third level uses 4 DEMUXes (one per branch from level 2), splitting using the LSB select bit, giving the final 8 outputs. Total DEMUXes = 1 + 2 + 4 = 7, matching the general formula (2^n - 1) 1-to-2 DEMUXes needed to build a 1-to-2^n DEMUX tree — the same count structure as the internal nodes of a complete binary tree with 8 leaves, and numerically identical to the 2:1-MUX-tree count for an 8:1 MUX."
 }
 );
+
+window.GATE_DATA.questions['digital'].topics.find(function(t){return t.id==='digital-sequential';}).questions.push(
+{
+  id: 'digital-sequential-x1',
+  q: "A sequential circuit's state diagram has exactly 6 distinct valid states. What is the minimum number of flip-flops required to encode these states?",
+  options: ["2", "3", "4", "6"],
+  answer: 1,
+  marks: 1,
+  difficulty: 'easy',
+  type: 'numerical',
+  explanation: "With k flip-flops, a circuit can represent up to 2^k distinct binary state codes (some of which may be left unused). To encode 6 distinct states, we need the smallest k such that 2^k >= 6. With k=2, 2^2=4 states — not enough. With k=3, 2^3=8 states — enough, with 2 unused/don't-care state codes left over. So the minimum is k=3 flip-flops, i.e., k = ceil(log2(6)) = 3. This is the standard first step of any counter/FSM design problem: before writing excitation tables or drawing K-maps for the flip-flop inputs, you must first fix how many flip-flops the state register needs, and it is always the ceiling of log base 2 of the state count, never the state count itself unless that count happens to already be a power of 2."
+},
+{
+  id: 'digital-sequential-x2',
+  q: "To detect the sequence 1011 in an incoming serial bit stream, a Mealy FSM needs only 4 states, while an equivalent Moore FSM needs 5 states. Why does the Moore implementation need one extra state?",
+  options: ["Moore machines always need exactly one more state than Mealy machines for any problem", "A Moore machine's output depends only on the current state, so it needs a dedicated extra state purely to represent 'sequence just detected', whereas a Mealy machine can signal detection on the transition (edge) itself", "The Moore machine needs an extra state to handle the reset input", "Mealy machines cannot detect 4-bit sequences at all, so the comparison is invalid"],
+  answer: 1,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'concept',
+  explanation: "In a Mealy machine, the output is a function of BOTH the current state and the current input, so 'sequence detected' can simply be asserted as an output label on the transition arc taken when the last required bit arrives — no new state is needed, since the very act of taking that particular transition IS the signal. In a Moore machine, the output is a function of the CURRENT STATE ONLY, so there must exist a distinct state whose sole identity is 'the sequence has just been completed', separate from any state that merely represents a partial match — otherwise the output could not be pinned to state alone. This is why converting any Mealy FSM to an equivalent Moore FSM can require splitting some states, generally increasing the total state count by at least one when detecting a specific pattern, exactly the gap seen here (4 states vs 5 states)."
+},
+{
+  id: 'digital-sequential-x3',
+  q: "A 4-bit ripple (asynchronous) counter is built from T flip-flops, each with a propagation delay of 20 ns. What is the maximum operating frequency of this counter, considering the worst-case time for the count to settle after a clock edge?",
+  options: ["50 MHz", "25 MHz", "12.5 MHz", "6.25 MHz"],
+  answer: 2,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'numerical',
+  explanation: "In a ripple counter, each flip-flop is clocked by the output of the previous stage (not by a common clock), so a change must propagate serially through all 4 stages before the count is fully stable — this is the defining worst-case delay path. Total worst-case settling delay = number of stages × per-stage delay = 4 × 20 ns = 80 ns. The counter must wait this long between input clock edges to guarantee the count is correct before the next edge arrives, so the maximum clock period is 80 ns, giving maximum frequency = 1 / 80 ns = 12.5 MHz. This delay, and hence the maximum frequency, gets worse (linearly) as more bits (stages) are added, which is the fundamental scalability weakness of ripple counters compared to synchronous designs."
+},
+{
+  id: 'digital-sequential-x4',
+  q: "A 4-bit synchronous counter is built from the same T flip-flops (20 ns delay each) as in a ripple counter, but here all flip-flops share a common clock, with 15 ns of additional combinational logic delay to compute each flip-flop's T input. What is this synchronous counter's maximum operating frequency?",
+  options: ["12.5 MHz", "20 MHz", "28.6 MHz (approx)", "50 MHz"],
+  answer: 2,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'numerical',
+  explanation: "In a synchronous counter, every flip-flop is triggered by the SAME clock edge simultaneously, so the worst-case delay per clock cycle is just one flip-flop's own propagation delay plus the combinational logic delay needed to compute its next input — it does NOT multiply by the number of stages, unlike a ripple counter. Here that is 20 ns (flip-flop delay) + 15 ns (combinational T-input logic delay) = 35 ns total per cycle. Maximum frequency = 1 / 35 ns ≈ 28.57 MHz, which rounds to about 28.6 MHz. Compare this to the equivalent 4-bit ripple counter's 12.5 MHz (from the previous question, using the same 20 ns flip-flop delay) — the synchronous design is over twice as fast here, and critically, this synchronous delay stays roughly constant even if more bits are added, while ripple delay keeps growing linearly."
+},
+{
+  id: 'digital-sequential-x5',
+  q: "A ring counter is built from 4 D flip-flops connected in a loop, initialized with a single 1 circulating (e.g. 1000). How many distinct states does it cycle through during normal operation, out of the 2^4 = 16 total possible flip-flop combinations?",
+  options: ["2", "4", "8", "16"],
+  answer: 1,
+  marks: 1,
+  difficulty: 'easy',
+  type: 'concept',
+  explanation: "A ring counter with n flip-flops is initialized with exactly one flip-flop set to 1 and the rest to 0 (e.g. 1000 for n=4), and each clock edge simply shifts that single 1 one position around the loop, wrapping back to the start after n shifts: 1000 -> 0100 -> 0010 -> 0001 -> 1000 -> ... For n=4, this cycle visits exactly 4 distinct states before repeating, using only 4 of the 16 possible 4-bit patterns — the other 12 patterns (including all-0, all-1, and any pattern with more than one or zero 1s) are never entered during normal operation and are typically treated as invalid lockout states requiring careful reset/self-correcting logic. In general, an n-flip-flop ring counter always has exactly n valid states in its cycle, one for each possible rotational position of the single active bit."
+},
+{
+  id: 'digital-sequential-x6',
+  q: "A Johnson (twisted-ring) counter is built from 4 D flip-flops, where the complemented output of the last stage is fed back to the first stage's input. How many distinct states does it cycle through during normal operation?",
+  options: ["4", "8", "16", "2"],
+  answer: 1,
+  marks: 1,
+  difficulty: 'medium',
+  type: 'concept',
+  explanation: "A Johnson counter differs from a plain ring counter by feeding back the COMPLEMENT of the last flip-flop's output instead of its true output. Starting from all-0s (0000), each clock edge shifts all bits right (or left) by one position and inserts the complement of the departing bit at the vacated end: 0000 -> 1000 -> 1100 -> 1110 -> 1111 -> 0111 -> 0011 -> 0001 -> 0000 -> ... This sequence visits 2n distinct states before repeating (here n=4, so 2×4 = 8 states), roughly double the count of an equivalent plain ring counter (which only visits n = 4 states) while using the SAME number of flip-flops. This 2n-state property is exactly why Johnson counters are preferred whenever more usable states per flip-flop are needed, at the cost of slightly more complex output decoding logic than a plain ring counter."
+},
+{
+  id: 'digital-sequential-x7',
+  q: "A 4-bit shift register initially holds Q3Q2Q1Q0 = 1010. It is shifted right by one bit, three times in a row, with serial input bits 1, 1, 0 fed into Q3 in that order (one bit per shift), and whatever bit is shifted out of Q0 is discarded each time. What is the register's final content Q3Q2Q1Q0?",
+  options: ["1101", "0111", "1110", "0101"],
+  answer: 1,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'numerical',
+  explanation: "Start: Q3Q2Q1Q0 = 1 0 1 0. Shift 1 (serial-in = 1): every bit moves one position right, Q0's old value (0) is discarded, and the new bit enters at Q3. New register = 1(new) 1(old Q3) 0(old Q2) 1(old Q1) = 1101. Shift 2 (serial-in = 1): discard old Q0 (1), new register = 1(new) 1(old Q3=1) 1(old Q2=1) 0(old Q1=0) = 1110. Shift 3 (serial-in = 0): discard old Q0 (0), new register = 0(new) 1(old Q3=1) 1(old Q2=1) 1(old Q1=1) = 0111. So after all three shifts, the final content is 0111. Careful bit-by-bit tracing like this, keeping strict track of which old bit moves into which new position and which one falls off the end, is essential — a single misplaced bit changes the whole answer."
+},
+{
+  id: 'digital-sequential-x8',
+  q: "You want to implement a T flip-flop using a D flip-flop plus some combinational logic. What logic expression should drive the D input, in terms of T and the flip-flop's current output Q?",
+  options: ["D = T", "D = T AND Q", "D = T XOR Q", "D = T OR Q'"],
+  answer: 2,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'concept',
+  explanation: "A T flip-flop's characteristic equation is Q+ = T ⊕ Q (hold when T=0, toggle when T=1). A D flip-flop's characteristic equation is simply Q+ = D — whatever is placed on D becomes the next state directly. To make the D flip-flop behave exactly like a T flip-flop, the D input must be driven with whatever expression makes Q+ come out to T ⊕ Q, which means setting D = T ⊕ Q directly, since then Q+ = D = T ⊕ Q, matching the T flip-flop's behavior exactly for every combination of T and Q. Verify with a truth table: T=0,Q=0: D=0, Q+=0 (hold, correct). T=0,Q=1: D=1, Q+=1 (hold, correct). T=1,Q=0: D=1, Q+=1 (toggle, correct). T=1,Q=1: D=0, Q+=0 (toggle, correct). All four cases match, confirming D = T ⊕ Q."
+},
+{
+  id: 'digital-sequential-x9',
+  q: "You want to implement a D flip-flop using a JK flip-flop plus some combinational logic. What should the J and K inputs be driven with, in terms of D?",
+  options: ["J = D, K = D", "J = D, K = D'", "J = D', K = D", "J = 1, K = D"],
+  answer: 1,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'concept',
+  explanation: "A D flip-flop must satisfy Q+ = D regardless of the current state Q. A JK flip-flop's characteristic equation is Q+ = JQ' + K'Q. Setting J = D and K = D' gives Q+ = D·Q' + (D')'·Q = D·Q' + D·Q = D·(Q' + Q) = D·1 = D, which is exactly the desired D flip-flop behavior for any value of Q. Checking directly: when D=0, J=0 and K=1, which per the JK truth table forces Q+=0 (reset) regardless of Q — correct, since D=0 should always give Q+=0. When D=1, J=1 and K=0, which forces Q+=1 (set) regardless of Q — correct, since D=1 should always give Q+=1. So J = D, K = D' correctly converts a JK flip-flop into a D flip-flop for both possible values of D."
+},
+{
+  id: 'digital-sequential-x10',
+  q: "You want to implement a JK flip-flop using an SR flip-flop plus some combinational logic. What should the S and R inputs be driven with, in terms of J, K, and the current output Q?",
+  options: ["S = J, R = K", "S = JK', R = J'K", "S = J·Q', R = K·Q", "S = J+Q, R = K+Q'"],
+  answer: 2,
+  marks: 2,
+  difficulty: 'hard',
+  type: 'concept',
+  explanation: "A JK flip-flop must satisfy Q+ = JQ' + K'Q, and additionally must correctly toggle when J=K=1, which a raw SR flip-flop cannot do directly (S=R=1 is forbidden for SR). Setting S = J·Q' and R = K·Q avoids ever asserting both simultaneously: S=1 requires Q'=1 (i.e. Q=0), and R=1 requires Q=1, so S and R can never both be 1 at the same time — the SR forbidden condition is structurally avoided. Verify: when Q=0, S=J·1=J and R=K·0=0, so SR flip-flop behavior with R=0 gives Q+ = S = J, matching JQ' = J·1 = J. When Q=1, S=J·0=0 and R=K·1=K, so SR flip-flop behavior with S=0 gives Q+ = R'·Q = K'·1 = K', matching K'Q = K'·1 = K'. Both match the JK characteristic equation exactly for both values of Q, so S = JQ', R = KQ is the correct conversion."
+},
+{
+  id: 'digital-sequential-x11',
+  q: "A decade (mod-10) counter must count through states 0 to 9 and then repeat. What is the minimum number of flip-flops required, and what must the design additionally check for?",
+  options: ["3 flip-flops; no additional check needed since 2^3=8 exactly covers the range", "4 flip-flops; the 6 unused states (10-15) must be checked so the counter is self-starting and does not get stuck outside the 0-9 cycle", "10 flip-flops, one per count value", "4 flip-flops; no additional check is ever needed for any mod-N counter"],
+  answer: 1,
+  marks: 1,
+  difficulty: 'easy',
+  type: 'concept',
+  explanation: "Since 2^3 = 8 is less than 10, three flip-flops cannot represent all 10 required states, so the minimum is 4 flip-flops, since 2^4 = 16 >= 10. However, this leaves 16 - 10 = 6 unused binary states (decimal 10 through 15) that the counter should never legitimately enter but which noise, power-up glitches, or an incomplete reset could still land it in. During design, each unused state's assigned next-state transition (whether left as a don't-care or explicitly forced) must be checked to confirm the counter eventually re-enters the valid 0-9 cycle rather than looping forever among only invalid states (a 'lock-out' condition) — this self-starting check is a standard, often-tested step whenever a counter's modulus is not an exact power of 2."
+},
+{
+  id: 'digital-sequential-x12',
+  q: "For an 8-bit counter, a ripple design uses flip-flops with 15 ns propagation delay each (no other logic). A synchronous design uses the same 15 ns flip-flops plus a fixed 25 ns of combinational next-state logic delay, independent of the number of bits. What is the ratio of the synchronous counter's maximum frequency to the ripple counter's maximum frequency?",
+  options: ["1x (they are equal)", "2x", "3x", "8x"],
+  answer: 2,
+  marks: 2,
+  difficulty: 'hard',
+  type: 'numerical',
+  explanation: "Ripple counter worst-case delay = number of stages × per-stage delay = 8 × 15 ns = 120 ns, giving maximum frequency f_ripple = 1/120 ns ≈ 8.33 MHz. Synchronous counter worst-case delay = one flip-flop delay + the fixed combinational logic delay = 15 ns + 25 ns = 40 ns, regardless of the 8-bit width, giving maximum frequency f_sync = 1/40 ns = 25 MHz. The ratio f_sync / f_ripple = 25 MHz / 8.33 MHz = 3, so the synchronous counter can run 3 times faster than the ripple counter at this width. This ratio would grow even larger for wider counters (e.g. 16 or 32 bits), since the ripple counter's delay scales linearly with bit count while the synchronous counter's delay stays essentially fixed — this is the core numeric argument GATE uses to test understanding of why synchronous designs dominate at scale."
+}
+);

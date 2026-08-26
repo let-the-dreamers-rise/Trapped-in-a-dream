@@ -1349,3 +1349,106 @@ window.GATE_DATA.questions['algo'].topics.find(function(t){return t.id==='algo-g
   explanation: 'When multiple edges share the same weight and each is independently a valid (cycle-free) addition at the point Kruskal\'s algorithm considers it, the cut property guarantees that including EITHER one still yields a minimum spanning tree, because both are minimum-weight crossing edges for the cut separating their two endpoint components at that moment — the cut property only requires the edge to be A minimum-weight crossing edge, and ties mean multiple edges qualify simultaneously. This is exactly why MSTs are not unique in the presence of weight ties: the specific tree structure (which edges appear) can vary across valid tie-breaking choices, but the SUM of all edge weights in the resulting spanning tree is provably invariant across all such choices, since every valid MST has the same total weight by definition of "minimum." Option B is wrong because no fixed tie-breaking rule is REQUIRED for correctness (any consistent rule works), and option D is wrong because a genuinely cycle-free edge at the time it is checked can never later retroactively create a cycle.'
 }
 );
+
+window.GATE_DATA.questions['algo'].topics.find(function(t){return t.id==='algo-dp';}).questions.push(
+{
+  id: 'algo-dp-x1',
+  q: 'For the sequence [3, 10, 2, 1, 20], what is the length of the Longest Increasing Subsequence (LIS)?',
+  options: ['2', '3', '4', '5'],
+  answer: 1,
+  marks: 1,
+  difficulty: 'easy',
+  type: 'numerical',
+  explanation: 'Using the standard LIS DP where dp[i] = length of the longest increasing subsequence ending exactly at index i: dp[0]=1 (just [3]); dp[1]=2 (since 10>3, extend [3] to [3,10]); dp[2]=1 (2 is not greater than 3 or 10, so it starts fresh as [2]); dp[3]=1 (1 is smaller than everything before it, starts fresh as [1]); dp[4]=3 (20 is greater than 3, 10, 2, and 1, so it extends the best prior subsequence, dp[1]=2, giving [3,10,20] of length 3). The maximum over all dp[i] is max(1,2,1,1,3) = 3, achieved by the subsequence [3, 10, 20]. Note [2,20] or [1,20] give only length 2, so the true LIS length is 3, not the tempting-looking 4 or 5.'
+},
+{
+  id: 'algo-dp-x2',
+  q: 'How many ways are there to make change for the amount 5 using coins {1, 2, 5}, where the order of coins does NOT matter (this is a combination-counting DP, dp[amt] built by iterating coins in the OUTER loop)?',
+  options: ['3', '4', '6', '9'],
+  answer: 1,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'numerical',
+  explanation: 'Enumerate all unordered multisets of {1,2,5} summing to 5: {5}, {2,2,1}, {2,1,1,1}, {1,1,1,1,1}. That is exactly 4 distinct combinations. This matches the "combination counting" DP where the coin denomination is the OUTER loop and the amount is the INNER loop, ensuring each multiset of coins is counted exactly once regardless of the order coins are added, since a coin already processed in an earlier outer iteration is never revisited as a "new first coin" in a different order. Contrast this with the PERMUTATION-counting variant (amount in the outer loop, coins in the inner loop), which would count {2,2,1}, {2,1,2}, and {1,2,2} as three separate sequences, inflating the count well above 4 — always identify whether a GATE question asks for combinations (order irrelevant) or permutations (order relevant, e.g. counting sequences of dice-roll-like steps) before choosing the loop order.'
+},
+{
+  id: 'algo-dp-x3',
+  q: 'How many ORDERED sequences (permutations, where order matters, e.g. counting distinct sequences of moves) are there to make a sum of exactly 4 using steps of size {1, 2}?',
+  options: ['3', '5', '6', '8'],
+  answer: 1,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'numerical',
+  explanation: 'This is the permutation-counting variant: dp[s] = number of ordered sequences of steps from {1,2} summing to s, with dp[s] = dp[s-1] + dp[s-2] (amount in the outer loop, both step sizes tried at each amount), dp[0]=1, dp[negative]=0. Compute: dp[1] = dp[0] + dp[-1] = 1+0 = 1. dp[2] = dp[1]+dp[0] = 1+1 = 2. dp[3] = dp[2]+dp[1] = 2+1 = 3. dp[4] = dp[3]+dp[2] = 3+2 = 5. Enumerating directly confirms: [1,1,1,1], [1,1,2], [1,2,1], [2,1,1], [2,2] — exactly 5 ordered sequences. This is structurally the Fibonacci recurrence, illustrating that permutation-counting coin/step problems with a fixed small step set often reduce to a Fibonacci-like recurrence, unlike the combination-counting variant which would treat [1,1,2], [1,2,1], and [2,1,1] as the SAME combination {1,1,2} and count it only once.'
+},
+{
+  id: 'algo-dp-x4',
+  q: 'A robot starts at the top-left cell of a 3x3 grid and can move only RIGHT or DOWN, ending at the bottom-right cell. Cell (2,1) (row 2, column 1, 0-indexed) is BLOCKED and cannot be entered. How many distinct paths are there from (0,0) to (2,2)?',
+  options: ['2', '3', '4', '6'],
+  answer: 1,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'numerical',
+  explanation: 'Use dp[i][j] = number of paths to reach (i,j), with dp[i][j] = dp[i-1][j] + dp[i][j-1] (from above or from the left), dp[0][0] = 1, and dp[i][j] = 0 for any blocked cell or out-of-bounds cell. Row 0: dp[0][0]=1, dp[0][1]=1, dp[0][2]=1 (only one way along the top row). Row 1: dp[1][0]=dp[0][0]=1, dp[1][1]=dp[0][1]+dp[1][0]=1+1=2, dp[1][2]=dp[0][2]+dp[1][1]=1+2=3. Row 2: dp[2][0]=dp[1][0]=1 (not blocked, reached only from above), dp[2][1]=0 (BLOCKED, forced to 0 regardless of incoming paths), dp[2][2]=dp[1][2]+dp[2][1]=3+0=3. The blocked cell at (2,1) removes all paths that would have passed through it, leaving exactly 3 valid paths, all of which pass through (1,2) then step down to (2,2).'
+},
+{
+  id: 'algo-dp-x5',
+  q: 'For the Traveling Salesman Problem solved via bitmask DP with state dp[mask][j] = minimum cost to visit exactly the set of cities in "mask", ending at city j, what is the time complexity for n cities, and why?',
+  options: [
+    'Theta(n^2 * 2^n), because there are 2^n masks times n possible ending cities, and each state transition considers up to n previous cities',
+    'Theta(n * 2^n), because there are 2^n masks times n ending cities, with O(1) transition work each',
+    'Theta(2^n), independent of n since the mask alone determines the state',
+    'Theta(n!), because bitmask DP still enumerates all permutations of cities explicitly'
+  ],
+  answer: 0,
+  marks: 2,
+  difficulty: 'hard',
+  type: 'concept',
+  explanation: 'The state space has 2^n possible masks (subsets of the n cities) times n possible "currently at city j" values, giving Theta(n * 2^n) distinct states. For each state dp[mask][j], the transition considers every possible PREVIOUS city k that could have been visited just before j (i.e., k is in mask, k != j, and dp[mask without j][k] + cost(k,j) is a candidate), which requires trying up to n choices of k. So the total work is (number of states) * (transition cost per state) = Theta(n * 2^n) * Theta(n) = Theta(n^2 * 2^n). This is a dramatic improvement over the naive Theta(n!) brute-force enumeration of all Hamiltonian cycles, though it remains exponential in n (as expected, since TSP is NP-hard), and the Theta(n^2 * 2^n) bound is the standard, well-known Held-Karp complexity result.'
+},
+{
+  id: 'algo-dp-x6',
+  q: 'A top-down memoized recursive solution and a bottom-up tabulated (iterative) solution both solve the same DP problem with a two-dimensional state space of size n x m. Which of the following statements about their time and space complexity is CORRECT?',
+  options: [
+    'Both have identical Theta(nm) time complexity in the worst case (every state computed once), but memoization can sometimes use less time in practice if not all states are reachable from the initial call, while tabulation always computes every state',
+    'Tabulation is always asymptotically faster than memoization because it avoids recursive function-call overhead entirely',
+    'Memoization always uses less memory than tabulation because it never allocates a full table',
+    'Memoization cannot be used for problems with more than one state variable, only tabulation can'
+  ],
+  answer: 0,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'concept',
+  explanation: 'Both approaches, in the worst case, compute and store a result for every one of the Theta(nm) reachable states exactly once (memoization\'s cache check ensures no state is recomputed, matching tabulation\'s guarantee that every table cell is filled once), so their asymptotic TIME complexity is identical, Theta(nm) (each with Theta(1) or Theta(k) work per state depending on the transition, applied identically to both approaches). The one genuine advantage memoization can have is when the recursive call structure never actually reaches some subset of the n x m state space for a particular input (e.g. certain states are unreachable given the specific starting parameters), in which case memoization only computes the states actually needed, potentially doing less work than tabulation, which typically fills the entire table regardless of reachability. Memoization does carry extra constant-factor overhead from recursive calls and hashing/lookup, and both typically need Theta(nm) space for the table/cache (independent of this reachability nuance), so options B, C, and D are each incorrect generalizations.'
+},
+{
+  id: 'algo-dp-x7',
+  q: 'The 0/1 knapsack DP with capacity W and n items normally uses a 2D table of size (n+1) x (W+1). If the recurrence dp[i][w] depends only on row i-1 (never on row i or earlier rows), what is the minimum space (in terms of number of DP cells stored, ignoring the input arrays) needed to compute just the final answer dp[n][W], and what critical implementation detail must be preserved?',
+  options: [
+    'Theta(W) cells suffice using a single 1D array, PROVIDED the inner loop over w iterates in DECREASING order so that dp[w - weight[i]] still refers to the previous row\'s value, not an already-updated current-row value',
+    'Theta(W) cells suffice using a single 1D array, and the iteration direction (increasing or decreasing w) does not matter for correctness',
+    'Theta(n) cells suffice by keeping only one column at a time, iterating w in the outer loop',
+    'The full Theta(nW) table is unavoidable because 0/1 knapsack cannot be space-optimized, unlike unbounded knapsack'
+  ],
+  answer: 0,
+  marks: 2,
+  difficulty: 'hard',
+  type: 'concept',
+  explanation: 'Since dp[i][w] = max(dp[i-1][w], dp[i-1][w-weight[i]] + value[i]) only ever reads from row i-1, a single 1D array of size W+1 can represent "the previous row," updated in place to become "the current row." The critical subtlety is iteration DIRECTION: if w is iterated in INCREASING order, then by the time dp[w - weight[i]] is read, it may have ALREADY been overwritten with the CURRENT row i\'s value (since w - weight[i] < w was processed earlier in this same pass), which would incorrectly allow item i to be used more than once, silently turning the computation into UNBOUNDED knapsack. Iterating w in DECREASING order guarantees that dp[w - weight[i]] (a smaller index, processed LATER in a decreasing pass) still holds row i-1\'s value when read, preserving the correct 0/1 (single-use) semantics. This decreasing-order requirement is one of the most frequently tested GATE code-tracing traps in space-optimized DP.'
+},
+{
+  id: 'algo-dp-x8',
+  q: 'For the Longest Common Subsequence of X = "AGCAT" and Y = "GAC", what is the length of the LCS, and which of the following is a valid LCS string?',
+  options: [
+    'Length 2, and a valid LCS is "GA" (G at X-index 2 followed by A at X-index 4, matching G then A of Y in order)',
+    'Length 3, and a valid LCS is "GAC", appearing as a subsequence of both strings in order',
+    'Length 2, and a valid LCS is "CT" (matching a common tail of both strings)',
+    'Length 1, since the strings share only isolated single-character matches'
+  ],
+  answer: 0,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'numerical',
+  explanation: 'Write X = A(1) G(2) C(3) A(4) T(5) and Y = G(1) A(2) C(3), with positions shown in parentheses. First check whether "GAC" (length 3) is genuinely a subsequence of X: this needs increasing indices i<j<k in X with X[i]=G, X[j]=A, X[k]=C. The only G in X is at index 2, so i=2. The only A in X after index 2 is at index 4, so j=4. Now C must appear in X at some index k>4, but the only C in X is at index 3, which is before 4, not after, so no valid k exists, meaning "GAC" is NOT actually a subsequence of X, ruling out option B. Filling the standard LCS DP table dp[i][j] for X versus Y row by row confirms dp[5][3] = 2, with "GA" (X indices 2 and 4, matching Y indices 1 and 2) as one valid witness; "CT" is not even a subsequence of Y, since Y has no T at all, ruling out option C. So the verified correct LCS length is 2, achieved by "GA" (option A).'
+}
+);
