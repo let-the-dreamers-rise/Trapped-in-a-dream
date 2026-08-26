@@ -1548,3 +1548,161 @@ window.GATE_DATA.questions['dbms'].topics.find(function(t){return t.id==='dbms-n
   explanation: "The common attribute set between R1(A,B,C) and R2(A,D,E) is {A}. The lossless-join test requires this common set to functionally determine all of R1 or all of R2 under F's closure. Since A->B, A->C, A->D, and A->E are all given directly, A+ = {A,B,C,D,E}, which is the entire attribute set of R - meaning A is in fact a superkey (indeed the sole candidate key) of the original relation. A superkey of R trivially determines every attribute of R, which certainly includes all of R1's attributes {A,B,C} and all of R2's attributes {A,D,E}. Since A->R1 (and equally A->R2) holds, the lossless-join condition is satisfied on both sides simultaneously, confirming the decomposition is lossless. This is the general and easily recognizable pattern: whenever a decomposition splits a relation along a key that is preserved whole in every fragment, the join is guaranteed lossless."
 }
 );
+
+window.GATE_DATA.questions['dbms'].topics.find(function(t){return t.id==='dbms-indexing';}).questions.push(
+{
+  id: 'dbms-indexing-x1',
+  q: 'A B+-tree of order 4 (maximum 4 pointers per node) has exactly 3 levels: the root, one level of internal nodes below it, and the leaf level. Using minimum-occupancy rules (root minimum 2 pointers; other internal nodes minimum ceil(4/2)=2 pointers; leaves minimum ceil((4-1)/2)=2 records), what are the maximum and minimum numbers of records this tree can index?',
+  options: ['Maximum 48, minimum 8', 'Maximum 36, minimum 6', 'Maximum 48, minimum 12', 'Maximum 64, minimum 8'],
+  answer: 0,
+  marks: 2,
+  difficulty: 'hard',
+  type: 'numerical',
+  explanation: "For the maximum, use full occupancy at every level: the root can have up to 4 pointers to internal nodes, each internal node can have up to 4 pointers to leaves, and each leaf can hold up to (order-1) = 3 records. Maximum records = 4 (root fanout) x 4 (internal fanout) x 3 (records per leaf) = 48. For the minimum, use the minimum-occupancy rule at every level: the root needs at least 2 pointers (a special, looser minimum that applies only to the root), each non-root internal node needs at least ceil(4/2) = 2 pointers, and each leaf needs at least ceil((4-1)/2) = 2 records. Minimum records = 2 (root) x 2 (internal) x 2 (leaf) = 8. Multiplying fanouts level by level, using maximum values throughout for the upper bound and minimum values throughout for the lower bound, gives the full range of records the tree's fixed 3-level shape can index."
+},
+{
+  id: 'dbms-indexing-x2',
+  q: 'A B+-tree has leaf nodes each storing at most 99 records and internal nodes each having at most 100 pointers (order 100). To index exactly 10,000 records with maximum occupancy everywhere, how many levels (root, internal levels, and the leaf level, counting the root itself as one level) are required at minimum?',
+  options: ['2', '3', '4', '5'],
+  answer: 1,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'numerical',
+  explanation: "Work upward from the leaves using maximum fanout at every level. Leaves needed: each leaf holds at most 99 records, so ceil(10000 / 99) = 102 leaves are required (since 101 x 99 = 9999, one short of 10000, forcing a 102nd leaf). Next level up: each internal node can point to at most 100 leaves, so ceil(102 / 100) = 2 internal nodes are needed to cover all 102 leaves. One more level up: can a single node point to these 2 internal nodes? Yes - a root with just 2 pointers is well within the maximum of 100 (and satisfies the root's looser minimum of 2 as well), so a single root node suffices at the very top. Counting levels from the root downward: root (1 node) - internal level (2 nodes) - leaf level (102 nodes) - that is exactly 3 levels total, with no need for a fourth level since 2 internal nodes already fit under one root."
+},
+{
+  id: 'dbms-indexing-x3',
+  q: 'Keys 5, 10, 15, 20, 25 are inserted, in this order, into an initially empty B+-tree of order 3 (maximum 2 keys per leaf node; maximum 2 keys / 3 pointers per internal node). How many node splits occur in total during this sequence of insertions?',
+  options: ['1', '2', '3', '4'],
+  answer: 1,
+  marks: 2,
+  difficulty: 'hard',
+  type: 'numerical',
+  explanation: "Simulate step by step. Insert 5: leaf = [5]. Insert 10: leaf = [5,10] (at capacity, no overflow yet). Insert 15: the leaf would need to hold [5,10,15], exceeding the maximum of 2 - overflow, so it SPLITS: left leaf keeps [5,10], right leaf gets [15], and the smallest key of the right leaf (15) is copied up to form a new root [15] pointing to both leaves. This is split #1. Insert 20: 20 belongs in the right leaf [15], which becomes [15,20] - exactly at capacity, no overflow. Insert 25: the right leaf would need [15,20,25], exceeding capacity - overflow, so it SPLITS again: left keeps [15,20], right gets [25], and 25 is copied up to the root. The root, currently holding just key [15] with 2 pointers, now absorbs key 25 and a third pointer, becoming [15,25] with 3 pointers - exactly at its own maximum of 2 keys / 3 pointers, so NO further (root) split is triggered. Total splits across the whole sequence: exactly 2, both at the leaf level."
+},
+{
+  id: 'dbms-indexing-x4',
+  q: 'Keys 10, 20, 30, 40, 50, 60, 70 are inserted, in this order, into an initially empty B+-tree of order 3 (maximum 2 keys per leaf; maximum 2 keys / 3 pointers per internal node). How many total node splits occur (counting both leaf splits and any internal/root splits), and what is the final height of the tree (the root counts as one level)?',
+  options: [
+    '3 splits, final height 2 levels',
+    '4 splits, final height 3 levels - three leaf splits occur (triggered while inserting 30, 50, and 70), and a fourth split - of the root itself - occurs when the root overflows while absorbing the key pushed up from the third leaf split',
+    '4 splits, final height 2 levels',
+    '5 splits, final height 3 levels'
+  ],
+  answer: 1,
+  marks: 2,
+  difficulty: 'hard',
+  type: 'numerical',
+  explanation: "Insert 10, 20: leaf = [10,20]. Insert 30: overflow -> split leaf into [10,20] and [30]; root becomes [30] (split #1). Insert 40: goes into the [30] leaf, becomes [30,40], no overflow. Insert 50: the [30,40] leaf would need [30,40,50] - overflow -> split into [30,40] and [50], pushing 50 up; root absorbs it, becoming [30,50] with 3 pointers, still within its 2-key/3-pointer maximum, so no root split yet (split #2, leaf only). Insert 60: goes into the [50] leaf, becomes [50,60], no overflow. Insert 70: the [50,60] leaf would need [50,60,70] - overflow -> split into [50,60] and [70], pushing 70 up (split #3, leaf). Now the root, already holding [30,50] with 3 pointers (at its maximum), must absorb key 70 and a fourth pointer - this exceeds the maximum, so the ROOT ITSELF SPLITS (split #4): middle key 50 is pushed further up to form a brand-new root, increasing the tree's height from 2 levels to 3. Total: 4 splits, final height 3."
+},
+{
+  id: 'dbms-indexing-x5',
+  q: 'In a B+-tree of order p=5 (maximum 5 pointers, maximum 4 keys per node), what are the maximum number of keys in a single leaf node and the minimum number of keys in a non-root leaf node (using the ceil((p-1)/2) convention)?',
+  options: ['Maximum 4, minimum 2', 'Maximum 5, minimum 3', 'Maximum 4, minimum 1', 'Maximum 3, minimum 2'],
+  answer: 0,
+  marks: 1,
+  difficulty: 'easy',
+  type: 'concept',
+  explanation: "A leaf node in a B+-tree of order p can hold at most (p-1) search-key values, each paired with its own record pointer, since a leaf devotes one slot per key-pointer pair rather than the pointer-key-pointer routing structure of internal nodes. With p=5, the maximum is 5-1 = 4 keys per leaf. The minimum occupancy rule for a non-root leaf requires at least ceil((p-1)/2) key-pointer pairs, so as to guarantee every leaf stays at least half full and the tree remains balanced and space-efficient; with p=5, this is ceil(4/2) = 2 keys. So a non-root leaf in this tree always holds between 2 and 4 keys inclusive - option A. Note that this minimum-occupancy rule explicitly excludes the root, which is allowed to be less full (down to just 1 key if it is also a leaf, in the trivial single-node-tree case) since it has no sibling to redistribute with."
+},
+{
+  id: 'dbms-indexing-x6',
+  q: 'For a B+-tree of order p=7 (maximum 7 pointers per internal node), what are the maximum and minimum number of search-key values stored in a non-root internal node?',
+  options: ['Maximum 6, minimum 3', 'Maximum 7, minimum 4', 'Maximum 6, minimum 4', 'Maximum 5, minimum 3'],
+  answer: 0,
+  marks: 1,
+  difficulty: 'easy',
+  type: 'concept',
+  explanation: "An internal node of order p can hold at most (p-1) search-key values, since between p tree pointers there are exactly (p-1) 'gaps' available for separator keys in the pointer-key-pointer-...-pointer layout. With p=7, the maximum is 7-1 = 6 keys. The minimum occupancy rule for a non-root internal node requires at least ceil(p/2) pointers, to keep the tree balanced and avoid excessive space waste; with p=7, that is ceil(7/2) = 4 pointers, which corresponds to (4-1) = 3 keys, since the number of keys in an internal node is always one less than its number of pointers. So a non-root internal node in this tree holds between 3 and 6 keys inclusive, matching option A. As with leaves, this minimum-occupancy floor is specifically relaxed for the root, which needs only 2 pointers (1 key) at minimum."
+},
+{
+  id: 'dbms-indexing-x7',
+  q: 'Block size = 2048 bytes, search-key size = 12 bytes, and block/tree-pointer size = 6 bytes. What is the maximum order (maximum number of tree pointers) of a B+-tree internal node?',
+  options: ['113', '114', '115', '116'],
+  answer: 1,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'numerical',
+  explanation: "An internal node of order n has n pointers and (n-1) keys, and must fit within one block: n x (pointer size) + (n-1) x (key size) <= block size, i.e. n x 6 + (n-1) x 12 <= 2048. Solving the standard derived form n <= (block size + key size) / (pointer size + key size) gives n <= (2048 + 12) / (6 + 12) = 2060 / 18 = 114.44, and taking the floor gives n = 114. Verify by direct substitution: with n=114, the space used is 114 x 6 + 113 x 12 = 684 + 1356 = 2040 bytes, which fits within 2048 bytes. Checking the next integer, n=115, gives 115 x 6 + 114 x 12 = 690 + 1368 = 2058 bytes, which exceeds 2048 and does not fit. This confirms n=114 is indeed the maximum order, and re-substituting both the computed floor value and the next integer back into the raw inequality is the reliable way to avoid off-by-one errors on this kind of calculation."
+},
+{
+  id: 'dbms-indexing-x8',
+  q: 'Using the same block size 2048 bytes, key size 12 bytes, and pointer size 6 bytes (for both block pointers and record pointers), what is the maximum number of (key, record-pointer) pairs a single B+-tree leaf node can hold?',
+  options: ['113', '114', '115', '112'],
+  answer: 0,
+  marks: 2,
+  difficulty: 'hard',
+  type: 'numerical',
+  explanation: "A leaf node holds up to (n-1) key/record-pointer pairs plus one extra block pointer at the end for chaining to the next leaf, giving the space constraint (n-1) x (key size + record pointer size) + (block pointer size) <= block size. Substituting the derived formula n <= (block size - block pointer size + key size) / (key size + record pointer size) gives n <= (2048 - 6 + 12) / (12 + 6) = 2054 / 18 = 114.1, and flooring gives n = 114, meaning the leaf holds at most (n-1) = 113 key-record-pointer pairs. Verify directly: 113 pairs use 113 x (12+6) = 113 x 18 = 2034 bytes, plus the 6-byte chaining pointer, totaling 2040 bytes, which fits within 2048. Checking 114 pairs instead: 114 x 18 = 2052, plus 6 = 2058 bytes, which exceeds the 2048-byte block - confirming that 113 is indeed the maximum number of (key, record-pointer) pairs a leaf can hold."
+},
+{
+  id: 'dbms-indexing-x9',
+  q: 'A file has 100-byte records stored in a 2048-byte block, with no record spanning across blocks. What is the blocking factor (records per block), and how many blocks does a sorted file of 50,000 such records occupy?',
+  options: ['Blocking factor 20; 2500 blocks', 'Blocking factor 20; 2000 blocks', 'Blocking factor 21; 2381 blocks', 'Blocking factor 20; 2450 blocks'],
+  answer: 0,
+  marks: 1,
+  difficulty: 'easy',
+  type: 'numerical',
+  explanation: "The blocking factor is the number of whole records that fit in one block, computed as floor(block size / record size) since records cannot span blocks: floor(2048 / 100) = floor(20.48) = 20 records per block. To find the number of blocks needed for 50,000 records at 20 records per block, divide and round up (since a partially filled final block still counts as a full block): ceil(50000 / 20) = 2500 blocks exactly, since 50000 is an exact multiple of 20 (2500 x 20 = 50000 with no remainder, so no extra partial block is even needed). This matches option A. Options like 2000 or 2450 would result from arithmetic errors in either the blocking factor or the division, and option C's blocking factor of 21 incorrectly assumes records can be packed more densely than the block size actually allows (21 x 100 = 2100 bytes, which exceeds the 2048-byte block)."
+},
+{
+  id: 'dbms-indexing-x10',
+  q: 'A sorted data file occupies 2500 blocks (blocking factor 20). A sparse primary index has one entry per data block (16 bytes per entry), giving 2500 index entries stored with an index blocking factor of floor(2048/16) = 128 entries per index block. How many index blocks are needed, and what is the total number of block accesses for an exact-match search (binary search on the index, then read the target data block)?',
+  options: ['20 index blocks; 6 total accesses', '25 index blocks; 5 total accesses', '20 index blocks; 5 total accesses', '18 index blocks; 6 total accesses'],
+  answer: 0,
+  marks: 2,
+  difficulty: 'hard',
+  type: 'numerical',
+  explanation: "Index blocks needed = ceil(2500 / 128). Since 128 x 19 = 2432 (short of 2500) and 128 x 20 = 2560 (enough), exactly 20 index blocks are required. A binary search over 20 index blocks takes ceil(log2(20)) probes: since 2^4 = 16 < 20 <= 32 = 2^5, this is ceil(4.32) = 5 block accesses to locate the correct index entry. That index entry then points directly to the target data block (since this is a sparse PRIMARY index over a sorted file - the record is guaranteed to be findable in that one block via an in-memory scan, with no further block access needed for that scan), contributing exactly 1 more access. Total block accesses = 5 (index binary search) + 1 (data block read) = 6. This matches option A; the other options either miscompute the index block count or omit the final data-block read from the total."
+},
+{
+  id: 'dbms-indexing-x11',
+  q: 'The same 50,000-record file, when unsorted with respect to a field Name, has a dense secondary index on Name: one entry per record (16 bytes each), blocked at 128 entries per index block. How many index blocks does this dense secondary index require, and how many block accesses does an exact-match lookup need (binary search on the index, plus one data-block fetch)?',
+  options: ['391 index blocks; 10 total accesses', '391 index blocks; 9 total accesses', '400 index blocks; 10 total accesses', '391 index blocks; 11 total accesses'],
+  answer: 0,
+  marks: 2,
+  difficulty: 'hard',
+  type: 'numerical',
+  explanation: "A dense index needs one entry per RECORD, not per block, so with 50,000 records: index blocks = ceil(50000 / 128). Since 128 x 390 = 49,920 (short of 50,000) and 128 x 391 = 50,048 (enough), exactly 391 index blocks are needed - far more than a sparse index would require on the same file, since density trades index size for the guaranteed ability to locate any record without relying on physical ordering. Binary search over 391 index blocks takes ceil(log2(391)) probes: since 2^8 = 256 < 391 <= 512 = 2^9, this is ceil(8.6) = 9 block accesses to find the matching index entry. That entry then points to the exact data block holding the record (which, since the file is unsorted on Name, could be anywhere), contributing 1 more access. Total = 9 + 1 = 10 block accesses, matching option A."
+},
+{
+  id: 'dbms-indexing-x12',
+  q: 'For a sorted file of 50,000 records with data blocking factor 20, compare a sparse index (one entry per block) against a dense index (one entry per record), both using 16-byte entries packed 128 per index block. How many index blocks does each require?',
+  options: [
+    'Sparse needs 20 blocks; dense needs 391 blocks - the sparse index is roughly 20 times smaller',
+    'Sparse needs 391 blocks; dense needs 20 blocks',
+    'Both need 391 blocks, since both index the same underlying file',
+    'Sparse needs 2500 blocks; dense needs 50000 blocks'
+  ],
+  answer: 0,
+  marks: 1,
+  difficulty: 'medium',
+  type: 'numerical',
+  explanation: "A sparse index needs only one entry per DATA BLOCK, not per record: with a data blocking factor of 20, there are 50000/20 = 2500 data blocks and hence 2500 sparse index entries, which pack into ceil(2500/128) = 20 index blocks. A dense index needs one entry per RECORD instead: 50000 entries, packing into ceil(50000/128) = 391 index blocks. So the sparse index occupies 20 index blocks versus the dense index's 391 - roughly a 20-fold reduction (391/20 is approximately 19.6), reflecting exactly the data blocking factor of 20 that separates the two counts, since a sparse index is smaller than an equivalent dense index by very close to that same blocking-factor ratio. This size advantage is precisely why sparse indexes are preferred whenever they are applicable (i.e., whenever the data file is physically sorted on the index's key), at the small added cost of an in-block scan after locating the sparse entry."
+},
+{
+  id: 'dbms-indexing-x13',
+  q: 'Which of the following correctly explains why a sparse index requires its data file to be physically sorted on the index search key, whereas a dense index has no such requirement?',
+  options: [
+    'A sparse index stores only one entry per block (or per group of identical values), so locating an unindexed value requires scanning forward within the target block from the nearest preceding entry - correct only if the file is sorted, guaranteeing that every value between two indexed entries physically lies between them; a dense index instead gives a direct pointer for every value, so no such positional guarantee is ever needed',
+    'Sparse indexes are always smaller than dense ones no matter how the file is organized, which is why sorting is irrelevant to them',
+    'It is actually the dense index that requires sorting, while the sparse index does not',
+    'Neither a sparse index nor a dense index has any dependency on the physical sort order of the underlying data file'
+  ],
+  answer: 0,
+  marks: 1,
+  difficulty: 'medium',
+  type: 'concept',
+  explanation: "A sparse index deliberately omits entries for most search-key values to save space, typically keeping just one entry per data block (pointing to that block's first record). Finding a value with no explicit entry means locating the nearest PRECEDING indexed entry and then scanning forward through the data block(s) from there - this procedure is only correct if the data file is physically sorted on that same search key, since sorting is what guarantees every value 'between' two consecutive index entries is physically stored between them on disk. Without that sort order, a sparse index could point to a starting position with no guarantee the target record is anywhere nearby. A dense index, in contrast, stores a direct pointer for every distinct search-key value (or every record), so it never needs to rely on any positional relationship between values, and works correctly regardless of how the underlying data file happens to be physically organized."
+},
+{
+  id: 'dbms-indexing-x14',
+  q: 'A B+-tree index has height 3 (root, one internal level, and the leaf level - 3 block accesses to reach the first qualifying leaf), with an average leaf occupancy of 100 records per leaf. A range query matches 850 qualifying records in total, retrieved by locating the first qualifying leaf via the tree and then following leaf-chain pointers for the rest. Approximately how many total block accesses are needed (assuming records are read directly from the leaf blocks, with no separate record-fetch step)?',
+  options: ['9', '11', '12', '3'],
+  answer: 1,
+  marks: 2,
+  difficulty: 'hard',
+  type: 'numerical',
+  explanation: "Reaching the first qualifying leaf costs 3 block accesses (the tree's height), and that single access already reads the first leaf block, yielding up to 100 of the 850 qualifying records. The remaining qualifying records after that first leaf: 850 - 100 = 750. Each additional leaf block accessed via the leaf-chain linked list yields up to 100 more records, so the number of additional leaf blocks needed is ceil(750 / 100) = 8 (since 7 x 100 = 700 is short of 750, an 8th leaf block is required to cover the rest). Total block accesses = 3 (tree traversal down to and including the first leaf) + 8 (additional leaf blocks read via chaining) = 11. This calculation illustrates the core efficiency benefit of the B+-tree's linked leaf level for range queries: after paying the initial height-proportional cost once, every subsequent qualifying leaf costs just a single sequential access with no need to re-traverse the tree from the root."
+}
+);

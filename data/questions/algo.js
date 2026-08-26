@@ -1555,3 +1555,121 @@ window.GATE_DATA.questions['algo'].topics.find(function(t){return t.id==='algo-g
   explanation: 'A spanning tree on 3 vertices needs exactly 2 edges (n-1 = 3-1 = 2). Since all three edges have the identical weight 5, any 2 of the 3 edges form a valid spanning tree (the triangle has no smaller subset that leaves a vertex disconnected, and any 2 edges out of a 3-cycle always span all 3 vertices without forming a cycle themselves), each with total weight 5+5=10, which is the minimum possible (using all 3 edges would create a cycle, which is invalid for a tree, and is unnecessary since 2 edges already connect everything at the lowest achievable weight). There are C(3,2) = 3 ways to choose which 2 of the 3 edges to include (equivalently, 3 ways to choose which single edge to EXCLUDE), so there are exactly 3 distinct MSTs, each of total weight 10, directly illustrating the rule that MSTs are non-unique whenever tied edge weights create multiple equally optimal spanning subgraphs.'
 }
 );
+
+window.GATE_DATA.questions['algo'].topics.find(function(t){return t.id==='algo-sorting-searching';}).questions.push(
+{
+  id: 'algo-sorting-searching-x1',
+  q: 'k sorted lists, each of length n (total kn elements), are merged into one sorted list using a min-heap of size k that always holds one "current" element from each non-exhausted list. What is the time complexity of producing the fully merged output?',
+  options: ['Theta(kn log k)', 'Theta(kn log n)', 'Theta(kn log(kn))', 'Theta(k^2 n)'],
+  answer: 0,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'concept',
+  explanation: 'The heap holds at most k elements at any time (one representative from each list still having unconsumed elements). Each of the kn total output elements requires one extract-min (Theta(log k)) to remove the smallest current element, followed by one insert (Theta(log k)) to push in that list\'s next element (or nothing if that list is now exhausted). So each of the kn elements costs Theta(log k) heap work, giving a total of Theta(kn log k). Interestingly, a balanced-merge-tree approach (repeatedly 2-way merging pairs of the k lists, log k levels deep, each level doing Theta(kn) total work) also reaches Theta(kn log k), matching the heap-based bound, but the heap-based k-way merge is generally preferred in practice for its single-pass streaming nature and lower constant factor. The key distinguishing point in this question is that the heap size is k (number of lists), not kn (total elements), so each heap operation costs Theta(log k), NOT Theta(log(kn)) or Theta(log n).'
+},
+{
+  id: 'algo-sorting-searching-x2',
+  q: 'An external sort must sort a file that is too large for main memory. The available memory can hold M records at once, and the file has N total records. Using the standard multi-pass merge external sort (create N/M initial sorted runs, then repeatedly merge pairs of runs), how many passes over the data are needed, and what is the total I/O time complexity?',
+  options: [
+    'Theta(log(N/M)) passes, Theta(N log(N/M)) total I/O work',
+    'Theta(log N) passes, Theta(N log N) total I/O work',
+    'Theta(N/M) passes, Theta(N^2/M) total I/O work',
+    'Theta(1) pass, Theta(N) total I/O work, since external sort is linear'
+  ],
+  answer: 0,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'concept',
+  explanation: 'Phase 1 creates N/M initial sorted runs (each run is one memory-load\'s worth of M records, sorted internally), a single pass over the data. Phase 2 repeatedly performs 2-way merge passes: each merge pass halves the number of remaining runs (pairing them up and merging), so starting from N/M runs, it takes log2(N/M) merge passes to reduce to a single fully-sorted run. Each merge pass reads and writes every one of the N records once, costing Theta(N) I/O work per pass. Total passes: 1 (initial run creation) + log2(N/M) (merging) = Theta(log(N/M)) passes overall (the initial run-creation pass is a lower-order additive constant compared to the merge passes for large N/M). Total I/O work: Theta(N) per pass times Theta(log(N/M)) passes = Theta(N log(N/M)), which is the standard, well-known external-merge-sort I/O complexity taught in GATE database/OS-adjacent algorithm questions.'
+},
+{
+  id: 'algo-sorting-searching-x3',
+  q: 'Interpolation search on a sorted array of n uniformly distributed numeric keys probes a position estimated by linear interpolation between the low and high bounds, rather than always the midpoint (as binary search does). Under the uniform-distribution assumption, what is its average-case time complexity, and under what condition does it degrade?',
+  options: [
+    'Average case Theta(log log n) under uniform distribution; degrades to Theta(n) worst case when the data is highly non-uniform (e.g. exponentially distributed or heavily clustered keys)',
+    'Average case Theta(log n) always, identical to binary search regardless of data distribution',
+    'Average case Theta(sqrt(n)) under uniform distribution; never degrades further regardless of distribution',
+    'Average case Theta(1) always, since interpolation always guesses the exact position'
+  ],
+  answer: 0,
+  marks: 2,
+  difficulty: 'hard',
+  type: 'concept',
+  explanation: 'When keys are uniformly distributed, the interpolation formula pos = low + (target - arr[low]) * (high - low) / (arr[high] - arr[low]) tends to land very close to the target\'s true position, and probabilistic analysis shows the expected number of probes needed is Theta(log log n), a doubly-logarithmic improvement over binary search\'s Theta(log n) — intuitively, each successful interpolation step reduces the remaining search space much faster than simple halving when the distribution assumption holds. However, this guarantee relies critically on uniformity: if the data is highly skewed or clustered (e.g. most keys bunched together with a few extreme outliers, or an exponential distribution), the interpolation estimate can be very inaccurate, causing the search range to shrink only slightly each step, degrading interpolation search to Theta(n) in the worst case (no better than, and sometimes even worse in practice than, linear search) — this fragility to distributional assumptions is precisely why interpolation search, despite its excellent average case, is used far less often than binary search in general-purpose code.'
+},
+{
+  id: 'algo-sorting-searching-x4',
+  q: 'To find the top-k largest elements out of n total elements (k much smaller than n), which approach achieves the best asymptotic time complexity, and what is it?',
+  options: [
+    'Build a min-heap of size k, then for each of the remaining n-k elements, compare against the heap minimum and replace if larger; total time Theta(n log k)',
+    'Fully sort all n elements first (Theta(n log n)), then take the last k; this is always asymptotically optimal',
+    'Use a simple linear scan keeping track of only the single largest element, extended naively to k elements in Theta(nk) time, which is always faster than any heap-based method',
+    'Use quickselect to find the kth largest element in Theta(n) expected time, but this alone identifies only the threshold value, not the sorted list of k elements, so no comparison-based method can do better than Theta(n log n) for the full top-k LIST'
+  ],
+  answer: 0,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'concept',
+  explanation: 'The min-heap approach maintains a heap of exactly k elements representing the current best k candidates seen so far. Building the initial heap from the first k elements costs Theta(k) (heapify). For each of the remaining n-k elements, one comparison against the heap\'s minimum (Theta(1)) determines whether to discard it or replace the heap minimum (Theta(log k) for the replace-and-sift operation) with it. In the worst case every one of the n-k remaining elements triggers a replacement, giving Theta((n-k) log k) = Theta(n log k) when k is much smaller than n. This strictly beats full sorting\'s Theta(n log n) whenever k = o(n) (since log k = o(log n) in that regime), making the bounded min-heap the standard, asymptotically superior technique for top-k selection; quickselect variants can find the Theta(n) expected-time threshold value but still need extra Theta(k log k) work to produce a SORTED top-k list, which remains competitive with, but does not universally beat, the heap approach for typical small k.'
+},
+{
+  id: 'algo-sorting-searching-x5',
+  q: 'For the array [2, 4, 1, 3, 5], how many inversions (pairs i<j with arr[i] > arr[j]) does it contain, and how does this relate to the minimum number of adjacent-swap operations needed to sort it with insertion sort or bubble sort?',
+  options: [
+    '3 inversions; exactly 3 adjacent swaps are needed, since each adjacent swap in insertion/bubble sort removes exactly one inversion',
+    '2 inversions; exactly 4 adjacent swaps are needed',
+    '4 inversions; exactly 2 adjacent swaps are needed',
+    '3 inversions; exactly 5 adjacent swaps are needed, since sorting requires touching every element at least once'
+  ],
+  answer: 0,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'numerical',
+  explanation: 'List all pairs (i,j) with i<j and arr[i]>arr[j] for [2,4,1,3,5] (0-indexed): (2,1) at positions (0,2): 2>1, inversion. (4,1) at positions (1,2): 4>1, inversion. (4,3) at positions (1,3): 4>3, inversion. Checking remaining pairs: (2,4): 2<4 no; (2,3): 2<3 no; (2,5): no; (4,5): no; (1,3): 1<3 no; (1,5): no; (3,5): no. Total inversions = 3, namely the pairs (2,1),(4,1),(4,3) by value. This matches the fundamental theorem that the number of inversions in an array EXACTLY equals the minimum number of ADJACENT transpositions (swaps of neighboring elements) needed to sort it, since each adjacent swap can resolve at most one inversion (swapping two adjacent out-of-order elements removes exactly that one inversion and cannot affect any other pair\'s relative order) and a sorted array has zero inversions. So exactly 3 adjacent swaps suffice and are necessary, confirming option A and illustrating why bubble sort and insertion sort (both of which only ever perform adjacent swaps) take Theta(number of inversions) time on any given input.'
+},
+{
+  id: 'algo-sorting-searching-x6',
+  q: 'An algorithm is allowed to use ARBITRARY (not necessarily adjacent) swaps to sort an array, where each swap can exchange any two elements regardless of position. For the array [3, 4, 1, 2] (0-indexed), what is the number of inversions (the minimum adjacent-swap count) versus the minimum number of ARBITRARY swaps needed to sort it, and why do they differ?',
+  options: [
+    'Inversions = 4, but only 2 arbitrary swaps are needed (swap positions 0 and 2, then swap positions 1 and 3), since each arbitrary swap can resolve an entire misplaced pair (a 2-cycle) in one move',
+    'Inversions = 4, and 4 arbitrary swaps are needed too, identical to the adjacent-swap count',
+    'Inversions = 2, and 2 arbitrary swaps are needed',
+    'Inversions = 4, and 3 arbitrary swaps are the true minimum'
+  ],
+  answer: 0,
+  marks: 2,
+  difficulty: 'hard',
+  type: 'concept',
+  explanation: 'For [3,4,1,2] (0-indexed), list inversions: (3,1) at positions (0,2): inversion. (3,2) at positions (0,3): inversion. (4,1) at positions (1,2): inversion. (4,2) at positions (1,3): inversion. (3,4) at (0,1): no. (1,2) at (2,3): no. Total inversions = 4, meaning 4 adjacent swaps would be needed by bubble or insertion sort. But with arbitrary swaps allowed, decompose the permutation into cycles by tracking where each value belongs: value 3 (at position 0) belongs at position 2; value 1 (at position 2) belongs at position 0 — this is a self-contained 2-cycle (0 and 2 swap directly). Likewise value 4 (at position 1) belongs at position 3, and value 2 (at position 3) belongs at position 1 — another self-contained 2-cycle (1 and 3 swap directly). Swapping positions 0 and 2 gives [1,4,3,2]; swapping positions 1 and 3 then gives [1,2,3,4], fully sorted in exactly 2 arbitrary swaps. In general a k-element cycle needs k-1 arbitrary swaps, and here two independent 2-cycles need 1 swap each, totaling 2 — far fewer than the 4 adjacent swaps, illustrating that arbitrary swaps can resolve multiple inversions simultaneously when the underlying permutation decomposes into short cycles.'
+},
+{
+  id: 'algo-sorting-searching-x7',
+  q: 'A "partial sort" operation returns the smallest k elements of an n-element array in SORTED order (not just as an unordered set). Using a min-heap-based partial-sort approach optimized for small k, what is the tightest asymptotic time complexity achievable, expressed in terms of n and k?',
+  options: [
+    'Theta(n + k log n), by building a min-heap of all n elements in Theta(n) time (heapify) and then extracting the minimum k times, each extraction costing Theta(log n)',
+    'Theta(n log k), by maintaining a size-k max-heap over a single pass and never touching the full n-element heap',
+    'Theta(n log n), no partial-sort method can ever beat a full sort',
+    'Theta(k^2), independent of n, since only k elements need to be finally arranged'
+  ],
+  answer: 0,
+  marks: 2,
+  difficulty: 'hard',
+  type: 'concept',
+  explanation: 'Building a min-heap from all n elements costs Theta(n) using the standard bottom-up heapify procedure (not Theta(n log n), a common misconception — heapify is linear because most nodes are near the bottom of the tree and require little sifting). After the heap is built, each extract-min operation costs Theta(log n) (sift-down through a heap of size up to n), and exactly k such extractions are needed to retrieve the k smallest elements in fully sorted order (each extraction yields the next-smallest remaining element, naturally producing sorted output one element at a time). Total time: Theta(n) [build] + Theta(k log n) [k extractions] = Theta(n + k log n). This is asymptotically the best comparison-based bound for this exact task (retrieving k SORTED smallest elements from all n) when using this heap-based technique, and it correctly reduces to Theta(n log n) when k = n (matching heapsort\'s known complexity) while being much cheaper, close to Theta(n), when k is a small constant or grows slowly, such as k = O(1) or k = O(log n).'
+},
+{
+  id: 'algo-sorting-searching-x8',
+  q: 'The array [5, 1, 4, 2, 3] is sorted using insertion sort. How many total ADJACENT swaps (swaps of two neighboring elements) does the standard insertion sort algorithm perform, and how does this number relate to the array\'s inversions?',
+  options: [
+    '6 swaps, exactly equal to the number of inversions in the array',
+    '5 swaps, equal to the array length',
+    '10 swaps, equal to n(n-1)/2 for n=5',
+    '3 swaps, since only 3 elements are out of their final position'
+  ],
+  answer: 0,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'numerical',
+  explanation: 'First count inversions in [5,1,4,2,3] (0-indexed) by checking every pair where the earlier element exceeds the later one: (5,1), (5,4), (5,2), (5,3), (4,2), (4,3) are all inversions; (1,4), (1,2), (1,3), (2,3) are not. Total inversions = 6. Now trace insertion sort directly: start [5,1,4,2,3]. Insert 1: it swaps leftward past 5, giving [1,5,4,2,3], 1 swap. Insert 4: it swaps leftward past 5 only (4 is not smaller than 1, so it stops there), giving [1,4,5,2,3], 1 swap. Insert 2: it swaps leftward past 5 then past 4 (stopping at 1), giving [1,2,4,5,3], 2 swaps. Insert 3: it swaps leftward past 5 then past 4 (stopping at 2), giving [1,2,3,4,5], 2 swaps. Total swaps = 1+1+2+2 = 6, exactly matching the 6 inversions counted directly. This confirms the general theorem that insertion sort\'s adjacent-swap count always equals the array\'s total inversion count, since each swap resolves precisely one out-of-order adjacent pair and no others.'
+}
+);

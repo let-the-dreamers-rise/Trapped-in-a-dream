@@ -1229,3 +1229,86 @@ window.GATE_DATA.questions['os'].topics.find(function(t){return t.id==='os-proce
   explanation: 'exec() does NOT create a new process -- it operates on the ALREADY EXISTING calling process (here, the child created moments earlier by fork()), completely replacing that process\'s code, data, heap, and stack with the code and data of a new program, while the process ID (PID) stays exactly the same as before the exec() call. This is precisely why fork()+exec() is the standard Unix idiom for launching a new program: fork() creates a new, independent process (initially a duplicate of the parent), and exec() then transforms that child into the desired new program. The parent\'s wait() call simply blocks the parent until the child eventually terminates (whenever the exec()\'d program finishes), it does not itself cause termination.'
 }
 );
+
+window.GATE_DATA.questions['os'].topics.find(function(t){return t.id==='os-scheduling';}).questions.push(
+{
+  id: 'os-scheduling-x1',
+  q: 'Processes P1(AT=0,BT=8), P2(AT=1,BT=4), P3(AT=2,BT=2) are scheduled using SRTF (preemptive shortest remaining time first). What is P1\'s waiting time?',
+  options: ['6', '0', '8', '4'],
+  answer: 0,
+  marks: 2,
+  difficulty: 'hard',
+  type: 'numerical',
+  explanation: 'Trace: t=0, only P1 present, P1 runs (remaining 8). At t=1, P2(BT4) arrives; P2\'s remaining(4) < P1\'s remaining(7), so P1 is PREEMPTED and P2 runs. At t=2, P3(BT2) arrives; P3\'s remaining(2) < P2\'s remaining(3), so P2 is preempted and P3 runs. P3 has the shortest job and no further arrivals beat it, so P3 runs to completion: 2 to 4. At t=4, compare remaining bursts: P2 has 3 left, P1 has 7 left; P2 runs 4 to 7 (completes). Then P1 runs its remaining 7, from 7 to 14. P1\'s completion time = 14, turnaround = 14-0=14, waiting time = turnaround - burst = 14-8 = 6. P1 experienced two preemptions and had to wait for both P2 and P3 to fully finish before resuming.'
+},
+{
+  id: 'os-scheduling-x2',
+  q: 'In an SRTF trace, a running process is preempted at the exact instant a new process arrives with remaining burst time EQUAL to (not less than) the running process\'s remaining time. What is the standard convention?',
+  options: ['No preemption occurs, since SRTF only preempts on a STRICTLY smaller remaining time; the currently running process continues', 'The new process always preempts on a tie, by convention', 'Both processes are considered to run simultaneously', 'The process with the higher arrival time is always preempted regardless of remaining time'],
+  answer: 0,
+  marks: 1,
+  difficulty: 'medium',
+  type: 'concept',
+  explanation: 'SRTF preempts the currently running process only when a newly arrived (or newly ready) process has a STRICTLY SMALLER remaining burst time than the process currently on the CPU. On an exact tie, there is no compelling reason to switch (switching would only add unnecessary context-switch overhead without reducing anyone\'s remaining work), so the standard convention -- and the one GATE numericals assume unless stated otherwise -- is that the currently running process CONTINUES uninterrupted. This subtlety matters because it changes which process accumulates waiting time in a tie scenario, and is a common source of off-by-one errors in preemptive scheduling traces.'
+},
+{
+  id: 'os-scheduling-x3',
+  q: 'A binary semaphore is used purely for mutual exclusion, while a monitor with a condition variable is used to solve the same producer-consumer problem. Which statement correctly distinguishes them for THIS specific comparison?',
+  options: ['The monitor automatically enforces mutual exclusion for all code inside it, and its condition-variable signal() is lost if no thread is currently waiting, whereas a semaphore\'s signal() always increments its counter regardless of whether anyone is waiting', 'A monitor cannot be used to solve producer-consumer at all, only semaphores can', 'A semaphore automatically provides mutual exclusion for an entire block of code without any explicit wait/signal calls, exactly like a monitor', 'Condition variables in a monitor behave identically to counting semaphores in every respect, including remembering signals sent with no waiter'],
+  answer: 0,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'concept',
+  explanation: 'A monitor bundles shared data and its operations into one module where the compiler/runtime automatically ensures only one thread executes inside the monitor at a time -- no explicit wait(mutex)/signal(mutex) pairing is needed by the programmer. Its condition variables are used only for scheduling constraints (e.g., "buffer not full"): calling signal() on a condition variable wakes ONE waiting thread if one exists, but if no thread happens to be waiting at that moment, the signal has no lasting effect and is simply lost -- it is NOT remembered for a future wait() call. A semaphore behaves completely differently: signal() always increments its internal counter, persisting that "credit" even if no process is currently blocked, to be consumed later by whichever process next calls wait(). This is why care must be taken translating a semaphore-based solution into a monitor-based one -- the "memory" of a missed signal simply does not exist for condition variables.'
+},
+{
+  id: 'os-scheduling-x4',
+  q: 'Four processes P1,P2,P3,P4 arrive at t=0 with burst times 6,8,7,3 respectively and are scheduled by non-preemptive SJF. What is the average waiting time?',
+  options: ['7', '9', '12', '3'],
+  answer: 0,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'numerical',
+  explanation: 'Since all four processes arrive simultaneously at t=0, non-preemptive SJF simply runs them in increasing order of burst time: P4(3), P1(6), P3(7), P2(8). Completion times: P4=3, P1=3+6=9, P3=9+7=16, P2=16+8=24. Since every process arrived at t=0, turnaround time equals completion time here, so waiting time = completion time - burst time: P4=3-3=0, P1=9-6=3, P3=16-7=9, P2=24-8=16. Sum of waiting times = 0+3+9+16 = 28; average = 28/4 = 7. This confirms that always scheduling the shortest job first among simultaneously ready processes is provably optimal for minimising average waiting time in the non-preemptive, all-arrive-together case.'
+},
+{
+  id: 'os-scheduling-x5',
+  q: 'In Round Robin scheduling with a very large time quantum (larger than the longest burst time of any process), the resulting schedule behaves most like which other algorithm?',
+  options: ['FCFS (First Come First Served)', 'SRTF (Shortest Remaining Time First)', 'Non-preemptive priority scheduling', 'Multilevel feedback queue with three levels'],
+  answer: 0,
+  marks: 1,
+  difficulty: 'easy',
+  type: 'concept',
+  explanation: 'If the Round Robin time quantum exceeds the burst time of every process in the system, then no process is ever actually preempted mid-execution -- each process, once dispatched, simply runs to completion within its allotted quantum before the timer would even trigger. This means processes are serviced in exactly the same order the ready queue presents them, which (assuming a plain FIFO ready-queue insertion order matching arrival order) is identical to plain FCFS scheduling. This is precisely why quantum size is described as tuning RR "between" fine-grained fairness (small quantum) and FCFS-like batch behaviour (very large quantum).'
+},
+{
+  id: 'os-scheduling-x6',
+  q: 'Which of the following is a valid GATE-style reason multilevel feedback queue (MLFQ) scheduling is considered more general than plain multilevel queue scheduling?',
+  options: ['MLFQ allows a process to move between queues based on its observed behaviour (e.g., CPU-bound vs I/O-bound), whereas plain multilevel queue permanently fixes each process to one queue', 'MLFQ uses only a single ready queue, unlike multilevel queue which uses several', 'MLFQ cannot be configured to behave like FCFS or Round Robin, unlike multilevel queue', 'MLFQ never allows preemption, while plain multilevel queue always does'],
+  answer: 0,
+  marks: 1,
+  difficulty: 'medium',
+  type: 'concept',
+  explanation: 'In plain multilevel queue scheduling, each process is assigned PERMANENTLY to exactly one queue (e.g., based on process type) for its entire lifetime, and a fixed policy governs CPU allocation between queues. Multilevel feedback queue relaxes this rigidity: a process can be DEMOTED to a lower-priority (usually longer-quantum) queue if it consumes a lot of CPU time (behaving as CPU-bound), or PROMOTED to a higher-priority queue if it frequently gives up the CPU early (behaving as I/O-bound), all without the scheduler needing to know burst times in advance. Because its parameters (number of queues, quantum per queue, promotion/demotion rules) are fully configurable, MLFQ can be tuned to emulate FCFS, Round Robin, or a plain multilevel queue as special cases, making it the most general scheduling framework among the classical algorithms.'
+},
+{
+  id: 'os-scheduling-x7',
+  q: 'Consider Round Robin with quantum=3 and processes P1(AT=0,BT=5), P2(AT=2,BT=4). What is the total number of context switches that occur (counting only switches BETWEEN different processes, not counting the very first dispatch)?',
+  options: ['2', '1', '3', '0'],
+  answer: 0,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'numerical',
+  explanation: 'Trace: t=0-3, P1 runs (only P1 has arrived), remaining becomes 5-3=2. At t=2, P2 arrives and joins the queue: queue=[P2]. At t=3, P1\'s quantum expires and it is preempted (SWITCH 1: P1 to P2), re-queued: queue=[P2, P1(2)]. t=3-6, P2 runs its full quantum (remaining 4-3=1), then is preempted (SWITCH 2: P2 to P1), re-queued: queue=[P1(2), P2(1)]. t=6-8, P1 runs its remaining 2 and FINISHES exactly at the quantum boundary, so control passes on to P2 without needing to re-queue P1 -- this handoff to run the next process is not counted as a preemption-switch since P1 completed rather than being cut off. t=8-9, P2 runs its remaining 1 and finishes. Total context switches between distinct processes (P1 to P2, then P2 to P1) = 2.'
+},
+{
+  id: 'os-scheduling-x8',
+  q: 'Under priority scheduling without aging, which scenario below correctly illustrates starvation?',
+  options: ['A continuous stream of high-priority processes keeps arriving, so a waiting low-priority process never gets scheduled even though it is ready and has been waiting a very long time', 'A single low-priority process is the only ready process in the system and runs immediately', 'The scheduler runs out of memory to store the ready queue', 'Two processes of identical priority alternate on the CPU indefinitely, sharing time equally'],
+  answer: 0,
+  marks: 1,
+  difficulty: 'easy',
+  type: 'concept',
+  explanation: 'Starvation (indefinite blocking) under priority scheduling specifically means a ready process is repeatedly passed over for the CPU because other, higher-priority processes keep arriving and always outrank it -- the low-priority process is never fundamentally denied resources it needs, it simply keeps losing the priority comparison every time the scheduler picks the next process to run, potentially forever if high-priority arrivals never stop. This is exactly why AGING is introduced as the standard fix: it gradually increases the priority of any process that has waited long enough, guaranteeing it eventually becomes the highest-priority ready process and gets scheduled. The other options describe either normal scheduling behaviour or an unrelated resource issue, not starvation.'
+}
+);
