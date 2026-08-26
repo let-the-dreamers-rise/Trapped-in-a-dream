@@ -1034,3 +1034,146 @@ window.GATE_DATA.questions['compiler'].topics.find(function(t){return t.id==='co
     explanation: 'The full token stream, in order, is: total, =, total, +, 1, ;, total, =, total, +, 1, ; — 12 tokens in all. But the question asks for distinct lexeme strings, i.e. the set of unique character sequences that occur, which is {total, =, +, 1, ;} — exactly 5 distinct lexemes, even though total appears four times and the statement is repeated verbatim. This distinguishes "how many tokens total" (12) from "how many distinct lexemes" (5); GATE occasionally tests exactly this difference between a token instance and the lexeme class it belongs to. Option 2 is correct.'
   }
 );
+
+window.GATE_DATA.questions['compiler'].topics.find(function(t){return t.id==='compiler-parsing';}).questions.push(
+  {
+    id: 'compiler-parsing-x1',
+    q: 'For the grammar S -> A B, A -> a A | epsilon, B -> b B | c, what is FOLLOW(A)?',
+    options: ['{a, b, c}', '{b, c}', '{b, c, $}', '{$}'],
+    answer: 1,
+    marks: 2,
+    difficulty: 'medium',
+    type: 'numerical',
+    explanation: 'A occurs only on the right side of S -> A B, with B immediately following it. The rule for a production of the form X -> alpha A beta says: add FIRST(beta) minus epsilon to FOLLOW(A); additionally add FOLLOW(X) to FOLLOW(A) only if beta is nullable. Here beta = B, and FIRST(B) = {b, c} (B is never nullable since neither of its alternatives is epsilon). Because B is not nullable, FOLLOW(S) = {$} is NOT propagated into FOLLOW(A). The self-recursive production A -> a A places A at the end, contributing FOLLOW(A) to itself, which adds nothing new. Hence FOLLOW(A) = {b, c}, option 2 — the $ is a common trap that does not belong here.'
+  },
+  {
+    id: 'compiler-parsing-x2',
+    q: 'Consider the grammar S -> S + T | T, T -> id. Which statement about this grammar is correct?',
+    options: ['It is LL(1) because FIRST(S) and FIRST(T) are disjoint', 'It is not LL(1) because S is left-recursive', 'It is not LL(1) because the two alternatives of S share a common prefix', 'It is LL(1) after removing the epsilon production'],
+    answer: 1,
+    marks: 1,
+    difficulty: 'easy',
+    type: 'concept',
+    explanation: 'A predictive (LL(1)) parser must decide which alternative to expand using only the next input symbol, before consuming anything; a left-recursive rule such as S -> S + T immediately calls S again with no token consumed, sending the parser into infinite recursion with no lookahead ever advancing. This is a structural disqualifier independent of any FIRST/FOLLOW computation: no left-recursive grammar can be LL(1). It must first be rewritten (S -> T S2, S2 -> + T S2 | epsilon) before a predictive table can be built. There is no common prefix here (S and T start differently once recursion is removed) and there is no epsilon production in the original grammar, so options 1, 3 and 4 are incorrect; option 2 correctly names the actual obstacle.'
+  },
+  {
+    id: 'compiler-parsing-x3',
+    q: 'Consider the grammar S -> a S b | a c. Why does this grammar fail to be LL(1)?',
+    options: ['S is left-recursive', 'Both alternatives of S begin with the terminal a, so FIRST sets overlap and one token of lookahead cannot choose between them', 'S has an epsilon production whose FOLLOW set overlaps with FIRST', 'The grammar generates an infinite language, which LL(1) parsers cannot handle'],
+    answer: 1,
+    marks: 2,
+    difficulty: 'medium',
+    type: 'concept',
+    explanation: 'FIRST(a S b) = {a} and FIRST(a c) = {a}: both alternatives of S start by consuming the terminal a, so seeing an a on the input does not tell the predictive parser which production to expand — it would need to look past the shared prefix. This is the classic "common prefix" obstruction, fixed by left factoring: rewrite as S -> a S2, S2 -> S b | c. Neither alternative is left-recursive (both begin with a terminal), there is no epsilon production here at all, and generating an infinite language is completely normal for LL(1) grammars (most useful ones do). So the correct diagnosis is option 2.'
+  },
+  {
+    id: 'compiler-parsing-x4',
+    q: 'For the augmented grammar S\' -> S, S -> C C, C -> c C | d (the canonical Dragon-book worked example), how many states are in the LR(0) (equivalently SLR(1)) canonical collection of item sets?',
+    options: ['5', '6', '7', '8'],
+    answer: 2,
+    marks: 2,
+    difficulty: 'hard',
+    type: 'numerical',
+    explanation: 'Constructing the automaton by closure and goto gives exactly seven distinct item sets: I0 = {S\'→•S, S→•CC, C→•cC, C→•d}; I1 = {S\'→S•} (accept); I2 = {S→C•C, C→•cC, C→•d} = goto(I0,C); I3 = {C→c•C, C→•cC, C→•d} = goto(I0,c); I4 = {C→d•} = goto(I0,d); I5 = {S→CC•} = goto(I2,C); I6 = {C→cC•} = goto(I3,C). Crucially, goto(I2,c) and goto(I3,c) both produce the exact same item set as I3 itself (no new state), and goto(I2,d) and goto(I3,d) both equal I4, because LR(0) items carry no lookahead to distinguish contexts. So the collection does not keep growing — it closes at exactly 7 states, option 3.'
+  },
+  {
+    id: 'compiler-parsing-x5',
+    q: 'For the same grammar S\' -> S, S -> C C, C -> c C | d, the canonical LR(1) (CLR) collection of items is known to have more states than the LR(0)/SLR(1) collection, because per-item lookaheads keep contexts separate that LR(0) would merge. If the canonical LR(1) automaton has 10 states, how many states remain after the LALR(1) construction merges states sharing the same LR(0) core?',
+    options: ['10 (LALR keeps every CLR state)', '7 (matches the LR(0)/SLR(1) state count exactly)', '5 (fewer than even LR(0))', '1 (all states collapse into one)'],
+    answer: 1,
+    marks: 2,
+    difficulty: 'hard',
+    type: 'pyq-style',
+    explanation: 'By construction, LALR(1) is built by taking the canonical LR(1) collection and merging every group of states that share the same core (the same LR(0) items, ignoring lookaheads) into a single state whose lookahead sets are the union of the merged states\' lookaheads. Since the LR(0) automaton for this grammar has exactly 7 states (as derived by closure/goto), and every LR(1) state\'s core corresponds to exactly one of those 7 LR(0) states, merging by core must produce exactly 7 LALR(1) states — never more, and never fewer, than the LR(0) count. This is the general theorem "LALR(1) always has the same number of states as LR(0)/SLR(1) for the same grammar," illustrated concretely here: 10 CLR states collapse to 7. Option 2 is correct.'
+  },
+  {
+    id: 'compiler-parsing-x6',
+    q: 'The well-known grammar S -> L = R | R, L -> * R | id, R -> L is the standard textbook example used to show that:',
+    options: ['The grammar is ambiguous and cannot be parsed by any LR method', 'The grammar is LALR(1) but is not SLR(1)', 'The grammar is SLR(1) but is not LALR(1)', 'The grammar is LL(1) but is not LR(1)'],
+    answer: 1,
+    marks: 2,
+    difficulty: 'hard',
+    type: 'pyq-style',
+    explanation: 'This is the canonical "L = R" assignment-statement grammar used to demonstrate the gap between SLR(1) and LALR(1). Computing FOLLOW(R) gives a set that includes "=" (because R can be reduced from L, and L can be followed by "=" in S -> L = R), which causes the SLR construction to see a spurious shift-reduce conflict in a state where reducing R -> L is only actually valid before $ or specific tokens, not before every symbol in the coarse FOLLOW(R) set. The canonical LR(1)/LALR(1) construction tracks the precise lookahead actually reachable in that specific state, which does not include "=" there, so the conflict disappears. The grammar is unambiguous and perfectly parsable by LALR(1); it simply exceeds what the cruder FOLLOW-set-based SLR(1) test can validate. Option 2 is correct.'
+  },
+  {
+    id: 'compiler-parsing-x7',
+    q: 'In the classic dangling-else grammar stmt -> if expr then stmt | if expr then stmt else stmt | other, an LALR parser state contains both a completed item stmt -> if expr then stmt . (reduce) and an item stmt -> if expr then stmt . else stmt (shift on else). To bind each else to its nearest unmatched if, the parser generator should resolve this shift-reduce conflict by:',
+    options: ['Always reducing, since reduce actions are preferred by default', 'Always shifting on else, discarding the reduce action in this state', 'Reporting a compile-time ambiguity error and refusing to generate a parser', 'Reducing only when the lookahead is $, shifting otherwise'],
+    answer: 1,
+    marks: 1,
+    difficulty: 'medium',
+    type: 'concept',
+    explanation: 'The dangling-else grammar is genuinely ambiguous, but the desired disambiguation rule — match every else to the closest preceding unmatched if — corresponds exactly to preferring shift over reduce whenever both are available on else. If the parser reduces early (closing off the inner if without its else), the else would be forced to attach to the outer if instead, which is the wrong, less intuitive binding. Parser generators such as yacc/bison implement this by defaulting to shift on a shift-reduce conflict, which is precisely correct for dangling-else and is the standard textbook resolution; no error needs to be reported and no lookahead-based special case (option 4) is needed. Option 2 is correct.'
+  },
+  {
+    id: 'compiler-parsing-x8',
+    q: 'Given the grammar E -> E + T | T, T -> T * F | F, F -> id, what does the shape of these productions imply about the operators + and *?',
+    options: ['+ and * have equal precedence and are right-associative', '* has higher precedence than +, and both operators are left-associative', '+ has higher precedence than *, and both operators are right-associative', 'Precedence cannot be inferred from a context-free grammar'],
+    answer: 1,
+    marks: 1,
+    difficulty: 'medium',
+    type: 'concept',
+    explanation: 'Precedence is encoded by nesting depth: * is generated deeper in the grammar (inside T, which is itself a "unit" that E is built from), so a * is always grouped with its operands before the surrounding + can apply — meaning * binds tighter, i.e. has higher precedence. Associativity is encoded by the direction of recursion: both E -> E + T and T -> T * F are LEFT-recursive, which forces expressions like a + b + c to parse as (a + b) + c and a * b * c as (a * b) * c — left associativity for both operators. This is exactly why the standard expression grammar is written this way: left recursion for left-associativity, and layering (E over T over F) for precedence. Option 2 is correct.'
+  },
+  {
+    id: 'compiler-parsing-x9',
+    q: 'For the augmented grammar S\' -> S, S -> a S | b, how many states are there in the canonical LR(0) collection of item sets?',
+    options: ['4', '5', '6', '7'],
+    answer: 1,
+    marks: 2,
+    difficulty: 'hard',
+    type: 'numerical',
+    explanation: 'Build the automaton: I0 = closure({S\'→•S}) = {S\'→•S, S→•aS, S→•b}. goto(I0,S) = {S\'→S•} = I1 (accept). goto(I0,a) = closure({S→a•S}) = {S→a•S, S→•aS, S→•b} = I2. goto(I0,b) = {S→b•} = I3. From I2: goto(I2,S) = {S→aS•} = I4; goto(I2,a) = closure({S→a•S}), which is the identical item set to I2 itself, so it is a self-loop, not a new state; goto(I2,b) = {S→b•}, identical to I3, so it reuses I3. No further new states appear. The complete collection is {I0, I1, I2, I3, I4} — exactly 5 states, option 2.'
+  },
+  {
+    id: 'compiler-parsing-x10',
+    q: 'For the grammar S -> A B c, A -> a | epsilon, B -> b | epsilon, what is FIRST(S)?',
+    options: ['{a, b, c}', '{a, b}', '{a, b, c, epsilon}', '{a, c}'],
+    answer: 0,
+    marks: 1,
+    difficulty: 'easy',
+    type: 'numerical',
+    explanation: 'S has one production, A B c, so FIRST(S) is built by walking the right-hand side: start with FIRST(A) minus epsilon = {a}. Since A is nullable (it has an epsilon alternative), continue into the next symbol: add FIRST(B) minus epsilon = {b}. Since B is also nullable, continue further: add FIRST(c) = {c}, and because c is a terminal (never nullable), the walk stops there. Since the walk terminated at a non-nullable symbol (c) rather than falling off the end of the production, epsilon is NOT added to FIRST(S). The result is FIRST(S) = {a, b, c}, option 1. This tests correctly chaining through two nullable nonterminals before reaching a solid terminal.'
+  },
+  {
+    id: 'compiler-parsing-x11',
+    q: 'For the grammar S -> A B, A -> a A | b, B -> c B | d, what is FOLLOW(A)?',
+    options: ['{c, d}', '{c, d, $}', '{a, b}', '{$}'],
+    answer: 0,
+    marks: 2,
+    difficulty: 'medium',
+    type: 'numerical',
+    explanation: 'A appears only in S -> A B, immediately followed by B, and also recursively at the end of A -> a A. From S -> A B: since A is not the last symbol, add FIRST(B) minus epsilon to FOLLOW(A). Neither alternative of B is epsilon (B -> c B | d), so B is not nullable, FIRST(B) = {c, d} exactly, and this is added to FOLLOW(A) without also pulling in FOLLOW(S) (that extra step only applies when the following symbols are nullable). From A -> a A, A is the last symbol, so FOLLOW(A) is added to itself, contributing nothing new. Hence FOLLOW(A) = {c, d}, option 1 — note that $ does NOT belong here because A is never the very last symbol of the sentential form derivable from S.'
+  },
+  {
+    id: 'compiler-parsing-x12',
+    q: 'The classic ambiguous grammar E -> E + E | E * E | id, with no declared precedence or associativity, causes which specific problem when an LR item-set automaton is constructed for it?',
+    options: ['A reduce-reduce conflict only, never a shift-reduce conflict', 'A shift-reduce conflict, because a state can simultaneously offer to shift the next operator and to reduce the completed E on top of the stack', 'No conflict at all; ambiguity only affects LL parsers, not LR parsers', 'A lexical error, because + and * cannot both be tokenized in the same expression'],
+    answer: 1,
+    marks: 1,
+    difficulty: 'medium',
+        type: 'concept',
+    explanation: 'After parsing "E + E" with a lookahead of "*" (as in id + id * id), the parser reaches a state containing both the completed item E -> E + E . (offering to reduce) and, because E can also start a new E * E, effectively a live shift possibility on the operator that follows. This is a textbook shift-reduce conflict, and it arises specifically because the grammar does not encode precedence structurally (unlike the layered E/T/F grammar) — it must be resolved externally by declaring that * binds tighter than + and that both are left-associative, exactly what yacc-style %left/%right precedence declarations are for. Ambiguity affects both LL and LR parsing equally (an ambiguous grammar cannot be strictly LL(1) or LR(k) either), so option 3 is false, and there is no lexical issue. Option 2 is correct.'
+  },
+  {
+    id: 'compiler-parsing-x13',
+    q: 'For the (deliberately ambiguous) grammar S -> A | B, A -> a, B -> a, which LL(1) parsing table cell exposes a conflict?',
+    options: ['M[A, a] only', 'M[S, a], because both S -> A and S -> B would be placed in this same cell', 'M[B, a] only', 'There is no conflict; the grammar is LL(1)'],
+    answer: 1,
+    marks: 2,
+    difficulty: 'medium',
+    type: 'pyq-style',
+    explanation: 'FIRST(A) = {a} and FIRST(B) = {a}, since both simply derive the terminal a. For the LL(1) table, production S -> A is entered into M[S, t] for every t in FIRST(A), i.e. M[S, a]; production S -> B is entered into M[S, t] for every t in FIRST(B), which is again just M[S, a]. Both productions land in the exact same table cell, meaning the parser cannot decide which one to use on seeing an a — a direct LL(1) conflict (in fact the grammar is ambiguous, since "a" has two distinct derivations from S). The individual rules A -> a and B -> a themselves cause no conflict in their own table rows, since each nonterminal has only one alternative. Option 2 correctly names the conflicting cell.'
+  },
+  {
+    id: 'compiler-parsing-x14',
+    q: 'The production pair E -> T ^ E | T, used for an exponentiation operator ^, is written with right recursion instead of left recursion. What does this imply about ^?',
+    options: ['^ is left-associative, matching typical arithmetic operators', '^ is right-associative, so a ^ b ^ c groups as a ^ (b ^ c)', 'The grammar is ambiguous regardless of recursion direction', 'Right recursion makes the grammar unusable by any parser'],
+    answer: 1,
+    marks: 1,
+    difficulty: 'easy',
+    type: 'concept',
+    explanation: 'Associativity is read off the direction of recursion in the grammar: a right-recursive rule E -> T ^ E nests new expansions on the right, forcing a string like a ^ b ^ c to derive as a ^ (b ^ c) — right associativity — which correctly matches how exponentiation is conventionally evaluated (2^2^3 = 2^(2^3), not (2^2)^3). This mirrors, in reverse, why left recursion (E -> E + T) produces left-associative operators. Right recursion is perfectly usable by both LL and LR parsers (LL parsers in fact often prefer it, since left recursion must be eliminated for them anyway); it is not inherently a source of ambiguity. Option 2 is correct.'
+  }
+);

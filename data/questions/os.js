@@ -485,6 +485,167 @@ window.GATE_DATA.questions['os'] = {
           explanation: 'The entire purpose of wait() and signal() is to safely coordinate access to shared data between competing processes, but this only works if the semaphore\\u2019s own internal integer value cannot itself be corrupted by a race condition when two processes call wait() or signal() at the same moment. This requires wait() and signal() to be implemented as atomic, indivisible operations -- typically by briefly disabling interrupts on a uniprocessor, or using a hardware atomic instruction, or a short internal spinlock on a multiprocessor -- so that the semaphore\\u2019s value update itself is never interleaved. Whether the blocked process then busy-waits or is put to sleep is a separate implementation choice (contradicting option B), and semaphores can be implemented in either the kernel or user-space libraries, contradicting option D.'
         }
       ]
+    },
+    {
+      id: 'os-deadlock',
+      name: 'Deadlocks',
+      theory: {
+        intro: 'A deadlock is a state where a set of processes are each waiting for a resource held by another process in the same set, so none of them can ever proceed. GATE tests this topic through two very different lenses: conceptual questions on the four necessary Coffman conditions and the three broad handling strategies (prevention, avoidance, detection), and computation-heavy questions built around the Banker\\u2019s algorithm, where you must compute a Need matrix, trace a safety algorithm to find a safe sequence, or decide whether a new resource request can be granted without risking deadlock. A third recurring numerical pattern asks for the minimum number of resource instances that guarantees deadlock can never occur, given how many processes exist and their maximum resource claims. Resource-allocation graphs (RAGs) round out the topic, especially the subtlety that a cycle in a RAG is necessary but not always sufficient for deadlock once resource types have multiple instances.',
+        core: 'A deadlock can occur only if all four Coffman conditions hold simultaneously:\n• Mutual exclusion: at least one resource must be held in a non-shareable mode.\n• Hold and wait: a process holding at least one resource is waiting to acquire additional resources currently held by other processes.\n• No preemption: resources cannot be forcibly taken away from a process; they must be released voluntarily.\n• Circular wait: there exists a set of waiting processes {P0, P1, ..., Pn} such that P0 waits for a resource held by P1, P1 waits for one held by P2, and so on, until Pn waits for one held by P0.\n\nA resource-allocation graph (RAG) represents processes and resource types as nodes, with a request edge (process to resource) and an assignment edge (resource to process). For resource types with a single instance, a cycle in the RAG is both necessary AND sufficient for deadlock. For resource types with multiple instances, a cycle is necessary but not sufficient -- the cycle only guarantees deadlock if every resource type involved in the cycle has all of its instances already allocated with no free instance available to break the wait.\n\nDeadlock handling falls into three strategies. Prevention works by ensuring at least one of the four Coffman conditions can never hold: hold-and-wait is prevented by requiring a process to request all its resources at once before starting (or to hold none while requesting more); no-preemption is negated by allowing the OS to forcibly preempt resources from a waiting process; and circular wait is prevented by imposing a total (linear) ordering on resource types and requiring every process to request resources only in strictly increasing order. Mutual exclusion cannot generally be removed for genuinely non-shareable resources, so prevention schemes usually target the other three. Avoidance takes a more dynamic approach: the OS is told each process\\u2019s maximum possible claim in advance, and before granting any request it checks whether the resulting state would still be safe (i.e., some ordering of processes exists in which every process can eventually finish); the Banker\\u2019s algorithm is the canonical avoidance algorithm. Detection allows deadlocks to occur but periodically runs an algorithm (similar to Banker\\u2019s safety check, but without needing maximum-claim information in advance) to identify a deadlocked set, followed by recovery via process termination or resource preemption.\n\nBanker\\u2019s algorithm safety check, given Available (a vector of currently free instances per resource type), Allocation (a matrix of currently held instances per process per resource type), and Max (a matrix of each process\\u2019s maximum possible demand), first computes Need = Max - Allocation for every process. The safety algorithm then repeatedly looks for a process whose Need is entirely <= the current Available vector; if found, it pretends that process runs to completion and releases all its resources, adding its Allocation back into Available, and marks it finished; this repeats until either all processes are marked finished (the state is safe, and the order in which processes were picked is a safe sequence) or no remaining process\\u2019s Need fits the current Available (the state is unsafe). A new resource request from a process is granted only if it does not exceed that process\\u2019s Need, does not exceed current Available, and the resulting hypothetical state (after tentatively granting it) still passes the full safety check; otherwise the process must wait.\n\nMinimum resources to guarantee deadlock avoidance: for n processes each with a maximum need of at most k instances of a single resource type, the system is guaranteed deadlock-free if the total number of instances is at least n(k-1) + 1 -- one short of this, every process could simultaneously hold (k-1) instances and request one more, creating a genuine circular wait with zero instances free. More generally, when different processes have different maximum needs Max_1, ..., Max_n for the same resource type, the analogous safe threshold is (Max_1 - 1) + (Max_2 - 1) + ... + (Max_n - 1) + 1.',
+        strategy: 'For any Banker\\u2019s algorithm question, first write out the Need matrix (Max - Allocation) before doing anything else -- most computation errors come from trying to compare Max or Allocation directly against Available instead of Need. Then run the safety algorithm mechanically: at each step, scan every unfinished process and pick any one whose full Need row is <= the current Available vector (component-wise); if several qualify, any one may be chosen, and different valid choices can produce different, equally correct safe sequences, so an exam option showing a different order from the one you found first is not automatically wrong -- verify it independently rather than assuming your first found order is the only one. When asked whether a request can be granted, first check Request <= Need and Request <= Available as a quick filter (if either fails, the request is simply invalid or must wait, no safety check even needed) -- only if both pass do you tentatively apply the request and re-run the full safety check on the resulting hypothetical state. For minimum-resource-instance formulas, remember the "-1" per process before the final "+1": it comes from the worst-case scenario where every process holds one less than its maximum need, since holding exactly its maximum would mean the process is already finished and does not need to wait. For RAG questions, always check whether a resource type is single-instance or multi-instance before concluding deadlock from a visible cycle -- multi-instance cycles need every implicated resource type to be fully allocated with no free instance anywhere along the cycle. Worked mini-example: 3 processes, single resource type, each with a maximum need of 4 units. Minimum instances to guarantee safety = 3(4-1)+1 = 10; with only 9 instances, all three processes could simultaneously hold 3 units each (using all 9) and each still need 1 more, producing an unavoidable circular wait.'
+      },
+      questions: [
+        {
+          id: 'os-deadlock-q1',
+          q: 'Which of the following is NOT one of the four necessary Coffman conditions for deadlock?',
+          options: ['Mutual exclusion, hold and wait, no preemption, circular wait', 'Mutual exclusion, hold and wait, no preemption, resource starvation', 'These are all valid: mutual exclusion, hold and wait, no preemption, circular wait', 'None of the other options -- all four standard conditions are listed correctly in option A'],
+          answer: 1,
+          marks: 1,
+          difficulty: 'easy',
+          type: 'concept',
+          explanation: 'The four Coffman conditions that must ALL hold simultaneously for a deadlock to be possible are: mutual exclusion (a resource is held non-shareably), hold and wait (a process holds resources while waiting for more), no preemption (resources cannot be forcibly taken back), and circular wait (a cycle of processes each waiting on the next). "Resource starvation" is not one of the four formal Coffman conditions -- starvation is a related but distinct phenomenon (a process being perpetually denied a resource, which can happen even without a full circular-wait deadlock, for instance under unfair priority scheduling). Option B is therefore the one that incorrectly substitutes starvation for circular wait, making it the correct choice for "NOT" one of the four conditions.'
+        },
+        {
+          id: 'os-deadlock-q2',
+          q: 'In a resource-allocation graph where every resource type has exactly one instance, the presence of a cycle means:',
+          options: ['The system is definitely deadlocked -- a cycle is both necessary and sufficient for deadlock in this case', 'The system might or might not be deadlocked -- a cycle is necessary but not sufficient', 'The system is definitely safe -- cycles never indicate deadlock', 'It indicates starvation but never deadlock'],
+          answer: 0,
+          marks: 1,
+          difficulty: 'easy',
+          type: 'concept',
+          explanation: 'When every resource type in the graph has only a single instance, a cycle in the resource-allocation graph is both a necessary and a sufficient condition for deadlock: since each resource can be assigned to only one process at a time, every process along the cycle is genuinely blocked forever waiting on the very next resource in the cycle, with no possibility of any free instance existing elsewhere to break the chain. This is precisely why single-instance RAGs make deadlock detection trivial -- just search for a cycle. The "necessary but not sufficient" caveat only applies once resource types can have multiple instances, where a cycle can exist yet still leave a free instance available somewhere to unblock the chain, which is not possible in the pure single-instance case.'
+        },
+        {
+          id: 'os-deadlock-q3',
+          q: 'What is the fundamental difference between deadlock prevention and deadlock avoidance?',
+          options: ['Prevention structurally ensures at least one Coffman condition can never hold; avoidance dynamically checks each resource request against future safety using advance knowledge of maximum claims', 'Prevention runs only after a deadlock has already occurred; avoidance runs only before any process starts', 'Prevention requires the Banker\\u2019s algorithm; avoidance never uses any algorithm', 'There is no real difference -- the two terms are interchangeable'],
+          answer: 0,
+          marks: 1,
+          difficulty: 'medium',
+          type: 'concept',
+          explanation: 'Deadlock prevention takes a static, structural approach: it redesigns the system so that at least one of the four Coffman conditions can never arise at all (e.g., forcing all resource requests upfront removes hold-and-wait, or imposing a resource ordering removes circular wait), guaranteeing deadlock cannot occur regardless of runtime behaviour, though often at the cost of resource utilisation or concurrency. Deadlock avoidance instead allows all four conditions to potentially exist, but dynamically evaluates every single resource request at runtime, using advance knowledge of each process\\u2019s maximum possible resource claim (via the Banker\\u2019s algorithm), and only grants requests that keep the system in a provably safe state. Prevention is a design-time guarantee; avoidance is a runtime, request-by-request decision, so the other three options mischaracterise both concepts.'
+        },
+        {
+          id: 'os-deadlock-q4',
+          q: 'A system has 5 processes (P0-P4) and 3 resource types A, B, C. Available = (3, 3, 2). The Need matrix (Max - Allocation) works out to: P0=(7,4,3), P1=(1,2,2), P2=(6,0,0), P3=(0,1,1), P4=(4,3,1), and the corresponding Allocation rows are P0=(0,1,0), P1=(2,0,0), P2=(3,0,2), P3=(2,1,1), P4=(0,0,2). Which of the following is a valid safe sequence?',
+          options: ['<P0, P1, P2, P3, P4>', '<P1, P3, P4, P0, P2>', '<P2, P1, P3, P0, P4>', '<P4, P0, P1, P2, P3>'],
+          answer: 1,
+          marks: 2,
+          difficulty: 'hard',
+          type: 'numerical',
+          explanation: 'Starting Available = (3,3,2). Check P1: Need (1,2,2) <= (3,3,2), yes; run P1, add its Allocation (2,0,0) back: Available becomes (5,3,2). Check P3: Need (0,1,1) <= (5,3,2), yes; run P3, add (2,1,1): Available becomes (7,4,3). Check P4: Need (4,3,1) <= (7,4,3), yes; run P4, add (0,0,2): Available becomes (7,4,5). Check P0: Need (7,4,3) <= (7,4,5), yes; run P0, add (0,1,0): Available becomes (7,5,5). Check P2: Need (6,0,0) <= (7,5,5), yes; run P2. All five processes finish, so <P1, P3, P4, P0, P2> is a valid safe sequence. Option A fails immediately since P0\\u2019s Need (7,4,3) exceeds Available (3,3,2) in the A component.'
+        },
+        {
+          id: 'os-deadlock-q5',
+          q: 'Using the same system as above, process P2 has Allocation = (3, 0, 2) and Max = (9, 0, 2). What is P2\\u2019s Need vector?',
+          options: ['(6, 0, 0)', '(9, 0, 2)', '(12, 0, 4)', '(3, 0, 0)'],
+          answer: 0,
+          marks: 1,
+          difficulty: 'medium',
+          type: 'numerical',
+          explanation: 'The Need vector for any process is defined as Need = Max - Allocation, computed component-wise across each resource type. For P2, Max = (9, 0, 2) and Allocation = (3, 0, 2), so Need = (9-3, 0-0, 2-2) = (6, 0, 0). This means P2 might still request up to 6 more units of resource type A in the future (since its declared maximum for A is 9 and it already holds 3), but it needs zero additional units of B or C since it has already been allocated its full maximum for those two resource types. This Need vector is exactly what the Banker\\u2019s safety algorithm compares against the Available vector at each step of the safety check.'
+        },
+        {
+          id: 'os-deadlock-q6',
+          q: 'Three processes each have a maximum requirement of 4 units of a single resource type. What is the minimum total number of resource instances that guarantees the system can never deadlock?',
+          options: ['10', '9', '12', '7'],
+          answer: 0,
+          marks: 2,
+          difficulty: 'hard',
+          type: 'numerical',
+          explanation: 'The standard safe-threshold formula for n processes each with maximum need k of a single resource type is n(k-1) + 1. Here n = 3 and k = 4, so the minimum safe total is 3(4-1) + 1 = 3(3) + 1 = 9 + 1 = 10. To see why 9 is insufficient, consider the worst case: each of the 3 processes could simultaneously be allocated exactly 3 units (one less than its maximum of 4), consuming all 9 available instances, with every process still needing 1 more unit to reach its maximum -- since no instance is free anywhere, this is an unavoidable circular wait, a genuine deadlock. With 10 instances, at least one process can always be allocated its full maximum of 4 and thus complete and release its resources, guaranteeing safety.'
+        },
+        {
+          id: 'os-deadlock-q7',
+          q: 'Imposing a strict, total ordering on all resource types, and requiring every process to request resources only in strictly increasing order of this ranking, is a deadlock prevention technique that specifically eliminates which Coffman condition?',
+          options: ['Circular wait', 'Mutual exclusion', 'Hold and wait', 'No preemption'],
+          answer: 0,
+          marks: 1,
+          difficulty: 'medium',
+          type: 'concept',
+          explanation: 'If every resource type is assigned a fixed rank, and every process is required to request resources only in strictly increasing rank order, then it becomes structurally impossible to form a circular chain of waiting processes: a cycle would require some process further along the chain to be waiting on a lower-ranked resource already held by a process earlier in the chain, which directly violates the increasing-order requirement. This removes the circular-wait condition entirely, regardless of process behaviour otherwise. It does not affect mutual exclusion (resources can still be non-shareable), hold-and-wait (a process can still hold some resources while requesting the next-ranked one), or preemptability, so those conditions could still, in principle, hold -- but without circular wait, deadlock cannot occur since all four conditions are required simultaneously.'
+        },
+        {
+          id: 'os-deadlock-q8',
+          q: 'Requiring every process to request and be allocated ALL of the resources it will ever need in a single atomic step, before it begins execution, is a deadlock prevention technique targeting which Coffman condition?',
+          options: ['Hold and wait', 'Circular wait', 'Mutual exclusion', 'No preemption'],
+          answer: 0,
+          marks: 1,
+          difficulty: 'medium',
+          type: 'concept',
+          explanation: 'The hold-and-wait condition specifically describes a process that already holds some resources while it waits to acquire additional ones held by other processes. If a process is instead forced to request every resource it will ever need in one single atomic request before starting (or, alternatively, must hold zero resources whenever it makes a new request), it can never simultaneously be "holding something" and "waiting for something else" -- so hold-and-wait can never arise. This technique tends to lower resource utilisation, since processes may sit idle holding resources they will not need until much later in their execution, but it structurally guarantees this particular condition is eliminated, which is sufficient (combined with the other three still possibly holding) to make deadlock impossible.'
+        },
+        {
+          id: 'os-deadlock-q9',
+          q: 'A system uses deadlock detection rather than avoidance. How does its detection algorithm differ from the Banker\\u2019s algorithm used for avoidance?',
+          options: ['Detection does not require processes to declare a maximum resource claim in advance; it works only with current Allocation and Request/pending information', 'Detection requires more advance information than avoidance, including future scheduling decisions', 'Detection and the Banker\\u2019s algorithm are mathematically identical with no differences at all', 'Detection can only be run once, at system startup, never periodically'],
+          answer: 0,
+          marks: 1,
+          difficulty: 'easy',
+          type: 'concept',
+          explanation: 'The Banker\\u2019s algorithm (avoidance) requires every process to declare its maximum possible resource claim in advance so the OS can proactively check, before granting any request, whether the resulting state remains safe. A deadlock detection algorithm is structurally similar in spirit -- it also compares an Available vector against processes\\u2019 outstanding needs to see which processes can still finish -- but it does not require any advance maximum-claim declaration; it works purely with the current Allocation matrix and the currently outstanding Request matrix, checking periodically (or when triggered, e.g., by low resource utilisation or a suspected hang) whether any subset of processes is stuck in a genuine circular wait with no possible progress, and if so, initiating recovery.'
+        },
+        {
+          id: 'os-deadlock-q10',
+          q: 'Consider a resource-allocation graph with two resource types, R1 and R2, each having 2 instances. R1\\u2019s two instances are allocated one each to P1 and P2. R2\\u2019s two instances: one is allocated to P2, and one instance of R2 is currently free (unallocated). P1 has a pending request for R2, and P2 has a pending request for R1. This graph contains a cycle P1 -> R2 -> P2 -> R1 -> P1. Is the system deadlocked?',
+          options: ['No -- since R2 has a free instance, P1\\u2019s request for R2 can be granted immediately, breaking the cycle in practice', 'Yes -- any cycle in a resource-allocation graph always implies deadlock', 'Yes, but only P1 is deadlocked, not P2', 'Cannot be determined without knowing the scheduling algorithm in use'],
+          answer: 0,
+          marks: 2,
+          difficulty: 'hard',
+          type: 'numerical',
+          explanation: 'This scenario illustrates precisely why a cycle is necessary but not sufficient for deadlock once resource types have multiple instances. Although the graph shows a cycle P1 -> R2 -> P2 -> R1 -> P1, resource type R2 still has one free, unallocated instance available. Since P1\\u2019s pending request is specifically for R2, and a free instance of R2 exists, the OS can immediately grant that instance to P1 without needing P2 to release anything first -- P1 can then finish, release both its R1 and R2 holdings, and P2\\u2019s request for R1 can subsequently be satisfied too. So despite the visible cycle, no process is actually stuck forever, and the system is not deadlocked. This is the key exception that makes multi-instance RAG analysis harder than the single-instance case.'
+        },
+        {
+          id: 'os-deadlock-q11',
+          q: 'Using the system from question 4 (Available = (3,3,2); Needs P0=(7,4,3), P1=(1,2,2), P2=(6,0,0), P3=(0,1,1), P4=(4,3,1)), suppose process P1 now issues a new request of (1, 0, 2). Can this request be safely granted immediately?',
+          options: ['Yes -- after tentatively granting it, the resulting state still passes the safety check (e.g., safe sequence <P1, P3, P0, P2, P4>)', 'No -- the request exceeds P1\\u2019s Need vector', 'No -- the request exceeds the current Available vector', 'No -- granting it would leave every process permanently blocked'],
+          answer: 0,
+          marks: 2,
+          difficulty: 'hard',
+          type: 'numerical',
+          explanation: 'First check the request against P1\\u2019s Need (1,2,2): the request (1,0,2) satisfies 1<=1, 0<=2, 2<=2, so it does not exceed Need. Next check it against Available (3,3,2): 1<=3, 0<=3, 2<=2, so it also fits. Tentatively grant it: Available becomes (3-1, 3-0, 2-2) = (2,3,0), P1\\u2019s Allocation becomes (3,0,2) and its new Need becomes (0,2,0). Re-running the safety algorithm on this hypothetical state: P1 (Need (0,2,0) <= (2,3,0)) can finish, returning (5,3,2); then P3, then P0, then P2, then P4 can each finish in turn exactly as in question 4\\u2019s trace, just starting from a slightly different Available. Since a complete safe sequence still exists, the request can indeed be granted immediately.'
+        },
+        {
+          id: 'os-deadlock-q12',
+          q: 'How does "livelock" differ from "deadlock"?',
+          options: ['In livelock, processes keep changing state in response to each other but make no actual progress; in deadlock, processes are simply blocked and their state never changes at all', 'Livelock only affects single-threaded programs, while deadlock only affects multi-threaded ones', 'Livelock is always resolved automatically by the OS; deadlock never is', 'There is no difference -- livelock is simply another name for deadlock'],
+          answer: 0,
+          marks: 1,
+          difficulty: 'easy',
+          type: 'concept',
+          explanation: 'In a deadlock, every process in the affected set is completely blocked, permanently waiting on a resource, and none of their states change at all until external intervention (such as forced termination or resource preemption) occurs. In a livelock, processes are not blocked in the traditional sense -- they remain actively executing and continuously changing their state (for example, repeatedly backing off and retrying an operation in response to detecting a potential conflict with another process), yet this constant activity never actually results in any real progress toward completion, similar to two people repeatedly stepping aside for each other in a hallway and blocking each other again each time. Both are undesirable, but deadlock is static/frozen while livelock is dynamic/busy-but-stuck.'
+        },
+        {
+          id: 'os-deadlock-q13',
+          q: 'Allowing the operating system to forcibly take a resource away from a process holding it (and give that resource to another waiting process, later restoring or restarting the preempted process) is a deadlock prevention technique aimed at removing which Coffman condition?',
+          options: ['No preemption', 'Circular wait', 'Hold and wait', 'Mutual exclusion'],
+          answer: 0,
+          marks: 1,
+          difficulty: 'medium',
+          type: 'concept',
+          explanation: 'The "no preemption" condition specifically states that resources cannot be forcibly taken away from a process; they can only be released voluntarily once the process has finished using them. If the OS instead implements a mechanism to forcibly preempt a resource from a process that is currently waiting for additional resources (for instance, saving that process\\u2019s state, taking back the resource, and giving it to a process that can make progress, later restoring the preempted process), this directly negates the no-preemption condition, since resources can now indeed be taken away without voluntary release. This is practical mainly for resources whose state can be easily saved and restored (like CPU registers or certain memory regions), and far less practical for resources like a printer mid-job.'
+        },
+        {
+          id: 'os-deadlock-q14',
+          q: 'Four processes have maximum requirements of 3, 4, 5, and 2 units respectively of a single shared resource type. What is the minimum total number of instances of this resource type needed to guarantee the system never deadlocks?',
+          options: ['11', '14', '10', '15'],
+          answer: 0,
+          marks: 2,
+          difficulty: 'hard',
+          type: 'numerical',
+          explanation: 'For processes with differing maximum needs Max_1, Max_2, ..., Max_n of the same resource type, the general safe-threshold formula is (Max_1 - 1) + (Max_2 - 1) + ... + (Max_n - 1) + 1. Here the maximums are 3, 4, 5, and 2, so the sum of (Max_i - 1) is (3-1) + (4-1) + (5-1) + (2-1) = 2 + 3 + 4 + 1 = 10, and adding 1 gives a minimum of 11 total instances. With only 10 instances, the worst case has every process holding exactly one less than its maximum (2, 3, 4, and 1 units respectively, summing to exactly 10, using up everything), with each process still needing exactly one more unit to finish -- since nothing is free anywhere, this is an unavoidable circular wait. With 11, at least one process can always reach its maximum and complete.'
+        },
+        {
+          id: 'os-deadlock-q15',
+          q: 'What is true about interpreting cycles in a resource-allocation graph, comparing single-instance versus multi-instance resource types?',
+          options: ['For single-instance resource types, a cycle is necessary and sufficient for deadlock; for multi-instance types, a cycle is necessary but not always sufficient', 'For single-instance types, a cycle is neither necessary nor sufficient; for multi-instance types, it is always both', 'Cycles are irrelevant to deadlock detection in both cases; only the Available vector matters', 'For multi-instance types, a cycle is sufficient but not necessary for deadlock'],
+          answer: 0,
+          marks: 1,
+          difficulty: 'medium',
+          type: 'concept',
+          explanation: 'When every resource type involved has only one instance, any cycle in the resource-allocation graph guarantees deadlock (necessary and sufficient), since each resource can satisfy at most one requester and every process along the cycle is genuinely, permanently blocked. Once resource types can have multiple instances, a cycle remains a necessary condition for deadlock (no cycle definitely means no deadlock), but it is no longer sufficient by itself, because a resource type inside the cycle might still have a free, unallocated instance elsewhere that can satisfy one of the pending requests and unravel the whole chain, as demonstrated in question 10\\u2019s scenario. This distinction is exactly why deadlock detection for multi-instance systems needs the fuller Banker\\u2019s-style algorithm rather than a simple graph-cycle check.'
+        }
+      ]
     }
   ]
 };

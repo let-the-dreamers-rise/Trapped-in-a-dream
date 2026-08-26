@@ -962,3 +962,166 @@ window.GATE_DATA.questions['coa'].topics.find(function(t){return t.id==='coa-ins
     explanation: 'After removing the 6-bit opcode, 32 − 6 = 26 bits remain, split equally between the two address fields, giving 13 bits per field. With a word-addressable memory, a field of w bits can directly name 2^w distinct words, so each field addresses 2^13 = 8192 words. A common mistake is dividing 32 (not 26) by 2 to get 16 bits per field, forgetting to first subtract the opcode; another is computing 2^12 or 2^14 from an off-by-one slip in the bit count.'
   }
 );
+
+window.GATE_DATA.questions['coa'].topics.find(function(t){return t.id==='coa-datapath';}).questions.push(
+  {
+    id: 'coa-datapath-x1',
+    q: 'What is the defining difference between horizontal and vertical microinstruction formats?',
+    options: ['Horizontal formats are shorter because they encode signals into small groups', 'Horizontal formats assign one bit per control signal (wide but no decoding needed); vertical formats encode groups of mutually exclusive signals into short fields (narrow but need decoders)', 'Vertical formats always execute in fewer clock cycles than horizontal formats', 'Horizontal formats can only be used with hardwired control'],
+    answer: 1,
+    marks: 1,
+    difficulty: 'easy',
+    type: 'concept',
+    explanation: 'Horizontal microinstructions dedicate a separate bit to every possible control signal, so many signals can be asserted in parallel with no decoding delay, at the cost of a wide control word and larger control store. Vertical microinstructions instead group mutually exclusive signals (only one of which can be active at a time) and encode the chosen one in a short binary field, shrinking the word width but requiring a decoder between the control store and the datapath, adding gate delay. Neither format is tied exclusively to hardwired control — both are used with microprogrammed control, and cycle count depends on the sequence of microinstructions, not directly on encoding style.'
+  },
+  {
+    id: 'coa-datapath-x2',
+    q: 'A microprogrammed control unit has 32 control signals, organized into 8 mutually exclusive groups of 4 signals each (exactly one signal per group can be active at a time). Using vertical (encoded) microinstruction format, what is the width of the control-signal portion of the microinstruction?',
+    options: ['32 bits', '8 bits', '16 bits', '4 bits'],
+    answer: 2,
+    marks: 2,
+    difficulty: 'medium',
+    type: 'numerical',
+    explanation: 'Each group of 4 mutually exclusive signals can be identified with ceil(log2 4) = 2 bits, since 2^2 = 4 exactly covers all four choices. With 8 such groups, the total encoded width is 8 × 2 = 16 bits. Compare this to the horizontal format, which would need one bit per signal: 32 bits total — exactly double. This factor-of-two saving is the entire point of vertical encoding, paid for by the decoder needed on each group to convert the 2-bit code back into one-of-four signal lines during execution. Choosing 32 ignores the encoding; choosing 8 or 4 forgets to multiply per-group bits by the number of groups.'
+  },
+  {
+    id: 'coa-datapath-x3',
+    q: 'Continuing from a vertical control-signal field of 16 bits, the control store holds 4096 microinstructions and each microinstruction also carries a 2-bit condition-select field (for conditional branching in the microprogram) plus a next-address field wide enough to address the whole control store. What is the total microinstruction width?',
+    options: ['18 bits', '28 bits', '30 bits', '12 bits'],
+    answer: 2,
+    marks: 2,
+    difficulty: 'hard',
+    type: 'numerical',
+    explanation: 'The next-address field must be able to name any of the 4096 control-store locations, requiring ceil(log2 4096) = 12 bits. Adding this to the 16-bit control-signal field and the 2-bit condition-select field gives 16 + 2 + 12 = 30 bits total. This models a realistic microinstruction: a control-signal portion that drives the datapath, a condition field that lets the microprogram branch based on flags, and an explicit next-address field (rather than always falling through to the next sequential microinstruction), which is exactly how residual-control microprogram sequencing works. Forgetting the address field, or using log2 of the word width instead of the store size, are the usual slips.'
+  },
+  {
+    id: 'coa-datapath-x4',
+    q: 'Which sequence of register transfers correctly describes the instruction fetch cycle in a typical bus-based CPU datapath?',
+    options: ['IR ← MDR; MDR ← M[MAR]; MAR ← PC, PC ← PC + 1', 'MAR ← PC; MDR ← M[MAR], PC ← PC + 1; IR ← MDR', 'MAR ← PC, IR ← MDR; MDR ← M[MAR]; PC ← PC + 1', 'PC ← PC + 1; MAR ← PC; IR ← M[MAR]'],
+    answer: 1,
+    marks: 1,
+    difficulty: 'medium',
+    type: 'concept',
+    explanation: 'Fetch must first copy the program counter into the memory address register (MAR ← PC) so the memory system knows what to read. Next, the memory read is initiated and the result lands in the memory data register, while — in parallel, since the adder is free — the PC is incremented to point at the next instruction (MDR ← M[MAR], PC ← PC + 1). Finally, once the data has arrived, it is latched into the instruction register (IR ← MDR) for decoding. Any ordering that increments PC first, or loads IR before MDR has valid data, breaks this dependency chain and is incorrect.'
+  },
+  {
+    id: 'coa-datapath-x5',
+    q: 'In a single-bus datapath, executing R3 ← R1 + R2 (after the instruction has already been fetched and decoded) requires moving one operand through a temporary latch since only one register can drive the bus per cycle. What is the minimum number of clock cycles needed for this execute step?',
+    options: ['1', '2', '3', '4'],
+    answer: 2,
+    marks: 2,
+    difficulty: 'medium',
+    type: 'numerical',
+    explanation: 'Cycle 1: R1 drives the bus and is latched into a temporary register Y feeding one ALU input. Cycle 2: R2 drives the bus into the other ALU input while the ALU computes Y + R2, and the result is latched into a temporary output register Z (the ALU output cannot be written straight back onto the bus and into R3 in the same cycle because the bus is busy carrying R2). Cycle 3: Z is placed on the bus and written into R3. Three cycles is the minimum with a single shared bus; multi-bus datapaths (with separate paths to each ALU input) can complete the same operation in fewer cycles.'
+  },
+  {
+    id: 'coa-datapath-x6',
+    q: 'On the same single-bus CPU, the fetch cycle takes 3 cycles (MAR ← PC; MDR ← M[MAR], PC ← PC+1; IR ← MDR), decode/register-read takes 1 cycle, and executing a register-register ADD (as analyzed with a temporary latch) takes 3 cycles. What is the total number of clock cycles to complete one ADD instruction?',
+    options: ['4', '6', '7', '9'],
+    answer: 2,
+    marks: 2,
+    difficulty: 'hard',
+    type: 'numerical',
+    explanation: 'Add the phases in sequence: fetch (3 cycles) + decode (1 cycle) + execute (3 cycles) = 3 + 1 + 3 = 7 cycles total. This decomposition — fetch, decode, execute, each contributing its own cycle count — is exactly how multi-cycle (non-pipelined) processors are analyzed, and it explains why simple multi-cycle designs are slower per instruction than pipelined ones despite using the same clock period: every instruction pays the full fetch-decode-execute latency serially rather than overlapping it with neighbouring instructions. Skipping the decode cycle or miscounting the execute phase are the usual sources of a wrong total.'
+  },
+  {
+    id: 'coa-datapath-x7',
+    q: 'Compared to microprogrammed control, what is the main advantage of hardwired control?',
+    options: ['It is easier to modify or extend after fabrication', 'It generates control signals directly through combinational logic, avoiding the control-store access delay, so it is generally faster', 'It requires no design verification effort', 'It supports a larger and more complex instruction set more easily'],
+    answer: 1,
+    marks: 1,
+    difficulty: 'medium',
+    type: 'concept',
+    explanation: 'Hardwired control implements the state machine of the control unit directly as combinational and sequential logic gates, so control signals appear after only gate propagation delay, with no memory read in the critical path. This makes it faster per step than microprogrammed control, which must fetch each microinstruction from a control store before its signals become available. The trade-off is flexibility: modifying hardwired logic after fabrication is difficult or impossible, whereas microprogrammed control can be updated by rewriting the control store contents. Hardwired control also becomes disproportionately complex for large, irregular instruction sets, which is why CISC machines historically preferred microcode.'
+  },
+  {
+    id: 'coa-datapath-x8',
+    q: 'What is the main practical benefit of microprogrammed control when a manufacturer wants to add a new instruction to an existing processor family?',
+    options: ['The datapath registers automatically grow to accommodate new operations', 'New behaviour can often be added by writing new microcode into the control store, without redesigning the combinational control logic', 'It removes the need for an instruction decoder entirely', 'It always makes the new instruction execute in a single cycle'],
+    answer: 1,
+    marks: 1,
+    difficulty: 'easy',
+    type: 'concept',
+    explanation: 'Because a microprogrammed control unit reads its control-signal sequences out of a control store (essentially a small program), extending the instruction set can often be done by adding new microroutines and updating the mapping from opcode to starting microaddress, rather than redesigning hardwired logic gates. This is far less risky and costly than modifying fixed circuitry, especially useful for maintaining compatibility across a processor family. It does not automatically enlarge the datapath, does not remove the need for decoding (the opcode must still select the right microroutine), and typically makes new instructions slower, not faster, since each microinstruction still costs a control-store access.'
+  },
+  {
+    id: 'coa-datapath-x9',
+    q: 'What are the roles of the Memory Address Register (MAR) and Memory Data Register (MDR) in the CPU datapath?',
+    options: ['MAR holds the next instruction to execute; MDR holds the current PC value', 'MAR holds the address to be sent to memory; MDR holds the data being transferred to or from memory', 'MAR and MDR are two names for the same register', 'MAR holds ALU results; MDR holds the condition flags'],
+    answer: 1,
+    marks: 1,
+    difficulty: 'easy',
+    type: 'concept',
+    explanation: 'The MAR is loaded with whatever address the CPU needs to access in memory (an instruction address during fetch, or an operand address during a load/store), and this value is placed on the address lines of the memory bus. The MDR is the staging register for the actual data word: on a read, memory places the fetched word into MDR for the CPU to use; on a write, the CPU places the value to be stored into MDR before the memory write is triggered. They are distinct registers with distinct roles — MAR carries "where", MDR carries "what" — and neither holds instructions, flags, or ALU results directly.'
+  },
+  {
+    id: 'coa-datapath-x10',
+    q: 'In the broadest sense, what is the function of the control unit within a CPU?',
+    options: ['To perform all arithmetic and logic computations directly', 'To generate the timed sequence of control signals that orchestrate register transfers and ALU operations needed to fetch and execute each instruction', 'To store the program and data being executed', 'To convert virtual addresses into physical addresses'],
+    answer: 1,
+    marks: 1,
+    difficulty: 'easy',
+    type: 'concept',
+    explanation: 'The control unit does not itself compute results — that is the ALU\'s job — nor does it store the program (that is memory\'s job) or translate addresses (that is the MMU\'s job). Its role is purely to generate, at the right moments relative to the clock, the enable, select, read/write, and ALU-function signals that move data along the correct paths of the datapath so that each instruction\'s fetch and execute steps happen in the right order. Whether implemented as hardwired logic or as a microprogram, the control unit is the conductor coordinating every other datapath component, never performing the data operations itself.'
+  },
+  {
+    id: 'coa-datapath-x11',
+    q: 'A microprogrammed control store holds 200 microinstructions, each 40 bits wide. What is the total storage capacity of the control store, in bytes?',
+    options: ['200 bytes', '800 bytes', '1000 bytes', '8000 bytes'],
+    answer: 2,
+    marks: 1,
+    difficulty: 'medium',
+    type: 'numerical',
+    explanation: 'Total bits = number of words × word width = 200 × 40 = 8000 bits. Converting to bytes, divide by 8: 8000 / 8 = 1000 bytes. This is a routine capacity computation that also appears for main memory and cache sizing, and the two common mistakes are stopping at the bit count (giving 8000, which is a valid but differently-unitted answer here mislabeled as bytes) or dividing by the wrong factor. Always confirm which unit the question asks for before finalizing the numeric answer, since control-store sizes are often quoted in bits during design but compared to memory chip sizes in bytes.'
+  },
+  {
+    id: 'coa-datapath-x12',
+    q: 'A microprogram control store contains 512 addressable microinstruction words, and next-microaddress selection is done by an explicit address field within each microinstruction. What is the minimum width of that next-address field?',
+    options: ['8 bits', '9 bits', '10 bits', '512 bits'],
+    answer: 1,
+    marks: 1,
+    difficulty: 'hard',
+    type: 'numerical',
+    explanation: 'To uniquely address any one of 512 locations, the field needs ceil(log2 512) bits. Since 512 = 2^9 exactly, 9 bits is both necessary and sufficient — 8 bits could only address 2^8 = 256 locations, too few. This is the same "bits to address N locations" computation used for memory address buses and register file specifiers, and it recurs across every control-store sizing question. The distractor of 512 bits confuses the number of locations with the number of bits needed to select among them, a mistake worth specifically guarding against under exam time pressure.'
+  },
+  {
+    id: 'coa-datapath-x13',
+    q: 'In a bus-based datapath, each register-transfer micro-operation takes 50 ns to complete (including bus settling and clocking overhead). Instruction fetch requires exactly 3 such micro-operations: MAR ← PC; MDR ← M[MAR] with PC ← PC + 1; IR ← MDR. How long does the entire fetch phase take?',
+    options: ['50 ns', '100 ns', '150 ns', '200 ns'],
+    answer: 2,
+    marks: 2,
+    difficulty: 'medium',
+    type: 'numerical',
+    explanation: 'Since the three listed transfers happen in three separate clock cycles (each a distinct micro-operation gated by the clock, even though the second step bundles a memory read with a PC increment into one cycle), the total fetch time is 3 × 50 ns = 150 ns. This is a direct multiplication once the number of sequential micro-operations is correctly identified from the RTL description; the usual error is either merging or splitting one of the three listed transfers, most often treating the memory-read-plus-increment step as two separate cycles instead of one, which would incorrectly give 200 ns.'
+  },
+  {
+    id: 'coa-datapath-x14',
+    q: 'A processor is implemented in two versions with identical instruction sets. The hardwired version generates each control step in 10 ns (combinational logic delay). The microprogrammed version needs 30 ns per microinstruction (control-store access plus decode). Both versions use exactly 5 sequential control steps to execute a given instruction. By what factor is the hardwired version faster for this instruction?',
+    options: ['1.5x', '2x', '3x', '5x'],
+    answer: 2,
+    marks: 2,
+    difficulty: 'hard',
+    type: 'numerical',
+    explanation: 'Hardwired total time = 5 steps × 10 ns/step = 50 ns. Microprogrammed total time = 5 steps × 30 ns/step = 150 ns. The speedup factor is 150 / 50 = 3. Because both designs execute the identical number of logical control steps for this instruction, the entire difference in execution time comes from the per-step delay difference (10 ns of pure logic versus 30 ns dominated by a control-store read), so the ratio of total times equals the ratio of per-step times — a shortcut worth recognizing instead of separately computing and then dividing both totals.'
+  },
+  {
+    id: 'coa-datapath-x15',
+    q: 'In a two-bus (or three-bus) datapath organization, where multiple registers can potentially feed a given ALU input path, which circuit element is typically used to select which single register\'s value actually reaches that ALU input in a given cycle?',
+    options: ['A multiplexer, controlled by select lines from the control unit', 'A demultiplexer', 'An encoder', 'A magnitude comparator'],
+    answer: 0,
+    marks: 1,
+    difficulty: 'medium',
+    type: 'concept',
+    explanation: 'A multiplexer takes several data inputs and, based on select control lines (driven by the control unit for the current micro-operation), routes exactly one of them through to its single output — precisely what is needed to choose, cycle by cycle, which register\'s value reaches a given ALU input in a multi-bus datapath. A demultiplexer does the opposite (one input routed to one of many outputs) and is not the right tool here. An encoder converts an active line into a binary code and a magnitude comparator only compares two values for ordering — neither performs the register-selection role the datapath needs.'
+  },
+  {
+    id: 'coa-datapath-x16',
+    q: 'In a single-bus CPU, why is each register connected to the shared bus through a tri-state buffer rather than a direct wire?',
+    options: ['Tri-state buffers make the bus run at a higher clock frequency', 'Only one register may drive the bus in a given cycle; tri-state buffers let every other register present a high-impedance (disconnected) output so their values do not electrically conflict with the driving register', 'Tri-state buffers store data permanently, acting as extra registers', 'They are required only for input/output devices, never for internal CPU registers'],
+    answer: 1,
+    marks: 1,
+    difficulty: 'hard',
+    type: 'concept',
+    explanation: 'A shared bus can only carry one valid value at a time. If two registers with different values both tried to drive the same wire directly, the result would be an undefined or even damaging electrical conflict. A tri-state buffer solves this by giving each register output three possible states: logic 0, logic 1, or high-impedance (effectively disconnected). The control unit enables exactly one register\'s buffer per cycle (driving 0 or 1) and disables all others (forcing high-impedance), so the bus reliably reflects only the selected register\'s value. Tri-state buffers do not store data or affect clock frequency, and the same bus-contention problem applies equally to internal registers and I/O devices sharing a bus.'
+  }
+);
