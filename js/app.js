@@ -243,6 +243,7 @@
       '<div class="theory-tabs">' +
       '<button data-tt="intro" class="active">Intro</button>' +
       '<button data-tt="core">Core theory</button>' +
+      (t.theory && t.theory.deep ? '<button data-tt="deep">Deep dive</button>' : '') +
       '<button data-tt="strategy">Exam strategy</button></div>' +
       '<div class="card"><div class="theory-body" id="tbody"></div></div>' +
       '<button class="btn block good" id="practice">🚀 Practice this topic (infinite quiz)</button>';
