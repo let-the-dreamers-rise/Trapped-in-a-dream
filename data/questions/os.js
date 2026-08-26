@@ -1312,3 +1312,86 @@ window.GATE_DATA.questions['os'].topics.find(function(t){return t.id==='os-sched
   explanation: 'Starvation (indefinite blocking) under priority scheduling specifically means a ready process is repeatedly passed over for the CPU because other, higher-priority processes keep arriving and always outrank it -- the low-priority process is never fundamentally denied resources it needs, it simply keeps losing the priority comparison every time the scheduler picks the next process to run, potentially forever if high-priority arrivals never stop. This is exactly why AGING is introduced as the standard fix: it gradually increases the priority of any process that has waited long enough, guaranteeing it eventually becomes the highest-priority ready process and gets scheduled. The other options describe either normal scheduling behaviour or an unrelated resource issue, not starvation.'
 }
 );
+
+window.GATE_DATA.questions['os'].topics.find(function(t){return t.id==='os-sync';}).questions.push(
+{
+  id: 'os-sync-x1',
+  q: 'A counting semaphore S is initialised to 2. The following calls happen in this exact order: wait(S), wait(S), wait(S), signal(S). Using the convention where the semaphore value can go negative to represent the count of blocked processes, what is the value of S after this sequence, and how many processes are currently blocked?',
+  options: ['S = -1, with 1 process blocked', 'S = 0, with 0 processes blocked', 'S = 1, with 0 processes blocked', 'S = -1, with 2 processes blocked'],
+  answer: 0,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'numerical',
+  explanation: 'Under this convention, wait(S) unconditionally decrements S, and the calling process blocks only if the resulting value is negative; signal(S) unconditionally increments S. Start S=2. wait #1: S=2-1=1 (result non-negative, process proceeds). wait #2: S=1-1=0 (still non-negative, proceeds -- all instances are now in use but no one is blocked yet). wait #3: S=0-1=-1 (result negative, so this process BLOCKS; the magnitude of a negative S counts how many processes are waiting). signal(S): S=-1+1=0, and this signal wakes the one blocked process, which now proceeds. Final S=0, with 0 processes blocked after the signal resolves the earlier block.'
+},
+{
+  id: 'os-sync-x2',
+  q: 'In the standard bounded-buffer producer-consumer solution using semaphores empty (init N), full (init 0), and mutex (init 1), what deadlock risk arises if a producer\'s code is accidentally written as: wait(mutex); wait(empty); ... insert item ...; signal(mutex); signal(full);  (i.e., wait(mutex) BEFORE wait(empty))?',
+  options: ['If the buffer is completely full, the producer blocks on wait(empty) while STILL HOLDING mutex, permanently preventing any consumer from acquiring mutex to remove an item and free up space -- a deadlock', 'There is no risk at all; the order of wait(mutex) and wait(empty) never matters', 'The consumer would immediately crash upon trying to call wait(full)', 'This ordering actually improves performance with no downside compared to the standard order'],
+  answer: 0,
+  marks: 2,
+  difficulty: 'hard',
+  type: 'concept',
+  explanation: 'The standard, correct order is to wait on the resource-counting semaphore (empty, for a producer) BEFORE acquiring the mutual-exclusion semaphore (mutex), specifically so that a producer never holds mutex while it might have to block waiting for space. If the order is swapped, and the buffer happens to be full, the producer will call wait(mutex) first (successfully acquiring exclusive access), and then call wait(empty), which blocks because there is no free slot. Crucially, the producer is now BLOCKED while STILL HOLDING mutex. Any consumer that wants to remove an item (which would call signal(empty) and free a slot) first needs to acquire mutex itself -- but mutex is held by the blocked producer and will never be released. Neither process can make progress: a classic deadlock caused purely by acquiring the wrong semaphore first.'
+},
+{
+  id: 'os-sync-x3',
+  q: 'Which of the following resource-allocation-graph (RAG) situations GUARANTEES deadlock, versus merely making it POSSIBLE?',
+  options: ['A cycle exists in a RAG where every resource type involved in the cycle has exactly one instance -- this guarantees deadlock; a cycle involving a resource type with multiple instances only makes deadlock possible, not certain', 'Any cycle in any RAG, regardless of instance counts, always guarantees deadlock', 'A RAG can never contain a cycle if the system is deadlock-free', 'A cycle only matters if it involves at least three distinct processes'],
+  answer: 0,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'concept',
+  explanation: 'When every resource type appearing in a resource allocation graph has a SINGLE instance, a cycle is both a necessary and a SUFFICIENT condition for deadlock: if such a cycle exists, every process in it is permanently stuck waiting on the next, with no possible escape, since there is no spare instance of any resource in the cycle that could free things up. However, if some resource types in the cycle have MULTIPLE instances, a cycle only shows that deadlock is POSSIBLE, not certain -- it may still be that a process elsewhere in the graph, not itself blocked, eventually releases an instance of a resource needed by a process in the cycle, breaking the impasse before deadlock actually occurs. Determining whether a multi-instance cyclic RAG is truly deadlocked requires checking for any valid completion (escape) sequence, essentially running a Banker\'s-style safety check on the current allocation.'
+},
+{
+  id: 'os-sync-x4',
+  q: 'Two threads increment a shared global counter with the non-atomic sequence: load counter into a register, add 1, store register back to counter. Both threads execute this with no synchronisation, starting from counter=5, and each executes it once. Which final value of counter is possible due to a race condition, in addition to the expected 7?',
+  options: ['6', '5', '8', '9'],
+  answer: 0,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'numerical',
+  explanation: 'If the two threads interleave so that BOTH read counter as 5 before either writes back its result, then thread A computes 5+1=6 and stores 6, and thread B (having also read 5 earlier) also computes 5+1=6 and stores 6 -- overwriting thread A\'s update rather than building on it. The final value is 6, not the expected 7, because one increment was effectively lost: this is a textbook race condition arising from the read-modify-write sequence not being executed as a single atomic (indivisible) operation. A value like 8 or 9 is impossible here since only two increments totalling at most +2 ever occur; 5 is impossible since at least one thread\'s write of 6 must land after the initial read of 5.'
+},
+{
+  id: 'os-sync-x5',
+  q: 'Under Peterson\'s solution for two processes P0 and P1, using shared variables flag[2] and turn, which property is specifically guaranteed by the turn variable rather than by flag[]?',
+  options: ['Progress and bounded waiting -- turn resolves which process enters when BOTH have simultaneously declared interest via flag[], preventing both mutual deadlock and indefinite postponement of either process', 'Mutual exclusion alone -- flag[] plays no role in preventing simultaneous entry', 'Turn ensures the two processes never both terminate, which flag[] cannot do', 'Turn is only used for debugging and has no effect on correctness'],
+  answer: 0,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'concept',
+  explanation: 'In Peterson\'s solution, flag[i]=true signals that process i WANTS to enter its critical section, and mutual exclusion is enforced by the combined check while(flag[j] && turn==j) -- a process cannot enter while the other wants in AND it is the other\'s turn. The flag array alone cannot resolve the case where both processes simultaneously set flag[true] and both are checking each other -- without turn, this could either let both in (violating mutual exclusion) or leave both stuck out (violating progress). Setting turn=j (giving priority to the OTHER process) right before checking guarantees that whichever process\'s turn is NOT current will proceed, resolving the standoff deterministically and ensuring the waiting process is not postponed indefinitely once its rival exits, satisfying both progress and bounded waiting.'
+},
+{
+  id: 'os-sync-x6',
+  q: 'A dining-philosophers table has 5 philosophers and 5 forks arranged in a circle. To PREVENT deadlock while still allowing maximum concurrency, which of the following modifications is a standard, correct fix?',
+  options: ['Make exactly one philosopher pick up forks in the opposite order (right fork then left fork) while all others pick up left then right -- this breaks the possibility of a circular wait', 'Give every philosopher three forks each instead of two', 'Allow all 5 philosophers to pick up their left fork and then immediately their right fork with no restriction, which never causes a problem', 'Remove the concept of forks entirely and let philosophers eat without any coordination'],
+  answer: 0,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'concept',
+  explanation: 'The naive symmetric solution (every philosopher picks up their left fork, then their right fork) can deadlock if all 5 pick up their left fork at the same time -- each then waits forever for a right fork that is a neighbour\'s already-held left fork, forming a circular wait among all 5. A standard, minimal fix is to break this symmetry: have exactly one philosopher (say philosopher 4) pick up the RIGHT fork first, then the left, while everyone else keeps the original left-then-right order. This asymmetry makes it impossible for all 5 to simultaneously hold one fork each while waiting for the next, since the odd-one-out philosopher will either get both their forks immediately or free up a fork that lets a neighbour proceed, structurally eliminating the circular-wait condition without reducing table capacity to fewer than 5 diners.'
+},
+{
+  id: 'os-sync-x7',
+  q: 'A monitor-based bounded-buffer solution uses condition variables notFull and notEmpty. A producer thread calls wait(notFull) when the buffer is full, then is eventually signalled. Which statement about what happens immediately after being signalled is correct for the standard (Hoare-style or Mesa-style, as commonly taught) semantics used in most textbook treatments?',
+  options: ['In the commonly taught (Mesa-style) semantics, a signalled thread does not run immediately -- it becomes ready but must re-acquire the monitor lock and should RE-CHECK the condition (e.g. in a while loop) before proceeding, since the state may have changed again before it actually resumes', 'The signalled thread is guaranteed to resume immediately, mid-instruction, before the signalling thread proceeds any further', 'Signalling a condition variable always terminates the monitor invocation of the signalling thread instantly', 'Condition variables can be signalled only once per program execution'],
+  answer: 0,
+  marks: 2,
+  difficulty: 'hard',
+  type: 'concept',
+  explanation: 'Most operating-systems courses teach the Mesa-style monitor semantics (as opposed to the stricter, less commonly implemented Hoare-style): calling signal() on a condition variable simply moves ONE waiting thread from blocked to ready -- it does NOT immediately transfer control to that thread, and the signalling thread continues running until it itself exits the monitor or waits again. Because some other thread might run first and change the shared state again before the newly-readied thread actually gets the CPU and re-acquires the monitor lock, the woken thread MUST re-check its waiting condition (typically via a while loop, e.g. while(buffer is full) wait(notFull);, rather than an if) before proceeding, rather than assuming the condition that justified waking it still holds.'
+},
+{
+  id: 'os-sync-x8',
+  q: 'Which of the following is a valid GATE-style trap regarding the Readers-Writers problem\'s classic first (reader-preference) solution using a mutex and a semaphore wrt?',
+  options: ['This solution can lead to writer STARVATION, because as long as at least one reader is always present or new readers keep arriving, a waiting writer may never get exclusive access', 'This solution guarantees writers always get priority over readers', 'This solution eliminates the need for any mutual exclusion among readers themselves', 'This solution allows two writers to write simultaneously as long as no readers are active'],
+  answer: 0,
+  marks: 1,
+  difficulty: 'medium',
+  type: 'concept',
+  explanation: 'In the classic first readers-writers solution, the semaphore wrt is acquired by the FIRST reader to arrive (locking out writers) and released only by the LAST reader to leave; any number of readers may enter and read concurrently in between, incrementing/decrementing a readcount variable (protected by mutex) to track this. Because a new reader arriving while other readers are already active does not need to wait for wrt at all (it only needs mutex briefly to update readcount), a continuous stream of overlapping readers can keep wrt permanently held on the readers\' side, indefinitely preventing any waiting writer from ever acquiring it -- writer starvation. This solution never allows two writers concurrently, since only one entity (a lone writer, or the collective group of readers) can hold wrt at any time.'
+}
+);
