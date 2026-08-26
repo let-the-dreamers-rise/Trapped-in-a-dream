@@ -507,3 +507,348 @@ window.GATE_DATA.questions['cn'] = {
       ]
     }
 ]};
+
+
+window.GATE_DATA.questions['cn'].topics.push({
+  id: 'cn-transport',
+  name: 'Transport Layer — TCP & UDP',
+  theory: {
+    intro: 'The transport layer is where GATE Computer Networks becomes an arithmetic exam. UDP is the easy half: connectionless, unreliable, no flow or congestion control, an 8-byte header, used where speed matters more than guaranteed delivery. TCP is the heavy half and dominates the marks: the 3-way handshake and 4-way teardown, sequence and acknowledgement number bookkeeping, the sliding receive window for flow control, and above all congestion control — slow start, congestion avoidance (AIMD), and the different reactions to a timeout versus three duplicate ACKs. GATE loves to hand you an initial cwnd, a threshold, and a sequence of rounds, and ask you to trace how cwnd evolves segment by segment or RTT by RTT, or to compute how many RTTs it takes to send a file of a given size. Round-trip time estimation via exponentially weighted moving averages is a smaller but recurring numeric theme. Master the arithmetic recipes here and this topic becomes as mechanical as the data link layer.',
+    core: 'UDP versus TCP. UDP is connectionless: no handshake, no acknowledgements, no retransmission, no ordering guarantee, no flow or congestion control. Its header is a fixed 8 bytes: source port, destination port, length, checksum (each 2 bytes). It suits DNS queries, streaming media and applications that implement their own reliability. TCP is connection-oriented and provides reliable, ordered, byte-stream delivery with flow control and congestion control; its header is at least 20 bytes.\n\nTCP header fields. Source port and destination port (16 bits each) identify the connection along with the two IP addresses. Sequence number (32 bits) identifies the byte-stream position of the first data byte in the segment. Acknowledgement number (32 bits) is valid when the ACK flag is set and names the next byte the receiver expects (cumulative ACK). HLEN (4 bits, in 4-byte words) gives header length, 20 to 60 bytes. Control flags include URG, ACK, PSH, RST, SYN and FIN. Window size (16 bits) advertises the receiver\'s available buffer space for flow control. Checksum and urgent pointer complete the fixed fields; options (such as window scaling and MSS) can extend the header.\n\nConnection establishment: the 3-way handshake. Client sends SYN with an initial sequence number x (SYN = 1, seq = x). Server replies SYN+ACK with its own initial sequence number y and acknowledgement x+1 (SYN = 1, ACK = 1, seq = y, ack = x+1). Client replies ACK with seq = x+1 and ack = y+1. Both SYN segments consume one sequence number even though they carry no data, which is why the first real data byte in each direction starts at x+1 or y+1.\n\nConnection teardown: 4-way (usually). Either side can initiate: it sends FIN, the peer ACKs it, then when the peer is also done it sends its own FIN, which the first side ACKs. Because each FIN consumes one sequence number, the ack after a FIN is (that side\'s sequence number so far) + 1. When the peer\'s ACK and FIN can be piggybacked together, teardown compresses to 3 segments.\n\nSequence and acknowledgement arithmetic. If a segment carries seq = S and L bytes of data, the next expected sequence number (and hence the ACK value the receiver sends back, assuming no loss) is S + L. Cumulative ACKs mean a single ACK can cover several segments at once if they arrived in order.\n\nFlow control. The receiver advertises a window (rwnd) in every ACK, capping how many unacknowledged bytes the sender may have outstanding: LastByteSent - LastByteAcked <= rwnd. This protects a slow receiver regardless of network conditions; it is entirely separate from congestion control, which protects the network.\n\nCongestion control. TCP maintains a congestion window cwnd, in addition to rwnd, and sends min(cwnd, rwnd) bytes at a time. Slow start: cwnd begins at 1 MSS (or a small constant) and doubles every RTT (each received ACK increases cwnd by 1 MSS, so a full window of ACKs doubles it) until cwnd reaches the slow-start threshold ssthresh, or a loss occurs. Congestion avoidance (AIMD, additive increase): once cwnd >= ssthresh, cwnd grows by roughly 1 MSS per RTT (linear, additive increase) instead of doubling. On loss detected by a timeout: ssthresh is set to cwnd/2 (of the window at the time of loss), cwnd resets to 1 MSS, and slow start begins again — a severe reaction reserved for the worse signal. On loss detected by three duplicate ACKs (fast retransmit): the lost segment is resent immediately without waiting for a timeout, ssthresh is set to cwnd/2, and cwnd is set to ssthresh (not reset to 1) before resuming congestion avoidance — this is fast recovery, a much gentler response because duplicate ACKs prove that later segments are still getting through.\n\nRTT estimation. TCP maintains a smoothed round-trip time using an exponentially weighted moving average: EstimatedRTT = (1 - alpha) x EstimatedRTT + alpha x SampleRTT, with alpha typically 0.125. A companion deviation term DevRTT tracks variability, and the retransmission timeout is set as RTO = EstimatedRTT + 4 x DevRTT, giving more slack when RTT is jittery.',
+    strategy: 'GATE patterns. (1) Handshake/teardown sequence-number tracing: given initial sequence numbers, fill in the SYN, SYN+ACK, ACK values, or find the ack number after a data segment. (2) cwnd evolution: given initial cwnd (often 1 MSS), ssthresh, MSS size and RTT, trace cwnd round by round through slow start and congestion avoidance, and answer "cwnd after round n" or "number of RTTs to send X KB". (3) Timeout versus 3-dup-ACK: know that a timeout is more punishing (cwnd to 1) while 3 dup ACKs trigger fast recovery (cwnd to ssthresh, not 1). (4) EWMA computation for EstimatedRTT given a sequence of SampleRTTs and alpha. (5) UDP vs TCP header size and use-case one-markers.\n\nTraps. Slow start doubles cwnd every RTT, it does not add a fixed amount — mixing this with additive increase is the single most common error. When cwnd (in MSS units) crosses ssthresh mid-round, growth switches from doubling to +1 per RTT starting from the next RTT, not mid-round. On a timeout, ssthresh takes half of the cwnd value at the moment of loss, not half of the current ssthresh. Sequence numbers for SYN and FIN each consume exactly one number even with zero data bytes — a frequent off-by-one trap.\n\nWorked mini-example. cwnd starts at 1 MSS, ssthresh = 8 MSS. Slow start: RTT1 cwnd=1->2, RTT2 cwnd=2->4, RTT3 cwnd=4->8 (hits ssthresh, switch to congestion avoidance from RTT4). RTT4 cwnd=8->9, RTT5 cwnd=9->10. If a timeout now occurs with cwnd=10: new ssthresh = 10/2 = 5, cwnd resets to 1, slow start resumes toward the new ssthresh of 5. If instead 3 dup ACKs occurred at cwnd=10: new ssthresh = 5, cwnd is set directly to 5 (fast recovery), and congestion avoidance resumes immediately without the doubling phase. Practise writing out such a round-by-round table; GATE frequently asks for the cwnd value at a specific numbered RTT.'
+  },
+  questions: [
+    {
+      id: 'cn-transport-q1',
+      q: 'Which of the following is a key property that distinguishes UDP from TCP?',
+      options: ['UDP guarantees in-order delivery of all datagrams', 'UDP performs no connection setup, acknowledgement, or congestion control', 'UDP header is larger than the TCP header', 'UDP retransmits lost datagrams automatically'],
+      answer: 1,
+      marks: 1,
+      difficulty: 'easy',
+      type: 'concept',
+      explanation: 'UDP is a bare-bones, connectionless transport protocol: it sends each datagram independently with no three-way handshake, no acknowledgements, no retransmission of lost datagrams, no reordering, and no congestion or flow control. This keeps its header tiny (8 bytes: source port, destination port, length, checksum) versus TCP\'s minimum 20 bytes, and it makes UDP suitable for latency-sensitive or self-managed applications such as DNS queries and real-time media. TCP, in contrast, provides all of the reliability machinery UDP lacks. The other options each describe TCP behaviour incorrectly attributed to UDP, which has none of them.'
+    },
+    {
+      id: 'cn-transport-q2',
+      q: 'In the TCP header, which field allows a receiver to limit how much unacknowledged data a sender may have in flight, independent of network congestion?',
+      options: ['Sequence number', 'Window size (advertised window)', 'Urgent pointer', 'Header length (HLEN)'],
+      answer: 1,
+      marks: 1,
+      difficulty: 'easy',
+      type: 'concept',
+      explanation: 'The 16-bit window size field carried in every TCP segment advertises the receiver\'s current available buffer space, and the sender must ensure LastByteSent - LastByteAcked never exceeds this value. This mechanism is flow control: it protects a slow or busy receiver from being overwhelmed, and it is entirely determined by the receiver\'s buffer state, not by conditions in the network. Congestion control (the cwnd variable) is a separate, sender-side mechanism protecting the network itself. Sequence number tracks byte-stream position, the urgent pointer marks out-of-band data, and HLEN just records header length in 4-byte words.'
+    },
+    {
+      id: 'cn-transport-q3',
+      q: 'A TCP client sends a SYN with sequence number 5000 to open a connection. The server responds with SYN+ACK carrying sequence number 9000. The acknowledgement number in the server\'s SYN+ACK segment is:',
+      options: ['5000', '5001', '9000', '9001'],
+      answer: 1,
+      marks: 1,
+      difficulty: 'medium',
+      type: 'numerical',
+      explanation: 'Even though a SYN segment carries no application data, the SYN flag itself consumes one sequence number. The client\'s SYN uses seq = 5000, so the byte-stream position the server must next acknowledge is 5000 + 1 = 5001. The server\'s own sequence number, 9000, is unrelated to this acknowledgement value — it is the starting point for the server\'s own outgoing byte stream, which the client will separately acknowledge as 9001 in the final leg of the handshake. Confusing the two independent sequence-number spaces of the two directions is the main trap in three-way handshake questions.'
+    },
+    {
+      id: 'cn-transport-q4',
+      q: 'A TCP sender transmits a segment with sequence number 2001 carrying 500 bytes of data, and it is received correctly with no other segments in flight. The acknowledgement number the receiver sends back is:',
+      options: ['2001', '2500', '2501', '500'],
+      answer: 2,
+      marks: 1,
+      difficulty: 'easy',
+      type: 'numerical',
+      explanation: 'TCP acknowledgement numbers are cumulative and name the next byte the receiver expects, not the last byte received. The segment occupies byte positions 2001 through 2001 + 500 - 1 = 2500. The next byte the receiver has not yet seen is byte 2501, so the acknowledgement number is 2501 = seq + length = 2001 + 500. This "sequence number of first byte plus data length" rule is the single formula behind nearly every TCP ACK-number question, whether for one segment or a run of several segments received in order.'
+    },
+    {
+      id: 'cn-transport-q5',
+      q: 'During a normal TCP connection close where each side sends its own FIN separately, how many segments are exchanged in total, and how does each FIN affect sequence-number bookkeeping?',
+      options: ['3 segments; only ACKs consume sequence numbers', '4 segments; each FIN consumes exactly one sequence number, just like a SYN', '2 segments; FIN carries no sequence-number cost', '4 segments; each FIN consumes one sequence number per byte of data it carries'],
+      answer: 1,
+      marks: 2,
+      difficulty: 'medium',
+      type: 'concept',
+      explanation: 'A full, non-piggybacked TCP teardown is a four-way exchange: side A sends FIN, side B ACKs it, side B later sends its own FIN when it is also done, and side A ACKs that. Like SYN, the FIN flag consumes exactly one sequence number even though it typically carries zero data bytes, so the ACK that follows a FIN is (that side\'s sequence number at the FIN) + 1. If B\'s ACK and its own FIN happen to be sent together, the exchange compresses to three segments, but the question specifies each side sending its FIN separately, so four segments are needed. This one-sequence-number rule for control flags with no payload is easy to forget under time pressure.'
+    },
+    {
+      id: 'cn-transport-q6',
+      q: 'TCP begins a connection with cwnd = 1 MSS and ssthresh = 16 MSS, growing purely by slow start (no losses). What is cwnd, in MSS units, immediately after the 4th RTT of transmission?',
+      options: ['4', '8', '16', '32'],
+      answer: 2,
+      marks: 2,
+      difficulty: 'medium',
+      type: 'numerical',
+      explanation: 'In slow start, cwnd doubles after every RTT because each of the cwnd segments sent gets an ACK that adds 1 MSS, and a full window of ACKs therefore doubles the window. Starting at cwnd = 1: after RTT1, cwnd = 2; after RTT2, cwnd = 4; after RTT3, cwnd = 8; after RTT4, cwnd = 16. Since ssthresh is 16, this exactly reaches the threshold at RTT4 (the switch to linear congestion-avoidance growth begins from RTT5 onward). The doubling pattern (1, 2, 4, 8, 16 after RTTs 0 through 4) should become an instant mental table for these questions.'
+    },
+    {
+      id: 'cn-transport-q7',
+      q: 'TCP has cwnd = 8 MSS and ssthresh = 8 MSS, currently at the boundary between slow start and congestion avoidance. Assuming no loss, what is cwnd after 3 more RTTs?',
+      options: ['16 MSS', '64 MSS', '11 MSS', '24 MSS'],
+      answer: 2,
+      marks: 2,
+      difficulty: 'hard',
+      type: 'numerical',
+      explanation: 'Because cwnd has already reached ssthresh, all further growth (with no losses) uses congestion avoidance, which increases cwnd by roughly 1 MSS per RTT (additive increase), not by doubling. Starting at cwnd = 8: after RTT1, cwnd = 9; after RTT2, cwnd = 10; after RTT3, cwnd = 11 MSS. The distractor 64 MSS wrongly continues slow-start doubling (8->16->32->64) past the threshold, and 16 MSS applies only one doubling step. This question tests exactly the switch-over rule: once cwnd >= ssthresh, growth becomes linear, and it stays linear until a loss event resets the state.'
+    },
+    {
+      id: 'cn-transport-q8',
+      q: 'A TCP sender has cwnd = 20 MSS when it detects a lost segment via a retransmission timeout (no duplicate ACKs were received). Immediately after this event, ssthresh and cwnd become:',
+      options: ['ssthresh = 10 MSS, cwnd = 10 MSS', 'ssthresh = 10 MSS, cwnd = 1 MSS', 'ssthresh = 20 MSS, cwnd = 1 MSS', 'ssthresh unchanged, cwnd = 20 MSS'],
+      answer: 1,
+      marks: 2,
+      difficulty: 'medium',
+      type: 'concept',
+      explanation: 'A timeout is treated as a severe congestion signal because it means no feedback at all has arrived for a while. TCP sets the new ssthresh to half the cwnd value at the time of loss: 20 / 2 = 10 MSS. It then resets cwnd all the way down to 1 MSS and re-enters slow start from scratch, growing back up toward the new, lower ssthresh before switching to congestion avoidance. This harsh reset is what distinguishes timeout-triggered loss recovery from the gentler fast-recovery path taken after three duplicate ACKs, where cwnd is set to ssthresh rather than collapsed to 1.'
+    },
+    {
+      id: 'cn-transport-q9',
+      q: 'A TCP sender has cwnd = 20 MSS when it receives three duplicate ACKs indicating a single lost segment (fast retransmit is triggered). Under standard TCP Reno fast recovery, ssthresh and cwnd become:',
+      options: ['ssthresh = 10 MSS, cwnd = 1 MSS', 'ssthresh = 10 MSS, cwnd = 10 MSS', 'ssthresh = 20 MSS, cwnd = 20 MSS', 'ssthresh unchanged, cwnd = 1 MSS'],
+      answer: 1,
+      marks: 2,
+      difficulty: 'hard',
+      type: 'pyq-style',
+      explanation: 'Three duplicate ACKs indicate that segments after the lost one are still arriving, which is much better news than a timeout, so TCP Reno reacts more gently. As with a timeout, ssthresh is halved: 20 / 2 = 10 MSS. But instead of collapsing cwnd to 1 MSS and restarting slow start, fast recovery sets cwnd directly to the new ssthresh value, here 10 MSS, and the connection resumes in congestion avoidance (linear growth) immediately. This is the crux distinction GATE tests repeatedly: timeout collapses cwnd to 1, three duplicate ACKs collapse cwnd only to ssthresh.'
+    },
+    {
+      id: 'cn-transport-q10',
+      q: 'TCP measures a SampleRTT of 120 ms when the current EstimatedRTT is 100 ms, using the standard EWMA formula with alpha = 0.125. The new EstimatedRTT is:',
+      options: ['110 ms', '102.5 ms', '100 ms', '120 ms'],
+      answer: 1,
+      marks: 2,
+      difficulty: 'medium',
+      type: 'numerical',
+      explanation: 'The EWMA update is EstimatedRTT_new = (1 - alpha) x EstimatedRTT_old + alpha x SampleRTT. Substituting alpha = 0.125, EstimatedRTT_old = 100 and SampleRTT = 120: (0.875 x 100) + (0.125 x 120) = 87.5 + 15 = 102.5 ms. The formula deliberately weights the long-run history heavily (0.875) and the newest sample lightly (0.125), so a single fluctuating sample nudges the estimate only slightly rather than swinging it all the way to 120 ms or leaving it unchanged at 100 ms — both of which are the intended wrong-answer traps here.'
+    },
+    {
+      id: 'cn-transport-q11',
+      q: 'Which statement correctly contrasts flow control and congestion control in TCP?',
+      options: ['Flow control protects the network from overload; congestion control protects the receiver buffer', 'Flow control uses the receiver-advertised window; congestion control uses the sender-maintained cwnd, and TCP sends min(cwnd, rwnd) bytes', 'Both mechanisms use the same single window variable', 'Congestion control is signalled by the receiver in every ACK, exactly like flow control'],
+      answer: 1,
+      marks: 1,
+      difficulty: 'medium',
+      type: 'concept',
+      explanation: 'Flow control exists to prevent a fast sender from overrunning a slow receiver\'s buffer; the receiver reports its available space as the advertised window (rwnd) in every ACK. Congestion control exists to prevent the sender from overloading the shared network; the sender itself estimates the network\'s capacity via the congestion window (cwnd), adjusting it based on signals like timeouts and duplicate ACKs that the receiver never directly reports. At any instant, TCP caps outstanding data by the smaller of the two: min(cwnd, rwnd). The two mechanisms address different problems (receiver capacity versus network capacity) and are computed by different parties.'
+    },
+    {
+      id: 'cn-transport-q12',
+      q: 'A TCP connection starts with cwnd = 1 MSS in slow start, with ssthresh = 64 MSS (never reached in this range) and RTT = 100 ms. Ignoring transmission and propagation time beyond RTT counting, how long after connection start does cwnd first reach 32 MSS?',
+      options: ['300 ms', '400 ms', '500 ms', '600 ms'],
+      answer: 2,
+      marks: 2,
+      difficulty: 'hard',
+      type: 'numerical',
+      explanation: 'In slow start cwnd doubles every RTT: after RTT1, cwnd = 2; RTT2, cwnd = 4; RTT3, cwnd = 8; RTT4, cwnd = 16; RTT5, cwnd = 32. Since ssthresh = 64 is never reached before cwnd hits 32, the doubling continues uninterrupted for all 5 RTTs. Elapsed time = 5 x RTT = 5 x 100 ms = 500 ms. The distractor 400 ms corresponds to stopping one RTT early (cwnd = 16), and 600 ms overshoots by one RTT (cwnd = 64) — both common off-by-one slips when counting doubling steps starting from cwnd = 1 rather than from RTT = 0.'
+    },
+    {
+      id: 'cn-transport-q13',
+      q: 'Which of the following correctly distinguishes go-back-N style loss recovery at the data link layer from TCP\'s response to duplicate ACKs at the transport layer?',
+      options: ['Both discard all frames/segments after the lost one, whether or not they arrived correctly', 'Go-back-N retransmits everything from the lost frame onward regardless of what arrived later; TCP fast retransmit resends only the missing segment while later correctly received data may already be buffered or acknowledged by SACK', 'TCP always requires a full timeout before retransmitting anything, exactly like go-back-N', 'Neither protocol uses cumulative acknowledgements'],
+      answer: 1,
+      marks: 2,
+      difficulty: 'hard',
+      type: 'concept',
+      explanation: 'Go-back-N receivers discard any frame that arrives out of order, so after a loss the sender must retransmit the lost frame and everything sent after it, even if some of those later frames were physically received correctly. TCP\'s fast retransmit, triggered by three duplicate ACKs, targets only the specific missing segment named by the duplicate ACKs; later segments that arrived correctly are not necessarily discarded (and with selective acknowledgement/SACK extensions the receiver can explicitly report them so they need not be resent at all). Both protocols do use cumulative-style acknowledgements at their base, so option four is wrong, and TCP does not need to wait for a timeout when duplicate ACKs already signal the loss.'
+    },
+    {
+      id: 'cn-transport-q14',
+      q: 'Which pair of transport-layer applications typically prefers UDP, and why?',
+      options: ['File transfer and email, because reliability outweighs speed', 'DNS lookups and live audio/video streaming, because low latency and simplicity outweigh strict reliability and in-order delivery', 'Remote login and web browsing, because ordered byte streams are essential', 'Database transactions, because congestion control is unnecessary for them'],
+      answer: 1,
+      marks: 1,
+      difficulty: 'easy',
+      type: 'concept',
+      explanation: 'DNS queries are short, latency-sensitive request-response exchanges where the overhead of a full TCP handshake would be wasteful, and the application itself can simply retry on timeout; UDP\'s connectionless, header-light design fits perfectly. Live audio and video streaming similarly favour UDP because a late-arriving retransmitted packet is often useless (the playback point has moved on), so occasional loss is preferred over the delay that TCP\'s reliability and congestion control would introduce. File transfer, email, remote login and web browsing all need guaranteed, ordered, complete delivery of every byte, which is exactly what TCP is built to provide, so they use TCP instead.'
+    },
+    {
+      id: 'cn-transport-q15',
+      q: 'In TCP, after the connection enters congestion avoidance and no losses occur, cwnd grows approximately linearly at about 1 MSS per RTT. If cwnd = 12 MSS at the start of congestion avoidance, what is cwnd after 6 RTTs of loss-free congestion avoidance?',
+      options: ['18 MSS', '72 MSS', '48 MSS', '24 MSS'],
+      answer: 0,
+      marks: 1,
+      difficulty: 'easy',
+      type: 'numerical',
+      explanation: 'Congestion avoidance is additive increase: cwnd grows by roughly 1 MSS for every RTT of successful transmission, unlike the doubling of slow start. Starting at cwnd = 12 MSS and adding 1 MSS per RTT for 6 RTTs gives 12 + 6 = 18 MSS. The distractor 72 MSS mistakenly doubles cwnd every RTT (a slow-start reflex applied where it does not belong), 48 MSS multiplies by 4, and 24 MSS mistakenly doubles once — all confusing the linear congestion-avoidance rule with the exponential slow-start rule.'
+    },
+    {
+      id: 'cn-transport-q16',
+      q: 'A TCP sender\'s current RTO (retransmission timeout) is computed as EstimatedRTT + 4 x DevRTT. If EstimatedRTT = 80 ms and DevRTT = 15 ms, the RTO is:',
+      options: ['95 ms', '140 ms', '120 ms', '60 ms'],
+      answer: 1,
+      marks: 1,
+      difficulty: 'easy',
+      type: 'numerical',
+      explanation: 'The standard TCP timeout formula adds a safety margin proportional to how much RTT samples have recently varied: RTO = EstimatedRTT + 4 x DevRTT = 80 + 4 x 15 = 80 + 60 = 140 ms. The factor of 4 on the deviation term ensures that when the network is jittery (large DevRTT) the timer waits considerably longer before assuming a segment is lost, avoiding spurious retransmissions; when the network is stable, DevRTT stays small and RTO tracks close to EstimatedRTT. The distractor 95 ms drops the factor of 4, treating DevRTT as added only once.'
+    }
+  ]
+});
+
+window.GATE_DATA.questions['cn'].topics.push({
+  id: 'cn-application',
+  name: 'Application Layer & Network Security Basics',
+  theory: {
+    intro: 'The application layer collects the protocols that end users actually touch, and GATE tests them mostly at the conceptual level, with a handful of numeric questions on HTTP timing and DNS round trips. You must know DNS name resolution end to end, distinguishing iterative from recursive queries and the roles of root, TLD and authoritative servers. HTTP questions compare persistent versus non-persistent connections and, with or without pipelining, ask how many round-trip times are needed to fetch a page and its embedded objects. Mail protocols split cleanly into three roles: SMTP pushes mail between servers, while POP3 and IMAP let a client retrieve mail, with different sync behaviour. FTP is unusual for using two separate TCP connections. Finally, network security basics — symmetric versus asymmetric (public-key) cryptography, the RSA idea, digital signatures for authentication and integrity, and where a firewall sits — round out the topic with reliable one-mark and two-mark conceptual questions.',
+    core: 'DNS. The Domain Name System resolves names to IP addresses through a distributed, hierarchical database of name servers: root servers (know the TLD servers), top-level-domain servers (.com, .org, .in, know the authoritative servers for domains under them), and authoritative servers (hold the actual records for a specific domain). A client typically makes a recursive query to its local (ISP) resolver: it asks one question and expects a complete final answer, with the resolver doing all the further work. The local resolver, in turn, usually makes iterative queries to the root, then TLD, then authoritative server: each queried server either answers directly or refers the resolver to the next server down the hierarchy, and the resolver itself follows each referral. Caching at every level (with a time-to-live) is what makes repeated lookups fast; without any cache, a full recursive resolution from scratch takes multiple round trips (root, then TLD, then authoritative, i.e. proportional to the number of hierarchy levels visited).\n\nHTTP connections. Non-persistent HTTP opens a fresh TCP connection for every single object (the base HTML page, then separately for each embedded image, script or stylesheet), so each object costs one full TCP connection setup (commonly modeled as 1 RTT for the handshake) plus 1 RTT for the HTTP request/response, i.e. 2 RTTs per object if connections are not overlapped, or 2 RTTs total for the first object followed by 2 RTTs per remaining object when done serially (using separate parallel connections can hide this behind concurrency). Persistent HTTP without pipelining reuses one TCP connection for all objects on the same server but still sends one request and waits for its full response before sending the next: 1 RTT for the (one-time) connection setup, then 1 RTT for the base page, then 1 RTT for each of the n embedded objects fetched serially, totaling 1 + 1 + n RTTs for a page with n embedded objects. Persistent HTTP with pipelining sends all requests back to back without waiting for individual responses, so after the initial connection and first exchange, all remaining objects can effectively be fetched in one further RTT (assuming they fit in the pipeline and bandwidth is not the bottleneck): total approximately 1 (setup) + 1 (base page) + 1 (all remaining objects pipelined) RTTs, dramatically fewer than the non-pipelined or non-persistent cases when n is large. HTTP itself is a stateless, text-based request-response protocol running over TCP; common methods are GET, POST, PUT, DELETE, and status codes such as 200 OK, 301/302 redirect, 404 Not Found, 500 server error.\n\nMail protocols. SMTP (Simple Mail Transfer Protocol) pushes a message from a sender\'s mail server to a recipient\'s mail server (and from client to its outgoing server); it is a push protocol and cannot be used by a client to pull mail down from its own mailbox. POP3 (Post Office Protocol) is a simple pull protocol: a client connects, authenticates, downloads all waiting mail, and typically deletes it from the server (though a "leave mail on server" option exists) — it does not maintain folders or synchronized state across multiple client devices. IMAP (Internet Message Access Protocol) is a richer pull protocol: mail stays on the server, organized into folders, and multiple clients can see the same synchronized mailbox state (read/unread flags, folder structure) — a heavier but more capable protocol than POP3.\n\nFTP. File Transfer Protocol is unusual among application-layer protocols for using two separate parallel TCP connections: a control connection (port 21) that stays open for the whole session, carrying commands and replies (login, directory listing, file requests), and a separate data connection (port 20 in active mode, or a negotiated port in passive mode) opened afresh for each actual file transfer or directory listing and closed once that transfer completes. This separation of control and data is a favourite one-mark distinguishing fact.\n\nSockets. A socket is the application programming interface endpoint identified by the combination of IP address and port number; a TCP server socket after accept() spawns a new connected socket per client while the original listening socket keeps accepting further connections, so a single well-known port can serve many simultaneous clients, each distinguished by the unique four-tuple (source IP, source port, destination IP, destination port).\n\nSecurity basics. Symmetric-key cryptography uses one shared secret key for both encryption and decryption (fast, but the key must be distributed securely in advance; example: AES). Asymmetric (public-key) cryptography uses a mathematically linked key pair: data encrypted with the public key can only be decrypted with the matching private key, and vice versa; the public key can be freely published while the private key stays secret. RSA is the classic example: it picks two large primes p and q, computes n = p x q and Euler\'s totient phi(n) = (p-1)(q-1), chooses a public exponent e coprime to phi(n), and derives a private exponent d such that e x d ≡ 1 (mod phi(n)); the public key is (e, n) and the private key is (d, n); encryption is c = m^e mod n and decryption is m = c^d mod n. A digital signature reverses the usual roles for authentication and integrity: the sender encrypts (signs) a message digest with its own private key, and anyone can verify the signature by decrypting with the sender\'s public key and comparing to a freshly computed hash — this proves the message came from that sender (authentication) and was not altered (integrity), but provides no confidentiality by itself, which is why signing is often combined with separate encryption. Firewalls sit at the boundary of a network and filter traffic by rules (packet-filter firewalls check IP/port/protocol headers at the network/transport layer; application-layer/proxy firewalls inspect content), blocking or allowing packets to protect internal hosts from unwanted external traffic.',
+    strategy: 'GATE patterns. (1) DNS: recursive versus iterative query direction, and counting round trips for a cold (uncached) lookup through the hierarchy. (2) HTTP RTT counting: given n embedded objects, compute total time for non-persistent (no parallel connections), persistent without pipelining, and persistent with pipelining — these differ sharply and are a favourite two-mark question. (3) One-mark protocol-matching: which protocol pushes vs pulls mail, which uses two TCP connections, which port number goes with which protocol (well-known ports: HTTP 80, HTTPS 443, FTP 20/21, SMTP 25, POP3 110, IMAP 143, DNS 53, Telnet 23, SSH 22). (4) Symmetric vs asymmetric crypto: key count, speed, key-distribution problem, and what a digital signature actually achieves (authentication and integrity, not confidentiality). (5) RSA small-number computation: given p, q, e, find n, phi(n), d, or compute a small ciphertext/plaintext by modular exponentiation.\n\nTraps. A client asking its local resolver "give me the full answer" is a recursive query; the resolver asking root/TLD/authoritative servers, expecting to be told the next hop if the queried server does not know, is iterative — do not swap these labels. In HTTP RTT questions, the base HTML page itself must be fetched before the browser even knows which embedded objects exist, so its 1 RTT is never skipped or pipelined with the rest. POP3 by default removes mail from the server; IMAP does not — mixing these up is common. Digital signatures use the signer\'s private key to sign and the signer\'s public key to verify — the reverse of ordinary public-key encryption, where the sender uses the recipient\'s public key.\n\nWorked mini-example. A page has 1 base HTML file and 5 embedded images, all from the same server, RTT = 20 ms, negligible transmission time, no caching, connections not already open. Non-persistent (no parallel connections): 2 RTT for base page (connect + request) + 5 x 2 RTT for images = 12 RTT = 240 ms. Persistent without pipelining: 1 RTT (connect) + 1 RTT (base page) + 5 x 1 RTT (images, serial) = 7 RTT = 140 ms. Persistent with pipelining: 1 RTT (connect) + 1 RTT (base page) + 1 RTT (all 5 images pipelined together) = 3 RTT = 60 ms. Reproduce this three-way comparison from scratch; GATE often asks for just one of the three totals or for the difference between two of them.'
+  },
+  questions: [
+    {
+      id: 'cn-application-q1',
+      q: 'A client sends a single DNS query to its local (ISP) resolver and expects a complete final answer, leaving all further contact with other name servers to the resolver. This query, from the client to the resolver, is best classified as:',
+      options: ['An iterative query', 'A recursive query', 'A zone transfer', 'A reverse lookup'],
+      answer: 1,
+      marks: 1,
+      difficulty: 'easy',
+      type: 'concept',
+      explanation: 'A recursive query places the entire burden of finding the final answer on the server that was asked: the client asks once and either gets the resolved IP address or an error, never a referral to another server. The local resolver, having accepted this recursive request from the client, typically then issues iterative queries of its own to the root, top-level-domain and authoritative servers — each of those servers responds either with the final answer or with a referral to the next server down, leaving the resolver to follow up itself. Confusing which leg of the resolution is recursive (client to resolver) and which is iterative (resolver to the hierarchy) is the most common DNS error in GATE.'
+    },
+    {
+      id: 'cn-application-q2',
+      q: 'In the standard DNS hierarchy resolving a name like www.example.com from a completely empty cache, the local resolver contacts, in order:',
+      options: ['The authoritative server, then the TLD server, then the root server', 'The root server, then the TLD (.com) server, then the authoritative server for example.com', 'Only the TLD server, which always has the final IP address cached', 'The root server, which directly returns the IP address'],
+      answer: 1,
+      marks: 1,
+      difficulty: 'easy',
+      type: 'concept',
+      explanation: 'DNS names are resolved by walking down the domain hierarchy from the most general to the most specific. With nothing cached, the resolver first asks a root server, which does not know the final address but knows which server handles the .com top-level domain and refers the resolver there. The .com TLD server does not know the address either, but knows which server is authoritative for example.com and refers the resolver there. Finally the authoritative server for example.com holds the actual record and returns the IP address. This root-then-TLD-then-authoritative order, and the fact that each level only ever holds a referral to the next level (never the final answer itself, except at the authoritative server), is a frequently tested fact.'
+    },
+    {
+      id: 'cn-application-q3',
+      q: 'A browser fetches a web page over HTTP using a separate, non-persistent TCP connection for every single object (base page and each embedded image), with no parallel connections. If RTT = 10 ms, TCP connection setup takes 1 RTT and each object request/response also takes 1 RTT, and the page has 3 embedded images besides the base HTML file, the total time to fetch everything is:',
+      options: ['40 ms', '80 ms', '70 ms', '30 ms'],
+      answer: 1,
+      marks: 2,
+      difficulty: 'medium',
+      type: 'numerical',
+      explanation: 'Non-persistent HTTP opens and closes a fresh TCP connection for every object. Each object therefore costs 1 RTT for the TCP handshake plus 1 RTT for the HTTP request and response, i.e. 2 RTTs per object. There are 4 objects total (1 base HTML page + 3 images), so total = 4 x 2 x RTT = 8 x 10 ms = 80 ms. This is markedly worse than a persistent connection, which pays the connection-setup RTT only once for the whole page; that saving is exactly why HTTP/1.1 made persistent connections the default. Forgetting to double for the handshake gives the 40 ms distractor.'
+    },
+    {
+      id: 'cn-application-q4',
+      q: 'The same page (1 base HTML file plus 3 embedded images from the same server, RTT = 10 ms) is fetched using a persistent HTTP connection without pipelining (one request is sent, and its full response is received, before the next request is sent). The total time is:',
+      options: ['80 ms', '50 ms', '30 ms', '20 ms'],
+      answer: 1,
+      marks: 2,
+      difficulty: 'medium',
+      type: 'numerical',
+      explanation: 'With a persistent connection, the TCP handshake happens only once: 1 RTT. The base HTML page is then requested and received: 1 more RTT (and only after this does the browser learn which images to request). Because pipelining is not used, each of the 3 images is requested and its response fully received before the next request goes out, costing 1 RTT each: 3 more RTTs. Total = 1 + 1 + 3 = 5 RTTs = 5 x 10 ms = 50 ms. Compare this to the 80 ms needed for non-persistent connections on the same page — persistence alone (without pipelining) already saves 30 ms here by eliminating the repeated handshakes.'
+    },
+    {
+      id: 'cn-application-q5',
+      q: 'The same page (1 base HTML file plus 3 embedded images, RTT = 10 ms) is fetched over a persistent HTTP connection WITH pipelining, so that after the base page arrives, all three image requests are sent back to back and their responses are effectively received within one further RTT. The total time is:',
+      options: ['50 ms', '20 ms', '30 ms', '10 ms'],
+      answer: 2,
+      marks: 2,
+      difficulty: 'medium',
+      type: 'numerical',
+      explanation: 'Pipelining still requires the one-time TCP handshake (1 RTT) and still requires fetching the base HTML page first, since the browser cannot know which images exist until it has parsed that page (1 more RTT). Only after that can pipelining help: instead of requesting each image serially, all three requests go out together and their responses come back within roughly one additional RTT. Total = 1 (setup) + 1 (base page) + 1 (all images pipelined) = 3 RTTs = 30 ms. This is faster than the 50 ms non-pipelined persistent case and much faster than the 80 ms non-persistent case, illustrating why pipelining benefits pages with many embedded objects the most.'
+    },
+    {
+      id: 'cn-application-q6',
+      q: 'Which statement correctly distinguishes SMTP from POP3?',
+      options: ['SMTP is used to pull mail from a mailbox to a client; POP3 pushes mail between mail servers', 'SMTP pushes mail from a sender to a recipient\'s mail server; POP3 is used by a client to pull (download) mail from its mailbox', 'Both protocols are used only between two mail servers, never involving a client', 'SMTP and POP3 are two names for the same protocol running on different ports'],
+      answer: 1,
+      marks: 1,
+      difficulty: 'easy',
+      type: 'concept',
+      explanation: 'SMTP (Simple Mail Transfer Protocol) is a push protocol: it is used both by a mail client to hand outgoing mail to its own outgoing mail server, and between mail servers to relay a message toward the recipient\'s server. It cannot be used to retrieve mail. POP3 (Post Office Protocol version 3) works in the opposite direction and role: an end-user\'s mail client uses it to connect to its own mailbox on the mail server and pull down (download) waiting messages, typically removing them from the server afterward. So sending always uses SMTP and retrieving always uses POP3 (or IMAP), a pairing GATE tests as a direct one-mark fact.'
+    },
+    {
+      id: 'cn-application-q7',
+      q: 'Which mail access protocol allows mail to remain stored on the server in organized folders, with multiple client devices seeing a synchronized view of read/unread status?',
+      options: ['SMTP', 'POP3', 'IMAP', 'FTP'],
+      answer: 2,
+      marks: 1,
+      difficulty: 'easy',
+      type: 'concept',
+      explanation: 'IMAP (Internet Message Access Protocol) is designed to keep the authoritative copy of the mailbox on the server, organized into folders that the client merely views and manipulates remotely; because state (read/unread flags, folder membership, deletions) lives on the server, multiple devices logging into the same account see a consistent, synchronized mailbox. POP3, by contrast, is a simpler protocol built around downloading messages to a single client and, by default, removing them from the server, which makes multi-device synchronization awkward. SMTP is unrelated to retrieval (it only pushes mail toward a destination server), and FTP is a general file-transfer protocol with no mailbox concept at all.'
+    },
+    {
+      id: 'cn-application-q8',
+      q: 'Which statement about FTP (File Transfer Protocol) is correct?',
+      options: ['FTP uses a single TCP connection that carries both commands and file data together', 'FTP uses one persistent control connection for commands and a separate connection opened per transfer for data', 'FTP is a connectionless protocol built directly over UDP', 'FTP requires no authentication because it always operates in anonymous mode'],
+      answer: 1,
+      marks: 1,
+      difficulty: 'medium',
+      type: 'concept',
+      explanation: 'FTP is distinctive precisely because it separates control from data onto two different TCP connections. The control connection, conventionally on port 21, is opened once at login and stays open for the whole session, carrying commands (login credentials, directory navigation, transfer requests) and their textual replies. A separate data connection (port 20 in active mode, or a port negotiated by the server in passive mode) is opened fresh for each actual file transfer or directory listing and is closed once that particular transfer finishes, while the control connection remains open for further commands. FTP does support (and by default expects) authenticated logins; anonymous FTP is only an optional configuration, not the norm the protocol requires.'
+    },
+    {
+      id: 'cn-application-q9',
+      q: 'A TCP server listens on well-known port 80 and accepts connections from many clients concurrently. What uniquely identifies each individual client connection to the server?',
+      options: ['The destination port number alone (80)', 'The server\'s IP address alone', 'The four-tuple: source IP, source port, destination IP, destination port', 'The TCP sequence number of the first segment'],
+      answer: 2,
+      marks: 1,
+      difficulty: 'medium',
+      type: 'concept',
+      explanation: 'Every client connecting to the same server on port 80 shares the same destination IP and destination port, so those two values alone cannot distinguish between clients. What makes each connection unique to the operating system\'s socket layer is the complete four-tuple: source IP address, source port (usually an ephemeral port chosen by the client), destination IP address, and destination port. Two different clients (different source IPs) or the same client opening two connections (different source ports) each get their own distinct four-tuple, and hence their own connected socket, even though the server\'s listening socket remains bound to the single well-known port 80 throughout.'
+    },
+    {
+      id: 'cn-application-q10',
+      q: 'In symmetric-key cryptography compared with asymmetric (public-key) cryptography, which statement is TRUE?',
+      options: ['Symmetric-key cryptography uses two different keys, one for encryption and one for decryption', 'Symmetric-key cryptography uses the same secret key for both encryption and decryption and is generally faster, but requires securely sharing that key in advance', 'Asymmetric cryptography cannot be used for encryption, only for digital signatures', 'Public-key cryptography requires no key at all'],
+      answer: 1,
+      marks: 1,
+      difficulty: 'easy',
+      type: 'concept',
+      explanation: 'In symmetric-key cryptography (such as AES), the exact same secret key both encrypts and decrypts the data, which makes the arithmetic simple and fast, but creates the key-distribution problem: both parties must somehow agree on and protect that one shared key before they can communicate securely, and if the key leaks the whole channel is compromised. Asymmetric (public-key) cryptography solves the distribution problem by using a mathematically related key pair — a public key that can be freely shared and a private key kept secret — and it is used both for encryption/decryption (as in RSA) and for creating digital signatures; it is not restricted to signatures alone. Public-key operations are computationally heavier than symmetric ones, which is why real systems (like TLS) use asymmetric crypto briefly to exchange a symmetric session key, then switch to fast symmetric encryption for the bulk of the traffic.'
+    },
+    {
+      id: 'cn-application-q11',
+      q: 'In RSA, a user selects primes p = 3 and q = 11. This gives n = 33 and phi(n) = 20. If the public exponent is chosen as e = 3, the private exponent d satisfying e x d ≡ 1 (mod phi(n)) is:',
+      options: ['3', '7', '9', '11'],
+      answer: 1,
+      marks: 2,
+      difficulty: 'hard',
+      type: 'numerical',
+      explanation: 'We need d such that 3d mod 20 = 1, with d coprime to 20 and typically taken as the smallest positive such value. Testing d = 7: 3 x 7 = 21, and 21 mod 20 = 1 — this satisfies the requirement. Checking the distractors: d = 3 gives 3 x 3 = 9 mod 20 = 9, not 1; d = 9 gives 27 mod 20 = 7, not 1; d = 11 gives 33 mod 20 = 13, not 1. So d = 7 is the modular multiplicative inverse of e = 3 modulo phi(n) = 20, and the private key becomes (d, n) = (7, 33) while the public key is (e, n) = (3, 33). GATE typically keeps p and q small enough that this inverse can be found by direct trial, as done here, rather than requiring the extended Euclidean algorithm.'
+    },
+    {
+      id: 'cn-application-q12',
+      q: 'A digital signature scheme is used so that a recipient can verify both who sent a message and that it was not altered in transit. Which statement correctly describes how the signature is created and verified?',
+      options: ['The sender encrypts the message digest with the recipient\'s public key; the recipient decrypts with their own private key', 'The sender encrypts the message digest with its own private key; anyone can verify by decrypting with the sender\'s public key and comparing to a freshly computed hash', 'The sender and recipient share one symmetric key used for both signing and verifying', 'Digital signatures provide confidentiality but no proof of who sent the message'],
+      answer: 1,
+      marks: 2,
+      difficulty: 'medium',
+      type: 'concept',
+      explanation: 'Digital signatures deliberately reverse the usual encryption direction. The sender computes a hash (message digest) of the message and encrypts that digest using its own private key — something only the true sender can do, since only the sender holds that private key. Any recipient can then decrypt the signature using the sender\'s freely available public key, recompute the hash of the received message independently, and check the two match; a match proves both authentication (only the claimed sender could have produced a signature that decrypts correctly with their public key) and integrity (any alteration of the message changes its hash and breaks the match). This is the opposite of confidentiality-oriented encryption, where the sender uses the recipient\'s public key so that only the recipient (holding the matching private key) can read the message; signatures by themselves provide no confidentiality at all, since anyone holding the public key can verify (and see) the digest.'
+    },
+    {
+      id: 'cn-application-q13',
+      q: 'Which of the following best describes the primary function of a network firewall?',
+      options: ['It encrypts all traffic leaving the private network to a public network', 'It filters incoming and outgoing traffic according to a defined set of rules, based on criteria such as IP address, port, and protocol, to protect internal hosts', 'It translates private IP addresses to a single public IP address', 'It resolves domain names to IP addresses for hosts inside the network'],
+      answer: 1,
+      marks: 1,
+      difficulty: 'easy',
+      type: 'concept',
+      explanation: 'A firewall is a security checkpoint placed at the boundary between a trusted internal network and an untrusted external one (typically the internet); it inspects each packet or connection attempt against a configured rule set and permits or blocks it based on attributes such as source/destination IP address, port number, and protocol (a packet-filter firewall), or based on application-level content (a proxy/application-layer firewall). Its purpose is access control and threat mitigation, not encryption (that is the job of protocols like TLS), address translation (that is NAT\'s job), or name resolution (that is DNS\'s job). Confusing a firewall\'s filtering role with NAT\'s address-translation role, since both often run on the same border device, is a common exam trap.'
+    },
+    {
+      id: 'cn-application-q14',
+      q: 'Which of the following well-known port number and protocol pairings is INCORRECT?',
+      options: ['Port 80 — HTTP', 'Port 25 — SMTP', 'Port 53 — DNS', 'Port 21 — HTTP'],
+      answer: 3,
+      marks: 1,
+      difficulty: 'medium',
+      type: 'concept',
+      explanation: 'Port 21 is the well-known port for FTP\'s control connection, not HTTP; HTTP\'s well-known port is 80 (443 for HTTPS). The other three pairings are correct: port 80 is HTTP, port 25 is SMTP (mail relay/submission between servers), and port 53 is DNS (both for queries and, using TCP, for zone transfers). Memorizing the small table of well-known ports — 20/21 FTP, 22 SSH, 23 Telnet, 25 SMTP, 53 DNS, 80 HTTP, 110 POP3, 143 IMAP, 443 HTTPS — is worth the effort because GATE asks this kind of matching question directly and quickly.'
+    },
+    {
+      id: 'cn-application-q15',
+      q: 'A DNS resolver has a completely cold cache and must resolve a name through 3 hierarchy levels (root, TLD, authoritative), with each query-response exchange taking one round-trip time (RTT) of 20 ms, before the client can even begin its actual request to the target server. Ignoring any other delay, the minimum extra time added before the client\'s real application request can be sent is:',
+      options: ['20 ms', '40 ms', '60 ms', '80 ms'],
+      answer: 2,
+      marks: 2,
+      difficulty: 'medium',
+      type: 'numerical',
+      explanation: 'With a fully cold cache, the resolver must complete one round trip to the root server (which refers it to the correct TLD server), one round trip to the TLD server (which refers it to the correct authoritative server), and one round trip to the authoritative server (which finally returns the IP address) — three RTTs in total for the three hierarchy levels described. At 20 ms per RTT, that is 3 x 20 = 60 ms of pure DNS resolution delay before the client even knows the destination\'s IP address and can begin its actual application-layer request (for example, the TCP handshake for HTTP). This is exactly why DNS caching at every level is so valuable in practice: a cache hit at any level shortens this chain immediately.'
+    },
+    {
+      id: 'cn-application-q16',
+      q: 'Which statement about HTTP is correct?',
+      options: ['HTTP is inherently a stateful protocol that remembers all previous requests from a client without any extra mechanism', 'HTTP is a stateless, text-based request-response protocol, typically running over TCP, and any need for state must be handled separately (e.g., using cookies)', 'HTTP requires UDP because it needs low latency more than reliability', 'HTTP responses can only ever be status code 200'],
+      answer: 1,
+      marks: 1,
+      difficulty: 'easy',
+      type: 'concept',
+      explanation: 'HTTP is designed as a stateless protocol: by default, the server treats every request independently and retains no memory of previous requests from the same client. Any application that needs to track session state across multiple requests (a shopping cart, a login session) must layer a separate mechanism on top, most commonly cookies, which the client sends back with each subsequent request so the server can look up the associated state. HTTP messages are human-readable text (headers and, often, a body) and the protocol runs over a reliable transport, TCP, precisely because losing or reordering parts of a web page or form submission would be unacceptable; a response can carry many different status codes (200 OK, 301/302 redirects, 404 Not Found, 500 Internal Server Error, and others), not only 200.'
+    }
+  ]
+});
