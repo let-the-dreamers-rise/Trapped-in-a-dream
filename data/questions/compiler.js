@@ -607,6 +607,297 @@ window.GATE_DATA.questions['compiler'] = {
         }
       ]
     },
-    /*__MARKER__*/
+    {
+      id: 'compiler-runtime',
+      name: 'Runtime Environments',
+      theory: {
+        intro: 'The runtime environment is the machinery a compiled program relies on while executing: how storage is laid out (code, static data, stack, heap), how a procedure call creates and destroys an activation record, how names are bound to storage under static or dynamic scoping, and how arguments reach parameters under the various parameter passing mechanisms. GATE questions here are of two kinds. Conceptual one-markers probe the contents of an activation record, the difference between control links and access links, why recursion demands stack allocation, and how symbol tables model scopes. Two-mark questions are output-tracing puzzles: the same program fragment is executed under static versus dynamic scoping, or under call by value, reference, value-result or name, and you must predict what is printed. These traces are entirely deterministic once you apply the definitions strictly, so this topic converts practice directly into marks — provided you resist the habit of always thinking in C semantics.',
+        core: 'Storage organization. A typical process image holds the code, static data (globals and compile-time constants), a stack growing from one end for activation records, and a heap growing from the other for dynamically allocated, arbitrarily-lived objects. Purely static allocation (as in old Fortran) fixes every variable address at compile time, which is fast but forbids recursion, since every activation of a procedure would share the same storage. Stack allocation gives each call its own activation record, enabling recursion; heap allocation is needed when data outlives its creating activation, as with closures or malloc-style objects.\n\nActivation records. A call pushes a record typically containing: actual parameters, the return address, the saved machine status/registers, the control link (dynamic link) pointing to the caller’s activation record, the access link (static link) pointing to the record of the most recent activation of the lexically enclosing procedure, local variables, and temporaries. Keep the two links straight: the control link follows the call chain (who called me) and is used for returning; the access link follows the lexical nesting (who encloses me in the source text) and is used to reach nonlocal variables under static scoping. To access a variable declared d levels out, the compiled code follows d access links; a display array of pointers, one per nesting depth, gives the same access in one step.\n\nScoping. Under static (lexical) scoping, a nonlocal name refers to the declaration in the closest lexically enclosing block — determined from the program text, at compile time. Under dynamic scoping, a free name refers to the most recently created and still-active binding on the call stack — determined by the calling history, at run time. The same program can print different values under the two disciplines whenever a called procedure references a name that both a global and some caller declare.\n\nParameter passing.\n\n• Call by value: the actual is evaluated and copied; assignments to the formal never affect the caller. C uses this exclusively (pointers are passed by value).\n• Call by reference: the formal is an alias for the actual’s location; assignments write through immediately. Passing the same variable for two formals aliases them to each other.\n• Call by value-result (copy-in copy-out): actuals are copied in, and on return the final formal values are copied back; differs from reference exactly when aliasing or intermediate observation occurs.\n• Call by name: the actual expression is substituted textually (implemented by thunks) and re-evaluated at every use of the formal, so side effects in the actual repeat.\n\nSymbol tables. Usually hash tables; nested scopes are handled by a stack of tables (push on scope entry, pop on exit) or by chaining entries per scope, so a lookup finds the innermost declaration first.',
+        strategy: 'Scoping traces: first mark every variable reference in the called procedure as local or free. For each free reference, static scoping asks "which declaration encloses this procedure in the source text?" — walk outward through the lexical blocks, ignoring who called whom. Dynamic scoping asks "which declaration is most recent on the call stack?" — walk down the callers. Write both chains explicitly; the exam options are built from mixing them up.\n\nParameter passing traces: simulate mechanically. For reference, draw arrows from formals to the caller’s variables and apply every assignment through the arrow at once — and watch for two formals aliasing one actual, the favourite trap. For value-result, keep separate local copies and perform all copy-backs at return, noting that a variable passed twice gets copied back twice (the later copy-back wins, and GATE expects you to say the order or call it undefined). For name, re-evaluate the actual expression at each use, repeating its side effects.\n\nWorked mini-example: void f(int a, int b) { a = a + 3; b = b + 4; } with x = 10 and the call f(x, x). Call by value: copies change, x stays 10. Call by reference: a and b both alias x, so x becomes 13 then 17 — printed value 17. Call by value-result: a = 13, b = 14 locally; copy-back in order leaves x = 14. Three mechanisms, three different answers from four lines of code — which is exactly why this fragment shape keeps reappearing in exams.'
+      },
+      questions: [
+        {
+          id: 'compiler-runtime-q1',
+          q: 'Which of the following is typically NOT stored in an activation record?',
+          options: ['Return address', 'Actual parameters and local variables', 'The complete machine code of the called procedure', 'Control link to the caller’s activation record'],
+          answer: 2,
+          marks: 1,
+          difficulty: 'easy',
+          type: 'concept',
+          explanation: 'An activation record (stack frame) holds the per-call data of one activation: the actual parameters passed in, the return address to resume the caller, saved registers/machine status, the control (dynamic) link to the caller’s record, the access (static) link for nonlocal access, local variables, and temporaries. The code of the procedure is not per-call data — it is shared, immutable, and lives in the code segment of the process; every activation of the procedure executes the same instructions. Putting code in the frame would duplicate it on every call for no purpose. Hence option 3 is the item that does not belong.'
+        },
+        {
+          id: 'compiler-runtime-q2',
+          q: 'In an activation record, the control link (dynamic link) points to:',
+          options: ['The activation record of the lexically enclosing procedure', 'The activation record of the caller', 'The global data area', 'The top of the heap'],
+          answer: 1,
+          marks: 1,
+          difficulty: 'easy',
+          type: 'concept',
+          explanation: 'Two links must never be confused. The control link, also called the dynamic link, points to the activation record of the procedure that made the call — it mirrors the dynamic call chain and is used when the callee returns, to restore the caller’s frame. The access link, also called the static link, points to the most recent activation of the procedure that lexically encloses the callee in the source text — it mirrors static nesting and is followed to reach nonlocal variables under static scoping. Caller and lexical parent often differ (a procedure may be called from a sibling), which is exactly why both links exist. Option 2 describes the control link correctly.'
+        },
+        {
+          id: 'compiler-runtime-q3',
+          q: 'Program: global x = 5. Procedure p() { print(x); }. Procedure q() { local x = 10; p(); }. The main program calls q(). Under STATIC scoping, what is printed?',
+          options: ['5', '10', '15', 'Undefined behaviour'],
+          answer: 0,
+          marks: 2,
+          difficulty: 'medium',
+          type: 'trace',
+          explanation: 'Static (lexical) scoping resolves the free variable x in p by looking at the program text, not the call history. Procedure p is declared at the outer level; walking outward from p’s body, the first enclosing declaration of x is the global x = 5. The fact that q declares its own x and happens to be the caller is irrelevant — q’s x is visible only inside q’s text, and p’s text is not nested inside q. So p prints the global value 5, option 1. This is the behaviour of C, Java, and almost every modern language: you can determine the answer by reading the source alone, at compile time, without simulating any calls.'
+        },
+        {
+          id: 'compiler-runtime-q4',
+          q: 'Same program: global x = 5; p() { print(x); }; q() { local x = 10; p(); }; main calls q(). Under DYNAMIC scoping, what is printed?',
+          options: ['5', '10', '0', 'A compile-time error occurs'],
+          answer: 1,
+          marks: 2,
+          difficulty: 'medium',
+          type: 'trace',
+          explanation: 'Dynamic scoping resolves a free variable to the most recently established binding that is still active on the call stack at the moment of use. Execution: main calls q, which creates a binding x = 10; q then calls p; inside p, the reference to x searches the stack of live bindings from the top: p has no local x, its caller q has x = 10 — found. The global x = 5 sits deeper and is shadowed. So p prints 10, option 2. Contrast with the static answer of 5 for identical code: the pair of questions shows that scoping discipline, not the program text alone, determines the output. Early Lisp and shell variables behave dynamically; the lookup happens at run time along the control link chain.'
+        },
+        {
+          id: 'compiler-runtime-q5',
+          q: 'void f(int a, int b) { a = a + 3; b = b + 4; } Let x = 10 and call f(x, x). Under call by REFERENCE, what is the value of x after the call?',
+          options: ['10', '13', '14', '17'],
+          answer: 3,
+          marks: 2,
+          difficulty: 'medium',
+          type: 'trace',
+          explanation: 'Under call by reference both formals alias the same actual: a and b are two names for the single location x. Execute the body through the aliases. First a = a + 3 reads x (10), writes 13 into x. Then b = b + 4 reads x again — which is now 13, not 10 — and writes 17. Final x = 17, option 4. The trap answers: 13 stops after the first assignment; 14 is the call-by-value-result answer (independent copies a = 13, b = 14, with b copied back last); 10 is call by value. The aliasing of two formals onto one actual is the whole point of the question — with distinct actuals, reference and value-result would agree.'
+        },
+        {
+          id: 'compiler-runtime-q6',
+          q: 'Which parameter passing mechanism does the C language use?',
+          options: ['Call by reference for all parameters', 'Call by value only (a pointer value is itself passed by value)', 'Call by name', 'Call by value-result'],
+          answer: 1,
+          marks: 1,
+          difficulty: 'easy',
+          type: 'concept',
+          explanation: 'C passes every argument by value: the actual expression is evaluated and a copy is placed in the parameter; assignments to the parameter inside the function change only the copy. The idiom of passing &x and dereferencing through int *p simulates reference semantics, but the mechanism is still call by value — the pointer itself is copied, and reassigning p inside the function does not affect the caller’s pointer. C++ adds true reference parameters (int &r); C has none. Arrays appear to be an exception but actually decay to a pointer, which is then passed by value. So option 2 is the precise statement.'
+        },
+        {
+          id: 'compiler-runtime-q7',
+          q: 'Under call by NAME, the actual argument expression is:',
+          options: ['Evaluated exactly once, before the call', 'Evaluated exactly once, after the call returns', 'Re-evaluated afresh at every use of the corresponding formal parameter in the body', 'Never evaluated'],
+          answer: 2,
+          marks: 2,
+          difficulty: 'hard',
+          type: 'concept',
+          explanation: 'Call by name behaves like textual substitution of the actual for the formal (with renaming to avoid capture), classically implemented by passing a thunk — a hidden parameterless procedure that computes the actual. Each appearance of the formal in the body invokes the thunk, so the actual is evaluated as many times as the formal is used: zero times if never used, several times otherwise, repeating any side effects and re-reading variables whose values may have changed between uses. This is why swap(i, a[i]) is the famous failure case: after i changes, re-evaluating a[i] indexes a different element, and no call-by-name swap routine can be written that works for all argument pairs. Options 1 and 2 describe call by value and by result respectively.'
+        },
+        {
+          id: 'compiler-runtime-q8',
+          q: 'Call by value-result (copy-in copy-out) produces the same observable behaviour as call by reference EXCEPT when:',
+          options: ['The actual is a constant expression', 'Aliasing exists, e.g., the same variable is passed for two formals, or a global used inside the callee is also passed as a parameter', 'The procedure has no parameters', 'The procedure is recursive'],
+          answer: 1,
+          marks: 2,
+          difficulty: 'medium',
+          type: 'concept',
+          explanation: 'Under value-result each formal is a private copy, updated locally, with final values copied back at return; under reference each formal writes through to the actual immediately. If every formal binds a distinct location that the callee touches only via that formal, the end states coincide. They diverge under aliasing: with f(x, x) by reference the two formals share one cell so updates compound (each assignment sees the other’s effect), while value-result keeps two independent copies and the copy-backs overwrite each other. Similarly, if the callee reads a global that was also passed as a parameter, reference sees updates immediately, value-result only at return. Hence option 2. Recursion and constant actuals do not by themselves distinguish the mechanisms.'
+        },
+        {
+          id: 'compiler-runtime-q9',
+          q: 'Why does support for recursive procedures require stack (or heap) allocation of activation records rather than purely static allocation?',
+          options: ['Recursive procedures have more local variables', 'Multiple activations of the same procedure can be live simultaneously, and each needs its own copy of locals and return address', 'Static allocation cannot store return addresses at all', 'Recursion requires garbage collection'],
+          answer: 1,
+          marks: 1,
+          difficulty: 'easy',
+          type: 'concept',
+          explanation: 'Static allocation assigns each procedure one fixed block of storage at compile time. A recursive call creates a second live activation while the first is still pending; with only one block, the inner call would overwrite the outer call’s locals and, fatally, its return address, so the outer activation could never resume correctly. Stack allocation solves this by pushing a fresh activation record per call — simultaneous activations occupy distinct frames, and returns pop them in LIFO order, which matches the nesting of calls exactly. That is option 2. Old Fortran forbade recursion precisely because it used static allocation. Garbage collection concerns heap object lifetimes and is unrelated.'
+        },
+        {
+          id: 'compiler-runtime-q10',
+          q: 'A common implementation of a block-structured symbol table handles scope entry and exit by:',
+          options: ['Erasing the entire table at every scope boundary', 'Maintaining a stack of tables: push a new table on entering a scope, look up from innermost outward, pop on exit', 'Keeping one flat table and forbidding name reuse across scopes', 'Sorting all identifiers alphabetically at each scope change'],
+          answer: 1,
+          marks: 1,
+          difficulty: 'medium',
+          type: 'concept',
+          explanation: 'Block structure means an inner declaration shadows an outer one and disappears when its block ends. The stack-of-tables scheme models this directly: entering a block pushes a fresh (usually hash) table; a declaration inserts into the top table; a lookup searches from the top of the stack downward, so the innermost declaration is found first, implementing shadowing; leaving the block pops its table, discarding all its names at once and un-shadowing outer ones. An equivalent single-table variant chains entries with scope numbers and unlinks a scope’s entries on exit. Option 2 describes the scheme. A flat table without reuse (option 3) rejects legal programs, and the other options destroy needed information.'
+        },
+        {
+          id: 'compiler-runtime-q11',
+          q: 'Under static scoping with nested procedures, compiled code inside a procedure at nesting depth 5 accesses a variable declared in the enclosing procedure at depth 2 by:',
+          options: ['Following 3 access links from the current activation record', 'Following 3 control links from the current activation record', 'Following 5 access links', 'Searching the heap for the variable'],
+          answer: 0,
+          marks: 2,
+          difficulty: 'hard',
+          type: 'application',
+          explanation: 'The access (static) link of an activation at depth d points to the most recent activation of its lexical parent at depth d-1. To reach a variable declared at depth m from code at depth n (n > m), the generated code follows exactly n - m access links: here 5 - 2 = 3 hops, landing in the frame that holds the variable, then adds the variable’s fixed offset. Option 1 is correct. Control links are useless for this — they follow the callers, and the caller chain need not correspond to lexical nesting at all (option 2 is the classic distractor). A display — a global array display[d] of frame pointers indexed by depth — replaces the link-following with a single indexed load, trading maintenance cost at call/return for faster nonlocal access.'
+        },
+        {
+          id: 'compiler-runtime-q12',
+          q: 'Heap allocation of activation records or environments becomes necessary (instead of pure stack allocation) when:',
+          options: ['A procedure calls itself recursively', 'Local data of a call must outlive the call, e.g., a returned closure still references the enclosing function’s variables', 'A procedure has more than one return statement', 'Parameters are passed by value'],
+          answer: 1,
+          marks: 2,
+          difficulty: 'medium',
+          type: 'concept',
+          explanation: 'Stack discipline assumes LIFO lifetimes: a callee’s data dies no later than its caller’s, so frames can be popped on return. That assumption breaks when local data must survive the activation that created it. The standard example is a function that returns an inner function (a closure) capturing its local variables: after the outer call returns, the closure can still be invoked and must still find those variables, so the environment cannot sit in a popped stack frame — it must be heap allocated and reclaimed later (often by garbage collection). Option 2 is exactly this situation. Recursion (option 1) is handled perfectly by the stack; multiple returns and by-value parameters raise no lifetime issues.'
+        },
+        {
+          id: 'compiler-runtime-q13',
+          q: 'Let g() be a function that increments a global counter and returns its new value. Consider f(x) whose body is: return x + x;. Starting with the counter at 0, what does f(g()) return under call by NAME, and how many times does the counter get incremented?',
+          options: ['Returns 2 with one increment', 'Returns 3 with two increments', 'Returns 2 with two increments', 'Returns 1 with one increment'],
+          answer: 1,
+          marks: 2,
+          difficulty: 'hard',
+          type: 'trace',
+          explanation: 'Under call by name, x stands for the unevaluated expression g(); each use of x in the body re-invokes it. The body x + x uses x twice. First use: g() increments the counter 0 -> 1 and returns 1. Second use: g() increments 1 -> 2 and returns 2. The sum is 1 + 2 = 3, and the counter was incremented twice — option 2. Under call by value the answer would be option 1: g() runs once (counter 1, value 1) and the copy is used twice, returning 1 + 1 = 2. The divergence whenever the actual has side effects is the standard exam signature of call by name, and it is why the mechanism (from Algol 60) survives mainly as lazy evaluation with memoization (call by need), which would evaluate g() once.'
+        }
+      ]
+    },
+    {
+      id: 'compiler-optimization',
+      name: 'Code Optimization',
+      theory: {
+        intro: 'Code optimization improves intermediate or target code without changing observable behaviour. GATE concentrates on machine-independent optimization over three-address code, and the entry point is the basic block: a maximal sequence of instructions with one entry (the first instruction) and one exit (the last), so that control always flows straight through. Partitioning code into basic blocks via the leader rules, and building the control flow graph over them, is a guaranteed exam skill. On top of that sit the named transformations — constant folding and propagation, copy propagation, common subexpression elimination, dead code elimination, strength reduction, loop-invariant code motion, and induction variable elimination — plus the dataflow intuition of liveness: which variables still matter at a program point. Questions either ask you to classify or define a transformation, to count basic blocks in a numbered TAC listing, or to reason about which variables are live at a marked point. All three are mechanical once the definitions are exact.',
+        core: 'Basic blocks and leaders. Given a numbered TAC listing, an instruction is a leader if (1) it is the first instruction of the program, or (2) it is the target of any conditional or unconditional jump, or (3) it immediately follows a conditional or unconditional jump. Each basic block runs from a leader up to, but not including, the next leader (or to the end). The control flow graph (CFG) has one node per block with edges for jumps and fall-throughs. Optimizations confined to one block are local; those using the whole CFG (via dataflow analysis) are global.\n\nThe classical transformations:\n\n• Constant folding: evaluate constant expressions at compile time (replace 2 * 3.14 by 6.28).\n• Constant propagation: replace a variable known to hold a constant by that constant (after x = 3, turn y = x + 1 into y = 3 + 1, which folding then makes 4).\n• Copy propagation: after a copy x = y, use y in place of x while both are unchanged, often making the copy dead.\n• Common subexpression elimination (CSE): if an expression was already computed and its operands are unchanged since, reuse the previous value. Local CSE works within a block (DAG construction does it automatically); global CSE needs available-expression analysis over the CFG.\n• Dead code elimination: remove instructions whose results are never used, and unreachable code.\n• Strength reduction: replace an expensive operation by a cheaper one — x * 8 by x << 3, or inside a loop the induction expression i * 4 by an addition t = t + 4 per iteration.\n• Loop-invariant code motion: an instruction whose operands do not change inside the loop is hoisted to a preheader, executing once instead of every iteration (subject to safety: it must dominate the exits or otherwise be safe to execute).\n• Induction variable elimination: variables that change by a constant per iteration are combined, often removing the loop counter entirely.\n• Loop unrolling replicates the body to cut loop-control overhead per iteration (more code, fewer branches); loop jamming or fusion merges two loops with identical iteration ranges into one.\n• Peephole optimization slides a small window over (usually target) code, applying pattern fixes: eliminating redundant load/store pairs, algebraic identities (x = x + 0, x = x * 1), unreachable code after unconditional jumps, and jump-over-jump simplifications.\n\nLiveness. A variable v is live at a point p if some path from p to the exit uses v before v is redefined; otherwise v is dead at p. Liveness is computed backwards: a use makes the variable live before that instruction; a definition kills liveness of the defined variable above it. Liveness drives dead code elimination (a definition of a dead variable can go) and register allocation (only live variables need registers).',
+        strategy: 'Basic block counting: underline the leaders using the three rules — first instruction, every jump target, every instruction just after a jump — then count the runs between leaders. The usual mistakes are missing the instruction after a conditional jump (rule 3 applies to conditional jumps too, because control may fall through) and forgetting that a label mentioned in a goto marks its target as a leader even when the jump is backwards.\n\nTransformation identification: exam options often present four transformations and one before/after code pair. Match by signature: constants replacing expressions is folding; a variable replaced by a constant is constant propagation; reuse of an earlier computation is CSE; multiplication turned into shift or addition is strength reduction; code hoisted out of a loop is invariant motion.\n\nWorked mini-example on liveness: 1: x = a + b; 2: y = x * c; 3: x = y + d; 4: print x. Which variables are live just after line 2? Work backwards from each later use: line 4 uses x, whose value comes from line 3, so the x defined at line 1 is dead after line 2 (it is redefined at 3 before any use). Line 3 uses y and d — both live. c is used only at line 2, so it is dead after it. Live set = {y, d} (plus nothing else among the named variables). Writing the use/def chain explicitly like this avoids the trap of counting x live merely because its name appears later — what appears later is a new value of x.'
+      },
+      questions: [
+        {
+          id: 'compiler-optimization-q1',
+          q: 'Which of the following correctly lists the leader rules for partitioning three-address code into basic blocks?',
+          options: ['Only the targets of unconditional jumps are leaders', 'The first instruction; any target of a conditional or unconditional jump; any instruction immediately following such a jump', 'Every labeled instruction and nothing else', 'The first and last instructions of the program only'],
+          answer: 1,
+          marks: 1,
+          difficulty: 'easy',
+          type: 'concept',
+          explanation: 'A basic block must have a single entry at its top and a single exit at its bottom. The three leader rules guarantee this: (1) the first instruction of the program starts the first block; (2) any instruction that is the target of a jump — conditional or unconditional — can be entered from elsewhere, so it must start a block; (3) any instruction immediately after a jump begins a block, because the jump ends the previous block (a conditional jump may fall through into it, an unconditional one makes it reachable only via labels). Each block then extends from its leader up to just before the next leader. Option 2 states all three rules; the others each omit cases.'
+        },
+        {
+          id: 'compiler-optimization-q2',
+          q: 'Consider the TAC: 1: a = 0; 2: b = 1; 3: c = a + b; 4: a = b; 5: b = c; 6: if c < n goto 3; 7: print c. How many basic blocks are there?',
+          options: ['2', '3', '4', '5'],
+          answer: 1,
+          marks: 2,
+          difficulty: 'medium',
+          type: 'numerical',
+          explanation: 'Find the leaders. Rule 1: instruction 1 is a leader (first instruction). Rule 2: instruction 3 is a leader (target of the goto in line 6). Rule 3: instruction 7 is a leader (it immediately follows the conditional jump at 6). No other instruction qualifies. Blocks run from each leader to just before the next: B1 = {1, 2}, B2 = {3, 4, 5, 6}, B3 = {7}. That is 3 basic blocks, option 2. The CFG edges are B1 -> B2 (fall-through), B2 -> B2 (the backward jump when c < n), and B2 -> B3 (fall-through when the condition fails) — a single-block loop body, the shape of this Fibonacci-style computation.'
+        },
+        {
+          id: 'compiler-optimization-q3',
+          q: 'Replacing the expression 4 * 2.5 by 10.0 at compile time is an example of:',
+          options: ['Strength reduction', 'Constant folding', 'Copy propagation', 'Loop unrolling'],
+          answer: 1,
+          marks: 1,
+          difficulty: 'easy',
+          type: 'concept',
+          explanation: 'Constant folding evaluates, during compilation, any expression whose operands are all compile-time constants, replacing the expression by its value — here 4 * 2.5 becomes the literal 10.0, so no multiplication happens at run time. Distinguish the neighbours: strength reduction keeps the computation but swaps the operator for a cheaper one (a shift for a multiply); copy propagation replaces a variable by another variable after a copy assignment; loop unrolling is a loop restructuring. Folding is often enabled by constant propagation: once x = 4 is propagated into x * 2.5 it becomes 4 * 2.5, which folding finishes. Option 2 is correct.'
+        },
+        {
+          id: 'compiler-optimization-q4',
+          q: 'Given the block: x = 3; y = x + 2; z = y * x; — after constant propagation and folding, what does z become?',
+          options: ['z = y * 3 with y unknown', 'z = 15', 'z = 9', 'The optimizer cannot simplify z at all'],
+          answer: 1,
+          marks: 2,
+          difficulty: 'medium',
+          type: 'trace',
+          explanation: 'Apply the transformations iteratively. Constant propagation of x = 3 into the second statement gives y = 3 + 2; constant folding evaluates it to y = 5. Now y is also a known constant, so propagate both into the third statement: z = y * x becomes z = 5 * 3, and folding gives z = 15, option 2. If the results y and x are unused afterwards, dead code elimination can then delete the first two assignments entirely. The answer 9 comes from the error of propagating x into both operand positions as if the statement were z = x * x. The example shows why these optimizations run to a fixed point: each round of propagation exposes new folding opportunities, which expose new propagation opportunities.'
+        },
+        {
+          id: 'compiler-optimization-q5',
+          q: 'The difference between local and global common subexpression elimination is that:',
+          options: ['Local CSE works within a single basic block; global CSE works across blocks using dataflow (available expressions) over the control flow graph', 'Local CSE is done by the linker, global CSE by the loader', 'Global CSE only handles constants, local CSE only variables', 'There is no difference; the terms are synonyms'],
+          answer: 0,
+          marks: 1,
+          difficulty: 'medium',
+          type: 'concept',
+          explanation: 'The scope of reasoning differs. Local CSE examines one basic block, where instructions execute in a fixed straight-line order; building the DAG of the block automatically merges repeated computations whose operands are unchanged. Global CSE must be sure an expression is available along EVERY path reaching a point before reusing it, which requires the available-expressions dataflow analysis over the whole control flow graph — an expression is available at a point if every path from the entry computes it and no operand is redefined afterwards. Same idea, different scope and machinery, so option 1 is correct. Linkers and loaders (option 2) perform no such semantic optimization.'
+        },
+        {
+          id: 'compiler-optimization-q6',
+          q: 'Dead code elimination removes:',
+          options: ['All comments from the source program', 'Instructions computing values that are never used afterwards, and code that can never be reached', 'All conditional jumps', 'Every instruction inside a loop body'],
+          answer: 1,
+          marks: 1,
+          difficulty: 'easy',
+          type: 'concept',
+          explanation: 'Dead code has two flavours, both safely removable because their absence cannot change observable behaviour. First, a definition x = expr where x is dead — no path uses that value before x is redefined or the program ends — computes something nobody consumes (provided expr has no side effects). Liveness analysis identifies exactly these. Second, unreachable code: instructions to which no control path leads, such as statements after an unconditional return or a branch whose condition constant-folds to false. Removing comments is the scanner’s job long before optimization, and removing jumps or loop bodies wholesale would change behaviour. Option 2 captures both flavours.'
+        },
+        {
+          id: 'compiler-optimization-q7',
+          q: 'Replacing the loop computation t = i * 4 (recomputed each iteration as i increases by 1) with an addition t = t + 4 per iteration is called:',
+          options: ['Loop jamming', 'Strength reduction on an induction variable', 'Constant folding', 'Peephole jump optimization'],
+          answer: 1,
+          marks: 1,
+          difficulty: 'medium',
+          type: 'concept',
+          explanation: 'Both i and t here are induction variables: they change by a fixed amount each trip around the loop (i by 1, hence i*4 by 4). Strength reduction exploits this linearity to replace the multiplication — relatively expensive — by a running addition: initialize t before the loop and add 4 each iteration. The values produced are identical, but each iteration now performs a cheap + instead of a *. This is the classic loop form of strength reduction (the non-loop form replaces x * 8 with x << 3). It frequently enables induction variable elimination next: if i itself is only used to compute t and the loop bound, i can disappear entirely with the test rewritten in terms of t. Option 2 is correct.'
+        },
+        {
+          id: 'compiler-optimization-q8',
+          q: 'Inside the loop: for (i = 0; i < n; i++) { x = y + z; a[i] = x * i; } — which statement may be moved out of the loop by loop-invariant code motion, assuming y and z are not modified in the loop?',
+          options: ['a[i] = x * i, because it uses x', 'x = y + z, because its operands do not change during the loop', 'The loop test i < n', 'i++, to make the loop faster'],
+          answer: 1,
+          marks: 1,
+          difficulty: 'medium',
+          type: 'application',
+          explanation: 'An instruction is loop invariant when every operand is either constant or defined only outside the loop (or by other invariant instructions). Here y and z are unchanged inside the loop, so x = y + z computes the same value on every iteration; hoisting it into a preheader executes it once instead of n times, preserving semantics (with the usual safety caveat that the loop executes at least once or the hoisted code is safe anyway). Option 2 is correct. The store a[i] = x * i depends on i, which changes every iteration, so it is not invariant; the loop test and the increment are the loop machinery itself and obviously vary. Spotting the invariant by checking each operand against the loop’s definitions is the whole technique.'
+        },
+        {
+          id: 'compiler-optimization-q9',
+          q: 'Code: 1: x = a + b; 2: y = x * c; 3: x = y + d; 4: print x. Which variables (among x, y, c, d) are live immediately AFTER line 2?',
+          options: ['{x, y, d}', '{y, d}', '{y, c, d}', '{x, y, c, d}'],
+          answer: 1,
+          marks: 2,
+          difficulty: 'hard',
+          type: 'trace',
+          explanation: 'A variable is live at a point if some later use of its CURRENT value occurs before it is redefined. Check each: y is used at line 3 with the value assigned at line 2, so y is live. d is used at line 3 and defined nowhere in the fragment, so d is live. x looks live because line 4 prints it — but the x printed at line 4 is the value assigned at line 3; the value x holds after line 2 (from line 1) is overwritten at line 3 before any use, so that x is dead. c’s last use is at line 2 itself; after line 2 it is never used, so c is dead. Live set after line 2 = {y, d}, option 2. Consequence for the optimizer: nothing yet — but if line 4 were removed, line 3 would define a dead x and could itself be deleted. The name-versus-value distinction for x is the entire point.'
+        },
+        {
+          id: 'compiler-optimization-q10',
+          q: 'A variable v is said to be live at a program point p if:',
+          options: ['v has been assigned a value somewhere before p', 'There exists a path from p to the exit along which v is used before being redefined', 'v appears anywhere in the program text after p', 'v is stored in a register at p'],
+          answer: 1,
+          marks: 1,
+          difficulty: 'medium',
+          type: 'concept',
+          explanation: 'Liveness looks forward: the value v holds at p matters iff some execution path leaving p reaches a use of v without passing a redefinition of v first — that is option 2, the textbook definition. Option 1 looks backward and describes something closer to "defined", not live. Option 3 is the classic trap: a later textual occurrence of v might be a redefinition, or might use a NEW value assigned between p and there; mere appearance does not make the current value needed. Option 4 confuses the analysis with one of its applications — register allocators keep live variables in registers, but liveness is a property of the program, computed by a backward dataflow analysis (out[B] = union of in of successors; in[B] = use[B] union (out[B] minus def[B])).'
+        },
+        {
+          id: 'compiler-optimization-q11',
+          q: 'Peephole optimization is best described as:',
+          options: ['A global dataflow analysis over the entire control flow graph', 'Examining a small sliding window of adjacent instructions and replacing patterns with better sequences, e.g., removing a store immediately followed by a load of the same location', 'Renaming all variables to shorter names', 'Splitting the program into basic blocks'],
+          answer: 1,
+          marks: 1,
+          difficulty: 'easy',
+          type: 'concept',
+          explanation: 'Peephole optimization slides a small window (a few adjacent instructions, typically over target or near-target code) and pattern-matches locally improvable sequences: a store to x immediately followed by a load from x (delete the load); algebraic identities like x = x + 0 or x = x * 1 (delete); strength reductions like multiply-by-power-of-two into shifts; a jump to a jump (retarget the first, possibly leaving the second unreachable); unreachable code after an unconditional branch. It is deliberately myopic — no global analysis — yet repeated passes catch many inefficiencies introduced by naive code generation, and one replacement often exposes another. Option 2 with its store/load example is the definition; option 1 describes global dataflow optimization instead.'
+        },
+        {
+          id: 'compiler-optimization-q12',
+          q: 'TAC: 1: read n; 2: i = 1; 3: s = 0; 4: if i > n goto 10; 5: t = i * i; 6: if t mod 2 == 0 goto 8; 7: s = s + t; 8: i = i + 1; 9: goto 4; 10: print s. How many basic blocks does this code have?',
+          options: ['4', '5', '6', '7'],
+          answer: 2,
+          marks: 2,
+          difficulty: 'hard',
+          type: 'numerical',
+          explanation: 'Leaders: instruction 1 (first instruction); instruction 4 (target of goto at 9); instruction 5 (immediately follows conditional jump 4); instruction 7 (immediately follows conditional jump 6); instruction 8 (target of the jump at 6); instruction 10 (target of the jump at 4, and also follows jump 9). Blocks between consecutive leaders: B1 = {1,2,3}, B2 = {4}, B3 = {5,6}, B4 = {7}, B5 = {8,9}, B6 = {10} — 6 basic blocks, option 3. The mistakes that give 4 or 5: forgetting rule 3 for the instruction after a CONDITIONAL jump (5 and 7 are leaders because control may fall through into them), or missing that instruction 8 is a jump target from 6. Note 8 would be a leader for two reasons if 7 ended in a jump, but one reason suffices.'
+        },
+        {
+          id: 'compiler-optimization-q13',
+          q: 'After the copy assignment x = y, copy propagation allows subsequent uses of x to be replaced by y as long as:',
+          options: ['x and y are both global variables', 'Neither x nor y is reassigned between the copy and the use', 'y is a constant', 'x is used at most once'],
+          answer: 1,
+          marks: 1,
+          difficulty: 'medium',
+          type: 'concept',
+          explanation: 'Copy propagation exploits that after x = y, both names hold the same value, so a use of x can read y instead. The substitution is valid only while the equality still holds at the use: if x is reassigned in between, its uses no longer mean y; if y is reassigned, y no longer holds the copied value even though x still does. Hence the condition is that neither variable is redefined on any path from the copy to the use, option 2. The payoff is indirect: after all uses of x are rewritten to y, the copy x = y defines a dead variable and dead code elimination deletes it — copy propagation is an enabling transformation. Constants are the domain of constant propagation, a sibling but distinct optimization.'
+        },
+        {
+          id: 'compiler-optimization-q14',
+          q: 'Block: t1 = a + b; t2 = a + b; c = t1 * t2. After local common subexpression elimination, copy propagation and dead code elimination, the minimum number of instructions remaining is:',
+          options: ['3', '2', '1', '4'],
+          answer: 1,
+          marks: 2,
+          difficulty: 'hard',
+          type: 'trace',
+          explanation: 'Step 1, local CSE: t2 = a + b recomputes the expression already held by t1 with operands unchanged, so replace it by the copy t2 = t1. Code: t1 = a + b; t2 = t1; c = t1 * t2. Step 2, copy propagation: substitute t1 for t2 in its use, giving c = t1 * t1. Step 3, dead code elimination: t2 = t1 now defines a value never used — delete it. Remaining: t1 = a + b; c = t1 * t1 — 2 instructions, option 2. One instruction is impossible: the computation needs an addition and a multiplication, and each TAC instruction carries one operator. The example is the standard illustration of optimizations enabling one another: CSE creates the copy, propagation makes it dead, elimination removes it.'
+        }
+      ]
+    }
   ]
 };

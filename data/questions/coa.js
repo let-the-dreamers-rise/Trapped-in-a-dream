@@ -637,6 +637,165 @@ window.GATE_DATA.questions['coa'] = {
         }
       ]
     },
-//__NEXT__
-  ]
-};
+    {
+      id: 'coa-io',
+      name: 'I/O Organization, DMA & Disk',
+      theory: {
+        intro: 'Input/output devices are orders of magnitude slower than the CPU, so how the processor coordinates with them determines how much useful work it can do. This topic covers the three transfer techniques — programmed I/O (the CPU busy-waits, polling a status flag), interrupt-driven I/O (the device signals readiness and the CPU services it), and direct memory access (a DMA controller moves whole blocks between device and memory while the CPU computes) — along with interrupt mechanics (vectored interrupts, priorities, daisy chaining) and the two addressing styles for device registers (memory-mapped versus isolated I/O). It closes with magnetic disk timing: seek time, rotational latency derived from RPM, and transfer time from track capacity. GATE questions here are dominated by overhead percentages (what fraction of CPU time does a device consume under each scheme) and disk access-time sums, both short calculations once the model is clear.',
+        core: 'Programmed I/O: the CPU reads a device status register in a loop until the device is ready, then transfers a word. The CPU is fully occupied during the wait, so this suits only very fast or very rare transfers. Polling cost = polls per second × cycles per poll, expressed as a fraction of the CPU clock rate.\n\nInterrupt-driven I/O: the device raises an interrupt when ready; the CPU finishes its current instruction, saves state (at minimum the PC and status word), runs an interrupt service routine (ISR) to transfer the data, and resumes. The CPU is free between interrupts, but each transfer pays ISR overhead — per-byte or per-word interrupts become crippling at high data rates. In vectored interrupts the device supplies an identifier from which the CPU obtains the ISR address directly (via the interrupt vector table); non-vectored schemes require software polling of devices to find the requester. Daisy chaining passes an interrupt-acknowledge signal serially through devices, so electrical position in the chain fixes priority — the nearest device wins. Interrupts are checked at instruction boundaries; maskable interrupts can be disabled, while the NMI cannot.\n\nDMA: the CPU programs the DMA controller with the memory address, word count and direction, then continues executing. The controller becomes bus master and moves data directly between the device and memory, interrupting the CPU only once, when the whole block finishes. Modes:\n\n• Burst (block) mode: the DMA controller seizes the bus for the entire block; fastest for the device, but the CPU is locked out of memory meanwhile.\n• Cycle stealing: the controller takes one bus cycle at a time, transferring one word and returning the bus; the CPU is slowed slightly rather than stopped.\n\nDMA overhead calculations use two ingredients: the fraction of bus/memory cycles stolen (device rate ÷ words per cycle ÷ cycle rate) and the CPU cycles spent on setup and completion interrupts, both expressed relative to the transfer duration.\n\nMemory-mapped I/O assigns device registers addresses inside the ordinary memory space, so any load/store instruction can access them — no special instructions, but the address space is shared and such regions must not be cached. Isolated (port-mapped) I/O uses a separate address space with dedicated IN/OUT instructions and a control line distinguishing the spaces.\n\nDisk timing. A disk spinning at R RPM completes one revolution in 60000/R ms; average rotational latency is half a revolution. Total access time for a request = seek time + rotational latency + transfer time, where transfer time = (bytes transferred / track capacity) × revolution time, or bytes ÷ sustained transfer rate. Reading a full track takes exactly one revolution after reaching the first sector. Sequential access amortizes the seek and latency across many sectors, while random access pays them per request — the source of the enormous throughput gap between the two patterns. Data is recorded in sectors (with the sector as the atomic transfer unit), and capacity = surfaces × tracks per surface × sectors per track × bytes per sector.',
+        strategy: 'Three calculation templates cover most GATE questions. (1) Interrupt overhead: fraction = (transfers per second × service time per transfer); compare against programmed I/O where the CPU is busy the entire device time, and against DMA where only setup plus one completion interrupt per block count. (2) Cycle stealing: cycles stolen per second = device byte rate ÷ bytes per bus transfer; fraction = that × bus cycle time. (3) Disk: revolution time = 60000/RPM ms, average latency = half of that, then add seek and transfer.\n\nWorked mini-example: a disk at 7200 RPM revolves in 60000/7200 = 8.33 ms, so average rotational latency is 4.17 ms; with an 8 ms average seek and a 4 KB read at 50 MB/s (0.08 ms), one random access costs about 12.25 ms — note how seek and latency dwarf the transfer.\n\nTraps: using a full revolution instead of half for average latency; forgetting that DMA interrupts the CPU once per block, not per byte; quoting device rates in MB/s but bus cycles in ns and dropping a factor of 1000; assuming memory-mapped I/O needs special instructions (that is isolated I/O); and reversing daisy-chain priority (closest to the controller is highest). When a question asks what percentage of CPU time a scheme consumes, always convert everything to time per second — events per second times seconds per event — and the fraction falls out cleanly. Expect at least one disk-timing and one DMA/interrupt-overhead question in most papers; both are quick marks with these templates.'
+      },
+      questions: [
+        {
+          id: 'coa-io-q1',
+          q: 'The key advantage of DMA over interrupt-driven I/O for large block transfers is that:',
+          options: ['The CPU executes the transfer loop faster', 'The CPU is involved only at the start and end of the block, not per word', 'DMA eliminates the need for a system bus', 'Interrupts are completely disabled during DMA'],
+          answer: 1,
+          marks: 1,
+          difficulty: 'easy',
+          type: 'concept',
+          explanation: 'With interrupt-driven I/O the CPU must execute an interrupt service routine for every word or byte transferred, which at high data rates consumes most of the processor. DMA moves the per-word work into a hardware controller: the CPU merely programs it with the address, count and direction, then receives a single interrupt when the whole block completes. Between those two moments the CPU computes freely (competing only for stolen bus cycles). The bus is still used — in fact the DMA controller becomes bus master — and ordinary interrupts remain enabled for other devices, so options 3 and 4 are wrong.'
+        },
+        {
+          id: 'coa-io-q2',
+          q: 'In cycle-stealing DMA, the DMA controller:',
+          options: ['Holds the bus until the entire block is transferred', 'Takes control of the bus for one transfer at a time, releasing it between transfers', 'Copies data through CPU registers', 'Transfers data only while the CPU is halted'],
+          answer: 1,
+          marks: 1,
+          difficulty: 'easy',
+          type: 'concept',
+          explanation: 'Cycle stealing interleaves DMA activity with CPU activity at the granularity of single bus cycles: the controller requests the bus, transfers one word between device and memory, then releases the bus so the CPU can continue. The CPU is slowed — some of its memory cycles are stolen — but never stopped for long. Option 1 describes burst (block) mode, where the CPU can be locked out of memory for the whole block; burst mode suits very fast devices like disks, while cycle stealing suits moderate-rate devices. DMA data never passes through CPU registers; bypassing the CPU is the entire point.'
+        },
+        {
+          id: 'coa-io-q3',
+          q: 'A device delivers data at 10000 bytes per second using interrupt-driven I/O with one interrupt per byte. Each interrupt (including state saving, service and return) costs 2 microseconds of CPU time. What fraction of the CPU is consumed servicing this device?',
+          options: ['0.2%', '2%', '20%', '5%'],
+          answer: 1,
+          marks: 2,
+          difficulty: 'medium',
+          type: 'numerical',
+          explanation: 'Interrupts per second = 10000 (one per byte). CPU time consumed per second = 10000 × 2 μs = 20000 μs = 0.02 s. Fraction = 0.02 s per second = 2%. The template: overhead fraction = event rate × time per event, with everything converted to consistent units first. At this modest rate interrupt-driven I/O is fine, but scale the device to 1 MB/s and the same arithmetic gives 200% — impossible, meaning the CPU cannot keep up and DMA becomes mandatory. GATE often asks exactly this comparison or the maximum device rate a scheme can sustain.'
+        },
+        {
+          id: 'coa-io-q4',
+          q: 'A device transfers data at 10 MB/s into memory via cycle-stealing DMA, moving one 4-byte word per stolen bus cycle. Each bus cycle takes 100 ns. What fraction of bus cycles is stolen by the DMA controller?',
+          options: ['10%', '25%', '40%', '2.5%'],
+          answer: 1,
+          marks: 2,
+          difficulty: 'medium',
+          type: 'numerical',
+          explanation: 'Words per second = 10 MB/s ÷ 4 bytes per word = 2.5 × 10^6 word transfers per second, each stealing one 100 ns bus cycle. Bus time stolen per second = 2.5 × 10^6 × 100 ns = 0.25 s. Fraction = 25%. Equivalently, the bus supports 10^7 cycles per second, of which 2.5 × 10^6 are taken: 25%. The two standard slips are forgetting to divide the byte rate by the bus width (giving 100%, i.e. treating each byte as a cycle) and mixing ns with μs. Wider buses proportionally cut the stolen fraction — the reason DMA transfers use full-word cycles.'
+        },
+        {
+          id: 'coa-io-q5',
+          q: 'A disk rotates at 7200 RPM with an average seek time of 8 ms and a sustained transfer rate of 50 MB/s. Approximately how long does one random 4 KB read take (seek + average rotational latency + transfer)?',
+          options: ['8.4 ms', '12.25 ms', '16.4 ms', '20.5 ms'],
+          answer: 1,
+          marks: 2,
+          difficulty: 'medium',
+          type: 'numerical',
+          explanation: 'Revolution time = 60000 / 7200 = 8.33 ms, so average rotational latency = half a revolution = 4.17 ms. Transfer time for 4 KB at 50 MB/s = 4096 / (50 × 10^6) s ≈ 0.08 ms. Total ≈ 8 + 4.17 + 0.08 = 12.25 ms. Observe the proportions: mechanical positioning (seek plus latency) accounts for over 99% of the time, while the actual data movement is negligible — the fundamental reason random disk I/O is slow and why operating systems batch, reorder and cache disk requests. Using a full revolution (8.33) instead of half is the trap that yields 16.4 ms.'
+        },
+        {
+          id: 'coa-io-q6',
+          q: 'A disk spins at 15000 RPM and each track holds 1 MB. Ignoring seek and initial latency, what is the maximum sustained rate at which a full track can be read?',
+          options: ['15 MB/s', '250 MB/s', '62.5 MB/s', '125 MB/s'],
+          answer: 1,
+          marks: 2,
+          difficulty: 'hard',
+          type: 'numerical',
+          explanation: 'Reading a complete track takes exactly one revolution once the head is positioned. Revolution time = 60000 / 15000 = 4 ms. Rate = 1 MB per 4 ms = 1 MB / 0.004 s = 250 MB/s. This media transfer rate is the physical ceiling set by rotation speed and areal density; sustained rates across multiple tracks are lower because of head switches and track-to-track seeks. The calculation template — track capacity ÷ revolution time — also inverts: given a transfer rate and RPM you can recover track capacity, a variant GATE has used. Confusing RPM with revolutions per second (giving 62.5) is the standard slip.'
+        },
+        {
+          id: 'coa-io-q7',
+          q: 'In memory-mapped I/O, device registers are accessed using:',
+          options: ['Special IN and OUT instructions with a separate address space', 'Ordinary load and store instructions at reserved memory addresses', 'Only DMA transfers', 'The interrupt vector table'],
+          answer: 1,
+          marks: 1,
+          difficulty: 'easy',
+          type: 'concept',
+          explanation: 'Memory-mapped I/O places device data, status and control registers at addresses within the normal memory address space, so the full set of load/store instructions and addressing modes works on them — no special I/O instructions are needed. The costs: device regions consume address space and must be marked non-cacheable, since reading a status register twice must query the device, not a stale cached copy. Option 1 describes isolated (port-mapped) I/O, which uses a separate I/O space selected by a control line and accessed through dedicated IN/OUT instructions, as in x86. The vector table is for locating ISRs, unrelated to register addressing.'
+        },
+        {
+          id: 'coa-io-q8',
+          q: 'In a vectored interrupt scheme, the processor determines the starting address of the interrupt service routine by:',
+          options: ['Polling every device in a fixed order until one responds', 'Using an identifier supplied by the interrupting device to index the interrupt vector table', 'Always jumping to address zero', 'Asking the DMA controller'],
+          answer: 1,
+          marks: 1,
+          difficulty: 'medium',
+          type: 'concept',
+          explanation: 'With vectored interrupts, the device (or an interrupt controller acting for it) places a vector number on the bus during the interrupt-acknowledge cycle. The CPU uses this number as an index into the interrupt vector table, a memory structure holding the starting addresses of the service routines, and jumps directly to the right ISR. This makes ISR dispatch fast and independent of the number of devices. Option 1 describes non-vectored (polled) interrupt identification, where software queries device status registers one by one — simpler hardware but latency grows with device count. A fixed jump to one address would force that single routine to poll anyway.'
+        },
+        {
+          id: 'coa-io-q9',
+          q: 'A disk device transfers 32000-byte blocks by DMA at a rate of 8 MB/s. DMA initialization takes 50 CPU cycles and the completion interrupt handler takes 100 CPU cycles, on a 100 MHz CPU. What percentage of CPU time is spent managing this transfer while it proceeds?',
+          options: ['0.0375%', '3.75%', '0.375%', '1.5%'],
+          answer: 0,
+          marks: 2,
+          difficulty: 'hard',
+          type: 'numerical',
+          explanation: 'CPU overhead per block = 50 + 100 = 150 cycles; at 100 MHz each cycle is 10 ns, so overhead = 1500 ns = 1.5 μs. Block transfer time = 32000 bytes ÷ 8 MB/s = 32000 / (8 × 10^6) s = 4 ms = 4000 μs. Fraction = 1.5 / 4000 = 0.000375 = 0.0375%. The result shows why DMA scales: the CPU cost is fixed per block regardless of block size, so bigger blocks shrink the percentage further. Interrupt-per-byte I/O on the same device would instead interrupt 8 million times per second — utterly infeasible. Watch the μs/ms conversion, the main source of the 10× and 100× wrong options.'
+        },
+        {
+          id: 'coa-io-q10',
+          q: 'In a daisy-chained interrupt acknowledgement scheme, the priority of a device is determined by:',
+          options: ['Its data transfer rate', 'Its electrical position in the chain — devices closer to the CPU/controller have higher priority', 'The alphabetical order of device names', 'A random arbiter'],
+          answer: 1,
+          marks: 1,
+          difficulty: 'easy',
+          type: 'concept',
+          explanation: 'In a daisy chain, the interrupt-acknowledge signal from the CPU propagates serially from device to device. A device that requested the interrupt absorbs the acknowledge and places its vector on the bus; a device that did not request passes the signal to the next in line. Consequently the device electrically nearest the CPU always gets first chance — position in the chain is priority, a simple scheme requiring no arbiter but inflexible (priorities are fixed by wiring) and slower for far devices as the grant ripples through. This hardware ordering is a favourite one-mark fact, sometimes asked as which device can starve.'
+        },
+        {
+          id: 'coa-io-q11',
+          q: 'A mouse must be polled 60 times per second, and each poll consumes 200 clock cycles on a 50 MHz processor. What fraction of CPU time does polling this mouse consume?',
+          options: ['0.024%', '0.24%', '2.4%', '0.0024%'],
+          answer: 0,
+          marks: 2,
+          difficulty: 'medium',
+          type: 'numerical',
+          explanation: 'Cycles spent polling per second = 60 polls × 200 cycles = 12000 cycles. The CPU provides 50 × 10^6 cycles per second. Fraction = 12000 / (50 × 10^6) = 2.4 × 10^-4 = 0.024%. This illustrates when programmed I/O is perfectly acceptable: for slow devices with low required poll rates, the overhead is trivial and the simplicity is worth it. The same template applied to a hard disk needing hundreds of thousands of polls per second would consume the entire CPU, which is the comparative point such questions usually build toward. Keep the powers of ten straight — the options differ only by factors of 10.'
+        },
+        {
+          id: 'coa-io-q12',
+          q: 'A disk has 5 ms average seek time, spins at 6000 RPM, and reading one sector takes 0.1 ms once positioned. What is the total time to read 100 sectors located at random positions on the disk?',
+          options: ['510 ms', '1010 ms', '101 ms', '760 ms'],
+          answer: 1,
+          marks: 2,
+          difficulty: 'hard',
+          type: 'numerical',
+          explanation: 'Revolution time = 60000 / 6000 = 10 ms, so average rotational latency = 5 ms. Each random sector requires its own seek and latency: per-sector time = 5 (seek) + 5 (latency) + 0.1 (transfer) = 10.1 ms. For 100 independent random sectors: 100 × 10.1 = 1010 ms. Contrast with 100 sequential sectors on one track: one seek and one latency (10 ms) plus 100 × 0.1 = 10 ms of transfer, about 20 ms total — some fifty times faster. This random-versus-sequential contrast is the conceptual heart of most GATE disk questions and of real-world I/O scheduling.'
+        },
+        {
+          id: 'coa-io-q13',
+          q: 'Compared with programmed (polling) I/O, the fundamental benefit of interrupt-driven I/O is that:',
+          options: ['Data transfers themselves become faster', 'The CPU can do useful work instead of busy-waiting for the device to become ready', 'No service routine is needed', 'The device no longer needs a status register'],
+          answer: 1,
+          marks: 1,
+          difficulty: 'easy',
+          type: 'concept',
+          explanation: 'Under programmed I/O the CPU sits in a loop reading the device status register until the ready bit sets, wasting every cycle of the wait — for a slow device that can be millions of cycles per transfer. Interrupt-driven I/O inverts control: the CPU runs other work, and the device announces readiness by raising an interrupt, after which a short service routine performs the transfer. The transfer itself is no faster (the same data movement occurs, plus interrupt overhead), but CPU utilization improves enormously. A service routine is still required, and devices retain status registers; only the busy-waiting disappears.'
+        },
+        {
+          id: 'coa-io-q14',
+          q: 'When a processor accepts an interrupt, which of the following is the minimal state that the hardware must save before transferring control to the service routine?',
+          options: ['All general-purpose registers and the cache contents', 'The program counter and the processor status word', 'Only the stack pointer', 'The contents of main memory'],
+          answer: 1,
+          marks: 1,
+          difficulty: 'medium',
+          type: 'concept',
+          explanation: 'To resume the interrupted program transparently, the hardware must preserve where it was — the program counter — and the condition flags and mode/mask information in the processor status word, since the ISR will overwrite both. These are typically pushed onto the stack (or saved to dedicated registers) automatically during interrupt entry. General-purpose registers are saved selectively by the ISR software itself, only those it will use — making hardware entry fast. Cache and memory contents need no saving; they are not destroyed by running the ISR. This hardware/software split of state saving is a recurring conceptual question.'
+        },
+        {
+          id: 'coa-io-q15',
+          q: 'Using interrupt-driven I/O with one interrupt per byte, a system spends 4 microseconds of CPU time per interrupt. What is the maximum device data rate this scheme can sustain, even if the CPU does nothing else?',
+          options: ['25 KB/s', '250 KB/s', '2.5 MB/s', '400 KB/s'],
+          answer: 1,
+          marks: 2,
+          difficulty: 'hard',
+          type: 'numerical',
+          explanation: 'Each byte costs 4 μs of CPU time, so even at 100% CPU dedication the system can service at most 1 / (4 × 10^-6) = 250000 interrupts per second, i.e. 250000 bytes/s = 250 KB/s. Any device faster than this loses data or forces a different scheme. The saturation-rate template — maximum rate = 1 ÷ per-transfer overhead — is the mirror image of the overhead-fraction template (fraction = rate × overhead), and GATE uses both directions. It also quantifies exactly when to switch strategies: a 10 MB/s disk exceeds this ceiling forty-fold, which is why block devices universally use DMA.'
+        }
+      ]
+    }
+]};
