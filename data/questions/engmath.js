@@ -1002,3 +1002,185 @@ window.GATE_DATA.questions['engmath'] = {
       ]
     }
 ]};
+
+window.GATE_DATA.questions['engmath'].topics.push({
+  id: 'engmath-calculus',
+  name: 'Calculus',
+  theory: {
+    intro: "Calculus contributes some of the most predictable marks on the GATE CS&IT paper: a limit (often needing L'Hopital or a standard series expansion), a continuity/differentiability check on a piecewise function, a maxima-minima or Rolle/Mean-Value-Theorem application, and a definite integral. Unlike discrete math, these questions reward mechanical fluency - once you recognize the pattern (0/0 form, corner in a graph, critical point), the algebra is short. The recurring theme is behaviour at a point or on an interval: does a limit exist, does a function stay smooth, where does it peak, how much area lies under it. GATE rarely asks for a proof; it asks you to compute a number or classify a statement, so speed with standard limits, derivative rules and basic integrals matters more than theoretical depth. Treat this topic as high-yield practice of a small, fixed toolkit rather than open-ended problem solving.",
+    core: "• Standard limits to memorize cold: lim_{x->0} sin x / x = 1, lim_{x->0} tan x / x = 1, lim_{x->0} (1-cos x)/x^2 = 1/2, lim_{x->0} (e^x - 1)/x = 1, lim_{x->0} ln(1+x)/x = 1, lim_{n->infinity} (1+1/n)^n = e, and more generally lim_{n->infinity} (1+k/n)^n = e^k. Recognizing these instantly (rather than re-deriving them) is the single biggest speed gain in this topic.\n\n• L'Hopital's rule applies only to 0/0 or infinity/infinity forms: lim f(x)/g(x) = lim f'(x)/g'(x) provided the right-hand limit exists. Other indeterminate forms - 0*infinity, infinity-infinity, 1^infinity, 0^0, infinity^0 - must first be algebraically converted to 0/0 or infinity/infinity (e.g. rewrite x ln x as ln x / (1/x); for 1^infinity forms take logarithms first: y = f(x)^{g(x)} => ln y = g(x) ln f(x), find the limit of ln y, then exponentiate). A very common GATE trap is applying L'Hopital to a limit that is not actually indeterminate - always verify the 0/0 or infinity/infinity form before differentiating.\n\n• Continuity at a point a requires three things to match: f(a) is defined, lim_{x->a} f(x) exists, and lim_{x->a} f(x) = f(a). For piecewise functions this means the left-hand limit, right-hand limit and the defined value at the junction must all agree; GATE frequently asks you to solve for an unknown parameter that forces this match.\n\n• Differentiability at a point requires the left-hand derivative and right-hand derivative to be equal and finite; differentiability implies continuity, but not conversely - |x| is continuous but not differentiable at 0 because the left derivative is -1 and the right derivative is +1. A subtler trap: a function can be differentiable everywhere (derivative exists at every point, including via the limit definition at a special point) yet have a derivative that is itself discontinuous there - this happens with functions built from x^2 sin(1/x)-type terms.\n\n• Rolle's Theorem: if f is continuous on [a,b], differentiable on (a,b), and f(a) = f(b), then there exists c in (a,b) with f'(c) = 0. All three hypotheses are essential - GATE loves testing functions that fail exactly one hypothesis (e.g. |x| on [-1,1] fails differentiability at 0, so Rolle's conclusion need not hold).\n\n• Mean Value Theorem (MVT) generalizes Rolle's: if f is continuous on [a,b] and differentiable on (a,b), there exists c in (a,b) with f'(c) = (f(b) - f(a))/(b - a). Geometrically, some tangent is parallel to the chord joining the endpoints.\n\n• Maxima and minima: at an interior critical point (f'(x) = 0 or f' undefined), the second derivative test classifies it - f''(x) < 0 gives a local maximum, f''(x) > 0 gives a local minimum, f''(x) = 0 is inconclusive (check higher derivatives or sign change of f'). For a function on a closed interval [a,b], the global maximum and minimum occur either at a critical point inside (a,b) or at one of the endpoints a, b - always check all candidates.\n\n• Definite integration: the Fundamental Theorem of Calculus gives integral_a^b f(x) dx = F(b) - F(a) where F' = f. Useful properties: integral_a^b f(x) dx = -integral_b^a f(x) dx; if f is odd, integral_{-a}^{a} f(x) dx = 0; if f is even, integral_{-a}^{a} f(x) dx = 2*integral_0^{a} f(x) dx; integration by parts, integral u dv = uv - integral v du, handles products like x*e^x or x*sin x. Area between two curves y = f(x) and y = g(x) (with f >= g on [a,b]) is integral_a^b (f(x) - g(x)) dx.",
+    strategy: "Limits: first check the form by direct substitution. If you get a finite number, you are done - do not blindly reach for L'Hopital. If you get 0/0 or infinity/infinity, apply L'Hopital or a Taylor/Maclaurin expansion (often faster: e^x ~ 1+x+x^2/2, cos x ~ 1-x^2/2, ln(1+x) ~ x-x^2/2). For 1^infinity forms, always take logs first. Mini worked example: lim_{x->0} (cos x)^{1/x^2}. Take ln: L = ln(cos x)/x^2. Using cos x ~ 1 - x^2/2, ln(cos x) ~ -x^2/2, so L -> -1/2, and the original limit is e^{-1/2} = 1/sqrt(e).\n\nContinuity/differentiability on piecewise functions: write the left piece and right piece, set them equal at the junction point for continuity, and set their derivatives equal at the junction for differentiability - this typically gives one or two linear equations in the unknown constants. A classic trap function is f(x) = x^2 sin(1/x) for x != 0, f(0) = 0: using the definition of the derivative directly shows f'(0) = 0 exists, even though f'(x) for x != 0 oscillates and has no limit as x -> 0 - so f is differentiable at 0 but f' is not continuous there.\n\nRolle's/MVT questions on GATE are usually 'does this function satisfy the hypotheses' or 'find c' computations - always verify continuity and differentiability explicitly before invoking the conclusion, and compute f'(c) = slope of chord directly. Maxima-minima questions reduce to solving f'(x) = 0 and classifying with f''; for closed-interval global extrema, never forget to evaluate the endpoints. For integrals, spot symmetry (odd/even) before grinding through algebra - it can turn a page of work into 'the answer is 0' instantly."
+  },
+  questions: [
+    {
+      id: 'engmath-calculus-q1',
+      q: 'What is lim_{x->0} sin(3x)/x ?',
+      options: ['3', '1/3', '0', 'The limit does not exist'],
+      answer: 0,
+      marks: 1,
+      difficulty: 'easy',
+      type: 'concept',
+      explanation: "Write sin(3x)/x = 3 * sin(3x)/(3x). As x -> 0, 3x -> 0 too, and the standard limit lim_{u->0} sin u / u = 1 applies with u = 3x, giving sin(3x)/(3x) -> 1. Hence the whole expression tends to 3 * 1 = 3. In general, lim_{x->0} sin(kx)/x = k for any constant k - this scaling trick (multiply and divide by the coefficient inside the sine) is the fastest way to handle any variant of the basic sin x / x limit without invoking L'Hopital."
+    },
+    {
+      id: 'engmath-calculus-q2',
+      q: 'What is lim_{n->infinity} (1 + 3/n)^n ?',
+      options: ['e^3', 'e^(1/3)', '3e', 'It diverges to infinity'],
+      answer: 0,
+      marks: 1,
+      difficulty: 'easy',
+      type: 'concept',
+      explanation: "This is the standard exponential limit lim_{n->infinity} (1 + k/n)^n = e^k, obtained by taking logarithms: ln[(1+k/n)^n] = n*ln(1+k/n) ~ n*(k/n) = k as n -> infinity (using ln(1+u) ~ u for small u), so the expression tends to e^k. Here k = 3, so the limit is e^3. This family of limits is a favourite GATE 1-mark question precisely because it looks like it should diverge (base slightly bigger than 1, raised to an infinite power) but actually converges to a finite, specific constant."
+    },
+    {
+      id: 'engmath-calculus-q3',
+      q: 'Evaluate lim_{x->0} (e^x - 1 - x) / x^2.',
+      options: ['1/2', '1', '0', '2'],
+      answer: 0,
+      marks: 2,
+      difficulty: 'medium',
+      type: 'numerical',
+      explanation: "Direct substitution gives 0/0, so L'Hopital applies: differentiate numerator and denominator to get (e^x - 1)/(2x), which is again 0/0 at x = 0. Apply L'Hopital once more: e^x / 2, which at x = 0 equals 1/2. Alternatively, use the Maclaurin series e^x = 1 + x + x^2/2 + x^3/6 + ...; then e^x - 1 - x = x^2/2 + x^3/6 + ..., and dividing by x^2 gives 1/2 + x/6 + ... which tends to 1/2 as x -> 0. The series method is faster once you have memorized e^x's expansion and avoids differentiating twice."
+    },
+    {
+      id: 'engmath-calculus-q4',
+      q: 'Evaluate lim_{x->0} (1 - cos x) / x^2.',
+      options: ['1', '1/2', '0', '2'],
+      answer: 1,
+      marks: 1,
+      difficulty: 'easy',
+      type: 'concept',
+      explanation: "This is one of the standard limits worth memorizing directly. Using the half-angle identity 1 - cos x = 2 sin^2(x/2), the expression becomes 2 sin^2(x/2) / x^2 = (1/2) * [sin(x/2)/(x/2)]^2. As x -> 0, sin(x/2)/(x/2) -> 1, so the whole limit is (1/2)*1^2 = 1/2. Equivalently, L'Hopital twice on the 0/0 form gives sin x / (2x) -> cos x / 2 -> 1/2. Confusing this with lim sin x/x = 1 (forgetting the extra factor of 1/2 from the squared sine) is the most common slip."
+    },
+    {
+      id: 'engmath-calculus-q5',
+      q: 'What is lim_{x->0+} x ln x ?',
+      options: ['0', '-infinity', '1', 'The limit does not exist'],
+      answer: 0,
+      marks: 2,
+      difficulty: 'medium',
+      type: 'numerical',
+      explanation: "This is a 0*(-infinity) indeterminate form, so first rewrite it as a quotient: x ln x = ln x / (1/x), which as x -> 0+ is (-infinity)/(infinity), a valid form for L'Hopital. Differentiating: (ln x)' / (1/x)' = (1/x) / (-1/x^2) = -x. As x -> 0+, -x -> 0. So the limit is 0, meaning x ln x approaches 0 even though ln x itself plunges to -infinity - the x factor shrinks faster than ln x grows in magnitude. This result (x ln x -> 0 near the origin) is also the reason x ln x is often defined to be 0 at x = 0 in entropy-type formulas."
+    },
+    {
+      id: 'engmath-calculus-q6',
+      q: 'Which statement about f(x) = |x| at x = 0 is correct?',
+      options: ['f is neither continuous nor differentiable at 0', 'f is continuous at 0 but not differentiable at 0', 'f is differentiable at 0 but not continuous at 0', 'f is both continuous and differentiable at 0'],
+      answer: 1,
+      marks: 1,
+      difficulty: 'easy',
+      type: 'concept',
+      explanation: "f(x) = |x| is continuous everywhere, including at 0, since lim_{x->0} |x| = 0 = f(0) from both sides. However, the left-hand derivative at 0 is lim_{h->0-} (|h|-0)/h = lim_{h->0-} (-h)/h = -1, while the right-hand derivative is lim_{h->0+} h/h = 1. Since these one-sided derivatives disagree (-1 != 1), f is not differentiable at 0 - the graph has a sharp corner there. This is the textbook example showing continuity does not imply differentiability, though the converse (differentiability implies continuity) always holds."
+    },
+    {
+      id: 'engmath-calculus-q7',
+      q: 'Let f(x) = x^2 sin(1/x) for x != 0 and f(0) = 0. Which statement is true?',
+      options: ['f is not differentiable at 0 because f oscillates near 0', 'f is differentiable at 0 with f\'(0) = 0, but f\' is discontinuous at 0', 'f is discontinuous at 0', 'f is differentiable at 0 and f\' is also continuous at 0'],
+      answer: 1,
+      marks: 2,
+      difficulty: 'hard',
+      type: 'concept',
+      explanation: "Using the definition of the derivative at 0: f'(0) = lim_{h->0} [f(h)-f(0)]/h = lim_{h->0} h^2 sin(1/h)/h = lim_{h->0} h sin(1/h) = 0, since sin(1/h) is bounded between -1 and 1 and h -> 0 (squeeze theorem). So f is differentiable at 0 with f'(0) = 0. But for x != 0, the product rule gives f'(x) = 2x sin(1/x) - cos(1/x); as x -> 0, the term -cos(1/x) oscillates forever between -1 and 1 with no limit, so f'(x) does not tend to f'(0) = 0 - f' exists everywhere but is discontinuous at 0. This is the classic GATE-style counterexample showing differentiability does not imply continuity of the derivative."
+    },
+    {
+      id: 'engmath-calculus-q8',
+      q: 'For f(x) = kx + 1 when x <= 2 and f(x) = 3x - 5 when x > 2 to be continuous at x = 2, k must equal:',
+      options: ['0', '1', '-1', '2'],
+      answer: 0,
+      marks: 2,
+      difficulty: 'medium',
+      type: 'numerical',
+      explanation: "Continuity at x = 2 requires the value from the left piece to match the limit from the right piece: left value is f(2) = k(2) + 1 = 2k + 1 (using the x <= 2 branch, which includes 2). The right-hand limit is lim_{x->2+} (3x-5) = 3(2) - 5 = 1. Setting them equal: 2k + 1 = 1, so 2k = 0 and k = 0. With k = 0, the left piece becomes the constant 1 near x = 2, matching the right piece's limit of 1 exactly, confirming continuity."
+    },
+    {
+      id: 'engmath-calculus-q9',
+      q: 'On the interval [-1, 1], consider f(x) = |x|. Which of the following correctly describes Rolle\'s theorem here?',
+      options: ['Rolle\'s theorem guarantees a c in (-1,1) with f\'(c) = 0, and c = 0 works', 'Rolle\'s theorem does not apply because f is not differentiable at every point of (-1,1)', 'Rolle\'s theorem does not apply because f(-1) != f(1)', 'Rolle\'s theorem applies and guarantees infinitely many such c'],
+      answer: 1,
+      marks: 2,
+      difficulty: 'medium',
+      type: 'concept',
+      explanation: "f(x) = |x| is continuous on [-1,1] and f(-1) = f(1) = 1, so two of Rolle's three hypotheses hold. But f is not differentiable at x = 0 (an interior point), so the differentiability-on-(a,b) hypothesis fails, and Rolle's theorem simply does not apply - it makes no guarantee either way. Indeed f'(x) is -1 for x<0 and +1 for x>0, and it is never 0 anywhere on (-1,1), confirming that the conclusion actually fails here. This illustrates why every hypothesis of Rolle's theorem must be checked before using its conclusion; GATE frequently builds distractor functions that fail exactly one hypothesis."
+    },
+    {
+      id: 'engmath-calculus-q10',
+      q: 'For f(x) = x^3 - 3x on [0, 2], the Mean Value Theorem guarantees some c in (0,2) with f\'(c) equal to the average rate of change. What is the value of c?',
+      options: ['2/sqrt(3)', 'sqrt(3)', '1', '4/3'],
+      answer: 0,
+      marks: 2,
+      difficulty: 'medium',
+      type: 'numerical',
+      explanation: "f is a polynomial, hence continuous and differentiable everywhere, so MVT applies. Average rate of change = [f(2)-f(0)]/(2-0) = [(8-6) - 0]/2 = 2/2 = 1. Now f'(x) = 3x^2 - 3, so set 3c^2 - 3 = 1, giving c^2 = 4/3 and c = 2/sqrt(3) (taking the positive root since c must lie in (0,2); note 2/sqrt(3) ~ 1.1547, which indeed lies in (0,2)). The negative root -2/sqrt(3) is rejected as it falls outside the interval."
+    },
+    {
+      id: 'engmath-calculus-q11',
+      q: 'For f(x) = x^3 - 3x^2, the local maximum occurs at x =',
+      options: ['0', '2', '1', '-2'],
+      answer: 0,
+      marks: 1,
+      difficulty: 'easy',
+      type: 'numerical',
+      explanation: "f'(x) = 3x^2 - 6x = 3x(x-2), so critical points are x = 0 and x = 2. The second derivative is f''(x) = 6x - 6. At x = 0: f''(0) = -6 < 0, so this is a local maximum. At x = 2: f''(2) = 6 > 0, so this is a local minimum. Hence the local maximum is at x = 0 (with value f(0) = 0), and the local minimum is at x = 2 (with value f(2) = 8 - 12 = -4). This second-derivative classification is the standard, fast way to identify maxima and minima once critical points are found."
+    },
+    {
+      id: 'engmath-calculus-q12',
+      q: 'The absolute maximum value of f(x) = x^3 - 6x^2 + 9x + 1 on the closed interval [0, 5] is:',
+      options: ['21', '5', '1', '9'],
+      answer: 0,
+      marks: 2,
+      difficulty: 'hard',
+      type: 'numerical',
+      explanation: "f'(x) = 3x^2 - 12x + 9 = 3(x^2 - 4x + 3) = 3(x-1)(x-3), giving interior critical points x = 1 and x = 3, both inside [0,5]. Evaluate f at the critical points and both endpoints: f(0) = 1, f(1) = 1-6+9+1 = 5, f(3) = 27-54+27+1 = 1, and f(5) = 125-150+45+1 = 21. Comparing all four candidate values {1, 5, 1, 21}, the largest is 21, occurring at the right endpoint x = 5. This illustrates why global extrema on a closed interval must always be checked at the endpoints, not just at interior critical points - here the true maximum is not at a critical point at all."
+    },
+    {
+      id: 'engmath-calculus-q13',
+      q: 'Evaluate integral_0^{pi/2} sin^3(x) dx.',
+      options: ['2/3', '1', 'pi/4', '1/3'],
+      answer: 0,
+      marks: 2,
+      difficulty: 'medium',
+      type: 'numerical',
+      explanation: "Write sin^3 x = sin x * sin^2 x = sin x * (1 - cos^2 x). Substitute u = cos x, du = -sin x dx; when x=0, u=1, and when x=pi/2, u=0. The integral becomes integral_1^0 (1-u^2)*(-du) = integral_0^1 (1-u^2) du = [u - u^3/3]_0^1 = 1 - 1/3 = 2/3. This matches the Wallis-type reduction formula for odd powers of sine over [0, pi/2], which gives 2/3 for the cube - a result worth recognizing directly to skip the substitution in a timed exam."
+    },
+    {
+      id: 'engmath-calculus-q14',
+      q: 'What is integral_{-2}^{2} (x^3 + x*cos(x)) dx ?',
+      options: ['0', '4', '16', 'Cannot be determined without more information'],
+      answer: 0,
+      marks: 1,
+      difficulty: 'medium',
+      type: 'concept',
+      explanation: "Check the parity of the integrand over the symmetric interval [-2,2]. x^3 is odd (replacing x by -x negates it). For x*cos(x): x is odd and cos(x) is even, and odd*even = odd, so x*cos(x) is also odd. The sum of two odd functions is odd. For any odd function g, integral_{-a}^{a} g(x) dx = 0, because the positive and negative halves of the interval contribute exactly cancelling areas. So the whole integral is 0 without any actual integration - recognizing odd/even symmetry instantly resolves definite integrals over symmetric limits like this one."
+    },
+    {
+      id: 'engmath-calculus-q15',
+      q: 'Evaluate integral_0^1 x*e^x dx.',
+      options: ['1', 'e', 'e - 1', '0'],
+      answer: 0,
+      marks: 2,
+      difficulty: 'medium',
+      type: 'numerical',
+      explanation: "Use integration by parts with u = x, dv = e^x dx, so du = dx and v = e^x: integral x e^x dx = x e^x - integral e^x dx = x e^x - e^x + C = e^x(x-1) + C. Evaluate from 0 to 1: at x=1, e^1*(1-1) = e*0 = 0; at x=0, e^0*(0-1) = 1*(-1) = -1. So the definite integral is 0 - (-1) = 1. This x*e^x pattern (polynomial times exponential) is one of the most frequently tested integration-by-parts setups on GATE."
+    },
+    {
+      id: 'engmath-calculus-q16',
+      q: 'What is the area of the region enclosed between the curves y = x and y = x^2, for 0 <= x <= 1?',
+      options: ['1/6', '1/2', '1/3', '1'],
+      answer: 0,
+      marks: 2,
+      difficulty: 'hard',
+      type: 'numerical',
+      explanation: "First find where the curves cross on [0,1]: x = x^2 gives x(1-x) = 0, so x = 0 and x = 1, meaning the two curves bound a single region over the whole interval. On (0,1), x > x^2 (e.g. at x = 0.5, 0.5 > 0.25), so the line lies above the parabola there. The area is integral_0^1 (x - x^2) dx = [x^2/2 - x^3/3]_0^1 = (1/2 - 1/3) - 0 = 1/6. A common error is integrating x^2 - x instead (getting a negative area) by not first checking which curve is on top over the interval."
+    },
+    {
+      id: 'engmath-calculus-q17',
+      q: 'What is lim_{x->0} (cos x)^{1/x^2} ?',
+      options: ['1/sqrt(e)', 'sqrt(e)', '1', '0'],
+      answer: 0,
+      marks: 2,
+      difficulty: 'hard',
+      type: 'numerical',
+      explanation: "This is a 1^infinity indeterminate form, so take logarithms first. Let y = (cos x)^{1/x^2}; then ln y = ln(cos x) / x^2. Using the small-angle expansion cos x ~ 1 - x^2/2 for x near 0, ln(cos x) ~ ln(1 - x^2/2) ~ -x^2/2 (using ln(1+u) ~ u for small u). So ln y ~ (-x^2/2)/x^2 = -1/2, meaning lim_{x->0} ln y = -1/2. Exponentiating, the original limit is e^{-1/2} = 1/sqrt(e). Whenever you see base -> 1 and exponent -> infinity (a 1^infinity form), converting to logs before applying series expansions or L'Hopital is the reliable, systematic approach."
+    }
+  ]
+});

@@ -515,4 +515,201 @@ window.GATE_DATA.questions['toc'] = {
           type: 'concept',
           explanation: "Emptiness of a DFA is graph reachability: L(D1) is nonempty iff some final state is reachable from the start state - checkable by BFS/DFS in finite time. Equivalence reduces to emptiness: build product automata for the symmetric difference (strings accepted by exactly one of D1, D2), which is again a DFA, and test it for emptiness; alternatively minimize both DFAs and compare, since the minimal DFA is unique up to isomorphism. Both procedures always terminate, so both problems are decidable - option C. This is worth contrasting with CFGs, where emptiness stays decidable but equivalence becomes undecidable, and with TMs, where even emptiness is undecidable. The dividing lines between the three levels form a standard GATE table."
         }
-]}]};
+]},
+    {
+      id: 'toc-hierarchy',
+      name: 'Chomsky Hierarchy & Language Classification',
+      theory: {
+        intro: "The Chomsky hierarchy arranges the four grammar-defined language families - regular, context-free, context-sensitive, and recursively enumerable - into a strict containment chain, and adds recursive languages as an important intermediate class between context-sensitive and RE. GATE questions in this topic rarely ask you to derive a grammar from scratch; instead they hand you a language description or a set-builder definition and ask you to place it as precisely as possible in the hierarchy, or they hand you a closure-property claim and ask whether it holds for a named class. The whole topic reduces to knowing the containment chain cold, knowing what distinguishes each grammar type structurally, and knowing which classes are closed under which operations. Because the classes nest, 'is L context-free' and 'is L NOT regular' are often two separate true facts about the same language, and exam options are built to test whether you confuse tightest classification with any true classification.",
+        core: "Chomsky's four types are defined by restrictions on production rules alpha -> beta. Type 0 (unrestricted, recognized by Turing machines / RE languages): alpha can be any string containing at least one non-terminal, beta anything - no restriction at all. Type 1 (context-sensitive, recognized by linear-bounded automata): every production has |alpha| <= |beta| (non-contracting), with productions written as x A y -> x gamma y where gamma is nonempty (A is rewritten to something at least as long, only in the context x _ y); S -> epsilon is allowed if S never appears on a right-hand side. Type 2 (context-free, recognized by pushdown automata): every production has a single non-terminal on the left, A -> beta, with beta any string - the rewriting does not depend on surrounding context. Type 3 (regular, recognized by finite automata): every production is A -> aB, A -> a, or A -> epsilon (right-linear), or symmetrically all left-linear - each step consumes exactly one terminal and carries at most one non-terminal.\n\n• The containment chain. Regular is a strict subset of context-free (a^n b^n is CFL but not regular). Context-free is a strict subset of context-sensitive (a^n b^n c^n is CSL but not CFL - no PDA can check three counts with only one stack). Context-sensitive is a strict subset of recursive: every CSL is decided by an LBA which always halts (bounded tape forces termination), and there exist decidable languages that need unbounded working space and hence no LBA - so REC properly contains CSL. Recursive is a strict subset of recursively enumerable: the halting-adjacent languages (like A_TM) are RE but not recursive. Inside CFL there is also the strict chain deterministic CFL (DCFL, accepted by a deterministic PDA) is a strict subset of CFL, witnessed by languages like { a^n b^n } union { a^n b^2n } which is CFL but not deterministic (a DPDA cannot decide, without lookahead beyond the a-block, which count to match). So the full chain is: regular subset-of DCFL subset-of CFL subset-of CSL subset-of REC subset-of RE, each inclusion strict, and RE itself is a strict subset of all languages (which is uncountable while RE is only countable).\n\n• Classic classification anchors to memorize. { a^n b^n : n >= 0 } is CFL, not regular (one unbounded count, needs a stack). { a^n b^n c^n : n >= 0 } is CSL, not CFL (two independent unbounded counts). { a^n b^m c^n d^m : n,m >= 0 } is CFL (a stack can match a-d as outer nesting and hold b-c pairs is a common trap - actually this needs care: it IS context-free via a PDA that pushes a's, then on b's does nothing extra, matches d's against pushed a's - the b,c-matching separately needs its own bookkeeping; the safe GATE fact is that languages requiring exactly two independent unbounded equalities like a^n b^n c^n are CSL, while a single equality or two equalities in properly nested/separable positions are often still CFL - always test with a candidate PDA or the pumping lemma for CFLs rather than pattern-matching by symbol count). { ww : w in {a,b}* } is CSL, not CFL (matching two copies of an unbounded string defeats a single stack, provable by the CFL pumping lemma). { a^i b^j : i != j } is CFL (union/complement tricks on a^n b^n within a regular universe). { a^p : p prime } is neither regular nor context-free but is recursive (primality is decidable). L = { <M> : M is a TM that halts on empty input } is RE but not recursive. The complement of A_TM is not even RE.\n\n• Closure properties across classes (the standard comparison table). Union: closed for regular, CFL, CSL, REC, RE. Intersection: closed for regular, CSL, REC, RE, but CFL is NOT closed under intersection (two CFLs can intersect to a non-CFL, e.g. { a^n b^n c^m } intersect { a^m b^n c^n } = { a^n b^n c^n }). Complement: closed for regular, CSL, REC, but NOT for CFL, and NOT for RE (RE closed under complement would force RE = REC). Concatenation and Kleene star: closed for regular, CFL, CSL, REC, RE. Intersection with a regular language: CFL IS closed here (this is the one intersection closure CFLs keep - it powers many undecidability and non-regularity arguments). Since CFL is closed under union but not intersection or complement, by De Morgan's laws it cannot be closed under both intersection and complement simultaneously - a fact often tested as a single combined statement.",
+        strategy: "GATE patterns: (1) 'Which grammar type generates L' or 'L is best classified as' - always find the TIGHTEST true class, since a CFL is technically also CSL, REC, and RE, but exam answers want the smallest class containing it unless the question explicitly asks 'which of the following is true' with multiple non-exclusive options. (2) Containment true/false batteries - memorize the six-link chain regular subset DCFL subset CFL subset CSL subset REC subset RE and answer each link independently; a common trap flips CSL and REC's relationship or claims DCFL = CFL. (3) Closure-property tables presented as four statements about CFL (or another class) with exactly one false - the CFL non-closure trio to remember instantly is intersection, complement, and difference (complement of a CFL need not be CFL; if a CFL were closed under both intersection and complement it would be closed under the other by De Morgan, contradicting known counterexamples). (4) Set-builder classification questions - test candidates against three tools in order: can a DFA/regular expression describe it (bounded memory)? If not, can a single stack (one unbounded counter or matched nesting) describe it - try building a PDA or apply the CFL pumping lemma to rule it out? If not, is it still decidable (a Turing machine that always halts) even though no PDA suffices - that lands it in CSL or REC depending on whether a bounded-tape LBA suffices; GATE rarely forces you to distinguish CSL from REC precisely, so 'not CFL but still decidable' is often an acceptable landing spot.\n\nWorked mini-example: classify L = { a^n b^n c^n : n >= 0 }. Is it regular? No - Myhill-Nerode distinguishes a^n for all n via matching b^n c^n. Is it context-free? Apply the CFL pumping lemma: for any p, take w = a^p b^p c^p; any split uvxyz with |vxy| <= p and vy nonempty has vxy confined to at most two of the three symbol blocks (since |vxy| <= p means it cannot span from the a-block into the c-block), so pumping up breaks the equal-count balance among a, b, c - contradiction, hence not CFL. Is it decidable? Yes: a TM can scan and cross off one a, one b, one c repeatedly, accepting when all are exhausted simultaneously - this uses only space proportional to the input (in fact it can be done within the input's own tape in a context-sensitive-style bounded manner), so it is CSL and hence also REC. Final classification: CSL (and everything the chain implies above it), not CFL, not regular.\n\nTraps: 'not regular' does not mean 'not CFL' - always check both boundaries. Never assume closure results transfer from CFL to CSL or REC without separate justification; REC and CSL are closed under complement precisely because they can decide membership and simply flip the accept/reject verdict, which RE cannot do since RE machines may only loop on rejection."
+      },
+      questions: [
+        {
+          id: 'toc-hierarchy-q1',
+          q: 'Which of the following correctly orders the classes from smallest to largest, with every inclusion strict?',
+          options: [
+            'regular subset CFL subset CSL subset recursive subset RE',
+            'regular subset CSL subset CFL subset recursive subset RE',
+            'CFL subset regular subset recursive subset CSL subset RE',
+            'regular subset CFL subset recursive subset CSL subset RE'
+          ],
+          answer: 0,
+          marks: 1,
+          difficulty: 'easy',
+          type: 'concept',
+          explanation: "The standard Chomsky containment chain, from most restrictive grammar to least, is regular (Type 3) inside context-free (Type 2) inside context-sensitive (Type 1) inside recursive (decidable) inside recursively enumerable (Type 0), with every inclusion known to be strict via a witness language at each step: a^n b^n separates regular from CFL, a^n b^n c^n separates CFL from CSL, a decidable-but-not-context-sensitive language (one needing more than linear space) separates CSL from recursive, and A_TM separates recursive from RE. Option A states exactly this chain. Option B swaps CFL and CSL, option C is scrambled and even places CFL below regular, and option D swaps recursive and CSL - CSL is properly inside recursive, not the reverse, since every CSL is decided by an always-halting LBA."
+        },
+        {
+          id: 'toc-hierarchy-q2',
+          q: 'A grammar in which every production has the form x A y -> x gamma y, with A a single non-terminal and gamma a nonempty string (so |left side| <= |right side|), generates languages of which type?',
+          options: ['Type 3, regular', 'Type 2, context-free', 'Type 1, context-sensitive', 'Type 0, unrestricted'],
+          answer: 2,
+          marks: 1,
+          difficulty: 'easy',
+          type: 'concept',
+          explanation: "This is precisely the context-sensitive (Type 1) production format: a single non-terminal A is rewritten to a nonempty string gamma, but only in the context of x on the left and y on the right, and the rule is non-contracting since gamma is required to be nonempty, meaning the right-hand side is at least as long as the left. Context-free (Type 2) productions drop the surrounding context requirement (A -> beta unconditionally). Regular (Type 3) productions further restrict beta to a single terminal optionally followed by one non-terminal. Type 0 productions allow the left side itself to be an arbitrary string containing a non-terminal, with no length restriction at all. So the length-preserving, context-dependent rule described is the definition of Type 1: option C."
+        },
+        {
+          id: 'toc-hierarchy-q3',
+          q: 'L = { a^n b^n c^n : n >= 0 } is',
+          options: ['regular', 'context-free but not regular', 'context-sensitive but not context-free', 'not recursively enumerable'],
+          answer: 2,
+          marks: 2,
+          difficulty: 'medium',
+          type: 'concept',
+          explanation: "L fails the CFL pumping lemma: for any pumping length p, the string a^p b^p c^p has every valid decomposition uvxyz confined (since |vxy| <= p) to span at most two of the three symbol blocks, so pumping v and y up or down unbalances the equal counts of a, b, and c - hence L is not context-free. It is also clearly not regular, since it is not even context-free and regular is a subset of context-free. However, L is decidable: a linear-bounded automaton (or an ordinary TM using only linearly bounded space) can repeatedly cross off one a, one b, and one c and accept exactly when all three run out together, using space proportional to input length - which places it in the context-sensitive class. So the tightest correct classification is context-sensitive but not context-free: option C."
+        },
+        {
+          id: 'toc-hierarchy-q4',
+          q: 'Which of the following is the standard example of a language that is context-free but NOT regular?',
+          options: ['{ a^n : n is a perfect square }', '{ a^n b^n : n >= 0 }', '{ a^n b^n c^n : n >= 0 }', '{ ww : w in {a,b}* }'],
+          answer: 1,
+          marks: 1,
+          difficulty: 'easy',
+          type: 'concept',
+          explanation: "{ a^n b^n } is generated by the simple grammar S -> aSb | epsilon, so it is context-free, and it fails the regular pumping lemma (pumping the a-block in a string a^p b^p unbalances the counts), so it is not regular - the canonical CFL-not-regular witness, option B. Option A ({ a^n : n a perfect square }) is not even context-free - a unary language is regular if and only if it is eventually periodic, and perfect squares grow too irregularly, but proving it needs a unary pumping argument, and this is a distractor language many students misclassify as CFL when it is actually not CFL at all. Option C needs two independent counts and is CSL, not CFL, as shown above. Option D ({ ww }) requires matching two unbounded copies of an arbitrary string, which defeats a single stack and is also not context-free, only CSL."
+        },
+        {
+          id: 'toc-hierarchy-q5',
+          q: 'L = { ww : w in {a, b}* } is best classified as',
+          options: ['regular', 'context-free but not regular', 'not context-free, but context-sensitive', 'not recursively enumerable'],
+          answer: 2,
+          marks: 2,
+          difficulty: 'hard',
+          type: 'concept',
+          explanation: "L is not regular (Myhill-Nerode: for a fixed length, distinct prefixes of length n are pairwise distinguishable using an appropriate matching suffix). It is also not context-free: a PDA's single stack can verify a palindrome-style relationship (compare from both ends) but cannot verify that a string is literally two adjacent identical halves, since by the time the second half begins, the stack has already been used to remember the first half in reverse and comparing in the same order needed for ww (not the reversed order needed for ww^R) is precisely what a single LIFO stack cannot do - a rigorous CFL pumping lemma argument on a^p b^p a^p b^p confirms this. Yet L is decidable: a TM (or LBA, since it needs only linear space to hold and compare the two halves of the input) can split the string in half and compare position by position. So L sits in CSL, not CFL - option C. This is the standard example distinguishing 'requires matching an unbounded string against a later unbounded copy' (needs more than a stack) from 'requires matching an unbounded string against its own reverse' (a stack suffices, e.g. ww^R is a well-known CFL)."
+        },
+        {
+          id: 'toc-hierarchy-q6',
+          q: 'Which class of languages is NOT closed under intersection?',
+          options: ['Regular languages', 'Context-free languages', 'Recursive languages', 'Recursively enumerable languages'],
+          answer: 1,
+          marks: 2,
+          difficulty: 'medium',
+          type: 'concept',
+          explanation: "Regular languages are closed under intersection (product automaton construction), recursive languages are closed under intersection (run both deciders, accept if both accept, this always halts), and RE languages are closed under intersection (dovetail both recognizers, accept if both eventually accept). Context-free languages, however, are famously NOT closed under intersection: L1 = { a^n b^n c^m : n, m >= 0 } and L2 = { a^m b^n c^n : n, m >= 0 } are each context-free (single stack suffices for each individually, since only one pair of blocks needs matching in each), but their intersection is { a^n b^n c^n : n >= 0 }, which was already shown to not even be context-free. This single counterexample is the standard proof and the standard exam fact: option B."
+        },
+        {
+          id: 'toc-hierarchy-q7',
+          q: 'Consider the following two statements about context-free languages. S1: CFLs are closed under intersection with a regular language. S2: CFLs are closed under complementation. Which is correct?',
+          options: ['Both S1 and S2 are true', 'S1 is true, S2 is false', 'S1 is false, S2 is true', 'Both S1 and S2 are false'],
+          answer: 1,
+          marks: 2,
+          difficulty: 'medium',
+          type: 'concept',
+          explanation: "S1 is true: given a CFL L accepted by a PDA P and a regular language R accepted by a DFA D, build a product PDA that runs P and D in lockstep on the same input, using P's stack and accepting when both P and D would accept - this recognizes L intersect R, so CFLs ARE closed under intersection with a regular set (this is a genuinely useful closure, unlike general CFL-CFL intersection). S2 is false: if CFLs were closed under complement, then since they are already closed under union, De Morgan's law (L1 intersect L2 = complement(complement(L1) union complement(L2))) would make CFLs closed under general intersection too - but the previous question's counterexample shows they are not. So S1 true, S2 false: option B. This De Morgan argument - deriving non-closure under one operation from known non-closure under another plus known closure under a third - is a recurring proof pattern."
+        },
+        {
+          id: 'toc-hierarchy-q8',
+          q: 'Every context-sensitive language is accepted by some Turing machine that always halts (i.e., every CSL is recursive), but the converse fails. Which of the following best explains why some recursive languages are NOT context-sensitive?',
+          options: [
+            'Recursive languages allow productions that shrink the length of the derived string, which CSL grammars forbid',
+            'Some decidable languages provably require more than linear working space on every deciding Turing machine, exceeding what a linear-bounded automaton can use',
+            'Recursive languages are not required to be generated by any grammar at all',
+            'Context-sensitive languages must be finite, while recursive languages can be infinite'
+          ],
+          answer: 1,
+          marks: 2,
+          difficulty: 'hard',
+          type: 'concept',
+          explanation: "A CSL is exactly a language accepted by some linear-bounded automaton (LBA), a TM restricted to the tape space occupied by the input (times a constant). By the space hierarchy theorem, there exist decidable languages whose deciders provably need more than linear space (for instance, some language requiring space n log n or n^2 to decide by any algorithm) - such a language is recursive (some TM, using that much space, always halts and decides it) but cannot be squeezed into any LBA's linear tape bound, so it is not context-sensitive. This is exactly why the inclusion CSL subset recursive is strict: option B captures the real reason, a genuine space-complexity separation. Option A is false (CSL productions are explicitly non-contracting, they never shrink); option C is false (every recursive language IS generated by some unrestricted Type-0 grammar, and generally not by any Type-1 grammar as just discussed, but grammars for it do exist at the RE level); option D is false, since both recursive and context-sensitive languages can certainly be infinite."
+        },
+        {
+          id: 'toc-hierarchy-q9',
+          q: 'L = { a^i b^j c^k : i = j or j = k, i,j,k >= 0 } is',
+          options: ['regular', 'context-free but not regular', 'context-sensitive but not context-free', 'not decidable'],
+          answer: 1,
+          marks: 2,
+          difficulty: 'hard',
+          type: 'concept',
+          explanation: "Write L as the union of L1 = { a^i b^j c^k : i = j } and L2 = { a^i b^j c^k : j = k }. Each is context-free individually: a PDA for L1 pushes a's, pops one per b (ignoring the b/c boundary the trailing c's freely), then reads any number of c's unconstrained; symmetrically a PDA for L2 reads any a's freely, then pushes b's and pops one per c. CFLs are closed under union, so L1 union L2 = L is context-free. L is not regular: fixing j = k and letting i vary independently shows unbounded counting is needed (Myhill-Nerode distinguishes a^i for all i via a fixed suffix b^n c^n). The trap this question sets is assuming any language that 'looks like' the a^n b^n c^n pattern with three blocks must be context-sensitive-but-not-CFL; but here the two equality constraints are alternatives (OR), not simultaneous (AND), and it is exactly this OR-versus-AND distinction that keeps it inside CFL via closure under union - option B."
+        },
+        {
+          id: 'toc-hierarchy-q10',
+          q: 'Which of the following statements about the language classes is FALSE?',
+          options: [
+            'Every deterministic context-free language is context-free',
+            'Every regular language is a deterministic context-free language',
+            'Every context-free language is deterministic context-free',
+            'Every recursive language is recursively enumerable'
+          ],
+          answer: 2,
+          marks: 1,
+          difficulty: 'medium',
+          type: 'concept',
+          explanation: "DCFL (languages accepted by some deterministic PDA) is a strict subset of CFL - a standard witness is L = { a^n b^n } union { a^n b^2n : n >= 0 }, which is context-free (union of two simple CFLs, each with its own PDA, combined nondeterministically by guessing which disjunct applies) but not deterministic: a DPDA reading the a-block cannot commit, without unbounded lookahead, to whether it should later expect n or 2n b's, so no single deterministic machine handles both cases with one pass. This makes option C false, since not every CFL is DCFL. Option A is trivially true (DCFL is defined as a subset of CFL). Option B is true: every DFA is already a trivial DPDA that ignores its stack. Option D is the standard recursive-subset-of-RE fact and is true. The false statement is C."
+        },
+        {
+          id: 'toc-hierarchy-q11',
+          q: 'L = { a^p : p is a prime number } is',
+          options: [
+            'regular',
+            'context-free but not regular',
+            'not context-free, but recursive',
+            'not recursively enumerable'
+          ],
+          answer: 2,
+          marks: 2,
+          difficulty: 'medium',
+          type: 'concept',
+          explanation: "L is unary, and a fundamental theorem states a unary language is regular if and only if it is eventually periodic (ultimately a finite union of arithmetic-progression-like residue classes). The primes have gaps that grow without any periodic bound (by the prime number theorem, gaps between consecutive primes are unbounded), so L is not regular; the same argument, refined, also rules out context-freeness for unary languages via the CFL pumping lemma applied to a sufficiently large prime exponent - pumping by a bounded amount from a prime length p (for p larger than the pumping length) always lands on a non-prime length for some choice of pump count, but a careful argument shows no valid split can keep every pumped length prime, so L is not context-free either. However, primality is decidable (trial division, or any of several polynomial-time primality tests) so a TM can decide membership in finite time for every input - L is recursive. Not RE is wrong since recursive implies RE. The tightest classification is 'not context-free, but recursive': option C."
+        },
+        {
+          id: 'toc-hierarchy-q12',
+          q: 'Which of the following is true about the relationship between recursive (REC) and recursively enumerable (RE) languages?',
+          options: [
+            'REC = RE for all languages',
+            'A language L is recursive if and only if both L and its complement are recursively enumerable',
+            'Every RE language has an RE complement',
+            'A language whose complement is not RE must itself be recursive'
+          ],
+          answer: 1,
+          marks: 2,
+          difficulty: 'medium',
+          type: 'concept',
+          explanation: "This is the key theorem linking the two classes: if both L and complement(L) are RE, run their two recognizers in parallel on the same input - exactly one of them is guaranteed to eventually accept (since every string is in exactly one of L, complement(L)), giving a total decision procedure, so L is recursive; conversely if L is recursive, simply running the decider and flipping the answer decides complement(L), so complement(L) is RE too (and indeed recursive). This is option B, the standard 'RE and co-RE implies recursive' characterization. Option A is false - A_TM is RE but not recursive, a strict inclusion. Option C is false - A_TM's complement is provably not RE. Option D reverses the direction of the theorem: a complement failing to be RE tells you nothing extra beyond confirming L itself is not recursive (since recursive would force the complement to be RE too), it does not force L to BE recursive - if anything it is evidence against it."
+        },
+        {
+          id: 'toc-hierarchy-q13',
+          q: 'A language L over a single-letter alphabet {a} is regular if and only if',
+          options: [
+            'L is finite',
+            'L is context-free',
+            'the set of lengths of strings in L is eventually periodic',
+            'L is decidable'
+          ],
+          answer: 2,
+          marks: 1,
+          difficulty: 'medium',
+          type: 'concept',
+          explanation: "For unary languages there is a clean characterization: L (viewed as a set of lengths, since the alphabet has only one letter) is regular if and only if that set of lengths is eventually periodic - meaning there exist thresholds N and a period k such that for all n >= N, n is in the length-set exactly when n + k is. This follows from the pumping lemma structure of a unary DFA, which after entering a cycle of length k repeats membership with period k forever. Option A is too strong - infinite unary languages like { a^2n : n >= 0 } (even lengths) are still regular, just not finite. Option B is unrelated context-freeness. Option D is far too weak: many decidable unary languages (like the primes example) are not eventually periodic and hence not regular, even though they are decidable. Option C, eventual periodicity, is the precise iff condition."
+        },
+        {
+          id: 'toc-hierarchy-q14',
+          q: 'Given that L1 is context-free and L2 is regular, which of the following is guaranteed to be context-free?',
+          options: ['L1 intersect L2', 'complement of L1', 'L1 intersect complement(L1)', 'L2 minus L1'],
+          answer: 0,
+          marks: 1,
+          difficulty: 'easy',
+          type: 'concept',
+          explanation: "CFLs are closed under intersection with a regular language (build a product of L1's PDA and L2's DFA, running in lockstep and accepting on mutual acceptance) - this is one of the few intersection-type closures CFLs actually enjoy, so L1 intersect L2 is guaranteed context-free: option A. Complement of L1 (option B) is not guaranteed CFL, since CFLs are not closed under complement in general. L1 intersect complement(L1) (option C) is simply the empty set, which happens to be regular/CFL/everything trivially, but this is a degenerate coincidence, not a guarantee derivable from the stated closure properties, and the question intends the general, non-degenerate guarantee. L2 minus L1 equals L2 intersect complement(L1); since complement(L1) need not be CFL, this difference is not guaranteed to be CFL by any standard closure rule. The clean, always-applicable guarantee is option A."
+        },
+        {
+          id: 'toc-hierarchy-q15',
+          q: 'Which single fact correctly explains why the set of all languages over {0, 1} is NOT equal to the set of recursively enumerable languages?',
+          options: [
+            'Some RE languages are not recursive',
+            'The set of all TMs is countably infinite, but the set of all languages over {0,1} is uncountable',
+            'RE languages are not closed under complement',
+            'Every RE language is generated by a Type-0 grammar'
+          ],
+          answer: 1,
+          marks: 2,
+          difficulty: 'medium',
+          type: 'concept',
+          explanation: "Every RE language is the language of some Turing machine, and Turing machines have finite string descriptions, so they can be enumerated - there are only countably many TMs and hence only countably many RE languages. But the collection of all languages over {0,1} is the power set of the (countably infinite) set of all binary strings, which Cantor's diagonal argument proves is uncountable. A countable set cannot equal an uncountable one, so RE languages are a proper (indeed vanishingly small) subset of all possible languages - option B is the direct cardinality reason. Option A is true but explains a different fact (REC subset RE strictly), not why RE is not everything. Option C is true but is a closure-property fact, not a cardinality argument, and does not by itself imply RE is a proper subset of all languages. Option D is simply the definition of RE and explains nothing about the size comparison."
+        }
+      ]
+    }
+]};

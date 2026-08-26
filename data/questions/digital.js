@@ -668,3 +668,206 @@ window.GATE_DATA.questions['digital'] = {
       ]
     }
 ]};
+
+window.GATE_DATA.questions['digital'].topics.push({
+  id: 'digital-arithmetic',
+  name: 'Computer Arithmetic & IEEE 754',
+  theory: {
+    intro: "Computer arithmetic asks a very practical question: given a fixed number of bits, how do we represent numbers and combine them so that hardware built from simple adders can produce correct results, and how do we detect when it cannot? GATE draws heavily on two halves of this topic. The first half is fixed-point integer arithmetic in 2's complement — addition, subtraction, overflow detection, and the high-level idea behind Booth's algorithm for signed multiplication. The second half is IEEE 754 floating point — encoding and decoding single and double precision numbers, the biased exponent, normalized versus denormalized numbers, the special bit patterns for zero, infinity and NaN, and the resulting limits on range, precision and rounding. Both halves reward the same skill: converting confidently between decimal and binary while tracking exactly which bits mean what, under exam time pressure.",
+    core: "Fixed-point 2's complement arithmetic. An n-bit 2's complement number represents values from -2^(n-1) to 2^(n-1)-1. Addition and subtraction use the same binary adder: to compute A - B, take the 2's complement of B (invert all bits, add 1) and add it to A, discarding any final carry-out. This is why 2's complement dominates hardware — one adder circuit handles both operations.\n\n• Overflow detection (two equivalent rules): (1) overflow occurs when two operands of the SAME sign produce a result of the OPPOSITE sign; adding a positive and a negative number can never overflow. (2) overflow occurs exactly when the carry INTO the sign (MSB) bit differs from the carry OUT of the sign bit — a rule that is easy to apply mechanically once you track both carries during the addition.\n\n• Booth's algorithm (high-level idea). Naive shift-add multiplication of an n-bit multiplier needs up to n additions, one per 1-bit. Booth's insight is that a maximal run of consecutive 1s in the multiplier, say from bit i down to bit j, contributes the same value as adding 2^(i+1) and subtracting 2^j — replacing a whole run of additions with just one subtraction (at the run's start) and one addition (just past the run's end). Formally, Booth recoding scans adjacent bit pairs (current bit, previous bit, with an implicit 0 to the right of the LSB): pattern 10 means 'a run is beginning' so subtract the multiplicand; pattern 01 means 'a run just ended' so add the multiplicand; patterns 00 and 11 (inside a run of 0s or inside a run of 1s) require no arithmetic, only a shift. The payoff is fewer arithmetic steps for multipliers with long runs of 1s or 0s, and it extends naturally to signed multiplication without a separate sign-correction step, which is why real ALUs use variants of it (e.g. radix-4 Booth, examining bits in overlapping pairs to halve the number of cycles further).\n\nIEEE 754 floating point. A floating-point number is stored as (sign, exponent, mantissa/fraction). Single precision uses 1 + 8 + 23 = 32 bits with exponent bias 127; double precision uses 1 + 11 + 52 = 64 bits with exponent bias 1023. For a NORMALIZED number, the value is (-1)^sign × 1.mantissa × 2^(exponent_field − bias); the leading 1 before the binary point is implicit and is never stored, which is where the 'extra' bit of precision comes from.\n\n• Special bit patterns. Exponent field all 0s with mantissa all 0s represents ±0 (two signed zeros exist). Exponent field all 0s with a nonzero mantissa represents a DENORMALIZED (subnormal) number, value = (-1)^sign × 0.mantissa × 2^(1 − bias) — note the implicit leading bit becomes 0, not 1, and the exponent used is 1 − bias, not 0 − bias. Denormals let the representable magnitudes shrink gradually to zero instead of jumping straight from the smallest normal number to zero ('gradual underflow'). Exponent field all 1s with mantissa all 0s represents ±infinity. Exponent field all 1s with a nonzero mantissa represents NaN (Not a Number), the result of undefined operations like 0/0 or sqrt(-1); by definition NaN compares unequal to everything, including itself.\n\n• Range and precision. For single precision, the smallest positive normalized magnitude is 2^-126 (exponent field = 1, giving actual exponent 1-127 = -126) ≈ 1.18×10^-38, and the largest finite magnitude is (2 − 2^-23) × 2^127 ≈ 3.4×10^38. The smallest positive denormal is 2^-149 ≈ 1.4×10^-45. The gap between 1.0 and the next larger representable single-precision number (machine epsilon) is 2^-23 ≈ 1.19×10^-7, giving roughly 6-7 significant decimal digits of precision. Double precision extends this to about 15-16 significant decimal digits, with machine epsilon 2^-52 ≈ 2.22×10^-16, smallest normal 2^-1022 ≈ 2.2×10^-308 and largest finite value ≈ 1.8×10^308.\n\n• Rounding. IEEE 754 defines round-to-nearest-even (banker's rounding) as the default mode: when a result falls exactly halfway between two representable values, it rounds to whichever has an even last mantissa bit, which avoids a systematic upward bias that plain round-half-up would introduce over many operations."
+    ,
+    strategy: "GATE's arithmetic questions cluster into a few recurring shapes. First, small n-bit 2's complement addition/subtraction where you must state both the result AND whether overflow occurred — always check the sign-based rule (same-sign operands, opposite-sign result) as a fast sanity check even if you compute via carries. Second, Booth's algorithm questions almost never ask you to run the full algorithm by hand in an MCQ; they ask a conceptual question (which bit pattern triggers add vs subtract) or a counting question (how many arithmetic operations does Booth save on a given bit pattern compared to naive shift-add) — spot the runs of 1s, since each run costs exactly one subtract and one add regardless of its length. Third, and most exam-frequent, IEEE 754 encode/decode problems: practice converting a decimal number to binary scientific form (mantissa and exponent) fluently, then slotting sign, biased exponent, and mantissa bits into their fields — and the reverse, reading a hex/bit pattern back into a decimal value. A classic trap is forgetting the bias when reading the exponent field, or forgetting the implicit leading 1 (or, for denormals, that it becomes 0). Another classic trap is confusing 'exponent field value' with 'actual exponent' — e.g. field 124 in single precision means actual exponent 124-127 = -3, not -3 itself as a field. Worked mini-example: encode 9.5 in single precision. 9.5 = 1001.1(binary) = 1.0011 × 2^3, so exponent field = 3+127 = 130 = 10000010, mantissa = 00110000000000000000000, sign = 0, giving 0 10000010 00110000000000000000000, i.e. hex 0x41180000. Always double check by reversing the computation from your final bit pattern back to decimal before committing to an option."
+  },
+  questions: [
+    {
+      id: 'digital-arithmetic-q1',
+      q: "In n-bit 2's complement addition, overflow is correctly detected when:",
+      options: [
+        "the two operands have opposite signs and the result has the same sign as the larger-magnitude operand",
+        "the two operands have the same sign but the result has the opposite sign",
+        "the final carry-out of the addition is 1, regardless of operand signs",
+        "either operand is zero and the result is nonzero"
+      ],
+      answer: 1,
+      marks: 1,
+      difficulty: 'easy',
+      type: 'concept',
+      explanation: "Overflow in 2's complement addition happens exactly when the true mathematical sum falls outside the representable range [-2^(n-1), 2^(n-1)-1]. That can only happen when both operands push the result in the same direction, i.e. both are positive (sum too large and positive) or both are negative (sum too large and negative) — so 'same sign in, opposite sign out' is the reliable symptom, matching option B. Adding operands of opposite sign always produces a result whose magnitude is smaller than the larger operand's magnitude, so it can never overflow (option A describes a scenario that is actually always safe). Option C is wrong because the final carry-out bit alone is meaningless for signed overflow — it must be compared against the carry INTO the sign bit, not read in isolation. Option D is irrelevant to overflow entirely."
+    },
+    {
+      id: 'digital-arithmetic-q2',
+      q: "Adding the two 4-bit 2's complement numbers 0101 and 0011 gives the result 1000. What is the correct interpretation?",
+      options: [
+        "Correct result -8, no overflow",
+        "Overflow occurred; the true sum +8 cannot be represented in 4-bit 2's complement",
+        "The addition should have produced 0111 instead, indicating a hardware fault",
+        "No overflow, because the carry-out of the addition is 0"
+      ],
+      answer: 1,
+      marks: 1,
+      difficulty: 'easy',
+      type: 'numerical',
+      explanation: "0101 = +5 and 0011 = +3, and their true sum is +8. But 4-bit 2's complement can only represent -8 to +7, so +8 is not representable. The binary addition 0101 + 0011 = 1000 indeed produces the bit pattern for -8, a nonsensical result (two positives summing to a negative) that is the textbook symptom of overflow. Checking via the sign rule: both operands are positive (same sign) yet the result 1000 has sign bit 1 (negative) — same sign in, opposite sign out, confirming overflow per the standard rule. Option A misreads the overflowed bit pattern as if it were a valid answer. Option C invents a fault where none exists — the adder behaved exactly as 2's complement arithmetic dictates; the bits are 'correct' bits, just not a valid representable value. Option D is not the correct test in this case; the sign-based rule is the reliable check here."
+    },
+    {
+      id: 'digital-arithmetic-q3',
+      q: "Using 4-bit 2's complement representation, compute 3 - 5 by adding 3 to the 2's complement of 5, and give the resulting decimal value.",
+      options: ["-2, correct, no overflow", "-2, but flagged as overflow", "+2, correct, no overflow", "14, since the carry-out is discarded incorrectly"],
+      answer: 0,
+      marks: 2,
+      difficulty: 'medium',
+      type: 'numerical',
+      explanation: "5 in 4-bit is 0101; its 2's complement (negation) is obtained by inverting to 1010 and adding 1, giving 1011 (which represents -5). Now add: 0011 (+3) + 1011 (-5) = 1110, discarding any carry out of the 4-bit width. The pattern 1110 in 4-bit 2's complement equals -2 (invert 1110 to 0001, add 1 to get 0010 = 2, so 1110 = -2), which matches the true value 3 - 5 = -2 exactly. No overflow occurred, consistent with the rule that overflow is impossible when you are effectively adding operands of opposite sign (here +3 and -5): the sum's magnitude is smaller than the larger operand's magnitude, well within range. Option D misapplies the idea of discarding carry-out — that discarding is normal and correct in 2's complement arithmetic, not an error."
+    },
+    {
+      id: 'digital-arithmetic-q4',
+      q: "In Booth's algorithm, examining the current multiplier bit and the bit immediately to its right (with an implicit 0 appended before the least significant bit), which bit pair correctly signals 'subtract the multiplicand from the partial product, then arithmetic-shift right'?",
+      options: ["Pattern 00", "Pattern 01", "Pattern 10", "Pattern 11"],
+      answer: 2,
+      marks: 1,
+      difficulty: 'medium',
+      type: 'concept',
+      explanation: "Booth recoding reads pairs (current bit, previous bit) moving from LSB to MSB. Pattern 10 means the current bit is 1 and the previous (already-processed, to its right) bit was 0 — this is precisely the START of a new run of 1s when scanned left to right, or equivalently the point where the algorithm must subtract the multiplicand to 'begin' representing that run as a single higher power of two minus a lower one. Pattern 01 is the mirror case (a run of 1s just ended), calling for an ADD instead. Patterns 00 and 11 occur strictly inside a run of 0s or a run of 1s respectively, where the bit value hasn't changed, so no arithmetic operation is needed — only a shift. Getting the add/subtract assignment backwards is the single most common Booth mistake students make, since both patterns 'look similar' (one 1, one 0) unless you're careful about which one is which."
+    },
+    {
+      id: 'digital-arithmetic-q5',
+      q: "A 4-bit unsigned multiplier has the bit pattern 0111 (a single run of three consecutive 1s). Using Booth's algorithm instead of naive shift-add multiplication, how many arithmetic operations (adds or subtracts, not counting shifts) are needed?",
+      options: ["1", "2", "3, same as naive shift-add", "4"],
+      answer: 1,
+      marks: 2,
+      difficulty: 'hard',
+      type: 'numerical',
+      explanation: "Naive shift-add multiplication performs one addition for every 1-bit in the multiplier — for 0111, that is 3 additions (one per bit). Booth's algorithm instead treats the entire maximal run of 1s as a single unit: a run occupying bits j through i (inclusive) is arithmetically equivalent to 2^(i+1) - 2^j, so it costs exactly one subtraction (at the position where the run begins, reading right to left) and one addition (at the position just past where the run ends), regardless of how long the run is. Scanning 0111 with the implicit trailing 0 gives the bit-pair sequence (Q0,Q-1)=(1,0) → subtract, (Q1,Q0)=(1,1) → shift only, (Q2,Q1)=(1,1) → shift only, (Q3,Q2)=(0,1) → add. That totals exactly 2 arithmetic operations (1 subtract + 1 add) versus the 3 additions naive shift-add would require — the whole point of Booth's algorithm is that this saving grows with run length while a naive approach's cost grows with the number of 1-bits."
+    },
+    {
+      id: 'digital-arithmetic-q6',
+      q: "In the IEEE 754 single precision (32-bit) floating-point format, the field widths for sign, exponent, and mantissa (fraction) are, in that order:",
+      options: ["1, 11, 52", "1, 8, 23", "1, 7, 24", "2, 8, 22"],
+      answer: 1,
+      marks: 1,
+      difficulty: 'easy',
+      type: 'concept',
+      explanation: "Single precision packs a value into exactly 32 bits divided as 1 sign bit + 8 exponent bits + 23 mantissa (fraction) bits, which is option B. The widths 1+11+52 (option A) describe double precision (64 bits total), a common mix-up when a question doesn't specify which precision it means. Option C's 1+7+24 and option D's 2+8+22 are not real IEEE 754 formats; they are distractors constructed to still sum to 32 so that a student who only checks the total bit count, rather than the individual field widths, is misled. Memorizing both the single (1-8-23) and double (1-11-52) splits, along with their biases (127 and 1023), is essential since GATE frequently asks about one format but expects you to distinguish it clearly from the other."
+    },
+    {
+      id: 'digital-arithmetic-q7',
+      q: "IEEE 754 double precision uses an 11-bit exponent field. What is the exponent bias used to convert the stored field value into the actual (signed) exponent?",
+      options: ["255", "511", "1023", "2047"],
+      answer: 2,
+      marks: 1,
+      difficulty: 'easy',
+      type: 'numerical',
+      explanation: "The bias for an e-bit exponent field is conventionally 2^(e-1) - 1, chosen so the field can represent both positive and negative actual exponents using only non-negative field values. For e = 11 bits, bias = 2^10 - 1 = 1024 - 1 = 1023, which is option C. Option A, 255, is the bias for the 8-bit single-precision exponent field (2^7 - 1 = 127... note 255 is NOT that bias either — 255 is the all-1s value 2^8-1, a distractor confusing 'maximum field value' with 'bias'). Option B, 511, similarly confuses 2^9-1 with the actual bias formula. Option D, 2047, is 2^11 - 1, the maximum representable value in an 11-bit field (reserved for infinity/NaN), not the bias. The bias lets exponent field values 1 through 2046 represent actual exponents -1022 through +1023 for double precision."
+    },
+    {
+      id: 'digital-arithmetic-q8',
+      q: "What is the IEEE 754 single precision (32-bit) hexadecimal encoding of the decimal value 9.5?",
+      options: ["0x41180000", "0x41980000", "0x40180000", "0x41180001"],
+      answer: 0,
+      marks: 2,
+      difficulty: 'medium',
+      type: 'numerical',
+      explanation: "9.5 in binary is 1001.1, which normalizes to 1.0011 × 2^3. The exponent field is 3 + 127 (bias) = 130 = 10000010 in binary; the mantissa stores the 23 bits after the implicit leading 1, i.e. 0011 followed by nineteen 0s; the sign bit is 0 since 9.5 is positive. Concatenating sign+exponent+mantissa: 0 10000010 00110000000000000000000, which regrouped into hex nibbles is 0100 0001 0001 1000 0000 0000 0000 0000 = 0x41180000. Option B changes a nibble to 0x419... which would correspond to a different exponent/mantissa combination (a larger or misaligned value). Option C's leading 0x40 would mean exponent field 128 (i.e. actual exponent 1), representing a value near 2-4, not 8-16, so it's too small in magnitude for 9.5. Option D adds a spurious 1 in the last mantissa bit, encoding a value an ULP (unit in the last place) away from exactly 9.5."
+    },
+    {
+      id: 'digital-arithmetic-q9',
+      q: "What is the IEEE 754 single precision hexadecimal encoding of the decimal value -0.75?",
+      options: ["0x3F400000", "0xBF400000", "0xBF000000", "0xBF800000"],
+      answer: 1,
+      marks: 2,
+      difficulty: 'medium',
+      type: 'numerical',
+      explanation: "0.75 in binary is 0.11, which normalizes to 1.1 × 2^-1. The exponent field is -1 + 127 = 126 = 01111110; the mantissa is 1 followed by twenty-two 0s (10000000000000000000000); the sign bit is 1 because the value is negative. Concatenating: 1 01111110 10000000000000000000000, regrouped into hex nibbles: 1011 1111 0100 0000 0000 0000 0000 0000 = 0xBF400000, option B. Option A has the same magnitude bits but a 0 sign bit, which would encode +0.75 instead. Option C, 0xBF000000, corresponds to exponent field 126 with an all-zero mantissa, i.e. -1.0 × 2^-1 = -0.5, not -0.75. Option D, 0xBF800000, is exponent field 127 (actual exponent 0) with zero mantissa, i.e. exactly -1.0. Precisely tracking which hex nibble encodes which field is the key skill this question drills."
+    },
+    {
+      id: 'digital-arithmetic-q10',
+      q: "The IEEE 754 single precision bit pattern 0x3E200000 represents which decimal value?",
+      options: ["0.125", "0.15625", "0.3125", "0.0625"],
+      answer: 1,
+      marks: 2,
+      difficulty: 'hard',
+      type: 'numerical',
+      explanation: "Expanding 0x3E200000 into bits: 0011 1110 0010 0000 0000 0000 0000 0000, i.e. sign = 0, exponent field = 01111100 = 124, mantissa = 01000000000000000000000. The actual exponent is 124 - 127 = -3. The mantissa's leading bits 01 combine with the implicit leading 1 to give the significand 1.01 (binary) = 1 + 0.25 = 1.25 (decimal). The value is therefore 1.25 × 2^-3 = 1.25 × 0.125 = 0.15625, option B — matching the earlier encode direction of the same example, since 5/32 = 0.15625 = 0.00101 in binary = 1.01 × 2^-3. Option A, 0.125, is exactly 2^-3 with no mantissa contribution (would need mantissa all 0s). Option C, 0.3125, would need actual exponent -2 instead. Option D, 0.0625, is 2^-4, one exponent step too small. This reverse-decoding direction is exactly as exam-relevant as encoding and should be equally fluent."
+    },
+    {
+      id: 'digital-arithmetic-q11',
+      q: "In IEEE 754 format, a bit pattern with the exponent field all 1s and the mantissa field all 0s represents:",
+      options: ["The largest representable finite normalized number", "±Infinity, sign determined by the sign bit", "NaN (Not a Number)", "A denormalized number close to zero"],
+      answer: 1,
+      marks: 1,
+      difficulty: 'easy',
+      type: 'concept',
+      explanation: "IEEE 754 reserves the all-1s exponent field for two special cases distinguished by the mantissa: mantissa all 0s means ±infinity (sign from the sign bit), while any nonzero mantissa means NaN. So this exact pattern — all-1s exponent AND all-0s mantissa — is ±infinity, option B. The largest finite normalized number instead uses exponent field = 254 (all 1s minus one, i.e. one less than the maximum, since 255 is reserved) with mantissa all 1s, which is a different, smaller pattern than what's described here. NaN requires the mantissa to be nonzero, which contradicts this question's 'all 0s' condition. Denormalized numbers use exponent field all 0s (the opposite extreme), not all 1s. This 'reserved exponent' design is what lets floating-point hardware represent overflow (infinity) and undefined results (NaN) using ordinary bit patterns instead of raising a hardware exception every time."
+    },
+    {
+      id: 'digital-arithmetic-q12',
+      q: "Which statement about IEEE 754 NaN (Not a Number) is correct?",
+      options: [
+        "NaN always compares equal to itself, since it represents a single well-defined error code",
+        "NaN arises only from division by zero and never from any other operation",
+        "A comparison NaN == NaN evaluates to false under the IEEE 754 standard",
+        "NaN is encoded with the exponent field all 0s and a nonzero mantissa"
+      ],
+      answer: 2,
+      marks: 1,
+      difficulty: 'medium',
+      type: 'concept',
+      explanation: "By IEEE 754 design, NaN is deliberately unordered and unequal to everything, including another NaN or even itself — so NaN == NaN evaluates to false, which is option C and is a famous gotcha used to test 'is this value NaN?' in real code (checking x != x). Option A is therefore false — the opposite is true. Option B is false: NaN can arise from many undefined operations, such as 0/0, infinity - infinity, sqrt of a negative number, or 0 × infinity, not division by zero alone. Option D is also wrong on the encoding: NaN requires the exponent field to be ALL 1s (not all 0s) together with a nonzero mantissa; all-0s exponent with nonzero mantissa instead encodes a denormalized number, a completely different and perfectly ordered value near zero."
+    },
+    {
+      id: 'digital-arithmetic-q13',
+      q: "For an IEEE 754 single precision denormalized (subnormal) number, which formula correctly gives its value from the stored fields?",
+      options: [
+        "(-1)^sign × 1.mantissa × 2^(exponent_field - 127), same formula as normalized numbers",
+        "(-1)^sign × 0.mantissa × 2^(-126), using -126 regardless of the mantissa value",
+        "(-1)^sign × 0.mantissa × 2^(1 - 127)",
+        "(-1)^sign × 1.mantissa × 2^(-127)"
+      ],
+      answer: 2,
+      marks: 2,
+      difficulty: 'medium',
+      type: 'concept',
+      explanation: "Denormalized numbers are signaled by an exponent field of all 0s. For these, two things change simultaneously from the normalized formula: the implicit leading bit becomes 0 instead of 1 (so the significand is 0.mantissa, not 1.mantissa), and the actual exponent used is 1 - bias (not 0 - bias, and not the field value minus bias) — for single precision, 1 - 127 = -126. So the correct formula is (-1)^sign × 0.mantissa × 2^(1-127), option C, which correctly evaluates to 2^-126 as the fixed exponent. Option A wrongly reuses the normalized formula's implicit-1 convention. Option B gets the correct fixed exponent -126 but wrongly keeps an implicit leading 1 pattern description off — actually it says 0.mantissa correctly but states '2^(-126) regardless of mantissa' as if the exponent formula weren't derived from 1-bias, which is coincidentally the same number but the reasoning offered is wrong framing; the intended distractor is exponent -126 stated without deriving it from 1-bias, which shows a memorized-but-not-understood answer. Option D incorrectly keeps the implicit 1 and uses the wrong exponent -127. This 1-bias/implicit-0 pair is precisely what allows the smallest denormal (mantissa = 000...001) to equal 2^-23 × 2^-126 = 2^-149, smoothly continuing below the smallest normal number 2^-126."
+    },
+    {
+      id: 'digital-arithmetic-q14',
+      q: "Approximately what is the smallest positive NORMALIZED number representable in IEEE 754 single precision, and how is it derived?",
+      options: [
+        "2^-149, from exponent field 0 and mantissa = 1",
+        "2^-126, from exponent field 1 (actual exponent 1-127=-126) and mantissa all 0s",
+        "2^-127, from exponent field 0 (actual exponent -127) and mantissa all 0s",
+        "2^-23, the machine epsilon value"
+      ],
+      answer: 1,
+      marks: 2,
+      difficulty: 'hard',
+      type: 'numerical',
+      explanation: "The smallest NORMALIZED single-precision number uses the smallest exponent field that still counts as normalized, which is field value 1 (field value 0 is reserved for denormals/zero), giving actual exponent 1 - 127 = -126, combined with the smallest significand 1.000...0 (mantissa all 0s, implicit leading 1). The value is therefore 1.0 × 2^-126 ≈ 1.18 × 10^-38, option B. Option A, 2^-149, is instead the smallest positive DENORMALIZED number (exponent field 0, actual exponent 1-127=-126, mantissa = smallest nonzero value 2^-23, giving 2^-23 × 2^-126 = 2^-149) — a real and important number, but not the smallest NORMALIZED one, which this question asks for. Option C incorrectly treats exponent field 0 as giving actual exponent -127 and as still being 'normalized' — but field 0 always means denormal/zero territory, never normalized. Option D, 2^-23, is machine epsilon (the precision gap near 1.0), an unrelated quantity governing precision, not range."
+    },
+    {
+      id: 'digital-arithmetic-q15',
+      q: "IEEE 754 single precision stores a 23-bit mantissa (with an implicit leading 1). What is the resulting 'machine epsilon' — the gap between 1.0 and the next larger representable single-precision number — and roughly how many significant decimal digits of precision does this correspond to?",
+      options: ["2^-52, about 15-16 digits", "2^-23, about 6-7 digits", "2^-24, about 8 digits", "2^-127, essentially unlimited digits"],
+      answer: 1,
+      marks: 2,
+      difficulty: 'hard',
+      type: 'numerical',
+      explanation: "Machine epsilon is the value of the least significant mantissa bit at the exponent range containing 1.0, i.e. 2^-23, since the mantissa has 23 stored bits after the implicit leading 1. That gives roughly 1.19 × 10^-7 as the smallest distinguishable gap near 1.0, which corresponds to about 7 significant decimal digits of reliable precision (log10(2^23) ≈ 6.9), commonly rounded to '6-7 digits' — option B. Option A's 2^-52 and '15-16 digits' correctly describe DOUBLE precision (52 mantissa bits), not single — a frequent mix-up when a question doesn't clearly separate the two formats. Option C, 2^-24, one bit off, would result from forgetting that the leading implicit bit is not itself stored but does count as a significant bit of precision. Option D is nonsensical; floating point never offers unlimited precision, that is precisely the tradeoff it makes for wide range."
+    },
+    {
+      id: 'digital-arithmetic-q16',
+      q: "IEEE 754 defines 'round to nearest, ties to even' as its default rounding mode. Why is 'ties to even' used instead of always rounding a tie upward?",
+      options: [
+        "It is simpler to implement in hardware than any other tie-breaking rule",
+        "It avoids a systematic upward statistical bias that consistently rounding ties up would introduce across many operations",
+        "It guarantees that no rounding error ever occurs in any computation",
+        "It is required only for denormalized numbers and never affects normalized results"
+      ],
+      answer: 1,
+      marks: 1,
+      difficulty: 'medium',
+      type: 'concept',
+      explanation: "When a computed result falls exactly halfway between two representable floating-point values, always rounding up (or always rounding away from zero) would, over a long sequence of computations, systematically push accumulated sums slightly higher than they should be — a statistical drift. Rounding ties to whichever neighbor has an even least-significant mantissa bit instead makes the direction of rounding effectively alternate/cancel on average across many independent ties, eliminating that systematic bias — option B. Option A is false: ties-to-even is not simpler than, say, always-round-up; it requires an extra check of the trailing bit's parity. Option C is false — rounding error is fundamental to finite-precision floating point and can never be eliminated entirely, only managed; ties-to-even reduces bias, not error. Option D is false; ties-to-even applies to rounding results of normalized arithmetic broadly (whenever a result must be rounded to fit back into the mantissa width), not specifically to denormals."
+    }
+  ]
+});
