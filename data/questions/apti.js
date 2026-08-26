@@ -1378,3 +1378,206 @@ window.GATE_DATA.questions['apti'].topics.find(function(t){return t.id==='apti-v
     explanation: '"Tread carefully" means to proceed cautiously in a sensitive situation, which fits advising a new intern to be careful before challenging a long-established workflow. "Jump the gun" means acting prematurely without adequate preparation, which is advice the sentence is warning against, not recommending. "Go the extra mile" means putting in additional effort, and "cut corners" means doing something in a cheaper or easier but lower-quality way, neither of which relates to caution around proposing sensitive changes. Matching the idiom meaning to the situational tone described, here caution around a sensitive, established system, is more reliable than matching on any single keyword in the sentence.'
   }
 );
+
+window.GATE_DATA.questions['apti'].topics.find(function(t){return t.id==='apti-data-spatial';}).questions.push(
+  {
+    id: 'apti-data-spatial-x1',
+    q: 'A table records the units sold by a store over four days: Monday 120, Tuesday 150, Wednesday 90, Thursday 140. What is the average number of units sold per day over these four days?',
+    options: ['100', '110', '125', '130'],
+    answer: 2,
+    marks: 1,
+    difficulty: 'easy',
+    type: 'numerical',
+    explanation: 'Add all four values first: 120 + 150 + 90 + 140 = 500. Divide by the number of days, 4, to get the average: 500/4 = 125. For quick table-based averages, adding in pairs that are easy to combine mentally, such as 120 + 140 = 260 and 150 + 90 = 240, then summing 260 + 240 = 500, is often faster than adding the numbers strictly left to right, especially when some pairs round to convenient totals.'
+  },
+  {
+    id: 'apti-data-spatial-x2',
+    q: 'A table lists the total marks (Maths plus Science, out of 100 each) of five students: A scored 150, B scored 155, C scored 140, D scored 145, E scored 160. How many of these students scored a total greater than 150?',
+    options: ['1', '2', '3', '4'],
+    answer: 1,
+    marks: 2,
+    difficulty: 'medium',
+    type: 'numerical',
+    explanation: 'Scan the five totals against the threshold of strictly greater than 150: A = 150 (not greater, equal does not count), B = 155 (greater), C = 140 (not greater), D = 145 (not greater), E = 160 (greater). Exactly two students, B and E, exceed 150. The common error here is including A, whose score of exactly 150 fails a strict "greater than" condition; always re-read whether a table question asks for "greater than," "at least," or "at most," since equal-value entries are included or excluded depending on the exact wording.'
+  },
+  {
+    id: 'apti-data-spatial-x3',
+    q: 'A pie chart shows a company total annual expenditure of Rs. 5,00,000 split as Marketing 20 percent, R&D 30 percent, Operations 35 percent, and Admin 15 percent. A second chart shows that within the R&D expenditure, 40 percent goes towards employee salaries. How much of the total company expenditure is spent on R&D salaries?',
+    options: ['Rs. 50,000', 'Rs. 60,000', 'Rs. 70,000', 'Rs. 75,000'],
+    answer: 1,
+    marks: 2,
+    difficulty: 'medium',
+    type: 'numerical',
+    explanation: 'First find the R&D expenditure from the first chart: 30 percent of Rs. 5,00,000 = Rs. 1,50,000. Then apply the second chart percentage to that R&D amount, not to the total: 40 percent of Rs. 1,50,000 = Rs. 60,000. The key discipline in two-linked-chart questions is applying each percentage to the correct base amount in sequence, first chart percentage on the grand total, second chart percentage on the resulting sub-total, rather than multiplying both percentages directly against the grand total, which would give a wrong combined figure of only 12 percent of 5,00,000.'
+  },
+  {
+    id: 'apti-data-spatial-x4',
+    q: 'A pie chart shows that a college total enrollment of 4000 students is split as Arts 25 percent, Commerce 30 percent, Science 35 percent, and Others 10 percent. A second chart shows that among Science students specifically, the ratio of male to female students is 3 to 2. How many female students are enrolled in Science?',
+    options: ['480', '520', '560', '600'],
+    answer: 2,
+    marks: 2,
+    difficulty: 'hard',
+    type: 'numerical',
+    explanation: 'First isolate the Science student count from the first chart: 35 percent of 4000 = 1400 students. The male-to-female ratio 3 : 2 within this group splits the 1400 into 5 equal parts, each part worth 1400/5 = 280. Females occupy 2 of those 5 parts, so female Science students = 2 x 280 = 560. As with any two-linked-chart question, resolve the whole-to-subgroup percentage first to get an actual headcount, then apply the internal ratio to that headcount, never to the original grand total of 4000 directly.'
+  },
+  {
+    id: 'apti-data-spatial-x5',
+    q: 'A company annual revenue grew from Rs. 200 crore in 2021 to Rs. 250 crore in 2022. What was the percentage growth in revenue?',
+    options: ['20 percent', '25 percent', '30 percent', '50 percent'],
+    answer: 1,
+    marks: 1,
+    difficulty: 'easy',
+    type: 'numerical',
+    explanation: 'Percentage growth is always computed as (increase / original value) x 100. The increase here is 250 - 200 = 50, and the original value is 200, giving (50/200) x 100 = 25 percent. A common error is dividing the increase by the new value, 250, instead of the original value, 200, which would incorrectly give 20 percent; always anchor the percentage change calculation to the starting figure, not the ending one, since growth is measured relative to where a quantity began.'
+  },
+  {
+    id: 'apti-data-spatial-x6',
+    q: 'A firm revenue was Rs. 100 crore in Year 1. It grew by 20 percent in Year 2, and then by a further 25 percent in Year 3 relative to the Year 2 figure. What is the revenue in Year 3?',
+    options: ['Rs. 140 crore', 'Rs. 145 crore', 'Rs. 150 crore', 'Rs. 160 crore'],
+    answer: 2,
+    marks: 2,
+    difficulty: 'medium',
+    type: 'numerical',
+    explanation: 'Apply each growth rate to the immediately preceding value, not to the original Year 1 figure. Year 2 revenue = 100 x 1.20 = Rs. 120 crore. Year 3 revenue = 120 x 1.25 = Rs. 150 crore. This can also be done in one step by multiplying the growth factors together first: 1.20 x 1.25 = 1.50, so Year 3 revenue = 100 x 1.50 = Rs. 150 crore directly. Whenever a bar or line chart describes successive year-on-year growth rates, chaining the multipliers into a single combined factor before applying it to the base year value is faster than computing each intermediate year separately when only the final value is needed.'
+  },
+  {
+    id: 'apti-data-spatial-x7',
+    q: 'In a class of 50 students, 30 play cricket and 25 play football, while 10 students play both sports. How many students play neither cricket nor football?',
+    options: ['0', '5', '10', '15'],
+    answer: 1,
+    marks: 1,
+    difficulty: 'easy',
+    type: 'numerical',
+    explanation: 'Use the inclusion-exclusion principle to find how many play at least one of the two sports: cricket + football - both = 30 + 25 - 10 = 45. Subtracting this from the total class size gives the number playing neither: 50 - 45 = 5. The subtraction of the "both" count is essential because those 10 students would otherwise be counted twice, once within the cricket group and once within the football group, inflating the at-least-one total beyond the true figure.'
+  },
+  {
+    id: 'apti-data-spatial-x8',
+    q: 'In a survey of 100 people, 60 like tea, 50 like coffee, and 20 like neither beverage. How many people like both tea and coffee?',
+    options: ['20', '25', '30', '35'],
+    answer: 2,
+    marks: 2,
+    difficulty: 'medium',
+    type: 'numerical',
+    explanation: 'Since 20 out of 100 people like neither drink, the number liking at least one of the two is 100 - 20 = 80. By inclusion-exclusion, tea + coffee - both = at least one, so 60 + 50 - both = 80, giving both = 110 - 80 = 30. The general Venn-diagram shortcut for two overlapping sets is: both = (sum of the two individual counts) - (count liking at least one), where the at-least-one figure itself is obtained by subtracting the "neither" count from the grand total whenever it is given instead of being stated directly.'
+  },
+  {
+    id: 'apti-data-spatial-x9',
+    q: 'Question: What is the value of x? Statement I: x squared equals 49. Statement II: x is greater than 0. Which of the following best describes the sufficiency of these statements?',
+    options: ['Statement I alone is sufficient, but Statement II alone is not', 'Statement II alone is sufficient, but Statement I alone is not', 'Both statements together are sufficient, but neither statement alone is sufficient', 'Each statement alone is sufficient to answer the question'],
+    answer: 2,
+    marks: 2,
+    difficulty: 'medium',
+    type: 'concept',
+    explanation: 'Statement I alone gives x squared = 49, which allows x = 7 or x = -7, two possible values, so it does not pin down a unique answer on its own. Statement II alone only says x is positive, which is consistent with infinitely many values of x, giving no specific value at all. Combining both statements restricts x to being positive and satisfying x squared = 49, which uniquely forces x = 7, discarding the negative root. Since neither statement alone fixes a unique value but both together do, the correct classification is that they are sufficient only jointly, never individually.'
+  },
+  {
+    id: 'apti-data-spatial-x10',
+    q: 'Question: What is the ratio of the present ages of A and B? Statement I: Five years ago, the ratio of the age of A to the age of B was 3 to 4. Statement II: Ten years from now, the ratio of the age of A to the age of B will be 5 to 6. Which of the following best describes the sufficiency of these statements?',
+    options: ['Statement I alone is sufficient, but Statement II alone is not', 'Statement II alone is sufficient, but Statement I alone is not', 'Both statements together are sufficient, but neither statement alone is sufficient', 'Each statement alone is sufficient to answer the question'],
+    answer: 2,
+    marks: 2,
+    difficulty: 'hard',
+    type: 'concept',
+    explanation: 'Each statement alone gives just one linear relationship between the present ages of A and B, which has infinitely many solutions since there are two unknowns and only one equation; for example, Statement I alone is satisfied by many different actual age pairs that all preserve a 3-to-4 ratio five years ago. Combining both statements provides two independent linear equations in the two unknowns, present age of A and present age of B, which together pin down a single unique solution and hence a single determinate ratio. This is the standard data-sufficiency signature for age or ratio problems: one equation per statement, needing both together to match the two unknowns actually present.'
+  },
+  {
+    id: 'apti-data-spatial-x11',
+    q: 'A square sheet of paper is folded exactly once in half along a straight vertical line and then unfolded completely. How many crease lines are visible on the unfolded sheet?',
+    options: ['0', '1', '2', '4'],
+    answer: 1,
+    marks: 1,
+    difficulty: 'easy',
+    type: 'concept',
+    explanation: 'A single fold produces exactly one crease line along the fold axis, and unfolding the paper does not remove this crease, since the crease is a permanent mark left in the paper fibers. With only one fold performed in the entire process, only one crease line can possibly exist on the unfolded sheet. The general rule for paper-folding crease questions is that the number of distinct crease lines equals the number of distinct fold operations performed, provided each fold is made along a new line rather than repeating an existing crease.'
+  },
+  {
+    id: 'apti-data-spatial-x12',
+    q: 'A square sheet of paper is folded in half along a vertical line, and then folded again in half along a horizontal line, before being completely unfolded. How many crease lines are visible on the unfolded sheet in total?',
+    options: ['1', '2', '3', '4'],
+    answer: 1,
+    marks: 2,
+    difficulty: 'medium',
+    type: 'concept',
+    explanation: 'Each distinct fold direction leaves behind exactly one crease line running the full length of the sheet along that fold axis. The vertical fold leaves one vertical crease, and the separate horizontal fold leaves one horizontal crease, giving 2 crease lines total once the sheet is fully unfolded. It does not matter that the second fold was made on an already-folded (smaller, doubled) sheet, since the crease still propagates through both layers and appears as a single continuous line across the full sheet once unfolded; the total crease count still equals the number of distinct fold directions used, which is 2 here.'
+  },
+  {
+    id: 'apti-data-spatial-x13',
+    q: 'A square sheet of paper is folded in half twice in succession, producing a smaller square exactly one-fourth the area of the original sheet. A small hole is then punched through the corner of this folded square that corresponds to an actual outer corner of the original, unfolded sheet. When the paper is completely unfolded, how many holes appear in total?',
+    options: ['1', '2', '4', '8'],
+    answer: 2,
+    marks: 2,
+    difficulty: 'hard',
+    type: 'concept',
+    explanation: 'Folding a square sheet in half twice creates 4 layers of paper stacked together, and punching through the folded corner cuts through all 4 layers at once, at a position that maps to a genuine corner of the original sheet rather than to its center. Each of the 4 original corners of the unfolded sheet lands exactly on this stacked corner position after the two folds, so unfolding reveals one hole at each of the 4 original corners, giving 4 holes total. This differs from punching at the folded corner that corresponds to the sheet center, which would instead produce a single hole shared right at the middle, since all 4 layers there map onto the same central point rather than 4 distinct points.'
+  },
+  {
+    id: 'apti-data-spatial-x14',
+    q: 'The word OXIDE is held up in front of a vertical plane mirror. Considering only the individual letters that look visually identical to their normal form when mirrored left to right, how many of the letters in OXIDE remain unchanged in the mirror image?',
+    options: ['2', '3', '4', '5'],
+    answer: 1,
+    marks: 1,
+    difficulty: 'easy',
+    type: 'concept',
+    explanation: 'A letter looks unchanged in a left-right mirror exactly when it has a vertical line of symmetry. Checking each letter of OXIDE: O is symmetric (unchanged), X is symmetric (unchanged), I is symmetric (unchanged), D is not vertically symmetric (its curved side reverses), E is not vertically symmetric (its open side reverses). This gives 3 letters, O, X, and I, that remain visually unchanged. The fast method for any mirror-image letter question is to mentally classify only the specific letters involved as either having a vertical symmetry axis (like A, H, I, M, O, T, U, V, W, X, Y) or not, rather than trying to mirror the entire word as one image.'
+  },
+  {
+    id: 'apti-data-spatial-x15',
+    q: 'Consider the letters D, E, H, and N reflected in still water below them, so each letter is flipped upside down (top to bottom) rather than left to right. How many of these four letters appear visually unchanged in this water image?',
+    options: ['1', '2', '3', '4'],
+    answer: 2,
+    marks: 2,
+    difficulty: 'medium',
+    type: 'concept',
+    explanation: 'A water image flips a shape about a horizontal axis, so a letter appears unchanged only if it has a horizontal line of symmetry, top and bottom mirroring each other. D has such symmetry (its curve is symmetric top to bottom), E has such symmetry (its three horizontal strokes mirror around the middle one), and H has such symmetry (its structure is identical when flipped vertically). N does not have horizontal symmetry, since its diagonal stroke reverses direction when flipped top to bottom, turning into a different-looking shape. This gives 3 letters, D, E, and H, that remain unchanged, distinguishing a water (horizontal-axis) reflection question from a plane-mirror (vertical-axis) reflection question, which would test a different symmetry property of the same letters.'
+  },
+  {
+    id: 'apti-data-spatial-x16',
+    q: 'A standard cubical die has its numbers arranged so that the numbers on any pair of opposite faces always add up to 7 (so 1 is opposite 6, 2 is opposite 5, and 3 is opposite 4). If the die is placed with 1 facing up and 2 facing towards you, which number faces directly away from you?',
+    options: ['3', '4', '5', '6'],
+    answer: 2,
+    marks: 1,
+    difficulty: 'easy',
+    type: 'concept',
+    explanation: 'The face pointing directly away from the viewer is the one opposite the face pointing towards the viewer, not the one opposite the top face. Since 2 is the face towards the viewer, its opposite face, which faces away, is the number that sums with 2 to make 7, namely 5. The top face showing 1 is not directly relevant to this particular question, since only the front-back pair of faces determines what lies directly behind; a common error is instead computing the opposite of the top face and answering 6, which actually names the bottom face, not the back face.'
+  },
+  {
+    id: 'apti-data-spatial-x17',
+    q: 'Three different views of the same die are described. View 1 shows the numbers 1, 2, and 3 on its three visible faces. View 2 shows the numbers 1, 4, and 5. View 3 shows the numbers 2, 4, and 6. Based on these views, which number lies on the face opposite to the face showing 1?',
+    options: ['3', '4', '5', '6'],
+    answer: 3,
+    marks: 2,
+    difficulty: 'medium',
+    type: 'concept',
+    explanation: 'Two faces that appear together in the same view of a die can never be opposite each other, since opposite faces of a cube can never be seen simultaneously in a single view. Face 1 appears together with 2 and 3 in View 1, and together with 4 and 5 in View 2, so 1 cannot be opposite any of 2, 3, 4, or 5, since each of these has been directly seen alongside 1 in some view. Among the six faces, the only number never seen in the same view as 1 is 6, since 6 only appears in View 3 alongside 2 and 4, never alongside 1. By elimination, 6 must be the face opposite 1. This elimination technique, ruling out every number that has co-appeared with the target face, is the standard method whenever several partial views of the same die are given instead of one direct pair of opposite faces.'
+  },
+  {
+    id: 'apti-data-spatial-x18',
+    q: 'A cube net is made of six squares arranged as a vertical strip of four squares (with the squares in order U2, U1, C, D from top to bottom), with an additional square L attached to the left of C and another square R attached to the right of C. When this net is folded into a cube, which square becomes the face opposite square C?',
+    options: ['U1 (immediately above C)', 'U2 (two squares above C)', 'L (attached to the left of C)', 'D (immediately below C)'],
+    answer: 1,
+    marks: 1,
+    difficulty: 'easy',
+    type: 'concept',
+    explanation: 'In any straight run of four consecutive squares within a cube net, the standard folding rule is that the 1st and 3rd squares in the run become opposite faces, and the 2nd and 4th squares become opposite faces, since folding a 4-strip wraps it exactly once around the four side faces of the cube. In the vertical run U2, U1, C, D (positions 1, 2, 3, 4), square C sits in the 3rd position, so its opposite face is the 1st position square, U2, which is two squares above it. The two side squares L and R, both attached directly to C on either side, become the remaining top and bottom faces of the cube and end up opposite each other, not opposite C, since C itself is already paired with U2 by the strip rule.'
+  },
+  {
+    id: 'apti-data-spatial-x19',
+    q: 'A cube net consists of four squares P, Q, R, and S arranged left to right in a straight horizontal row, with an extra square T attached above square Q and an extra square U attached below square Q. When this net is folded into a cube, which face becomes opposite face S?',
+    options: ['P', 'Q', 'R', 'U'],
+    answer: 1,
+    marks: 2,
+    difficulty: 'medium',
+    type: 'concept',
+    explanation: 'Using the standard rule for a straight run of four squares, positions 1, 2, 3, 4 in the row P, Q, R, S pair up as (1st, 3rd) opposite and (2nd, 4th) opposite, since a 4-square strip wraps exactly once around the four lateral faces of the cube. Here S is the 4th square in the row, so its opposite face is the 2nd square, Q. The squares T and U, both attached to Q on opposite sides (above and below) in the flat net, become the remaining top and bottom faces of the cube and are opposite each other, but neither is opposite S, since S has already been paired with Q by the strip rule, leaving T and U to pair only with each other by elimination.'
+  },
+  {
+    id: 'apti-data-spatial-x20',
+    q: 'A cube net is drawn as a horizontal row of four squares B, C, D, E from left to right, with a fifth square A attached directly above square C, and a sixth square F attached directly below square D. When this net is folded into a cube, which face lies opposite face A?',
+    options: ['B', 'C', 'D', 'F'],
+    answer: 3,
+    marks: 2,
+    difficulty: 'hard',
+    type: 'concept',
+    explanation: 'Apply the straight-run rule to the horizontal strip B, C, D, E (positions 1, 2, 3, 4): the 1st and 3rd squares are opposite, giving B opposite D, and the 2nd and 4th squares are opposite, giving C opposite E. This accounts for two of the three opposite pairs among the six faces using the reliable strip rule alone. The two remaining squares, A and F, have not yet been paired with anything, since each is attached to a different square (A above C, F below D) rather than sharing one attachment point, so a fresh straight-run cannot be formed between them directly. However, since a cube has exactly three pairs of opposite faces and two pairs are already accounted for, the only two faces left over, A and F, must form the third and final pair by elimination, so F is opposite A.'
+  }
+);
