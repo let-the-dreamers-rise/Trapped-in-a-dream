@@ -1395,3 +1395,335 @@ window.GATE_DATA.questions['os'].topics.find(function(t){return t.id==='os-sync'
   explanation: 'In the classic first readers-writers solution, the semaphore wrt is acquired by the FIRST reader to arrive (locking out writers) and released only by the LAST reader to leave; any number of readers may enter and read concurrently in between, incrementing/decrementing a readcount variable (protected by mutex) to track this. Because a new reader arriving while other readers are already active does not need to wait for wrt at all (it only needs mutex briefly to update readcount), a continuous stream of overlapping readers can keep wrt permanently held on the readers\' side, indefinitely preventing any waiting writer from ever acquiring it -- writer starvation. This solution never allows two writers concurrently, since only one entity (a lone writer, or the collective group of readers) can hold wrt at any time.'
 }
 );
+
+window.GATE_DATA.questions['os'].topics.find(function(t){return t.id==='os-deadlock';}).questions.push(
+{
+  id: 'os-deadlock-x1',
+  q: 'A resource allocation graph has resource types R1 and R2, each with a SINGLE instance. Process P1 holds R1 and requests R2; process P2 holds R2 and requests R1. Is the system deadlocked, and why?',
+  options: ['Yes -- this forms a cycle (P1->R2->P2->R1->P1) among single-instance resources, which is both necessary and sufficient for deadlock', 'No -- a cycle only matters if there are at least three processes involved', 'No -- deadlock is impossible with only two processes regardless of the resource graph', 'Cannot be determined without knowing the total number of resource instances of some OTHER resource type not mentioned'],
+  answer: 0,
+  marks: 1,
+  difficulty: 'easy',
+  type: 'concept',
+  explanation: 'The described allocation and request edges form a cycle: P1 holds R1 and requests R2 (edge P1->R2), while P2 holds R2 and requests R1 (edge P2->R1), with assignment edges R1->P1 and R2->P2 closing the loop. Since BOTH R1 and R2 have exactly one instance each, a cycle in this single-instance resource allocation graph is both a NECESSARY and SUFFICIENT condition for deadlock: neither P1 nor P2 can ever proceed, since each is waiting for a resource permanently held by the other, and neither can release what it holds until it gets what it is waiting for. A two-process cycle is the smallest possible deadlock and is entirely valid.'
+},
+{
+  id: 'os-deadlock-x2',
+  q: 'In a system using the Banker\'s algorithm with 4 resource types, a process Pi has Max=[6,4,7,3] and current Allocation=[2,1,3,1]. What is Pi\'s Need vector?',
+  options: ['[4,3,4,2]', '[8,5,10,4]', '[6,4,7,3]', '[2,1,3,1]'],
+  answer: 0,
+  marks: 1,
+  difficulty: 'easy',
+  type: 'numerical',
+  explanation: 'The Need vector is defined component-wise as Need[i] = Max[i] - Allocation[i], representing the additional resources of each type the process may still legitimately request before reaching its declared maximum claim. Computing component-wise: 6-2=4, 4-1=3, 7-3=4, 3-1=2, giving Need = [4,3,4,2]. This vector is exactly what the Banker\'s safety algorithm compares against the working "Work" vector at each step to decide whether a process can be safely allowed to finish with currently available resources. Getting this subtraction wrong (e.g., accidentally comparing Max or Allocation directly against Work instead of Need) is one of the most common arithmetic slips made when tracing a Banker\'s algorithm question by hand under exam time pressure, so always double-check which of the three vectors -- Max, Allocation, or Need -- a given step of the algorithm actually requires.'
+},
+{
+  id: 'os-deadlock-x3',
+  q: 'A system has a single resource type with a total of 12 instances and 4 processes, each with a declared maximum need of 4 instances. Using the formula for guaranteeing no deadlock (minimum instances = n*(k-1)+1), is a total of 12 instances sufficient to GUARANTEE the system can never deadlock?',
+  options: ['No -- the formula requires n*(k-1)+1 = 4*(4-1)+1 = 13 instances to guarantee no deadlock, so 12 is one short and deadlock remains possible', 'Yes -- 12 instances is always enough once it reaches or exceeds n*(k-1) = 12, with no extra instance needed', 'Yes -- since 12 equals n*k - 4, it comfortably exceeds the safe threshold', 'No -- the system needs at least n*k = 16 instances regardless of the formula'],
+  answer: 0,
+  marks: 2,
+  difficulty: 'hard',
+  type: 'numerical',
+  explanation: 'The guaranteed-safe minimum is n*(k-1)+1 = 4*(4-1)+1 = 4*3+1 = 13 instances. With only 12 instances available, it IS possible for all 4 processes to simultaneously hold 3 instances each (4*3=12, using up every instance) while each still needs exactly 1 more instance to reach its maximum of 4 -- at this point no process can proceed and no process can release anything voluntarily (each still needs more, not less), which is a genuine deadlock. With 13 instances, this exact stuck configuration becomes impossible, since after 4 processes hold 3 each (using 12), 1 instance would remain free, which is enough for at least one process to obtain its full need of 4 and finish, releasing its holdings for the others.'
+},
+{
+  id: 'os-deadlock-x4',
+  q: 'Which single condition is DIRECTLY attacked by requiring every process to acquire ALL the resources it will ever need for its entire execution in one single request, before it starts running (and to hold nothing otherwise)?',
+  options: ['Hold and wait', 'Mutual exclusion', 'No preemption', 'Circular wait'],
+  answer: 0,
+  marks: 1,
+  difficulty: 'easy',
+  type: 'concept',
+  explanation: 'The hold-and-wait condition specifically requires that a process holds at least one resource WHILE simultaneously waiting for additional resources held by others. If a process is instead forced to request and receive absolutely everything it will ever need in one atomic, all-or-nothing request before beginning execution (and never requests anything more afterward), it can never be in the state of holding something while also waiting for something else -- it either has everything up front, or it has nothing and is simply waiting to be granted everything. This directly and completely eliminates the possibility of hold-and-wait, though at the cost of potentially poor resource utilisation (resources sit idle in a process\'s possession long before they are actually used).'
+},
+{
+  id: 'os-deadlock-x5',
+  q: 'Applying the Banker\'s safety algorithm: Available=[3,3,2]. Need for P0=[7,4,3], P1=[1,2,2], P2=[6,0,0], P3=[0,1,1]. Allocation for P0=[0,1,0], P1=[2,0,0], P2=[3,0,2], P3=[2,1,1]. Which process can be scheduled FIRST in a safe sequence?',
+  options: ['P1, since Need[P1]=[1,2,2] <= Available=[3,3,2] component-wise, while none of the other processes\' Need vectors are fully covered by the current Available', 'P0, because it appears first in process order', 'P2, because it holds the most resources already', 'No process can run first; the system is immediately in an unsafe state'],
+  answer: 0,
+  marks: 2,
+  difficulty: 'hard',
+  type: 'numerical',
+  explanation: 'The safety algorithm looks for a process whose ENTIRE Need vector is component-wise less than or equal to the current Work (initialised to Available=[3,3,2]). Checking each: P0 needs [7,4,3] -- 7>3, fails. P1 needs [1,2,2] -- 1<=3, 2<=3, 2<=2, all satisfied, so P1 CAN be granted its remaining need right now. P2 needs [6,0,0] -- 6>3, fails. P3 needs [0,1,1] -- all satisfied too, actually, but P1 is checked first in process order and succeeds, so it is scheduled first in this pass (the algorithm may find P3 also eligible on the same or a later pass, but P1 is a valid, correct first choice since its need vector already fits). After P1 finishes, Work becomes Available + Allocation[P1] = [3+2,3+0,2+0] = [5,3,2], and the algorithm continues checking remaining processes against this larger Work.'
+},
+{
+  id: 'os-deadlock-x6',
+  q: 'A system detects a deadlock among processes P1, P2, and P3. The OS decides to recover by aborting processes ONE AT A TIME (rather than all simultaneously) until the deadlock is broken. What must the OS do after aborting each single process?',
+  options: ['Re-run the deadlock detection algorithm to check whether the deadlock still exists before deciding whether to abort another process', 'Immediately abort all remaining processes regardless of whether the deadlock is resolved', 'Restart the entire operating system to clear the deadlock state', 'Do nothing further -- aborting exactly one process always resolves any deadlock completely'],
+  answer: 0,
+  marks: 1,
+  difficulty: 'medium',
+  type: 'concept',
+  explanation: 'When recovering by aborting processes one at a time, the OS cannot know in advance whether killing a single process is enough to break the entire cycle of circular waiting -- it depends on exactly which resources that process was holding and whether those specific resources are what the remaining deadlocked processes were waiting for. Therefore, after each individual abort, the detection algorithm (essentially a Banker\'s-style safety/cycle check using actual current allocations) must be RE-RUN to determine whether the deadlock has actually been resolved; if processes are still deadlocked, another victim is selected and aborted, and the cycle repeats. This incremental approach minimises unnecessary process termination compared to aborting all deadlocked processes at once, but costs more overhead from repeated detection runs.'
+},
+{
+  id: 'os-deadlock-x7',
+  q: 'Which of the following is the most accurate statement about the relationship between an UNSAFE state and an actual DEADLOCK, as used in the Banker\'s algorithm framework?',
+  options: ['An unsafe state means deadlock is POSSIBLE depending on the order future requests happen to arrive in, but the system might still avoid deadlock if it gets lucky; a genuine deadlock is a stronger, already-realised condition where no process can proceed no matter what', 'An unsafe state and a deadlock are exactly the same thing and always occur together', 'A safe state can still be a deadlock if enough processes request resources simultaneously', 'An unsafe state guarantees deadlock will occur within a fixed, bounded number of future requests'],
+  answer: 0,
+  marks: 2,
+  difficulty: 'hard',
+  type: 'concept',
+  explanation: 'A SAFE state guarantees that SOME sequence of resource grants exists that lets every process eventually complete, regardless of how future requests happen to be ordered -- this is a strong guarantee. An UNSAFE state simply means the Banker\'s safety algorithm could NOT find such a guaranteed-safe completion sequence for at least one possible future; it does NOT mean deadlock has actually happened, or even that it definitely will -- it only means the system can no longer PROVE deadlock is impossible, and depending on which specific requests actually arrive next, the system might still manage to avoid deadlock by chance. A true deadlock is the concrete, realised situation where a set of processes are ALREADY stuck waiting on each other with zero possibility of proceeding. Deadlock avoidance (Banker\'s algorithm) is conservative precisely because it refuses to ever enter an unsafe state at all, even though not every unsafe state actually leads to deadlock.'
+},
+{
+  id: 'os-deadlock-x8',
+  q: 'Which of the following best distinguishes deadlock PREVENTION from deadlock AVOIDANCE?',
+  options: ['Prevention imposes structural constraints on HOW resources may be requested (e.g. total ordering, request-all-at-once) without needing advance knowledge of future claims; avoidance (e.g. Banker\'s algorithm) requires each process to declare its maximum resource claim in advance and checks safety before every grant', 'Prevention and avoidance are two different names for exactly the same technique', 'Avoidance always uses less memory bookkeeping than prevention', 'Prevention only works for systems with a single resource type, while avoidance works for any number of resource types'],
+  answer: 0,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'concept',
+  explanation: 'Deadlock PREVENTION works by structurally ensuring at least one of the four necessary conditions (mutual exclusion, hold-and-wait, no preemption, circular wait) can NEVER hold, via rules imposed on how and when resources may be requested (e.g., a strict total ordering on resource types, or requiring all-at-once requests) -- crucially, this requires NO advance knowledge of what a process will eventually need. Deadlock AVOIDANCE, exemplified by the Banker\'s algorithm, takes a different approach: it requires each process to declare its MAXIMUM possible future claim on each resource type in advance, and then, before granting any individual request, dynamically checks (via the safety algorithm) whether granting it would leave the system in a safe state; only safe-state-preserving requests are granted immediately, others must wait. Avoidance is generally considered more flexible and permits higher resource utilisation than prevention, but requires that advance-knowledge assumption that prevention does not.'
+}
+);
+
+window.GATE_DATA.questions['os'].topics.find(function(t){return t.id==='os-memory';}).questions.push(
+{
+  id: 'os-memory-x1',
+  q: 'A system uses paging with a 32-bit logical address and a page size of 4 KB (2^12 bytes). How many bits are used for the page NUMBER portion of the logical address?',
+  options: ['20 bits', '12 bits', '16 bits', '32 bits'],
+  answer: 0,
+  marks: 1,
+  difficulty: 'easy',
+  type: 'numerical',
+  explanation: 'A page size of 4 KB = 2^12 bytes means the page OFFSET (the low-order bits that index directly within a page/frame) requires exactly 12 bits, since 2^12 distinct byte offsets exist within one page. The logical address is 32 bits total, so the remaining high-order bits form the page number: 32 - 12 = 20 bits. This means the page table could have up to 2^20 (about a million) entries in the worst case, which is exactly the kind of large page-table-size concern that motivates multi-level or inverted page tables in real systems with wide address spaces.'
+},
+{
+  id: 'os-memory-x2',
+  q: 'A TLB has an access time of 10 ns, and main memory access time is 90 ns. If the TLB hit ratio is 0.6 (a relatively low value), what is the effective memory access time (EMAT), using the standard formula EMAT = t + m + (1-h)*m?',
+  options: ['136 ns', '100 ns', '190 ns', '60 ns'],
+  answer: 0,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'numerical',
+  explanation: 'Using EMAT = t + m + (1-h)*m with t=10, m=90, h=0.6: EMAT = 10 + 90 + (1-0.6)*90 = 100 + 0.4*90 = 100 + 36 = 136 ns. Cross-checking via the hit/miss branches directly: on a hit (probability 0.6), cost = t+m = 100 ns; on a miss (probability 0.4), cost = t+m+m = 190 ns. EMAT = 0.6*100 + 0.4*190 = 60 + 76 = 136 ns, confirming the same result. This example specifically illustrates that even a fairly LOW hit ratio like 0.6 still keeps EMAT well below the full miss cost of 190 ns, though clearly worse than a high hit ratio would give.'
+},
+{
+  id: 'os-memory-x3',
+  q: 'Which of the following is true regarding INTERNAL fragmentation under pure paging (no segmentation involved)?',
+  options: ['It can occur, up to almost one full page/frame of wasted space per process, whenever a process\'s total size is not an exact multiple of the page size', 'It can never occur under paging, since paging is specifically designed to eliminate all forms of fragmentation', 'It always equals exactly half a page for every single process without exception', 'It only occurs if the process requests more memory than physically exists in the system'],
+  answer: 0,
+  marks: 1,
+  difficulty: 'easy',
+  type: 'concept',
+  explanation: 'Paging allocates memory in whole-page (whole-frame) units. If a process\'s actual memory requirement is not an exact multiple of the page size, its LAST allocated page will only be partially used, with the remaining space in that frame wasted -- this is internal fragmentation, and in the worst case it can approach almost one entire page size (if just 1 byte spills into a new page, nearly the whole of that new page is wasted). On AVERAGE across many processes with essentially random final-page usage, the expected waste per process is about half a page, but for any SPECIFIC individual process it can range from 0 (exact multiple) up to just under one full page -- so "always exactly half a page" is not correct as a per-process guarantee, only as a long-run average.'
+},
+{
+  id: 'os-memory-x4',
+  q: 'Which of the following best explains why SEGMENTATION (unlike pure paging) can suffer from EXTERNAL fragmentation?',
+  options: ['Segments are variable-sized logical units, so as segments of different sizes are allocated and freed over time, physical memory can end up broken into scattered holes too small individually to satisfy a new segment request, even though the total free space may be sufficient', 'Segmentation always allocates memory in fixed 4 KB chunks, exactly like paging, so this statement about segmentation is not actually true', 'External fragmentation in segmentation occurs only when the segment table itself runs out of space', 'Segmentation eliminates external fragmentation entirely by definition, since segments map directly to a program\'s logical structure'],
+  answer: 0,
+  marks: 1,
+  difficulty: 'medium',
+  type: 'concept',
+  explanation: 'Unlike paging, where every allocatable unit (a frame) is exactly the same fixed size, segmentation allocates memory in VARIABLE-sized chunks matching each segment\'s actual logical size (code segment, stack segment, heap segment, etc.), placed contiguously in physical memory. As segments of differing sizes are loaded and later freed throughout a system\'s uptime, the freed spaces can end up as scattered holes of assorted sizes -- exactly the same external-fragmentation problem that plain contiguous (variable-partition) memory allocation experiences, and for exactly the same underlying reason: variable-sized allocation units. This is a key structural difference from paging, whose uniform fixed-size frames make external fragmentation structurally impossible (though internal fragmentation remains possible).'
+},
+{
+  id: 'os-memory-x5',
+  q: 'A dynamic memory allocator maintains free holes of sizes 100 KB, 500 KB, 200 KB, and 300 KB (in that order in the free list). A request for 212 KB arrives. Which hole does BEST FIT allocate from, and what is the resulting leftover fragment?',
+  options: ['The 300 KB hole is used, leaving a 88 KB fragment', 'The 500 KB hole is used, leaving a 288 KB fragment', 'The 200 KB hole is used, since it is close enough, even though it is technically too small', 'The 100 KB hole is used, leaving a -112 KB deficit'],
+  answer: 0,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'numerical',
+  explanation: 'Best fit must scan every hole in the free list and select the SMALLEST one that is still large enough to satisfy the request. Checking each hole against the 212 KB request: 100 KB is too small (rejected). 500 KB fits but is far larger than necessary. 200 KB is too small (200 < 212, rejected). 300 KB fits and is the smallest hole among {500, 300} that is still big enough. So best fit selects the 300 KB hole, using 212 KB of it and leaving a leftover fragment of 300-212 = 88 KB. This small leftover fragment is exactly the kind of sliver that, over many such allocations, tends to accumulate into many small, hard-to-reuse gaps -- a well-known drawback of best fit despite its per-allocation optimality.'
+},
+{
+  id: 'os-memory-x6',
+  q: 'Compaction is used to eliminate external fragmentation by shuffling processes together in physical memory to merge all free holes into one large contiguous block. Which precondition is REQUIRED for compaction to be possible?',
+  options: ['Processes must be relocatable at run time, typically via hardware base-register relocation, since compaction physically moves a process to a different memory address', 'Compaction requires that every process be exactly the same fixed size', 'Compaction can only be performed once, at system boot, and never again afterward', 'Compaction eliminates the need for any relocation hardware whatsoever'],
+  answer: 0,
+  marks: 1,
+  difficulty: 'medium',
+  type: 'concept',
+  explanation: 'Compaction works by physically relocating running processes\' contents within physical memory to consolidate scattered free holes into one large contiguous free region. For this to be safe, every address a relocated process uses (instruction fetches, data references) must still resolve correctly after the process\'s physical location changes -- this requires RUN-TIME relocation support, most commonly a hardware base (relocation) register that is simply updated to the process\'s new starting address, with every logical address transparently offset by this register at run time. Without such relocation hardware, a process\'s hardcoded or previously-bound physical addresses would become invalid the instant it was moved, making compaction impossible or requiring far more invasive software fix-ups. Compaction can be run repeatedly, whenever fragmentation becomes problematic again, not just once at boot.'
+},
+{
+  id: 'os-memory-x7',
+  q: 'Which statement correctly compares first fit and worst fit memory allocation strategies?',
+  options: ['First fit can stop scanning as soon as it finds any sufficiently large hole, making it typically faster; worst fit must scan the entire free list to find the largest hole, and empirical studies show it tends to perform worse overall than first fit', 'Worst fit is always faster than first fit because it only checks one hole', 'First fit and worst fit always produce identical allocation results for any given request sequence', 'Worst fit guarantees zero external fragmentation over time, unlike first fit'],
+  answer: 0,
+  marks: 1,
+  difficulty: 'medium',
+  type: 'concept',
+  explanation: 'First fit scans the free-hole list from the start and immediately allocates from the FIRST hole encountered that is large enough, so it can terminate its scan early -- typically the fastest of the classical strategies. Worst fit, by contrast, must examine EVERY hole in the free list to determine which one is truly the LARGEST, since it deliberately always picks the biggest available hole (reasoning that the leftover fragment will also be large and hence more useful later). Despite this reasoning, extensive simulation studies in the classical OS literature have found that worst fit tends to perform WORSE overall (in terms of both speed and long-run fragmentation) than both first fit and best fit, making it the least favoured of the three strategies in practice.'
+},
+{
+  id: 'os-memory-x8',
+  q: 'A process\'s logical address space is divided into 4 segments: code (size 4 KB), data (size 6 KB), stack (size 2 KB), and heap (size 3 KB). If segmentation is used WITHOUT paging, what determines whether a given logical address (segment number s, offset d) is valid?',
+  options: ['The offset d must be less than the LIMIT (size) recorded for segment s in the segment table; if d exceeds that segment\'s limit, a segmentation fault (protection violation) occurs', 'The offset d must always be exactly equal to the segment\'s base address', 'Validity depends only on the total combined size of all four segments together, not on any individual segment', 'Segmentation never performs any bounds checking; all offsets are considered valid'],
+  answer: 0,
+  marks: 1,
+  difficulty: 'easy',
+  type: 'concept',
+  explanation: 'In pure segmentation, each segment table entry records a BASE (the starting physical address of that segment) and a LIMIT (the size/length of that segment). A logical address is given as (segment number, offset); to translate it, the hardware looks up the segment\'s base and limit, and CHECKS that the offset is strictly less than the limit -- if the offset is within bounds, the physical address is base+offset; if the offset equals or exceeds the limit, a protection violation (segmentation fault) is raised, since the reference falls outside that segment\'s legitimately allocated space. This per-segment bounds checking is one of segmentation\'s natural advantages: it maps directly onto a program\'s logical divisions and can enforce access protection independently for each one (e.g., marking code segments read-only).'
+}
+);
+
+window.GATE_DATA.questions['os'].topics.find(function(t){return t.id==='os-virtual-memory';}).questions.push(
+{
+  id: 'os-virtual-memory-x1',
+  q: 'Which best explains why an INVERTED PAGE TABLE, which keeps only one entry per PHYSICAL FRAME rather than one entry per virtual page, typically needs a hash table to perform translation efficiently?',
+  options: ['Given a virtual address, the OS must SEARCH for which single global entry matches this process\'s (PID, virtual page number) pair, since the table is indexed by physical frame, not by virtual page; hashing that pair to a likely entry avoids a slow linear scan of every frame', 'Inverted page tables do not need any translation at all once created', 'The hash table is used only to save disk space, not to speed up address translation', 'Inverted page tables have one entry per virtual page just like conventional page tables, so no special lookup mechanism is required'],
+  answer: 0,
+  marks: 2,
+  difficulty: 'hard',
+  type: 'concept',
+  explanation: 'A conventional per-process page table is naturally indexed by virtual page number, so translation is a direct lookup. An inverted page table flips this: it keeps exactly ONE system-wide table with one entry per PHYSICAL FRAME, recording which (process, virtual page) currently occupies each frame -- this saves huge amounts of memory when virtual address spaces are large but physical memory is comparatively small. The cost is that translation now runs backwards: given a virtual address, the OS must find which frame entry (if any) matches the requesting process\'s (PID, virtual page number), which is fundamentally a search problem rather than a direct index. Scanning every physical frame entry linearly on every memory reference would be prohibitively slow, so a hash table mapping (PID, virtual page number) to a candidate frame-table entry is used to bring this lookup close to constant time.'
+},
+{
+  id: 'os-virtual-memory-x2',
+  q: 'A system uses a TWO-LEVEL page table with TLB hit ratio 0.9, TLB access time 4 ns, and main memory access time 100 ns. On a TLB miss, the walk requires 2 memory accesses (one per level) plus 1 final access for the data. What is the EMAT?',
+  options: ['124 ns', '104 ns', '304 ns', '100 ns'],
+  answer: 0,
+  marks: 2,
+  difficulty: 'hard',
+  type: 'numerical',
+  explanation: 'On a TLB hit (probability 0.9): cost = TLB access + 1 data access = 4 + 100 = 104 ns. On a TLB miss (probability 0.1): cost = TLB access (failed) + 2 page-table-level accesses + 1 data access = 4 + 100 + 100 + 100 = 304 ns. EMAT = 0.9*104 + 0.1*304 = 93.6 + 30.4 = 124 ns. This is the general pattern for a k-level page table: EMAT = h*(t+m) + (1-h)*(t + k*m + m), where each additional page-table level adds exactly one more mandatory memory access to the miss-branch cost, making the hit ratio increasingly important as page-table depth grows.'
+},
+{
+  id: 'os-virtual-memory-x3',
+  q: 'A page-replacement scheme implements EXACT LRU using a counter/timestamp updated on every memory reference. What is the main practical drawback of this approach compared to an approximate scheme like the clock (second-chance) algorithm?',
+  options: ['Every single memory reference must update a timestamp field, and eviction requires scanning for the minimum timestamp -- this per-reference overhead is far more costly in hardware/time than simply checking and occasionally clearing one reference bit per page as the clock algorithm does', 'Exact LRU using counters can only track a maximum of 2 pages at a time', 'The counter-based method requires no additional memory at all, unlike the clock algorithm', 'Exact LRU always produces MORE page faults than FIFO, making it strictly worse'],
+  answer: 0,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'concept',
+  explanation: 'Implementing true LRU via a timestamp/counter requires updating that timestamp on literally EVERY memory reference (not just page faults), which is an enormous overhead if done for every single memory access at full processor speed, and finding the eviction victim (minimum timestamp) still requires an O(n) scan unless a more complex stack-based structure is maintained. The clock (second-chance) algorithm approximates LRU far more cheaply: it only requires a single REFERENCE BIT per page, set by hardware on access and periodically inspected/cleared by the replacement algorithm at eviction time -- vastly less overhead than maintaining exact per-reference timestamps. This is precisely why virtually no real system implements exact LRU in hardware for every access; approximations like clock are used instead. LRU\'s fault COUNT is provably never worse than FIFO\'s in the sense of never suffering Belady\'s anomaly, so option D is also incorrect.'
+},
+{
+  id: 'os-virtual-memory-x4',
+  q: 'Which statement correctly explains the role of COPY-ON-WRITE in reducing the cost of fork() specifically when the child process immediately calls exec()?',
+  options: ['Since COW defers actually copying any page until a write occurs, and the child\'s call to exec() replaces its entire address space before it ever writes to most of the copied pages, those pages are never actually duplicated at all, saving the cost of copying memory that would have been immediately discarded', 'COW has no benefit in this scenario since exec() forces an immediate full copy regardless', 'COW only helps if the child process never calls exec() at all', 'COW duplicates all pages immediately regardless of whether exec() is subsequently called'],
+  answer: 0,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'concept',
+  explanation: 'Without copy-on-write, fork() would need to eagerly duplicate the ENTIRE parent address space into new physical frames for the child, even though a hugely common pattern is for the child to immediately call exec() to load an entirely different program, discarding essentially all of that freshly copied memory almost instantly. With COW, fork() instead marks pages shared and read-only between parent and child, deferring any actual physical copy until a WRITE occurs. Since the child in this common fork-then-exec pattern typically never writes to most of its inherited pages before exec() wipes the address space clean and replaces it with the new program\'s image, those pages are never duplicated at all -- the potential copy is entirely avoided, not merely delayed, making fork()+exec() dramatically cheaper in practice than a naive eager-copy fork() would be.'
+},
+{
+  id: 'os-virtual-memory-x5',
+  q: 'Reference string: 2,3,2,1,5,2,4,5,3,2,5,2 with exactly 3 frames, using OPTIMAL (Belady\'s) replacement. When the 5th reference (value 5) causes a page fault with frames currently holding {2,3,1}, which page should optimal replacement evict?',
+  options: ['Page 1, since among {2,3,1} it is never referenced again anywhere later in the string, while 2 is used again almost immediately and 3 is used again later but still within the string', 'Page 2, because it was the very first page loaded', 'Page 3, because it is numerically the largest of the three held pages', 'All three pages simultaneously, to make room for future requests'],
+  answer: 0,
+  marks: 2,
+  difficulty: 'hard',
+  type: 'numerical',
+  explanation: 'Optimal replacement evicts the page that will NOT be used for the LONGEST time into the future, including pages never used again at all. Looking ahead in the remaining reference string (2,4,5,3,2,5,2) for each currently-held page: page 2 is used again almost immediately (right after this fault); page 3 is used again later, near the end of the string; page 1 is NEVER referenced again for the rest of the string. Since page 1 has no future reference whatsoever, it is unambiguously the correct victim under optimal replacement, which always prefers evicting a page with no future use over one merely needed later. This demonstrates why optimal replacement, though unimplementable in practice (it needs knowledge of the future), is the correct theoretical benchmark against which LRU, FIFO, and clock are all compared.'
+},
+{
+  id: 'os-virtual-memory-x6',
+  q: 'A process is thrashing badly under the current degree of multiprogramming. According to the working-set model, what is the recommended corrective action?',
+  options: ['Reduce the degree of multiprogramming -- suspend one or more processes so the remaining processes can each be allocated enough frames to hold their working sets', 'Increase the degree of multiprogramming further, since more processes always improve CPU utilisation', 'Switch every process to FCFS CPU scheduling, since thrashing is a CPU-scheduling problem, not a memory problem', 'Disable the CPU scheduler entirely until thrashing stops on its own'],
+  answer: 0,
+  marks: 1,
+  difficulty: 'medium',
+  type: 'concept',
+  explanation: 'Thrashing occurs when the combined memory demand (sum of working-set sizes) of all currently running processes exceeds the total number of physical frames available, forcing constant page faulting as processes repeatedly steal frames from each other faster than they can make productive use of them. The working-set model\'s prescribed fix is to REDUCE the degree of multiprogramming: temporarily suspend (swap out) one or more processes entirely, freeing up their frames so the remaining processes each get enough frames to comfortably hold their working sets and stop faulting constantly. Counter-intuitively, INCREASING multiprogramming when memory is already oversubscribed makes thrashing worse, not better, since it only shrinks each process\'s frame allocation further -- CPU scheduling policy changes do not address the underlying memory-pressure cause of thrashing at all.'
+},
+{
+  id: 'os-virtual-memory-x7',
+  q: 'Which of the following correctly states why the CLOCK (second-chance) page replacement algorithm can be viewed as an approximation of LRU rather than an approximation of FIFO?',
+  options: ['Clock gives a recently-referenced page a "second chance" (skipping it and clearing its reference bit) rather than evicting it purely because it is old, which specifically tries to avoid evicting recently-USED pages -- the defining goal of LRU, not merely oldest-loaded-first as in FIFO', 'Clock always evicts strictly in load order with no exceptions, exactly like FIFO', 'Clock requires a full timestamp per page just like exact LRU, with no reduction in overhead', 'Clock and FIFO are mathematically proven to always produce identical eviction sequences'],
+  answer: 0,
+  marks: 1,
+  difficulty: 'medium',
+  type: 'concept',
+  explanation: 'Plain FIFO evicts strictly based on LOAD order, regardless of whether a page has been used recently -- a heavily-used page loaded long ago is just as likely to be evicted as an unused one. Clock (second-chance) modifies this: it still circulates through pages in a roughly FIFO-like order, but before evicting a candidate page, it checks that page\'s REFERENCE bit; if the bit is set (meaning the page was accessed recently), the algorithm gives it a "second chance" by clearing the bit and moving on to check the next page instead of evicting it immediately. This behaviour specifically protects RECENTLY USED pages from eviction, which is precisely the goal LRU pursues (evict the page unused for the longest time) -- making clock a cheap approximation of LRU\'s intent, using only one bit per page rather than full timestamps, unlike plain FIFO which ignores usage recency entirely.'
+},
+{
+  id: 'os-virtual-memory-x8',
+  q: 'A page table entry (PTE) contains, among other fields, a valid/invalid bit, a dirty (modified) bit, and a reference bit. If a page\'s dirty bit is 0 at the moment it is chosen as an eviction victim, what does this allow the OS to skip?',
+  options: ['The OS can skip writing the page\'s contents back to disk before reusing its frame, since a clean (unmodified) copy already exists on disk (or was never modified since being loaded), saving a costly disk write', 'The OS can skip updating the page table entry for the evicted page', 'The OS can skip checking whether the page is currently valid', 'The OS can skip loading the new page into the freed frame'],
+  answer: 0,
+  marks: 1,
+  difficulty: 'easy',
+  type: 'concept',
+  explanation: 'The dirty (modified) bit is set by hardware automatically whenever a page is WRITTEN to after being loaded into memory. If a page\'s dirty bit is still 0 at eviction time, this means the in-memory copy is identical to whatever is already stored on disk (either the page was never modified since loading, or it was loaded fresh and read-only so far), so the OS can safely discard the in-memory copy WITHOUT writing it back to disk first -- saving a potentially expensive disk I/O operation. If the dirty bit were 1, the modified contents would need to be written back to disk before the frame could be safely reused for something else, or those changes would be permanently lost. The page table entry for the evicted page must still be updated (marked invalid) regardless of the dirty bit\'s value, so option B is not something that can be skipped.'
+}
+);
+
+window.GATE_DATA.questions['os'].topics.find(function(t){return t.id==='os-file-disk';}).questions.push(
+{
+  id: 'os-file-disk-x1',
+  q: 'Which statement correctly compares classical seek-minimising disk scheduling algorithms (SCAN, C-SCAN, SSTF) on an HDD versus their relevance on an SSD?',
+  options: ['These algorithms exist specifically to reduce mechanical seek time on a spinning-platter HDD; since SSDs have no moving read/write head and roughly comparable random and sequential access costs, such algorithms provide little to no benefit there', 'These algorithms are equally essential on SSDs because SSDs also have a mechanical head that must physically move', 'SSDs require SCAN and C-SCAN even more than HDDs because SSD seek times are much larger', 'C-SCAN cannot be implemented in software at all and requires special SSD hardware support'],
+  answer: 0,
+  marks: 1,
+  difficulty: 'medium',
+  type: 'concept',
+  explanation: 'SCAN, C-SCAN, LOOK, and SSTF are all designed around the fact that a mechanical disk head takes real, significant time to physically move between cylinders, so servicing pending requests in a sensible spatial order meaningfully reduces total seek time. SSDs have no moving parts at all -- there is no read/write head to position -- so random access and sequential access latencies are far closer to each other than on an HDD, and reordering requests by "cylinder" position (which does not meaningfully exist for flash memory) provides little to no measurable benefit. SSD performance is instead governed by entirely different concerns such as wear levelling and write amplification, which have no counterpart in classical mechanical-disk scheduling theory.'
+},
+{
+  id: 'os-file-disk-x2',
+  q: 'Which of the following is the primary benefit a JOURNALING file system provides over a traditional non-journaling file system after an unexpected crash or power loss?',
+  options: ['Recovery only needs to replay or discard the log of recently intended changes, instead of scanning the ENTIRE disk for inconsistencies, making crash recovery vastly faster', 'Journaling makes it physically impossible for any disk write to ever fail', 'Journaling removes the need to ever flush data to persistent storage', 'Journaling doubles the total usable storage capacity of the disk'],
+  answer: 0,
+  marks: 1,
+  difficulty: 'easy',
+  type: 'concept',
+  explanation: 'A journaling file system records intended metadata changes (and sometimes data changes) into a dedicated log BEFORE committing them to their final on-disk locations. If a crash interrupts an in-progress update, the OS does not need to perform a slow, exhaustive scan of the ENTIRE file system (as older non-journaling systems required via utilities like fsck) to detect and repair inconsistencies. Instead, on reboot it simply consults the journal: completed transactions are replayed to guarantee they took full effect, and incomplete ones are safely discarded, restoring a consistent state almost instantly. This comes at the cost of a modest write-performance overhead (every change effectively gets written twice), but the dramatic improvement in recovery time and reliability is why virtually all modern general-purpose file systems use some form of journaling.'
+},
+{
+  id: 'os-file-disk-x3',
+  q: 'An inode uses 10 direct block pointers, 1 single indirect pointer, and 1 double indirect pointer (no triple indirect). Block size is 1 KB, and each block pointer is 4 bytes. What is the maximum file size (in blocks) this inode structure can address?',
+  options: ['65,802 blocks', '10 blocks', '256 blocks', '65,536 blocks'],
+  answer: 0,
+  marks: 2,
+  difficulty: 'hard',
+  type: 'numerical',
+  explanation: 'Pointers per block p = block size / pointer size = 1024/4 = 256. Direct blocks contribute 10 blocks directly. The single indirect block contributes p = 256 data blocks (256 pointers, each pointing straight to one data block). The double indirect block contributes p^2 = 256*256 = 65,536 data blocks (256 pointers to single-indirect blocks, each of which holds 256 pointers to data blocks). Total maximum file size = 10 + 256 + 65,536 = 65,802 blocks. This demonstrates how quickly capacity grows with each additional level of indirection -- moving from single to double indirection multiplies the indirect contribution by a full factor of p (256x in this case).'
+},
+{
+  id: 'os-file-disk-x4',
+  q: 'A disk has cylinders 0-99, and the head is currently at cylinder 40, having just serviced a request there while moving in the direction of DECREASING cylinder numbers. Pending requests are at cylinders 10, 25, 60, 70, 90. Using SCAN (continuing toward 0 first, then reversing), what is the total head movement?',
+  options: ['130', '80', '190', '99'],
+  answer: 0,
+  marks: 2,
+  difficulty: 'hard',
+  type: 'numerical',
+  explanation: 'SCAN continues in its current direction (toward 0) first, servicing every request along the way, before reversing. From 40 moving down: 40->25->10->0 (SCAN travels all the way to the disk boundary at 0, even though the last actual request in this direction is 10) = a movement of 40-0=40 cylinders. Then it reverses and sweeps upward, servicing 60, 70, 90 in increasing order: 0->60->70->90 = a movement of 90-0=90 cylinders. Total head movement = 40 + 90 = 130 cylinders. Note that the trip from 10 down to the boundary at 0, and later from 0 back up past 10, 25 again on the reversal, is pure overhead that LOOK would have avoided by turning around immediately after servicing the last request (10) instead of continuing to the physical boundary.'
+},
+{
+  id: 'os-file-disk-x5',
+  q: 'In indexed file allocation, what is the primary advantage over linked allocation for supporting DIRECT (random) access to a specific block of a file?',
+  options: ['The index block holds pointers to every data block, so accessing block k is a single lookup into entry k of the index, without following any chain of intermediate blocks', 'Indexed allocation requires every file to be stored contiguously, guaranteeing fast access automatically', 'Indexed allocation eliminates the need for a directory entry for the file', 'Indexed allocation is only usable for files smaller than one disk block'],
+  answer: 0,
+  marks: 1,
+  difficulty: 'easy',
+  type: 'concept',
+  explanation: 'In linked allocation, reaching the k-th data block of a file requires starting at the first block and following "next block" pointers one at a time through k blocks, making random access slow and proportional to k. Indexed allocation instead collects pointers to ALL of a file\'s data blocks into one (or more, for very large files) dedicated index block; to access block k, the OS simply reads entry k directly from the index block -- a single lookup, independent of how far into the file that block lies. This gives indexed allocation genuinely fast, direct/random access comparable to contiguous allocation, while still avoiding the requirement that a file\'s data occupy physically contiguous disk space, unlike contiguous allocation.'
+},
+{
+  id: 'os-file-disk-x6',
+  q: 'A request queue for C-LOOK scheduling (disk cylinders 0-199, head at 100, moving toward increasing cylinder numbers) contains requests at 30, 50, 120, 160, 180. What is the correct servicing order under C-LOOK?',
+  options: ['120, 160, 180, 30, 50', '120, 160, 180, 199, 0, 30, 50', '30, 50, 120, 160, 180', '180, 160, 120, 50, 30'],
+  answer: 0,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'numerical',
+  explanation: 'C-LOOK sweeps in the current direction (increasing, from 100) servicing every pending request up to the LAST one in that direction -- here 120, then 160, then 180 -- without needlessly continuing all the way to the physical boundary at 199, since no request lies there. Having serviced the last request in the increasing direction (180), C-LOOK then jumps DIRECTLY to the position of the FIRST pending request in the other direction (the smallest remaining cylinder, 30) without servicing anything during that jump, and resumes sweeping in the SAME original (increasing) direction from there, servicing 30 then 50. This avoids both the wasted trip to the disk boundary (unlike C-SCAN) and the wasted return sweep back through the already-serviced region (unlike LOOK), giving the order: 120, 160, 180, 30, 50.'
+},
+{
+  id: 'os-file-disk-x7',
+  q: 'Which of the following is a genuine drawback of FAT (File Allocation Table) as compared to fully independent linked allocation with pointers stored inside each individual data block?',
+  options: ['If the FAT itself becomes corrupted or is lost, the OS can lose track of every file\'s block chain system-wide, since all "next block" information is concentrated in one table rather than distributed across the files\' own blocks', 'FAT cannot support files larger than one block under any circumstances', 'FAT always causes worse external fragmentation than contiguous allocation', 'FAT requires every file to be a fixed, identical size'],
+  answer: 0,
+  marks: 1,
+  difficulty: 'medium',
+  type: 'concept',
+  explanation: 'FAT centralises all the "next block" chaining information for every file into one single table stored in a reserved area of the disk, rather than scattering "next pointer" fields inside each individual data block as plain linked allocation does. This centralisation actually helps random access somewhat (the whole table, or a cached portion, can be read without touching data blocks) and improves resilience against a single bad pointer breaking one file\'s chain irrecoverably. However, it also concentrates risk: if the FAT itself is corrupted or becomes unreadable, the block-chain information for POTENTIALLY EVERY FILE on the volume can be lost at once, which is why systems using FAT typically keep a backup/duplicate copy of the table. FAT is not limited to single-block files, and its fragmentation behaviour is a property of the underlying free-block management, not something intrinsically worse than contiguous allocation.'
+},
+{
+  id: 'os-file-disk-x8',
+  q: 'For solid-state drives, "wear levelling" refers to which of the following concerns?',
+  options: ['Spreading write and erase operations evenly across all flash memory cells, since each cell can endure only a limited number of write/erase cycles before it wears out and becomes unreliable', 'Physically balancing the drive\'s weight to prevent mechanical vibration', 'Levelling the read speed and write speed of the drive to be exactly equal', 'Reducing the physical size of the drive\'s casing to fit more storage'],
+  answer: 0,
+  marks: 1,
+  difficulty: 'easy',
+  type: 'concept',
+  explanation: 'Flash memory cells used in SSDs have a finite endurance: each cell can only tolerate a limited number of write/erase cycles before it starts to degrade and eventually fails to reliably retain data. If writes were always directed to the same physical cells (e.g., always overwriting the "same" logical block in place), those specific cells would wear out far faster than the rest of the drive, leading to premature failure of just that region even while most of the drive remains lightly used. Wear levelling is the SSD firmware\'s strategy of spreading write and erase operations evenly across ALL available cells over time (often by remapping logical block addresses to different physical locations on each write), maximising the drive\'s overall usable lifespan. This concern has no equivalent in classical HDD theory, since magnetic platters do not wear out from repeated writes in the same way.'
+}
+);
