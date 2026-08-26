@@ -1004,3 +1004,126 @@ window.GATE_DATA.questions['digital'].topics.find(function(t){return t.id==='dig
   explanation: "There are 2^(2^2) = 16 total functions of 2 variables. The 'degenerate' functions — those that do not truly depend on both A and B — are: the 2 constants (0 and 1), the 2 functions equal to A alone regardless of B (A and A'), and the 2 functions equal to B alone regardless of A (B and B'), giving 2+2+2 = 6 degenerate functions in total. Subtracting these from the full 16 leaves 16 - 6 = 10 functions that genuinely use both inputs. These 10 are exactly AND, OR, NAND, NOR, XOR, XNOR, A AND NOT-B, NOT-A AND B, A OR NOT-B, and NOT-A OR B — every one of these changes output when either input alone is toggled, confirming real dependence on both variables, unlike the excluded 6 which ignore at least one input entirely."
 }
 );
+
+window.GATE_DATA.questions['digital'].topics.find(function(t){return t.id==='digital-combinational';}).questions.push(
+{
+  id: 'digital-combinational-x1',
+  q: "A 4-to-1 MUX has select lines A (MSB), B (LSB) and data inputs D0=C', D1=0, D2=1, D3=C. Which function f(A,B,C) does this MUX realize?",
+  options: ["f = Σm(1,2,3,6)", "f = Σm(0,4,5,7)", "f = Σm(0,1,2,3)", "f = Σm(2,3,4,6)"],
+  answer: 1,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'numerical',
+  explanation: "Evaluate the output for each select combination AB (index = 2A+B). AB=00 selects D0=C': gives f=1 at C=0 (minterm 0) and f=0 at C=1 (minterm 1). AB=01 selects D1=0: f=0 for both C values (minterms 2,3 both 0). AB=10 selects D2=1: f=1 for both C values (minterms 4,5 both 1). AB=11 selects D3=C: gives f=0 at C=0 (minterm 6) and f=1 at C=1 (minterm 7). Collecting all rows where f=1: minterms 0, 4, 5, 7 — so f = Σm(0,4,5,7). Simplifying with a K-map confirms f = AC + B'C' as the minimal form, but the question only asks which minterm list is realized, which is read directly off the MUX truth table."
+},
+{
+  id: 'digital-combinational-x2',
+  q: "A 16-to-1 MUX is built as a two-level tree using only 4-to-1 MUX blocks (each 4:1 MUX has 2 select lines). How many 4-to-1 MUX chips are needed in total?",
+  options: ["4", "5", "6", "16"],
+  answer: 1,
+  marks: 1,
+  difficulty: 'easy',
+  type: 'numerical',
+  explanation: "The 16 data inputs are split into 4 groups of 4. The first level uses four 4:1 MUXes, each selecting one of its 4 inputs using the two LEAST significant select bits (S1S0), producing 4 intermediate outputs — one per group. The second level uses one more 4:1 MUX to select among these 4 intermediate outputs, using the two MOST significant select bits (S3S2), to produce the final single output. Total MUX count = 4 (first level) + 1 (second level) = 5. This tree approach generalizes: to build a 4^k-to-1 MUX from 4:1 MUX blocks needs (4^k - 1)/3 chips arranged in k levels; here k=2 gives (16-1)/3 = 5, matching the direct count."
+},
+{
+  id: 'digital-combinational-x3',
+  q: "An 8-to-1 MUX is built as a binary tree using only 2-to-1 MUX blocks. How many 2-to-1 MUXes are required?",
+  options: ["3", "6", "7", "8"],
+  answer: 2,
+  marks: 1,
+  difficulty: 'easy',
+  type: 'numerical',
+  explanation: "A binary MUX tree for 2^n inputs built from 2:1 MUXes needs n levels: the first level has 2^(n-1) MUXes combining pairs of the original inputs (using the LSB select bit), the next level has 2^(n-2) MUXes, and so on down to a single MUX at the top (using the MSB select bit). For n=3 (8 inputs): level 1 needs 4 MUXes (8→4 outputs), level 2 needs 2 MUXes (4→2), level 3 needs 1 MUX (2→1), totaling 4+2+1 = 7. This matches the general formula (2^n - 1) 2:1 MUXes for a 2^n-to-1 MUX, which is the same count as the number of internal nodes in a complete binary tree with 2^n leaves."
+},
+{
+  id: 'digital-combinational-x4',
+  q: "Two functions of 3 variables, f1 = Σm(0,2,4,6) and f2 = Σm(1,3,5,7), are both realized using a single 3-to-8 decoder plus external OR gates. How many decoder output lines are active in total (fixed count), and how many OR gates are needed?",
+  options: ["4 output lines, 1 OR gate", "8 output lines, 2 OR gates", "8 output lines, 1 OR gate", "6 output lines, 2 OR gates"],
+  answer: 1,
+  marks: 1,
+  difficulty: 'easy',
+  type: 'concept',
+  explanation: "A 3-to-8 decoder always has exactly 8 output lines (one per minterm of 3 variables, m0 through m7), regardless of how many of them are actually used by the functions being realized — this count is fixed by the decoder's size, not by f1 or f2. To realize f1 = Σm(0,2,4,6), OR together decoder outputs m0, m2, m4, m6 with one 4-input OR gate. To realize f2 = Σm(1,3,5,7), OR together outputs m1, m3, m5, m7 with a second 4-input OR gate. So the decoder always shows all 8 output lines, and exactly 2 OR gates are needed here, one per function that needs combining multiple minterms — note that f1 and f2 happen to partition all 8 minterms exactly (f2 = f1'), a common special case."
+},
+{
+  id: 'digital-combinational-x5',
+  q: "A 4-to-16 decoder combined with external OR gates is used to realize 3 independent functions of the same 4 variables using the decoder+OR method. How many OR gates are needed at minimum, and does the required decoder size change if a 4th independent function of the same variables is added?",
+  options: ["3 OR gates; decoder must grow to 5-to-32 for a 4th function", "3 OR gates; the decoder stays a fixed 4-to-16 regardless of how many functions share it", "4 OR gates; decoder must double in size", "1 OR gate; a single OR gate can combine all functions simultaneously"],
+  answer: 1,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'concept',
+  explanation: "The decoder's job is only to generate all 2^n minterms of the n input variables exactly once; a 4-to-16 decoder already produces all 16 minterms of 4 variables regardless of how many separate output functions will be built from them. Each additional function needing to be realized just requires ORing together the subset of those same 16 decoder outputs it is 1 for — no new decoder outputs and no bigger decoder are ever needed as long as the variables stay the same. So realizing 3 functions needs exactly 3 OR gates (one per function, sized to however many minterms that particular function includes), and adding a 4th independent function of the SAME 4 variables would only need 1 more OR gate, never a bigger decoder — this sharing of the decoder's fixed minterm generation across many outputs is the main efficiency argument for decoder-based (and PLA-based) design."
+},
+{
+  id: 'digital-combinational-x6',
+  q: "In an ideal 4-bit carry-lookahead adder, generate/propagate signals (Gi, Pi) are ready 1 gate delay after the inputs are stable. All carries C1 through C4 are then ready 2 further gate delays later, regardless of bit position. Each sum bit needs one more XOR gate delay after its carry-in is ready. What is the worst-case total delay (in gate delays) to produce the MSB sum bit S3?",
+  options: ["2", "3", "4", "8"],
+  answer: 2,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'numerical',
+  explanation: "The whole point of carry-lookahead is that every carry is computed directly from the generate/propagate signals in a fixed number of levels, independent of bit width, instead of rippling stage by stage. So the delay chain is: 1 gate delay to compute all Gi, Pi in parallel, then 2 more gate delays for the lookahead carry logic to produce C3 (the carry into bit 3) — total 3 gate delays for any carry, including C3, whether it is C1 or C3. Sum bit S3 = A3 ⊕ B3 ⊕ C3 needs one more XOR gate delay after C3 is stable: 3 + 1 = 4 gate delays total. Crucially, this total (4) would be exactly the same for an 8-bit or 16-bit ideal CLA computing its MSB sum, which is precisely the constant-delay advantage over ripple-carry that GATE numeric comparisons test."
+},
+{
+  id: 'digital-combinational-x7',
+  q: "An 8-bit ripple-carry adder has each full adder's carry-out ready 2 ns after its carry-in is stable, and each full adder's sum output ready 3 ns after both its inputs (including carry-in) are stable. All A and B inputs are stable from time 0, with carry-in to bit 0 also available at time 0. What is the worst-case delay to the most significant sum bit S7?",
+  options: ["16 ns", "17 ns", "21 ns", "24 ns"],
+  answer: 1,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'numerical',
+  explanation: "The carry must ripple through bits 0 to 6 before it reaches bit 7's carry-in (C7): that is 7 full-adder carry stages, each taking 2 ns, so C7 is stable at 7 × 2 = 14 ns. Bit 7's sum, S7, then needs its own 3 ns sum-delay after both its inputs (A7, B7, and C7) are stable: 14 + 3 = 17 ns total. Note this differs from the delay to the final carry-OUT C8, which would need all 8 stages: 8 × 2 = 16 ns — S7 needs only 7 carry stages (up through C7) plus its own sum delay, since S7 does not wait for C8 at all. This carry-in-count-vs-sum-delay distinction (7 stages to C7 vs 8 stages to C8) is exactly the kind of off-by-one GATE numeric questions test."
+},
+{
+  id: 'digital-combinational-x8',
+  q: "An 8-bit equality comparator (checks if A = B) is built using one XNOR gate per bit position, followed by a single gate that ANDs all the XNOR outputs together to produce the final A=B signal. How many XNOR gates are used, and how many inputs does the final AND gate need?",
+  options: ["8 XNOR gates, 8-input AND gate", "8 XNOR gates, 1-input AND gate", "4 XNOR gates, 8-input AND gate", "16 XNOR gates, 8-input AND gate"],
+  answer: 0,
+  marks: 1,
+  difficulty: 'easy',
+  type: 'concept',
+  explanation: "Bitwise equality is checked per bit using XNOR, since (Ai XNOR Bi) = (Ai ⊕ Bi)' = 1 exactly when Ai = Bi and 0 when they differ. For an 8-bit comparator, this needs exactly 8 XNOR gates, one per bit position i = 0 to 7. The two numbers A and B are equal overall only if EVERY bit position matches, i.e., only if all 8 XNOR outputs are simultaneously 1 — this is exactly the AND function of all 8 XNOR outputs, requiring a single AND gate with 8 inputs (or a tree of smaller ANDs computing the same 8-input AND, if fan-in is limited). So the answer is 8 XNOR gates feeding one 8-input AND gate; this scales linearly with word width, unlike the multi-level logic a full A>B/A<B magnitude comparator would additionally need."
+},
+{
+  id: 'digital-combinational-x9',
+  q: "A 4-bit magnitude comparator compares A and B bit by bit starting from the MSB (bit 3) down to the LSB (bit 0). If bit 3 of A equals bit 3 of B, what determines the overall comparison result?",
+  options: ["The result is immediately fixed as A = B regardless of the remaining bits", "The comparison must move on to compare bit 2, and continues down bit by bit until either a differing bit is found or all bits are exhausted", "The result is always A > B by convention when the MSBs tie", "Bit 3 alone always determines A vs B regardless of lower bits"],
+  answer: 1,
+  marks: 1,
+  difficulty: 'easy',
+  type: 'concept',
+  explanation: "Magnitude comparison is decided by the highest-order bit at which A and B actually differ: whichever operand has a 1 there is the larger one, since a higher bit position always outweighs any combination of all lower bits. So the comparator design starts at the MSB (bit 3) and only concludes A>B or A<B immediately if that bit differs. If bit 3 is tied (equal in both A and B), the outcome cannot yet be determined from bit 3 alone, so the circuit must cascade down and check bit 2 next, and so on recursively down to bit 0. Only if every single bit position ties all the way down to bit 0 is the final conclusion A = B. This cascading-on-tie structure is why magnitude comparators are naturally built as a chain of per-bit compare-and-cascade stages, most significant bit first."
+},
+{
+  id: 'digital-combinational-x10',
+  q: "The two-level SOP circuit f = AB + A'C has a static-1 hazard during a transition where B=C=1 and A changes from 0 to 1 (or 1 to 0), because no single product term stays active throughout that transition. Which term, if added to the expression, eliminates this hazard?",
+  options: ["AC", "BC", "A'B", "AB'"],
+  answer: 1,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'concept',
+  explanation: "With B=C=1, f = A·1 + A'·1 = A + A' = 1 for both A=0 and A=1, so the output should stay at logic 1 throughout the transition. But in the literal SOP realization, at the instant A is changing, both AB and A'C can momentarily read as 0 (since real gates take nonzero time, A and A' may briefly both appear to be their pre-transition or post-transition value inconsistently), causing an unwanted 0 glitch — the static-1 hazard. Adding the term BC fixes this precisely because BC = 1·1 = 1 throughout the entire transition (BC does not depend on A at all, so it is completely unaffected by A changing), keeping at least one product term active continuously. Notice BC is exactly the classic consensus term of AB and A'C (the redundant term from the consensus theorem AB + A'C + BC = AB + A'C) — algebraically redundant but functionally essential for hazard-free hardware."
+},
+{
+  id: 'digital-combinational-x11',
+  q: "Can a dynamic hazard (an output glitching more than once, e.g. 0→1→0→1, during a single intended transition) occur in a simple two-level AND-OR (SOP) or OR-AND (POS) circuit?",
+  options: ["Yes, dynamic hazards are actually more common in two-level circuits than static hazards", "No, dynamic hazards require multiple reconverging signal paths of unequal delay through more than two logic levels, which a two-level circuit does not have", "Yes, but only when more than 4 variables are involved", "No, because two-level circuits never have any hazards of any kind"],
+  answer: 1,
+  marks: 1,
+  difficulty: 'medium',
+  type: 'concept',
+  explanation: "A dynamic hazard needs the same input change to reach the output through at least two different paths of different total delay, in a way that causes the output to overshoot and correct itself more than once before settling — this fundamentally requires multiple logic levels with reconverging paths (fan-out that splits and later recombines through paths of unequal depth/delay). A plain two-level SOP or POS circuit has every output built from signals that pass through exactly two gate levels (AND-then-OR, or OR-then-AND), so there is only one path length from any input to the output — not enough structural depth for a path-length mismatch to create more than one glitch. Two-level circuits can still suffer STATIC hazards (a single unwanted glitch when the output should stay constant), but dynamic hazards are only possible in multi-level circuits with reconverging fan-out, making option B correct and the last option too strong (static hazards ARE still possible in two-level circuits)."
+},
+{
+  id: 'digital-combinational-x12',
+  q: "A 1-to-8 DEMUX is built as a binary tree using only 1-to-2 DEMUX blocks. How many 1-to-2 DEMUXes are required?",
+  options: ["3", "6", "7", "8"],
+  answer: 2,
+  marks: 1,
+  difficulty: 'easy',
+  type: 'numerical',
+  explanation: "This is the exact dual of building an 8-to-1 MUX from 2-to-1 MUXes. The first level uses 1 DEMUX, splitting the single input into 2 branches based on the MSB select bit. The second level uses 2 DEMUXes (one per branch from level 1), splitting each branch further using the middle select bit, giving 4 branches. The third level uses 4 DEMUXes (one per branch from level 2), splitting using the LSB select bit, giving the final 8 outputs. Total DEMUXes = 1 + 2 + 4 = 7, matching the general formula (2^n - 1) 1-to-2 DEMUXes needed to build a 1-to-2^n DEMUX tree — the same count structure as the internal nodes of a complete binary tree with 8 leaves, and numerically identical to the 2:1-MUX-tree count for an 8:1 MUX."
+}
+);

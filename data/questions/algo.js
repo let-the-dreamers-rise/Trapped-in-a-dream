@@ -1246,3 +1246,106 @@ window.GATE_DATA.questions['algo'].topics.find(function(t){return t.id==='algo-d
   explanation: 'After recursively solving both halves, d is the smaller of the two halves\' closest-pair distances, so ANY pair within the same half is already known to be at least d apart, meaning within the strip, any two points that are candidates for beating d must be within a d x 2d rectangle of each other (d horizontally since they are in the strip, at most 2d vertically to possibly be closer than d apart accounting for both halves). Because all points on the same side of the dividing line are at least d apart from each other (by the half-recursion invariant), at most a small constant number of such points (a standard packing argument bounds it to at most 7 or 8) can fit inside that d x 2d rectangle without violating the d-apart-within-a-half constraint. So checking each strip point against only its next few neighbors in sorted-by-y order suffices, an O(1) amount of work per point, giving Theta(n) total for the strip step and preserving the overall Theta(n log n) recurrence T(n) = 2T(n/2) + Theta(n).'
 }
 );
+
+window.GATE_DATA.questions['algo'].topics.find(function(t){return t.id==='algo-greedy';}).questions.push(
+{
+  id: 'algo-greedy-x1',
+  q: 'Four sorted files of lengths 20, 30, 10, 5 (records) are to be merged pairwise into one file using the optimal merge pattern (always merge the two currently-smallest files; each merge of sizes a and b costs a+b comparisons/moves). What is the minimum total cost?',
+  options: ['105', '110', '115', '120'],
+  answer: 2,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'numerical',
+  explanation: 'Sort the lengths: 5, 10, 20, 30. Greedily merge the two smallest each time (this is exactly a Huffman-style merge, provably optimal by an exchange argument identical to Huffman coding\'s). Step 1: merge 5 and 10 -> cost 15, producing a file of size 15; remaining files: 15, 20, 30. Step 2: merge the two smallest of {15, 20, 30}, i.e. 15 and 20 -> cost 35, producing size 35; remaining files: 35, 30. Step 3: merge 30 and 35 -> cost 65. Total cost = 15 + 35 + 65 = 115. A quick cross-check uses the weighted-path-length formula: each file contributes length times the number of merges it participates in (its depth in the merge tree) — 5 and 10 each participate in 3 merges, 20 participates in 2, and 30 participates in 1, giving 5*3 + 10*3 + 20*2 + 30*1 = 15+30+40+30 = 115, confirming option C.'
+},
+{
+  id: 'algo-greedy-x2',
+  q: 'A Huffman tree is built for symbols with frequencies A:2, B:3, C:4, D:5. After building the optimal Huffman tree (always merging the two smallest current weights), what is the total weighted path length (sum of frequency times code-length over all symbols)?',
+  options: ['26', '28', '30', '32'],
+  answer: 1,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'numerical',
+  explanation: 'Sort frequencies: A:2, B:3, C:4, D:5. Merge the two smallest, A(2) and B(3), into a node AB of weight 5; remaining nodes: {C:4, AB:5, D:5}. Merge the two smallest among these, C:4 and AB:5, into a node CAB of weight 9; remaining: {CAB:9, D:5}. Merge CAB:9 and D:5 into the root of weight 14. Reading depths from the merge tree: A and B were merged first and then merged again twice more before reaching the root, so both sit at depth 3; C was merged once after AB, so it sits at depth 2; D was merged directly with the near-final node into the root, so it sits at depth 1. Weighted path length = A(2)*3 + B(3)*3 + C(4)*2 + D(5)*1 = 6 + 9 + 8 + 5 = 28. This matches the standard shortcut of summing all internal (merged) node weights: 5 (AB) + 9 (CAB) + 14 (root) = 28, confirming option B.'
+},
+{
+  id: 'algo-greedy-x3',
+  q: 'Activities with (start, finish) times: A(1,4), B(3,5), C(0,6), D(5,7), E(3,9), F(5,9), G(6,10), H(8,11), I(8,12), J(2,14), K(12,16). Using the standard greedy activity-selection algorithm (sort by finish time, pick each activity whose start is not before the last picked activity\'s finish), how many activities are selected?',
+  options: ['3', '4', '5', '6'],
+  answer: 1,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'numerical',
+  explanation: 'Sort by finish time: A(1,4), B(3,5), C(0,6), D(5,7), E(3,9), F(5,9), G(6,10), H(8,11), I(8,12), J(2,14), K(12,16). Greedily scan: pick A(1,4) first (earliest finish overall). Next, skip B(3,5) since 3 < 4 (start before A finishes); skip C(0,6) similarly (0<4). Pick D(5,7) since 5 >= 4. Next skip E(3,9) and F(5,9) since both start before 7 (3<7, 5<7). Pick G(6,10)? 6 < 7, so G is skipped too, not picked. Continue: H(8,11) has start 8 >= 7, pick H. Next I(8,12) starts at 8 < 11 (H\'s finish), skip. J(2,14) starts at 2 < 11, skip. K(12,16) starts at 12 >= 11, pick K. Total picked: A, D, H, K = 4 activities, matching this classic textbook (CLRS) example whose known optimal answer is indeed 4.'
+},
+{
+  id: 'algo-greedy-x4',
+  q: 'A greedy variant for activity selection sorts activities by DURATION (finish - start) ascending instead of by finish time, and picks each activity (shortest first) that does not conflict with any already-picked activity. Consider activities A(1,2) [duration 1], B(0,10) [duration 10], C(3,4) [duration 1], D(2,3) [duration 1]. What does this duration-greedy select, and does it match the true optimum?',
+  options: [
+    'Duration-greedy picks A, D, C (3 activities), matching the true optimum of 3',
+    'Duration-greedy picks only B (1 activity), while the true optimum is 3 (A, D, C), so duration-greedy is suboptimal here',
+    'Duration-greedy picks A, B (2 activities), matching the true optimum of 2',
+    'Duration-greedy and finish-time-greedy always agree, both giving 3 here'
+  ],
+  answer: 0,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'concept',
+  explanation: 'Sorting by duration ascending: A(1,2) dur 1, C(3,4) dur 1, D(2,3) dur 1 (all tied at duration 1), then B(0,10) dur 10. Processing shortest-first (with ties broken arbitrarily, say by start time: A, D, C): pick A(1,2). Next D(2,3): start 2 >= A\'s finish 2, no conflict, pick D. Next C(3,4): start 3 >= D\'s finish 3, no conflict, pick C. B(0,10) conflicts with all three already picked (0 < 4), so B is rejected. Result: {A, D, C}, 3 activities, which happens to match the true optimum here (the standard finish-time-greedy would also select A, D, C by an identical construction since ties happen to align nicely in this instance). This example is chosen so duration-sorting greedy accidentally succeeds; it is well known that duration-sorting greedy can fail on other instances (e.g. many short activities clustered against one that would otherwise unblock a longer chain), which is precisely why finish-time-greedy, not duration-greedy, is the ONLY provably correct rule.'
+},
+{
+  id: 'algo-greedy-x5',
+  q: 'A denomination coin system has coins of value {1, 3, 4}. To make change for the amount 6, the greedy algorithm (always pick the largest coin value not exceeding the remaining amount) is used. What does greedy produce, and is it optimal?',
+  options: [
+    'Greedy gives 4+1+1 (3 coins); the true optimum is 3+3 (2 coins), so greedy is suboptimal',
+    'Greedy gives 4+1+1 (3 coins), which is also optimal since no 2-coin combination sums to 6',
+    'Greedy gives 3+3 (2 coins), which matches the optimum',
+    'Greedy gives 4+3 which sums to 7, an invalid overshoot, so greedy fails to terminate correctly'
+  ],
+  answer: 0,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'numerical',
+  explanation: 'Greedy picks the largest coin <= remaining amount each time: for amount 6, pick 4 (largest <= 6), leaving 2; then pick 1 (largest <= 2 among {1,3,4} is 1, since 3 and 4 exceed 2), leaving 1; then pick 1 again, leaving 0. Total: 4+1+1 = 3 coins. But 3+3 = 6 uses only 2 coins and is a valid combination since 3 is a valid denomination, so the true optimum is 2 coins, strictly better than greedy\'s 3. This is the standard textbook counterexample showing the greedy coin-change algorithm is NOT optimal for arbitrary denomination sets (it IS optimal for "canonical" systems like standard currency {1,5,10,25,...}, but {1,3,4} is a classic non-canonical system engineered to break greedy), requiring dynamic programming for a guaranteed-optimal solution instead.'
+},
+{
+  id: 'algo-greedy-x6',
+  q: 'For the coin system {1, 5, 6, 8}, making change for amount 10 using the greedy algorithm (always pick the largest coin not exceeding the remainder), what result does greedy produce, and is it optimal?',
+  options: [
+    'Greedy gives 8+1+1 (3 coins); the optimum is 5+5 (2 coins), so greedy fails here too',
+    'Greedy gives 8+1+1 (3 coins), which is optimal since 5+5 is not achievable with these denominations',
+    'Greedy gives 6+ 1+1+1+1 (5 coins), clearly worse than any alternative',
+    'Greedy correctly gives 5+5 (2 coins), matching the optimum'
+  ],
+  answer: 0,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'numerical',
+  explanation: 'Greedy for amount 10 with denominations {1,5,6,8}: pick 8 (largest <= 10), remainder 2; pick 1 (largest <= 2), remainder 1; pick 1 again, remainder 0. Total: 8+1+1 = 3 coins. But 5+5 = 10 is a valid combination using only 2 coins (5 is a valid denomination and can be used twice), which is strictly better than greedy\'s 3-coin solution. This is a second, independent counterexample (distinct from the {1,3,4} case) demonstrating that greedy coin selection fails whenever the denomination set is not "canonical" — the failure mode here specifically arises because after taking the single largest coin (8), the remainder (2) cannot be paid efficiently, whereas avoiding the largest coin entirely and using two mid-sized coins (5+5) pays the whole amount more efficiently, something a purely local largest-coin-first greedy rule can never discover since it never reconsiders an earlier choice.'
+},
+{
+  id: 'algo-greedy-x7',
+  q: 'Consider the fractional knapsack problem with capacity W = 15 and items (weight, value): P(6,30) ratio 5, Q(5,25) ratio 5, R(4,16) ratio 4, S(3,9) ratio 3. Using the greedy value-to-weight-ratio rule (take highest ratio first, taking a fraction of an item if it does not fully fit), what is the maximum achievable value?',
+  options: ['66', '70', '71', '75'],
+  answer: 2,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'numerical',
+  explanation: 'Sort by ratio descending: P and Q are tied at ratio 5, then R at ratio 4, then S at ratio 3. Take P fully: weight used 6, value 30, remaining capacity 15-6=9. Take Q fully: weight used 5 (running total 11), value +25=55, remaining capacity 9-5=4. Take R next: R\'s weight is exactly 4, which exactly matches the remaining capacity of 4, so R is taken fully with no fraction needed (running total weight 15, exactly filling the knapsack), value +16=71. Since the capacity is now exactly exhausted, S is left untaken. Total value = 30+25+16 = 71, confirming option C. Note that this instance was constructed so R fits exactly, avoiding the more typical fractional-item case, but the greedy ratio-ordering procedure is identical either way.'
+},
+{
+  id: 'algo-greedy-x8',
+  q: 'In Kruskal\'s algorithm applied to a graph where two different edges e1 and e2 have the EXACT SAME weight, and both are candidates that would each individually complete the spanning tree without forming a cycle at the point they are considered, does the choice between e1 and e2 affect the total MST weight?',
+  options: [
+    'No, both choices lead to a valid MST with the identical total weight, though the specific set of edges in the tree may differ',
+    'Yes, the total weight can differ because Kruskal must always break ties by choosing the lexicographically smaller edge',
+    'No valid MST exists when two edges tie in weight; the algorithm must abort',
+    'Yes, choosing the "wrong" tied edge can create a cycle even though both were verified individually as cycle-free at that point'
+  ],
+  answer: 0,
+  marks: 1,
+  difficulty: 'easy',
+  type: 'concept',
+  explanation: 'When multiple edges share the same weight and each is independently a valid (cycle-free) addition at the point Kruskal\'s algorithm considers it, the cut property guarantees that including EITHER one still yields a minimum spanning tree, because both are minimum-weight crossing edges for the cut separating their two endpoint components at that moment — the cut property only requires the edge to be A minimum-weight crossing edge, and ties mean multiple edges qualify simultaneously. This is exactly why MSTs are not unique in the presence of weight ties: the specific tree structure (which edges appear) can vary across valid tie-breaking choices, but the SUM of all edge weights in the resulting spanning tree is provably invariant across all such choices, since every valid MST has the same total weight by definition of "minimum." Option B is wrong because no fixed tie-breaking rule is REQUIRED for correctness (any consistent rule works), and option D is wrong because a genuinely cycle-free edge at the time it is checked can never later retroactively create a cycle.'
+}
+);

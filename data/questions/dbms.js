@@ -1222,3 +1222,161 @@ window.GATE_DATA.questions['dbms'].topics.find(function(t){return t.id==='dbms-e
   explanation: "In the classical ER model, a relationship diamond can only connect to entity rectangles, never directly to another relationship diamond - there is no notation for a relationship participating in a further relationship. Aggregation solves exactly this limitation: it treats an entire relationship set together with its participating entity sets as if it were a single abstract higher-level entity, which can then participate in a further relationship with some other entity set. The textbook example is a Works_On relationship between Employee and Project that itself needs to be Monitored_By a Manager; aggregation lets {Employee-Works_On-Project} act as one composite entity connecting to Manager via Monitored_By. Options A, C, and D describe entirely different ER constructs (an ordinary M:N relationship, multiple candidate keys, and multi-owner weak entities respectively) that are handled by other standard mechanisms, not by aggregation."
 }
 );
+
+window.GATE_DATA.questions['dbms'].topics.find(function(t){return t.id==='dbms-ra-sql';}).questions.push(
+{
+  id: 'dbms-ra-sql-x1',
+  q: 'R(A,B) = {(1,2),(1,3),(2,2),(2,4)} and S(B,C) = {(2,5),(2,6),(3,7)}. How many tuples are in R NATURAL JOIN S (joining on the common attribute B)?',
+  options: ['5', '4', '6', '3'],
+  answer: 0,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'numerical',
+  explanation: "Match each R tuple against every S tuple sharing the same B value, row by row. (1,2) has B=2, which matches both S tuples with B=2, namely (2,5) and (2,6), producing (1,2,5) and (1,2,6) - 2 result tuples. (1,3) has B=3, matching (3,7) only - 1 result tuple. (2,2) has B=2, again matching both (2,5) and (2,6) - 2 result tuples. (2,4) has B=4, which appears in no S tuple - 0 result tuples. Summing: 2 + 1 + 2 + 0 = 5 tuples total. This kind of row-by-row matching, rather than assuming one match per row, is essential whenever the join attribute is not a key on the side being matched against - here B repeats within S (twice for value 2), causing the fan-out that produces more result tuples than input R tuples."
+},
+{
+  id: 'dbms-ra-sql-x2',
+  q: 'Enrolled(Student, Course) = {(S1,C1),(S1,C2),(S1,C3),(S2,C1),(S2,C3),(S3,C1),(S3,C2),(S3,C3),(S4,C1)} and AllCourses(Course) = {C1,C2,C3}. How many students satisfy Enrolled / AllCourses (relational division - enrolled in every course in AllCourses)?',
+  options: ['1', '2', '3', '4'],
+  answer: 1,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'numerical',
+  explanation: "Division returns exactly those Student values whose set of associated Course values is a superset of AllCourses = {C1,C2,C3}. Check each student individually: S1 is enrolled in C1, C2, C3 - all three present, qualifies. S2 is enrolled in C1, C3 only - missing C2, fails. S3 is enrolled in C1, C2, C3 - all three present, qualifies. S4 is enrolled in C1 only - missing C2 and C3, fails. So exactly two students, S1 and S3, satisfy the division: the result set is {S1, S3}, giving a count of 2. This matches the standard division algorithm pi_Student(Enrolled) - pi_Student((pi_Student(Enrolled) x AllCourses) - Enrolled), which would likewise isolate S2 and S4 as the students with at least one missing (student, course) combination and subtract them out, leaving S1 and S3."
+},
+{
+  id: 'dbms-ra-sql-x3',
+  q: 'R(A,B) = {(1,10),(2,20),(3,30)} and S(B,C) = {(10,100),(20,200),(40,400)}. How many tuples result from R LEFT OUTER JOIN S (on B) versus R FULL OUTER JOIN S (on B)?',
+  options: [
+    '3 for left outer join, 3 for full outer join',
+    '3 for left outer join, 4 for full outer join, since S has one unmatched tuple (B=40) that only the full outer join preserves',
+    '4 for left outer join, 4 for full outer join',
+    '3 for left outer join, 2 for full outer join'
+  ],
+  answer: 1,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'numerical',
+  explanation: "Left outer join keeps every R tuple, padding with NULL where no S match exists, but never adds extra rows for unmatched S tuples. Matching on B: R's (1,10) matches S's (10,100); R's (2,20) matches S's (20,200); R's (3,30) has no match (no S tuple with B=30), so it appears padded as (3,30,NULL). That is exactly 3 tuples - one per R row, exactly matching R's cardinality since B is unique on both sides here. Full outer join additionally preserves unmatched S tuples: S's (40,400) has no matching R tuple (no R row with B=40), so it must appear once, padded as (NULL,40,400). That adds one extra row beyond the left outer join's 3, giving 4 tuples total for the full outer join. This illustrates the general rule: left outer join count is at least |R|, and full outer join additionally accounts for any S tuples with no R match at all."
+},
+{
+  id: 'dbms-ra-sql-x4',
+  q: 'Emp(Eid, Bonus) = (1,1000), (2,NULL), (3,2000), (4,NULL). Query1: SELECT COUNT(*) FROM Emp WHERE Bonus > 1000; Query2: SELECT COUNT(*) FROM Emp WHERE NOT (Bonus > 1000). What do Query1 and Query2 return, and why do the two counts not add up to 4?',
+  options: [
+    'Query1 returns 1, Query2 returns 3, and they do sum to 4 as expected',
+    'Query1 returns 1, Query2 returns 1; they do not sum to 4 because rows with NULL Bonus make the condition evaluate to UNKNOWN under both queries and are excluded from both results',
+    'Query1 returns 2, Query2 returns 2',
+    'Query1 returns 1, Query2 returns 2'
+  ],
+  answer: 1,
+  marks: 2,
+  difficulty: 'hard',
+  type: 'numerical',
+  explanation: "Evaluate Bonus > 1000 per row under three-valued logic: row 1 (1000 > 1000) is FALSE; row 2 (NULL > 1000) is UNKNOWN; row 3 (2000 > 1000) is TRUE; row 4 (NULL > 1000) is UNKNOWN. Query1's WHERE keeps only rows evaluating to TRUE, so only row 3 qualifies: COUNT(*) = 1. For Query2, negate each: NOT FALSE = TRUE (row 1 qualifies), NOT UNKNOWN = UNKNOWN (rows 2 and 4 still excluded, negation does not turn UNKNOWN into TRUE), NOT TRUE = FALSE (row 3 excluded). So Query2 keeps only row 1: COUNT(*) = 1. The two counts (1 and 1) sum to 2, not 4, because rows 2 and 4 are excluded from BOTH queries - a condition and its logical negation do not partition a table into two complementary groups whenever NULLs are involved, since UNKNOWN survives negation as UNKNOWN, never becoming TRUE."
+},
+{
+  id: 'dbms-ra-sql-x5',
+  q: 'Emp(Eid, Dept, Salary) = (1,CS,50000), (2,CS,70000), (3,EE,60000), (4,EE,40000), (5,ME,80000). Query: SELECT Eid FROM Emp E1 WHERE Salary > (SELECT AVG(Salary) FROM Emp E2 WHERE E2.Dept = E1.Dept); How many Eid values does this correlated subquery return?',
+  options: ['1', '2', '3', '4'],
+  answer: 1,
+  marks: 2,
+  difficulty: 'hard',
+  type: 'numerical',
+  explanation: "The subquery is correlated: for each outer row, it recomputes the average salary of just that row's own department. Department CS has salaries 50000 and 70000, averaging 60000; Eid 1 (50000) is below 60000 and fails, Eid 2 (70000) exceeds 60000 and qualifies. Department EE has salaries 60000 and 40000, averaging 50000; Eid 3 (60000) exceeds 50000 and qualifies, Eid 4 (40000) is below and fails. Department ME has only Eid 5 (80000), so its own department average is exactly 80000, and 80000 > 80000 is FALSE (a single employee can never exceed their own department's average when they are the only member) - Eid 5 fails. Collecting the qualifying rows gives {Eid 2, Eid 3}, a count of exactly 2. This is a standard 'above the departmental average' pattern, and the single-member department is a deliberate trap testing whether the strict inequality is applied correctly."
+},
+{
+  id: 'dbms-ra-sql-x6',
+  q: "Sales(Region, Amount) = (N,100), (N,200), (S,50), (S,60), (S,70), (E,300). How many regions (groups) satisfy the query SELECT Region FROM Sales GROUP BY Region HAVING SUM(Amount) > 200?",
+  options: ['1', '2', '3', '0'],
+  answer: 1,
+  marks: 1,
+  difficulty: 'easy',
+  type: 'numerical',
+  explanation: "First form the groups by Region and compute each group's aggregate before applying HAVING. Region N has rows 100 and 200, summing to 300. Region S has rows 50, 60, and 70, summing to 180. Region E has a single row, 300, summing to 300. Now apply the HAVING filter SUM(Amount) > 200 to each group's aggregate, not to individual rows: N's sum 300 > 200 is TRUE, so N is kept; S's sum 180 > 200 is FALSE, so S is dropped; E's sum 300 > 200 is TRUE, so E is kept. Exactly two groups, N and E, satisfy the HAVING condition, so the query returns 2 rows. Remember that HAVING operates strictly after GROUP BY has partitioned the rows and the aggregate has been computed per group - it can never filter on a per-row basis the way WHERE does."
+},
+{
+  id: 'dbms-ra-sql-x7',
+  q: 'Person(Id, Name, Age) = (1,A,30), (2,B,30), (3,C,25), (4,D,30). How many result rows does SELECT COUNT(*) FROM Person P1, Person P2 WHERE P1.Age = P2.Age AND P1.Id < P2.Id return?',
+  options: ['2', '3', '4', '6'],
+  answer: 1,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'numerical',
+  explanation: "This self-join with the condition P1.Id < P2.Id counts each unordered pair of distinct people sharing the same Age exactly once (the strict inequality on Id prevents both a person pairing with itself and each pair being counted twice in both orders). Group by Age first: Age 30 contains Ids {1, 2, 4} - three people, and the number of pairs with P1.Id < P2.Id among them is C(3,2) = 3, namely (1,2), (1,4), and (2,4). Age 25 contains only Id {3} - a single person, giving C(1,2) = 0 pairs, since a pair needs two distinct rows. Total pairs = 3 + 0 = 3. This self-join-with-inequality pattern is the standard SQL idiom for enumerating unordered pairs sharing a property without double-counting or including a row paired with itself, and it generalizes to C(k,2) = k(k-1)/2 pairs for any group of k rows sharing the same value."
+},
+{
+  id: 'dbms-ra-sql-x8',
+  q: 'A = (SELECT x FROM T1) = {1,2,3,4,5} and B = (SELECT x FROM T2) = {3,4,5,6,7}, both duplicate-free sets. What are the cardinalities of (A EXCEPT B) and (A INTERSECT B) respectively?',
+  options: ['2 and 3', '3 and 2', '2 and 2', '5 and 5'],
+  answer: 0,
+  marks: 1,
+  difficulty: 'easy',
+  type: 'numerical',
+  explanation: "A EXCEPT B keeps only the elements of A that do NOT appear in B at all. A = {1,2,3,4,5} and B = {3,4,5,6,7} share the elements 3, 4, and 5, so removing those from A leaves {1, 2} - a cardinality of 2. A INTERSECT B keeps only the elements common to both sets, which is exactly {3, 4, 5} - a cardinality of 3. So (A EXCEPT B) has 2 elements and (A INTERSECT B) has 3 elements, matching option A. As a sanity check, these two results together with (B EXCEPT A) = {6,7} (cardinality 2) should partition A UNION B = {1,2,3,4,5,6,7} (cardinality 7) without overlap: 2 + 3 + 2 = 7, confirming the arithmetic is consistent."
+},
+{
+  id: 'dbms-ra-sql-x9',
+  q: 'R(A,B) has A as a candidate key and holds 30 tuples. S(B,C) has B as a candidate key. R.B is a foreign key referencing S.B, with no NULL values in R.B, so every R tuple is guaranteed to match some S tuple. What are the minimum and maximum possible numbers of tuples in R NATURAL JOIN S (on B)?',
+  options: [
+    'Minimum 20, maximum 30',
+    'Minimum 30, maximum 30 - always exactly 30, because B is a key of S so each of the 30 R rows matches exactly one S row',
+    'Minimum 0, maximum 30',
+    'Minimum 30, maximum 600'
+  ],
+  answer: 1,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'concept',
+  explanation: "Because B is a candidate key of S, no B value can repeat within S, so any R tuple can match at most one S tuple - fan-out on the S side is structurally impossible. Because R.B is a non-NULL foreign key referencing S.B, referential integrity guarantees every one of the 30 R tuples has at least one matching S tuple - so no R tuple is ever dropped for lack of a match either. Combining 'at most one match' with 'at least one match' forces exactly one match per R tuple, regardless of how S's other tuples or C values are arranged: the join produces exactly 30 tuples every single time, with no variation possible - so the minimum and maximum coincide at 30. This is a direct consequence of a foreign key referencing a candidate key: such a join behaves like a lookup that neither loses rows nor duplicates them."
+},
+{
+  id: 'dbms-ra-sql-x10',
+  q: 'T(X) = 10, NULL, 20, NULL, 30 (five rows). What do COUNT(*), COUNT(X), SUM(X), and AVG(X) return respectively for SELECT COUNT(*), COUNT(X), SUM(X), AVG(X) FROM T?',
+  options: ['5, 3, 60, 20', '5, 5, 60, 12', '5, 3, 60, 12', '3, 3, 60, 20'],
+  answer: 0,
+  marks: 1,
+  difficulty: 'easy',
+  type: 'numerical',
+  explanation: "COUNT(*) counts every row in the table regardless of NULLs, so it counts all 5 rows. COUNT(X), SUM(X), and AVG(X) all ignore rows where X is NULL, operating only on the 3 non-NULL values 10, 20, and 30. COUNT(X) is therefore 3, not 5. SUM(X) adds only the non-NULL values: 10 + 20 + 30 = 60. AVG(X) divides that sum by the COUNT of non-NULL values, not by COUNT(*): 60 / 3 = 20, not 60 / 5 = 12. So the correct tuple of results is (5, 3, 60, 20), matching option A. The AVG(X) = 12 answer in option B and C is the classic trap of dividing by the total row count instead of the count of non-NULL values - every standard aggregate function except COUNT(*) silently skips NULLs entirely rather than treating them as zero."
+},
+{
+  id: 'dbms-ra-sql-x11',
+  q: 'Emp(Eid, MgrId) = (1,2), (2,NULL), (3,1). How many rows does SELECT Eid FROM Emp WHERE MgrId NOT IN (SELECT MgrId FROM Emp) return?',
+  options: ['0', '1', '2', '3'],
+  answer: 0,
+  marks: 2,
+  difficulty: 'hard',
+  type: 'numerical',
+  explanation: "The inner subquery SELECT MgrId FROM Emp returns the set {2, NULL, 1} - it includes the NULL from Eid 2's row, since a plain SELECT does not filter out NULLs. NOT IN is defined as a conjunction of inequalities: 'X NOT IN (v1, v2, v3)' means 'X <> v1 AND X <> v2 AND X <> v3'. Whenever one of those values is NULL, the corresponding inequality (X <> NULL) evaluates to UNKNOWN for every X, and UNKNOWN AND anything is never TRUE (it is UNKNOWN unless another conjunct is FALSE, and equality/inequality comparisons here are never FALSE against a value that actually differs unless it's the NULL case) - concretely, 'X <> NULL' is UNKNOWN regardless of X, so the whole AND chain collapses to at best UNKNOWN for every row, never TRUE. Since WHERE only keeps rows evaluating to TRUE, the entire query returns 0 rows, regardless of what the actual MgrId values are. This is the single most important NOT IN pitfall: NOT IN against any subquery that can produce a NULL silently returns no rows at all, which is why NOT EXISTS is the safer idiom."
+},
+{
+  id: 'dbms-ra-sql-x12',
+  q: 'Student(Sid) = S1, S2, S3, S4. Enroll(Sid, Cid) = (S1,C1), (S1,C2), (S2,C1), (S4,C3). How many rows does SELECT COUNT(*) FROM Student S WHERE EXISTS (SELECT * FROM Enroll E WHERE E.Sid = S.Sid) return?',
+  options: ['2', '3', '4', '1'],
+  answer: 1,
+  marks: 1,
+  difficulty: 'easy',
+  type: 'numerical',
+  explanation: "EXISTS checks, for each outer Student row, whether the correlated subquery returns at least one row - it does not care how many rows or what their column values are, only whether the set is non-empty. S1 has enrollment rows (S1,C1) and (S1,C2), so the subquery is non-empty and S1 qualifies. S2 has (S2,C1), non-empty, qualifies. S3 has no rows at all in Enroll, so the subquery is empty and S3 is excluded. S4 has (S4,C3), non-empty, qualifies. Three students - S1, S2, and S4 - satisfy the EXISTS condition, so COUNT(*) returns 3. This is the standard idiom for 'students who are enrolled in at least one course', and it generalizes directly to NOT EXISTS for finding students enrolled in none, which would return just S3, a count of 1."
+},
+{
+  id: 'dbms-ra-sql-x13',
+  q: "Course(Cid) = C1, C2, C3. Enroll(Sid,Cid) = (S1,C1), (S1,C2), (S1,C3), (S2,C1), (S4,C3). Consider the double-negation 'for all' query: SELECT Sid FROM Student S WHERE NOT EXISTS (SELECT Cid FROM Course C WHERE NOT EXISTS (SELECT * FROM Enroll E WHERE E.Sid = S.Sid AND E.Cid = C.Cid)); with Student = {S1,S2,S3,S4}. How many students does this return?",
+  options: ['0', '1', '2', '4'],
+  answer: 1,
+  marks: 2,
+  difficulty: 'hard',
+  type: 'numerical',
+  explanation: "This is the classic double-NOT-EXISTS pattern expressing 'students enrolled in every course in Course', i.e. relational division in SQL. Read it as: a student S qualifies unless there EXISTS some course C for which NO matching enrollment row exists for S - so S qualifies only if every course has a matching enrollment. Check each student: S1 has enrollments in C1, C2, and C3 - every course in {C1,C2,C3} is covered, so the inner NOT EXISTS finds no uncovered course, and S1 qualifies. S2 has only C1 - courses C2 and C3 are uncovered, so the inner subquery finds an uncovered course, and S2 is excluded. S3 has no enrollments at all - all three courses are uncovered, excluded. S4 has only C3 - C1 and C2 are uncovered, excluded. Only S1 satisfies the condition, so exactly 1 student is returned - matching how relational division would isolate the single student enrolled in the complete course set."
+},
+{
+  id: 'dbms-ra-sql-x14',
+  q: 'Emp(Eid, Dept, Salary) = (1,CS,40000), (2,CS,60000), (3,EE,55000), (4,EE,45000), (5,ME,70000), (6,CS,65000). Evaluate the relational algebra expression pi_Dept(sigma_Salary greater than 50000(Emp)) under pure set semantics. How many tuples does the result contain?',
+  options: ['4', '3', '2', '5'],
+  answer: 1,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'numerical',
+  explanation: "First apply the selection sigma_Salary>50000 to filter rows: qualifying rows are Eid 2 (60000), Eid 3 (55000), Eid 5 (70000), and Eid 6 (65000) - 4 rows survive, with Dept values CS, EE, ME, and CS respectively. Then apply the projection pi_Dept: relational algebra projection uses SET semantics, meaning duplicate result tuples are automatically eliminated after keeping only the Dept column. The 4 selected rows yield the Dept values {CS, EE, ME, CS}, and after removing the duplicate CS, the distinct set is {CS, EE, ME} - exactly 3 tuples. This is the standard trap distinguishing pure relational algebra projection from a plain SQL SELECT Dept FROM Emp WHERE Salary > 50000 without DISTINCT, which under SQL's bag semantics would instead return all 4 rows including the repeated CS value; only RA projection (or SQL's SELECT DISTINCT) collapses it down to 3."
+}
+);
