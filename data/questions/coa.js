@@ -1451,3 +1451,166 @@ window.GATE_DATA.questions['coa'].topics.find(function(t){return t.id==='coa-mem
     explanation: 'The block offset needs log2 32 = 5 bits, leaving at most 12 − 5 = 7 bits of the 12-bit page offset available for the index field without crossing into the translated part of the address. With 7 index bits, the maximum number of sets is 2^7 = 128. With 2-way associativity, total capacity = sets × ways × block size = 128 × 2 × 32 bytes = 8192 bytes = 8 KB. Any larger cache (or higher associativity at the same capacity) would need more index bits than the page offset can supply without translation, reintroducing the aliasing problem VIPT designs try to avoid — which is why practical VIPT caches are sized and organized specifically around this page-offset constraint.'
   }
 );
+
+window.GATE_DATA.questions['coa'].topics.find(function(t){return t.id==='coa-io';}).questions.push(
+  {
+    id: 'coa-io-x1',
+    q: 'In isolated (port-mapped) I/O, how are device registers accessed?',
+    options: ['Through ordinary load/store instructions at reserved memory addresses', 'Through dedicated IN and OUT instructions addressing a separate I/O address space, distinguished from memory by a control line', 'Only through DMA transfers, never directly by the CPU', 'Through the interrupt vector table'],
+    answer: 1,
+    marks: 1,
+    difficulty: 'easy',
+    type: 'concept',
+    explanation: 'Isolated I/O gives device registers their own address space, completely separate from main memory, accessed using special instructions (classically IN and OUT, as in the x86 architecture) rather than general load/store instructions. A dedicated control/status line on the bus tells memory and I/O devices which address space a given bus cycle refers to, so the same numeric address can validly refer to both a memory location and a device register without conflict. This contrasts with memory-mapped I/O, where device registers share the ordinary memory address space and any instruction that can touch memory can touch a device register, at the cost of consuming part of the memory address range.'
+  },
+  {
+    id: 'coa-io-x2',
+    q: 'What is the primary trade-off between memory-mapped I/O and isolated I/O?',
+    options: ['Memory-mapped I/O is always faster because it uses DMA automatically', 'Memory-mapped I/O lets any instruction access device registers but consumes part of the memory address space and requires those regions to be non-cacheable; isolated I/O keeps the address spaces separate but needs dedicated instructions', 'Isolated I/O eliminates the need for status registers on devices', 'There is no real trade-off; the two are functionally identical in every respect'],
+    answer: 1,
+    marks: 1,
+    difficulty: 'medium',
+    type: 'concept',
+    explanation: 'Memory-mapped I/O gains programming flexibility — the compiler and every addressing mode already available for memory can be used on device registers directly — but it uses up part of the address space for devices, and that region must be marked non-cacheable so that reads and writes reliably reach the device rather than a stale cached value. Isolated I/O avoids consuming memory address space and keeps the two spaces cleanly separate, but requires the instruction set to include special I/O instructions (IN/OUT) that ordinary compiled code cannot use as flexibly. Neither approach involves DMA automatically, and both device styles still need status/control registers regardless of which addressing scheme is used.'
+  },
+  {
+    id: 'coa-io-x3',
+    q: 'A device transfers data at 4 MB/s via cycle-stealing DMA, using one 4-byte bus cycle per word, where each bus cycle takes 100 ns. What fraction of bus cycles does the DMA controller steal?',
+    options: ['4%', '10%', '25%', '40%'],
+    answer: 1,
+    marks: 2,
+    difficulty: 'medium',
+    type: 'numerical',
+    explanation: 'Word transfers per second = 4,000,000 bytes/s ÷ 4 bytes/word = 1,000,000 words/s, each requiring one 100 ns bus cycle. Total bus time stolen per second = 1,000,000 × 100 ns = 1,000,000 × 10^-7 s = 0.1 s. As a fraction of the full second, that is 10%. The standard checkpoint: the total available bus cycles per second here is 1/(100ns) = 10^7, and 10^6 of them are stolen, giving the same 10% directly. Forgetting to divide the byte rate by the word size before comparing to the cycle rate is the most common way to land on the wrong 40% distractor.'
+  },
+  {
+    id: 'coa-io-x4',
+    q: 'A DMA controller operates in burst (block) mode, transferring an entire 8 KB block at a sustained rate of 4 MB/s while holding the bus for the whole transfer. For how long is the CPU locked out of the memory bus during this single transfer?',
+    options: ['0.5 ms', '2.048 ms', '8 ms', '4.096 ms'],
+    answer: 1,
+    marks: 2,
+    difficulty: 'hard',
+    type: 'numerical',
+    explanation: 'Burst mode holds the bus continuously until the whole block moves, so the lockout duration equals the block\'s total transfer time: 8 KB / 4 MB/s = 8192 bytes / (4 × 10^6 bytes/s) = 0.002048 s = 2.048 ms. During this entire window the CPU cannot access memory at all — a stark contrast with cycle stealing, where the same total data would be moved in tiny interleaved slices, letting the CPU continue running (just slightly slowed) throughout. This is exactly why burst mode is reserved for very fast devices whose transfer windows are short enough that occasional total CPU lockout is an acceptable trade for the fastest possible device service.'
+  },
+  {
+    id: 'coa-io-x5',
+    q: 'A device must be checked often enough that it is never left waiting more than 5 ms after becoming ready. Using programmed polling at exactly this minimum safe frequency, with each poll costing 100 clock cycles on a 200 MHz CPU, what fraction of CPU time does polling consume?',
+    options: ['0.001%', '0.01%', '0.1%', '1%'],
+    answer: 1,
+    marks: 2,
+    difficulty: 'medium',
+    type: 'numerical',
+    explanation: 'A 5 ms maximum wait requires polling at least once every 5 ms, i.e., 1 / 0.005 = 200 times per second. Cycles spent polling per second = 200 × 100 = 20,000 cycles. A 200 MHz CPU executes 200 × 10^6 cycles per second, so the fraction consumed = 20,000 / (200 × 10^6) = 10^-4 = 0.01%. This shows polling can be extremely cheap when the required responsiveness is modest (a 5 ms tolerance is generous for many slow devices); the overhead only becomes a serious burden when a device demands very frequent checks, at which point interrupt-driven I/O or DMA becomes the more efficient design choice.'
+  },
+  {
+    id: 'coa-io-x6',
+    q: 'For a device that produces data continuously at an extremely high rate — so high that it is essentially always ready every time it is checked — which servicing technique tends to have the lowest overhead, and why?',
+    options: ['Interrupt-driven I/O, because interrupts always cost less than checking a status flag', 'Tight-loop polling, because the fixed per-event cost of taking an interrupt (saving and restoring processor state) is paid on every single transfer, while a simple status check when the device is already ready wastes almost nothing', 'Isolated I/O, because it uses a separate address space', 'None of these techniques can handle a continuously ready device'],
+    answer: 1,
+    marks: 2,
+    difficulty: 'medium',
+    type: 'concept',
+    explanation: 'Interrupt handling carries fixed overhead per event — saving the program counter and status word, dispatching to the ISR, and later restoring state — regardless of how predictable the event is. When a device is almost always ready the moment it is checked, a tight polling loop pays only the cost of testing a status bit each time, with essentially no wasted iterations, and never pays interrupt entry/exit overhead at all. This is why extremely high-throughput scenarios sometimes favor polling (or, more commonly in practice, DMA) over per-transfer interrupts — the crossover depends on how the fixed interrupt cost compares to the cost of a single poll, not on the address space used, which is unrelated to this trade-off.'
+  },
+  {
+    id: 'coa-io-x7',
+    q: 'A disk spins at 6000 RPM (giving a 10 ms revolution time) with an 5 ms average seek time. Reading one sector takes 0.1 ms once positioned. What is the total time to sequentially read 250 sectors, starting from the very first sector of a track (one seek and one rotational latency for the whole run, then continuous transfer)?',
+    options: ['25 ms', '30 ms', '35 ms', '2525 ms'],
+    answer: 2,
+    marks: 2,
+    difficulty: 'hard',
+    type: 'numerical',
+    explanation: 'For a purely sequential read, the seek and the rotational latency are paid only once, at the very start; afterward the head simply continues reading consecutive sectors as they pass beneath it. Average rotational latency = half of 10 ms = 5 ms. One-time positioning cost = seek + latency = 5 + 5 = 10 ms. Transfer time = 250 sectors × 0.1 ms/sector = 25 ms. Total = 10 + 25 = 35 ms. Compare this to treating all 250 sectors as independent random accesses, which would cost 250 × 10.1 ms ≈ 2525 ms — roughly 72 times slower — the single clearest illustration in this topic of why sequential disk access vastly outperforms random access.'
+  },
+  {
+    id: 'coa-io-x8',
+    q: 'The disk head is already positioned on a track (no seek needed). The controller must read 20 sectors scattered at different, non-adjacent positions around that same track, so each read requires its own rotational wait. The disk spins at 6000 RPM, and each sector\'s transfer takes 0.1 ms. What is the total time for all 20 reads?',
+    options: ['2 ms', '100 ms', '102 ms', '200 ms'],
+    answer: 2,
+    marks: 2,
+    difficulty: 'medium',
+    type: 'numerical',
+    explanation: 'Revolution time = 60000 / 6000 = 10 ms, so average rotational latency per independent access = 5 ms. Since no seek is needed (already on the right track) but each of the 20 sectors is at a scattered, non-adjacent position, each read still needs its own average rotational wait before its 0.1 ms transfer: per-sector cost = 5 + 0.1 = 5.1 ms. Total for 20 sectors = 20 × 5.1 = 102 ms. This sits between the fully sequential case (near-zero extra latency after the first sector) and the fully random case with seeks (which would additionally add a seek time to every one of the 20 accesses) — a useful intermediate scenario to recognize on exams that specify "same track" but "non-sequential" access.'
+  },
+  {
+    id: 'coa-io-x9',
+    q: 'In the total access time for a disk request, what do "seek time," "rotational latency," and "transfer time" each represent?',
+    options: ['They are three names for the same quantity, added together to avoid underestimating cost', 'Seek time moves the head to the correct track; rotational latency waits for the target sector to rotate under the head; transfer time is the duration to actually read/write the data once positioned', 'Seek time is the time to read data; rotational latency is the time to write data; transfer time is idle time', 'These terms apply only to solid-state drives, not magnetic disks'],
+    answer: 1,
+    marks: 1,
+    difficulty: 'easy',
+    type: 'concept',
+    explanation: 'A disk access has three physically distinct phases. Seek time is the mechanical time for the read/write head assembly to move radially to the correct track/cylinder — it depends on how far the head must travel. Rotational latency is the time spent waiting for the platter to spin so the desired sector arrives under the head — on average, half a revolution, since the sector could be anywhere around the track. Transfer time is the time actually spent reading or writing the requested bytes once the head is correctly positioned over the start of the data, which depends on the data size and the disk\'s transfer rate. All three are physically necessary and distinct; total access time sums them, and these terms are standard for magnetic (spinning) disks specifically, describing their mechanical operation.'
+  },
+  {
+    id: 'coa-io-x10',
+    q: 'A disk has a 6 ms average seek time, spins at 7200 RPM, and delivers a sustained transfer rate of 40 MB/s. What is the approximate effective throughput (useful data rate) for random 512-byte sector reads, accounting for seek, average rotational latency and transfer time?',
+    options: ['About 40 MB/s', 'About 512 KB/s', 'About 50 KB/s', 'About 5 KB/s'],
+    answer: 2,
+    marks: 2,
+    difficulty: 'medium',
+    type: 'numerical',
+    explanation: 'Revolution time = 60000 / 7200 ≈ 8.33 ms, so average rotational latency ≈ 4.17 ms. Transfer time for 512 bytes at 40 MB/s = 512 / (40 × 10^6) s ≈ 0.0128 ms — negligible next to the mechanical delays. Total time per random access ≈ 6 + 4.17 + 0.0128 ≈ 10.18 ms. Effective throughput = 512 bytes / 0.01018 s ≈ 50,300 bytes/s, i.e., roughly 50 KB/s. This is dramatically lower than the disk\'s quoted 40 MB/s "sustained transfer rate," which only describes the data-movement phase once positioned — the entire point of this calculation is to show how mechanical overhead dominates for small, randomly scattered accesses, unlike the sequential case where the same seek and latency get amortized over far more data.'
+  },
+  {
+    id: 'coa-io-x11',
+    q: 'A DMA controller uses cycle stealing to take 15% of all memory bus cycles for a transfer. The CPU needs a memory cycle on essentially every one of its own execution cycles, so any stolen cycle directly delays it. By what factor does the CPU\'s effective program execution time increase while this DMA transfer is active?',
+    options: ['1.05x (5% longer)', '1.15x (15% longer)', 'About 1.18x (about 17.6% longer)', '1.30x (30% longer)'],
+    answer: 2,
+    marks: 2,
+    difficulty: 'hard',
+    type: 'numerical',
+    explanation: 'If the DMA controller takes 15% of the bus cycles, the CPU is left with only 85% of the cycles to make its normal progress; the remaining 15% of every second is time it does not get to use. To finish the same amount of memory-bound work, it now needs 1 / (1 − 0.15) = 1 / 0.85 ≈ 1.176 times as long as it would with no DMA active — about an 17.6% increase, not 15%. The naive answer of 1.15x incorrectly treats "15% of cycles stolen" as equivalent to "15% more time needed," but the correct relationship is time multiplied by 1/(1 − stolen fraction), the same form used for occupancy/utilization problems elsewhere in this subject.'
+  },
+  {
+    id: 'coa-io-x12',
+    q: 'Which of the following instruction types are characteristic of isolated (port-mapped) I/O, as opposed to memory-mapped I/O?',
+    options: ['Ordinary MOV/LOAD/STORE instructions used for both memory and devices', 'Dedicated IN and OUT instructions that access a separate I/O address space', 'Only interrupt-return instructions', 'Only branch instructions'],
+    answer: 1,
+    marks: 1,
+    difficulty: 'easy',
+    type: 'concept',
+    explanation: 'Isolated I/O architecturally separates device registers into their own address space, distinct from main memory, and requires the instruction set to provide special instructions — classically IN (read from a port) and OUT (write to a port) — solely for accessing that space; ordinary load/store instructions cannot reach it. Memory-mapped I/O instead reuses the same load/store instructions already used for memory, since device registers occupy addresses within the shared memory address space, with no special instructions required. Interrupt-return and branch instructions are unrelated to how device registers are addressed; they belong to control flow and interrupt handling, not to the memory-versus-port addressing distinction.'
+  },
+  {
+    id: 'coa-io-x13',
+    q: 'Why must a region of the address space used for memory-mapped I/O device registers typically be excluded from caching?',
+    options: ['Caching device registers would make writes to them illegal', 'A cached copy of a status or data register could become stale, so the CPU would see an old value instead of the device\'s current state, and writes might not reach the device promptly', 'Device registers are physically incompatible with SRAM cache cells', 'Caching is disallowed only for interrupt vector addresses, not device registers'],
+    answer: 1,
+    marks: 2,
+    difficulty: 'easy',
+    type: 'concept',
+    explanation: 'Ordinary memory locations rarely change underneath the CPU except through its own accesses, so caching is safe and beneficial. Device registers are different: a status register can change asynchronously (the device sets a "ready" bit on its own schedule), and a data register\'s effect (like triggering a transfer) must actually reach the device promptly rather than being absorbed into a cache line and possibly delayed or coalesced. If such an address were cached, the CPU could keep reading a stale cached status value forever, or a write-back cache could delay a control write to the device indefinitely. Marking the I/O region non-cacheable ensures every access genuinely reaches the device, at the cost of losing the speed benefit of caching for that region — there is no physical incompatibility involved, and writes to device registers remain perfectly legal.'
+  },
+  {
+    id: 'coa-io-x14',
+    q: 'A device produces data at 500,000 bytes/second. Two schemes are proposed: (a) interrupt-driven I/O with one interrupt per byte costing 3 microseconds each, or (b) cycle-stealing DMA moving 4 bytes per stolen 100 ns bus cycle. Which scheme(s), if any, can sustain this device without exceeding 100% CPU utilization, and what is the utilization for the feasible one?',
+    options: ['Only DMA is feasible, consuming about 1.25% of CPU time', 'Only interrupt-driven I/O is feasible, consuming about 1.25% of CPU time', 'Both are feasible, using 150% and 1.25% respectively', 'Neither scheme can sustain this data rate'],
+    answer: 0,
+    marks: 2,
+    difficulty: 'hard',
+    type: 'pyq-style',
+    explanation: 'Interrupt-driven: 500,000 interrupts/sec × 3 μs each = 1.5 seconds of CPU time needed per second of real time — 150% of the CPU, which is impossible, so this scheme cannot sustain the device (data will be lost or the device will have to be throttled). Cycle-stealing DMA: word rate = 500,000 / 4 = 125,000 stolen cycles/sec, each costing 100 ns, giving 125,000 × 100 ns = 0.0125 s = 1.25% of CPU time stolen — easily sustainable, leaving 98.75% of the CPU free for other work. This pairing is exactly why high data-rate devices universally use DMA rather than per-unit interrupts: the per-transfer overhead of an interrupt is simply too large relative to the time budget once the data rate crosses a certain threshold.'
+  },
+  {
+    id: 'coa-io-x15',
+    q: 'A keyboard is polled every 20 ms, and each poll costs 50 clock cycles on a 100 MHz CPU. What fraction of CPU time does polling this keyboard consume?',
+    options: ['0.0025%', '0.025%', '0.25%', '2.5%'],
+    answer: 0,
+    marks: 1,
+    difficulty: 'medium',
+    type: 'numerical',
+    explanation: 'Polls per second = 1000 ms / 20 ms = 50 polls/sec. Cycles spent per second = 50 × 50 = 2500 cycles. A 100 MHz CPU executes 100 × 10^6 cycles per second, so the fraction = 2500 / (100 × 10^6) = 2.5 × 10^-5 = 0.0025%. This tiny figure explains why polling remains an entirely reasonable choice for slow, infrequent human-interface devices like keyboards and mice — the overhead is so small that the added complexity of interrupt handling or DMA buys essentially nothing, and many embedded and simple systems poll such devices for exactly this reason.'
+  },
+  {
+    id: 'coa-io-x16',
+    q: 'A disk has 50 sectors per track, each sector transfer taking 0.2 ms, and switching the active head from one track to the next (with no seek, e.g. adjacent cylinders on a multi-surface stack) costs 2 ms. An initial seek plus rotational latency of 8 ms positions the head at the start of the first track. What is the total time to sequentially read 175 sectors, spanning multiple tracks?',
+    options: ['35 ms', '43 ms', '49 ms', '55 ms'],
+    answer: 2,
+    marks: 2,
+    difficulty: 'hard',
+    type: 'numerical',
+    explanation: '175 sectors at 50 sectors/track span 4 tracks (sectors 1–50, 51–100, 101–150, and 151–175), requiring 3 head switches between consecutive tracks. Transfer time = 175 × 0.2 ms = 35 ms. Head-switch overhead = 3 × 2 ms = 6 ms. Adding the one-time initial positioning cost of 8 ms: total = 8 + 35 + 6 = 49 ms. This models a realistic large sequential transfer that crosses track boundaries: even though the bulk of the cost is still the raw transfer time, the extra head-switch overhead at each track boundary must be counted separately from both the initial seek/latency and the per-sector transfer time, since it is neither of those — leaving it out (getting 43 ms) or double-counting a switch for the very first track (getting 55 ms) are the usual errors.'
+  }
+);
