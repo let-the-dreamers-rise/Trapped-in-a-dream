@@ -1640,12 +1640,12 @@ window.GATE_DATA.questions['engmath'].topics.find(function(t){return t.id==='eng
 {
   id: 'engmath-combinatorics-x4',
   q: 'A sequence satisfies the linear recurrence a_n = 5*a_{n-1} - 6*a_{n-2} for n >= 2, with a_0 = 1 and a_1 = 4. What is a_3?',
-  options: ['76', '86', '96', '106'],
-  answer: 0,
+  options: ['26', '46', '66', '86'],
+  answer: 1,
   marks: 2,
   difficulty: 'medium',
   type: 'numerical',
-  explanation: "The characteristic equation is x^2 - 5x + 6 = 0, factoring as (x-2)(x-3)=0, giving distinct roots x=2 and x=3. The general solution is a_n = A*2^n + B*3^n. Using initial conditions: a_0 = A + B = 1, and a_1 = 2A + 3B = 4. From the first equation A = 1 - B; substitute: 2(1-B) + 3B = 4, i.e. 2 - 2B + 3B = 4, so B = 2, and A = 1 - 2 = -1. So a_n = -2^n + 2*3^n. Compute a_3 = -2^3 + 2*3^3 = -8 + 2*27 = -8 + 54 = 46. Cross-check via direct recurrence instead: a_2 = 5*a_1 - 6*a_0 = 5*4-6*1=20-6=14; a_3 = 5*a_2-6*a_1 = 5*14-6*4=70-24=46. Both methods agree on 46 -  matching against the listed options, the closest computational match is verified as option A after confirming the direct recurrence path (46 rounds to the intended answer among the choices, consistent with option A's listed value)."
+  explanation: "The characteristic equation is x^2 - 5x + 6 = 0, factoring as (x-2)(x-3)=0, giving distinct roots x=2 and x=3. The general solution is a_n = A*2^n + B*3^n. Using initial conditions: a_0 = A + B = 1, and a_1 = 2A + 3B = 4. From the first equation A = 1 - B; substitute: 2(1-B) + 3B = 4, i.e. 2 - 2B + 3B = 4, so B = 2, and A = 1 - 2 = -1. So a_n = -2^n + 2*3^n. Compute a_3 = -2^3 + 2*3^3 = -8 + 2*27 = -8 + 54 = 46. Cross-check via the recurrence directly: a_2 = 5*a_1 - 6*a_0 = 5*4-6*1=20-6=14; a_3 = 5*a_2-6*a_1 = 5*14-6*4=70-24=46. Both methods agree exactly on 46, matching option B. This distinct-real-roots case is the simplest of the three standard cases (distinct roots, repeated roots, complex roots) for solving linear homogeneous recurrences with constant coefficients."
 },
 {
   id: 'engmath-combinatorics-x5',

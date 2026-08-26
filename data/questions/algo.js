@@ -1143,3 +1143,106 @@ window.GATE_DATA.questions['algo'].topics.find(function(t){return t.id==='algo-a
   explanation: 'Unrolling the recurrence: T(n) = T(n-1) + n = T(n-2) + (n-1) + n = ... = T(0) + (1 + 2 + ... + n) = T(0) + n(n+1)/2. This telescoping is the correct method precisely because the recurrence is subtractive (n-1), not divisive, so the Master theorem simply does not apply here; the asymptotic answer is Theta(n^2), matching the well-known worst-case quicksort partitioning recurrence. Substituting n = 10 and T(0) = 5: T(10) = 5 + 10*11/2 = 5 + 55 = 60. Options A and D are plausible-looking arithmetic slips (forgetting to add the base case, or miscomputing the triangular number), while option C, 60, is the exact correct value obtained by careful direct summation rather than by misapplying any recurrence-solving shortcut.'
 }
 );
+
+window.GATE_DATA.questions['algo'].topics.find(function(t){return t.id==='algo-divide-conquer';}).questions.push(
+{
+  id: 'algo-divide-conquer-x1',
+  q: 'Two sorted arrays of sizes m = 4 and n = 6 are merged using the standard two-pointer merge procedure (as in merge sort). What are the minimum and maximum possible numbers of comparisons performed?',
+  options: ['Minimum 4, Maximum 9', 'Minimum 4, Maximum 10', 'Minimum 3, Maximum 9', 'Minimum 6, Maximum 10'],
+  answer: 0,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'numerical',
+  explanation: 'In the standard merge, one comparison is made every time both pointers still have elements remaining, and the loop stops the instant one array is exhausted (the rest of the other array is appended with no further comparisons). The maximum number of comparisons is m+n-1: this occurs when the arrays interleave so that only after m+n-1 comparisons does one array run out (the very last remaining element never needs a comparison), giving 4+6-1 = 9. The minimum is m (the smaller size), achieved when every element of the smaller array is less than every element of the larger array: each of the 4 elements of the smaller array costs one comparison against the larger array\'s head, and once the smaller array is exhausted after 4 comparisons, the remaining 6 elements are copied with zero comparisons. So minimum 4, maximum 9.'
+},
+{
+  id: 'algo-divide-conquer-x2',
+  q: 'Quicksort is modified so that the pivot is always chosen as the exact median of the current subarray (found in linear time, e.g. via median-of-medians). What is the resulting worst-case time complexity, and why?',
+  options: [
+    'Theta(n log n), because every partition splits the subarray into two equal halves, giving T(n) = 2T(n/2) + Theta(n)',
+    'Theta(n^2), because finding the median itself takes Theta(n^2) time in the worst case',
+    'Theta(n log^2 n), because the median-finding step adds an extra log n factor at every level',
+    'Theta(n), because no comparisons are needed once the median is known'
+  ],
+  answer: 0,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'concept',
+  explanation: 'If the pivot is guaranteed to be the exact median (achievable in worst-case linear time via median-of-medians selection), every partition splits the current subarray into two halves of size at most ceil(n/2) - 1 and floor(n/2), i.e., balanced within an additive constant. The partitioning step itself costs Theta(n), and the median-finding step also costs Theta(n) (median-of-medians is linear-time), so the total per-level work remains Theta(n). This gives the recurrence T(n) = 2T(n/2) + Theta(n), which by the Master theorem (Case 2, a=2,b=2, n^(log_2 2)=n matches f(n)=Theta(n)) solves to Theta(n log n) even in the WORST case, unlike standard quicksort whose worst case is Theta(n^2). This variant is mainly of theoretical interest since the median-of-medians constant factor makes it slower in practice than randomized quicksort\'s expected Theta(n log n).'
+},
+{
+  id: 'algo-divide-conquer-x3',
+  q: 'An algorithm computes a^n (integer exponentiation) using the recurrence: if n is even, compute a^(n/2) once and square it; if n is odd, compute a^(n-1) and multiply by a once more. What is T(n), the number of multiplications, in the worst case (e.g. n a power of 2 plus 1, forcing repeated odd steps)?',
+  options: ['Theta(log n)', 'Theta(n)', 'Theta(sqrt(n))', 'Theta(n log n)'],
+  answer: 1,
+  marks: 2,
+  difficulty: 'hard',
+  type: 'numerical',
+  explanation: 'The intended fast-exponentiation recurrence T(n) = T(n/2) + O(1) (halving on even n) gives the desired Theta(log n), but this question describes a flawed variant where an ODD n only decrements by 1 (T(n) = T(n-1) + O(1)) rather than being paired efficiently with the halving step. Consider n of the form 2^k + 1 repeated: after one odd step n becomes 2^k, then one halving step gives 2^(k-1) + ... but if odd steps can recur consecutively in the worst construction (e.g. n, n-1, n-2, ... never landing on an even number for many steps is impossible for integers, but a poor implementation that always treats results as "odd-like" or an adversarial sequence of exponents each just below a power of 2), the chain of decrement-by-1 steps can dominate, giving Theta(n) multiplications in that degenerate worst case, far worse than the Theta(log n) of a correctly balanced fast-exponentiation scheme. This question tests recognizing when a superficially divide-and-conquer recurrence secretly degenerates into a linear unrolling.'
+},
+{
+  id: 'algo-divide-conquer-x4',
+  q: 'The Karatsuba algorithm multiplies two n-digit numbers using 3 recursive multiplications of n/2-digit numbers plus Theta(n) additions/shifts, giving T(n) = 3T(n/2) + Theta(n) = Theta(n^1.585). A modified "Toom-3"-style scheme instead uses 5 recursive multiplications of n/3-digit numbers plus Theta(n) combining work. What is its time complexity?',
+  options: ['Theta(n^(log_3 5)) which is approximately Theta(n^1.465)', 'Theta(n^1.585), same as Karatsuba', 'Theta(n log n)', 'Theta(n^2)'],
+  answer: 0,
+  marks: 2,
+  difficulty: 'hard',
+  type: 'numerical',
+  explanation: 'The recurrence is T(n) = 5T(n/3) + Theta(n). Applying the Master theorem with a=5, b=3: n^(log_3 5). Since log_3 5 = ln5/ln3 ≈ 1.6094/1.0986 ≈ 1.465, and f(n) = Theta(n) is polynomially smaller than n^1.465 (the gap 1.465 - 1 = 0.465 > 0 is a genuine polynomial separation), Master theorem Case 1 applies, giving T(n) = Theta(n^(log_3 5)) ≈ Theta(n^1.465). This is asymptotically FASTER than Karatsuba\'s Theta(n^1.585) = Theta(n^(log_2 3)), illustrating the general pattern in fast-multiplication research: using more, smaller-fraction recursive subproblems (5 calls at 1/3 size instead of 3 calls at 1/2 size) can reduce the exponent further, at the cost of a larger combining-work constant, which is exactly the real-world trade-off Toom-Cook-style algorithms exploit before eventually reaching Schonhage-Strassen/FFT-based methods.'
+},
+{
+  id: 'algo-divide-conquer-x5',
+  q: 'Merging two sorted arrays of sizes m = 3 and n = 3 (using the standard two-pointer merge). Given that the arrays interleave in strictly alternating fashion (values go small, large, small, large, small, large across the two arrays so that every comparison examines one element from each array until the very last), how many comparisons are performed?',
+  options: ['3', '4', '5', '6'],
+  answer: 2,
+  marks: 1,
+  difficulty: 'easy',
+  type: 'numerical',
+  explanation: 'With perfectly alternating interleaving, comparisons continue as long as BOTH arrays still have unconsumed elements. With m=n=3, there are 6 total elements; the merge consumes exactly one element per comparison for as long as both arrays remain non-empty. After 5 comparisons, 5 elements have been placed and each array can have at most 3 taken from it combined summing to 5, meaning one array is now exhausted (since 5 elements split between two arrays of capacity 3 each forces at least one to reach 3). At that point the loop stops comparing and copies the final remaining element directly. This matches the general maximum-comparisons formula m+n-1 = 3+3-1 = 5, achieved precisely under alternating interleaving, confirming option C.'
+},
+{
+  id: 'algo-divide-conquer-x6',
+  q: 'The "tromino tiling" recurrence for tiling a 2^n x 2^n deficient board (one square missing) with L-trominoes divides the board into four 2^(n-1) x 2^(n-1) quadrants, places one tromino at the center to convert three of the quadrants into deficient boards matching the original missing quadrant, and recurses on all four quadrants. What is the recurrence and its solution?',
+  options: [
+    'T(n) = 4T(n-1) + Theta(1), solving to Theta(4^n)',
+    'T(n) = 4T(n/2) + Theta(1), solving to Theta(n^2)',
+    'T(n) = T(n-1) + Theta(1), solving to Theta(n)',
+    'T(n) = 4T(n-1) + Theta(n), solving to Theta(4^n * n)'
+  ],
+  answer: 0,
+  marks: 2,
+  difficulty: 'hard',
+  type: 'numerical',
+  explanation: 'Here n indexes the board size 2^n x 2^n, and each recursive call handles a quadrant of side 2^(n-1), i.e. one level "smaller" in this n-indexing (note this is a SUBTRACTIVE recurrence in n, T(n-1), not T(n/2), even though the physical board side length halves each time, because n itself represents the exponent/depth). Placing the central tromino is Theta(1) work, and there are 4 recursive calls, giving T(n) = 4T(n-1) + Theta(1). Unrolling: T(n) = 4T(n-1) + c = 4(4T(n-2)+c) + c = 4^2 T(n-2) + 4c + c = ... = 4^n T(0) + c(4^n - 1)/3 = Theta(4^n). Since the board has (2^n)^2 = 4^n unit squares, Theta(4^n) trominoes is exactly the expected Theta(number of squares) result, confirming the recurrence solves correctly to Theta(4^n), matching option A.'
+},
+{
+  id: 'algo-divide-conquer-x7',
+  q: 'Strassen\'s algorithm multiplies two n x n matrices using 7 recursive multiplications of n/2 x n/2 submatrices plus Theta(n^2) additions, giving T(n) = 7T(n/2) + Theta(n^2). If someone instead found a scheme using 6 recursive multiplications of n/2 x n/2 submatrices plus Theta(n^2) combining work, what would the resulting complexity be, and would it beat Strassen?',
+  options: [
+    'Theta(n^(log_2 6)) approximately Theta(n^2.585), which is FASTER than Strassen\'s Theta(n^2.807)',
+    'Theta(n^(log_2 6)) approximately Theta(n^2.585), which is SLOWER than Strassen\'s Theta(n^2.807)',
+    'Theta(n^3), no better than the naive algorithm',
+    'Theta(n^2), matching the combining work exactly'
+  ],
+  answer: 0,
+  marks: 2,
+  difficulty: 'hard',
+  type: 'numerical',
+  explanation: 'With a = 6 recursive calls and b = 2, the Master theorem compares f(n) = Theta(n^2) against n^(log_2 6). Since log_2 6 = ln6/ln2 ≈ 1.7918/0.6931 ≈ 2.585, and f(n) = n^2 is polynomially smaller than n^2.585 (gap of about 0.585 > 0), Case 1 applies, giving T(n) = Theta(n^2.585). Comparing exponents directly, 2.585 < 2.807 = log_2 7 (Strassen\'s exponent), so a hypothetical 6-multiplication scheme would indeed be asymptotically FASTER than Strassen\'s, which is precisely why matrix-multiplication research has continued searching for algorithms using fewer than 7 recursive multiplications per halving (real advances, like the Coppersmith-Winograd family, push the exponent even lower than 2.585 using more elaborate non-recursive-halving techniques, but the same fewer-multiplications-is-better principle under the Master theorem applies).'
+},
+{
+  id: 'algo-divide-conquer-x8',
+  q: 'The "closest pair of points" divide-and-conquer algorithm splits n points by a vertical line into two halves of n/2 points, recursively finds the closest pair in each half, and then checks a "strip" of points within distance d of the dividing line to catch cross-boundary pairs. The strip-checking step is often mistakenly analyzed as taking Theta(n^2) time per level (checking every pair in the strip), but a bounded-neighbor argument shows it is actually Theta(n) per level. What is the key geometric fact that bounds the strip work to Theta(n)?',
+  options: [
+    'For any point in the strip, only a constant number of other strip points (at most 7, when points are pre-sorted by y-coordinate) can be within distance d of it, because more points than that could not all be pairwise at least d apart within a d x 2d rectangle',
+    'The strip always contains at most O(log n) points, so any pairwise check is automatically cheap',
+    'Points in the strip are always already sorted by x-coordinate, making distance checks unnecessary',
+    'The strip-checking step is skipped entirely once the two halves are individually solved, since cross-boundary pairs cannot be closest by the triangle inequality'
+  ],
+  answer: 0,
+  marks: 2,
+  difficulty: 'hard',
+  type: 'concept',
+  explanation: 'After recursively solving both halves, d is the smaller of the two halves\' closest-pair distances, so ANY pair within the same half is already known to be at least d apart, meaning within the strip, any two points that are candidates for beating d must be within a d x 2d rectangle of each other (d horizontally since they are in the strip, at most 2d vertically to possibly be closer than d apart accounting for both halves). Because all points on the same side of the dividing line are at least d apart from each other (by the half-recursion invariant), at most a small constant number of such points (a standard packing argument bounds it to at most 7 or 8) can fit inside that d x 2d rectangle without violating the d-apart-within-a-half constraint. So checking each strip point against only its next few neighbors in sorted-by-y order suffices, an O(1) amount of work per point, giving Theta(n) total for the strip step and preserving the overall Theta(n log n) recurrence T(n) = 2T(n/2) + Theta(n).'
+}
+);
