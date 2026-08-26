@@ -1465,3 +1465,156 @@ window.GATE_DATA.questions['cn'].topics.find(function(t){return t.id==='cn-trans
     explanation: "Even though the underlying link could carry 100 Mbps, TCP throughput is fundamentally capped at window size / RTT whenever the receive window is the binding constraint, since the sender cannot have more than one window's worth of data outstanding at a time. Here, throughput <= 262,144 bits / 0.05 s = 5,242,880 bps, approximately 5.24 Mbps. Because this window-imposed ceiling (about 5.24 Mbps) is far below the link's actual 100 Mbps capacity, the connection will achieve only around 5.24 Mbps regardless of how fast or lightly loaded the physical link is — a classic illustration of why a receiver's small advertised window (or an unnecessarily small configured TCP buffer) can badly under-utilize an otherwise fast, high-latency path, a scenario often called the 'long fat pipe' problem."
   }
 );
+
+window.GATE_DATA.questions['cn'].topics.find(function(t){return t.id==='cn-application';}).questions.push(
+  {
+    id: "cn-application-x1",
+    q: "A web page consists of one base HTML file plus 10 embedded image objects, all hosted on the same server. Using non-persistent HTTP with no parallel connections (strictly one TCP connection opened, used once, and closed at a time), how many total round-trip times (RTTs) are needed to fetch the entire page, ignoring DNS lookup and transmission time?",
+    options: ["11 RTTs", "20 RTTs", "22 RTTs", "24 RTTs"],
+    answer: 2,
+    marks: 2,
+    difficulty: "medium",
+    type: "numerical",
+    explanation: "Non-persistent HTTP opens a brand-new TCP connection for every single object retrieved, and each such connection costs 1 RTT for the TCP connection setup (SYN/SYN-ACK) plus 1 RTT for the HTTP request/response itself, so 2 RTTs per object. There are 11 total objects to fetch: the base HTML page itself, plus its 10 embedded images. With no parallelism, these are fetched strictly one after another, giving total time = 11 objects x 2 RTTs each = 22 RTTs. This large overhead from repeatedly re-establishing TCP connections is precisely the motivation for persistent HTTP connections in HTTP/1.1 and later."
+  },
+  {
+    id: "cn-application-x2",
+    q: "Using the same page (1 base HTML file + 10 embedded images), now fetched over a single persistent HTTP connection, but with requests sent one at a time (non-pipelined, each waiting for its response before the next request is sent), how many total RTTs are needed, ignoring DNS and transmission time?",
+    options: ["10 RTTs", "11 RTTs", "12 RTTs", "22 RTTs"],
+    answer: 2,
+    marks: 2,
+    difficulty: "medium",
+    type: "numerical",
+    explanation: "A persistent connection is established just once, costing 1 RTT for the initial TCP setup, and then reused for every subsequent request, avoiding the repeated connection-setup overhead of the non-persistent case. With non-pipelined requests, each of the 11 objects (base page plus 10 images) still requires its own full request/response round trip of 1 RTT, sent strictly one after another. Total time = 1 RTT (connection setup) + 11 RTTs (11 sequential request/response exchanges) = 12 RTTs — nearly half of the 22 RTTs needed by non-persistent HTTP, simply by eliminating the repeated TCP handshakes."
+  },
+  {
+    id: "cn-application-x3",
+    q: "Using the same page again, but now with a persistent, pipelined HTTP connection where the client sends all 11 requests back-to-back without waiting for individual responses, what is the minimum number of RTTs needed, ignoring transmission and processing time?",
+    options: ["1 RTT", "2 RTTs", "11 RTTs", "12 RTTs"],
+    answer: 1,
+    marks: 1,
+    difficulty: "easy",
+    type: "concept",
+    explanation: "Pipelining eliminates the need to wait for each response before sending the next request: the client fires off all 11 requests for the base page and 10 images essentially together, immediately after the connection is established, and the server streams back the responses. In the idealized case (ignoring transmission and processing time), this costs just 1 RTT to establish the TCP connection plus 1 more RTT for the round trip during which all the pipelined requests go out and all responses come back, for a minimum of 2 RTTs total. This dramatic reduction, from 22 RTTs (non-persistent) to 12 RTTs (persistent, non-pipelined) to just 2 RTTs (persistent, pipelined), is exactly why pipelining and, more recently, HTTP/2 multiplexing are such significant performance improvements."
+  },
+  {
+    id: "cn-application-x4",
+    q: "A client's local DNS resolver already has the .com TLD server's address cached from an earlier, unrelated lookup, but has no cached information about a new domain's authoritative name server. Each query-response exchange in the DNS hierarchy takes 15 ms. How much total DNS resolution time is needed before the client can begin its actual application request?",
+    options: ["15 ms", "30 ms", "45 ms", "60 ms"],
+    answer: 1,
+    marks: 2,
+    difficulty: "medium",
+    type: "numerical",
+    explanation: "Because the local resolver already has the TLD (.com) server's address cached, it can skip querying the root server entirely and go straight to the cached TLD server. That leaves exactly 2 remaining round trips in the hierarchy: one to the TLD server (which returns a referral to the correct authoritative server), and one to that authoritative server (which finally returns the actual IP address). At 15 ms per round trip, this totals 2 x 15 = 30 ms, half of what a fully cold cache (needing all 3 levels: root, TLD, authoritative) would require. This illustrates how partial caching, even just one level of the hierarchy, still meaningfully speeds up resolution."
+  },
+  {
+    id: "cn-application-x5",
+    q: "If the local DNS resolver instead has a fully valid, unexpired cached entry for the exact domain name being looked up (from a previous, recent lookup), how many additional RTTs to the root, TLD, or authoritative servers are needed to resolve the name?",
+    options: ["0", "1", "2", "3"],
+    answer: 0,
+    marks: 1,
+    difficulty: "easy",
+    type: "concept",
+    explanation: "When the local DNS resolver's cache already holds a valid, unexpired mapping for the exact name being queried (typically because some other client recently looked up the same name and the record's TTL has not yet elapsed), the resolver can answer immediately from its cache without contacting the root, TLD, or authoritative servers at all. This means 0 additional RTTs are spent traversing the DNS hierarchy; the client only experiences whatever minimal delay exists between itself and its local resolver. This is exactly why DNS caching, at browsers, operating systems, and local resolvers, is so effective at hiding DNS lookup latency for popular, frequently accessed domains."
+  },
+  {
+    id: "cn-application-x6",
+    q: "Which of the following correctly describes the division of roles between SMTP and POP3/IMAP in email delivery?",
+    options: ["SMTP is used both to push mail into the recipient's mail server and to let the recipient's client pull/download mail from it; POP3 and IMAP are never actually used", "SMTP pushes mail from a sender's client to its mail server and between mail servers, but is never used by a receiving client to pull mail down from its own mailbox; POP3 or IMAP are what the recipient's client uses to retrieve messages", "POP3 and IMAP are used to send mail out to other mail servers, while SMTP is only used by the final recipient to read their inbox", "All three protocols are functionally identical and interchangeable at every step of email delivery"],
+    answer: 1,
+    marks: 1,
+    difficulty: "easy",
+    type: "concept",
+    explanation: "SMTP is fundamentally a push protocol: it is used by a sender's mail client to submit an outgoing message to its own mail server, and then used again, server to server, to relay that message onward to the recipient's mail server, where it is deposited into the recipient's mailbox. Critically, SMTP is never used by the receiving user's client to download or read mail from their own mailbox — that final pull step is instead handled by POP3 (typically downloading, sometimes deleting, messages) or IMAP (which manages messages and folders while they remain stored on the server). This clean separation, push via SMTP, pull via POP3/IMAP, is a frequently tested distinction."
+  },
+  {
+    id: "cn-application-x7",
+    q: "What is the key functional difference between IMAP and POP3 for retrieving email?",
+    options: ["POP3 and IMAP are identical protocols with different names used by different vendors", "IMAP keeps mail organized on the server, supporting folders and state that stay synchronized across multiple client devices, while POP3 is designed around downloading messages to a single client, offering no native multi-device folder synchronization", "POP3 supports multiple simultaneous devices with synchronized folders, while IMAP only works with a single device at a time", "Neither protocol supports accessing email from more than one device"],
+    answer: 1,
+    marks: 1,
+    difficulty: "medium",
+    type: "concept",
+    explanation: "IMAP is designed around the idea that mail primarily lives on the server: it supports server-side folders, flags (read/unread, starred), and search, and any changes a client makes are reflected back to the server, so multiple devices (a phone, a laptop, a webmail client) all see a consistent, synchronized view of the mailbox. POP3, by contrast, was designed for a simpler model where a single client periodically connects, downloads new messages (often deleting them from the server afterward, though a 'leave a copy' option exists), and manages them locally, with no built-in concept of synchronizing folder structure or read status across multiple devices. This is why IMAP is the standard choice for anyone checking mail from more than one device."
+  },
+  {
+    id: "cn-application-x8",
+    q: "In FTP, how do active mode and passive mode differ in how the data connection (used for transferring files or directory listings) is established?",
+    options: ["In active mode, the server initiates the data connection back to the client, requiring the client to open a listening port, which is often blocked by client-side firewalls/NAT; in passive mode, the client initiates both the control and data connections to server-specified ports, avoiding this problem", "In passive mode, the server always refuses to accept any data connection at all", "Active and passive modes differ only in the port number used for the control connection, not the data connection", "Passive mode does not use a separate data connection; all data flows over the control connection"],
+    answer: 0,
+    marks: 2,
+    difficulty: "medium",
+    type: "concept",
+    explanation: "FTP always uses two separate TCP connections: a control connection (commands and responses) and a data connection (actual file/listing transfer). In active mode, after the client tells the server which port it is listening on, the server itself initiates the data connection back to the client; this frequently fails when the client sits behind a firewall or NAT that blocks unsolicited inbound connections, since from the network's perspective the server is 'calling in' to the client. Passive mode was introduced to fix this: the server instead opens a listening port and tells the client about it, and the client initiates both the control connection and the data connection outbound to the server, which is far friendlier to typical client-side firewalls and NAT devices that readily allow outbound connections."
+  },
+  {
+    id: "cn-application-x9",
+    q: "Why does FTP use two separate TCP connections (control and data) instead of a single connection the way HTTP does?",
+    options: ["FTP maintains a persistent control connection for commands throughout the session, and opens a separate data connection specifically for each file transfer or directory listing, keeping command/response traffic separate from bulk data traffic", "FTP actually uses only one connection; the description of two connections is a common misconception", "The two connections in FTP both carry commands, and neither ever carries actual file data", "FTP uses two connections purely for historical compatibility reasons with a since-abandoned protocol, with no functional benefit"],
+    answer: 0,
+    marks: 1,
+    difficulty: "medium",
+    type: "concept",
+    explanation: "FTP's design deliberately separates concerns: the control connection stays open for the duration of the session and carries commands (like login, change directory, or list files) and their textual responses, while a fresh data connection is opened specifically whenever an actual file transfer or directory listing needs to happen, and closed again once that transfer completes. This is different from HTTP, which since HTTP/1.1 typically reuses a single persistent connection for both requests/responses and any body data. FTP's separation allows commands to be exchanged (and status monitored) independently of whatever bulk data transfer might be in progress, though it is also precisely what makes FTP more firewall/NAT-unfriendly than protocols using just one connection type."
+  },
+  {
+    id: "cn-application-x10",
+    q: "Given that HTTP is a stateless protocol, how do cookies enable a web application to maintain session state (such as a shopping cart or a logged-in session) across multiple requests from the same user?",
+    options: ["Cookies modify the fundamental HTTP protocol so it becomes inherently stateful for all servers", "The server sends a Set-Cookie header the first time a client visits; the client's browser stores this and automatically includes it as a Cookie header on all subsequent requests to that same domain, letting the server recognize the same client across otherwise-independent requests", "Cookies are stored only on the server and require no participation from the client browser at all", "Cookies work only for a single request and cannot persist across separate HTTP requests"],
+    answer: 1,
+    marks: 1,
+    difficulty: "easy",
+    type: "concept",
+    explanation: "HTTP itself remains stateless; cookies are a layered-on mechanism, not a change to HTTP's core semantics. On an initial response, the server includes a Set-Cookie header containing some identifying token (often a session ID mapping to server-side state). The browser stores this cookie and, on every subsequent request to the same domain (subject to the cookie's scope and expiration rules), automatically attaches it via a Cookie request header. This lets the server correlate a sequence of otherwise independent, stateless HTTP requests as belonging to the same client, enabling features like shopping carts, login sessions, and personalized content, all without altering HTTP's fundamentally stateless request-response model."
+  },
+  {
+    id: "cn-application-x11",
+    q: "A web caching proxy serves 40% of requests directly from its cache (a hit) and forwards the remaining 60% to the origin server (a miss). The RTT between client and proxy is 2 ms, and the RTT between proxy and origin server is 100 ms (ignore transmission time). What is the average response time per request?",
+    options: ["44 ms", "84 ms", "124 ms", "204 ms"],
+    answer: 2,
+    marks: 2,
+    difficulty: "hard",
+    type: "numerical",
+    explanation: "On a cache hit, the client only needs a round trip to the proxy itself: response time = 2 x RTT(client-proxy) = 2 x 2 = 4 ms. On a cache miss, the proxy must additionally fetch the object from the origin server before returning it to the client, adding a round trip to the origin: response time = 2 x RTT(client-proxy) + 2 x RTT(proxy-origin) = 4 + 200 = 204 ms. The weighted average response time is (0.4 x 4 ms) + (0.6 x 204 ms) = 1.6 + 122.4 = 124 ms. This demonstrates the practical value of a high cache hit ratio: even a modest 40% hit rate substantially lowers average latency compared to fetching every single request all the way from the distant origin server (which alone would average 204 ms)."
+  },
+  {
+    id: "cn-application-x12",
+    q: "For RSA with small toy primes p = 5 and q = 11 (so n = p x q = 55 and phi(n) = (p-1)(q-1) = 4 x 10 = 40), and a chosen public exponent e = 7 (valid since gcd(7, 40) = 1), what is the corresponding private exponent d, satisfying e x d = 1 (mod 40)?",
+    options: ["3", "13", "23", "33"],
+    answer: 2,
+    marks: 2,
+    difficulty: "hard",
+    type: "numerical",
+    explanation: "d must satisfy e x d = 1 (mod phi(n)), i.e., 7d = 1 (mod 40). Testing d = 23: 7 x 23 = 161. Dividing 161 by 40 gives 4 remainder 1 (since 4 x 40 = 160, and 161 - 160 = 1), so 161 = 1 (mod 40), confirming d = 23 satisfies the requirement. The public key is therefore (e=7, n=55) and the private key is (d=23, n=55). This is exactly the kind of small, hand-computable RSA example used to test whether a student actually understands modular multiplicative inverses rather than just memorizing the RSA algorithm's steps."
+  },
+  {
+    id: "cn-application-x13",
+    q: "Using the same toy RSA parameters (n = 55, public exponent e = 7), what is the ciphertext obtained by encrypting the plaintext message m = 2, using c = m^e (mod n)?",
+    options: ["8", "18", "28", "38"],
+    answer: 1,
+    marks: 2,
+    difficulty: "hard",
+    type: "numerical",
+    explanation: "RSA encryption computes c = m^e (mod n) = 2^7 (mod 55). First, 2^7 = 128. Then reduce modulo 55: 128 - 2 x 55 = 128 - 110 = 18, so 2^7 (mod 55) = 18. The ciphertext is therefore c = 18. To confirm the RSA scheme is consistent, decrypting this ciphertext with the private exponent d = 23 found earlier should recover the original plaintext: 18^23 (mod 55) = 2, which holds by Euler's theorem since e and d were chosen to be exact modular inverses with respect to phi(n) = 40, guaranteeing that (m^e)^d = m (mod n) for any valid message m."
+  },
+  {
+    id: "cn-application-x14",
+    q: "For a group of N = 6 users who all want to be able to communicate securely and privately with each other pairwise, how many distinct symmetric keys are needed to give every pair its own shared secret key, compared to how many public/private key pairs are needed if an asymmetric (public-key) scheme is used instead?",
+    options: ["15 symmetric keys; 6 asymmetric key pairs", "6 symmetric keys; 15 asymmetric key pairs", "30 symmetric keys; 6 asymmetric key pairs", "15 symmetric keys; 12 asymmetric key pairs"],
+    answer: 0,
+    marks: 2,
+    difficulty: "medium",
+    type: "numerical",
+    explanation: "For full pairwise secrecy using symmetric cryptography, every distinct pair of users needs its own unique shared key, and the number of unique pairs among N users is N(N-1)/2 = 6 x 5 / 2 = 15 keys. This is why symmetric key distribution scales quadratically and becomes unwieldy as N grows. In contrast, an asymmetric (public-key) scheme needs only one key pair (a public key and a private key) per user, since any user's public key can be used by everyone else to securely send them messages that only their matching private key can decrypt; with N = 6 users, that means just 6 key pairs total, regardless of how many pairwise communication channels are actually needed."
+  },
+  {
+    id: "cn-application-x15",
+    q: "As the number of users N in a network grows large, how does the key-management burden of symmetric cryptography compare to that of asymmetric (public-key) cryptography, in terms of scaling?",
+    options: ["Symmetric key requirements grow linearly with N, the same as asymmetric", "Symmetric key requirements grow quadratically, roughly proportional to N^2, since every pair needs a unique key, while asymmetric key requirements grow only linearly, proportional to N, since each user needs just one key pair", "Both schemes require a number of keys proportional to N^2", "Asymmetric cryptography requires more keys than symmetric cryptography as N grows"],
+    answer: 1,
+    marks: 1,
+    difficulty: "easy",
+    type: "concept",
+    explanation: "The number of unique pairwise symmetric keys needed for N users to each have a private shared secret with every other user is N(N-1)/2, which grows on the order of N^2 (quadratically) as N increases, making full pairwise symmetric key distribution impractical for large networks without a trusted key-distribution centre. Asymmetric cryptography sidesteps this entirely: each user generates just a single public/private key pair regardless of how many other users exist, so the total number of key pairs needed grows only linearly, proportional to N. This fundamental scaling difference is a major reason public-key cryptography (often combined with symmetric encryption for the bulk data, as in TLS) is preferred for key management in large, open networks like the internet."
+  }
+);
