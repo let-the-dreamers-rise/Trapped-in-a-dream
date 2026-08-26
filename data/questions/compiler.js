@@ -1453,3 +1453,136 @@ window.GATE_DATA.questions['compiler'].topics.find(function(t){return t.id==='co
     explanation: 'A syntax tree gives every occurrence of a subexpression its own separate subtree, even when two occurrences are textually and semantically identical (same operator, same operands, no intervening redefinition). A DAG instead merges any two nodes that compute the same value from the same, still-valid operands into a single shared node, so the operation is represented (and, downstream, computed) only once no matter how many times it textually appears in the block. This is precisely local common subexpression elimination, and it falls out automatically from the DAG construction algorithm rather than needing a separate analysis pass. Loop-invariant motion and global register allocation require information beyond a single basic block, and unreachable-block elimination is a control-flow-level optimization, not a local DAG property. Option 2 is correct.'
   }
 );
+
+window.GATE_DATA.questions['compiler'].topics.find(function(t){return t.id==='compiler-runtime';}).questions.push(
+  {
+    id: 'compiler-runtime-x1',
+    q: 'Consider: int x = 1; void p() { print(x); } void q() { int x = 2; p(); } void main() { q(); }. What does the call to q() print under static (lexical) scoping, and what would it print under dynamic scoping?',
+    options: ['Static: 1, Dynamic: 2', 'Static: 2, Dynamic: 1', 'Static: 1, Dynamic: 1', 'Static: 2, Dynamic: 2'],
+    answer: 0,
+    marks: 2,
+    difficulty: 'medium',
+    type: 'pyq-style',
+    explanation: 'Under static scoping, the free variable x inside p is resolved using where p is textually DEFINED, not who calls it: since p is written at the top level, its x always refers to the global x = 1, no matter that q happens to call it — so static scoping prints 1. Under dynamic scoping, the free variable x inside p is resolved by searching the runtime call chain for the most recently created, still-active binding of x: the call sequence is main -> q -> p, and q has just declared its own local x = 2 which is still on the stack when p executes, so dynamic scoping finds and uses q\'s x = 2, printing 2. This pair (1 for static, 2 for dynamic) is exactly option 1, and is the classic minimal example distinguishing the two scoping disciplines.'
+  },
+  {
+    id: 'compiler-runtime-x2',
+    q: 'Consider: int x = 5; void r() { print(x); } void s() { int x = 10; r(); } void t() { int x = 20; s(); } void main() { t(); }. What does main() print under static scoping, and under dynamic scoping?',
+    options: ['Static: 5, Dynamic: 10', 'Static: 20, Dynamic: 5', 'Static: 5, Dynamic: 20', 'Static: 10, Dynamic: 5'],
+    answer: 0,
+    marks: 2,
+    difficulty: 'hard',
+    type: 'pyq-style',
+    explanation: 'Static scoping again resolves r\'s free x by where r is textually defined — at the top level — so it always refers to the global x = 5, regardless of the three-deep call chain main -> t -> s -> r; static scoping prints 5. Dynamic scoping instead walks the call chain backward from r looking for the nearest active binding: r itself declares no x, so look at its immediate caller s, which HAS an active local x = 10 — the search stops there and does not need to continue further back to t\'s x = 20, because s\'s binding is found first (nearer in the dynamic call chain). So dynamic scoping prints 10, not 20 — a common trap is assuming the outermost or first-declared shadowing variable wins, but dynamic scoping always uses the NEAREST active binding on the call stack. Option 1 (Static: 5, Dynamic: 10) is correct.'
+  },
+  {
+    id: 'compiler-runtime-x3',
+    q: 'In an activation record, the field commonly called the access link (or static link) is used to:',
+    options: ['Point to the activation record of the procedure that directly called this one, so control can return there', 'Point to the activation record of the lexically (textually) enclosing procedure invocation, enabling correct resolution of non-local variables under static scoping regardless of the actual call chain', 'Store the return address in the calling procedure\'s code', 'Hold the saved values of machine registers to be restored on return'],
+    answer: 1,
+    marks: 1,
+    difficulty: 'easy',
+    type: 'concept',
+    explanation: 'Static scoping requires resolving a non-local variable reference by following lexical nesting, not the call chain — and the call chain and lexical nesting can differ whenever a procedure is called from somewhere other than its lexically enclosing procedure. The access link (static link) solves this: it always points to the activation record of the most recent invocation of the procedure that lexically encloses the current one, so following a fixed number of access links (equal to the difference in nesting depth) always lands on the correct enclosing scope\'s data, independent of who actually called whom. Pointing to the caller\'s activation record for control-flow purposes is instead the job of the control link (dynamic link), and register-save duties belong to the saved-machine-status field. Option 2 is correct.'
+  },
+  {
+    id: 'compiler-runtime-x4',
+    q: 'In an activation record, the control link (dynamic link) is used to:',
+    options: ['Point to the activation record of the lexically enclosing procedure, for non-local variable access', 'Point to the activation record of the caller, so that the callee\'s activation record can be popped and control (and the stack) correctly returned to the caller on exit', 'Store the values of all actual parameters', 'Hold a pointer used only by garbage collection to trace live heap objects'],
+    answer: 1,
+    marks: 1,
+    difficulty: 'easy',
+    type: 'concept',
+    explanation: 'The control link records exactly who called this procedure, i.e. it points to the caller\'s activation record on the runtime stack. This is what lets the runtime system, upon the callee\'s return, restore the stack pointer to the caller\'s frame and resume execution at the correct point in the caller — it is purely about the dynamic call sequence, unrelated to lexical structure. This is different from the access/static link, which serves lexical (non-local variable) resolution and may point somewhere completely different from the immediate caller when the call chain does not mirror the lexical nesting. Parameters have their own dedicated area, and control links have nothing to do with garbage collection. Option 2 is correct.'
+  },
+  {
+    id: 'compiler-runtime-x5',
+    q: 'For a language with statically nested procedures, an alternative to following a chain of access (static) links to reach an enclosing scope is to maintain a "display": what is a display?',
+    options: ['A symbol table sorted by variable name for fast lookup', 'An array indexed by lexical nesting depth, where entry k holds a pointer to the activation record of the most recent invocation of the procedure currently active at nesting depth k, giving O(1) access to any enclosing scope', 'A visual debugger window showing the current call stack', 'A cache of the most recently computed expression values, used to avoid recomputation'],
+    answer: 1,
+    marks: 2,
+    difficulty: 'hard',
+    type: 'concept',
+    explanation: 'Following a static-link chain to reach a variable declared k lexical levels up costs k pointer dereferences, which can be slow for deeply nested procedures accessed frequently. A display trades a small amount of bookkeeping on every call/return for constant-time non-local access: it is simply an array where display[k] always points to the activation record of whichever invocation is currently the "active" one at nesting depth k. On a call, the display entry for the callee\'s nesting depth is updated (saving the old value to be restored on return), so at any moment, resolving a variable declared at depth k is a single array lookup rather than a chain walk. None of the other options describe this mechanism. Option 2 is correct.'
+  },
+  {
+    id: 'compiler-runtime-x6',
+    q: 'Consider: void swap(int a, int b) { int t = a; a = b; b = t; } void main() { int x = 1, y = 2; swap(x, y); print(x, y); }. What does main() print if parameters are passed by value, and what would it print if passed by reference instead?',
+    options: ['By value: x=1, y=2 (unchanged); By reference: x=2, y=1 (swapped)', 'By value: x=2, y=1; By reference: x=1, y=2', 'Both by value and by reference print x=2, y=1', 'Both by value and by reference print x=1, y=2'],
+    answer: 0,
+    marks: 2,
+    difficulty: 'medium',
+    type: 'pyq-style',
+    explanation: 'Under call by value, swap receives independent copies of x and y\'s values; the local variables a and b inside swap are swapped, but this has no effect whatsoever on the caller\'s x and y, which remain x=1, y=2 after the call — a very common misconception is that swap "works" here, but it provably cannot under pure call by value. Under call by reference, a and b are aliases (bound to the same storage locations) as x and y themselves, so assigning to a and b directly modifies x and y; the body\'s sequence (t=a so t=1; a=b so x becomes 2; b=t so y becomes 1) genuinely swaps the caller\'s variables, printing x=2, y=1. This contrast is the standard illustration of why swap needs reference (or pointer) semantics to work at all. Option 1 is correct.'
+  },
+  {
+    id: 'compiler-runtime-x7',
+    q: 'Consider call-by-name parameter passing (the actual argument expression is substituted textually and re-evaluated at every use inside the callee, rather than evaluated once at the call). Given: int i = 5; array a[]; void p(x) { i = i + 1; x = x + 1; } — and the call p(a[i]) is made when i = 5. Under call-by-name semantics, which array element actually gets incremented?',
+    options: ['a[5], the same element that call-by-reference would have used', 'a[6], because i has already been incremented to 6 by the time x (standing for a[i]) is evaluated in the second statement', 'a[4], because i is decremented internally', 'No array element is modified; only the local copy of i changes'],
+    answer: 1,
+    marks: 2,
+    difficulty: 'hard',
+    type: 'pyq-style',
+    explanation: 'Call-by-name does not fix the argument\'s address once at call time (unlike call-by-reference); instead, every occurrence of the formal parameter x inside p is replaced, at the moment it is used, by a fresh (re-evaluated) copy of the actual argument expression "a[i]". The first statement, i = i + 1, executes normally and changes the GLOBAL i from 5 to 6 — note this i is not the parameter, it is a separate global variable that a[i]\'s expression depends on. The second statement, x = x + 1, expands textually to a[i] = a[i] + 1, but by now i has already become 6, so this actually executes as a[6] = a[6] + 1 — NOT a[5], which is what one would naively expect (and what call-by-reference would actually do, since it would have fixed the address of a[5] once at the call). This surprising aliasing effect (Jensen\'s Device) is the classic textbook warning against call-by-name. Option 2 is correct.'
+  },
+  {
+    id: 'compiler-runtime-x8',
+    q: 'Which of the following is allocated on the heap rather than being part of some procedure\'s activation record on the runtime stack?',
+    options: ['A local int variable declared inside a (non-recursive) function', 'A global array declared at file scope outside any function', 'A block of memory obtained by an explicit call to malloc(), to be explicitly freed later by the programmer', 'A value parameter passed into a function by copying'],
+    answer: 2,
+    marks: 1,
+    difficulty: 'medium',
+    type: 'concept',
+    explanation: 'Storage classes map cleanly onto three allocation strategies: variables whose size and lifetime are fixed for the whole program run (globals, and locals of procedures that are never re-entered/recursive in some simple schemes) go in static storage, allocated once at compile/load time. Ordinary local variables and value parameters of a procedure are allocated inside that specific call\'s activation record on the stack, created on entry and destroyed on return. Memory whose size or lifetime cannot be determined until run time, and which must persist independently of any particular procedure call\'s lifetime (or be explicitly managed by the programmer), is allocated on the heap — exactly what malloc() (or new) provides. Only option 3 describes heap allocation; the rest are static or stack-based. Option 3 is correct.'
+  },
+  {
+    id: 'compiler-runtime-x9',
+    q: 'Why must the local variables of a recursive procedure be allocated on a stack (inside a fresh activation record per call) rather than in fixed static storage?',
+    options: ['Because recursive procedures are not allowed to have local variables at all', 'Because each concurrently active invocation of the procedure needs its own independent copy of the locals; a single static location would be shared and overwritten by every nested call, corrupting all the outer invocations\' data', 'Because static storage cannot hold integer values, only strings', 'Because the compiler cannot compute the address of static variables at compile time'],
+    answer: 1,
+    marks: 1,
+    difficulty: 'easy',
+    type: 'concept',
+    explanation: 'A recursive call means multiple invocations of the same procedure are simultaneously "in progress," each potentially at a different point in its own computation with its own distinct values for what look like "the same" local variables. If those locals were static (one fixed memory location shared by every call), then a nested recursive call would overwrite the outer call\'s values in that same location, and when the nested call returned, the outer call would find its local variables corrupted. Giving each call its own activation record on a stack — pushed on call, popped on return — automatically gives every active invocation an independent, correctly preserved copy of its locals. Static allocation works fine for non-recursive procedures but fundamentally breaks recursion. Option 2 is correct.'
+  },
+  {
+    id: 'compiler-runtime-x10',
+    q: 'A recursive procedure declares one local integer variable count. At a moment when the recursion has reached a depth of 3 (three invocations of the procedure are simultaneously active on the call stack), how many separate, independently addressable copies of count currently exist in memory?',
+    options: ['1', '2', '3', '0'],
+    answer: 2,
+    marks: 1,
+    difficulty: 'medium',
+    type: 'numerical',
+    explanation: 'Stack-based allocation gives every active activation record its own private storage for the procedure\'s local variables, completely independent of every other active invocation\'s storage for the "same" variable name. With exactly 3 invocations simultaneously active (recursion depth 3), there are exactly 3 separate activation records currently on the stack, and hence exactly 3 separate copies of count, one inside each activation record, each potentially holding a different value at that moment. This is precisely the mechanism that makes recursion work correctly: no invocation\'s local state interferes with any other\'s. Option 3 is correct.'
+  },
+  {
+    id: 'compiler-runtime-x11',
+    q: 'In general, the control (dynamic) link and the access (static) link of the same activation record:',
+    options: ['Always point to the same activation record, since a procedure is always called from within its lexically enclosing procedure', 'Can point to different activation records, because the caller of a procedure (determined by the dynamic call chain) need not be the same as its lexically enclosing procedure (determined by where it is textually defined)', 'Are only both present in languages that disallow nested procedures', 'Are merged into a single field in every practical compiler implementation'],
+    answer: 1,
+    marks: 2,
+    difficulty: 'hard',
+    type: 'concept',
+    explanation: 'The control link always points to whoever actually called the procedure at run time, following the dynamic call sequence. The access link always points to the most recent invocation of the procedure that lexically (textually) contains this one\'s declaration, following the static nesting structure. These two coincide only in the special case that a procedure happens to be called directly from within its own lexically enclosing procedure. In general — for example when a deeply nested procedure is called indirectly through several other unrelated procedures, or when procedures are passed as parameters and invoked far from their lexical "home" — the caller and the lexical parent are different activation records entirely, so the two links diverge. This distinction is precisely why languages supporting nested procedures with static scoping need both links maintained separately. Option 2 is correct.'
+  },
+  {
+    id: 'compiler-runtime-x12',
+    q: 'In copy-restore (also called copy-in copy-out) parameter passing, when are the final values of the formal parameters copied back into the actual argument variables?',
+    options: ['Continuously, on every single assignment to the formal parameter during the procedure body, just like call by reference', 'Only once, at the moment the procedure returns, after which the actual arguments are updated with whatever final values the formals held', 'Never; copy-restore behaves identically to call by value with no copy-back at all', 'Before the procedure body executes, instead of after'],
+    answer: 1,
+    marks: 1,
+    difficulty: 'medium',
+    type: 'concept',
+    explanation: 'Copy-restore is a middle ground between call by value and call by reference: at call time the actual argument\'s current value is copied INTO the formal parameter (like call by value), the procedure body then operates purely on this local copy (unlike call by reference, so no aliasing effects occur during execution), and only when the procedure is about to return is the formal parameter\'s final value copied back OUT to the actual argument\'s storage location. This one-shot copy-back at exit is what distinguishes it from call by value (which never copies back) and from call by reference (which effectively "copies back" continuously and immediately, since it is really just aliasing). The distinction between copy-restore and true reference passing only becomes visible when the same variable is passed as two different aliased arguments, or when the callee has aliasing side effects during its execution. Option 2 is correct.'
+  },
+  {
+    id: 'compiler-runtime-x13',
+    q: 'The total size of a procedure\'s activation record can usually be computed entirely at compile time. Under which of the following circumstances does this stop being true, so that the size becomes known only when the procedure is actually called (or even only as it executes)?',
+    options: ['Whenever the procedure has more than one local variable', 'Whenever the procedure declares a local array (or other local data) whose size depends on a value that is only known at run time, such as a variable-length array', 'Whenever the procedure has any parameters at all', 'Whenever the procedure is recursive, regardless of what it declares locally'],
+    answer: 1,
+    marks: 2,
+    difficulty: 'medium',
+    type: 'concept',
+    explanation: 'For an "ordinary" procedure — fixed number of parameters, fixed number of simple local variables, no locals whose size depends on run-time data — the compiler knows exactly how many bytes each field of the activation record needs, so the whole frame size is a compile-time constant, baked directly into the generated prologue/epilogue code. This breaks down precisely when a local has a size that cannot be determined until execution reaches that declaration — the classic example is a local array declared with a bound that is itself a run-time expression (a variable-length array, as in C99, or certain dynamic-array declarations). In that case the activation record\'s size is only fixed at the point the procedure is actually invoked (or even partway through, once the bound is evaluated), not earlier at compile time. Simply having many locals, having parameters, or being recursive does not by itself prevent compile-time size computation — recursion only requires multiple same-sized frames, not variable-sized ones. Option 2 is correct.'
+  }
+);
