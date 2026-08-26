@@ -1184,3 +1184,195 @@ window.GATE_DATA.questions['engmath'].topics.push({
     }
   ]
 });
+
+window.GATE_DATA.questions['engmath'].topics.push({
+  id: 'engmath-probability',
+  name: 'Probability',
+  theory: {
+    intro: "Probability is one of the two or three highest-yield engineering-mathematics topics on GATE CS&IT, appearing almost every year as both 1-mark concept checks and 2-mark numericals. It underlies randomized algorithms, machine learning, queueing and reliability analysis, so examiners test it heavily. The core skill set is small but must be automatic: the basic axioms and set-style manipulations (union, complement), conditional probability and Bayes' theorem (especially the classic disease-test and multi-box setups), independence, the standard named random variables (binomial, Poisson, uniform, exponential, normal) with their means and variances, and the linearity properties of expectation and variance. GATE questions rarely require deep probability theory; they require recognizing which of these five or six formulas applies and plugging in numbers cleanly and quickly, without arithmetic slips - so fluency with the formulas matters far more than derivations.",
+    core: "• Axioms: for any event A, 0 <= P(A) <= 1, P(sample space) = 1, and for mutually exclusive events P(A union B) = P(A) + P(B). The complement rule P(A') = 1 - P(A) is used constantly to compute 'at least one' probabilities. The general addition rule for any two events is P(A union B) = P(A) + P(B) - P(A intersect B), subtracting the double-counted overlap.\n\n• Conditional probability: P(A|B) = P(A intersect B) / P(B), defined whenever P(B) > 0; it is the probability of A restricted to the world where B is known to have happened. Rearranging gives the multiplication rule P(A intersect B) = P(A|B) * P(B) = P(B|A) * P(A), useful for building up joint probabilities from a sequence of conditional steps (as in a tree diagram).\n\n• Law of total probability: if B1, B2, ..., Bn partition the sample space (mutually exclusive, exhaustive), then P(A) = sum over i of P(A|Bi) * P(Bi). This is the standard way to compute an overall probability when the world splits into distinct cases (e.g. drawing from one of several boxes, or a population split into diseased/healthy).\n\n• Bayes' theorem: P(Bi|A) = P(A|Bi) * P(Bi) / P(A), where the denominator P(A) is expanded via the law of total probability. GATE's favourite dressing for this is the medical-test problem: given a disease prevalence P(D), a test sensitivity P(positive|D), and a false-positive rate P(positive|not D), find P(D|positive) - the answer is often surprisingly small even for an accurate-sounding test, because a rare disease means most positives come from the much larger healthy population.\n\n• Independence: events A and B are independent iff P(A intersect B) = P(A) * P(B), equivalently P(A|B) = P(A). Independence must be verified (or given), never assumed from the problem's phrasing alone; a common trap is disjoint (mutually exclusive) events being mistaken for independent ones - in fact, two events with nonzero probability that are mutually exclusive are always dependent, since knowing one occurred makes the other impossible.\n\n• Random variables and standard distributions. Discrete: Bernoulli(p) has mean p and variance p(1-p). Binomial(n,p) counts successes in n independent Bernoulli trials: P(X=k) = C(n,k) p^k (1-p)^{n-k}, mean np, variance np(1-p). Geometric(p) counts trials to the first success: P(X=k) = (1-p)^{k-1} p, mean 1/p. Poisson(lambda) models rare events in a fixed interval: P(X=k) = e^{-lambda} lambda^k / k!, with the special property mean = variance = lambda.\n\n• Continuous: Uniform(a,b) has constant density 1/(b-a) on [a,b], mean (a+b)/2, variance (b-a)^2/12. Exponential(lambda) has density lambda*e^{-lambda x} for x>=0, mean 1/lambda, variance 1/lambda^2, and the defining memoryless property P(X > s+t | X > s) = P(X > t). Normal(mu, sigma^2) is the bell curve with mean mu and variance sigma^2; roughly 68% of its mass lies within 1 standard deviation of the mean, 95% within 2, and 99.7% within 3 (the empirical or '68-95-99.7' rule); the standard normal has mu=0, sigma=1.\n\n• Expectation and variance: E[X] = sum x*P(X=x) (or integral x*f(x) dx for continuous X). Linearity always holds, independence or not: E[aX+bY+c] = a*E[X] + b*E[Y] + c. Variance: Var(X) = E[X^2] - (E[X])^2, and Var(aX+b) = a^2 * Var(X) (adding a constant shifts the mean but never changes spread). For independent X and Y, Var(X+Y) = Var(X) + Var(Y) and E[XY] = E[X]*E[Y]; neither identity holds in general when X and Y are dependent.\n\n• Mean, median, mode: the mean is the arithmetic average, the median is the middle value (50th percentile), and the mode is the most frequent value. For a symmetric unimodal distribution (like the normal), all three coincide. For a right-skewed (long right tail) distribution, mean > median > mode; for a left-skewed distribution, the inequalities reverse: mean < median < mode.",
+    strategy: "The exam's most heavily tested pattern is Bayes' theorem in a disease-test or box/urn disguise. Always build the calculation in three explicit lines: (1) the prior probabilities of each case, (2) the conditional probability of the observed evidence under each case, (3) combine via the law of total probability for the denominator, then divide. Mini worked example: a factory's machine A produces 60% of items with a 2% defect rate, machine B produces 40% with a 5% defect rate; given a random item is defective, P(from A) = P(defective|A)*P(A) / [P(defective|A)*P(A) + P(defective|B)*P(B)] = (0.02*0.6)/(0.02*0.6 + 0.05*0.4) = 0.012/0.032 = 0.375. Writing out numerator and denominator separately (never trying to do it in your head) avoids the arithmetic slip that costs most Bayes questions.\n\nFor expectation-of-waiting-time questions (expected number of coin tosses until an event), set up a state-based recursion: let E be the expected additional trials from the 'no progress' state; each state's equation is 1 (for the trial just taken) plus a weighted average of where you land next. This handles 'first head' (mean 1/p) and the harder 'first HH' (mean 6 for a fair coin) equally well, and generalizes beyond memorized formulas.\n\nFor distribution questions, first identify which of the five named distributions fits the story (counting successes in fixed trials => binomial; counting rare events over an interval => Poisson; time until an event under memorylessness => exponential; equally likely over a range => uniform), then simply plug into its known mean/variance formula - do not re-derive from the definition under time pressure. For linearity-of-expectation questions, remember it needs no independence assumption at all, which is what makes it such a powerful shortcut for sums of possibly-dependent indicator variables (a technique widely used in randomized algorithm analysis)."
+  },
+  questions: [
+    {
+      id: 'engmath-probability-q1',
+      q: 'If P(A) = 0.4, P(B) = 0.5 and P(A intersect B) = 0.1, what is P(A union B)?',
+      options: ['0.8', '0.9', '0.5', '1.0'],
+      answer: 0,
+      marks: 1,
+      difficulty: 'easy',
+      type: 'numerical',
+      explanation: "The general addition rule states P(A union B) = P(A) + P(B) - P(A intersect B), where the last term corrects for the overlap being counted twice when you simply add P(A) and P(B). Substituting: 0.4 + 0.5 - 0.1 = 0.8. If A and B were mutually exclusive (P(A intersect B) = 0), you could add directly, but here the events overlap, so the subtraction is essential - forgetting it and adding 0.4+0.5=0.9 is the most common error on this exact question type."
+    },
+    {
+      id: 'engmath-probability-q2',
+      q: 'If P(A intersect B) = 0.2 and P(B) = 0.4, what is P(A|B)?',
+      options: ['0.5', '0.8', '0.2', '0.08'],
+      answer: 0,
+      marks: 1,
+      difficulty: 'easy',
+      type: 'concept',
+      explanation: "By definition, conditional probability is P(A|B) = P(A intersect B)/P(B) = 0.2/0.4 = 0.5. This says that among the outcomes where B has occurred, half of them also have A occurring. A frequent confusion is dividing the wrong way (computing P(B)/P(A intersect B) or P(B|A) instead) - always divide the joint probability by the probability of the event you are conditioning ON (the one after the vertical bar)."
+    },
+    {
+      id: 'engmath-probability-q3',
+      q: 'Events A and B satisfy P(A) = 0.5, P(B) = 0.4, and P(A intersect B) = 0.2. Which statement is correct?',
+      options: ['A and B are independent', 'A and B are mutually exclusive', 'A and B are neither independent nor mutually exclusive', 'Not enough information to decide'],
+      answer: 0,
+      marks: 2,
+      difficulty: 'medium',
+      type: 'concept',
+      explanation: "Independence requires P(A intersect B) = P(A)*P(B). Here P(A)*P(B) = 0.5*0.4 = 0.2, which exactly equals the given P(A intersect B) = 0.2, so A and B are independent. They are clearly not mutually exclusive, since mutually exclusive events would require P(A intersect B) = 0, but it is 0.2 here. This question tests the precise definitional check for independence rather than an intuitive guess - always compute P(A)*P(B) and compare it numerically to the given joint probability."
+    },
+    {
+      id: 'engmath-probability-q4',
+      q: 'A disease affects 1% of a population. A screening test has 99% sensitivity (correctly detects the disease when present) and 95% specificity (correctly gives a negative result when the disease is absent). If a random person tests positive, what is the probability they actually have the disease?',
+      options: ['Approximately 16.7%', 'Approximately 99%', 'Approximately 95%', 'Approximately 50%'],
+      answer: 0,
+      marks: 2,
+      difficulty: 'hard',
+      type: 'pyq-style',
+      explanation: "Let D = has disease, Pos = tests positive. P(D)=0.01, P(Pos|D)=0.99, and since specificity is 95%, the false-positive rate is P(Pos|not D)=0.05, with P(not D)=0.99. By the law of total probability, P(Pos) = P(Pos|D)P(D) + P(Pos|not D)P(not D) = 0.99*0.01 + 0.05*0.99 = 0.0099 + 0.0495 = 0.0594. By Bayes' theorem, P(D|Pos) = P(Pos|D)P(D)/P(Pos) = 0.0099/0.0594 = 1/6 ~ 0.1667, i.e. about 16.7%. This is the single most important intuition-check in probability: even a seemingly accurate 99%/95% test gives a mostly-false alarm when the underlying condition is rare, because the large healthy population still contributes many false positives in absolute terms."
+    },
+    {
+      id: 'engmath-probability-q5',
+      q: 'Box 1 contains 3 red and 2 blue balls; Box 2 contains 1 red and 4 blue balls. A box is chosen at random (equal chance) and a ball is drawn, which turns out to be red. What is the probability the ball came from Box 1?',
+      options: ['0.75', '0.6', '0.5', '0.4'],
+      answer: 0,
+      marks: 2,
+      difficulty: 'hard',
+      type: 'pyq-style',
+      explanation: "P(Box1)=P(Box2)=0.5. P(Red|Box1)=3/5=0.6, P(Red|Box2)=1/5=0.2. By the law of total probability, P(Red) = 0.5*0.6 + 0.5*0.2 = 0.3 + 0.1 = 0.4. By Bayes' theorem, P(Box1|Red) = P(Red|Box1)*P(Box1)/P(Red) = (0.6*0.5)/0.4 = 0.3/0.4 = 0.75. The key structure to notice is that Box 1 both has the higher chance of producing red AND is equally likely to have been chosen, so observing red should shift belief substantially toward Box 1 - which the 0.75 answer confirms (up from the 0.5 prior)."
+    },
+    {
+      id: 'engmath-probability-q6',
+      q: 'A fair coin is tossed repeatedly until the first head appears. What is the expected number of tosses?',
+      options: ['2', '1', '0.5', '4'],
+      answer: 0,
+      marks: 1,
+      difficulty: 'medium',
+      type: 'numerical',
+      explanation: "The number of tosses until the first head follows a geometric distribution with success probability p = 0.5, whose mean is 1/p. Here that gives 1/0.5 = 2. This can also be derived from a simple recursion: let E be the expected number of tosses; with probability 0.5 the first toss is heads (done in 1 toss), and with probability 0.5 it is tails, costing 1 toss and restarting the same problem, giving E = 1 + 0.5*0 + 0.5*E, so 0.5E = 1 and E = 2. This 1/p formula for 'trials until first success' is one of the most reusable results in GATE probability."
+    },
+    {
+      id: 'engmath-probability-q7',
+      q: 'A fair coin is tossed repeatedly until two consecutive heads (HH) appear for the first time. What is the expected number of tosses?',
+      options: ['6', '4', '3', '2'],
+      answer: 0,
+      marks: 2,
+      difficulty: 'hard',
+      type: 'pyq-style',
+      explanation: "Define state S0 (no useful progress: start, or last toss was T) and state S1 (last toss was H, one more H needed). Let E0, E1 be the expected further tosses from each state. From S0: E0 = 1 + 0.5*E1 + 0.5*E0, which simplifies to E0 = 2 + E1. From S1: E1 = 1 + 0.5*0 + 0.5*E0 (a head finishes; a tail sends you back to S0), i.e. E1 = 1 + 0.5*E0. Substituting: E0 = 2 + 1 + 0.5*E0 = 3 + 0.5*E0, so 0.5*E0 = 3 and E0 = 6. This state-recursion technique is essential whenever the stopping condition depends on a run or pattern rather than a single event, and 6 is the well-known answer for expected tosses to first HH with a fair coin."
+    },
+    {
+      id: 'engmath-probability-q8',
+      q: 'X follows a Binomial distribution with n = 10 trials and success probability p = 0.3. What is E[X]?',
+      options: ['3', '7', '0.3', '2.1'],
+      answer: 0,
+      marks: 1,
+      difficulty: 'easy',
+      type: 'concept',
+      explanation: "For a Binomial(n,p) random variable, the mean is simply E[X] = n*p, since X is the sum of n independent Bernoulli(p) trials and expectation is linear (E[sum] = sum of E[each], each contributing p). Here E[X] = 10*0.3 = 3. The variance, by contrast, is n*p*(1-p) = 10*0.3*0.7 = 2.1 - note that 2.1 is the variance, not the mean, and is a common distractor for students who confuse the two formulas."
+    },
+    {
+      id: 'engmath-probability-q9',
+      q: 'A fair coin is tossed 4 times. What is the probability of getting exactly 2 heads?',
+      options: ['0.375', '0.25', '0.5', '0.0625'],
+      answer: 0,
+      marks: 2,
+      difficulty: 'medium',
+      type: 'numerical',
+      explanation: "This is Binomial(n=4, p=0.5). P(X=2) = C(4,2) * (0.5)^2 * (0.5)^2 = 6 * 0.25 * 0.25 = 6/16 = 0.375. The combinatorial factor C(4,2)=6 counts the number of ways to choose which 2 of the 4 tosses are heads (e.g. HHTT, HTHT, HTTH, THHT, THTH, TTHH), and each specific sequence of 2 heads and 2 tails has probability (0.5)^4 = 1/16, so the total is 6/16. A common slip is forgetting the combinatorial factor and just computing (0.5)^4 = 0.0625, which is the probability of one specific sequence, not 'exactly 2 heads' overall."
+    },
+    {
+      id: 'engmath-probability-q10',
+      q: 'A random variable X follows a Poisson distribution with mean 4. What is Var(X)?',
+      options: ['4', '2', '16', '0.25'],
+      answer: 0,
+      marks: 1,
+      difficulty: 'easy',
+      type: 'concept',
+      explanation: "The Poisson distribution has the distinctive property that its mean and variance are always equal to the same parameter, lambda. Since the mean is given as 4, lambda = 4, and therefore Var(X) = lambda = 4 as well. This mean-equals-variance property is unique among the commonly tested distributions and is frequently used directly as a 1-mark identification question - if a problem states both the mean and variance of a distribution are equal, it is very likely describing a Poisson random variable."
+    },
+    {
+      id: 'engmath-probability-q11',
+      q: 'The number of typos on a page follows a Poisson distribution with mean 2 per page. What is the probability that a randomly chosen page has zero typos?',
+      options: ['e^{-2} (approximately 0.135)', 'e^{-2}/2', '1 - e^{-2}', '0.5'],
+      answer: 0,
+      marks: 2,
+      difficulty: 'medium',
+      type: 'numerical',
+      explanation: "For Poisson(lambda), P(X=k) = e^{-lambda} * lambda^k / k!. With lambda = 2 and k = 0: P(X=0) = e^{-2} * 2^0 / 0! = e^{-2} * 1 / 1 = e^{-2}, which numerically is about 0.1353. Note 0! = 1 and 2^0 = 1, so the formula collapses cleanly for k=0 - a useful shortcut to remember is that P(X=0) for any Poisson(lambda) is always just e^{-lambda}, with no other terms to compute."
+    },
+    {
+      id: 'engmath-probability-q12',
+      q: 'X is uniformly distributed on the interval [2, 10]. What is E[X]?',
+      options: ['6', '5', '8', '4'],
+      answer: 0,
+      marks: 1,
+      difficulty: 'easy',
+      type: 'concept',
+      explanation: "For a Uniform(a,b) random variable, the density is constant across the interval, so by symmetry the mean is simply the midpoint: E[X] = (a+b)/2. Here (2+10)/2 = 12/2 = 6. This midpoint rule works because the uniform density is symmetric about the center of the interval, so the average value of X is exactly that center point, with no integration needed for a quick 1-mark question."
+    },
+    {
+      id: 'engmath-probability-q13',
+      q: 'X is uniformly distributed on the interval [0, 6]. What is Var(X)?',
+      options: ['3', '6', '1', '9'],
+      answer: 0,
+      marks: 2,
+      difficulty: 'medium',
+      type: 'numerical',
+      explanation: "For a Uniform(a,b) random variable, the variance formula is Var(X) = (b-a)^2 / 12. Here b - a = 6 - 0 = 6, so Var(X) = 6^2/12 = 36/12 = 3. This formula is worth memorizing directly, since deriving it from Var(X) = E[X^2] - (E[X])^2 by integration under time pressure is slower and more error-prone than simply substituting into (b-a)^2/12."
+    },
+    {
+      id: 'engmath-probability-q14',
+      q: 'The lifetime of a component follows an exponential distribution with mean 5 years. What is the probability that the component lasts more than 10 years?',
+      options: ['e^{-2} (approximately 0.135)', 'e^{-0.5}', '0.5', '1 - e^{-2}'],
+      answer: 0,
+      marks: 2,
+      difficulty: 'hard',
+      type: 'numerical',
+      explanation: "For Exponential(lambda), the mean is 1/lambda, so a mean of 5 gives lambda = 1/5 = 0.2. The survival probability is P(X > t) = e^{-lambda*t}. Here P(X > 10) = e^{-0.2*10} = e^{-2}, approximately 0.135. A related and equally testable fact is the memoryless property: given the component has already survived s years, the probability it survives t more years is still e^{-lambda*t}, exactly as if it were brand new - so P(X > 15 | X > 5) would also equal e^{-0.2*10} = e^{-2}, the same value as this unconditional computation."
+    },
+    {
+      id: 'engmath-probability-q15',
+      q: 'For a Normal (Gaussian) distribution, approximately what percentage of the data lies within 2 standard deviations of the mean?',
+      options: ['95%', '68%', '99.7%', '50%'],
+      answer: 0,
+      marks: 1,
+      difficulty: 'easy',
+      type: 'concept',
+      explanation: "This is the empirical rule (also called the 68-95-99.7 rule) for normal distributions: about 68% of the data lies within 1 standard deviation of the mean, about 95% within 2 standard deviations, and about 99.7% within 3 standard deviations. These approximate percentages come from integrating the normal density over the corresponding z-ranges and are worth memorizing as quick reference points, since GATE often tests recognition of these figures directly rather than requiring a z-table lookup."
+    },
+    {
+      id: 'engmath-probability-q16',
+      q: 'If Var(X) = 4, what is Var(3X + 5)?',
+      options: ['36', '17', '9', '4'],
+      answer: 0,
+      marks: 1,
+      difficulty: 'hard',
+      type: 'concept',
+      explanation: "Variance is unaffected by adding a constant (shifting the distribution does not change its spread) but scales by the square of a multiplicative constant: Var(aX + b) = a^2 * Var(X). Here a = 3 and b = 5, so Var(3X+5) = 3^2 * Var(X) = 9 * 4 = 36. A common error is forgetting to square the coefficient (giving 3*4=12, not an option here but a frequent mistake elsewhere) or incorrectly including the additive constant 5 in the variance calculation - constants shift the mean E[3X+5] = 3E[X]+5 but never affect the variance."
+    },
+    {
+      id: 'engmath-probability-q17',
+      q: 'X and Y are independent random variables with E[X] = 3 and E[Y] = 5. What is E[XY]?',
+      options: ['15', '8', '3', '5'],
+      answer: 0,
+      marks: 1,
+      difficulty: 'medium',
+      type: 'concept',
+      explanation: "For independent random variables, E[XY] = E[X] * E[Y], since independence means the joint distribution factors as the product of the marginals, and the expectation of a product of independent variables is the product of their expectations. Here E[XY] = 3 * 5 = 15. It is important to note this identity generally FAILS when X and Y are dependent (in that case E[XY] can differ from E[X]E[Y] by an amount related to their covariance); the independence assumption given in the problem is what licenses this shortcut, in contrast to linearity of expectation E[X+Y]=E[X]+E[Y], which holds unconditionally regardless of independence."
+    },
+    {
+      id: 'engmath-probability-q18',
+      q: 'A distribution has a long tail extending to the right (right-skewed), such as typical income data. Which ordering of its mean, median and mode is expected?',
+      options: ['mean > median > mode', 'mean < median < mode', 'mean = median = mode', 'mode > mean > median'],
+      answer: 0,
+      marks: 1,
+      difficulty: 'medium',
+      type: 'concept',
+      explanation: "In a right-skewed distribution, a small number of unusually large values pull the mean upward more strongly than they affect the median (which only depends on the middle-ranked value, not on how extreme the tail values are), while the mode stays at the most frequent (typically lower) value. This produces the ordering mean > median > mode. For a symmetric distribution like the normal, all three coincide (mean = median = mode); for a left-skewed distribution, the inequalities reverse to mean < median < mode. Income distributions are the standard real-world example of right skew, since a few very high earners pull the average above the typical (median) income."
+    }
+  ]
+});
