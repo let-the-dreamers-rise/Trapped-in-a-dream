@@ -646,6 +646,328 @@ window.GATE_DATA.questions['os'] = {
           explanation: 'When every resource type involved has only one instance, any cycle in the resource-allocation graph guarantees deadlock (necessary and sufficient), since each resource can satisfy at most one requester and every process along the cycle is genuinely, permanently blocked. Once resource types can have multiple instances, a cycle remains a necessary condition for deadlock (no cycle definitely means no deadlock), but it is no longer sufficient by itself, because a resource type inside the cycle might still have a free, unallocated instance elsewhere that can satisfy one of the pending requests and unravel the whole chain, as demonstrated in question 10\\u2019s scenario. This distinction is exactly why deadlock detection for multi-instance systems needs the fuller Banker\\u2019s-style algorithm rather than a simple graph-cycle check.'
         }
       ]
+    },
+    {
+      id: 'os-memory',
+      name: 'Memory Management',
+      theory: {
+        intro: 'Memory management covers how the OS maps a process\\u2019s logical address space onto physical RAM, and it is one of the most numerically dense topics in GATE OS: expect direct bit-arithmetic on page numbers and offsets, page-table-size computations, multilevel page-table splits, TLB-based effective memory access time (EMAT), and classic dynamic-partition allocation (first fit, best fit, worst fit) tracing. Contiguous allocation questions test whether you can track fragmentation and predict which strategy can satisfy a sequence of allocation requests. Paging questions test whether you can convert bit counts into page-table sizes and vice versa. Segmentation questions test base-and-limit validity checks. This topic rewards careful, disciplined arithmetic far more than memorised formulas -- get one bit-width wrong and every downstream number in a multilevel paging question collapses.',
+        core: 'Contiguous memory allocation gives each process one single contiguous block of physical memory. As processes are loaded and removed, memory develops holes of varying sizes -- external fragmentation -- even though the total free space may be more than sufficient, because no single hole is big enough for a given request. Three classic strategies decide which hole to use for an incoming request: first fit scans holes from the start and picks the first one large enough (fast, but tends to leave many small unusable fragments near the front); best fit scans all holes and picks the smallest one that is still large enough (tightest fit, minimising wasted space per allocation, but leaves many very small, often-useless leftover slivers, and is slower since it must scan everything); worst fit picks the largest available hole (leaves the biggest possible leftover fragment, hoping it stays usable later, but empirically performs worst overall and is also a full-scan algorithm). A well-known statistical result, the 50-percent rule, states that under first-fit allocation, given N allocated blocks, roughly 0.5N additional blocks worth of space are lost to fragmentation on average.\n\nInternal fragmentation is wasted space INSIDE an allocated block/page/frame because the allocation granularity is coarser than what the process actually needs (e.g., a process needing 4097 bytes with 4KB pages wastes almost an entire extra page). External fragmentation is wasted space BETWEEN allocated blocks -- free memory exists in total, but is too fragmented into small, non-contiguous pieces to satisfy a request. Paging trades external fragmentation for a small amount of internal fragmentation (in the last page of each process); pure segmentation trades internal fragmentation for external fragmentation, since segments are logically sized to match program units (code, stack, data) rather than fixed hardware-friendly sizes.\n\nPaging divides both logical address space (into pages) and physical memory (into frames) of the same fixed size, so any page can be placed in any free frame with no external fragmentation. A logical address is split into a page number and a page offset: if the page size is 2^d bytes, the low-order d bits of the logical address form the offset, and the remaining high-order bits form the page number, which indexes into the page table to find the corresponding frame number; the physical address is then (frame number x page size) + offset. Page table size = (number of pages) x (size of one page-table entry, PTE); the number of pages equals 2 raised to (total logical-address bits minus offset bits).\n\nWhen the logical address space is large, a single flat page table itself becomes too big to keep entirely in memory (or even to allocate contiguously), so multilevel (hierarchical) paging splits the page-number field itself into two or more index fields, each indexing into a separate level of page tables, so that any given process only needs to keep in memory the specific inner-level page-table pages it is actually using. A common GATE constraint is: choose each level\\u2019s index width so that one page table at that level fits exactly within a single page frame; if the PTE size is s bytes and the page/frame size is 2^d bytes, then each such page table holds 2^d / s entries, requiring log2(2^d / s) index bits per level.\n\nThe Translation Lookaside Buffer (TLB) is a small, fast, associative hardware cache of recent page-number-to-frame-number translations, avoiding a memory access to the page table on every single reference. Effective Memory Access Time (EMAT) combines the TLB hit and miss cases: on a TLB hit, translation costs only the TLB lookup time before the actual memory access; on a TLB miss, the CPU must additionally access the page table in memory (one extra memory access) before it can access the actual data. If TLB lookup time is t, memory access time is m, and TLB hit ratio is h, then EMAT = h(t + m) + (1 - h)(t + m + m) = t + m + (1 - h)m, assuming a single-level page table and no page faults.\n\nSegmentation represents a program as a collection of logically meaningful, variable-length segments (code, stack, heap, individual data structures), each described by a segment table entry holding a base address and a limit (length). A logical address is a pair (segment number, offset); the hardware checks offset < limit (bounds check) before computing physical address = base + offset; if the offset is not less than the limit, a segmentation fault (protection trap) is raised, since the reference falls outside that segment\\u2019s allocated bounds.',
+        strategy: 'For bit-arithmetic paging questions, always start from the offset field: offset bits = log2(page size), and page-number bits = total address bits - offset bits; number of pages/frames = 2^(those bits). Page table size = number of page-table entries x PTE size -- do not forget to convert the final answer into the unit (KB/MB) the options use. For multilevel paging splits, remember the standard GATE trick: each level\\u2019s page table is deliberately sized to fit inside exactly one frame, so entries-per-level-table = frame size / PTE size, and the number of index bits for that level is log2 of that quantity; verify your split by adding all the index-field bit widths plus the offset bits and confirming the total equals the given address width exactly -- a mismatch means you have made an arithmetic slip somewhere. For EMAT questions, identify every access the hardware must actually perform on a hit versus a miss before writing the formula down; a single-level TLB+page-table system costs (t + m) on a hit and (t + 2m) on a miss, giving EMAT = h(t+m) + (1-h)(t+2m); do not conflate this with page-fault EMAT formulas from demand paging, which add a page-fault service time instead of a second memory access. For contiguous-allocation questions, simulate first fit, best fit, and worst fit as three completely separate, parallel traces on the same original hole list -- do not let one strategy\\u2019s allocation choices influence another\\u2019s, and always re-sort or re-scan holes exactly as each strategy requires (first fit in original order, best/worst fit by size). Worked mini-example: page size 4KB (2^12), logical address space 4GB (2^32), so offset = 12 bits, page number = 32 - 12 = 20 bits, giving 2^20 pages; with a 4-byte PTE, page table size = 2^20 x 4 = 2^22 bytes = 4MB -- exactly the kind of chained computation GATE expects you to carry through without rounding errors at any step.'
+      },
+      questions: [
+        {
+          id: 'os-memory-q1',
+          q: 'What is the main drawback of pure contiguous memory allocation, where each process must occupy one single unbroken block of physical memory?',
+          options: ['External fragmentation: free memory becomes scattered into holes too small individually to satisfy new requests, even if their total is sufficient', 'Internal fragmentation only, never external fragmentation', 'It requires every process to be exactly the same size', 'It cannot support more than one process in memory at a time'],
+          answer: 0,
+          marks: 1,
+          difficulty: 'easy',
+          type: 'concept',
+          explanation: 'As processes of varying sizes are loaded into and removed from a contiguously allocated memory space, the free memory gradually breaks up into multiple non-contiguous holes of different sizes. Even if the sum of all free holes is more than enough to satisfy a new process\\u2019s memory request, no SINGLE hole may be large enough on its own, since contiguous allocation demands one unbroken block -- this wasted, scattered free space is called external fragmentation, and it is the defining weakness of pure contiguous allocation schemes. This is a different phenomenon from internal fragmentation, which involves wasted space within an allocated block rather than free space scattered between blocks; contiguous allocation can in principle support multiple processes simultaneously (each in its own contiguous region), so option D is also false.'
+        },
+        {
+          id: 'os-memory-q2',
+          q: 'Memory has holes, in order, of sizes 100K, 500K, 200K, 300K, 600K. Requests arrive in this order: 212K, 417K, 112K, 426K. Which allocation strategy can successfully satisfy ALL four requests?',
+          options: ['Best fit only', 'First fit only', 'Worst fit only', 'All three strategies succeed equally'],
+          answer: 0,
+          marks: 2,
+          difficulty: 'hard',
+          type: 'numerical',
+          explanation: 'First fit: 212K goes into the 500K hole (leaves 288K); 417K goes into the 600K hole (leaves 183K); 112K goes into the 288K leftover (leaves 176K); now remaining holes are 100K, 176K, 200K, 300K, 183K -- none reach 426K, so the last request FAILS. Worst fit: 212K goes into the largest hole, 600K (leaves 388K); 417K goes into the next largest, 500K (leaves 83K); 112K goes into the largest remaining, 388K (leaves 276K); remaining holes are 100K, 83K, 200K, 300K, 276K -- again none reach 426K, so it FAILS too. Best fit: 212K goes into the tightest fitting hole, 300K (leaves 88K); 417K goes into 500K (leaves 83K); 112K goes into 200K (leaves 88K); 426K goes into 600K (leaves 174K) -- every request is satisfied. Hence only best fit succeeds here.'
+        },
+        {
+          id: 'os-memory-q3',
+          q: 'What is the key distinction between internal fragmentation and external fragmentation?',
+          options: ['Internal fragmentation is wasted space inside an allocated unit; external fragmentation is wasted space scattered between allocated units', 'Internal fragmentation only occurs in segmentation; external fragmentation only occurs in paging', 'Internal fragmentation can never be reduced, while external fragmentation always can be eliminated with compaction', 'There is no meaningful difference between the two terms'],
+          answer: 0,
+          marks: 1,
+          difficulty: 'easy',
+          type: 'concept',
+          explanation: 'Internal fragmentation refers to memory wasted INSIDE a block, page, or frame that has already been allocated to a process, arising because the allocation granularity (e.g., a fixed page size) is coarser than the process\\u2019s actual requirement -- for example, a process needing just 1 byte more than a whole number of pages still gets allocated an entire extra page, wasting almost all of it. External fragmentation refers to memory that is technically free, but scattered as many small, non-contiguous holes BETWEEN allocated blocks, none individually large enough for a new request. Paging typically causes only internal fragmentation (in the last page of a process), while pure contiguous or segmented allocation causes external fragmentation; compaction can address external fragmentation but internal fragmentation cannot be compacted away, so option C reverses the truth.'
+        },
+        {
+          id: 'os-memory-q4',
+          q: 'A system has a 4 GB (2^32 byte) logical address space and a page size of 4 KB (2^12 bytes). How many bits of the logical address are used for the page number?',
+          options: ['20 bits', '12 bits', '32 bits', '22 bits'],
+          answer: 0,
+          marks: 1,
+          difficulty: 'medium',
+          type: 'numerical',
+          explanation: 'The page offset field always uses exactly log2(page size) bits, since the offset must be able to address every byte within a single page. Here the page size is 2^12 bytes, so the offset uses 12 bits. The remaining bits of the total 32-bit logical address are used for the page number: 32 - 12 = 20 bits. This means there are 2^20 (about 1 million) distinct pages in the logical address space, each of which the page table must be able to map to a physical frame number. A common error is to instead compute page count using the wrong total (e.g., dividing address space by page size incorrectly) rather than simply subtracting the offset-bit count from the total address-bit count.'
+        },
+        {
+          id: 'os-memory-q5',
+          q: 'Continuing from the previous question (20-bit page number, so 2^20 pages), if each page table entry (PTE) occupies 4 bytes, what is the total size of a single-level page table for one process using the full address space?',
+          options: ['4 MB', '1 MB', '2 MB', '20 MB'],
+          answer: 0,
+          marks: 1,
+          difficulty: 'medium',
+          type: 'numerical',
+          explanation: 'The total page-table size equals the number of page-table entries multiplied by the size of each entry. There are 2^20 pages, requiring 2^20 page-table entries, and each entry is 4 bytes (2^2 bytes), so the total page-table size is 2^20 x 2^2 = 2^22 bytes. Since 2^20 bytes is defined as 1 MB, 2^22 bytes equals 4 MB. This is exactly the kind of computation that motivates multilevel page tables in real systems: a full-address-space single-level page table per process, at 4 MB each, becomes wasteful when most processes only actually use a small fraction of their address space, since a flat table must still reserve entries for every possible page whether used or not.'
+        },
+        {
+          id: 'os-memory-q6',
+          q: 'A system uses two-level paging with a 32-bit logical address, a page size of 4 KB, and a page table entry size of 4 bytes, with each page-table page (at either level) required to fit exactly within one page frame. What are the bit-widths of the outer index, inner index, and offset fields respectively?',
+          options: ['10 bits, 10 bits, 12 bits', '12 bits, 10 bits, 10 bits', '11 bits, 11 bits, 10 bits', '9 bits, 11 bits, 12 bits'],
+          answer: 0,
+          marks: 2,
+          difficulty: 'hard',
+          type: 'numerical',
+          explanation: 'The offset field is fixed by the page size: 4 KB = 2^12 bytes, so offset = 12 bits. Since each page-table page must itself fit within one 4 KB frame and each entry is 4 bytes, each page table can hold 4096 / 4 = 1024 = 2^10 entries, so each index field (both the outer index into the top-level table, and the inner index into a second-level table) needs 10 bits to address all 1024 possible entries. Adding these up: 10 (outer) + 10 (inner) + 12 (offset) = 32 bits, exactly matching the given logical address width -- this cross-check confirms the split is correct. This clean "fit exactly in one frame" constraint is the standard way GATE forces the index-width computation rather than giving it directly.'
+        },
+        {
+          id: 'os-memory-q7',
+          q: 'A system uses a TLB with a hit ratio of 90%. TLB lookup takes 10 ns, and a main memory access takes 100 ns. Assuming a single-level page table with no page faults, what is the effective memory access time (EMAT)?',
+          options: ['120 ns', '110 ns', '100 ns', '210 ns'],
+          answer: 0,
+          marks: 2,
+          difficulty: 'hard',
+          type: 'numerical',
+          explanation: 'On a TLB hit (probability 0.9), the access cost is TLB lookup plus the one memory access to fetch the actual data: 10 + 100 = 110 ns. On a TLB miss (probability 0.1), the CPU must first do the TLB lookup (which misses, 10 ns), then access the page table in memory to get the frame number (100 ns), then access the actual data in memory (another 100 ns), totalling 10 + 100 + 100 = 210 ns. EMAT is the probability-weighted average: EMAT = 0.9 x 110 + 0.1 x 210 = 99 + 21 = 120 ns. A common mistake is forgetting the page-table memory access on a miss and only counting one extra memory reference instead of the TLB lookup plus two full memory accesses.'
+        },
+        {
+          id: 'os-memory-q8',
+          q: 'What is the key structural difference between paging and pure segmentation as memory management schemes?',
+          options: ['Paging uses fixed-size units transparent to the programmer (avoiding external fragmentation but risking internal fragmentation); segmentation uses variable-size, logically meaningful units matching program structure (avoiding internal fragmentation but risking external fragmentation)', 'Paging always requires more physical memory than segmentation for the same process', 'Segmentation cannot support memory protection, while paging always does', 'Paging and segmentation are mathematically identical schemes with different names'],
+          answer: 0,
+          marks: 1,
+          difficulty: 'medium',
+          type: 'concept',
+          explanation: 'Paging divides both logical and physical memory into fixed-size units (pages and frames) that are invisible to the programmer -- since any page can go into any free frame, external fragmentation is eliminated, though the very last page of a process typically is not fully used, causing internal fragmentation. Segmentation instead divides a program\\u2019s logical address space into variable-length segments that correspond to natural, logically meaningful units of the program (such as the code segment, the stack, or a particular data structure); since each segment is sized exactly to its content, there is no internal fragmentation, but variable-sized segments scattered through physical memory can still leave unusable external gaps. Both schemes support memory protection via bounds checking (limit registers), so option C is false, and the two are structurally quite different, so option D is false.'
+        },
+        {
+          id: 'os-memory-q9',
+          q: 'A system uses paging with a page size of 1 KB (1024 bytes). A process\\u2019s page table maps logical page number 3 to physical frame number 7. What is the physical address corresponding to logical address 3172?',
+          options: ['7268', '7172', '3172', '7072'],
+          answer: 0,
+          marks: 2,
+          difficulty: 'medium',
+          type: 'numerical',
+          explanation: 'With a page size of 1024 bytes, the logical address 3172 splits into a page number and offset by dividing by the page size: 3172 / 1024 = 3 with a remainder of 3172 - (3 x 1024) = 3172 - 3072 = 100. So the page number is 3 and the offset within that page is 100. The page table says logical page 3 maps to physical frame 7. The physical address is then computed as (frame number x page size) + offset = (7 x 1024) + 100 = 7168 + 100 = 7268. A common error is forgetting to first convert the frame number into a byte address (by multiplying by the page size) before adding the offset, which would incorrectly give something like frame number 7 concatenated arithmetically with the offset rather than properly scaled.'
+        },
+        {
+          id: 'os-memory-q10',
+          q: 'What is the primary purpose of a Translation Lookaside Buffer (TLB) in a paged memory system?',
+          options: ['To cache recent page-number-to-frame-number translations in fast associative hardware, avoiding a memory access to the page table on every reference', 'To store the entire contents of every page currently in physical memory', 'To replace the page table entirely so the OS never needs one', 'To detect and resolve deadlocks between competing processes'],
+          answer: 0,
+          marks: 1,
+          difficulty: 'easy',
+          type: 'concept',
+          explanation: 'Without a TLB, every single memory reference made by a process would require at least two actual memory accesses: one to read the relevant page table entry (to find the frame number), and a second to actually access the desired data or instruction at the translated physical address. A TLB is a small, fast, associative (content-addressable) hardware cache that stores a limited number of recently used page-number-to-frame-number mappings; on a TLB hit, the translation is available immediately without needing to touch the page table in memory at all, cutting the effective access time roughly in half on average. It supplements, rather than replaces, the page table (which must still exist as the authoritative full mapping), and it has nothing to do with deadlock detection.'
+        },
+        {
+          id: 'os-memory-q11',
+          q: 'A system uses two-level paging with a 35-bit virtual address space, a page size of 8 KB, and a page table entry size of 4 bytes, with each page-table page required to fit exactly within one page frame. What are the bit-widths of the offset field and each of the two page-table index fields?',
+          options: ['Offset = 13 bits, each index = 11 bits', 'Offset = 12 bits, each index = 12 bits', 'Offset = 13 bits, outer index = 12 bits, inner index = 10 bits', 'Offset = 14 bits, each index = 10 bits'],
+          answer: 0,
+          marks: 2,
+          difficulty: 'hard',
+          type: 'numerical',
+          explanation: 'Page size is 8 KB = 2^13 bytes, so the offset field is 13 bits. Each page-table page must fit inside one 8 KB frame, and each PTE is 4 bytes, so each page table holds 8192 / 4 = 2048 = 2^11 entries, meaning each index field (outer and inner) needs 11 bits to index all 2048 entries. Checking the total: 11 (outer) + 11 (inner) + 13 (offset) = 35 bits, which exactly matches the given 35-bit virtual address width, confirming this split is correct. This question is deliberately built so that both index fields come out equal and the totals check out exactly, which is the standard sanity check GATE numericals of this type are designed to reward.'
+        },
+        {
+          id: 'os-memory-q12',
+          q: 'Which statement correctly compares best-fit and worst-fit dynamic memory allocation strategies?',
+          options: ['Best fit tends to leave many very small, often-unusable leftover holes; worst fit deliberately leaves the largest possible leftover hole, hoping it remains usable, but this strategy performs worst overall in practice', 'Best fit always runs faster than worst fit because it stops at the first suitable hole', 'Worst fit guarantees zero external fragmentation, unlike best fit', 'Best fit and worst fit produce identical allocations for any input'],
+          answer: 0,
+          marks: 1,
+          difficulty: 'medium',
+          type: 'concept',
+          explanation: 'Best fit scans every free hole and selects the smallest one that is still large enough for the request, minimising the leftover space for that particular allocation; however, this tight fit often leaves behind slivers of free space too small to be useful for most future requests, accumulating many small, wasted fragments over time. Worst fit instead deliberately selects the largest available hole, on the theory that the resulting leftover fragment (also large) is more likely to remain useful later; despite this reasoning, extensive simulation studies have found worst fit tends to perform worse overall than both first fit and best fit. Both strategies require scanning the entire hole list to find the smallest or largest respectively, so best fit is not inherently faster (first fit is the one that can stop early), and neither strategy eliminates external fragmentation entirely.'
+        },
+        {
+          id: 'os-memory-q13',
+          q: 'A segment table has: Segment 1, base = 2000, limit = 300. A process presents logical address (segment = 1, offset = 350). What happens?',
+          options: ['A segmentation fault (protection trap) occurs, because the offset 350 is not less than the limit 300', 'The physical address 2350 is generated successfully', 'The physical address 2000 is generated, ignoring the offset', 'The offset wraps around to 50 and address 2050 is generated'],
+          answer: 0,
+          marks: 2,
+          difficulty: 'medium',
+          type: 'numerical',
+          explanation: 'Segmentation hardware always performs a bounds check before computing the physical address: it verifies that the given offset is strictly less than the segment\\u2019s limit (its declared length). Here the limit for segment 1 is 300, but the offset presented is 350, which is NOT less than 300 -- this means the process is trying to access memory beyond what was allocated to this segment. Rather than silently computing an out-of-bounds physical address (which would be a serious protection violation), the hardware raises a segmentation fault, trapping to the operating system, typically resulting in the process being terminated or signalled. There is no wraparound behaviour in standard segmentation hardware; the check is a strict less-than comparison, and any violation is treated as an addressing error, not silently corrected.'
+        },
+        {
+          id: 'os-memory-q14',
+          q: 'The "50-percent rule" for dynamic storage allocation under first-fit (and best-fit) states that, given N currently allocated memory blocks, approximately how much additional memory (measured in equivalent block units) is typically lost to fragmentation?',
+          options: ['About 0.5N blocks worth of space', 'Exactly N blocks worth of space', 'No space at all is ever lost under first fit', 'About 2N blocks worth of space'],
+          answer: 0,
+          marks: 1,
+          difficulty: 'medium',
+          type: 'concept',
+          explanation: 'The 50-percent rule is a well-known statistical result (derived under certain probabilistic assumptions about block sizes and request patterns) stating that, for dynamic storage allocation using first-fit or best-fit strategies, if there are currently N allocated blocks of memory, roughly an additional 0.5N blocks\\u2019 worth of memory space will typically be lost to fragmentation -- meaning for every two blocks successfully allocated, roughly one further block\\u2019s worth of capacity becomes unusable due to scattered small holes. This rule of thumb is used to argue that even seemingly efficient dynamic allocation strategies waste a significant, predictable fraction of memory to fragmentation over time, motivating the move to paging (which sidesteps external fragmentation entirely) in most modern operating systems.'
+        },
+        {
+          id: 'os-memory-q15',
+          q: 'Among first fit, best fit, and worst fit, which one is typically the fastest to execute for a single allocation request, and why?',
+          options: ['First fit, because it can stop scanning as soon as it finds the first hole large enough, without needing to examine every hole', 'Best fit, because it always finds the correct hole on its very first comparison', 'Worst fit, because the largest hole is always stored first in memory', 'All three strategies always take exactly the same amount of time'],
+          answer: 0,
+          marks: 1,
+          difficulty: 'easy',
+          type: 'concept',
+          explanation: 'First fit scans the list of free holes in order and immediately allocates the very first one it encounters that is large enough for the request, without needing to look at any of the remaining holes -- this makes it the fastest strategy on average, since it can terminate its search early. Best fit and worst fit, by contrast, both fundamentally require examining every single free hole in the entire list before they can be certain they have found the smallest (best fit) or largest (worst fit) one respectively, making them inherently full-scan algorithms regardless of how the holes happen to be ordered in memory. Neither best fit nor worst fit has any guaranteed shortcut to avoid this exhaustive comparison, so both are generally slower than first fit for a single allocation decision.'
+        }
+      ]
+    },
+    {
+      id: 'os-virtual-memory',
+      name: 'Virtual Memory',
+      theory: {
+        intro: 'Virtual memory lets a process run with only part of its address space actually resident in physical memory, loading the rest on demand and evicting pages when memory is full. GATE\\u2019s favourite exercise here is a page-replacement trace: given a reference string and a fixed number of frames, count the page faults produced by FIFO, LRU, and Optimal replacement, and sometimes deliberately expose Belady\\u2019s anomaly, where FIFO produces MORE faults with MORE frames -- a genuinely counter-intuitive result unique to non-stack algorithms. Beyond tracing, expect conceptual questions on thrashing (when the system spends more time paging than executing) and the working-set model that tries to prevent it, plus effective-access-time numericals that fold in a page-fault rate and page-fault service time. Precision in tie-breaking and look-ahead is essential -- a single wrong eviction choice cascades into a wrong fault count for the rest of the trace.',
+        core: 'Demand paging loads a page into physical memory only when it is actually referenced for the first time (or after being evicted), rather than loading a process\\u2019s entire address space upfront. Every memory reference to a page not currently resident triggers a page fault: the OS traps, finds a free frame (or selects a victim page to evict if memory is full), reads the required page in from secondary storage, updates the page table, and restarts the instruction that faulted.\n\nPage replacement algorithms decide which resident page to evict when a page fault occurs and no free frame exists. First-In-First-Out (FIFO) evicts the page that has been resident the longest, tracked via a simple queue ordered by load time; it is simple to implement but ignores how recently or frequently a page has actually been used, sometimes evicting a heavily used page purely because it happened to be loaded early. Least Recently Used (LRU) evicts the page that has not been referenced for the longest time, approximating the idea that recent access patterns predict near-future access; it generally performs well but requires either a hardware access-time stack/counter or an approximation (e.g., a reference-bit-based "clock"/second-chance algorithm) since exact LRU bookkeeping on every reference is expensive. Optimal (also called MIN or Belady\\u2019s optimal algorithm) evicts whichever resident page will not be referenced for the longest time in the future (or never again); it is provably the algorithm that minimises page faults for any given reference string, but it requires knowing the future reference sequence in advance, so it is used only as a theoretical lower bound for comparison, never in a real system.\n\nBelady\\u2019s anomaly is the surprising phenomenon where, for certain reference strings, increasing the number of available frames actually INCREASES the number of page faults under FIFO replacement -- intuitively one would always expect more frames to help or at worst not hurt, but FIFO is not a "stack algorithm" (its set of resident pages with m frames is not always a subset of its resident-page set with m+1 frames), which is precisely the property that allows this anomaly. LRU and Optimal are both stack algorithms and are mathematically guaranteed to never exhibit Belady\\u2019s anomaly -- adding frames under LRU or Optimal can never increase the fault count.\n\nThrashing occurs when the degree of multiprogramming is pushed so high, or a process is allocated so few frames, that the CPU spends most of its time servicing page faults and swapping pages in and out, rather than executing useful instructions -- system-wide CPU utilisation actually collapses even though the CPU scheduler, seeing low utilisation, may respond by admitting even more processes, worsening the problem in a vicious feedback loop. The working set model, introduced by Denning, is a leading defence against thrashing: the working set W(t, Delta) of a process at time t, with window size Delta, is defined as the set of distinct pages referenced in the most recent Delta references; a process is allocated (at least) as many frames as the size of its working set, and the OS can use the total working-set size across all active processes as an admission-control signal -- if the sum of all working sets exceeds the total number of available frames, the OS should suspend (swap out) some process entirely rather than let every process starve for frames simultaneously.\n\nEffective Access Time (EAT) under demand paging, given a page-fault rate p, a memory access time ma, and a page-fault service time pf (dominated by the disk I/O needed to bring in the missing page), is computed as EAT = (1 - p) x ma + p x pf, since with probability (1-p) the reference is a plain memory access, and with probability p it additionally (or instead, in the simplified model commonly used) incurs the full page-fault service time, which is usually many orders of magnitude larger than a normal memory access, so even a very small page-fault rate can dominate EAT completely.',
+        strategy: 'For every replacement-algorithm trace, build a table with one row per reference and explicitly write the frame contents after each step -- do not try to track faults only mentally, since GATE reference strings are deliberately long enough that mental tracking causes errors. For FIFO, maintain a simple queue of load order and never let a hit reorder it. For LRU, maintain a recency list and move a page to the "most recently used" end on every hit, not just after a fault -- forgetting to update recency on a hit is the single most common LRU tracing error. For Optimal, at each fault, look strictly forward from the current position in the reference string and evict whichever currently resident page is used furthest in the future, treating a page with no remaining future reference as an immediate, automatic eviction candidate over any page that will be used again. Belady\\u2019s anomaly only ever shows up in FIFO-style questions asking you to compare fault counts across two different frame counts on the SAME reference string -- if a question asks this explicitly, expect the "more frames, more faults" trap and verify by tracing both frame counts fully rather than assuming monotonic improvement. For EAT-with-page-faults numericals, always check whether the given formula in the question intends p x pf alone or p x (pf + ma) -- state your assumption if the question does not fully specify, since page-fault service time so heavily dominates memory access time that both conventions usually round to a very similar final answer regardless. For working-set questions, carefully count exactly Delta references back from time t (inclusive of the reference at t itself, per the standard definition) and take the count of DISTINCT page numbers in that window, not the count of references. Worked mini-example: reference string 1,2,3,4,1,2,5,1,2,3,4,5 with 3 frames under FIFO gives 9 faults, while the identical string with 4 frames gives 10 faults -- the textbook demonstration of Belady\\u2019s anomaly; the same string under Optimal replacement with 3 frames gives only 7 faults, the provable minimum for that string.'
+      },
+      questions: [
+        {
+          id: 'os-virtual-memory-q1',
+          q: 'What is "demand paging"?',
+          options: ['Loading a page into physical memory only when it is actually referenced, rather than loading the entire process upfront', 'Loading every page of a process into memory before it starts executing', 'A scheme where physical memory is divided into variable-sized segments', 'Preemptively evicting pages before they are ever referenced'],
+          answer: 0,
+          marks: 1,
+          difficulty: 'easy',
+          type: 'concept',
+          explanation: 'Demand paging is a lazy-loading strategy: instead of bringing a process\\u2019s entire address space into physical memory before it can begin executing (which would waste memory on pages that may never even be touched, and delay startup), the OS loads each page only at the moment it is actually referenced for the first time. If a referenced page is not currently resident, a page fault is triggered, causing the OS to fetch that specific page from secondary storage into a free frame. This allows a process whose total virtual address space is much larger than physical memory to still run correctly, and it is the foundation on which virtual memory systems are built; it has nothing to do with segmentation, which is an unrelated way of structuring the logical address space itself.'
+        },
+        {
+          id: 'os-virtual-memory-q2',
+          q: 'For the reference string 1, 2, 3, 4, 1, 2, 5, 1, 2, 3, 4, 5 with 3 available frames (all initially empty), how many page faults occur under FIFO page replacement?',
+          options: ['9', '7', '10', '12'],
+          answer: 0,
+          marks: 2,
+          difficulty: 'medium',
+          type: 'numerical',
+          explanation: 'Tracing FIFO with a queue (front = oldest loaded): references 1,2,3,4 each fault as frames fill and then the oldest (1) is evicted for 4 -- queue becomes [2,3,4] (4 faults so far). Reference 1 faults, evicting 2 -- queue [3,4,1] (5 faults). Reference 2 faults, evicting 3 -- queue [4,1,2] (6 faults). Reference 5 faults, evicting 4 -- queue [1,2,5] (7 faults). References 1 and 2 are now both hits (no faults) since they are in {1,2,5}. Reference 3 faults, evicting the oldest (1) -- queue [2,5,3] (8 faults). Reference 4 faults, evicting the oldest (2) -- queue [5,3,4] (9 faults). Reference 5 is now a HIT since 5 is still resident in {5,3,4}. Total: 9 page faults.'
+        },
+        {
+          id: 'os-virtual-memory-q3',
+          q: 'For the same reference string 1, 2, 3, 4, 1, 2, 5, 1, 2, 3, 4, 5 with 3 available frames, how many page faults occur under LRU page replacement?',
+          options: ['10', '9', '7', '8'],
+          answer: 0,
+          marks: 2,
+          difficulty: 'medium',
+          type: 'numerical',
+          explanation: 'The first 7 references (1,2,3,4,1,2,5) fault identically to FIFO, evicting the least-recently-used page at each step, ending with resident set {1,2,5} and recency order updated to [4-evicted...,1,2,5] most-recent-last. The next two references, 1 and 2, are hits, and crucially LRU updates recency on every hit: after these two hits the recency order becomes [5,1,2] (5 is now least recently used, having not been touched since it was loaded). Reference 3 faults and evicts the LRU page, which is now 5 (not 1, unlike FIFO) -- resident set becomes {1,2,3}. Reference 4 faults, evicting LRU page 1 -- resident set {2,3,4}. Reference 5 faults again, since 5 was evicted earlier and is not in {2,3,4}. This gives 7 + 3 = 10 total faults -- one MORE than FIFO produced on this exact string, illustrating that LRU is not universally better than FIFO for every specific reference string, even though it usually performs at least as well on average.'
+        },
+        {
+          id: 'os-virtual-memory-q4',
+          q: 'For the same reference string 1, 2, 3, 4, 1, 2, 5, 1, 2, 3, 4, 5 with 3 available frames, how many page faults occur under Optimal (MIN) page replacement?',
+          options: ['7', '9', '10', '6'],
+          answer: 0,
+          marks: 2,
+          difficulty: 'medium',
+          type: 'numerical',
+          explanation: 'References 1,2,3 fault to fill the 3 frames. Reference 4 faults; looking ahead, among {1,2,3}, page 1 is next needed soonest, page 2 next, and page 3 is not needed until much later -- so Optimal evicts 3, giving {1,2,4}. References 1 and 2 are hits. Reference 5 faults; among {1,2,4}, page 4 is not needed again until the very end while 1 and 2 are needed sooner, so Optimal evicts 4, giving {1,2,5} (5th fault). References 1 and 2 are hits again. Reference 3 faults; among {1,2,5}, neither 1 nor 2 is ever referenced again in the remaining string, so Optimal evicts one of them (say 1), giving {2,5,3} (6th fault). Reference 4 faults; among {2,5,3}, 5 is needed again (at the very last position) while 2 and 3 are not, so Optimal evicts one of the unneeded ones, giving {5,3,4} or {5,2,4} (7th fault). Reference 5 is now a hit since 5 was kept. Total: 7 faults -- the provable minimum for this string, and indeed fewer than both FIFO (9) and LRU (10) on it.'
+        },
+        {
+          id: 'os-virtual-memory-q5',
+          q: 'The reference string 1, 2, 3, 4, 1, 2, 5, 1, 2, 3, 4, 5 produces 9 page faults under FIFO replacement with 3 frames. What happens to the number of FIFO page faults on this SAME string if the number of frames is increased to 4?',
+          options: ['It increases to 10 faults -- an example of Belady\\u2019s anomaly', 'It decreases to 6 faults, as expected with more memory', 'It stays exactly at 9 faults, unaffected by the extra frame', 'It becomes 0 faults since 4 frames can hold the entire working set'],
+          answer: 0,
+          marks: 2,
+          difficulty: 'hard',
+          type: 'numerical',
+          explanation: 'Tracing FIFO with 4 frames: references 1,2,3,4 all fault, filling all 4 frames (4 faults). References 1 and 2 are hits (already resident). Reference 5 faults, evicting the oldest, 1 -- frames {2,3,4,5} (5 faults). Reference 1 faults, evicting oldest 2 -- {3,4,5,1} (6 faults). Reference 2 faults, evicting oldest 3 -- {4,5,1,2} (7 faults). Reference 3 faults, evicting oldest 4 -- {5,1,2,3} (8 faults). Reference 4 faults, evicting oldest 5 -- {1,2,3,4} (9 faults). Reference 5 faults again, evicting oldest 1 -- {2,3,4,5} (10 faults). This gives 10 total faults with 4 frames, MORE than the 9 faults with only 3 frames -- the textbook demonstration of Belady\\u2019s anomaly, which is possible specifically because FIFO is not a stack algorithm.'
+        },
+        {
+          id: 'os-virtual-memory-q6',
+          q: 'What is "thrashing" in the context of virtual memory?',
+          options: ['A state where the system spends most of its time servicing page faults and swapping pages, rather than executing useful instructions, causing CPU utilisation to collapse', 'A technique for compressing rarely-used pages to save memory', 'The process of converting a logical address into a physical address', 'A hardware fault that permanently corrupts the page table'],
+          answer: 0,
+          marks: 1,
+          difficulty: 'easy',
+          type: 'concept',
+          explanation: 'Thrashing describes a pathological state in a virtual memory system where processes have been allocated too few frames relative to their actual memory needs (often because the degree of multiprogramming has been pushed too high), causing them to fault almost continuously as pages are evicted only to be immediately needed again shortly afterward. The system ends up spending nearly all of its time on the overhead of servicing page faults -- reading pages in from and writing pages out to secondary storage -- leaving very little actual CPU time for useful computation, so overall system throughput and CPU utilisation collapse dramatically even though the system appears extremely "busy". This is distinct from address translation (option C) and has nothing to do with page compression or hardware corruption.'
+        },
+        {
+          id: 'os-virtual-memory-q7',
+          q: 'What does the "working set" of a process at time t, with window size Delta, represent?',
+          options: ['The set of distinct pages referenced in the most recent Delta memory references made by the process', 'The complete set of all pages the process will ever reference during its entire lifetime', 'The set of frames currently marked as free in physical memory', 'The set of pages that have never yet been referenced by the process'],
+          answer: 0,
+          marks: 1,
+          difficulty: 'medium',
+          type: 'concept',
+          explanation: 'The working set W(t, Delta) of a process, as defined by Denning, is the set of DISTINCT page numbers that appear among the most recent Delta memory references made by that process, up to and including the reference at time t. Its size gives a practical, dynamically changing estimate of how many frames the process currently needs to run without excessive faulting, based on the principle that recent access locality is a good predictor of near-future access needs. It is not the process\\u2019s entire lifetime reference set (which would be static and often far too large to be a useful allocation target), nor is it related to which physical frames happen to be free -- it is purely a property of one process\\u2019s own recent reference pattern.'
+        },
+        {
+          id: 'os-virtual-memory-q8',
+          q: 'A system has a memory access time of 100 ns and a page-fault service time of 8 ms. If the page-fault rate is 0.001 (0.1%), what is the effective access time (EAT), using EAT = (1 - p) x ma + p x (page-fault service time)?',
+          options: ['Approximately 8099.9 ns (about 8.1 microseconds)', 'Approximately 100 ns', 'Approximately 8000 ns exactly', 'Approximately 4050 ns'],
+          answer: 0,
+          marks: 2,
+          difficulty: 'hard',
+          type: 'numerical',
+          explanation: 'First convert everything to the same unit: page-fault service time = 8 ms = 8,000,000 ns. Applying the formula: EAT = (1 - 0.001) x 100 + 0.001 x 8,000,000 = 0.999 x 100 + 0.001 x 8,000,000 = 99.9 + 8000 = 8099.9 ns, or roughly 8.1 microseconds. Notice how a page-fault rate of just 0.1% still causes the effective access time to balloon to about 81 times the plain memory access time of 100 ns -- this dramatic sensitivity is precisely because the page-fault service time (dominated by mechanical or flash-storage I/O latency) is many orders of magnitude larger than a memory access, so even rare page faults dominate the average heavily. This is exactly why keeping the page-fault rate extremely low is critical for acceptable system performance.'
+        },
+        {
+          id: 'os-virtual-memory-q9',
+          q: 'Why is exact LRU (Least Recently Used) page replacement rarely implemented precisely in real operating systems, being approximated instead (e.g., via a reference-bit-based clock/second-chance algorithm)?',
+          options: ['Exact LRU requires either a hardware time-stamp counter or a doubly linked list updated on every single memory reference, which is prohibitively expensive in time and hardware', 'LRU is mathematically impossible to implement correctly on any hardware', 'LRU always performs worse than FIFO, so implementing it exactly is pointless', 'LRU requires knowledge of the future reference string, exactly like Optimal replacement'],
+          answer: 0,
+          marks: 1,
+          difficulty: 'medium',
+          type: 'concept',
+          explanation: 'Implementing LRU exactly would require the hardware to record, and continuously update, an extremely precise ordering of "how recently was this page referenced" for every page on literally every single memory access -- either via a hardware clock/counter updated and stored per page-table entry on every reference, or via maintaining an exact doubly linked list reordered on every access. Both approaches impose overhead on the fast path of every memory reference, which is unacceptable for performance. Real systems instead approximate recency using a much cheaper mechanism: a single reference bit per page, periodically cleared, combined with a circular "clock hand" that gives a page a second chance if its reference bit is set (the clock/second-chance algorithm), trading some accuracy for far lower overhead. LRU is not impossible, does not always underperform FIFO (question 3 notwithstanding), and unlike Optimal it needs no knowledge of the future.'
+        },
+        {
+          id: 'os-virtual-memory-q10',
+          q: 'Which of the following page-replacement algorithms is mathematically guaranteed to NEVER exhibit Belady\\u2019s anomaly, for any reference string, because it is a "stack algorithm"?',
+          options: ['Both LRU and Optimal', 'Only FIFO', 'Both FIFO and Optimal', 'None of the algorithms have this guarantee'],
+          answer: 0,
+          marks: 1,
+          difficulty: 'easy',
+          type: 'concept',
+          explanation: 'A stack algorithm is one where the set of pages that would be resident with m frames is always a subset of the set of pages that would be resident with m+1 frames, for any reference string. Both LRU and Optimal satisfy this stack property, which mathematically guarantees that increasing the number of available frames can never increase (and can only decrease or leave unchanged) their page-fault count -- so neither can ever exhibit Belady\\u2019s anomaly. FIFO, by contrast, is famously NOT a stack algorithm, which is exactly why certain reference strings (such as the classic example in this topic) can cause FIFO to produce more faults with more frames, the defining signature of Belady\\u2019s anomaly. So it is FIFO, not LRU or Optimal, that is the algorithm actually susceptible to this counter-intuitive behaviour.'
+        },
+        {
+          id: 'os-virtual-memory-q11',
+          q: 'A process generates the page-reference sequence, in order: 2, 6, 1, 5, 7, 7, 7, 7, 5, 1 (positions 1 through 10). Using a working-set window of Delta = 4 (the current reference plus the previous 3), what is the working set W(t=10, Delta=4)?',
+          options: ['{7, 5, 1} (size 3)', '{2, 6, 1, 5} (size 4)', '{7} (size 1)', '{5, 1, 7, 7} (size 4, counting duplicates)'],
+          answer: 0,
+          marks: 2,
+          difficulty: 'hard',
+          type: 'numerical',
+          explanation: 'A window of Delta = 4 at time t = 10 covers the 4 most recent references, which are positions 7, 8, 9, and 10 in the sequence: those references are 7, 7, 5, and 1 respectively. The working set is defined as the set of DISTINCT pages within this window, so duplicates collapse: {7, 7, 5, 1} becomes the distinct set {7, 5, 1}, giving a working-set size of 3. Note that this is different from simply looking at the first 4 references in the whole sequence (which would incorrectly give {2,6,1,5}) -- the window must always be measured backward from the current time t, not forward from the start of the reference string, and duplicate page numbers within the window must be counted only once.'
+        },
+        {
+          id: 'os-virtual-memory-q12',
+          q: 'What is the typical underlying cause that pushes a system into thrashing?',
+          options: ['The degree of multiprogramming is increased so much that the frames allocated per process fall below what each process actually needs, triggering a vicious cycle of increasing faults and CPU idling', 'The disk used for swapping is replaced with a faster SSD', 'A single process is given far more frames than its working set requires', 'The page size is increased to match the working set size exactly'],
+          answer: 0,
+          marks: 1,
+          difficulty: 'medium',
+          type: 'concept',
+          explanation: 'Thrashing typically begins when the OS, observing low CPU utilisation, responds by admitting more processes to increase multiprogramming and thereby (it hopes) keep the CPU busier. However, since total physical memory is fixed, each additional process further shrinks the number of frames available per process. Once a process\\u2019s allocation drops below its actual working-set size, it starts faulting very frequently; the resulting flood of page-fault I/O keeps the CPU idle waiting on disk, which the scheduler misreads as low utilisation, prompting it to admit still MORE processes -- a destructive feedback loop that is the classic signature of thrashing. Giving processes MORE frames than needed (option C) or using faster swap hardware (option B) generally reduces the risk rather than causing it.'
+        },
+        {
+          id: 'os-virtual-memory-q13',
+          q: 'How does the working-set model help the OS prevent thrashing at a system-wide level?',
+          options: ['By summing the working-set sizes of all currently active processes and suspending (swapping out) some process entirely if that sum exceeds the total number of available frames', 'By permanently fixing every process to exactly one frame regardless of its needs', 'By disabling paging entirely once thrashing is detected', 'By always allocating every process the maximum possible number of frames simultaneously'],
+          answer: 0,
+          marks: 1,
+          difficulty: 'medium',
+          type: 'concept',
+          explanation: 'The working-set model is used as an admission-control and load-control mechanism: the OS tracks each active process\\u2019s current working-set size (an estimate of how many frames it actually needs right now to avoid excessive faulting) and sums these across all resident processes. If this total working-set demand exceeds the number of physical frames actually available, the OS proactively reduces the degree of multiprogramming by suspending one or more entire processes (swapping them out completely) rather than letting every process limp along with insufficient frames and fault constantly. This deliberately trades a temporarily lower degree of multiprogramming for a system that continues to make real forward progress, which is precisely the opposite of what happens during uncontrolled thrashing.'
+        },
+        {
+          id: 'os-virtual-memory-q14',
+          q: 'A system has 62 total frames to distribute between two processes using proportional allocation based on their sizes: process P1 has size 10 (in some page-count unit) and process P2 has size 127. Using the standard proportional allocation formula (frames_i = (size_i / total_size) x total_frames, rounded down), how many frames does each process receive?',
+          options: ['P1 receives 4 frames, P2 receives 57 frames', 'P1 receives 10 frames, P2 receives 52 frames', 'P1 receives 31 frames, P2 receives 31 frames', 'P1 receives 5 frames, P2 receives 57 frames'],
+          answer: 0,
+          marks: 2,
+          difficulty: 'hard',
+          type: 'numerical',
+          explanation: 'Total size = 10 + 127 = 137. Proportional allocation gives each process a share of the total frames proportional to its own size relative to the combined size. For P1: (10 / 137) x 62 = 620 / 137 ~= 4.53, which rounds down to 4 frames. For P2: (127 / 137) x 62 = 7874 / 137 ~= 57.47, which rounds down to 57 frames. Note that 4 + 57 = 61, one frame short of the full 62 -- this leftover frame due to rounding is typically held in a free-frame pool or given to whichever process has the larger fractional remainder, but the core proportional calculation itself yields 4 and 57 as the two allocations, which is the standard textbook result for exactly these two input sizes.'
+        },
+        {
+          id: 'os-virtual-memory-q15',
+          q: 'When a page fault occurs, which of the following correctly orders the OS\\u2019s response?',
+          options: ['Trap to the OS, locate the required page on secondary storage, find or evict a free frame, load the page into that frame and update the page table, then restart the faulting instruction', 'Terminate the faulting process immediately, then log the error', 'Restart the faulting instruction first, then check afterward whether the required page is now present', 'Ignore the fault and return a default value of zero to the faulting instruction'],
+          answer: 0,
+          marks: 1,
+          difficulty: 'easy',
+          type: 'concept',
+          explanation: 'A page fault triggers a well-defined recovery sequence: the hardware traps into the operating system (switching to kernel mode), the OS determines which page was being referenced and locates it on secondary storage (or determines the reference was actually invalid, in which case the process is terminated instead), finds a free frame or selects and evicts a victim page if none is free, reads the required page into that frame from disk, updates the page table entry to reflect the new mapping, and finally restarts the very instruction that originally caused the fault (which now succeeds, since the required page is present). Terminating the process immediately, restarting before the page is actually loaded, or silently returning a default value would all produce an incorrect or crashing program, since the instruction genuinely needs that page\\u2019s actual data to proceed.'
+        }
+      ]
     }
   ]
 };

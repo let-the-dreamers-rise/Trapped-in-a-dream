@@ -297,9 +297,23 @@ window.GATE_GEN = (function () {
     return null;
   }
 
+  // ~30% of generated questions with a purely numeric answer become NAT
+  // (type-the-number, no options) — matching the real GATE 2026 pattern.
+  function maybeNat(qq) {
+    if (!qq || Math.random() > 0.3) return qq;
+    var correctText = qq.options[qq.answer];
+    var num = parseFloat(correctText);
+    if (isNaN(num) || String(num) !== String(correctText).trim()) return qq;
+    qq.kind = 'nat';
+    qq.options = [];
+    qq.answer = num;
+    qq.tolerance = Math.max(0.01, Math.abs(num) * 0.005);
+    qq.q += '\n(NAT: enter your numerical answer.)';
+    return qq;
+  }
   return {
     has: function (topicId) { return !!generatorFor(topicId); },
-    make: function (topicId) { var g2 = generatorFor(topicId); return g2 ? g2() : null; },
+    make: function (topicId) { var g2 = generatorFor(topicId); return g2 ? maybeNat(g2()) : null; },
     topics: Object.keys(G)
   };
 })();

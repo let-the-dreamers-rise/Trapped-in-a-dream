@@ -1177,3 +1177,279 @@ window.GATE_DATA.questions['compiler'].topics.find(function(t){return t.id==='co
     explanation: 'Associativity is read off the direction of recursion in the grammar: a right-recursive rule E -> T ^ E nests new expansions on the right, forcing a string like a ^ b ^ c to derive as a ^ (b ^ c) — right associativity — which correctly matches how exponentiation is conventionally evaluated (2^2^3 = 2^(2^3), not (2^2)^3). This mirrors, in reverse, why left recursion (E -> E + T) produces left-associative operators. Right recursion is perfectly usable by both LL and LR parsers (LL parsers in fact often prefer it, since left recursion must be eliminated for them anyway); it is not inherently a source of ambiguity. Option 2 is correct.'
   }
 );
+
+window.GATE_DATA.questions['compiler'].topics.find(function(t){return t.id==='compiler-sdt';}).questions.push(
+  {
+    id: 'compiler-sdt-x1',
+    q: 'Given the synthesized SDD: E -> E1 + T {E.val = E1.val + T.val}; E -> T {E.val = T.val}; T -> T1 * F {T.val = T1.val * F.val}; T -> F {T.val = F.val}; F -> digit {F.val = digit.lexval}. What value does E.val take for the input string 3+4*2?',
+    options: ['14', '11', '10', '24'],
+    answer: 1,
+    marks: 2,
+    difficulty: 'medium',
+    type: 'numerical',
+    explanation: 'This SDD mirrors the usual expression grammar, so it respects operator precedence exactly as the grammar layering enforces (T handles multiplication before it can be combined by an E-level addition). Parsing 3+4*2 the reduction sequence computes F.val=4, F.val=2, T.val = T1.val * F.val = 4*2 = 8 for the "4*2" part, and separately F.val = T.val = 3 for the leading 3. Then the top rule computes E.val = E1.val + T.val = 3 + 8 = 11. Adding 3 and 4 first (giving 7, then 7*2=14) would be the wrong answer that ignores precedence, so option 1 is a distractor for people who evaluate strictly left to right; the correct value honoring precedence is 11, option 2.'
+  },
+  {
+    id: 'compiler-sdt-x2',
+    q: 'Given the left-recursive SDD: E -> E1 + T {E.val = E1.val + T.val}; E -> E1 - T {E.val = E1.val - T.val}; E -> T {E.val = T.val}; T -> digit {T.val = digit.lexval}. What is E.val for the input 9-5+2?',
+    options: ['6', '2', '12', '-6'],
+    answer: 0,
+    marks: 2,
+    difficulty: 'medium',
+    type: 'numerical',
+    explanation: 'Because both + and - are introduced by left-recursive productions at the same grammar level, the operators are left-associative and are applied strictly left to right in the order they appear, exactly as ordinary arithmetic notation intends: 9-5+2 must be read as (9-5)+2, not 9-(5+2). Evaluating left to right: first E.val = 9 - 5 = 4 (using the E -> E1 - T rule), then that result is combined with the next term: E.val = 4 + 2 = 6 (using the E -> E1 + T rule). The wrong grouping 9-(5+2) would give 9-7=2, which is option 2, a classic trap for anyone who evaluates the rightmost operator first. The correctly left-associated value is 6, option 1.'
+  },
+  {
+    id: 'compiler-sdt-x3',
+    q: 'In the classic declaration SDD: D -> T L {L.in = T.type}; T -> int {T.type = integer}; T -> float {T.type = float}; L -> L1, id {L1.in = L.in; addtype(id.entry, L.in)}; L -> id {addtype(id.entry, L.in)} — the attribute L.in is best classified as:',
+    options: ['A synthesized attribute of L, computed from its children', 'An inherited attribute of L, whose value flows down from the parent production D -> T L', 'A synthesized attribute of D', 'Neither synthesized nor inherited, since it is used only as a side effect'],
+    answer: 1,
+    marks: 1,
+    difficulty: 'easy',
+    type: 'concept',
+    explanation: 'An attribute is inherited when its value is defined using attributes of the parent node or of siblings to its left, rather than being computed bottom-up from its own children. Here L.in is set by the rule attached to D -> T L using T.type, which comes from the sibling T positioned before L in the same production — this is exactly the defining pattern of an inherited attribute flowing "down and across" the parse tree. It is then further passed down inherited-style to L1.in in the recursive rule. It is not synthesized because L\'s own value is not built up from computations performed at or below L in the tree; it is handed to L from outside. Option 2 is correct.'
+  },
+  {
+    id: 'compiler-sdt-x4',
+    q: 'A synthesized attribute at a parse-tree node is one whose value is computed:',
+    options: ['From the attribute values of that node\'s children (or the node\'s own lexical value), never from its parent or siblings', 'From the attribute values of the node\'s parent only', 'From the attribute values of the node\'s siblings to its right only', 'Independently of the parse tree, from global variables only'],
+    answer: 0,
+    marks: 1,
+    difficulty: 'easy',
+    type: 'concept',
+    explanation: 'By definition, a synthesized attribute of a nonterminal A at a production A -> X1 X2 ... Xn is computed purely from the attribute values of X1 through Xn (its children in the parse tree) and possibly A\'s own terminal/lexical information, never from A\'s parent or from nodes elsewhere in the tree. This makes synthesized attributes natural to evaluate bottom-up, exactly matching the order in which a bottom-up (LR) parser reduces handles, which is why S-attributed definitions integrate so cleanly with bottom-up parsing using a single semantic value stack. Inherited attributes, by contrast, pull information from the parent or left siblings. Option 1 correctly captures the synthesized case.'
+  },
+  {
+    id: 'compiler-sdt-x5',
+    q: 'A syntax-directed definition is called L-attributed if, for every production A -> X1 X2 ... Xn, each inherited attribute of Xi depends only on:',
+    options: ['Attributes of Xi\'s own children', 'Inherited attributes of A, and any attributes (inherited or synthesized) of X1, ..., Xi-1 — symbols strictly to its left, never to its right', 'Synthesized attributes of Xi+1, ..., Xn only', 'Global attributes shared across the entire parse tree'],
+    answer: 1,
+    marks: 1,
+    difficulty: 'medium',
+    type: 'concept',
+    explanation: 'The L-attributed restriction is designed so that attributes can be evaluated in a single left-to-right, depth-first pass over the parse tree (the same order a top-down or one-pass translator naturally visits nodes). It permits an inherited attribute on Xi to depend on the inherited attributes of the parent A and on any attribute of symbols appearing before Xi in the production (X1 through Xi-1), but forbids dependence on symbols to its right (Xi+1 onward), since those have not been processed yet in a left-to-right pass. Every S-attributed grammar is automatically L-attributed (since synthesized-only definitions have no inherited attributes to restrict), but not every L-attributed grammar is S-attributed. Option 2 is the precise definition.'
+  },
+  {
+    id: 'compiler-sdt-x6',
+    q: 'A translation scheme for converting infix to postfix uses: E -> E1 + T {print(\'+\')}; E -> T; T -> id {print(id.name)}. If the actions execute in the order the corresponding productions are reduced, what is printed for the input a+b+c?',
+    options: ['ab+c+', 'abc++', 'a+b+c', '++abc'],
+    answer: 0,
+    marks: 2,
+    difficulty: 'medium',
+    type: 'pyq-style',
+    explanation: 'Because + is left-associative here, a+b+c parses as (a+b)+c. Trace the reductions in order: first T->id for a prints "a"; the rule E->T makes this the current E. Next T->id for b prints "b" (output so far "ab"), and then the completed E1+T reduces, printing "+" (output "ab+") for the inner (a+b). That result becomes the new E1. Then T->id for c prints "c" (output "ab+c"), and the outer E1+T reduces, printing the final "+" (output "ab+c+"). This left-to-right, innermost-first firing of print actions is exactly why this translation scheme correctly converts infix to postfix. Option 1 is correct.'
+  },
+  {
+    id: 'compiler-sdt-x7',
+    q: 'Extend the same style of infix-to-postfix translation scheme to include multiplication, respecting precedence: E -> E1 + T {print(\'+\')} | T; T -> T1 * F {print(\'*\')} | F; F -> id {print(id.name)}. What is printed for the input a*b+c*d?',
+    options: ['a*b+c*d', 'ab*cd*+', 'abcd*+*', '+*ab*cd'],
+    answer: 1,
+    marks: 2,
+    difficulty: 'hard',
+    type: 'pyq-style',
+    explanation: 'The grammar forces a*b and c*d to each be fully reduced to a T (hence a completed subexpression) before the outer + can combine them, matching normal precedence. Trace the left subexpression a*b: F->id(a) prints "a"; F->id(b) prints "b"; then T->T1*F reduces and prints "*", giving "ab*" so far. Trace the right subexpression c*d identically: prints "c", then "d", then the T reduction prints "*", extending the output to "ab*cd*". Finally the outermost E->E1+T reduces and prints "+", giving the final output "ab*cd*+" — exactly the postfix form of a*b+c*d, where each operator appears immediately after both of its operands have been fully emitted. Option 2 is correct.'
+  },
+  {
+    id: 'compiler-sdt-x8',
+    q: 'Using the classic declaration SDD (D -> T L {L.in = T.type}; L -> L1, id {L1.in = L.in; addtype(id.entry, L.in)} | id {addtype(id.entry, L.in)}) for the source line "int x, y, z;", how many times is the addtype procedure invoked while processing this one declaration?',
+    options: ['1', '2', '3', '4'],
+    answer: 2,
+    marks: 2,
+    difficulty: 'medium',
+    type: 'numerical',
+    explanation: 'The identifier list L expands to match "x, y, z" via two applications of L -> L1, id (peeling off z then y) and one application of the base case L -> id (matching x). Every single one of these three alternatives — the base case and both recursive cases — calls addtype exactly once, each time entering the currently inherited type (integer, propagated down from T.type through the chain of L.in assignments) against one identifier\'s symbol table entry. Since there are exactly three identifiers in the list (x, y, z), addtype is called exactly 3 times, once per identifier, regardless of how deep the recursive L expansion goes. Option 3 is correct.'
+  },
+  {
+    id: 'compiler-sdt-x9',
+    q: 'Which of the following statements about evaluating attributes in a general (not necessarily S- or L-attributed) syntax-directed definition is TRUE?',
+    options: ['Attributes can always be evaluated in a single left-to-right depth-first pass, regardless of the dependency structure', 'A valid evaluation order must be some topological sort of the dependency graph induced by the semantic rules on the parse tree; if that graph has a cycle, no evaluation order exists', 'Inherited attributes are always evaluated before synthesized attributes at every node', 'Attribute evaluation order is irrelevant as long as every rule eventually fires once'],
+    answer: 1,
+    marks: 2,
+    difficulty: 'hard',
+    type: 'concept',
+    explanation: 'A general SDD lets each semantic rule define one attribute in terms of others, forming a dependency graph over all attribute instances in a specific parse tree. An attribute can only be computed once every attribute it depends on has already been computed, so any legal evaluation order must be a topological sort of this graph. If the dependency graph contains a cycle, the SDD is simply not well-defined for that tree — no evaluation order can satisfy all the dependencies, and the SDD is rejected as circular. A single left-to-right depth-first pass only suffices for the restricted L-attributed class, not for arbitrary SDDs, and there is no universal rule about inherited attributes always preceding synthesized ones — the correct order depends entirely on the actual dependency graph. Option 2 correctly states the general principle.'
+  },
+  {
+    id: 'compiler-sdt-x10',
+    q: 'Given the synthesized SDD: L -> L1, id {L.count = L1.count + 1}; L -> id {L.count = 1}, used to count identifiers in a list, what is L.count for the input a, b, c, d?',
+    options: ['3', '4', '5', '1'],
+    answer: 1,
+    marks: 2,
+    difficulty: 'medium',
+    type: 'numerical',
+    explanation: 'The base case L -> id fires once, on the very first identifier a, setting count = 1. Each subsequent identifier is attached via the recursive rule L -> L1, id, which simply adds 1 to the count already accumulated by the smaller list L1. Starting from a (count 1), adding b gives 2, adding c gives 3, and adding d gives 4. Since the input a, b, c, d has exactly 4 identifiers total, and each one contributes exactly +1 to the running synthesized count (with the very first one contributing the initial 1), the final L.count correctly equals 4, matching the identifier count exactly. Option 2 is correct.'
+  },
+  {
+    id: 'compiler-sdt-x11',
+    q: 'Consider a hypothetical SDD with the production A -> B C, where the semantic rule sets B.in = f(C.s) — that is, the inherited attribute of B is defined using the synthesized attribute of C, the symbol to its right in the same production. This SDD is:',
+    options: ['L-attributed, since B and C are both children of A', 'Not L-attributed, because B\'s inherited attribute depends on C, which lies to the right of B in the production', 'S-attributed, since C.s is a synthesized attribute', 'Automatically circular and therefore invalid for any input'],
+    answer: 1,
+    marks: 2,
+    difficulty: 'hard',
+    type: 'pyq-style',
+    explanation: 'The L-attributed restriction specifically requires that an inherited attribute of any symbol Xi in a production depend only on the inherited attributes of the left-hand side and on attributes (of any kind) of symbols strictly to Xi\'s left — X1 through Xi-1. Here B is X1 (leftmost) and C is X2, so B\'s inherited attribute is not permitted to depend on anything belonging to C, since C comes after B. This dependency violates the L-attributed condition outright, even though it does not necessarily make the SDD circular on any particular tree (B.in and C.s could still be computed without a cycle, just not in a single left-to-right depth-first pass). It is also not S-attributed, since B.in is inherited, not synthesized. Option 2 correctly identifies the violation.'
+  },
+  {
+    id: 'compiler-sdt-x12',
+    q: 'Given the left-recursive SDD: E -> E1 / T {E.val = E1.val / T.val}; E -> T {E.val = T.val}; T -> digit {T.val = digit.lexval}, what is E.val for the input 16/4/2 (using integer division)?',
+    options: ['2', '8', '32', '4'],
+    answer: 0,
+    marks: 2,
+    difficulty: 'hard',
+    type: 'numerical',
+    explanation: 'Division introduced through left recursion is left-associative, so 16/4/2 must be evaluated as (16/4)/2, not 16/(4/2). Following the reduction order dictated by the left-recursive rule: first E.val = 16/4 = 4 (via the leftmost E1/T application), and this intermediate E becomes the new E1 for the next reduction, giving E.val = 4/2 = 2. The alternative right-associated grouping 16/(4/2) = 16/2 = 8 (option 2) is the classic trap for anyone who evaluates the rightmost operation first, but that grouping is not what a left-recursive grammar produces. The correctly left-associated result is 2, option 1.'
+  },
+  {
+    id: 'compiler-sdt-x13',
+    q: 'S-attributed syntax-directed definitions (those using only synthesized attributes) are especially convenient to implement because their attribute values can be computed:',
+    options: ['Only with a two-pass tree-walking interpreter', 'Naturally during bottom-up (LR) parsing, by attaching values to a semantic value stack alongside the parser stack and computing each value at the moment its production is reduced', 'Only by first building a fully inherited attribute dependency graph', 'Only during top-down predictive parsing, never during bottom-up parsing'],
+    answer: 1,
+    marks: 1,
+    difficulty: 'easy',
+    type: 'concept',
+    explanation: 'Because every synthesized attribute of A is computed purely from the attributes of A\'s children, and a bottom-up (LR-family) parser completes (reduces) a production only after all of its right-hand-side symbols have already been fully parsed and their attributes computed, the value for A can be computed exactly at the moment of reduction, using values already sitting on a parallel semantic value stack. This is precisely how yacc/bison-style actions ($$ = $1 + $3, for instance) are implemented in practice, requiring no separate tree-building or dependency-graph pass. It is not restricted to top-down parsing at all — in fact, S-attributed definitions are the natural fit for bottom-up parsing specifically. Option 2 is correct.'
+  }
+);
+
+window.GATE_DATA.questions['compiler'].topics.find(function(t){return t.id==='compiler-icg';}).questions.push(
+  {
+    id: 'compiler-icg-x1',
+    q: 'If a simple one-pass code generator (with no common subexpression elimination) translates a = b*c + b*c into three-address code, how many TAC instructions are generated in total, including the final assignment to a?',
+    options: ['3', '4', '5', '6'],
+    answer: 1,
+    marks: 2,
+    difficulty: 'easy',
+    type: 'numerical',
+    explanation: 'Without any optimization, the generator translates each occurrence of b*c independently, since it has no memory of having already computed it: t1 = b * c (first occurrence); t2 = b * c (second occurrence, recomputed from scratch); t3 = t1 + t2 (the addition); a = t3 (the assignment). That is exactly 4 instructions. A naive one-pass generator has no way to notice that t1 and t2 compute the identical value from unchanged operands — that recognition is precisely what common subexpression elimination adds on top of this baseline. Option 2 is correct.'
+  },
+  {
+    id: 'compiler-icg-x2',
+    q: 'If the code generator instead builds a DAG for the expression a = b*c + b*c and generates code from the DAG (so the repeated subexpression b*c is computed once), how many TAC instructions are generated?',
+    options: ['2', '3', '4', '5'],
+    answer: 1,
+    marks: 2,
+    difficulty: 'medium',
+    type: 'numerical',
+    explanation: 'A DAG for b*c + b*c has only one interior node for the multiplication b*c, since both occurrences are structurally identical with unchanged operands and therefore collapse onto the same shared node; the addition node then has this single multiplication node as BOTH of its operands. Generating code from this DAG requires only: t1 = b * c (computed once, for the single shared node); t2 = t1 + t1 (the addition, reusing t1 for both operands); a = t2. That is exactly 3 instructions, one fewer than the naive 4-instruction version, illustrating exactly how DAG-based code generation automatically achieves common subexpression elimination for free. Option 2 is correct.'
+  },
+  {
+    id: 'compiler-icg-x3',
+    q: 'How many distinct nodes does the DAG for the expression x = (p+q) * (p+q) + (p+q) contain?',
+    options: ['4', '5', '6', '7'],
+    answer: 1,
+    marks: 2,
+    difficulty: 'hard',
+    type: 'numerical',
+    explanation: 'The subexpression p+q occurs three times with identical, unchanged operands, so a DAG represents it with exactly ONE shared interior node, reused by every occurrence. Enumerate the distinct nodes needed: two leaves (p and q), one "+" node for p+q (shared by all three uses), one "*" node whose both operand edges point to that same shared "+" node (representing the multiplication), and one final "+" node combining the multiplication result with the shared p+q node again (representing the outermost addition). That totals 5 distinct nodes: p, q, the shared +, the *, and the outer +. The identifier x is simply attached as a label on the outer + node, not a separate node. Option 2 is correct.'
+  },
+  {
+    id: 'compiler-icg-x4',
+    q: 'For the same expression x = (p+q) * (p+q) + (p+q), counting each operand link as a separate directed edge (so a node used twice by the same parent contributes two edges), how many edges does the DAG have?',
+    options: ['4', '5', '6', '7'],
+    answer: 2,
+    marks: 2,
+    difficulty: 'hard',
+    type: 'numerical',
+    explanation: 'Using the 5-node DAG from this expression (leaves p, q; shared node N3 = p+q; N4 = N3*N3; N5 = N4+N3), count every operand edge: N3 has two edges, to p and to q (2 edges). N4 has two edges, both pointing to N3 — one for each operand position of the multiplication, counted as two distinct edges even though they share a target (2 edges). N5 has two edges, one to N4 and one to N3 (2 edges). Summing 2+2+2 gives exactly 6 edges. This is a common trap: students sometimes count shared-target edges only once, arriving at 5 instead of the correct 6. Option 3 is correct.'
+  },
+  {
+    id: 'compiler-icg-x5',
+    q: 'In the triples representation of three-address code (each record storing only op, arg1, arg2, with no explicit result field), a later instruction refers to the result of an earlier operation by:',
+    options: ['Naming a compiler-generated temporary variable such as t1', 'Giving the position (index) of the triple that computed that result, used as an implicit pointer to it', 'Repeating the entire earlier expression inline', 'Looking it up in the symbol table under a generated label'],
+    answer: 1,
+    marks: 1,
+    difficulty: 'medium',
+    type: 'concept',
+    explanation: 'The defining difference between quadruples and triples is exactly this: quadruples give every operation an explicit named or numbered result field (a temporary such as t1) that can be referenced independently of where the instruction sits in the list, whereas triples avoid naming temporaries at all and instead let a later triple\'s argument simply be a reference to the position (index) of the triple that produced the needed value — essentially "the value computed by instruction number k." This saves space (no symbol table entries for throwaway temporaries) but makes triples awkward to rearrange, since moving a triple changes its index and breaks every reference to it. Option 2 correctly describes this positional referencing scheme.'
+  },
+  {
+    id: 'compiler-icg-x6',
+    q: 'Indirect triples improve on plain triples specifically by:',
+    options: ['Eliminating the need for a result field entirely, same as plain triples', 'Adding a separate list of pointers to the triples in the desired execution order, so that optimizations reordering or deleting statements only need to edit this pointer list, leaving the triples themselves untouched', 'Storing three operands per instruction instead of two', 'Removing the need for an operator field in each record'],
+    answer: 1,
+    marks: 1,
+    difficulty: 'medium',
+    type: 'concept',
+    explanation: 'Plain triples suffer because references between instructions are by position in the triple table, so reordering instructions during optimization (code motion, dead code removal, instruction scheduling) would silently break every reference that pointed to a moved triple\'s old position. Indirect triples fix this by introducing an extra level of indirection: a separate array of pointers into the (now immutable in position) triple table, and this pointer array — not the triples themselves — determines execution order. An optimizer can freely reorder, insert, or delete entries in the pointer list without touching the underlying triples or invalidating any existing intra-triple references. This is the specific benefit indirect triples add. Option 2 is correct.'
+  },
+  {
+    id: 'compiler-icg-x7',
+    q: 'In the backpatching technique for generating jump code for Boolean expressions without allocating explicit temporaries for true/false values, the truelist and falselist maintained for each subexpression serve to:',
+    options: ['Store the runtime boolean values 1 and 0 for later use', 'Hold the list of generated jump instructions whose target label is not yet known, so the correct target address can be filled in (patched) once it becomes known later in code generation', 'Record which variables are live across the boolean expression', 'List the identifiers used inside the condition, for symbol table lookup'],
+    answer: 1,
+    marks: 1,
+    difficulty: 'medium',
+    type: 'concept',
+    explanation: 'Backpatching exists to avoid generating a separate label-defining pass or explicit boolean-valued temporaries: as jump instructions (like "if a<b goto _" or "goto _") are emitted, their target field is deliberately left unfilled because the correct destination (e.g., the start of the true branch, or the instruction after the whole statement) has not been generated yet. Each such incomplete instruction\'s address is recorded in a truelist (jumps to take when the condition is true) or falselist (jumps to take when false). Once the actual target address is known — for instance, once code generation reaches the point that should be jumped to — every instruction number in the appropriate list is "backpatched" with that address in one pass. Option 2 correctly describes this bookkeeping role.'
+  },
+  {
+    id: 'compiler-icg-x8',
+    q: 'Using Sethi-Ullman register labeling (label(leaf) = 1; for an interior node with children of equal label k, parent label = k+1; for unequal labels, parent label = the larger of the two), what is the minimum number of temporary registers needed to evaluate (a+b)*(c+d) - (e+f)*(g+h) with an optimal evaluation order?',
+    options: ['2', '3', '4', '5'],
+    answer: 2,
+    marks: 2,
+    difficulty: 'hard',
+    type: 'numerical',
+    explanation: 'All eight leaves (a through h) have label 1. Each of the four "+" nodes (a+b), (c+d), (e+f), (g+h) combines two label-1 children of EQUAL label, so each gets label 1+1 = 2. The left multiplication (a+b)*(c+d) combines two label-2 children, again equal, giving label 2+1 = 3; the right multiplication (e+f)*(g+h) similarly gets label 3. Finally the root subtraction combines two label-3 children, equal again, giving label 3+1 = 4. This label is exactly the minimum number of registers needed when the larger (or, on ties, either) subtree is evaluated first so its registers can be freed and reused before evaluating the sibling subtree. Hence the minimum is 4 registers, option 3.'
+  },
+  {
+    id: 'compiler-icg-x9',
+    q: 'How many three-address instructions (assuming indexed array-element addressing is directly available, so a[i] is fetched or stored in one instruction) are needed to translate a[i] = b[i] + c[i] * d[i]?',
+    options: ['4', '5', '6', '7'],
+    answer: 2,
+    marks: 2,
+    difficulty: 'medium',
+    type: 'numerical',
+    explanation: 'Respecting precedence, the multiplication c[i]*d[i] must be computed before the addition. Step by step: t1 = c[i] (fetch, 1); t2 = d[i] (fetch, 2); t3 = t1 * t2 (multiply, 3); t4 = b[i] (fetch, 4); t5 = t4 + t3 (add, 5); a[i] = t5 (store, 6). That is exactly 6 instructions. This assumes the simplifying convention (common in introductory TAC generation) that indexed loads/stores like x[i] are single TAC operations rather than being further decomposed into explicit address arithmetic (offset multiplication and base-plus-offset computation); if address arithmetic were expanded explicitly the count would be higher. Under the stated assumption, option 3 is correct.'
+  },
+  {
+    id: 'compiler-icg-x10',
+    q: 'Compared to a triples-based intermediate representation, a quadruples-based representation is easier for an optimizer to freely reorder, delete, or duplicate statements in, mainly because:',
+    options: ['Quadruples always require fewer instructions for the same expression', 'Each quadruple names its result with an explicit temporary (e.g. t5), so other instructions reference that name rather than a table position, and moving the instruction around does not break any reference to its result', 'Quadruples do not use temporary variables at all', 'Quadruples are always stored in a different memory segment than the code being optimized'],
+    answer: 1,
+    marks: 1,
+    difficulty: 'medium',
+    type: 'concept',
+    explanation: 'The whole point of an explicit result field (a symbolic temporary name) in quadruples is that it decouples "what value is being referred to" from "where in the instruction list that value happened to be computed." Since other instructions refer to t5 by name, not by "the result of instruction number k," an optimizer is free to relocate, duplicate, or delete the instruction that defines t5 (as long as some definition of t5 still reaches each use) without needing to renumber or fix up any other instruction. Triples lack this decoupling because a reference IS a table position, making rearrangement fragile unless the extra indirection of indirect triples is added. Quadruples do not inherently need fewer instructions; the count depends purely on the expression. Option 2 is correct.'
+  },
+  {
+    id: 'compiler-icg-x11',
+    q: 'For the backpatching translation of E -> E1 || M E2 (where the marker nonterminal M records M.instr = the label of the next instruction to be generated, right before E2\'s code), which set of semantic actions is standard and correct?',
+    options: ['backpatch(E1.truelist, M.instr); E.falselist = merge(E1.falselist, E2.falselist); E.truelist = E2.truelist', 'backpatch(E1.falselist, M.instr); E.truelist = merge(E1.truelist, E2.truelist); E.falselist = E2.falselist', 'backpatch(E2.falselist, M.instr); E.truelist = E1.truelist; E.falselist = merge(E1.falselist, E2.falselist)', 'No backpatching is needed for ||, since both operands always fall through sequentially'],
+    answer: 1,
+    marks: 2,
+    difficulty: 'hard',
+    type: 'pyq-style',
+    explanation: 'For OR, if E1 is true the whole expression E is already true, so E1\'s true-exits should join E\'s true-exits directly — no jump to E2\'s code is needed for that case. Only if E1 turns out false must control fall through into evaluating E2, which is exactly why E1.falselist gets backpatched to M.instr, the address where E2\'s code begins. Since E is true whenever either E1 or E2 is true, E.truelist is the merge of both operands\' truelists. Since E is false only when both are false, and E1-false control has already been redirected into E2, the only remaining false exits belong to E2, so E.falselist = E2.falselist. This is exactly the rule in option 2, the textbook-standard short-circuit OR translation.'
+  },
+  {
+    id: 'compiler-icg-x12',
+    q: 'A straightforward one-pass TAC generator (no register/temporary reuse across independent subexpressions) translates a*b + c*d - e*f into three-address code, introducing one fresh temporary per operation. How many temporaries (and hence how many TAC instructions) are generated in total?',
+    options: ['3', '4', '5', '6'],
+    answer: 2,
+    marks: 2,
+    difficulty: 'medium',
+    type: 'numerical',
+    explanation: 'The expression has exactly five binary operations: two multiplications forming the terms, and two more operations (an addition and a subtraction) combining them left to right, since + and - are left-associative at the same precedence level: ((a*b) + (c*d)) - (e*f). A naive one-pass generator with no reuse allocates one new temporary per operation: t1 = a*b; t2 = c*d; t3 = t1+t2; t4 = e*f; t5 = t3-t4. That is exactly 5 temporaries and 5 instructions. This naive count (5) is deliberately larger than the Sethi-Ullman-optimal register count for a similarly structured expression, illustrating the difference between "one temporary per operation" generation and register-reuse-optimized generation. Option 3 is correct.'
+  },
+  {
+    id: 'compiler-icg-x13',
+    q: 'A key structural limitation of plain (direct) triples, which indirect triples and quadruples both avoid, is that:',
+    options: ['Triples cannot represent binary operators, only unary ones', 'A reference to an earlier triple\'s result is tied to that triple\'s position in the table, so relocating the triple during optimization silently breaks every instruction that referenced it by position', 'Triples require twice as much memory as quadruples for every instruction', 'Triples cannot be used for arithmetic expressions, only for control flow'],
+    answer: 1,
+    marks: 1,
+    difficulty: 'easy',
+    type: 'concept',
+    explanation: 'Because a triple has no explicit named result field, later instructions refer to "the value computed by triple number k" using k itself as the reference. This works fine as long as the triple table order never changes, but the moment an optimization pass reorders, inserts, or removes triples (which is exactly what optimizations like code motion or dead-code elimination need to do), every numeric reference that pointed at a moved triple\'s old slot becomes wrong. Indirect triples solve this with an extra pointer array that can be freely edited instead of the triples themselves, and quadruples sidestep the issue entirely by giving each result a name-based rather than position-based identity. Triples are perfectly capable of representing binary operators and arithmetic; that is not the limitation. Option 2 is correct.'
+  },
+  {
+    id: 'compiler-icg-x14',
+    q: 'Building a DAG (rather than a plain syntax tree) for a basic block during intermediate code generation automatically exposes which optimization opportunity within that block?',
+    options: ['Loop-invariant code motion', 'Common subexpression elimination, since two computations of the same expression over unchanged operands collapse onto a single shared node', 'Global register allocation across the whole procedure', 'Elimination of unreachable basic blocks'],
+    answer: 1,
+    marks: 1,
+    difficulty: 'easy',
+    type: 'concept',
+    explanation: 'A syntax tree gives every occurrence of a subexpression its own separate subtree, even when two occurrences are textually and semantically identical (same operator, same operands, no intervening redefinition). A DAG instead merges any two nodes that compute the same value from the same, still-valid operands into a single shared node, so the operation is represented (and, downstream, computed) only once no matter how many times it textually appears in the block. This is precisely local common subexpression elimination, and it falls out automatically from the DAG construction algorithm rather than needing a separate analysis pass. Loop-invariant motion and global register allocation require information beyond a single basic block, and unreachable-block elimination is a control-flow-level optimization, not a local DAG property. Option 2 is correct.'
+  }
+);

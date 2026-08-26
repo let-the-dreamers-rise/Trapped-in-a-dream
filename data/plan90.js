@@ -42,6 +42,7 @@ window.GATE_DATA = window.GATE_DATA || {};
       });
       tasks.push({ text: 'Redo every question you got wrong today (the app queues them for you)', kind: 'review' });
       tasks.push({ text: '45 min Aptitude drills (non-negotiable — 15 free marks live here)', topic: 'apti', kind: 'quiz' });
+      if (key !== 'engmath') tasks.push({ text: '15 min discrete maths warm-up — 10 quick questions (the AIR-1 daily habit)', topic: 'engmath-discrete-logic', kind: 'quiz' });
       tasks.push({ text: '30 min recall: close the app, write everything you remember on paper', kind: 'recall' });
       pushDay({
         day: dayNo,
@@ -81,7 +82,7 @@ window.GATE_DATA = window.GATE_DATA || {};
     } else {
       tasks.push({ text: 'Deep revision: ' + revNames[subj] + ' — reread every Strategy section, redo all hard questions', topic: null, kind: 'theory', subject: subj });
       tasks.push({ text: '120 mixed questions across ' + revNames[subj] + ' (use infinite mode — it resurfaces your mistakes)', kind: 'quiz', subject: subj });
-      tasks.push({ text: '45 min Aptitude + 30 min formula-sheet recall on paper', kind: 'recall' });
+      tasks.push({ text: '45 min Aptitude + 15 min discrete warm-up + 30 min formula-sheet recall on paper', kind: 'recall' });
     }
     tasks.push({ text: 'Sleep 7 h minimum. A tired brain scores like rank 5000.', kind: 'health' });
     pushDay({

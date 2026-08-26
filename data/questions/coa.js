@@ -1125,3 +1125,329 @@ window.GATE_DATA.questions['coa'].topics.find(function(t){return t.id==='coa-dat
     explanation: 'A shared bus can only carry one valid value at a time. If two registers with different values both tried to drive the same wire directly, the result would be an undefined or even damaging electrical conflict. A tri-state buffer solves this by giving each register output three possible states: logic 0, logic 1, or high-impedance (effectively disconnected). The control unit enables exactly one register\'s buffer per cycle (driving 0 or 1) and disables all others (forcing high-impedance), so the bus reliably reflects only the selected register\'s value. Tri-state buffers do not store data or affect clock frequency, and the same bus-contention problem applies equally to internal registers and I/O devices sharing a bus.'
   }
 );
+
+window.GATE_DATA.questions['coa'].topics.find(function(t){return t.id==='coa-pipelining';}).questions.push(
+  {
+    id: 'coa-pipelining-x1',
+    q: 'For a k-stage pipeline executing a very large number of instructions n, what does the ideal speedup over a non-pipelined processor approach?',
+    options: ['n', 'k', '1', 'n/k'],
+    answer: 1,
+    marks: 1,
+    difficulty: 'easy',
+    type: 'concept',
+    explanation: 'Pipelined execution time for n instructions is (k + n − 1) cycles, versus n × k cycles non-pipelined. Speedup = nk / (k + n − 1). As n grows very large, the "+n" term in the denominator dominates the constant (k − 1), so the ratio approaches nk / n = k — the number of pipeline stages. This is the theoretical ceiling: a 5-stage pipeline can, at best, run about 5 times faster than the unpipelined version once the pipeline is kept full for long enough programs. Real pipelines fall short of this ceiling because of hazards and non-uniform stage delays, which is exactly what the stall-cycle and cycle-time questions in this topic quantify.'
+  },
+  {
+    id: 'coa-pipelining-x2',
+    q: 'A 5-stage pipeline runs a program of 500 instructions, issuing one instruction per cycle in the best case. On average, each instruction incurs 0.4 stall cycles due to hazards. What speedup does this pipeline achieve over an equivalent non-pipelined processor (which takes 5 cycles per instruction) for this program?',
+    options: ['5.00', '3.55', '4.20', '2.50'],
+    answer: 1,
+    marks: 2,
+    difficulty: 'medium',
+    type: 'pyq-style',
+    explanation: 'Pipelined cycles without stalls = k + n − 1 = 5 + 500 − 1 = 504. Added stall cycles = n × 0.4 = 500 × 0.4 = 200. Total pipelined cycles = 504 + 200 = 704. Non-pipelined cycles = n × k = 500 × 5 = 2500. Speedup = 2500 / 704 ≈ 3.55. Note the ideal ceiling for a 5-stage pipeline is 5 (from the previous concept), and the 0.4 stalls per instruction pull the achieved speedup well below that ceiling — this gap between ideal and achieved speedup, driven entirely by the stall rate, is exactly what GATE numerical questions in this style are testing.'
+  },
+  {
+    id: 'coa-pipelining-x3',
+    q: 'A 6-stage pipeline resolves branch outcomes at the end of stage 4. Branches make up 20% of all instructions, and the branch predictor is 90% accurate. Assuming non-branch instructions and correctly predicted branches take 1 cycle, what is the effective CPI?',
+    options: ['1.06', '1.60', '1.20', '1.03'],
+    answer: 0,
+    marks: 2,
+    difficulty: 'hard',
+    type: 'numerical',
+    explanation: 'Since the outcome resolves at the end of stage 4, a misprediction discards 4 − 1 = 3 wrongly fetched instructions, i.e., a 3-cycle penalty. Fraction of instructions that are mispredicted branches = 0.20 × (1 − 0.90) = 0.02. Extra stalls per instruction = 0.02 × 3 = 0.06. Effective CPI = 1 + 0.06 = 1.06. This problem combines two templates in sequence — first derive the branch penalty from where in the pipeline the outcome becomes known (b − 1 rule), then apply the standard prediction-overhead formula (branch fraction × misprediction rate × penalty) — exactly the kind of two-step composition GATE uses to raise difficulty without introducing new concepts.'
+  },
+  {
+    id: 'coa-pipelining-x4',
+    q: 'In a 7-stage pipeline that fetches one instruction per cycle, a branch instruction\'s outcome is determined at the end of stage 5. On a misprediction, how many wrongly fetched instructions must be squashed?',
+    options: ['5', '4', '7', '2'],
+    answer: 1,
+    marks: 1,
+    difficulty: 'medium',
+    type: 'numerical',
+    explanation: 'Once the branch is fetched (occupying stage 1), one new instruction enters the pipeline in each subsequent cycle while the branch itself is still working its way through stages 2, 3, 4 and 5. By the time the outcome is known at the end of stage 5, four more instructions have been fetched behind it (the ones that entered while the branch was in stages 2 through 5), all following the wrong (fall-through) path if the branch is actually taken. So 5 − 1 = 4 instructions are squashed. This b − 1 relationship (b = stage number where outcome resolves) is the standard way GATE frames branch penalty questions without giving the penalty directly.'
+  },
+  {
+    id: 'coa-pipelining-x5',
+    q: 'Consider I1: ADD R1, R2, R3 followed immediately by I2: SUB R4, R1, R5 in a 5-stage pipeline (IF ID EX MEM WB) with no operand forwarding. The register file supports writing in the first half of a cycle and reading in the second half of the same cycle. What is the minimum number of stall cycles needed before I2 can correctly read R1 in its ID stage?',
+    options: ['0', '1', '2', '3'],
+    answer: 2,
+    marks: 2,
+    difficulty: 'medium',
+    type: 'numerical',
+    explanation: 'I1 writes R1 in its WB stage, which falls in cycle 5. Because the register file allows a same-cycle write-then-read, I2\'s ID stage can also occur in cycle 5 and still see the updated value. Normally (with no stalls) I2\'s ID would fall in cycle 3, so it must be delayed to cycle 5 — a delay of 2 cycles, meaning 2 stall (bubble) cycles are inserted between I1 and I2. This is the classic "2 stalls without forwarding, with the write/read same-cycle trick" result for an immediately-dependent ALU-to-ALU hazard, and it is the baseline every forwarding-based improvement in this topic is measured against.'
+  },
+  {
+    id: 'coa-pipelining-x6',
+    q: 'Repeat the previous scenario — I1: ADD R1, R2, R3 then I2: SUB R4, R1, R5 in a 5-stage pipeline with no forwarding — but now assume the register file does NOT support reading and writing in the same cycle (a read must happen in a strictly later cycle than the write). How many stall cycles are now needed before I2\'s ID stage?',
+    options: ['1', '2', '3', '4'],
+    answer: 2,
+    marks: 2,
+    difficulty: 'medium',
+    type: 'numerical',
+    explanation: 'I1 writes R1 in cycle 5 (its WB stage). Without the same-cycle write-read trick, I2\'s ID must now happen strictly after cycle 5, i.e., in cycle 6. Normally I2\'s ID would occur in cycle 3, so it is delayed by 3 cycles, requiring 3 stall cycles. This is one more stall than the same-cycle-trick version, illustrating exactly why real register files are commonly designed to allow a write-then-read within one cycle: it eliminates one full stall cycle on every immediately-dependent instruction pair even before forwarding hardware is added.'
+  },
+  {
+    id: 'coa-pipelining-x7',
+    q: 'Now suppose the pipeline in the same I1/I2 scenario (ADD R1,R2,R3 then SUB R4,R1,R5) is equipped with full operand forwarding, including an EX/MEM-to-EX forwarding path. How many stall cycles are needed before I2 can correctly use R1 in its EX stage?',
+    options: ['0', '1', '2', '3'],
+    answer: 0,
+    marks: 1,
+    difficulty: 'easy',
+    type: 'concept',
+    explanation: 'I1\'s ALU result is available at the end of its EX stage (cycle 3) and is captured in the EX/MEM pipeline latch. With an EX/MEM-to-EX forwarding path, that value is routed directly to the ALU input of I2, whose EX stage falls in cycle 4 — exactly when it is needed, with no waiting. So zero stall cycles are required. This is precisely why forwarding is so effective for back-to-back ALU instructions: it converts a hazard that would otherwise cost 2 or 3 stall cycles (as seen in the two preceding questions) into a hazard that costs nothing, simply by wiring the result to where it is needed one cycle earlier than the register file could supply it.'
+  },
+  {
+    id: 'coa-pipelining-x8',
+    q: 'Consider I1: LOAD R1, 0(R2) followed immediately by I2: ADD R3, R1, R4 in a 5-stage pipeline (IF ID EX MEM WB) with full forwarding, including forwarding from the MEM/WB latch to EX. What is the minimum number of stall cycles still required?',
+    options: ['0', '1', '2', '3'],
+    answer: 1,
+    marks: 2,
+    difficulty: 'hard',
+    type: 'numerical',
+    explanation: 'The loaded value only becomes available at the end of I1\'s MEM stage (cycle 4), because that is when the data actually returns from memory — earlier than that, there is nothing valid to forward. I2\'s EX stage, without any stall, would fall in cycle 4 as well, which is too early: forwarding from MEM/WB can deliver the value to I2\'s EX only in cycle 5, one cycle later than I2 naturally wants it. So exactly 1 stall cycle (the mandatory load-use / load-delay stall) must be inserted even with full forwarding hardware present. This single unavoidable bubble is why compilers try to schedule an independent instruction right after a load whenever possible, to fill the slot productively instead of wasting it.'
+  },
+  {
+    id: 'coa-pipelining-x9',
+    q: 'A 5-stage pipeline has stage delays of 100, 150, 120, 160 and 140 ps, and each pipeline latch adds 20 ps of overhead. For a very long instruction stream, what is the maximum sustained throughput of this pipeline, in instructions per second?',
+    options: ['About 5.56 billion instructions/sec', 'About 6.67 billion instructions/sec', 'About 1.43 billion instructions/sec', 'About 10 billion instructions/sec'],
+    answer: 0,
+    marks: 2,
+    difficulty: 'hard',
+    type: 'numerical',
+    explanation: 'The clock period must accommodate the slowest stage plus the latch overhead: the slowest stage is 160 ps, so T = 160 + 20 = 180 ps. For a very long stream, one instruction completes every cycle in steady state, so throughput = 1 / T = 1 / (180 × 10^-12 s) ≈ 5.56 × 10^9 instructions/sec, i.e., about 5.56 billion instructions per second (5.56 GIPS). Using the fastest stage (100 ps) instead of the slowest gives the wrong, overly optimistic 6.67 GIPS-style answer, and forgetting the 20 ps latch overhead gives 1/160ps ≈ 6.25 GIPS — the slowest stage plus its latch overhead is always the correct basis for cycle time in a synchronous pipeline.'
+  },
+  {
+    id: 'coa-pipelining-x10',
+    q: 'A pipelined processor has a single-ported unified cache shared by instruction fetch and data access. Every load/store instruction causes a 1-cycle structural-hazard stall against the fetch of a later instruction, and exactly 1 in every 4 instructions is a load or store. For a program of 800 instructions on a 5-stage pipeline, what is the total number of clock cycles?',
+    options: ['804', '1004', '1000', '900'],
+    answer: 1,
+    marks: 2,
+    difficulty: 'medium',
+    type: 'numerical',
+    explanation: 'Stall-free pipelined execution takes k + n − 1 = 5 + 800 − 1 = 804 cycles. The number of load/store instructions is 800 / 4 = 200, and each contributes one structural-hazard stall cycle, adding 200 × 1 = 200 cycles. Total = 804 + 200 = 1004 cycles. This is the same additive template used for data-hazard stalls (base pipeline cycles plus stalls-per-affected-instruction × count of affected instructions) applied instead to a structural hazard — the source of the stall differs, but the arithmetic for totalling cycles is identical, which is worth recognizing so the calculation feels familiar regardless of hazard type.'
+  },
+  {
+    id: 'coa-pipelining-x11',
+    q: 'What is the standard hardware remedy for a structural hazard caused by a single, unified memory port being needed simultaneously by instruction fetch and a data access?',
+    options: ['Add more pipeline stages to slow down fetch', 'Provide separate instruction and data memory ports (e.g., split L1 instruction and data caches), giving each access its own path', 'Switch to a shorter pipeline with fewer stages', 'Increase the clock frequency'],
+    answer: 1,
+    marks: 1,
+    difficulty: 'easy',
+    type: 'concept',
+    explanation: 'A structural hazard exists because two operations compete for one shared resource in the same cycle. The direct fix is to duplicate the resource — giving instruction fetch and data access their own independent memory ports, most commonly realized as separate L1 instruction and data caches (a Harvard-style split at the cache level even though main memory remains unified). This removes the conflict entirely rather than just working around it. Adding pipeline stages or shortening the pipeline changes timing but does not address the resource conflict, and raising clock frequency would only make the same conflict occur more often relative to real time, not resolve it.'
+  },
+  {
+    id: 'coa-pipelining-x12',
+    q: 'Which of the following is NOT one of the three standard categories of pipeline hazards?',
+    options: ['Structural hazard', 'Data hazard', 'Control hazard', 'Arithmetic overflow hazard'],
+    answer: 3,
+    marks: 1,
+    difficulty: 'easy',
+    type: 'concept',
+    explanation: 'Pipeline hazards are conventionally classified into exactly three categories: structural hazards (resource conflicts, such as two stages needing the same memory port), data hazards (an instruction needs a value not yet produced by an earlier, still-in-flight instruction), and control hazards (the next instruction to fetch is not yet known, typically due to an unresolved branch). "Arithmetic overflow" is a runtime exception condition detected by the ALU — it may trigger a trap or interrupt, but it is not a category of pipeline hazard in the standard taxonomy used throughout computer architecture, so it is the odd one out among the four options.'
+  },
+  {
+    id: 'coa-pipelining-x13',
+    q: 'Using the standard pipeline speedup formula Speedup = nk / (k + n − 1), a 6-stage pipeline executes a program of 200 instructions. What is the speedup over the non-pipelined equivalent?',
+    options: ['6.00', '5.85', '4.90', '3.33'],
+    answer: 1,
+    marks: 2,
+    difficulty: 'medium',
+    type: 'numerical',
+    explanation: 'Substitute n = 200, k = 6: numerator nk = 200 × 6 = 1200; denominator k + n − 1 = 6 + 200 − 1 = 205. Speedup = 1200 / 205 ≈ 5.85. This falls just short of the theoretical ceiling of k = 6 because the pipeline-fill overhead (k − 1 = 5 extra cycles relative to the idealized n cycles) still matters somewhat for a program of only 200 instructions; the ceiling of exactly 6 would only be reached in the limit of an infinitely long program. A common wrong shortcut is answering exactly 6, ignoring the fill/drain correction that the formula\'s denominator captures.'
+  },
+  {
+    id: 'coa-pipelining-x14',
+    q: 'A processor needs its effective CPI not to exceed 1.10. Branches make up 15% of instructions, and each misprediction costs 4 cycles (non-branch and correctly predicted instructions cost 1 cycle). What is the minimum branch prediction accuracy required?',
+    options: ['75%', '80%', '83.3%', '90%'],
+    answer: 2,
+    marks: 2,
+    difficulty: 'hard',
+    type: 'numerical',
+    explanation: 'Let p be the prediction accuracy. CPI = 1 + 0.15 × (1 − p) × 4 ≤ 1.10. This simplifies to 0.6 × (1 − p) ≤ 0.10, so (1 − p) ≤ 0.10 / 0.6 = 0.1667, giving p ≥ 1 − 0.1667 = 0.8333, i.e., at least 83.3%. This is the mirror image of the usual "compute CPI from given accuracy" question: here the target CPI is fixed and the required accuracy is the unknown, so the same formula is simply solved in reverse. Rounding 0.1/0.6 incorrectly (e.g., to 0.15 instead of 0.1667) is the most common source of a wrong answer among the distractors.'
+  },
+  {
+    id: 'coa-pipelining-x15',
+    q: 'A 5-stage pipeline executes 100 instructions and a total of 10 stall (bubble) cycles are inserted across the whole run due to hazards. What is the effective CPI for this run?',
+    options: ['1.00', '1.10', '1.14', '1.04'],
+    answer: 2,
+    marks: 2,
+    difficulty: 'medium',
+    type: 'numerical',
+    explanation: 'Stall-free pipelined cycles = k + n − 1 = 5 + 100 − 1 = 104. Adding the 10 stall cycles gives a total of 104 + 10 = 114 cycles. Effective CPI = total cycles / number of instructions = 114 / 100 = 1.14. It is a common mistake to divide the raw stall count by the instruction count and add that to 1 (1 + 10/100 = 1.10), which quietly forgets that the 104 baseline itself already includes the (k − 1) = 4-cycle fill overhead beyond n; for large n this fill correction becomes negligible, but for a modest 100-instruction run it visibly shifts the answer from 1.10 to 1.14.'
+  },
+  {
+    id: 'coa-pipelining-x16',
+    q: 'A chain of four dependent instructions runs on a 5-stage pipeline with full forwarding: I1: LOAD R1, 0(R2); I2: ADD R3, R1, R4; I3: SUB R5, R3, R6; I4: OR R7, R5, R8. Each instruction depends only on the immediately preceding one. How many total clock cycles do these 4 instructions take to complete?',
+    options: ['8', '9', '10', '12'],
+    answer: 1,
+    marks: 2,
+    difficulty: 'hard',
+    type: 'numerical',
+    explanation: 'With no hazards at all, 4 instructions would take k + n − 1 = 5 + 4 − 1 = 8 cycles. Checking each dependency: I1 (LOAD) to I2 (ADD) is a load-use hazard, which needs exactly 1 stall cycle even with full forwarding, as established earlier. I2 (ADD) to I3 (SUB) and I3 (SUB) to I4 (OR) are both ALU-to-ALU dependencies, which full forwarding resolves with zero stalls. So only the very first dependency contributes a stall, adding 1 cycle to the base 8, giving a total of 9 cycles. Recognizing that only the load-use link in a dependency chain costs anything under forwarding — every ALU-to-ALU link is free — is the key simplification for these multi-instruction chain problems.'
+  }
+);
+
+window.GATE_DATA.questions['coa'].topics.find(function(t){return t.id==='coa-memory';}).questions.push(
+  {
+    id: 'coa-memory-x1',
+    q: 'A cache miss occurs on a block the very first time it is ever referenced, even in an infinitely large cache. What category of miss is this?',
+    options: ['Capacity miss', 'Conflict miss', 'Compulsory (cold-start) miss', 'Coherence miss'],
+    answer: 2,
+    marks: 1,
+    difficulty: 'easy',
+    type: 'concept',
+    explanation: 'A compulsory miss (also called a cold-start miss) happens the first time any block is touched, because it simply has never been brought into the cache before — no amount of cache size or associativity can prevent it, since even an infinite cache would still miss on the first reference to any block. This distinguishes it from capacity misses (which disappear in an infinite cache, because they are caused by the cache being too small to hold the working set) and conflict misses (which disappear with full associativity, because they are caused by multiple blocks contending for the same limited set). Coherence misses arise only in multiprocessor systems from another core invalidating a shared block, not from a single-core reference pattern.'
+  },
+  {
+    id: 'coa-memory-x2',
+    q: 'A program\'s working set is larger than the cache can hold, so useful blocks are evicted and later re-referenced, causing repeated misses even though the cache is fully associative with an optimal replacement policy. What category of miss is this?',
+    options: ['Compulsory miss', 'Capacity miss', 'Conflict miss', 'TLB miss'],
+    answer: 1,
+    marks: 1,
+    difficulty: 'easy',
+    type: 'concept',
+    explanation: 'A capacity miss occurs because the cache is simply not large enough to hold all the blocks needed during execution, so blocks are evicted and later re-fetched purely due to limited capacity — this happens even with full associativity and an ideal (e.g., optimal/Belady) replacement policy, which rules out conflict misses (a placement-restriction problem) as the cause. It also is not compulsory, since these blocks were already resident once before being evicted; the miss is a re-miss caused by insufficient room, not a first-ever reference. Enlarging the cache directly reduces capacity misses, whereas enlarging associativity (with the same total capacity) would not, since the problem here is total space, not confinement to specific sets.'
+  },
+  {
+    id: 'coa-memory-x3',
+    q: 'In a direct-mapped cache, two frequently used blocks happen to map to the same cache line and repeatedly evict each other, even though the cache overall has plenty of free space in other lines. What category of miss is this?',
+    options: ['Compulsory miss', 'Capacity miss', 'Conflict miss', 'Cold miss'],
+    answer: 2,
+    marks: 1,
+    difficulty: 'easy',
+    type: 'concept',
+    explanation: 'A conflict miss happens when a block is evicted because another block maps to the same set, even though the cache as a whole is not full — the problem is restricted placement, not total capacity. Increasing associativity (allowing each set to hold more than one block at a time) directly reduces conflict misses, and a fully associative cache eliminates them entirely, since any block may occupy any line. This is different from a capacity miss, where even a fully associative cache would still miss because there genuinely is not enough total room, and different from a compulsory miss, which would occur regardless of the cache\'s mapping policy on the block\'s first reference.'
+  },
+  {
+    id: 'coa-memory-x4',
+    q: 'A system has L1 cache with a 1-cycle hit time and a 10% (local) miss rate, an L2 cache with a 10-cycle access time and a global miss rate (fraction of ALL accesses that reach main memory) of 2%, and main memory taking 100 cycles. Using the hierarchical access model, what is the average memory access time in cycles?',
+    options: ['4', '3', '13', '112'],
+    answer: 0,
+    marks: 2,
+    difficulty: 'medium',
+    type: 'numerical',
+    explanation: 'When the L2 miss rate is already expressed globally, each term of the AMAT expansion can be added directly without further conversion: AMAT = L1 hit time + (L1 miss rate × L2 access time) + (global L2 miss rate × memory time) = 1 + (0.10 × 10) + (0.02 × 100) = 1 + 1 + 2 = 4 cycles. This is the same answer structure as the local-miss-rate version of this problem, but arrived at more directly since no conversion between local and global rates is needed — recognizing whether a given miss rate is local or global (and converting between them, global = local_L1miss × local_L2miss, when necessary) is the single most important skill for multilevel AMAT questions.'
+  },
+  {
+    id: 'coa-memory-x5',
+    q: 'A three-level memory hierarchy has: L1 with 1-cycle hit time and 10% local miss rate; L2 with 10-cycle access time and 40% local miss rate; L3 with 20-cycle access time and 25% local miss rate; and main memory taking 200 cycles. Using the hierarchical access model throughout, what is the average memory access time?',
+    options: ['4.8 cycles', '3.8 cycles', '31 cycles', '1.475 cycles'],
+    answer: 0,
+    marks: 2,
+    difficulty: 'hard',
+    type: 'numerical',
+    explanation: 'Work from the innermost level outward. If L3 misses, memory is accessed: L3 branch cost = L3 access + L3 local miss × memory = 20 + 0.25 × 200 = 20 + 50 = 70. If L2 misses, L3 is accessed: L2 branch cost = L2 access + L2 local miss × (L3 branch cost) = 10 + 0.40 × 70 = 10 + 28 = 38. Finally, AMAT = L1 hit + L1 miss × (L2 branch cost) = 1 + 0.10 × 38 = 1 + 3.8 = 4.8 cycles. This nested-expectation structure — each level\'s local miss rate weighting the cost of everything below it — extends cleanly to any number of cache levels, and the arithmetic must be done from the deepest level upward, never by trying to combine all rates in one flat expression.'
+  },
+  {
+    id: 'coa-memory-x6',
+    q: 'A program generates 1,000,000 memory references, 30% of which are writes, on a write-through cache with no write-allocate. Assuming every write is sent to main memory regardless of whether it hits or misses in the cache, and each write transfers 4 bytes, what is the total write traffic to main memory?',
+    options: ['400,000 bytes', '1,200,000 bytes', '4,000,000 bytes', '300,000 bytes'],
+    answer: 1,
+    marks: 2,
+    difficulty: 'medium',
+    type: 'numerical',
+    explanation: 'Write-through means every write instruction updates main memory immediately, independent of a cache hit or miss (a hit additionally updates the cached copy, a miss with no write-allocate updates only memory, but both send the write to memory). Number of writes = 0.30 × 1,000,000 = 300,000 writes, each moving 4 bytes, giving total traffic = 300,000 × 4 = 1,200,000 bytes. This traffic is independent of the cache\'s hit ratio entirely, which is the defining (and costly) property of write-through: it guarantees memory is never stale, at the price of generating write traffic proportional to the raw write count rather than to the much smaller number of dirty-block evictions that a write-back cache would generate.'
+  },
+  {
+    id: 'coa-memory-x7',
+    q: 'A write-back cache experiences 100,000 total accesses with a 5% miss rate. On average, 60% of the blocks evicted due to a miss are dirty and must be written back to memory (clean evictions are simply discarded). Each block is 64 bytes. What is the total write-back traffic to main memory due to dirty evictions?',
+    options: ['192,000 bytes', '320,000 bytes', '96,000 bytes', '3,000,000 bytes'],
+    answer: 0,
+    marks: 2,
+    difficulty: 'hard',
+    type: 'numerical',
+    explanation: 'Number of misses = 100,000 × 0.05 = 5,000. Of these, dirty evictions requiring a write-back = 5,000 × 0.60 = 3,000. Each write-back moves one full block, so traffic = 3,000 × 64 bytes = 192,000 bytes. Notice how much smaller this is than the equivalent write-through traffic would be for the same workload — write-back coalesces potentially many individual writes to the same block into at most one eventual block write-back, which is exactly why write-back caches are preferred whenever write traffic (not just correctness) matters, despite the added complexity of tracking dirty bits and handling the double transfer when an eviction target is itself dirty.'
+  },
+  {
+    id: 'coa-memory-x8',
+    q: 'For a workload where the same few memory locations are written to repeatedly in a short span (high write locality), which cache write policy generally produces less traffic to main memory, and why?',
+    options: ['Write-through, because it never needs a dirty bit', 'Write-back, because repeated writes to the same block are coalesced into at most one eventual write-back instead of one memory write per store', 'They always produce identical traffic regardless of workload', 'Write-through, because it always writes larger blocks than write-back'],
+    answer: 1,
+    marks: 1,
+    difficulty: 'medium',
+    type: 'concept',
+    explanation: 'Write-back only updates the cached copy on each write, marking the line dirty; the actual memory update happens once, only when the line is eventually evicted. If a block is written many times before eviction, all but the last write are absorbed entirely within the cache, producing at most one memory transaction for the whole burst. Write-through, in contrast, sends every single write to memory immediately, so N writes to the same block cost N memory transactions no matter how close together they occur. The claim that write-through avoids needing a dirty bit is true but irrelevant to traffic volume, and write-through does not use larger block transfers than write-back — if anything it typically writes only the changed word, not a full block.'
+  },
+  {
+    id: 'coa-memory-x9',
+    q: 'A cache is indexed and tagged directly using the virtual address, before any translation to a physical address takes place. What kind of cache is this, and what is its main drawback?',
+    options: ['Physically indexed, physically tagged (PIPT) — slow because it always waits for translation', 'Virtually indexed, virtually tagged (VIVT) — fast lookup, but suffers aliasing problems when multiple virtual addresses map to the same physical address', 'Virtually indexed, physically tagged (VIPT) — a compromise requiring no special handling', 'Content-addressable memory — used only for TLBs, never for data caches'],
+    answer: 1,
+    marks: 1,
+    difficulty: 'easy',
+    type: 'concept',
+    explanation: 'A virtually indexed, virtually tagged (VIVT) cache uses the virtual address for both indexing and tag comparison, so it can be probed even before the TLB completes translation — the fastest possible lookup path. Its major drawback is aliasing: if two different virtual addresses (e.g., in different processes, or shared memory mapped at different virtual addresses) map to the same physical location, they can end up cached as two separate, potentially inconsistent copies, since the cache never sees the physical address to detect the collision. This forces extra hardware or software (cache flushing on context switch, or restricting shared mappings) to maintain correctness, which is why VIVT caches are less common than VIPT designs in modern processors.'
+  },
+  {
+    id: 'coa-memory-x10',
+    q: 'A cache waits for the TLB to translate the virtual address to a physical address, and then uses that physical address for both indexing and tag comparison. What is this design called, and what is its chief benefit over a virtually addressed cache?',
+    options: ['VIVT — faster, since it skips translation', 'PIPT (physically indexed, physically tagged) — free of aliasing problems, since indexing and tagging both use the unique physical address', 'VIPT — combines the speed of VIVT with no drawbacks', 'None of these; caches never use physical addresses'],
+    answer: 1,
+    marks: 1,
+    difficulty: 'medium',
+    type: 'concept',
+    explanation: 'A physically indexed, physically tagged (PIPT) cache performs its indexing and tag comparison only after the virtual address has been translated by the TLB, so both fields are derived from the physical address. Since physical addresses are unique system-wide, this design has no aliasing problem: two virtual addresses mapping to the same physical location naturally land in the very same cache line, keeping a single consistent copy automatically. The cost is speed — the cache access cannot begin until translation completes, adding the TLB lookup to the critical path, which is exactly the delay a VIVT design avoids and which VIPT designs try to hide by overlapping translation with indexing.'
+  },
+  {
+    id: 'coa-memory-x11',
+    q: 'A cache uses the untranslated low-order bits of the virtual address (which are identical to the corresponding bits of the physical address, since they fall within the page offset) to select the index/set, but waits for the TLB to supply the physical address before comparing tags. What is this design called, and what advantage does it offer?',
+    options: ['VIVT — it eliminates the TLB entirely', 'PIPT — it requires translation to complete before indexing can begin', 'VIPT (virtually indexed, physically tagged) — indexing can proceed in parallel with TLB translation, then physical tags are compared once translation completes, avoiding most of the aliasing problems of VIVT', 'It is not a valid cache design'],
+    answer: 2,
+    marks: 1,
+    difficulty: 'medium',
+    type: 'concept',
+    explanation: 'VIPT (virtually indexed, physically tagged) is a practical compromise: as long as the index bits are drawn entirely from the page offset (the portion of the address unchanged by translation), the cache can begin selecting the set immediately using the virtual address, in parallel with the TLB translation running for the tag comparison. Once the physical address arrives, its upper bits (the physical tag) are compared against the stored tag to confirm a hit. This overlaps translation latency with indexing latency, recovering most of VIVT\'s speed while avoiding most of its aliasing issues, since the tag comparison uses the unique physical address. The constraint that the index must stay within the page offset limits how large or how associative such a cache can be relative to the page size, a limit tested numerically elsewhere in this topic.'
+  },
+  {
+    id: 'coa-memory-x12',
+    q: 'A direct-mapped cache has 4 lines (line number = block number mod 4) and starts empty. The processor references memory blocks in this order: 0, 4, 0, 1, 5, 0, 4. How many of these 7 references are hits?',
+    options: ['0', '1', '2', '3'],
+    answer: 1,
+    marks: 2,
+    difficulty: 'medium',
+    type: 'numerical',
+    explanation: 'Trace line 0\'s contents: ref 0 → miss, line0=0. ref 4 (line 4 mod 4 = 0) → line0 held 0, miss, line0=4. ref 0 → line0 held 4, miss, line0=0. ref 1 (line 1) → miss, line1=1. ref 5 (line 1) → line1 held 1, miss, line1=5. ref 0 (line 0) → line0 still holds 0 from the third reference (untouched since) → HIT. ref 4 (line 0) → line0 holds 0, miss, line0=4. Total hits = 1. This trace deliberately makes blocks 0 and 4 (and 1 and 5) conflict on the same line despite being far apart in reference order, showing how direct-mapping can thrash even a small working set that would fit comfortably in a set-associative or fully associative cache of the same size.'
+  },
+  {
+    id: 'coa-memory-x13',
+    q: 'A 2-way set-associative cache has 2 sets (set number = block number mod 2), uses LRU replacement within each set, and starts empty. The processor references blocks in the order: 0, 1, 2, 3, 0, 4, 1. How many of these 7 references are hits?',
+    options: ['0', '1', '2', '3'],
+    answer: 2,
+    marks: 2,
+    difficulty: 'hard',
+    type: 'numerical',
+    explanation: 'Track each set (recency order, oldest first). ref 0 (set 0): miss, set0=[0]. ref 1 (set 1): miss, set1=[1]. ref 2 (set 0): miss, set0=[0,2]. ref 3 (set 1): miss, set1=[1,3]. ref 0 (set 0): block 0 is present → HIT; recency updates to set0=[2,0]. ref 4 (set 0): set0=[2,0] is full; block 4 absent → miss; evict LRU block 2; set0=[0,4]. ref 1 (set 1): block 1 is present in set1=[1,3] → HIT; recency updates to set1=[3,1]. Total hits = 2 (the second reference to block 0 and the second reference to block 1). This shows how associativity rescues exactly the kind of same-line conflicts (blocks 0 and 2, or 1 and 3, sharing a set) that would have caused thrashing in the direct-mapped version of a similar trace.'
+  },
+  {
+    id: 'coa-memory-x14',
+    q: 'For a cache of fixed total capacity and fixed associativity, how does the total tag storage overhead (in bits) change as the block size is increased?',
+    options: ['It increases, since larger blocks need wider tags', 'It stays exactly the same regardless of block size', 'It decreases, because doubling the block size halves the number of lines needing a tag, even though each individual tag stays roughly the same width', 'It becomes zero once blocks are large enough'],
+    answer: 2,
+    marks: 2,
+    difficulty: 'hard',
+    type: 'concept',
+    explanation: 'For fixed capacity C and associativity, the number of lines is C / block_size, so doubling the block size halves the line count. Meanwhile, since (index bits + offset bits) = log2(C / associativity) is fixed by capacity and associativity alone, growing the block size only shifts bits from the index field to the offset field — the combined width barely changes, and so the tag width (total address bits minus index minus offset) stays essentially constant. Total tag storage = tag width × number of lines, so with tag width roughly constant and the number of lines shrinking, the overall tag storage overhead decreases as block size grows. This is one reason larger blocks reduce the relative cost of the tag directory, even though they can hurt performance in other ways (higher miss penalty, more pollution from unused bytes fetched).'
+  },
+  {
+    id: 'coa-memory-x15',
+    q: 'A direct-mapped cache holds 64 KB of data with 32-byte blocks, in a system with 32-bit addresses. Each line also stores 1 valid bit in addition to its tag. What is the total tag+valid storage overhead as a percentage of the 64 KB of cached data?',
+    options: ['6.6%', '3.1%', '12.5%', '25%'],
+    answer: 0,
+    marks: 2,
+    difficulty: 'medium',
+    type: 'numerical',
+    explanation: 'Lines = 64 KB / 32 B = 2^16 / 2^5 = 2^11 = 2048. Offset = log2 32 = 5 bits, index = log2 2048 = 11 bits, tag = 32 − 11 − 5 = 16 bits. Overhead per line = tag + valid bit = 16 + 1 = 17 bits. Total overhead = 2048 × 17 = 34,816 bits = 4,352 bytes. As a fraction of the 65,536-byte data array: 4,352 / 65,536 ≈ 0.0664, i.e., about 6.6%. Omitting the valid bit (using only the 16-bit tag) would give 2048 × 16 = 32,768 bits = 4,096 bytes, or about 6.25% — close to, but distinguishably different from, the correct answer, which is exactly why the question explicitly specifies the extra valid bit.'
+  },
+  {
+    id: 'coa-memory-x16',
+    q: 'A system uses 4 KB pages (12-bit page offset) and a virtually indexed, physically tagged (VIPT) cache with 32-byte blocks and 2-way set associativity. To avoid aliasing problems, all index bits must come from the page offset (the untranslated portion of the address). What is the maximum total cache size (data capacity) this constraint allows?',
+    options: ['8 KB', '4 KB', '16 KB', '2 KB'],
+    answer: 0,
+    marks: 2,
+    difficulty: 'hard',
+    type: 'numerical',
+    explanation: 'The block offset needs log2 32 = 5 bits, leaving at most 12 − 5 = 7 bits of the 12-bit page offset available for the index field without crossing into the translated part of the address. With 7 index bits, the maximum number of sets is 2^7 = 128. With 2-way associativity, total capacity = sets × ways × block size = 128 × 2 × 32 bytes = 8192 bytes = 8 KB. Any larger cache (or higher associativity at the same capacity) would need more index bits than the page offset can supply without translation, reintroducing the aliasing problem VIPT designs try to avoid — which is why practical VIPT caches are sized and organized specifically around this page-offset constraint.'
+  }
+);

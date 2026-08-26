@@ -261,6 +261,37 @@
     document.getElementById('practice').addEventListener('click', function () { nav('quiz', tid); });
   }
 
+  // ---------- question kinds (GATE 2026 pattern: MCQ / MSQ / NAT) ----------
+  function qKind(qq) {
+    if (qq.kind) return qq.kind;
+    if (Array.isArray(qq.answers)) return 'msq';
+    if (!qq.options || !qq.options.length) return 'nat';
+    return 'mcq';
+  }
+  function natMatches(qq, val) {
+    var v = parseFloat(val);
+    if (isNaN(v)) return false;
+    var tol = (qq.tolerance !== undefined) ? qq.tolerance : Math.max(0.01, Math.abs(qq.answer) * 0.001);
+    return Math.abs(v - qq.answer) <= tol;
+  }
+  function msqMatches(qq, selArr) {
+    var want = qq.answers.slice().sort().join(',');
+    var got = (selArr || []).slice().sort().join(',');
+    return want === got && got !== '';
+  }
+  function kindPill(qq) {
+    var k = qKind(qq);
+    if (k === 'msq') return '<span class="pill">MSQ · pick all</span>';
+    if (k === 'nat') return '<span class="pill">NAT · type answer</span>';
+    return '';
+  }
+  function answerLabel(qq) {
+    var k = qKind(qq);
+    if (k === 'nat') return 'Answer: ' + qq.answer;
+    if (k === 'msq') return 'Answer: ' + qq.answers.map(function (i) { return String.fromCharCode(65 + i); }).join(', ');
+    return 'Answer: ' + String.fromCharCode(65 + qq.answer);
+  }
+
   // ---------- QUIZ (infinite topic practice) ----------
   function viewQuiz(tid) {
     var e = topicById(tid); if (!e) return viewSubjects();
@@ -274,38 +305,74 @@
       var repeatTag = (L && L.seen > 0 && qq.type !== 'generated') ? '<span class="pill">repeat</span>' : '';
       var genTag = qq.type === 'generated' ? '<span class="pill gen">∞ generated</span>' : '';
       var html = '<button class="back-link" id="back">‹ ' + esc(e.topic.name) + '</button>' +
-        '<div class="quiz-meta"><span>Q' + num + ' · ' + right + ' correct</span><span><span class="pill ' + qq.difficulty + '">' + qq.difficulty + '</span><span class="pill">' + qq.marks + ' mark' + (qq.marks > 1 ? 's' : '') + '</span>' + repeatTag + genTag + '</span></div>' +
+        '<div class="quiz-meta"><span>Q' + num + ' · ' + right + ' correct</span><span><span class="pill ' + qq.difficulty + '">' + qq.difficulty + '</span><span class="pill">' + qq.marks + ' mark' + (qq.marks > 1 ? 's' : '') + '</span>' + kindPill(qq) + repeatTag + genTag + '</span></div>' +
         '<div class="card"><div class="q-text">' + esc(qq.q) + '</div><div id="opts">';
-      qq.options.forEach(function (o, i) {
-        html += '<button class="opt" data-i="' + i + '">' + String.fromCharCode(65 + i) + '.  ' + esc(o) + '</button>';
-      });
+      var kind = qKind(qq);
+      if (kind === 'nat') {
+        html += '<input type="number" step="any" id="nat-in" placeholder="Type your numerical answer" inputmode="decimal">' +
+          '<div class="btn-row"><button class="btn" id="nat-go">Check answer</button></div>';
+      } else {
+        (qq.options || []).forEach(function (o, i) {
+          html += '<button class="opt" data-i="' + i + '">' + String.fromCharCode(65 + i) + '.  ' + esc(o) + '</button>';
+        });
+        if (kind === 'msq') html += '<div class="btn-row"><button class="btn" id="msq-go">Submit selection</button></div>';
+      }
       html += '</div><div id="after"></div></div>';
       $view.innerHTML = html;
       document.getElementById('back').addEventListener('click', function () { nav('topic', tid); });
-      $view.querySelectorAll('.opt').forEach(function (b) {
-        b.addEventListener('click', function () {
-          var i = Number(b.getAttribute('data-i'));
-          var ok = i === qq.answer;
-          if (ok) right++;
-          recordAnswer(qq, ok, tid);
-          $view.querySelectorAll('.opt').forEach(function (bb, j) {
-            bb.disabled = true;
-            if (j === qq.answer) bb.classList.add('correct');
-            else if (j === i && !ok) bb.classList.add('wrong');
-          });
-          document.getElementById('after').innerHTML =
-            '<div class="feedback-banner ' + (ok ? 'ok' : 'no') + '">' + (ok ? '✅ Correct!' : '❌ Not quite — read why, this one WILL come back') + '</div>' +
-            '<div class="explain"><b>Answer: ' + String.fromCharCode(65 + qq.answer) + '</b>\n' + esc(qq.explanation || '') + '</div>' +
-            '<div class="btn-row"><button class="btn" id="next">Next question →</button></div>';
-          document.getElementById('next').addEventListener('click', ask);
-          window.scrollTo(0, 0);
+      function settle(ok, chosen) {
+        if (ok) right++;
+        recordAnswer(qq, ok, tid);
+        $view.querySelectorAll('.opt').forEach(function (bb, j) {
+          bb.disabled = true;
+          var isRight = kind === 'msq' ? qq.answers.indexOf(j) >= 0 : j === qq.answer;
+          var wasPicked = kind === 'msq' ? (chosen || []).indexOf(j) >= 0 : j === chosen;
+          if (isRight) bb.classList.add('correct');
+          else if (wasPicked) bb.classList.add('wrong');
         });
-      });
+        var goBtn = document.getElementById('msq-go') || document.getElementById('nat-go');
+        if (goBtn) goBtn.disabled = true;
+        var natIn = document.getElementById('nat-in');
+        if (natIn) natIn.disabled = true;
+        document.getElementById('after').innerHTML =
+          '<div class="feedback-banner ' + (ok ? 'ok' : 'no') + '">' + (ok ? '✅ Correct!' : '❌ Not quite — read why, this one WILL come back') + '</div>' +
+          '<div class="explain"><b>' + answerLabel(qq) + '</b>\n' + esc(qq.explanation || '') + '</div>' +
+          '<div class="btn-row"><button class="btn" id="next">Next question →</button></div>';
+        document.getElementById('next').addEventListener('click', ask);
+        window.scrollTo(0, 0);
+      }
+      if (kind === 'mcq') {
+        $view.querySelectorAll('.opt').forEach(function (b) {
+          b.addEventListener('click', function () {
+            var i = Number(b.getAttribute('data-i'));
+            settle(i === qq.answer, i);
+          });
+        });
+      } else if (kind === 'msq') {
+        var sel = {};
+        $view.querySelectorAll('.opt').forEach(function (b) {
+          b.addEventListener('click', function () {
+            var i = Number(b.getAttribute('data-i'));
+            sel[i] = !sel[i];
+            b.style.borderColor = sel[i] ? 'var(--accent)' : 'transparent';
+          });
+        });
+        document.getElementById('msq-go').addEventListener('click', function () {
+          var chosen = Object.keys(sel).filter(function (k) { return sel[k]; }).map(Number);
+          settle(msqMatches(qq, chosen), chosen);
+        });
+      } else {
+        document.getElementById('nat-go').addEventListener('click', function () {
+          settle(natMatches(qq, document.getElementById('nat-in').value), null);
+        });
+      }
     }
     ask();
   }
 
   // ---------- MOCK TEST ----------
+  // Typical GATE CSE weightage (marks share) used to bias core sampling toward what the paper actually asks.
+  var WEIGHT = { engmath: 14, pds: 10, algo: 8, os: 9, dbms: 7, cn: 7, coa: 8, toc: 7, digital: 4, compiler: 5 };
   function buildMock() {
     // GATE pattern: 10 GA questions (5×1M + 5×2M = 15 marks) + 55 core (25×1M + 30×2M = 85 marks)
     function sample(pool, n) {
@@ -313,15 +380,26 @@
       while (out.length < n && p.length) out.push(p.splice(Math.floor(Math.random() * p.length), 1)[0]);
       return out;
     }
+    function weightedSample(pool, n) {
+      var p = pool.slice(); var out = [];
+      while (out.length < n && p.length) {
+        var total = 0;
+        p.forEach(function (r) { total += (WEIGHT[r.subject] || 5); });
+        var roll = Math.random() * total, acc = 0, idx = 0;
+        for (var i = 0; i < p.length; i++) { acc += (WEIGHT[p[i].subject] || 5); if (roll <= acc) { idx = i; break; } }
+        out.push(p.splice(idx, 1)[0]);
+      }
+      return out;
+    }
     var ga1 = [], ga2 = [], core1 = [], core2 = [];
     allTopics().forEach(function (e2) {
       (e2.topic.questions || []).forEach(function (qq) {
-        var rec = { q: qq, topic: e2.topic.id };
+        var rec = { q: qq, topic: e2.topic.id, subject: e2.subject };
         if (e2.subject === 'apti') (qq.marks === 2 ? ga2 : ga1).push(rec);
         else (qq.marks === 2 ? core2 : core1).push(rec);
       });
     });
-    return sample(ga1, 5).concat(sample(ga2, 5), sample(core1, 25), sample(core2, 30));
+    return sample(ga1, 5).concat(sample(ga2, 5), weightedSample(core1, 25), weightedSample(core2, 30));
   }
   function viewMockLanding() {
     var html = '<div class="card"><h2>📝 Full mock test</h2><p class="muted small">65 questions · 100 marks · 3 hours · real GATE negative marking (−1/3 on 1-mark, −2/3 on 2-mark MCQs). No pausing — treat it like the real hall.</p>' +
@@ -346,11 +424,17 @@
     }
     function draw() {
       var it = paper[idx]; var qq = it.q;
-      var html = header() + '<div class="card"><div class="q-text">' + esc(qq.q) + '</div><div>';
-      qq.options.forEach(function (o, i) {
-        var sel = answers[idx] === i;
-        html += '<button class="opt" data-i="' + i + '" style="' + (sel ? 'border-color:var(--accent)' : '') + '">' + String.fromCharCode(65 + i) + '.  ' + esc(o) + '</button>';
-      });
+      var kind = qKind(qq);
+      var html = header() + '<div class="card">' + kindPill(qq) + (kind === 'mcq' ? '<span class="pill">MCQ · −ve marking</span>' : '<span class="pill gen">no −ve marking</span>') +
+        '<div class="q-text" style="margin-top:8px">' + esc(qq.q) + '</div><div>';
+      if (kind === 'nat') {
+        html += '<input type="number" step="any" id="mock-nat" inputmode="decimal" placeholder="Type numerical answer" value="' + (answers[idx] !== undefined ? esc(answers[idx]) : '') + '">';
+      } else {
+        (qq.options || []).forEach(function (o, i) {
+          var sel = kind === 'msq' ? (Array.isArray(answers[idx]) && answers[idx].indexOf(i) >= 0) : answers[idx] === i;
+          html += '<button class="opt" data-i="' + i + '" style="' + (sel ? 'border-color:var(--accent)' : '') + '">' + String.fromCharCode(65 + i) + '.  ' + esc(o) + '</button>';
+        });
+      }
       html += '</div></div><div class="btn-row">' +
         '<button class="btn ghost" id="prev" ' + (idx === 0 ? 'disabled' : '') + '>‹ Prev</button>' +
         '<button class="btn ghost" id="skip">Clear</button>' +
@@ -358,7 +442,22 @@
         '</div><div class="btn-row"><button class="btn ghost small-btn" id="quit">Abandon test</button></div>';
       $view.innerHTML = html;
       $view.querySelectorAll('.opt').forEach(function (b) {
-        b.addEventListener('click', function () { answers[idx] = Number(b.getAttribute('data-i')); draw(); });
+        b.addEventListener('click', function () {
+          var i = Number(b.getAttribute('data-i'));
+          if (kind === 'msq') {
+            var cur = Array.isArray(answers[idx]) ? answers[idx].slice() : [];
+            var at = cur.indexOf(i);
+            if (at >= 0) cur.splice(at, 1); else cur.push(i);
+            if (cur.length) answers[idx] = cur; else delete answers[idx];
+          } else {
+            answers[idx] = i;
+          }
+          draw();
+        });
+      });
+      var natEl = document.getElementById('mock-nat');
+      if (natEl) natEl.addEventListener('input', function () {
+        if (natEl.value === '') delete answers[idx]; else answers[idx] = natEl.value;
       });
       var el;
       if ((el = document.getElementById('prev'))) el.addEventListener('click', function () { idx--; draw(); });
@@ -373,9 +472,11 @@
       paper.forEach(function (it, i) {
         var a = answers[i];
         if (a === undefined) { skipped++; return; }
-        if (a === it.q.answer) { score += it.q.marks; correct++; }
-        else { score -= it.q.marks / 3; wrong++; }
-        recordAnswer(it.q, a === it.q.answer, it.topic);
+        var kind = qKind(it.q);
+        var ok = kind === 'nat' ? natMatches(it.q, a) : kind === 'msq' ? msqMatches(it.q, a) : a === it.q.answer;
+        if (ok) { score += it.q.marks; correct++; }
+        else { wrong++; if (kind === 'mcq') score -= it.q.marks / 3; } // MSQ & NAT: no negative marking
+        recordAnswer(it.q, ok, it.topic);
       });
       score = Math.round(score * 100) / 100;
       S.mocks.push({ dateISO: new Date().toISOString(), day: missionDay(), score: score, max: 100, correct: correct, wrong: wrong, skipped: skipped });
@@ -391,17 +492,38 @@
       $view.innerHTML = html;
       document.getElementById('done').addEventListener('click', viewMockLanding);
       document.getElementById('review').addEventListener('click', function () {
-        var h = '<button class="back-link" id="back">‹ Result</button>';
+        var h = '<button class="back-link" id="back">‹ Result</button>' +
+          '<div class="card"><p class="small muted">Topper habit: label every miss. <b>Concept</b> = didn\'t know it, <b>Silly</b> = knew it but slipped, <b>Time</b> = rushed/panicked. Your Progress tab tallies these so you know exactly what to fix.</p></div>';
         paper.forEach(function (it, i) {
-          var a = answers[i]; var qq = it.q;
+          var a = answers[i]; var qq = it.q; var kind = qKind(qq);
+          var ok = a === undefined ? false : (kind === 'nat' ? natMatches(qq, a) : kind === 'msq' ? msqMatches(qq, a) : a === qq.answer);
           h += '<div class="card"><div class="q-text">Q' + (i + 1) + '. ' + esc(qq.q) + '</div>';
-          qq.options.forEach(function (o, j) {
-            var cls = j === qq.answer ? 'correct' : (j === a ? 'wrong' : '');
+          (qq.options || []).forEach(function (o, j) {
+            var isRight = kind === 'msq' ? qq.answers.indexOf(j) >= 0 : j === qq.answer;
+            var wasPicked = kind === 'msq' ? (Array.isArray(a) && a.indexOf(j) >= 0) : j === a;
+            var cls = isRight ? 'correct' : (wasPicked ? 'wrong' : '');
             h += '<div class="opt ' + cls + '" style="cursor:default">' + String.fromCharCode(65 + j) + '.  ' + esc(o) + '</div>';
           });
-          h += '<div class="explain"><b>' + (a === undefined ? 'Skipped' : a === qq.answer ? 'Correct' : 'Wrong') + ' · Answer: ' + String.fromCharCode(65 + qq.answer) + '</b>\n' + esc(qq.explanation || '') + '</div></div>';
+          if (kind === 'nat') h += '<div class="small muted">Your answer: ' + (a === undefined ? '—' : esc(a)) + '</div>';
+          h += '<div class="explain"><b>' + (a === undefined ? 'Skipped' : ok ? 'Correct' : 'Wrong') + ' · ' + answerLabel(qq) + '</b>\n' + esc(qq.explanation || '') + '</div>';
+          if (!ok) {
+            h += '<div class="btn-row" data-tag-row="' + i + '">' +
+              '<button class="btn ghost small-btn" data-tag="concept" data-qi="' + i + '">Concept gap</button>' +
+              '<button class="btn ghost small-btn" data-tag="silly" data-qi="' + i + '">Silly mistake</button>' +
+              '<button class="btn ghost small-btn" data-tag="time" data-qi="' + i + '">Time trap</button></div>';
+          }
+          h += '</div>';
         });
         $view.innerHTML = h;
+        S.mistakes = S.mistakes || { concept: 0, silly: 0, time: 0 };
+        $view.querySelectorAll('[data-tag]').forEach(function (b) {
+          b.addEventListener('click', function () {
+            S.mistakes[b.getAttribute('data-tag')]++;
+            save();
+            var row = $view.querySelector('[data-tag-row="' + b.getAttribute('data-qi') + '"]');
+            if (row) row.innerHTML = '<span class="pill">tagged: ' + b.getAttribute('data-tag') + '</span>';
+          });
+        });
         document.getElementById('back').addEventListener('click', function () { viewMockLanding(); });
         window.scrollTo(0, 0);
       });
@@ -433,6 +555,14 @@
       '<div class="stat"><div class="num">' + mastered + '/' + totalQ + '</div><div class="lbl">questions mastered</div></div>' +
       '<div class="stat"><div class="num">' + (S.mocks.length ? S.mocks[S.mocks.length - 1].score : '—') + '</div><div class="lbl">latest mock /100</div></div>' +
       '</div></div>';
+    var mk = S.mistakes;
+    if (mk && (mk.concept + mk.silly + mk.time) > 0) {
+      html += '<div class="card"><h3>🧠 Mock mistake anatomy</h3><div class="stat-grid" style="grid-template-columns:1fr 1fr 1fr">' +
+        '<div class="stat"><div class="num">' + mk.concept + '</div><div class="lbl">concept gaps</div></div>' +
+        '<div class="stat"><div class="num">' + mk.silly + '</div><div class="lbl">silly slips</div></div>' +
+        '<div class="stat"><div class="num">' + mk.time + '</div><div class="lbl">time traps</div></div></div>' +
+        '<p class="muted small" style="margin-top:8px">Concept gaps → reread that topic\'s Deep dive. Silly slips → slow down on 1-markers. Time traps → practice with a timer.</p></div>';
+    }
     // weakest topics
     var weak = [];
     Object.keys(S.topicStats).forEach(function (tid) {

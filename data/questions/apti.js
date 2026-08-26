@@ -769,3 +769,612 @@ window.GATE_DATA.questions['apti'] = {
     }
   ]
 };
+
+window.GATE_DATA.questions['apti'].topics.find(function(t){return t.id==='apti-quant';}).questions.push(
+  {
+    id: 'apti-quant-x1',
+    q: 'The price of an item is first increased by 20 percent and then the new price is decreased by 10 percent. What is the net percentage change in the price compared to the original?',
+    options: ['6 percent increase', '8 percent increase', '10 percent increase', '12 percent increase'],
+    answer: 1,
+    marks: 1,
+    difficulty: 'easy',
+    type: 'numerical',
+    explanation: 'Use the successive percentage change formula: net change = a + b + ab/100, where a and b carry their own signs. Here a = 20 and b = -10, so net change = 20 - 10 + (20 x -10)/100 = 10 - 2 = 8 percent increase. The fast mental route: take a base of 100, apply +20 to get 120, then apply -10 to get 120 x 0.9 = 108, a net gain of 8. Never simply add 20 and subtract 10 to get 10, since one change acts on a different base than the other; the correction term ab/100 captures exactly this base shift. Memorizing this single formula replaces two multiplication steps with one arithmetic line, which is the speed advantage needed for GATE.'
+  },
+  {
+    id: 'apti-quant-x2',
+    q: 'A quantity is increased by 20 percent and then the resulting value is further increased by 25 percent. What single percentage increase applied once would produce the same final value?',
+    options: ['45 percent', '48 percent', '50 percent', '55 percent'],
+    answer: 2,
+    marks: 1,
+    difficulty: 'medium',
+    type: 'numerical',
+    explanation: 'Apply net change = a + b + ab/100 with a = 20, b = 25: net = 20 + 25 + (20 x 25)/100 = 45 + 5 = 50 percent. Quick multiplier check: 1.20 x 1.25 = 1.50, confirming a 50 percent overall rise directly, which is the fastest route of all since it needs only one multiplication of the two growth factors. The naive sum of 45 percent, offered as a distractor, ignores that the second increase acts on an already-inflated base. Whenever two percentage changes are chained, multiplying (1 + a/100)(1 + b/100) and reading off the excess over 1 is quicker than the additive formula for GATE speed.'
+  },
+  {
+    id: 'apti-quant-x3',
+    q: 'A container holds 40 litres of pure milk. Eight litres of the mixture are withdrawn and replaced with water, and this same withdraw-and-replace operation is performed once more. How much pure milk remains in the container after the second operation?',
+    options: ['20 litres', '24 litres', '25.6 litres', '28.8 litres'],
+    answer: 2,
+    marks: 2,
+    difficulty: 'medium',
+    type: 'numerical',
+    explanation: 'For repeated replacement, the milk left after n operations is initial x (1 - drawn/total)^n. Here drawn = 8 out of total = 40, so the retained fraction each time is 1 - 8/40 = 0.8. After two operations, milk = 40 x 0.8 x 0.8 = 40 x 0.64 = 25.6 litres. The shortcut is to compute the fraction 32/40 = 4/5 once and square it mentally (4/5)^2 = 16/25, then multiply by 40 to get 25.6 directly, avoiding two separate subtraction steps. This dilution formula is the single fact to memorize for every milk-water replacement question, regardless of how many operations are repeated.'
+  },
+  {
+    id: 'apti-quant-x4',
+    q: 'Tea costing Rs. 60 per kg is mixed with tea costing Rs. 75 per kg to obtain a blend that sells at Rs. 65 per kg. In what ratio should the two teas be mixed?',
+    options: ['1 : 2', '2 : 1', '3 : 1', '1 : 3'],
+    answer: 1,
+    marks: 1,
+    difficulty: 'easy',
+    type: 'numerical',
+    explanation: 'Apply the alligation rule directly on the price line: cheaper price 60, dearer price 75, mean price 65. The ratio of cheaper to dearer quantity equals (dearer - mean) : (mean - cheaper) = (75 - 65) : (65 - 60) = 10 : 5 = 2 : 1. The crisscross diagram of alligation gives this ratio in one subtraction on each side, without setting up any weighted-average equation. As a sanity check, since 65 is closer to 60 than to 75, the cheaper tea should dominate the mix, and 2 : 1 in favor of the cheaper tea confirms this direction instantly.'
+  },
+  {
+    id: 'apti-quant-x5',
+    q: 'A boat travels at 15 km/h downstream and at 9 km/h upstream. What is the speed of the boat in still water?',
+    options: ['10 km/h', '12 km/h', '13 km/h', '14 km/h'],
+    answer: 1,
+    marks: 1,
+    difficulty: 'easy',
+    type: 'numerical',
+    explanation: 'Speed in still water is the average of the downstream and upstream speeds: (15 + 9)/2 = 24/2 = 12 km/h. The stream speed, if needed, is the half-difference: (15 - 9)/2 = 3 km/h. Both quantities come from the same pair of half-sum and half-difference operations, so compute them together whenever a boats and streams question is seen, since either one might be asked. No equation setup is required beyond recognizing downstream = boat + stream and upstream = boat - stream, then adding or subtracting the two given values and halving.'
+  },
+  {
+    id: 'apti-quant-x6',
+    q: 'A boat covers 30 km upstream in 6 hours and returns downstream over the same distance in 3 hours. What is the speed of the stream?',
+    options: ['2 km/h', '2.5 km/h', '3 km/h', '3.5 km/h'],
+    answer: 1,
+    marks: 2,
+    difficulty: 'medium',
+    type: 'numerical',
+    explanation: 'First convert distance and time into speed: upstream speed = 30/6 = 5 km/h, downstream speed = 30/3 = 10 km/h. Stream speed is half the difference of these two: (10 - 5)/2 = 2.5 km/h. The boat speed in still water, obtainable the same way as the half-sum, would be (10 + 5)/2 = 7.5 km/h, though it is not asked here. The two-step route of finding speeds from distance/time first, then applying the half-sum/half-difference pair, is faster than writing simultaneous equations for boat and stream speed separately.'
+  },
+  {
+    id: 'apti-quant-x7',
+    q: 'Two trains of lengths 120 m and 180 m are moving towards each other on parallel tracks at 54 km/h and 36 km/h respectively. How long will they take to cross each other completely?',
+    options: ['10 seconds', '12 seconds', '14 seconds', '16 seconds'],
+    answer: 1,
+    marks: 2,
+    difficulty: 'medium',
+    type: 'numerical',
+    explanation: 'When two objects move towards each other, relative speed is the sum of their speeds: 54 + 36 = 90 km/h. Convert to m/s by multiplying by 5/18: 90 x 5/18 = 25 m/s. The total distance to be covered while crossing equals the sum of both lengths, 120 + 180 = 300 m, since each train must clear the entire length of the other. Time = distance/speed = 300/25 = 12 seconds. Doing the unit conversion once on the combined speed, rather than converting each train speed separately, saves an arithmetic step under time pressure.'
+  },
+  {
+    id: 'apti-quant-x8',
+    q: 'A train 120 m long, running at 45 km/h, crosses a platform 130 m long. How much time does it take to cross the platform completely?',
+    options: ['15 seconds', '18 seconds', '20 seconds', '25 seconds'],
+    answer: 2,
+    marks: 1,
+    difficulty: 'easy',
+    type: 'numerical',
+    explanation: 'Crossing a platform means the train must cover its own length plus the platform length: 120 + 130 = 250 m. Convert speed to m/s: 45 x 5/18 = 12.5 m/s. Time = 250/12.5 = 20 seconds. Recognizing 45 km/h as exactly 12.5 m/s (a common recurring conversion, since 45 x 5/18 simplifies cleanly) avoids long division and turns the final step into a two-step mental multiplication check: 12.5 x 20 = 250, confirming the answer immediately.'
+  },
+  {
+    id: 'apti-quant-x9',
+    q: 'Pipe A can fill an empty tank in 10 hours and pipe B can fill the same tank in 15 hours. If both pipes are opened together, how long will they take to fill the tank?',
+    options: ['5 hours', '6 hours', '7 hours', '8 hours'],
+    answer: 1,
+    marks: 1,
+    difficulty: 'easy',
+    type: 'numerical',
+    explanation: 'Combined time for two pipes filling together is given by the product-over-sum shortcut: (A x B)/(A + B) = (10 x 15)/(10 + 15) = 150/25 = 6 hours. This single-formula route avoids writing rate equations from scratch: add the reciprocals 1/10 + 1/15 = 3/30 + 2/30 = 5/30 = 1/6, giving 6 hours directly, and the product-over-sum version is just this reciprocal addition pre-simplified into one division. Either method takes under ten seconds once the formula is memorized, which matters because pipes and cisterns questions recur often in GATE GA.'
+  },
+  {
+    id: 'apti-quant-x10',
+    q: 'A pipe can fill a tank in 8 hours, but a leak in the bottom of the tank can empty a full tank in 24 hours. With the pipe open and the leak also active, how long will it take to fill the empty tank?',
+    options: ['10 hours', '12 hours', '14 hours', '16 hours'],
+    answer: 1,
+    marks: 2,
+    difficulty: 'hard',
+    type: 'numerical',
+    explanation: 'Treat the leak as a negative rate. Net rate of filling = 1/8 - 1/24. Using a common denominator of 24: 3/24 - 1/24 = 2/24 = 1/12, so the tank fills in 12 hours. The quick check on direction: since the fill rate is faster than the leak rate, the tank does eventually fill, and the combined time must be longer than 8 hours alone (which it is, at 12), ruling out any option below 8 immediately. Subtracting reciprocals for an outlet, rather than adding them as for a second inlet, is the one conceptual distinction that separates this question from the pure fill-together case.'
+  },
+  {
+    id: 'apti-quant-x11',
+    q: 'The present ages of A and B are in the ratio 3 : 5. Six years from now, the ratio of their ages will become 2 : 3. What is the present age of B?',
+    options: ['25 years', '28 years', '30 years', '32 years'],
+    answer: 2,
+    marks: 2,
+    difficulty: 'medium',
+    type: 'numerical',
+    explanation: 'Let the present ages be 3x and 5x. Six years later: (3x + 6)/(5x + 6) = 2/3. Cross multiply: 9x + 18 = 10x + 12, giving x = 6. Present age of B = 5x = 30 years. As a check, present age of A = 18, and six years later A is 24 and B is 36, giving ratio 24 : 36 = 2 : 3 as required. Setting up a single cross-multiplied linear equation from the ratio condition is faster than tracking two separate age variables, and always reduces ratio-based age problems to one equation in one unknown, x, the common ratio multiplier.'
+  },
+  {
+    id: 'apti-quant-x12',
+    q: 'A number, when raised to the power 123, has 7 as its base. What is the unit digit of 7 raised to the power 123?',
+    options: ['1', '3', '7', '9'],
+    answer: 1,
+    marks: 1,
+    difficulty: 'easy',
+    type: 'numerical',
+    explanation: 'Unit digits of powers of 7 cycle every 4 steps: 7, 9, 3, 1, then repeat. Divide the exponent by 4 to find the position in the cycle: 123 divided by 4 leaves a remainder of 3, so the unit digit matches the 3rd term of the cycle, which is 3. If the remainder had been 0, the unit digit would be the 4th term, 1, since a remainder of 0 always maps to the last position in the cycle rather than a zeroth one. Memorizing the four-term cycles for digits 2, 3, 4, 7, 8, 9 (digits 0, 1, 5, 6 always repeat themselves) makes every unit-digit question a fifteen-second remainder calculation.'
+  },
+  {
+    id: 'apti-quant-x13',
+    q: 'What is the remainder when 3 raised to the power 47 is divided by 5?',
+    options: ['1', '2', '3', '4'],
+    answer: 1,
+    marks: 2,
+    difficulty: 'medium',
+    type: 'numerical',
+    explanation: 'The remainders of powers of 3 modulo 5 cycle every 4 steps: 3^1 gives 3, 3^2 gives 4, 3^3 gives 2, 3^4 gives 1, then the pattern repeats. Divide the exponent 47 by 4: the remainder is 3, so the answer matches the 3rd term of the cycle, which is 2. This cyclicity method replaces computing an enormous power outright with a four-term lookup table built from just the first few powers, and it generalizes to any modulus: find the cycle length of the base modulo the divisor, then use exponent mod cycle-length to index into it. Verifying the cycle length by computing 3^4 mod 5 = 81 mod 5 = 1 confirms the cycle truly closes after 4 steps.'
+  },
+  {
+    id: 'apti-quant-x14',
+    q: 'Three temple bells toll at intervals of 6, 8, and 12 minutes respectively. If all three toll together at 9:00 am, at what time will they next toll together?',
+    options: ['9:12 am', '9:20 am', '9:24 am', '9:30 am'],
+    answer: 2,
+    marks: 1,
+    difficulty: 'easy',
+    type: 'numerical',
+    explanation: 'All three bells toll together again after a duration equal to the LCM of their individual intervals, since that is the smallest time that is simultaneously a multiple of 6, 8, and 12. Factor each: 6 = 2 x 3, 8 = 2^3, 12 = 2^2 x 3. LCM takes the highest power of each prime: 2^3 x 3 = 24 minutes. Adding 24 minutes to 9:00 am gives 9:24 am. Whenever a problem describes repeating periodic events synchronizing again, LCM is the operative tool, just as HCF is the tool whenever a problem asks for the largest common measuring unit; keeping this pairing straight avoids the common mix-up between the two.'
+  },
+  {
+    id: 'apti-quant-x15',
+    q: 'Triangles ABC and DEF are similar, with the ratio of their corresponding sides equal to 3 : 5. If the area of triangle ABC is 27 square cm, what is the area of triangle DEF?',
+    options: ['45 square cm', '60 square cm', '75 square cm', '90 square cm'],
+    answer: 2,
+    marks: 2,
+    difficulty: 'medium',
+    type: 'numerical',
+    explanation: 'For similar triangles, the ratio of areas equals the square of the ratio of corresponding sides, not the side ratio itself. Side ratio 3 : 5 gives area ratio 9 : 25. Area of DEF = 27 x (25/9) = 3 x 25 = 75 square cm. The distractor 45 comes from wrongly scaling area by the linear ratio 5/3 instead of its square, so a quick check is to confirm the scale factor used is the square of the given side ratio whenever areas of similar figures are compared. The same squared-ratio rule extends to volumes of similar solids, but there the ratio must be cubed instead of squared.'
+  },
+  {
+    id: 'apti-quant-x16',
+    q: 'A solid metallic cone of base radius 6 cm and height 24 cm is melted down and recast into a solid cylinder having the same base radius. What is the height of the resulting cylinder?',
+    options: ['6 cm', '7 cm', '8 cm', '9 cm'],
+    answer: 2,
+    marks: 2,
+    difficulty: 'hard',
+    type: 'numerical',
+    explanation: 'Melting and recasting conserves volume, so equate the two volume formulas. Cone volume = (1/3) x pi x r^2 x h = (1/3) x pi x 36 x 24 = 288 x pi. Cylinder volume = pi x r^2 x H = 36 x pi x H, using the same radius r = 6. Setting them equal: 36H = 288, so H = 8 cm. The fast route skips computing the numeric volume entirely: since a cone with the same base and height as a cylinder has exactly one-third the cylinder volume, a cylinder of the same radius needs one-third the cone height to hold the same volume, so H = 24/3 = 8 cm directly from the 1 : 3 cone-to-cylinder volume ratio.'
+  },
+  {
+    id: 'apti-quant-x17',
+    q: 'What is the value of log base 2 of 32, plus log base 3 of one-ninth, minus log base 5 of 125?',
+    options: ['-2', '0', '2', '4'],
+    answer: 1,
+    marks: 1,
+    difficulty: 'medium',
+    type: 'numerical',
+    explanation: 'Evaluate each term by expressing it as a power of its base. log base 2 of 32 = log base 2 of 2^5 = 5. log base 3 of one-ninth = log base 3 of 3^-2 = -2. log base 5 of 125 = log base 5 of 5^3 = 3. Combine: 5 + (-2) - 3 = 0. The general shortcut for these expressions is to rewrite the argument as the base raised to some power, since log base b of b^k always simplifies instantly to k; no logarithm tables or approximations are ever needed when the argument is an exact power of the base, which GATE questions are deliberately constructed to allow.'
+  },
+  {
+    id: 'apti-quant-x18',
+    q: 'The sum of the squares of two consecutive positive integers is 113. What is the larger of the two integers?',
+    options: ['6', '7', '8', '9'],
+    answer: 2,
+    marks: 2,
+    difficulty: 'medium',
+    type: 'numerical',
+    explanation: 'Let the integers be n and n + 1. Then n^2 + (n + 1)^2 = 113 gives 2n^2 + 2n + 1 = 113, so 2n^2 + 2n - 112 = 0, which simplifies to n^2 + n - 56 = 0. Factor as (n + 8)(n - 7) = 0, giving n = 7 as the positive root. The larger integer is n + 1 = 8. Checking: 7^2 + 8^2 = 49 + 64 = 113, confirming the answer. For speed under exam conditions, testing the given options directly as the larger integer (try 8: is 7^2 + 8^2 = 113? yes) can be faster than factoring the quadratic from scratch, since GATE always supplies the answer among the four choices.'
+  },
+  {
+    id: 'apti-quant-x19',
+    q: 'A card is drawn at random from a well-shuffled standard deck of 52 playing cards. What is the probability that the card drawn is either a king or a queen?',
+    options: ['1/13', '2/13', '3/13', '4/13'],
+    answer: 1,
+    marks: 1,
+    difficulty: 'easy',
+    type: 'numerical',
+    explanation: 'A standard deck has 4 kings and 4 queens, and these two events cannot happen at the same time on a single card, so their counts simply add: 4 + 4 = 8 favorable cards out of 52 total. Probability = 8/52 = 2/13. This is a direct application of the addition rule for mutually exclusive events, which applies whenever the two outcomes named (here, being a king and being a queen) share no overlap; had the question instead asked for a king or a heart, the king of hearts would be double counted and would need to be subtracted once before dividing by 52.'
+  },
+  {
+    id: 'apti-quant-x20',
+    q: 'In how many ways can 5 boys and 3 girls be arranged in a row so that no two girls are seated next to each other?',
+    options: ['2880', '14400', '20160', '40320'],
+    answer: 1,
+    marks: 2,
+    difficulty: 'hard',
+    type: 'numerical',
+    explanation: 'First arrange the 5 boys in a row: 5! = 120 ways. This creates 6 gaps around them (one before the first boy, one after each boy, and one after the last), into which the 3 girls can be placed so that no two girls are adjacent. Choose and arrange 3 of these 6 gaps for the girls: 6P3 = 6 x 5 x 4 = 120 ways. Total arrangements = 120 x 120 = 14400. The gap method is the standard fast technique for any no-two-alike-adjacent restriction: always arrange the unrestricted group first to generate gaps, then place the restricted group into distinct gaps using a permutation, never a combination, since the girls themselves are distinguishable and their order within the row matters.'
+  }
+);
+
+window.GATE_DATA.questions['apti'].topics.find(function(t){return t.id==='apti-logical';}).questions.push(
+  {
+    id: 'apti-logical-x1',
+    q: 'Look at the series: 2, 5, 4, 10, 6, 15, 8, ? Two interleaved patterns run through alternate terms. What number comes next?',
+    options: ['16', '18', '20', '24'],
+    answer: 2,
+    marks: 1,
+    difficulty: 'easy',
+    type: 'concept',
+    explanation: 'Split the series into odd-position and even-position terms separately. Odd positions (1st, 3rd, 5th, 7th) read 2, 4, 6, 8, increasing by 2 each time, so the next odd-position term after 8 would be 10, but the missing term is the 8th (even) position. Even positions (2nd, 4th, 6th) read 5, 10, 15, increasing by 5 each time, so the 4th even term is 15 + 5 = 20. The general technique for any series where a single obvious pattern does not fit every term is to test whether alternate terms form two separate simpler series, which resolves almost all two-pattern GATE series within seconds.'
+  },
+  {
+    id: 'apti-logical-x2',
+    q: 'Find the missing number in the series: 5, 6, 10, 12, 20, 24, 40, ?',
+    options: ['44', '46', '48', '50'],
+    answer: 2,
+    marks: 1,
+    difficulty: 'medium',
+    type: 'concept',
+    explanation: 'Separate the odd-position and even-position terms. Odd positions (1st, 3rd, 5th, 7th) are 5, 10, 20, 40, each exactly double the previous one. Even positions (2nd, 4th, 6th) are 6, 12, 24, each also exactly double the previous one, so the 4th even-position term (the 8th term overall) is 24 x 2 = 48. Recognizing that both interleaved sub-series share the same doubling rule, just starting from different values, is the fast confirmation step: once one sub-series pattern is found, always check whether the other sub-series follows an identical rule, since GATE often designs both strands with matching logic for elegance.'
+  },
+  {
+    id: 'apti-logical-x3',
+    q: 'In the sequence A1, C4, E9, G16, I25, ?, the letters skip one position in the alphabet each time while the numbers are perfect squares. What comes next?',
+    options: ['I36', 'K36', 'K25', 'K49'],
+    answer: 1,
+    marks: 2,
+    difficulty: 'medium',
+    type: 'concept',
+    explanation: 'Track the two interleaved patterns independently. The letters are A, C, E, G, I, each one skipping the letter in between (a jump of 2 positions in the alphabet), so after I the next letter is K. The numbers are 1, 4, 9, 16, 25, which are 1^2, 2^2, 3^2, 4^2, 5^2, so the next one is 6^2 = 36. Combining both gives K36. The key discipline is never letting the letter pattern and number pattern contaminate each other; solve each independently using its own simplest rule (arithmetic skip for letters, perfect squares for numbers), then merge only at the final answer.'
+  },
+  {
+    id: 'apti-logical-x4',
+    q: 'Five friends P, Q, R, S, and T are compared by height. P is taller than Q but shorter than R. S is the tallest of all five, and T is shorter than Q. Who is the shortest among the five?',
+    options: ['P', 'Q', 'S', 'T'],
+    answer: 3,
+    marks: 1,
+    difficulty: 'easy',
+    type: 'concept',
+    explanation: 'Chain the given comparisons into a single ordering. From R greater than P greater than Q, and S greatest of all, and T less than Q, the full order from tallest to shortest is S, R, P, Q, T. Reading directly off this chain, T sits at the very end, making T the shortest. The fast method for any height or rank puzzle is to convert every pairwise clue into a single greater-than chain as each clue is read, inserting new names into the correct position immediately rather than holding all clues in memory until the end.'
+  },
+  {
+    id: 'apti-logical-x5',
+    q: 'Five tasks A, B, C, D, and E must each be scheduled on a different day from Monday to Friday. Task C is done immediately after task A. Task B is scheduled on Wednesday. Task E is done sometime after task C but before task D. On which day is task A scheduled?',
+    options: ['Monday', 'Tuesday', 'Wednesday', 'Thursday'],
+    answer: 0,
+    marks: 2,
+    difficulty: 'medium',
+    type: 'concept',
+    explanation: 'Since B occupies Wednesday, the consecutive pair A-then-C cannot straddle Wednesday, so the pair must sit entirely within Monday-Tuesday or entirely within Thursday-Friday. If A and C took Thursday and Friday, there would be no days left after C for both E and D in the required order, since only Monday, Tuesday would remain and Wednesday is taken. So A and C must be Monday and Tuesday, giving A = Monday, C = Tuesday, and the remaining days Thursday and Friday go to E and D in order, E = Thursday, D = Friday. The technique of testing which placement of a fixed adjacent pair leaves enough room for the remaining ordering constraints quickly eliminates one of only two candidate slots.'
+  },
+  {
+    id: 'apti-logical-x6',
+    q: 'Statements: All pens are pencils. Some pencils are erasers. Conclusions: I. Some pens are erasers. II. Some erasers are pens. Which conclusion(s) logically follow?',
+    options: ['Only conclusion I follows', 'Only conclusion II follows', 'Both conclusions follow', 'Neither conclusion follows'],
+    answer: 3,
+    marks: 2,
+    difficulty: 'medium',
+    type: 'concept',
+    explanation: 'An All-A-are-B statement combined with a Some-B-are-C statement never yields a valid conclusion linking A and C, because the pencils that happen to be erasers might be exactly the pencils that are not pens; nothing forces the eraser-pencils to overlap with the pen-pencils. Drawing a quick Venn sketch shows pens fully inside pencils, and the eraser circle overlapping pencils somewhere, but that overlap can sit entirely outside the pens region. Since this configuration is possible, no conclusion is guaranteed, so neither I nor II follows. The standard syllogism trap here is assuming that a universal statement automatically transfers a particular statement through it, which it does not.'
+  },
+  {
+    id: 'apti-logical-x7',
+    q: 'Statements: Some doctors are engineers. All engineers are teachers. Conclusions: I. Some doctors are teachers. II. Some teachers are doctors. Which conclusion(s) logically follow?',
+    options: ['Only conclusion I follows', 'Only conclusion II follows', 'Both conclusions follow', 'Neither conclusion follows'],
+    answer: 2,
+    marks: 2,
+    difficulty: 'hard',
+    type: 'concept',
+    explanation: 'Some-A-are-B combined with All-B-are-C validly gives Some-A-are-C, because the doctors who are engineers are, by the second statement, definitely also teachers, so some doctors are teachers: conclusion I holds. A particular statement of the form Some-A-are-C can always be reversed to Some-C-are-A, since "some overlap exists" is a symmetric fact about the same group of individuals, so conclusion II also holds. The rule to retain is that Some-plus-All chains (in that order) always produce a valid Some conclusion, and any valid Some conclusion is automatically reversible, unlike All conclusions, which are not reversible in general.'
+  },
+  {
+    id: 'apti-logical-x8',
+    q: 'Statement: Road accidents near School X have increased sharply because the stretch lacks a pedestrian crossing. Courses of Action: I. The municipal authority should install a pedestrian crossing and warning signage near School X. II. School X should be permanently shut down. Which course(s) of action logically follow?',
+    options: ['Only I follows', 'Only II follows', 'Both I and II follow', 'Neither follows'],
+    answer: 0,
+    marks: 1,
+    difficulty: 'medium',
+    type: 'concept',
+    explanation: 'A valid course of action must be a practical, proportionate response that directly addresses the stated cause. Course I directly targets the identified cause, the missing pedestrian crossing, with a reasonable administrative fix, so it follows. Course II is a disproportionate and impractical overreaction, since shutting the school does not address road safety and ignores the actual remedy available; extreme measures that discard the underlying institution rather than fixing the specific defect are the hallmark of a course of action that does not follow. This same disproportionality test is the fastest filter for eliminating one option in most courses-of-action questions.'
+  },
+  {
+    id: 'apti-logical-x9',
+    q: 'Which one of the following words does not belong with the others?',
+    options: ['Mango', 'Banana', 'Potato', 'Guava'],
+    answer: 2,
+    marks: 1,
+    difficulty: 'easy',
+    type: 'concept',
+    explanation: 'Mango, banana, and guava are all fruits, typically sweet and eaten raw, while potato is a vegetable, usually starchy and eaten after cooking. The classification test for odd-one-out word groups is to find the single shared category that binds three of the four items tightly (here, "fruit") and confirm the fourth item genuinely falls outside that category rather than just being a less typical example of it; potato clearly fails the fruit test on botanical and culinary grounds alike, making it the outlier with no ambiguity.'
+  },
+  {
+    id: 'apti-logical-x10',
+    q: 'Which of the following numbers is not a perfect cube?',
+    options: ['27', '64', '100', '125'],
+    answer: 2,
+    marks: 1,
+    difficulty: 'easy',
+    type: 'concept',
+    explanation: 'Check each number against the cubes of small integers: 27 = 3^3, 64 = 4^3, 125 = 5^3, but 100 has no integer cube root, since 4^3 = 64 and 5^3 = 125 bracket it with nothing in between. Memorizing the cubes of 1 through 10 (1, 8, 27, 64, 125, 216, 343, 512, 729, 1000) turns this kind of odd-one-out question into an instant lookup rather than requiring any computation during the exam, which matters because GATE frequently tests recognition of perfect squares and cubes disguised among plausible-looking numbers.'
+  },
+  {
+    id: 'apti-logical-x11',
+    q: 'A man walks 5 km towards the north and then walks 3 km towards the south. How far is he from his starting point, and in which direction?',
+    options: ['2 km north', '2 km south', '8 km north', '8 km south'],
+    answer: 0,
+    marks: 1,
+    difficulty: 'easy',
+    type: 'concept',
+    explanation: 'Since north and south are exactly opposite directions, the two displacements act along the same line and simply subtract: 5 km north minus 3 km south leaves a net 5 - 3 = 2 km displacement in the direction of the larger component, which is north. The distances do not add up to 8 km because the second leg partially cancels the first rather than extending further away from the start. For any direction-sense problem, the fast method is to track net displacement separately along the north-south axis and the east-west axis, adding movements in the same direction and subtracting movements in the opposite direction on each axis.'
+  },
+  {
+    id: 'apti-logical-x12',
+    q: 'A man walks 10 m towards the north, then turns right and walks 6 m, then turns right again and walks 10 m. How far is he now from his starting point, and in which direction?',
+    options: ['6 m east', '6 m west', '16 m east', '4 m east'],
+    answer: 0,
+    marks: 2,
+    difficulty: 'medium',
+    type: 'concept',
+    explanation: 'Track direction changes step by step: facing north, a right turn means the man now faces east, so the 6 m leg is towards the east. Facing east, another right turn means he now faces south, so the final 10 m leg is towards the south. Net displacement on the north-south axis is 10 m north followed by 10 m south, which exactly cancels to zero. Net displacement on the east-west axis is simply the 6 m east leg, unopposed. Combining both axes, the man ends up 6 m east of the starting point. Drawing a quick compass cross and marking each leg as an arrow is the safest way to avoid direction errors under time pressure.'
+  },
+  {
+    id: 'apti-logical-x13',
+    q: 'In a certain code, P*Q means P is the father of Q, and Q+R means Q is the mother of R. If the relation P*Q+R holds, how is R related to P?',
+    options: ['Grandfather', 'Grandmother', 'Father', 'Uncle'],
+    answer: 0,
+    marks: 1,
+    difficulty: 'medium',
+    type: 'concept',
+    explanation: 'Decode the chain one link at a time: P*Q means P is the father of Q, and Q+R means Q is the mother of R. So P is the father of Q, and Q is the mother of R, which makes P the parent of a parent of R, that is, a grandparent of R. Since P is specifically male (a father), P is the grandfather of R, not merely a grandparent of unspecified gender. The general method for coded blood-relation chains is to translate each symbol into a plain-English relation first, draw a two-generation family tree from the translations, and only then read off the relation asked, rather than trying to track the code symbolically throughout.'
+  },
+  {
+    id: 'apti-logical-x14',
+    q: 'In a certain code, P@Q means P is the father of Q, Q-R means Q is the sister of R, and R+S means R is the mother of S. If P@Q-R+S all hold true, how is S related to P?',
+    options: ['Grandfather', 'Grandmother', 'Father', 'Uncle'],
+    answer: 0,
+    marks: 2,
+    difficulty: 'hard',
+    type: 'concept',
+    explanation: 'Translate each link: P is the father of Q; Q is the sister of R, meaning Q and R are siblings with the same parents, so P is also the father of R; R is the mother of S. Combining, P is the father of R, and R is the mother of S, so P is the grandfather of S, since P is a parent of a parent of S and is specifically male. The step easiest to miss is that a sister relation between Q and R implies they share both parents, which is what allows P to be identified as the father of R too, not just of Q; always propagate shared-parent information across sibling links before continuing the chain.'
+  },
+  {
+    id: 'apti-logical-x15',
+    q: 'What is the angle between the hour hand and the minute hand of a clock at exactly 3:00?',
+    options: ['60 degrees', '75 degrees', '90 degrees', '120 degrees'],
+    answer: 2,
+    marks: 1,
+    difficulty: 'easy',
+    type: 'concept',
+    explanation: 'At any exact hour, the minute hand points at 12 and the hour hand points at the hour number, and each hour mark on the dial is separated by 360/12 = 30 degrees. At 3:00 the hour hand is exactly at the 3 mark, which is 3 x 30 = 90 degrees away from the 12 mark where the minute hand sits. Memorizing this 30-degrees-per-hour-mark fact lets any exact-hour clock-angle question be answered by a single multiplication, without needing the full clock-angle formula reserved for times with non-zero minutes.'
+  },
+  {
+    id: 'apti-logical-x16',
+    q: 'What is the angle between the hour hand and the minute hand of a clock at 4:20?',
+    options: ['0 degrees', '5 degrees', '10 degrees', '15 degrees'],
+    answer: 2,
+    marks: 2,
+    difficulty: 'medium',
+    type: 'concept',
+    explanation: 'The minute hand moves 6 degrees per minute, so at 20 minutes it stands at 20 x 6 = 120 degrees from 12. The hour hand moves 0.5 degrees per minute overall (30 degrees per hour plus a fraction for the minutes elapsed), so at 4 hours 20 minutes it stands at 4 x 30 + 20 x 0.5 = 120 + 10 = 130 degrees from 12. The angle between them is the absolute difference, 130 - 120 = 10 degrees. The formula angle = |30H - 5.5M|, with H the hour and M the minutes, packages both hand positions into one expression and is the fastest way to handle any non-exact-hour clock angle question in a single substitution.'
+  },
+  {
+    id: 'apti-logical-x17',
+    q: 'If 1 January 2023 fell on a Sunday, what day of the week was 1 January 2024?',
+    options: ['Saturday', 'Sunday', 'Monday', 'Tuesday'],
+    answer: 2,
+    marks: 1,
+    difficulty: 'easy',
+    type: 'concept',
+    explanation: '2023 is not a leap year, since it is not divisible by 4, so it contains exactly 365 days, which is 52 complete weeks plus 1 extra day. Each ordinary year therefore advances the day of the week for the same calendar date by exactly one day, while a leap year advances it by two days (because of the extra 29 February). Starting from Sunday and adding one day for the non-leap year 2023 gives Monday for 1 January 2024. The general rule, advance by 1 for a non-leap year and by 2 for a leap year that contains 29 February within the span being counted, resolves almost every year-to-year calendar shift question quickly.'
+  },
+  {
+    id: 'apti-logical-x18',
+    q: '15 August 1947 fell on a Friday. What day of the week was 15 August 2023?',
+    options: ['Monday', 'Tuesday', 'Wednesday', 'Thursday'],
+    answer: 1,
+    marks: 2,
+    difficulty: 'hard',
+    type: 'concept',
+    explanation: 'Across the 76 years from 1947 to 2023, every ordinary year advances the same calendar date by 1 day of the week, and every leap year among them (because it inserts 29 February before 15 August) advances it by 1 extra day on top of that. Leap years from 1948 through 2020, occurring every 4 years, number (2020 - 1948)/4 + 1 = 19. Total advance = 76 (one per year) + 19 (one extra per leap year) = 95 days. Reduce modulo 7: 95 = 13 x 7 + 4, so the net shift is 4 days. Advancing Friday by 4 days (Saturday, Sunday, Monday, Tuesday) gives Tuesday. This "1 per year, plus 1 more per leap year, then mod 7" shortcut avoids ever computing a raw day count over a multi-decade span.'
+  },
+  {
+    id: 'apti-logical-x19',
+    q: 'A cube with side 3 units is painted red on all six outer faces and then cut into 27 identical unit cubes. How many of these unit cubes have no paint on any face at all?',
+    options: ['0', '1', '4', '6'],
+    answer: 1,
+    marks: 1,
+    difficulty: 'medium',
+    type: 'concept',
+    explanation: 'Unpainted unit cubes are exactly the ones fully hidden inside, away from every outer face, and their count for an n x n x n cube is (n - 2)^3. With n = 3, this gives (3 - 2)^3 = 1^3 = 1, meaning only the single cube dead center has no paint at all. This matches intuition: a 3-unit cube has just one layer of cubes surrounding a single central cube on every side, so exactly one cube can be fully interior. The formula (n-2)^3 for no-paint cubes, alongside 6(n-2)^2 for one-face cubes, 12(n-2) for two-face cubes, and a constant 8 for three-face corner cubes, together always sum to n^3, providing a built-in check.'
+  },
+  {
+    id: 'apti-logical-x20',
+    q: 'A cuboid measuring 4 units by 3 units by 3 units is painted on all its outer faces and then cut into unit cubes. How many of the resulting unit cubes have paint on exactly one face?',
+    options: ['6', '8', '10', '12'],
+    answer: 2,
+    marks: 2,
+    difficulty: 'hard',
+    type: 'concept',
+    explanation: 'For a cuboid of dimensions a, b, c, the count of unit cubes painted on exactly one face is 2[(a-2)(b-2) + (b-2)(c-2) + (c-2)(a-2)], since each pair of opposite faces contributes an interior rectangle of unpainted-edge cubes. With a = 4, b = 3, c = 3: (a-2)(b-2) = 2 x 1 = 2, (b-2)(c-2) = 1 x 1 = 1, (c-2)(a-2) = 1 x 2 = 2, summing to 5, then doubled for both faces of each pair gives 10. As a cross-check, the two faces of size 3 x 3 (perpendicular to the length-4 axis) each contribute (3-2)(3-2) = 1 interior cube, giving 2 total from those, and the four faces of size 4 x 3 each contribute (4-2)(3-2) = 2, giving 8 total, and 2 + 8 = 10 matches.'
+  }
+);
+
+window.GATE_DATA.questions['apti'].topics.find(function(t){return t.id==='apti-verbal';}).questions.push(
+  {
+    id: 'apti-verbal-x1',
+    q: 'Despite the heavy rain, the outdoor event continued as scheduled because the organizers had been ______ prepared for such weather.',
+    options: ['barely', 'meticulously', 'reluctantly', 'accidentally'],
+    answer: 1,
+    marks: 1,
+    difficulty: 'easy',
+    type: 'concept',
+    explanation: 'The sentence describes an event continuing smoothly despite bad weather, which requires a word implying careful, thorough advance planning. "Meticulously" means with great attention to detail, exactly matching the implied cause of the event proceeding without disruption. "Barely" and "accidentally" both suggest inadequate or unintentional preparation, which contradicts the outcome described, while "reluctantly" describes attitude rather than the thoroughness needed to explain the smooth continuation. For sentence completion, first identify what quality the surrounding clause logically demands, here "prepared enough to handle rain," then match that meaning to the option before considering word familiarity.'
+  },
+  {
+    id: 'apti-verbal-x2',
+    q: 'The negotiations, which had dragged on for months without visible progress, were finally brought to a ______ when both sides agreed to bring in an independent mediator.',
+    options: ['impasse', 'denouement', 'stalemate', 'deadlock'],
+    answer: 1,
+    marks: 2,
+    difficulty: 'hard',
+    type: 'concept',
+    explanation: 'The sentence structure signals a resolution, since agreeing to a mediator is an action that moves the negotiation forward rather than freezing it further. "Denouement" specifically means the final resolution or unraveling of a situation, fitting a positive turning point. "Impasse," "stalemate," and "deadlock" all describe being stuck with no progress, the opposite of what the sentence describes happening. This question rewards noticing that three of the four options are near-synonyms for the same idea (being stuck), so the correct answer must be the one word that breaks that pattern and actually matches the described forward movement.'
+  },
+  {
+    id: 'apti-verbal-x3',
+    q: 'Although the two business proposals appeared similar on the surface, the finance head identified a ______ difference in their long-term cost implications.',
+    options: ['negligible', 'superficial', 'substantive', 'cosmetic'],
+    answer: 2,
+    marks: 1,
+    difficulty: 'easy',
+    type: 'concept',
+    explanation: 'The word "although" signals a contrast with "appeared similar," so the missing word must describe a difference that is significant despite that surface-level similarity. "Substantive" means real and meaningful, exactly capturing an important underlying difference hidden beneath surface similarity. "Negligible," "superficial," and "cosmetic" all describe unimportant or surface-only differences, which would not warrant being highlighted by a finance head as a concern, and would also contradict the contrast signaled by "although." Spotting the contrast word ("although," "but," "however") first tells you the blank must oppose the preceding idea, which narrows the choice immediately.'
+  },
+  {
+    id: 'apti-verbal-x4',
+    q: 'After months of preparation, she finally decided to ______ and submit her resignation, rather than continue postponing the difficult conversation.',
+    options: ['bite the bullet', 'beat around the bush', 'spill the beans', 'let the cat out of the bag'],
+    answer: 0,
+    marks: 1,
+    difficulty: 'easy',
+    type: 'concept',
+    explanation: '"Bite the bullet" means to face a difficult or unpleasant situation with courage after a period of hesitation, which matches "finally decided" after "months of preparation" and avoiding further postponement. "Beat around the bush" means avoiding the main point, the opposite of taking direct action here. "Spill the beans" and "let the cat out of the bag" both mean revealing a secret, which is unrelated to the act of resigning. Idiom questions in context are solved by translating each idiom to its plain meaning first and then checking which meaning fits the sentence logically, rather than relying on surface keyword overlap.'
+  },
+  {
+    id: 'apti-verbal-x5',
+    q: 'Rather than admit that the project had failed, the manager tried to ______ during the review meeting, giving vague answers to every direct question.',
+    options: ['bite the bullet', 'beat around the bush', 'hit the nail on the head', 'break the ice'],
+    answer: 1,
+    marks: 1,
+    difficulty: 'easy',
+    type: 'concept',
+    explanation: '"Beat around the bush" means avoiding the central issue or speaking evasively instead of addressing it directly, which precisely matches "vague answers to every direct question." "Bite the bullet" means facing a hard situation directly, the opposite of evasiveness described here. "Hit the nail on the head" means being exactly correct or precise, and "break the ice" means easing initial social awkwardness, neither of which relates to evasive answering. Whenever a sentence explicitly describes vagueness or avoidance, that description is itself the definition being tested, so match it word for word against each idiom meaning.'
+  },
+  {
+    id: 'apti-verbal-x6',
+    q: 'Four sentences are given below, forming a single paragraph when arranged correctly. P: This, in turn, reduced crop yields across the region. Q: A prolonged drought struck the farming districts last summer. R: As a result, several farmers had to seek alternate sources of income. S: The lack of rainfall caused reservoirs to dry up rapidly. Choose the correct order.',
+    options: ['QSPR', 'QPSR', 'SQPR', 'QRSP'],
+    answer: 0,
+    marks: 1,
+    difficulty: 'easy',
+    type: 'concept',
+    explanation: 'The paragraph must follow a cause-to-effect chain. Q introduces the root cause, the drought, and must open the paragraph since every other sentence depends on it. S explains the immediate physical consequence of the drought, reservoirs drying up, following directly from Q. P then describes how that drying up affected crop yields, using "this, in turn," which explicitly refers back to the reservoir problem in S. R closes the paragraph with the final downstream human consequence, farmers seeking other income, following from the reduced yields in P. The sequence QSPR traces one continuous cause-effect thread, which is the fastest way to verify para-jumble ordering: follow referring words like "this" and "as a result" back to what they must point to.'
+  },
+  {
+    id: 'apti-verbal-x7',
+    q: 'Four sentences are given below, forming a single paragraph when arranged correctly. P: Consequently, many species that depend on coral reefs face habitat loss. Q: Rising ocean temperatures have led to widespread coral bleaching. R: This phenomenon weakens coral structures and can eventually kill them. S: Scientists warn that without intervention, reef ecosystems may collapse within decades. Choose the correct order.',
+    options: ['QRPS', 'QPRS', 'RQPS', 'QRSP'],
+    answer: 0,
+    marks: 2,
+    difficulty: 'hard',
+    type: 'concept',
+    explanation: 'Q must open the paragraph since it introduces the triggering cause, rising ocean temperatures, that every other sentence builds on. R follows immediately, because "this phenomenon" in R can only refer back to the coral bleaching just named in Q. P then follows with "consequently," describing the downstream ecological effect, species facing habitat loss, which results from the weakened coral described in R. S closes the paragraph as the broadest, most forward-looking statement, a scientist warning about ecosystem collapse, a natural concluding sentence after the specific effects have been laid out. Tracing each referring phrase, "this phenomenon" and "consequently," back to its antecedent sentence is the reliable way to lock in QRPS without guessing.'
+  },
+  {
+    id: 'apti-verbal-x8',
+    q: 'Identify the part of the sentence that contains a grammatical error: "Each of the members / are required / to submit their report / by Friday."',
+    options: ['Each of the members', 'are required', 'to submit their report', 'by Friday'],
+    answer: 1,
+    marks: 1,
+    difficulty: 'easy',
+    type: 'concept',
+    explanation: 'The subject of the sentence is "each," which is always grammatically singular regardless of the plural noun that follows it in the phrase "of the members." A singular subject requires a singular verb, so "are required" is incorrect and should read "is required." The remaining parts of the sentence are grammatically sound in isolation. This is one of the most frequently tested agreement rules in GATE grammar questions: words like each, every, either, and neither always take a singular verb even when followed by a prepositional phrase containing a plural noun, since that phrase is not the true subject.'
+  },
+  {
+    id: 'apti-verbal-x9',
+    q: 'Identify the part of the sentence that contains a grammatical error: "The number of accidents / on this stretch of road / have increased dramatically / over the last decade."',
+    options: ['The number of accidents', 'on this stretch of road', 'have increased dramatically', 'over the last decade.'],
+    answer: 2,
+    marks: 2,
+    difficulty: 'medium',
+    type: 'concept',
+    explanation: 'The subject here is "the number," which is treated as singular in standard usage, so it requires the singular verb "has increased," not "have increased." Note the contrast with the phrase "a number of accidents," which would instead take a plural verb, since "a number of" functions as a plural quantifier while "the number of" refers to a single count or figure. This distinction between "the number" (singular) and "a number of" (plural) is a classic subject-verb agreement trap, and recognizing which of the two phrasings is used is the fastest way to resolve it correctly.'
+  },
+  {
+    id: 'apti-verbal-x10',
+    q: 'Identify the part of the sentence that contains a grammatical error: "Neither the manager / nor the employees / was informed / about the sudden change in policy."',
+    options: ['Neither the manager', 'nor the employees', 'was informed', 'about the sudden change in policy.'],
+    answer: 2,
+    marks: 2,
+    difficulty: 'medium',
+    type: 'concept',
+    explanation: 'With "either...or" and "neither...nor" constructions, the verb must agree with whichever subject is closer to it, not with the first-mentioned subject. Here the subject nearer the verb is "the employees," which is plural, so the verb should be "were informed," not "was informed." Had the order been reversed, "neither the employees nor the manager," the singular "was informed" would have been correct instead. This proximity rule is distinct from ordinary compound-subject agreement with "and," where the combined subject is simply treated as plural, so recognizing which connecting word is used, "and" versus "either/or" or "neither/nor," changes which agreement rule applies.'
+  },
+  {
+    id: 'apti-verbal-x11',
+    q: 'Complete the analogy: Doctor is to Hospital as Teacher is to ______.',
+    options: ['School', 'Book', 'Student', 'Blackboard'],
+    answer: 0,
+    marks: 1,
+    difficulty: 'easy',
+    type: 'concept',
+    explanation: 'The relationship in the first pair is professional-to-workplace: a doctor typically practices at a hospital. Applying the same relationship to the second pair, a teacher typically practices at a school, making "School" the matching answer. "Book" and "Blackboard" are tools a teacher uses, not the workplace itself, and "Student" is the person a teacher serves, not the location, so both represent a different relationship than the one established by the first pair. For analogy questions, first state the exact relationship in words (here, "is the typical workplace of") before scanning the options, since this prevents being misled by superficially related but structurally different word pairs.'
+  },
+  {
+    id: 'apti-verbal-x12',
+    q: 'Complete the analogy: Frugal is to Miserly as Confident is to ______.',
+    options: ['Humble', 'Arrogant', 'Shy', 'Careful'],
+    answer: 1,
+    marks: 2,
+    difficulty: 'medium',
+    type: 'concept',
+    explanation: 'The relationship in the first pair is one of degree: "miserly" is an excessive, negative extreme of the milder, more neutral quality "frugal." Applying the same degree-based relationship, the excessive, negative extreme of "confident" is "arrogant," where healthy self-assurance tips over into overbearing self-importance. "Humble" and "shy" describe qualities opposite to confidence rather than an intensified version of it, and "careful" is unrelated to confidence altogether. This "mild trait to its excessive negative version" pattern is a recurring analogy type, distinct from simple synonym or antonym pairs, and recognizing the degree relationship immediately rules out plain synonyms and antonyms as answers.'
+  },
+  {
+    id: 'apti-verbal-x13',
+    q: 'Complete the analogy: Author is to Manuscript as Sculptor is to ______.',
+    options: ['Chisel', 'Statue', 'Museum', 'Marble'],
+    answer: 1,
+    marks: 2,
+    difficulty: 'medium',
+    type: 'concept',
+    explanation: 'The relationship in the first pair is creator-to-creation: an author produces a manuscript as the finished result of their work. Applying the same relationship, a sculptor produces a statue as the finished result of their work, making "Statue" the correct match. "Chisel" is a tool the sculptor uses, comparable to a pen for the author, not the output itself, and "Marble" is the raw material worked on, comparable to blank paper, again not the finished creation. "Museum" is merely a place where a statue might later be displayed, unrelated to the act of creation. Distinguishing tool, raw material, and finished product is essential whenever a creator-creation analogy is tested.'
+  },
+  {
+    id: 'apti-verbal-x14',
+    q: 'A city council claims that installing more streetlights on Elm Avenue will reduce nighttime crime there, citing that most reported crimes on that street occur after dark. Which finding, if true, would most strengthen this claim?',
+    options: ['Crime rates on nearby streets that are already well-lit are significantly lower than on Elm Avenue', 'The city currently has limited funds available for infrastructure projects', 'Some residents oppose additional streetlights due to concerns about light pollution', 'Daytime crime on Elm Avenue is currently negligible'],
+    answer: 0,
+    marks: 2,
+    difficulty: 'medium',
+    type: 'concept',
+    explanation: 'To strengthen a causal claim linking lighting to reduced crime, the strongest support is evidence of the same pattern holding elsewhere: nearby well-lit streets having lower crime directly supports that better lighting is associated with less nighttime crime, reinforcing that the proposed fix targets the right cause. Limited city funds is a practical obstacle, irrelevant to whether the claim itself is true. Resident opposition to light pollution is a social concern, not evidence about crime rates. Negligible daytime crime merely restates part of the existing premise (crime is a nighttime issue) without adding any new supporting evidence about lighting specifically reducing it.'
+  },
+  {
+    id: 'apti-verbal-x15',
+    q: 'A company argues that switching its entire workforce to a four-day workweek will raise overall productivity, based on a pilot study of one small team that showed higher output. Which statement, if true, would most weaken this argument?',
+    options: ['The pilot team consisted of highly motivated volunteers, unlike the general workforce', 'The company currently employs about 500 people in total', 'The four-day week was well received by the pilot team members', 'Other companies have also tried similar four-day-week pilots'],
+    answer: 0,
+    marks: 2,
+    difficulty: 'medium',
+    type: 'concept',
+    explanation: 'The argument generalizes from one small, possibly unrepresentative pilot group to the entire workforce. If the pilot team was made up of unusually motivated volunteers, their productivity gain may not transfer to a general workforce with mixed motivation levels, directly undermining the generalization the argument depends on. The total employee count and general employee reception of the pilot team do not address whether the sample was representative. That other companies ran similar pilots is irrelevant without knowing their outcomes, so it neither strengthens nor weakens this specific argument. Weaken questions about small-sample generalizations are almost always answered by attacking the representativeness of the sample.'
+  },
+  {
+    id: 'apti-verbal-x16',
+    q: 'Advertisers should focus more of their budget on social media platforms than on television, an analyst argues, because a recent survey found that most consumers now spend more time browsing social media daily than watching television. This argument depends on which assumption?',
+    options: ['Time spent by consumers on a medium correlates with how effectively advertisements placed there influence them', 'Television advertising costs more per slot than social media advertising', 'All consumers use at least one social media platform regularly', 'Social media platforms allow more precise audience targeting than television'],
+    answer: 0,
+    marks: 2,
+    difficulty: 'hard',
+    type: 'concept',
+    explanation: 'The argument moves from a fact about time spent on a medium to a conclusion about where advertising budget should go, which only makes sense if spending more time on a medium actually makes advertisements on that medium more effective, an unstated link the argument silently relies on. Without this assumption, consumers could spend hours on social media while systematically ignoring or blocking out its ads, breaking the logical bridge between the premise and conclusion. The cost comparison, universal social media usage, and targeting precision are all plausible related facts, but none of them is the specific gap that must be true for the stated premise to actually support the stated conclusion; only the effectiveness-correlation assumption fills that exact gap.'
+  },
+  {
+    id: 'apti-verbal-x17',
+    q: 'Read the following passage: The number of applicants to the university engineering program has risen every year for the past five years, even as the total number of available seats has stayed exactly the same. This year, for the first time, the admissions committee received twice as many applications as it did five years ago. Which of the following can be most reasonably inferred?',
+    options: ['The acceptance rate for the engineering program has declined over the five years', 'The academic quality of applicants has improved over the five years', 'The university is planning to increase the number of available seats soon', 'Most rejected applicants are turned down because of poor academic grades'],
+    answer: 0,
+    marks: 2,
+    difficulty: 'medium',
+    type: 'concept',
+    explanation: 'The passage establishes two facts directly: applications have risen every year, and seats have remained constant. Since acceptance rate is the ratio of seats offered to applications received, a constant numerator combined with a strictly growing denominator mathematically forces the ratio to fall each year, so a declining acceptance rate follows directly from the stated facts alone. Improved applicant quality, plans to add seats, and rejection reasons are all plausible real-world scenarios, but none of them is stated or logically forced by the passage, whereas the declining acceptance rate is a direct mathematical consequence, not a wider speculation.'
+  },
+  {
+    id: 'apti-verbal-x18',
+    q: 'Read the following passage: In a small town, the only bakery is normally closed every Monday. Last week, a visitor seeking fresh bread found the bakery unexpectedly open on a Monday, and was told this was because of a local festival being celebrated that day. This week, the same festival is instead being celebrated in a neighboring town. Which of the following can be most reasonably inferred?',
+    options: ['The bakery is likely to remain closed as usual this coming Monday', 'The bakery will always stay open on Mondays whenever any festival occurs anywhere', 'The visitor who found the bakery open actually lives in the neighboring town', 'The bakery has permanently changed its regular closing day'],
+    answer: 0,
+    marks: 2,
+    difficulty: 'hard',
+    type: 'concept',
+    explanation: 'The passage links the bakery being open last Monday specifically to the local festival happening in this town that day. Since the same festival has now moved to a neighboring town this week, the specific reason for the exception no longer applies here this week, so the bakery reverts to its normal closed status on Monday, which is the narrowest and most directly supported inference. Claiming the bakery always opens for any festival anywhere overgeneralizes far beyond the single case described. The visitor location and a permanent schedule change are unsupported speculations introduced by the reader, not conclusions drawn from the stated facts, which is the key distinction between a valid inference and an unwarranted guess.'
+  },
+  {
+    id: 'apti-verbal-x19',
+    q: 'The committee decision seemed ______ at first glance, but a closer reading revealed a carefully reasoned argument underlying it.',
+    options: ['judicious', 'capricious', 'meticulous', 'unanimous'],
+    answer: 1,
+    marks: 2,
+    difficulty: 'medium',
+    type: 'concept',
+    explanation: 'The word "but" signals that the initial impression contrasts with the later discovery of careful reasoning, so the blank needs a word meaning arbitrary or whimsical, which the closer reading then disproves. "Capricious" means impulsive or unpredictable, exactly the kind of surface impression that a subsequent careful reading would overturn. "Judicious" and "meticulous" both already imply careful reasoning, which would not require a contrasting "but" afterward, and "unanimous" describes agreement among people, unrelated to the quality of the reasoning itself. Locating the contrast word first, here "but," and determining that the blank must describe the opposite of "carefully reasoned" is the fastest route to the answer.'
+  },
+  {
+    id: 'apti-verbal-x20',
+    q: 'The new intern was advised to ______ before proposing major changes to a workflow that had been in place for over a decade.',
+    options: ['tread carefully', 'jump the gun', 'go the extra mile', 'cut corners'],
+    answer: 0,
+    marks: 1,
+    difficulty: 'medium',
+    type: 'concept',
+    explanation: '"Tread carefully" means to proceed cautiously in a sensitive situation, which fits advising a new intern to be careful before challenging a long-established workflow. "Jump the gun" means acting prematurely without adequate preparation, which is advice the sentence is warning against, not recommending. "Go the extra mile" means putting in additional effort, and "cut corners" means doing something in a cheaper or easier but lower-quality way, neither of which relates to caution around proposing sensitive changes. Matching the idiom meaning to the situational tone described, here caution around a sensitive, established system, is more reliable than matching on any single keyword in the sentence.'
+  }
+);
