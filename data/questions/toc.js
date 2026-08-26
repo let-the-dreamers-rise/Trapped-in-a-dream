@@ -1335,3 +1335,156 @@ window.GATE_DATA.questions['toc'].topics.find(function(t){return t.id==='toc-dec
   explanation: "Regular languages are closed under intersection via the standard product construction, so L(M1) intersect L(M2) is itself regular, recognized by a product DFA whose states are pairs of states from M1 and M2. Finiteness of a regular language is decidable: a regular language is infinite exactly when its minimal (or any) accepting automaton has a cycle that lies on some path from the start state to an accepting state (a state that is both reachable from the start and can reach an accepting state). This is a straightforward graph algorithm on the product automaton, giving a fully decidable procedure - option B. Rice's theorem (option D) applies only to Turing machine language properties, not to finite-automaton properties, which is a common category confusion; DFA-based questions are essentially always decidable, in sharp contrast to their Turing-machine analogues."
 }
 );
+
+window.GATE_DATA.questions['toc'].topics.find(function(t){return t.id==='toc-hierarchy';}).questions.push(
+{
+  id: 'toc-hierarchy-x1',
+  q: 'Which of the following is a valid example of a context-sensitive language that is NOT context-free?',
+  options: ['{ a^n b^n c^n : n >= 0 }', '{ a^n b^n : n >= 0 }', '{ a^n b^m : n, m >= 0 }', '{ w in {a,b}* : w is a palindrome }'],
+  answer: 0,
+  marks: 1,
+  difficulty: 'easy',
+  type: 'concept',
+  explanation: "{ a^n b^n c^n } is the standard textbook witness of the CFL-to-CSL gap: a context-sensitive grammar can enforce all three counts being equal using a linear-bounded, mark-and-check strategy (cross off one a, one b, one c per sweep of the tape, which never exceeds the input's length), so the language is context-sensitive, but the CFL pumping lemma proves no single stack can maintain two independent matching relations at once, ruling out context-freeness. The other three options are all comfortably context-free: {a^n b^n} and palindromes each need only one stack-checkable relation, and {a^n b^m} with independent n, m is simply a*b*, which is even regular. So option A is the only genuine CSL-not-CFL example among the four."
+},
+{
+  id: 'toc-hierarchy-x2',
+  q: 'Which of the following statements about context-sensitive languages (CSL) is TRUE?',
+  options: ['CSL is closed under union, intersection, and complement', 'CSL is closed under union and intersection but not complement', 'Whether a given CSL grammar generates the empty language is decidable in general', 'Every context-sensitive language is regular'],
+  answer: 0,
+  marks: 2,
+  difficulty: 'hard',
+  type: 'concept',
+  explanation: "CSLs are closed under union, intersection, AND complementation - complementation closure for CSLs is a genuinely deep result (the Immerman-Szelepcsenyi theorem, originally proved in the complexity-theory setting for nondeterministic space classes, which context-sensitive languages coincide with via linear bounded automata). This makes CSL closure properties richer than CFL's (which loses both intersection and complement) even though CSL sits above CFL in the hierarchy - closure properties do not simply get worse as a class grows. Emptiness for CSGs is actually UNDECIDABLE (unlike CFG emptiness), since a CSG can simulate enough of a Turing machine's bounded behavior to encode the acceptance problem restricted to linear space, making option C false. CSLs are certainly not all regular; {a^n b^n c^n} itself is a non-regular CSL, ruling out option D."
+},
+{
+  id: 'toc-hierarchy-x3',
+  q: 'For which of the following classes in the Chomsky hierarchy is the MEMBERSHIP problem ("does this string belong to the language generated/accepted by this description?") DECIDABLE?',
+  options: ['Regular (DFA/regex) only', 'Regular and context-free only', 'Regular, context-free, and context-sensitive, but not unrestricted (Type-0)', 'All four classes, including Type-0'],
+  answer: 2,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'concept',
+  explanation: "Membership is decidable for regular languages (simulate the DFA, which always halts after reading the input), for context-free languages (the CYK algorithm runs in O(n^3) after CNF conversion, always terminating), and for context-sensitive languages (simulate the linear bounded automaton, which has only finitely many configurations bounded by the input length, so either it halts within that bound or it must be looping and can be safely rejected). For unrestricted Type-0 grammars, however, membership is exactly the Turing machine acceptance problem, and there is no length bound on the tape or the number of derivation steps, so membership is undecidable in general (though it remains recursively enumerable - you can always semi-decide by search). This progression - decidable for the first three, only semi-decidable for the last - is a key structural fact distinguishing bounded-resource models (finite automaton, PDA, LBA) from the unbounded Turing machine."
+},
+{
+  id: 'toc-hierarchy-x4',
+  q: 'Which grammar production shape correctly identifies a Type-1 (context-sensitive) grammar, distinguishing it from Type-0?',
+  options: ['Every production has the form alpha A beta -> alpha gamma beta, with gamma nonempty (length never decreases, except possibly S -> epsilon with S not on any right side)', 'Every production has exactly one nonterminal on the left and any string on the right', 'Every production is of the form A -> BC or A -> a', 'Every production has a single terminal at the start of the right-hand side'],
+  answer: 0,
+  marks: 1,
+  difficulty: 'easy',
+  type: 'concept',
+  explanation: "Type-1 productions have the noncontracting form alpha A beta -> alpha gamma beta, where A is rewritten to a nonempty string gamma only in the context surrounded by alpha and beta (hence 'context-sensitive'), and crucially |gamma| >= 1 ensures the right-hand side is never shorter than the left-hand side - the only allowed exception is S -> epsilon, permitted solely when S never appears on the right side of any other production. This length-nondecreasing property is exactly what a linear bounded automaton exploits: since no derivation step ever shrinks the string, generating a string of length n requires the working tape never to exceed length n. Option B describes Type-2 (context-free, single nonterminal on the left, but the right side is unrestricted so it can shrink or grow freely), option C describes CNF specifically (a normal form of Type-2), and option D describes Greibach Normal Form, not a hierarchy level at all."
+},
+{
+  id: 'toc-hierarchy-x5',
+  q: 'Which of the following correctly places recursive (decidable) languages, REC, in the standard hierarchy?',
+  options: ['REC is one of the four classical Chomsky types, sitting between Type-1 and Type-2', 'REC is not one of the four classical Chomsky types, but it sits strictly between CSL and RE: CSL is a proper subset of REC, which is a proper subset of RE', 'REC is identical to CSL', 'REC is identical to RE'],
+  answer: 1,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'concept',
+  explanation: "The four classical Chomsky types are exactly Regular, Context-Free, Context-Sensitive, and Type-0 (RE); REC (decidable languages) is not one of the original four grammar-defined types, but it is an essential extra layer that sits strictly between CSL and RE. Every CSL is decidable, because a linear bounded automaton has only finitely many configurations bounded by input length, so a decider can detect non-halting via configuration repetition; but there exist decidable languages that are not context-sensitive (since some decidable languages require more than linear space to recognize, by direct diagonalization over space-bounded machines), so CSL is a strict subset of REC. And REC is a strict subset of RE, witnessed classically by the Halting Problem, which is RE but not decidable. So the correct full chain is Regular subset CFL subset CSL subset REC subset RE, with REC as an added, non-grammar-type layer - option B."
+},
+{
+  id: 'toc-hierarchy-x6',
+  q: 'Which of the following is the standard witness demonstrating that CSL is a strict (proper) subset of RE?',
+  options: ['{ a^n b^n c^n : n >= 0 }, since it is not regular', 'The Acceptance Problem A_TM, since it is RE but provably not decidable, hence not context-sensitive (as every CSL is decidable)', 'The empty language, since it is trivially in every class', '{ w w^R : w in {a,b}* }, since it is not a DCFL'],
+  answer: 1,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'concept',
+  explanation: "To prove CSL is a PROPER subset of RE, you need a language that IS in RE but demonstrably is NOT in CSL. A_TM (or the Halting Problem) fits perfectly: it is RE (a universal machine can simulate and accept whenever the simulated machine halts-accepts), but it is provably undecidable by diagonalization. Since every context-sensitive language is decidable (via the linear-bounded-automaton configuration-counting argument - finitely many configurations bounded by input length means a decider can detect and reject non-terminating simulation loops), and A_TM is not decidable, A_TM cannot be context-sensitive. This is exactly the separation needed. The other options either separate the wrong pair of classes ({a^n b^n c^n} separates CFL from CSL, not CSL from RE) or are trivial/irrelevant to a strictness argument (the empty language belongs to every level, proving nothing about separation)."
+},
+{
+  id: 'toc-hierarchy-x7',
+  q: 'Which of the following grammars is a valid regular (Type-3) grammar in strict right-linear form?',
+  options: ['S -> aA | b, A -> aS | b', 'S -> aA | Ab, A -> b', 'S -> AB, A -> a, B -> b', 'S -> aSa | b'],
+  answer: 0,
+  marks: 1,
+  difficulty: 'medium',
+  type: 'concept',
+  explanation: "Strict right-linear form requires every production to be A -> aB (a single terminal followed by at most one nonterminal, appearing at the RIGHT end) or A -> a (or A -> epsilon for the start symbol). Option A fits perfectly: every right-hand side has the nonterminal, if present, in the rightmost position after a leading terminal, consistently throughout the whole grammar. Option B mixes forms within a single grammar: S -> aA is right-linear (nonterminal on the right) but S -> Ab is left-linear (nonterminal on the left) - mixing the two forms in one grammar can define non-regular languages, which is exactly why the definition insists on choosing one direction consistently for the entire grammar. Option C has two nonterminals on one right-hand side (A -> BC shape), which is Type-2 (context-free), not Type-3. Option D, S -> aSa | b, wraps a terminal on BOTH sides of the nonterminal, which is neither strictly right- nor left-linear - it actually generates {a^n b a^n}, a non-regular language, confirming it falls outside Type-3."
+},
+{
+  id: 'toc-hierarchy-x8',
+  q: 'Which of the following correctly identifies the grammar type (Chomsky classification) for the production set S -> aSBC, S -> abc, CB -> BC, bB -> bb, bC -> bc, cC -> cc?',
+  options: ['Type-3 (regular), since the alphabet is small', 'Type-2 (context-free), because every left-hand side is a single nonterminal', 'Type-1 (context-sensitive), because productions like CB -> BC and bB -> bb are noncontracting but not single-nonterminal-on-the-left', 'Type-0, because no restriction can classify this grammar at all'],
+  answer: 2,
+  marks: 2,
+  difficulty: 'hard',
+  type: 'concept',
+  explanation: "Scan every production for its shape. S -> aSBC and S -> abc have a single nonterminal on the left, fitting Type-2's requirement alone, but the remaining productions - CB -> BC, bB -> bb, bC -> bc, cC -> cc - all have MULTIPLE symbols on the left-hand side (two symbols each), which immediately disqualifies the grammar from Type-2 (context-free requires strictly one nonterminal on the left in EVERY production). Check the Type-1 requirement instead: is every production noncontracting (right-hand side length >= left-hand side length)? CB -> BC has length 2 -> 2 (equal, fine), bB -> bb has length 2 -> 2 (fine), bC -> bc and cC -> cc are similarly length-preserving, and S -> aSBC grows the string. Since no production ever shrinks the string, the whole grammar is noncontracting, exactly the defining property of Type-1 (context-sensitive) grammars - and in fact this specific grammar is the classical CSG that generates { a^n b^n c^n : n >= 1 } using the CB -> BC commutation trick to reorder markers before converting them to terminals in the correct count."
+},
+{
+  id: 'toc-hierarchy-x9',
+  q: 'Which of the following statements about the STRICTNESS of the containment CFL subset CSL is correctly justified?',
+  options: ['It follows immediately because CFL is closed under intersection while CSL is not', 'It is witnessed by { a^n b^n c^n : n >= 0 }, which is context-sensitive (generable by a noncontracting grammar / accepted by an LBA) but fails the CFL pumping lemma so cannot be context-free', 'It cannot be proven; the two classes are conjectured but not known to be different', 'It follows because every CSL grammar has strictly more productions than any CFG'],
+  answer: 1,
+  marks: 1,
+  difficulty: 'medium',
+  type: 'concept',
+  explanation: "Strictness proofs need a concrete witness language belonging to the larger class but demonstrably excluded from the smaller one. {a^n b^n c^n} is exactly such a witness for CFL versus CSL: it has a noncontracting (Type-1) grammar and is decidable by a linear bounded automaton within input-length space, so it is context-sensitive; but it fails the context-free pumping lemma (any candidate split uvwxy with |vwx| bounded can touch at most two of the three blocks, so pumping unbalances the third), ruling out context-freeness entirely. Option A misapplies a closure-property fact (which does hold, CFL lacks intersection-closure that CSL enjoys via Immerman-Szelepcsenyi-style results) as if it were itself a direct strictness proof, when a genuine separating witness language is the actual standard method. This hierarchy gap is thoroughly established, not merely conjectured, ruling out option C; option D is simply not a meaningful or valid separation criterion between grammar classes."
+},
+{
+  id: 'toc-hierarchy-x10',
+  q: 'Which of the following is TRUE regarding deciding "is a given language in class X regular" for various X in the Chomsky hierarchy?',
+  options: ['Given a DFA, deciding if the language is regular is trivially always yes; given a CFG, deciding if L(G) is regular is undecidable', 'Given a CFG, deciding if L(G) is regular is decidable using the pumping lemma directly', 'Given a DFA, deciding if the language is regular is undecidable', 'Regularity testing is undecidable for every input representation, including DFAs'],
+  answer: 0,
+  marks: 1,
+  difficulty: 'easy',
+  type: 'concept',
+  explanation: "A DFA already IS a finite automaton, so the language it accepts is regular by definition - there is nothing to test, the answer is trivially always 'yes' (a slightly degenerate but correct decidable fact, since a constant-yes function is a valid, terminating decision procedure). But given an arbitrary CFG, deciding whether L(G) happens to also be regular is a genuinely undecidable problem, sitting alongside CFG equivalence, universality, and ambiguity as one of the classical undecidable CFG properties. The pumping lemma alone (option B) cannot decide this in general - it can sometimes show a specific language is NOT regular by exhibiting a violation, but it cannot be turned into a general algorithm that correctly answers the regularity question for every possible CFG, since satisfying the pumping property is only necessary, never sufficient, for regularity, and there is no algorithmic way to check 'does this CFG's language satisfy the pumping property for all sufficiently long strings' in finite time for every case."
+},
+{
+  id: 'toc-hierarchy-x11',
+  q: 'Which of the following is the correct machine model / grammar type correspondence?',
+  options: ['Type-0 grammars correspond to Turing machines; Type-1 to linear bounded automata; Type-2 to pushdown automata; Type-3 to finite automata', 'Type-0 grammars correspond to pushdown automata; Type-1 to Turing machines; Type-2 to linear bounded automata; Type-3 to finite automata', 'All four types correspond to Turing machines, differing only in their allowed running time', 'Type-3 grammars correspond to pushdown automata, and Type-2 to finite automata'],
+  answer: 0,
+  marks: 1,
+  difficulty: 'easy',
+  type: 'concept',
+  explanation: "This is the foundational Chomsky-Schutzenberger correspondence to memorize cold: Type-0 (unrestricted) grammars generate exactly the languages recognized by (unbounded-tape) Turing machines - the RE languages. Type-1 (context-sensitive, noncontracting) grammars correspond exactly to linear bounded automata, Turing machines restricted to tape length proportional to the input. Type-2 (context-free) grammars correspond exactly to (nondeterministic) pushdown automata. Type-3 (regular, right- or left-linear) grammars correspond exactly to finite automata (DFA/NFA, equal power). Each level's machine model is progressively more restricted in its memory resource (unbounded tape, linear tape, a single stack, no auxiliary memory at all beyond finite states), which is precisely why each level's language class is progressively smaller, giving the strict containment chain Regular subset CFL subset CSL subset RE."
+},
+{
+  id: 'toc-hierarchy-x12',
+  q: 'Consider the language L = { a^n b^n : n >= 0 } union { a^n b^(2n) : n >= 0 }. What is the tightest level of the Chomsky hierarchy that correctly classifies L?',
+  options: ['Regular', 'Context-free but not regular', 'Context-sensitive but not context-free', 'Recursively enumerable but not context-sensitive'],
+  answer: 1,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'concept',
+  explanation: "Each piece is individually a simple, standard CFL: {a^n b^n} via S1 -> aS1b | epsilon, and {a^n b^(2n)} via S2 -> aS2bb | epsilon. CFLs are closed under union, so combining them with S -> S1 | S2 gives a valid CFG for the whole union, confirming L is context-free. It is not regular: apply Myhill-Nerode directly to L using the strings a^i for i = 0, 1, 2, .... For i not equal to j, the suffix z = b^i puts a^i z = a^i b^i into L (via the first piece), while a^j z = a^j b^i is neither of the form a^n b^n (since j is not equal to i) nor of the form a^n b^(2n) (since i is not equal to 2j in general) - so a^j z falls outside L. This distinguishes every pair a^i, a^j, giving infinitely many equivalence classes, so L needs unbounded memory and is not regular. A single stack (via the union grammar) suffices for generation, giving the tightest classification: context-free but not regular, option B."
+},
+{
+  id: 'toc-hierarchy-x13',
+  q: 'True/False: (i) The class of context-sensitive languages is closed under complementation. (ii) The class of context-sensitive languages is closed under Kleene star. (iii) Every context-sensitive language is decidable. (iv) Every decidable language is context-sensitive. Which combination is correct?',
+  options: ['(i) True, (ii) True, (iii) True, (iv) False', '(i) False, (ii) True, (iii) True, (iv) True', '(i) True, (ii) False, (iii) False, (iv) True', '(i) False, (ii) False, (iii) False, (iv) False'],
+  answer: 0,
+  marks: 2,
+  difficulty: 'hard',
+  type: 'pyq-style',
+  explanation: "(i) is true, and famously nontrivial: CSL closure under complement is the Immerman-Szelepcsenyi theorem, proved via nondeterministic space-bounded computation techniques rather than a simple direct construction. (ii) is also true: CSLs are closed under concatenation and Kleene star using standard grammar-combination techniques adapted to keep productions noncontracting. (iii) is true, and is the key fact linking CSL to the wider hierarchy: an LBA has only finitely many configurations bounded by input length, so a decider can detect looping via configuration repetition and safely reject, guaranteeing every CSL is decidable. (iv) is FALSE: there exist decidable languages that require more than linear space to even write down a certificate or run a natural decision procedure, so REC is a strictly larger class than CSL (CSL is a proper subset of REC, not equal to it) - a decidable language need not be recognizable within input-bounded tape. So the correct combination is option A."
+},
+{
+  id: 'toc-hierarchy-x14',
+  q: 'Which of the following grammars correctly has productions that would be classified as Type-2 (context-free) but NOT Type-3 (regular)?',
+  options: ['S -> aA, A -> bB, B -> c', 'S -> aSb | epsilon', 'S -> aA | b, A -> a', 'S -> a | b'],
+  answer: 1,
+  marks: 1,
+  difficulty: 'easy',
+  type: 'concept',
+  explanation: "S -> aSb | epsilon has a nonterminal S appearing in the MIDDLE of the right-hand side, sandwiched between two terminals (a on the left, b on the right) - this shape (A -> alpha B beta with both alpha, beta possibly nonempty and containing terminals on both sides of the nonterminal) is not expressible as either strict right-linear (A -> aB) or strict left-linear (A -> Ba) form, yet it is perfectly valid as a general context-free production (a single nonterminal on the left, anything on the right). Indeed this specific grammar generates {a^n b^n : n >= 0}, the canonical non-regular CFL. The other three options are all straightforward right-linear regular grammars (nonterminal only ever appears as the rightmost symbol, if at all), generating regular languages, so they fail to be examples of 'CFL but not regular' grammar shapes."
+},
+{
+  id: 'toc-hierarchy-x15',
+  q: 'Which of the following correctly ranks the four classical language classes together with REC, from smallest to largest?',
+  options: ['Regular ⊆ CFL ⊆ CSL ⊆ REC ⊆ RE', 'Regular ⊆ CSL ⊆ CFL ⊆ REC ⊆ RE', 'REC ⊆ Regular ⊆ CFL ⊆ CSL ⊆ RE', 'Regular ⊆ CFL ⊆ REC ⊆ CSL ⊆ RE'],
+  answer: 0,
+  marks: 1,
+  difficulty: 'easy',
+  type: 'concept',
+  explanation: "The chain, from most restricted machine model (and smallest language class) to least restricted, runs: Regular (finite memory only) is a subset of Context-Free (finite memory plus one unbounded stack) is a subset of Context-Sensitive (memory bounded linearly in the input length) is a subset of Recursive/decidable (any amount of memory, but the computation is guaranteed to halt) is a subset of Recursively Enumerable (any amount of memory, computation may run forever on non-members). Each containment is strict, with standard witnesses: {a^n b^n} separates Regular from CFL, {a^n b^n c^n} separates CFL from CSL, a super-linear-space-requiring decidable language separates CSL from REC, and the Halting Problem separates REC from RE. Option A states this chain in the correct order; the other three options scramble the CFL/CSL order or misplace REC relative to CSL."
+}
+);
