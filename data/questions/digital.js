@@ -1250,3 +1250,249 @@ window.GATE_DATA.questions['digital'].topics.find(function(t){return t.id==='dig
   explanation: "Ripple counter worst-case delay = number of stages × per-stage delay = 8 × 15 ns = 120 ns, giving maximum frequency f_ripple = 1/120 ns ≈ 8.33 MHz. Synchronous counter worst-case delay = one flip-flop delay + the fixed combinational logic delay = 15 ns + 25 ns = 40 ns, regardless of the 8-bit width, giving maximum frequency f_sync = 1/40 ns = 25 MHz. The ratio f_sync / f_ripple = 25 MHz / 8.33 MHz = 3, so the synchronous counter can run 3 times faster than the ripple counter at this width. This ratio would grow even larger for wider counters (e.g. 16 or 32 bits), since the ripple counter's delay scales linearly with bit count while the synchronous counter's delay stays essentially fixed — this is the core numeric argument GATE uses to test understanding of why synchronous designs dominate at scale."
 }
 );
+
+window.GATE_DATA.questions['digital'].topics.find(function(t){return t.id==='digital-number-systems';}).questions.push(
+{
+  id: 'digital-number-systems-x1',
+  q: "Find the radix r such that (24)_r + (13)_r = (41)_r holds true.",
+  options: ["r = 5", "r = 6", "r = 7", "r = 8"],
+  answer: 1,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'numerical',
+  explanation: "Expand each number using positional notation in base r: (24)_r = 2r + 4, (13)_r = 1r + 3, and (41)_r = 4r + 1. Setting up the equation: (2r + 4) + (1r + 3) = 4r + 1, which simplifies to 3r + 7 = 4r + 1, giving r = 6. Sanity check by substituting r=6: (24)_6 = 2(6)+4 = 16, (13)_6 = 1(6)+3 = 9, and 16+9 = 25; while (41)_6 = 4(6)+1 = 25 — the two sides match exactly. Also verify all digits used (2,4,1,3,4,1) are valid in base 6 (all less than 6), confirming r=6 is a legitimate solution and not just an algebraic artifact. This 'solve for the base' style question is a recurring GATE pattern: always convert every term to its decimal-equivalent polynomial in r first, then solve the resulting linear equation."
+},
+{
+  id: 'digital-number-systems-x2',
+  q: "In some base r, the number (121)_r equals decimal 100. What is r?",
+  options: ["r = 8", "r = 9", "r = 10", "r = 11"],
+  answer: 1,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'numerical',
+  explanation: "Expand (121)_r using positional notation: 1·r^2 + 2·r + 1 = 100. Notice the left side is a perfect square trinomial: r^2 + 2r + 1 = (r+1)^2. So (r+1)^2 = 100, giving r+1 = 10 (taking the positive root, since a radix must be positive), so r = 9. Verify: (121)_9 = 1(81) + 2(9) + 1(1) = 81 + 18 + 1 = 100, exactly as required. Also check digit validity: the digits used are 1, 2, 1, all strictly less than 9, so base 9 is a valid radix for this representation. Recognizing the perfect-square pattern (1,2,1 as coefficients matching (r+1)^2's expansion) makes this solvable instantly without a full quadratic formula, though solving r^2+2r-99=0 directly via the quadratic formula gives the same r=9 (discarding the negative root)."
+},
+{
+  id: 'digital-number-systems-x3',
+  q: "Convert the packed BCD number 1000 0111 (representing decimal 87) to its Excess-3 code representation.",
+  options: ["1011 1010", "1000 0111", "0101 0100", "1100 1011"],
+  answer: 0,
+  marks: 1,
+  difficulty: 'easy',
+  type: 'numerical',
+  explanation: "Excess-3 encodes each decimal digit as (digit value + 3) in 4-bit binary, applied independently to each BCD digit group. The BCD groups here are 1000 (decimal 8) and 0111 (decimal 7). For the first digit: 8 + 3 = 11, and 11 in 4-bit binary is 1011. For the second digit: 7 + 3 = 10, and 10 in 4-bit binary is 1010. Concatenating these gives the Excess-3 representation: 1011 1010. This is exactly why the code is called 'excess-3' — every digit's binary pattern is offset (in excess) by 3 compared to its plain BCD pattern, which is precisely the property that makes Excess-3 self-complementing for 9's-complement subtraction: complementing all the bits of a digit's excess-3 code directly gives the excess-3 code of (9 minus that digit)."
+},
+{
+  id: 'digital-number-systems-x4',
+  q: "Decode the Excess-3 encoded number 1100 0101 back into its decimal value.",
+  options: ["75", "92", "63", "98"],
+  answer: 1,
+  marks: 1,
+  difficulty: 'easy',
+  type: 'numerical',
+  explanation: "To decode Excess-3, subtract 3 from the binary value of each 4-bit group to recover the original decimal digit. The first group, 1100, equals binary 12; subtracting 3 gives 9. The second group, 0101, equals binary 5; subtracting 3 gives 2. So the two recovered decimal digits are 9 and 2, giving the decimal number 92. Double-checking by re-encoding: Excess-3 of digit 9 is 9+3=12=1100 (matches), and Excess-3 of digit 2 is 2+3=5=0101 (matches) — confirming the decode is correct. This subtract-3-per-nibble procedure is the exact reverse of the add-3-per-digit encoding process, and is why Excess-3 is always processed digit-group by digit-group, never as one large binary number across the whole multi-digit value."
+},
+{
+  id: 'digital-number-systems-x5',
+  q: "A code is called 'self-complementing' if the code for (9 - digit) can be obtained simply by inverting every bit of the code for digit, with no arithmetic needed. Which of these codes has this self-complementing property?",
+  options: ["Standard 8421 BCD", "Excess-3", "Plain unsigned binary", "Gray code"],
+  answer: 1,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'concept',
+  explanation: "Excess-3 encodes digit d as (d+3) in binary. For the self-complementing property, we need excess3(9-d) to equal the bitwise complement of excess3(d). Check digit 3: excess3(3) = 6 = 0110; bitwise complement = 1001 = 9; excess3(9-3) = excess3(6) = 9 = 1001 — matches exactly. This works in general because 9-3=6 (the weight sum of a 4-bit self-complementing code is 6), and excess-3's offset of +3 is exactly designed to make the code symmetric around this midpoint. Standard 8421 BCD is NOT self-complementing (e.g. BCD(3)=0011, complement=1100=12, but BCD(9-3)=BCD(6)=0110 — they don't match). This is precisely why Excess-3 was historically used for BCD subtraction via 9's-complement methods: inverting bits directly gives the 9's complement digit needed, skipping a separate subtraction step."
+},
+{
+  id: 'digital-number-systems-x6',
+  q: "Convert the Gray code 1011 to its equivalent binary number.",
+  options: ["1010", "1101", "1001", "0111"],
+  answer: 1,
+  marks: 1,
+  difficulty: 'medium',
+  type: 'numerical',
+  explanation: "Gray-to-binary conversion works from the MSB downward: the binary MSB equals the Gray MSB, and each subsequent binary bit equals the previous COMPUTED binary bit XOR the corresponding Gray bit (not the previous Gray bit). Given Gray = g3 g2 g1 g0 = 1 0 1 1: b3 = g3 = 1. b2 = b3 XOR g2 = 1 XOR 0 = 1. b1 = b2 XOR g1 = 1 XOR 1 = 0. b0 = b1 XOR g0 = 0 XOR 1 = 1. So binary = b3 b2 b1 b0 = 1 1 0 1 = 1101. A common mistake is XOR-chaining against the previous GRAY bit instead of the previous BINARY bit — that would give a different, wrong answer. As a sanity check, binary 1101 (decimal 13) converting back to Gray should reproduce 1011, confirming the round trip is consistent."
+},
+{
+  id: 'digital-number-systems-x7',
+  q: "Convert the binary number 1101 to its equivalent Gray code.",
+  options: ["1011", "1110", "1001", "0111"],
+  answer: 0,
+  marks: 1,
+  difficulty: 'easy',
+  type: 'numerical',
+  explanation: "Binary-to-Gray conversion keeps the MSB unchanged and XORs each remaining binary bit with the binary bit immediately to its left (more significant). Given binary = b3 b2 b1 b0 = 1 1 0 1: g3 = b3 = 1 (MSB unchanged). g2 = b3 XOR b2 = 1 XOR 1 = 0. g1 = b2 XOR b1 = 1 XOR 0 = 1. g0 = b1 XOR b0 = 0 XOR 1 = 1. So Gray code = g3 g2 g1 g0 = 1 0 1 1 = 1011. This is exactly the reverse operation of the previous Gray-to-binary example (which converted Gray 1011 back to binary 1101), confirming these two conversion procedures are true inverses of each other — a useful self-check technique whenever solving a conversion problem: convert the answer back and see if it reproduces the original value."
+},
+{
+  id: 'digital-number-systems-x8',
+  q: "Add the octal numbers (57)_8 and (36)_8, giving the result in octal.",
+  options: ["(113)_8", "(115)_8", "(117)_8", "(105)_8"],
+  answer: 1,
+  marks: 1,
+  difficulty: 'medium',
+  type: 'numerical',
+  explanation: "Add digit by digit in base 8, right to left, exactly like decimal addition but carrying when a column sum reaches 8 instead of 10. Rightmost column: 7 + 6 = 13 (decimal); since 13 >= 8, write 13 - 8 = 5 and carry 1. Next column: 5 + 3 + 1 (carry) = 9 (decimal); since 9 >= 8, write 9 - 8 = 1 and carry 1. The final carry 1 becomes a new leading digit. Reading the digits gives 1 1 5, i.e. (115)_8. Verify by converting to decimal: (57)_8 = 5(8)+7 = 47, (36)_8 = 3(8)+6 = 30, sum = 77 decimal; converting 77 back to octal: 77 = 9×8 + 5, 9 = 1×8 + 1, giving (115)_8 — matching exactly, confirming the direct octal addition was done correctly."
+},
+{
+  id: 'digital-number-systems-x9',
+  q: "Multiply the hexadecimal number (2A)_16 by decimal 3. Express the result in hexadecimal.",
+  options: ["(5A)_16", "(7E)_16", "(84)_16", "(6C)_16"],
+  answer: 1,
+  marks: 1,
+  difficulty: 'medium',
+  type: 'numerical',
+  explanation: "First convert (2A)_16 to decimal: 2×16 + 10 (A=10) = 32 + 10 = 42. Multiply by 3: 42 × 3 = 126. Now convert 126 back to hexadecimal by repeated division: 126 / 16 = 7 remainder 14 (14 = E in hex); 7 / 16 = 0 remainder 7. Reading remainders bottom to top: 7, then E, giving (7E)_16. Verify by converting back: (7E)_16 = 7×16 + 14 = 112 + 14 = 126, matching. This two-step approach (convert to decimal, do the arithmetic in the familiar base, convert back) is the most reliable method whenever a direct hex-native multiplication algorithm is not being explicitly practiced, and is exactly how GATE numerical questions expect hex arithmetic problems to be solved when a multiplier is given in decimal."
+},
+{
+  id: 'digital-number-systems-x10',
+  q: "Using exactly 8 bits, compare the number of distinct non-negative values representable by (a) plain unsigned binary and (b) packed BCD (two BCD digits, one per nibble, each nibble restricted to 0-9). Which has the larger range, and what is each range?",
+  options: ["Both are equal: 0 to 255 in both schemes", "Unsigned binary: 0 to 255 (256 values); packed BCD: 0 to 99 (100 values) — binary has the larger range", "Packed BCD has the larger range because each digit encodes more information", "Unsigned binary: 0 to 99; packed BCD: 0 to 255"],
+  answer: 1,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'concept',
+  explanation: "Plain unsigned 8-bit binary treats all 8 bits as one pure binary number, so every one of the 2^8 = 256 bit patterns (0000 0000 through 1111 1111) is a valid, distinct value, giving the range 0 to 255. Packed BCD splits the same 8 bits into two independent 4-bit nibbles, but each nibble is restricted to representing only decimal digits 0-9 (patterns 1010 through 1111 are invalid/unused in BCD), so each nibble only contributes 10 usable combinations instead of 16. Two BCD digits therefore represent only 10 × 10 = 100 distinct decimal values (00 to 99), wasting 256 - 100 = 156 of the 256 total bit patterns as invalid codes. So despite using the identical number of physical bits, unsigned binary's range (256 values) is substantially larger than packed BCD's range (100 values) — the tradeoff BCD accepts in exchange for making each digit's binary pattern trivially correspond to a familiar decimal digit for human-readable I/O and simple decimal arithmetic correction."
+},
+{
+  id: 'digital-number-systems-x11',
+  q: "For an 8-bit word, do unsigned binary and 2's complement signed representations encode the same TOTAL COUNT of distinct values, and if so, why does their numeric range still look asymmetric for signed?",
+  options: ["No, 2's complement can represent fewer total values because negative numbers need extra encoding overhead", "Yes, both represent exactly 256 distinct bit patterns; the ranges differ in placement (0 to 255 vs -128 to +127) because 2's complement has only ONE representation of zero, letting the extra code point go to the negative side instead of being 'wasted' on a duplicate zero", "No, 2's complement represents 512 values because each bit pattern can mean two different numbers", "Yes, and the ranges are numerically identical (0 to 255 for both)"],
+  answer: 1,
+  marks: 2,
+  difficulty: 'hard',
+  type: 'concept',
+  explanation: "An 8-bit word always has exactly 2^8 = 256 distinct bit patterns, full stop — this count never changes regardless of how those patterns are interpreted (unsigned, sign-magnitude, 1's complement, or 2's complement). Unsigned binary maps these 256 patterns to 0 through 255. Sign-magnitude and 1's complement each spend TWO of those 256 patterns on representing zero (+0 and -0), leaving only 254 patterns for nonzero values split symmetrically as -127 to +127. 2's complement instead has exactly ONE pattern for zero, freeing up the pattern that would have been '-0' to instead represent one additional genuine negative number, giving the asymmetric range -128 to +127 (128 negative values including zero's slot logic aside, 127 positive values, and 1 zero — 128+127+1=256, matching exactly). So the total COUNT of representable values is always 256 either way; only how that budget of 256 codes gets allocated across positive, negative, and zero differs between schemes."
+},
+{
+  id: 'digital-number-systems-x12',
+  q: "Find the radix r such that (30)_r - (12)_r = (13)_r holds true.",
+  options: ["r = 4", "r = 5", "r = 6", "r = 7"],
+  answer: 1,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'numerical',
+  explanation: "Expand each term as a polynomial in r: (30)_r = 3r + 0, (12)_r = 1r + 2, (13)_r = 1r + 3. The equation becomes (3r) - (r + 2) = r + 3, which simplifies to 3r - r - 2 = r + 3, i.e. 2r - 2 = r + 3, giving r = 5. Verify all digits (3,0,1,2,1,3) are valid in base 5 (all less than 5) — yes. Confirm numerically: (30)_5 = 3(5)+0 = 15, (12)_5 = 1(5)+2 = 7, and 15 - 7 = 8; while (13)_5 = 1(5)+3 = 8 — both sides match exactly, confirming r=5 is correct. As with all 'solve for the radix' problems, the key steps are expanding every term into its r-polynomial form, solving the resulting linear (or occasionally quadratic) equation in r, and then double-checking that every digit actually used is less than the found radix r."
+}
+);
+
+window.GATE_DATA.questions['digital'].topics.find(function(t){return t.id==='digital-arithmetic';}).questions.push(
+{
+  id: 'digital-arithmetic-x1',
+  q: "In 4-bit 2's complement representation (range -8 to +7), add 5 (0101) and 4 (0100). What is the result, and has overflow occurred?",
+  options: ["1001, no overflow, correctly represents 9", "1001, overflow has occurred since the true sum 9 is outside the representable range", "1000, no overflow", "0111, overflow has occurred"],
+  answer: 1,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'numerical',
+  explanation: "Adding 0101 (5) and 0100 (4) bit by bit: bit0: 1+0=1; bit1: 0+0=0; bit2: 1+1=10, write 0 carry 1; bit3 (sign bit): 0+0+carry 1 = 1, carry-out 0. Result = 1001. Interpreting 1001 as a 4-bit signed 2's complement number gives -7 (invert 1001 to 0110, add 1 to get 0111=7, so 1001=-7), which is clearly wrong since 5+4 should be +9. Checking the overflow rule: carry INTO the sign bit was 1, carry OUT of the sign bit was 0 — these differ, confirming overflow. Equally, this matches the simpler rule: two POSITIVE operands (5 and 4) produced a result whose sign bit is 1 (negative-looking) — this positive+positive=negative pattern is itself sufficient to declare overflow, since the true sum 9 exceeds the 4-bit signed maximum of +7."
+},
+{
+  id: 'digital-arithmetic-x2',
+  q: "Two 4-bit 2's complement numbers are multiplied together (e.g. representing values from -8 to +7). In general, how many bits are needed to represent their product exactly without any overflow?",
+  options: ["4 bits", "5 bits", "8 bits", "16 bits"],
+  answer: 2,
+  marks: 1,
+  difficulty: 'medium',
+  type: 'concept',
+  explanation: "For two n-bit signed numbers, the product's magnitude can be as large as (2^(n-1))^2 in the worst case (e.g. multiplying the most negative value by itself, or by the most negative value again), which requires up to 2n bits to represent without truncation or overflow, unlike addition where the sum of two n-bit numbers only ever needs n+1 bits at most. For n=4: the product needs 2×4 = 8 bits. As a concrete check, the most negative 4-bit value is -8; (-8)×(-8) = 64, and 64 needs at least 7 bits of magnitude plus a sign bit context — comfortably fitting within 8 bits (signed range -128 to 127) but not within any smaller signed width. This is exactly why hardware multipliers for n-bit operands always produce a 2n-bit-wide product register, unlike adders which only need one extra bit."
+},
+{
+  id: 'digital-arithmetic-x3',
+  q: "In 8-bit 2's complement representation (range -128 to +127), add 127 (01111111) and 1 (00000001). Does this addition overflow, and why?",
+  options: ["No overflow; the result correctly represents 128", "Yes, overflow occurs: the result is 10000000, which is -128, even though both operands are positive", "No overflow; the result wraps around to 0 as expected", "Yes, overflow occurs only because one operand is odd"],
+  answer: 1,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'numerical',
+  explanation: "Adding 01111111 (127) and 00000001 (1) bit by bit causes a carry to ripple through every one of the lower 7 bits (each column having at least one 1 plus an incoming carry), ending with a carry of 1 arriving at the sign bit column: 0 + 0 + carry-in 1 = 1, with carry-out 0 from that final addition. The result is 10000000, which as an 8-bit 2's complement number represents -128, clearly wrong since 127+1 mathematically equals 128. The overflow rule confirms this: carry INTO the sign bit (1) differs from carry OUT of the sign bit (0), signaling overflow; equivalently, two positive operands produced a negative-looking result. This is exactly the boundary case of 2's complement overflow — adding 1 to the maximum representable positive value always overflows, wrapping to the most negative representable value instead of the mathematically correct 128."
+},
+{
+  id: 'digital-arithmetic-x4',
+  q: "In IEEE 754 arithmetic, what is the result of computing (+Infinity) + (-Infinity)?",
+  options: ["+Infinity", "-Infinity", "NaN (Not a Number)", "0"],
+  answer: 2,
+  marks: 1,
+  difficulty: 'easy',
+  type: 'concept',
+  explanation: "IEEE 754 defines certain operations as mathematically indeterminate, and (+Infinity) + (-Infinity) is exactly one of them — there is no consistent finite or infinite value that this sum could sensibly equal, since it is analogous to the indeterminate form ∞ - ∞ in real analysis. The standard specifically defines the result of any such indeterminate operation to be NaN (Not a Number), a special reserved bit pattern (exponent field all 1s, mantissa field nonzero) that signals 'this result is undefined or not representable as a real number.' Other indeterminate operations that also produce NaN include 0 × Infinity, Infinity / Infinity, 0 / 0, and the square root of a negative number. Once a NaN appears, it propagates through essentially all further arithmetic — any subsequent operation involving that NaN also produces NaN, which is why NaN checks are typically done at the end of a computation chain rather than trying to catch every intermediate step."
+},
+{
+  id: 'digital-arithmetic-x5',
+  q: "In IEEE 754 arithmetic, what is the result of computing 0 × Infinity?",
+  options: ["0", "Infinity", "NaN (Not a Number)", "The result depends on the sign of the zero"],
+  answer: 2,
+  marks: 1,
+  difficulty: 'easy',
+  type: 'concept',
+  explanation: "Multiplying zero by infinity is mathematically indeterminate — there is no single consistent finite or infinite answer, since zero 'shrinks' a product toward 0 while infinity 'grows' it without bound, and neither effect can be said to dominate in general (this indeterminate form appears throughout calculus as well, e.g. as a limit form). IEEE 754 handles this by defining the result of 0 × Infinity to always be NaN, regardless of the signs of the zero or the infinity involved, rather than picking an arbitrary convention like 0 or Infinity. This is consistent with the standard's broader philosophy: any operation whose mathematically correct result is genuinely undefined or indeterminate (as opposed to merely out-of-range, like a finite overflow) produces NaN, while operations with a well-defined but unrepresentable result (like a finite number divided by zero) instead produce signed Infinity, not NaN."
+},
+{
+  id: 'digital-arithmetic-x6',
+  q: "In IEEE 754 arithmetic, what is the result of dividing a positive finite nonzero number by positive zero (+0.0)?",
+  options: ["NaN, since division by zero is always undefined", "+Infinity", "The largest finite representable number", "0"],
+  answer: 1,
+  marks: 1,
+  difficulty: 'easy',
+  type: 'concept',
+  explanation: "Unlike 0/0 or Infinity - Infinity, dividing a nonzero finite number by zero has a well-defined mathematical LIMIT behavior (the magnitude of the quotient grows without bound as the divisor approaches zero from the same side), so IEEE 754 does NOT treat this as indeterminate — it defines a specific signed Infinity result rather than NaN. Dividing a positive number by +0.0 gives +Infinity; dividing a positive number by -0.0 would give -Infinity instead (the sign follows the usual sign-of-quotient rule, treating +0.0 and -0.0 as having distinct signs for this purpose, which is one of the few places the standard's signed-zero distinction matters operationally). Only the genuinely indeterminate cases (0/0, 0×Infinity, Infinity-Infinity, Infinity/Infinity) produce NaN; a finite nonzero value divided by zero always produces a correctly-signed Infinity instead, reflecting the real mathematical limit."
+},
+{
+  id: 'digital-arithmetic-x7',
+  q: "Can the decimal integer 16,777,217 (which equals 2^24 + 1) be represented exactly in IEEE 754 single precision? If not, what does it round to under the default round-to-nearest-ties-to-even rule?",
+  options: ["Yes, it is represented exactly since it fits in 32 bits", "No; it rounds to 16,777,216 (2^24), since that neighbor's mantissa has an even (0) trailing bit while 16,777,218's does not", "No; it rounds to 16,777,218, always rounding upward on a tie", "No, and it cannot be represented by any nearby value at all"],
+  answer: 1,
+  marks: 2,
+  difficulty: 'hard',
+  type: 'numerical',
+  explanation: "Single precision's significand holds 24 significant bits total (1 implicit + 23 stored), so at the exponent range covering 2^24, the smallest gap between two representable values is 2^(24-23) = 2 — meaning only even integers are exactly representable near this magnitude, not every integer. 16,777,217 is odd and falls exactly halfway between the two representable neighbors 16,777,216 (2^24) and 16,777,218 (2^24+2), a genuine rounding tie. Round-to-nearest-ties-to-even resolves this by choosing whichever neighbor has an even (0) least-significant mantissa bit: 16,777,216 = 2^24 exactly has an all-zero mantissa (trailing bit 0, even), while 16,777,218 corresponds to a mantissa with trailing bit 1 (odd). So the tie is broken in favor of 16,777,216, and 16,777,217 rounds DOWN to 16,777,216 — a classic, frequently cited example of single precision silently losing exact integer representation once values exceed 2^24."
+},
+{
+  id: 'digital-arithmetic-x8',
+  q: "What is the ULP (unit in the last place — the gap between adjacent representable values) at x = 1024.0 in IEEE 754 single precision, compared to the ULP at x = 1.0?",
+  options: ["Identical: both are 2^-23", "The ULP at 1024.0 is 2^10 times LARGER than at 1.0, since 1024 = 2^10 shifts the exponent up by 10 relative to 1.0 = 2^0", "The ULP at 1024.0 is 2^10 times SMALLER, since larger numbers need more precision", "ULP is only defined for values between 0 and 1"],
+  answer: 1,
+  marks: 2,
+  difficulty: 'hard',
+  type: 'numerical',
+  explanation: "In IEEE 754, the ULP at a given exponent e is 2^(e-23) for single precision, since the 23 stored mantissa bits represent fractional increments of the significand scaled by 2^e. At x = 1.0 = 1.0 × 2^0, the exponent is e=0, so ULP = 2^(0-23) = 2^-23. At x = 1024.0 = 1.0 × 2^10, the exponent is e=10, so ULP = 2^(10-23) = 2^-13. The ratio of these two ULPs is 2^-13 / 2^-23 = 2^10 = 1024, so the ULP at 1024.0 is 1024 (2^10) times LARGER than the ULP at 1.0, matching exactly the factor by which the magnitude itself increased (2^10). This demonstrates floating point's core property: absolute precision (the gap between representable values) grows in direct proportion to the magnitude of the number, while RELATIVE precision (ULP divided by the value itself) stays roughly constant across the entire normalized range — this is the entire point of using a floating exponent instead of a fixed decimal point."
+},
+{
+  id: 'digital-arithmetic-x9',
+  q: "Why does IEEE 754 store the floating-point exponent in a biased (excess-K) form rather than as a plain signed 2's complement number?",
+  options: ["Biasing makes the hardware for addition and subtraction of exponents simpler to build", "Biasing lets two floating-point numbers of the same sign be compared for magnitude using ordinary unsigned integer comparison of their bit patterns directly, without special-casing the exponent's sign", "Biasing was chosen purely for historical compatibility with earlier decimal computers", "Biasing doubles the usable exponent range compared to 2's complement"],
+  answer: 1,
+  marks: 2,
+  difficulty: 'hard',
+  type: 'concept',
+  explanation: "With a biased exponent, a LARGER stored (biased) exponent value always corresponds to a LARGER actual exponent and hence a LARGER magnitude, and this ordering is preserved when the entire floating-point bit pattern (sign, exponent, mantissa, in that field order) is read simply as one big unsigned integer. This means comparing two same-signed floating point numbers for magnitude can reuse ordinary unsigned integer comparison circuitry directly on the raw bit patterns — no separate floating-point-aware comparator logic is needed for the exponent field. If the exponent were instead stored in 2's complement, a negative exponent's bit pattern (with its MSB set to 1) would numerically look LARGER as an unsigned integer than a positive exponent's bit pattern (MSB 0), completely inverting the intended ordering and breaking this direct-bit-comparison trick. This comparison-friendliness, not any arithmetic simplification, is the actual reason biasing was chosen."
+},
+{
+  id: 'digital-arithmetic-x10',
+  q: "If one operand of an IEEE 754 floating-point addition is NaN (Not a Number) and the other is a normal finite number, what is the result?",
+  options: ["The finite operand's value, ignoring the NaN", "0", "NaN — any arithmetic operation involving a NaN operand produces NaN", "+Infinity or -Infinity depending on the finite operand's sign"],
+  answer: 2,
+  marks: 1,
+  difficulty: 'easy',
+  type: 'concept',
+  explanation: "NaN represents 'the result of some earlier operation was undefined or not a real number', and IEEE 754 is designed so that this undefined-ness propagates forward through any further computation rather than silently disappearing — if a NaN could be 'overridden' by a valid operand, later code might use a value with no real mathematical meaning without ever being alerted. So the rule is simple and absolute for ordinary arithmetic operations (add, subtract, multiply, divide): if EITHER operand is NaN, the result is NaN, regardless of what the other operand is (even if that other operand is itself a well-defined finite number or an infinity). This propagation property is exactly why a single stray division by zero-with-zero or similar indeterminate operation deep inside a long calculation chain can silently turn a program's final numeric output into NaN, which is why NaN-checking is typically done on final results or at key checkpoints rather than after every individual operation."
+},
+{
+  id: 'digital-arithmetic-x11',
+  q: "In n-bit 2's complement, the most negative representable value is -2^(n-1). What happens when you multiply this value by -1?",
+  options: ["The result is +2^(n-1), computed correctly with no issue", "Overflow occurs, because the mathematically correct result +2^(n-1) exceeds the maximum representable positive value of +2^(n-1) - 1", "The result correctly wraps to 0", "This operation is undefined and always causes a hardware exception, unlike any other 2's complement overflow"],
+  answer: 1,
+  marks: 2,
+  difficulty: 'hard',
+  type: 'concept',
+  explanation: "This is the single most famous corner case in 2's complement arithmetic: negating (or equivalently multiplying by -1) the most negative representable value ALWAYS overflows, because 2's complement's range is asymmetric — it has exactly one MORE negative value than positive value (range -2^(n-1) to +2^(n-1)-1). The mathematically correct negation of -2^(n-1) is +2^(n-1), but the largest positive value the n-bit format can hold is only +2^(n-1) - 1, one less. So the true result is simply not representable, and hardware performing this negation (via invert-then-add-1) actually produces -2^(n-1) again unchanged (the bit pattern maps to itself under negation), silently signaling overflow through the standard carry-based overflow flag rather than crashing. For a concrete 4-bit example: negating -8 (1000) should give +8, but the maximum positive 4-bit value is only +7, so overflow occurs and the hardware result remains 1000 (still -8), not +8."
+},
+{
+  id: 'digital-arithmetic-x12',
+  q: "Subtracting two nearly equal large floating-point numbers in IEEE 754 (e.g. 100000.2 - 100000.1) can produce a result with drastically reduced relative precision, a phenomenon called catastrophic cancellation. Why does this happen even though both operands were each represented at full working precision?",
+  options: ["Because IEEE 754 subtraction hardware is inherently less accurate than addition hardware", "Because each operand's small representation error (relative to its own large magnitude) does not shrink when the two large values are subtracted, so that same absolute error becomes a much larger fraction of the now much smaller true result", "Because subtraction always rounds toward zero regardless of the selected rounding mode", "Because floating-point subtraction converts both operands to integers first, losing the fractional part"],
+  answer: 1,
+  marks: 2,
+  difficulty: 'hard',
+  type: 'concept',
+  explanation: "Each floating-point operand carries a small ABSOLUTE rounding/representation error that is proportional to its own magnitude (since floating point guarantees roughly constant RELATIVE precision, not constant absolute precision — recall the ULP grows with magnitude). When two large, nearly-equal numbers are subtracted, their large magnitudes cancel out in the exact mathematical subtraction, but each operand's small absolute error does NOT cancel out along with it (the errors are independent, not equal and opposite) — so the leftover absolute error stays roughly the same size while the TRUE result has become much smaller. That same fixed-size absolute error is now a much larger fraction of the smaller result, meaning the RELATIVE precision of the subtraction's output has collapsed even though no individual step technically violated IEEE 754's rounding guarantees. This is why numerically stable algorithms deliberately avoid subtracting two nearly-equal large quantities whenever a mathematically equivalent but cancellation-free reformulation is available."
+}
+);

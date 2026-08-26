@@ -1452,3 +1452,106 @@ window.GATE_DATA.questions['algo'].topics.find(function(t){return t.id==='algo-d
   explanation: 'Write X = A(1) G(2) C(3) A(4) T(5) and Y = G(1) A(2) C(3), with positions shown in parentheses. First check whether "GAC" (length 3) is genuinely a subsequence of X: this needs increasing indices i<j<k in X with X[i]=G, X[j]=A, X[k]=C. The only G in X is at index 2, so i=2. The only A in X after index 2 is at index 4, so j=4. Now C must appear in X at some index k>4, but the only C in X is at index 3, which is before 4, not after, so no valid k exists, meaning "GAC" is NOT actually a subsequence of X, ruling out option B. Filling the standard LCS DP table dp[i][j] for X versus Y row by row confirms dp[5][3] = 2, with "GA" (X indices 2 and 4, matching Y indices 1 and 2) as one valid witness; "CT" is not even a subsequence of Y, since Y has no T at all, ruling out option C. So the verified correct LCS length is 2, achieved by "GA" (option A).'
 }
 );
+
+window.GATE_DATA.questions['algo'].topics.find(function(t){return t.id==='algo-graph';}).questions.push(
+{
+  id: 'algo-graph-x1',
+  q: 'A graph has 4 vertices {A,B,C,D} and edges: A-B (weight 1), B-C (weight 1), C-D (weight 1), A-D (weight 1), A-C (weight 2). How many DISTINCT minimum spanning trees does this graph have?',
+  options: ['1', '2', '4', '6'],
+  answer: 2,
+  marks: 2,
+  difficulty: 'hard',
+  type: 'numerical',
+  explanation: 'The four weight-1 edges (A-B, B-C, C-D, A-D) form a 4-cycle; the weight-2 edge A-C is strictly heavier and can never appear in any MST here since a lighter alternative always exists to connect any cut it crosses. An MST needs exactly 3 edges (n-1 for n=4) with minimum total weight; since all four weight-1 edges are equal and any 3 of them already connect all 4 vertices without forming a cycle (removing exactly one edge from the 4-cycle A-B-C-D-A always leaves a spanning tree), every one of the C(4,3)=4 ways to choose 3 out of the 4 weight-1 edges yields a valid spanning tree of total weight 3, the minimum possible. So there are exactly 4 distinct MSTs, each obtained by excluding a different one of the four unit-weight cycle edges, confirming option C.'
+},
+{
+  id: 'algo-graph-x2',
+  q: 'A directed graph has edges: S->C (weight 1), S->A (weight 2), A->B (weight 1), B->C (weight -5). Running standard Dijkstra\'s algorithm from source S (always extracting and finalizing the unfinalized vertex with smallest tentative distance, and never revisiting a finalized vertex), what distance does Dijkstra report for vertex C, and is it correct?',
+  options: [
+    'Dijkstra reports 1 for C (finalizing C via the direct edge before the longer path through A and B is ever explored), which is WRONG since the true shortest distance is 2+1+(-5) = -2 via S->A->B->C',
+    'Dijkstra reports -2 for C, which is correct',
+    'Dijkstra reports 2 for C, which is correct',
+    'Dijkstra reports 1 for C, which is correct since the direct edge is always shortest by definition'
+  ],
+  answer: 0,
+  marks: 2,
+  difficulty: 'hard',
+  type: 'numerical',
+  explanation: 'Dijkstra initializes dist(S)=0 and relaxes S\'s edges, setting dist(C)=1 and dist(A)=2. Among all unfinalized vertices the smallest tentative distance is C at 1, so C is extracted and FINALIZED first, before A or B are even touched. Processing continues: extract A (distance 2), relax A->B giving dist(B)=3; extract B (distance 3), relax B->C giving a candidate distance of 3+(-5) = -2 for C — but C was already finalized in an earlier step, and standard Dijkstra never revisits or updates a finalized vertex, so this strictly better candidate is silently discarded. Dijkstra therefore reports dist(C)=1, the value from its very first (direct) edge. The true shortest path is S->A->B->C with total weight 2+1+(-5) = -2, far smaller than 1. This is the canonical failure pattern: a vertex reachable cheaply via a direct edge gets finalized too early, before a longer path carrying a large negative edge has a chance to be discovered, and Dijkstra\'s non-revisiting invariant then permanently locks in the wrong answer.'
+},
+{
+  id: 'algo-graph-x3',
+  q: 'For an undirected, connected graph with n vertices, which of the following statements about BFS trees and DFS trees (both rooted at the same source vertex) is always TRUE?',
+  options: [
+    'The height of the BFS tree is always less than or equal to the height of the DFS tree rooted at the same vertex',
+    'The height of the DFS tree is always less than or equal to the height of the BFS tree rooted at the same vertex',
+    'BFS and DFS trees always have exactly the same height',
+    'The BFS tree always has more edges than the DFS tree'
+  ],
+  answer: 0,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'concept',
+  explanation: 'BFS explores vertices in strictly non-decreasing order of their true shortest-path distance (in edges) from the source, so the BFS tree height equals the graph\'s eccentricity from that source, i.e., the length of the longest SHORTEST path from the root — this is provably the SMALLEST possible height any spanning tree rooted at that vertex can have, since no spanning tree can place a vertex closer to the root than its true graph distance. DFS, by contrast, can plunge deep along a single path before backtracking, potentially reaching a height equal to n-1 (visiting all vertices in one long chain) even when the graph\'s actual diameter/eccentricity is much smaller, e.g. a star graph has BFS height 1 from the center but a DFS tree from a leaf can have height n-1. Since BFS height is the true graph-distance-based minimum and DFS height can only be equal or larger (never smaller, since no spanning tree can beat the true shortest-path bound), option A is always true; both trees have exactly n-1 edges regardless (ruling out D), and BFS/DFS heights are equal only in specific graphs like simple paths, not always (ruling out C).'
+},
+{
+  id: 'algo-graph-x4',
+  q: 'In the undirected graph with vertices {A,B,C,D,E} and edges A-B, B-C, C-D, D-E, B-D (forming a path A-B-C-D-E plus one extra edge B-D creating a cycle B-C-D-B), how many articulation points does this graph have?',
+  options: ['0', '1', '2', '3'],
+  answer: 2,
+  marks: 2,
+  difficulty: 'hard',
+  type: 'numerical',
+  explanation: 'An articulation point is a vertex whose removal increases the number of connected components. A degree-1 vertex (a leaf, like A or E here) can never be an articulation point, since removing it only deletes a single pendant edge and cannot disconnect anything else, so A and E are immediately ruled out. Removing B leaves the remaining edges C-D and D-E, and since A\'s only connection was the now-gone edge A-B, vertex A becomes isolated — so B is an articulation point. Removing C leaves edges A-B, B-D, D-E, which still connect all remaining vertices (B and D are directly linked by the B-D edge, bypassing C entirely), so C is NOT an articulation point. Removing D leaves edges A-B, B-C, and since E\'s only connection was the now-gone edge D-E, vertex E becomes isolated — so D is an articulation point. In total, exactly B and D are articulation points, giving a count of 2.'
+},
+{
+  id: 'algo-graph-x5',
+  q: 'A DAG has vertices {1,2,3,4} and edges 1->2, 1->3, 2->4, 3->4. By direct enumeration, how many distinct valid topological orderings does this DAG have?',
+  options: ['1', '2', '3', '4'],
+  answer: 1,
+  marks: 2,
+  difficulty: 'hard',
+  type: 'numerical',
+  explanation: 'Vertex 1 has in-degree 0 and must come first in any valid ordering (both 2 and 3 depend on it, and nothing points to 1). Vertex 4 has in-degree 2 (from both 2 and 3) and must come last (nothing depends on 4, and it depends on both others). Vertices 2 and 3 have no edge between them directly (2 does not point to 3 or vice versa), so they are mutually unconstrained and can appear in either relative order, as long as both come after 1 and before 4. This gives exactly two valid orderings: [1,2,3,4] and [1,3,2,4]. Enumerating directly confirms both satisfy every edge constraint (1 before 2, 1 before 3, 2 before 4, 3 before 4) and no other ordering of {1,2,3,4} can satisfy all constraints (e.g. any ordering placing 4 before 2 or 3 immediately violates an edge). So the total count is 2, matching option B.'
+},
+{
+  id: 'algo-graph-x6',
+  q: 'A DAG has vertices {1,2,3,4,5} and edges 1->2, 1->3, 2->4, 3->4, 4->5. How many distinct valid topological orderings does this DAG have?',
+  options: ['1', '2', '3', '4'],
+  answer: 1,
+  marks: 2,
+  difficulty: 'hard',
+  type: 'numerical',
+  explanation: 'Vertex 1 (in-degree 0) must be first, since both 2 and 3 depend on it. Vertex 4 depends on both 2 and 3 (in-degree 2) and must come after both. Vertex 5 depends only on 4 (in-degree 1) and must come last, after 4. Vertices 2 and 3 are mutually unconstrained (no edge between them), so they can appear in either relative order as long as both fall between 1 and 4. This gives exactly two valid full orderings: [1,2,3,4,5] and [1,3,2,4,5]. Any other arrangement violates some edge constraint: for instance placing 4 before 2 or 3 violates 2->4 or 3->4, and placing 5 anywhere except last violates 4->5. Direct enumeration confirms only these 2 orderings are valid, matching option B, and illustrating that adding a "funnel" vertex (4) followed by a single chained successor (5) does not change the count of ways to order the parallel branch (2 and 3) — it only appends a fixed suffix.'
+},
+{
+  id: 'algo-graph-x7',
+  q: 'Consider running Kahn\'s algorithm (BFS-based topological sort using in-degrees) on a directed graph with vertices {1,2,3} and edges 1->2, 2->3, 3->1 (forming a directed cycle). What happens?',
+  options: [
+    'The algorithm outputs the valid order [1,2,3] since it follows the edges directly',
+    'The initial queue of zero-in-degree vertices is empty (every vertex has in-degree 1 due to the cycle), so the algorithm immediately terminates having output 0 vertices, correctly signaling that no topological order exists',
+    'The algorithm enters an infinite loop, never terminating',
+    'The algorithm outputs a partial order [1,2] and stops, incorrectly claiming success'
+  ],
+  answer: 1,
+  marks: 1,
+  difficulty: 'easy',
+  type: 'concept',
+  explanation: 'Compute in-degrees: vertex 1 receives an edge from 3 (in-degree 1), vertex 2 receives an edge from 1 (in-degree 1), vertex 3 receives an edge from 2 (in-degree 1). Every vertex has in-degree exactly 1, so the initial queue (populated with all zero-in-degree vertices) is empty from the very start. Kahn\'s algorithm then immediately exits its main loop (nothing to dequeue), having output zero vertices total. Since the algorithm\'s well-known cycle-detection guarantee is "output count less than V implies a cycle exists," outputting 0 vertices (which is less than V=3) correctly and immediately signals that this graph contains a cycle and has no valid topological order — the algorithm terminates cleanly rather than looping infinitely or producing an incorrect partial answer, which is precisely why Kahn\'s algorithm is a standard, well-behaved way to combine topological sorting with cycle detection in one pass.'
+},
+{
+  id: 'algo-graph-x8',
+  q: 'A weighted undirected graph has vertices {A,B,C} and edges A-B (weight 5), B-C (weight 5), A-C (weight 5), i.e., a triangle with all edges of EQUAL weight 5. How many distinct minimum spanning trees does this graph have, and what is the MST weight?',
+  options: [
+    '1 distinct MST, weight 10',
+    '3 distinct MSTs, weight 10 each',
+    '3 distinct MSTs, weight 15 each',
+    '1 distinct MST, weight 15'
+  ],
+  answer: 1,
+  marks: 1,
+  difficulty: 'easy',
+  type: 'numerical',
+  explanation: 'A spanning tree on 3 vertices needs exactly 2 edges (n-1 = 3-1 = 2). Since all three edges have the identical weight 5, any 2 of the 3 edges form a valid spanning tree (the triangle has no smaller subset that leaves a vertex disconnected, and any 2 edges out of a 3-cycle always span all 3 vertices without forming a cycle themselves), each with total weight 5+5=10, which is the minimum possible (using all 3 edges would create a cycle, which is invalid for a tree, and is unnecessary since 2 edges already connect everything at the lowest achievable weight). There are C(3,2) = 3 ways to choose which 2 of the 3 edges to include (equivalently, 3 ways to choose which single edge to EXCLUDE), so there are exactly 3 distinct MSTs, each of total weight 10, directly illustrating the rule that MSTs are non-unique whenever tied edge weights create multiple equally optimal spanning subgraphs.'
+}
+);

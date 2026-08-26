@@ -1182,3 +1182,156 @@ window.GATE_DATA.questions['toc'].topics.find(function(t){return t.id==='toc-tur
   explanation: "This is Cantor's classic diagonal argument adapted to languages: identify each language over {0,1} with its characteristic function (or, since binary strings can be enumerated w1, w2, w3, ..., identify a language with an infinite binary sequence of membership bits). Suppose for contradiction that all languages could be listed L1, L2, L3, .... Construct a new language D by flipping the membership of the n-th string relative to L_n: w_n is in D exactly when w_n is NOT in L_n. Then D differs from every L_n in the list (specifically at string w_n), so D cannot appear anywhere in the supposedly complete list - contradicting the assumption that the list was exhaustive. This proves no such enumeration of all languages exists, i.e. the set of languages over {0,1} is uncountable, which is exactly the cardinality gap that forces most languages to have no Turing machine at all (since TMs are only countably many)."
 }
 );
+
+window.GATE_DATA.questions['toc'].topics.find(function(t){return t.id==='toc-decidability';}).questions.push(
+{
+  id: 'toc-decidability-x1',
+  q: 'Which of the following properties of a given DFA M is DECIDABLE?',
+  options: ['Whether L(M) = Sigma* (M accepts every string)', 'Whether L(M) is context-free', 'Whether M has an equivalent PDA with fewer states', 'None of the above; all DFA properties are undecidable'],
+  answer: 0,
+  marks: 1,
+  difficulty: 'easy',
+  type: 'concept',
+  explanation: "Universality for DFAs is decidable: complement M by swapping final and non-final states (DFAs are closed under complement), then test the complement for emptiness using a simple reachability check for an accepting state - M is universal exactly when its complement is empty. Every regular language is trivially context-free, so 'is L(M) context-free' is a trivial YES for every DFA, technically decidable but a strange/trick question (still decidable, just not the intended distractor purpose here); the more interesting and directly useful decidable fact is universality, singled out in option A. Comparing to 'an equivalent PDA with fewer states' invokes a state-minimization question across different machine models that is not a standard decidable question in this form. In general, essentially every natural DFA/NFA property (emptiness, finiteness, universality, equivalence) is decidable, unlike the analogous TM properties."
+},
+{
+  id: 'toc-decidability-x2',
+  q: 'Which of the following properties of a given CFG G is UNDECIDABLE?',
+  options: ['Whether L(G) is empty', 'Whether a specific string w is in L(G)', 'Whether L(G) is regular', 'Whether L(G) is finite'],
+  answer: 2,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'concept',
+  explanation: "Emptiness is decidable via a productivity/reachability sweep over the grammar's nonterminals. Membership is decidable via the CYK algorithm after CNF conversion. Finiteness is decidable via a self-embedding cycle check in the nonterminal dependency graph. But testing whether L(G) is REGULAR is undecidable - there is no algorithm that, given an arbitrary CFG, always correctly determines whether the language it generates happens to also be regular. This sits alongside CFG equivalence, universality, and ambiguity as one of the well-known undecidable CFG properties, all typically established via a reduction from Post's Correspondence Problem. The key exam skill here is not lumping every CFG question into 'probably undecidable' - emptiness and finiteness are genuine, useful, decidable algorithms taught explicitly, while regularity, equivalence, universality, and ambiguity are the undecidable side of the table."
+},
+{
+  id: 'toc-decidability-x3',
+  q: 'Which of the following properties of a given Turing machine M is DECIDABLE?',
+  options: ['Whether M halts on the empty input within a specified number of k steps', 'Whether M halts on the empty input (with no step bound)', 'Whether L(M) is empty', 'Whether L(M) = Sigma*'],
+  answer: 0,
+  marks: 1,
+  difficulty: 'easy',
+  type: 'concept',
+  explanation: "A bounded simulation is always decidable: simulate M on the empty input for exactly k steps and check whether it has reached an accepting (or halting) configuration within that budget - this simulation itself always terminates after at most k steps, regardless of what M does afterward, so the answer is always computable. Removing the step bound turns this into the classical Halting Problem restricted to a fixed input, which is undecidable (a straightforward corollary of the general Halting Problem). Emptiness and universality of L(M) are both undecidable by Rice's theorem, since 'the language is empty' and 'the language is everything' are both nontrivial semantic properties. This question is designed to catch the common exam trap of reflexively marking every TM-related question as undecidable - adding an explicit step bound is exactly what makes option A the decidable one."
+},
+{
+  id: 'toc-decidability-x4',
+  q: 'Which of the following properties is NOT covered by Rice\'s theorem (i.e., Rice\'s theorem does not apply to determine its decidability status)?',
+  options: ['Whether L(M) contains at least one string of length 5', 'Whether L(M) is empty', 'Whether M has more than 100 states in its transition table', 'Whether L(M) is finite'],
+  answer: 2,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'concept',
+  explanation: "Rice's theorem applies only to properties of the LANGUAGE a machine recognizes (semantic properties), and only when the property is nontrivial (true for some RE languages and false for others). 'L(M) contains a string of length 5', 'L(M) is empty', and 'L(M) is finite' are all genuinely about the language, and each is nontrivial (some languages have length-5 strings, some don't; some are empty, some aren't; some are finite, some aren't) - Rice's theorem correctly declares all three undecidable. But 'M has more than 100 states' is a SYNTACTIC property of the machine's own description/code, not a property of the language it recognizes - two completely different-looking machines with different state counts can recognize the exact same language. Rice's theorem simply does not speak to this kind of question, and in fact it is trivially decidable: just count the states listed in M's description."
+},
+{
+  id: 'toc-decidability-x5',
+  q: 'Which of the following is TRUE regarding the reduction A ≤ B (A reduces to B via a computable transformation), used to prove undecidability?',
+  options: ['If A is undecidable and A ≤ B, then B is undecidable', 'If B is decidable and A ≤ B, then A is decidable', 'If A ≤ B and B is undecidable, then A must also be undecidable', 'Both option A and option B are correct consequences of A ≤ B'],
+  answer: 3,
+  marks: 2,
+  difficulty: 'hard',
+  type: 'concept',
+  explanation: "A <= B means a decider for B could be used (via the computable transformation) to build a decider for A. Two valid consequences follow from this single implication: (1) contrapositive-forward - if A is undecidable, B cannot be decidable either, since decidable B would make A decidable, a contradiction; this is option A, the standard way reductions PROVE new problems undecidable. (2) direct - if B actually is decidable, then A is decidable too, by literally running the construction; this is option B, the standard way reductions transfer decidability downward. Option C reverses the valid direction: A <= B and B undecidable tells you NOTHING about A (A might still be perfectly decidable; the reduction only promises that solving B would help solve A, not the other way). Since both A and B (the options) are individually valid and neither contradicts the other, the fully correct answer is option D, both valid consequences together, while option C is the classic backwards-reduction trap."
+},
+{
+  id: 'toc-decidability-x6',
+  q: 'Consider the property P(M): "the string 0110 appears somewhere in the transition table description of M written in a fixed encoding." Is the problem "given M, does P(M) hold" decidable?',
+  options: ['Undecidable by Rice\'s theorem since it is a nontrivial property', 'Decidable, because it is a syntactic property of M\'s description, not a semantic property of L(M)', 'Undecidable because it depends on the encoding scheme used', 'Decidable only if M is guaranteed to halt on all inputs'],
+  answer: 1,
+  marks: 2,
+  difficulty: 'hard',
+  type: 'concept',
+  explanation: "Rice's theorem is strictly about properties of the RECOGNIZED LANGUAGE, and explicitly does not apply to properties of the machine's own textual description or code. Whether the specific bit pattern 0110 literally occurs in M's encoded transition table is a purely syntactic, mechanical, string-matching question about a finite string (the encoding of M) - you can just scan the finite description for the substring 0110 directly, which always halts and gives a correct yes/no answer. This is decidable regardless of what language M happens to recognize, and regardless of whether M halts on any particular input, since the question never runs M at all - it only reads M's static description. This is exactly the kind of question designed to test whether a student over-applies Rice's theorem to any statement merely because it mentions a Turing machine; the correct habit is to first ask 'is this about the language, or about the code?'."
+},
+{
+  id: 'toc-decidability-x7',
+  q: 'Which of the following statements about EQ_TM = { <M1, M2> : L(M1) = L(M2) } is TRUE?',
+  options: ['EQ_TM is decidable', 'EQ_TM is RE but not decidable', 'EQ_TM is undecidable, and in fact not even RE or co-RE', 'EQ_TM is decidable exactly when both M1 and M2 always halt'],
+  answer: 2,
+  marks: 2,
+  difficulty: 'hard',
+  type: 'concept',
+  explanation: "EQ_TM is one of the strongest undecidability results in the standard syllabus. It is certainly undecidable by Rice's theorem, since 'the two machines recognize the same language' is a nontrivial semantic property when phrased via a fixed reference machine. But it is even worse than problems like the Acceptance Problem: EQ_TM is not RE (there is no algorithm that merely confirms 'yes, equal' whenever it is true, since confirming equality of two possibly-infinite languages cannot be done by any finite positive certificate scheme in general), and it is also not co-RE (no algorithm merely confirms 'no, not equal' either, since witnessing an actual difference could require unbounded search when both languages are complex). This puts EQ_TM in neither RE nor co-RE, a class strictly harder than problems like the Halting Problem, which is at least RE. Option D is a nonsensical restriction with no basis in the actual result."
+},
+{
+  id: 'toc-decidability-x8',
+  q: 'Which of the following statements about the property "L(M) is decidable (recursive)", as a property of a Turing machine M, is TRUE?',
+  options: ['This property is trivial, so it is automatically decidable to test', 'This property is nontrivial and semantic, so by Rice\'s theorem the problem "given M, is L(M) recursive?" is undecidable', 'This property can never apply since L(M) is always RE by definition of M being a Turing machine', 'This property is decidable specifically because recursive languages have deciders'],
+  answer: 1,
+  marks: 2,
+  difficulty: 'hard',
+  type: 'concept',
+  explanation: "Check the Rice's theorem conditions carefully. The property is about the LANGUAGE L(M), so it is semantic, not about M's code - condition one holds. Is it nontrivial? Yes: some Turing machines recognize recursive languages (e.g. a machine that always halts, recognizing a trivially decidable language), and other Turing machines recognize RE-but-not-recursive languages (e.g. a machine that simulates the universal machine to recognize the Halting Problem) - both possibilities genuinely occur among RE languages, so the property is neither always true nor always false. Both Rice's theorem conditions are satisfied, so the problem 'given an arbitrary M, is L(M) recursive?' is undecidable. This is a subtle and commonly missed case, since it feels like it should be answerable by 'just check if M always halts' - but that check itself (does M halt on every input) is exactly as undecidable, by an equivalent Rice's theorem argument, ruling out options A, C, and D."
+},
+{
+  id: 'toc-decidability-x9',
+  q: 'Which of the following statements is TRUE about reductions used to prove decidability (as opposed to undecidability)?',
+  options: ['To prove a problem B is decidable, reduce a known undecidable problem to B', 'To prove a problem B is decidable, exhibit a direct algorithm, or reduce B to a problem already known to be decidable, in that direction', 'Decidability can only be proven by reducing FROM B to the halting problem', 'Every problem that reduces to an undecidable problem is itself undecidable'],
+  answer: 1,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'concept',
+  explanation: "Proving decidability requires either giving an explicit terminating algorithm, or showing B can be solved USING a decider for some already-known-decidable problem C (i.e. reduce B to C, the opposite direction from the standard undecidability-proof template). Option A describes exactly the undecidability-proof pattern, not decidability - reducing a known-undecidable problem TO B shows B is at least as hard as that problem, hence undecidable, the opposite conclusion. Option C is a fabricated, overly narrow restriction with no basis in the actual proof technique (there is no requirement to specifically target the halting problem). Option D is false and is precisely the classic 'backwards reduction' fallacy: a problem reducing INTO an undecidable problem tells you nothing, since B <= (some undecidable problem) says solving the undecidable problem would help solve B, which is no information at all about B's own difficulty - B could easily still be decidable on its own."
+},
+{
+  id: 'toc-decidability-x10',
+  q: 'Consider two questions about a Turing machine M with a designated state q5. (i) Given M and a specific input w, does M\'s computation on w ever enter state q5? (ii) Given only M\'s transition table, with no reference to any input, is q5 reachable from q0 by following some sequence of transitions in the state-transition diagram (treated as a plain directed graph)? Which combination correctly states their decidability?',
+  options: ['(i) decidable, (ii) decidable', '(i) undecidable, (ii) decidable', '(i) decidable, (ii) undecidable', '(i) undecidable, (ii) undecidable'],
+  answer: 1,
+  marks: 2,
+  difficulty: 'hard',
+  type: 'pyq-style',
+  explanation: "Question (i) requires actually simulating M on w to see whether q5 ever comes up during a computation that may run forever; it is undecidable, by a direct reduction from the acceptance problem A_TM - build M' from M so that M' enters q5 exactly when the original M would accept w, then a decider for (i) applied to M' and w would decide A_TM, which is impossible. Question (ii), in contrast, never mentions running M on anything - it only asks about the static transition diagram, treating states as graph nodes and transitions as edges regardless of tape symbols or input. This is answered by an ordinary reachability search (BFS or DFS) from q0 in a finite graph, which always terminates and is fully decidable. The contrast is exactly the syntactic-versus-semantic distinction: (ii) is a question about M's fixed, finite code structure, while (i) is a question about an unbounded, possibly nonterminating computation."
+},
+{
+  id: 'toc-decidability-x11',
+  q: 'Which of the following is the correct decidability status of "given TM M and string w, does M loop forever on w (never halts)"?',
+  options: ['Decidable, by simulating M on w and checking if it halts within a computed bound', 'Undecidable, since it is the complement of the halting problem restricted to this instance, and complement(HALT_TM) is not RE', 'Decidable, because looping forever is the negation of a decidable property', 'Undecidable, but it is at least RE'],
+  answer: 1,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'concept',
+  explanation: "Whether M halts on w (HALT_TM) is RE but not recursive. Its complement - 'M does NOT halt on w', exactly the looping question here - is therefore not RE (by the central theorem: if it were RE alongside HALT_TM's own RE recognizer, HALT_TM would become recursive, a contradiction). Not being RE means there isn't even a one-sided semi-algorithm that correctly confirms 'yes, it loops' whenever that is true; you cannot get partial credit for this problem the way you can for HALT_TM itself. So it is undecidable and NOT RE, worse than being merely undecidable-but-RE, ruling out option D. There is no computable universal bound to simulate up to (that is exactly what makes the original halting problem hard), so no simulation-based decision procedure exists, ruling out options A and C."
+},
+{
+  id: 'toc-decidability-x12',
+  q: 'Which of the following statements correctly applies the fact "if A ≤ B and A is undecidable, then B is undecidable" to conclude that the problem E_TM = { <M> : L(M) = empty set } is undecidable?',
+  options: ['Reduce E_TM to A_TM (the acceptance problem) to show A_TM is undecidable', 'Reduce A_TM to E_TM: build M\' that ignores its input and simulates M on w, so L(M\') is empty exactly when M does not accept w; a decider for E_TM would then decide A_TM', 'Show that E_TM and A_TM are the same problem under renaming', 'Reduce the regular-language emptiness problem to E_TM'],
+  answer: 1,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'concept',
+  explanation: "The correct reduction direction is FROM the already-known-undecidable problem A_TM TO the target problem E_TM. Construct M' that, on any input x, ignores x entirely and instead simulates M on the fixed string w; M' accepts x if and only if M accepts w. Then L(M') is either empty set (if M does not accept w) or all of Sigma* (if M does accept w) - either way, testing 'is L(M') empty?' via a hypothetical decider for E_TM directly answers 'does M accept w?', which is exactly A_TM. Since A_TM is known undecidable, this shows E_TM cannot be decidable either (option B). Option A reduces in the useless backwards direction. Option C is false, they are genuinely different problems even though related by this construction. Option D reduces a decidable problem (regular emptiness) to E_TM, which establishes nothing about E_TM's difficulty, since a decidable-to-anything reduction is uninformative."
+},
+{
+  id: 'toc-decidability-x13',
+  q: 'Given a CFG G and a DFA R for a regular language over the same alphabet, which of the following correctly states the decidability of the two questions "is L(G) a subset of L(R)?" and "is L(G) = L(R)?"',
+  options: ['Subset is decidable; equality is undecidable in general', 'Both are decidable', 'Both are undecidable', 'Subset is undecidable; equality is decidable'],
+  answer: 0,
+  marks: 2,
+  difficulty: 'hard',
+  type: 'concept',
+  explanation: "L(G) is a subset of L(R) exactly when L(G) intersect complement(L(R)) is empty. Complementing the DFA for R is free (swap final states), so complement(L(R)) is regular, and CFL intersected with a regular language is again context-free (run the PDA for G and the DFA for complement(R) in lockstep). CFG emptiness is decidable, so this subset question is decidable. Equality is a different matter: taking R to be the specific DFA accepting Sigma* itself, 'L(G) = L(R)' becomes exactly 'L(G) = Sigma*', the CFG universality problem, which is a landmark UNDECIDABLE problem (reduces from Post's Correspondence Problem). Since general CFG-versus-regular equality would in particular have to solve this special case, equality testing cannot be decidable in general, even though the one-directional subset test is. This subset-versus-equality asymmetry is a subtle and easily-missed distinction."
+},
+{
+  id: 'toc-decidability-x14',
+  q: 'A problem X is known to be RE but not recursive. Which of the following CANNOT be concluded about X directly from this information alone?',
+  options: ['X is undecidable', 'X has a semi-decider (a machine halting-and-accepting on every yes-instance)', 'complement(X) is RE', 'X is not recursive'],
+  answer: 2,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'concept',
+  explanation: "By definition, RE-but-not-recursive already directly gives: X is undecidable (options A, D restate 'not recursive' in different words, both correctly following) and X has a semi-decider (that is exactly what RE means - a recognizer halting-and-accepting on every member, though it need not halt on non-members). But complement(X) being RE does NOT follow - in fact, by the central RE+co-RE=REC theorem, if complement(X) were also RE, X would have to be recursive, directly contradicting the given hypothesis that X is not recursive. So complement(X) being RE is not just unconfirmed but actually impossible given the stated facts, making option C the one that cannot (indeed must not) be concluded. This question tests precise handling of what a hypothesis does and does not entail, a common source of GATE errors when students assume unrelated closure facts transfer automatically."
+},
+{
+  id: 'toc-decidability-x15',
+  q: 'Which of the following is the correct decidability status of the problem: "given two DFAs M1 and M2, is L(M1) intersect L(M2) infinite?"',
+  options: ['Undecidable, since it requires reasoning about an infinite intersection', 'Decidable: build the product DFA for the intersection, then check the product automaton\'s reachable-and-co-reachable graph for a cycle', 'Decidable only when both M1 and M2 are acyclic', 'Undecidable, by Rice\'s theorem'],
+  answer: 1,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'concept',
+  explanation: "Regular languages are closed under intersection via the standard product construction, so L(M1) intersect L(M2) is itself regular, recognized by a product DFA whose states are pairs of states from M1 and M2. Finiteness of a regular language is decidable: a regular language is infinite exactly when its minimal (or any) accepting automaton has a cycle that lies on some path from the start state to an accepting state (a state that is both reachable from the start and can reach an accepting state). This is a straightforward graph algorithm on the product automaton, giving a fully decidable procedure - option B. Rice's theorem (option D) applies only to Turing machine language properties, not to finite-automaton properties, which is a common category confusion; DFA-based questions are essentially always decidable, in sharp contrast to their Turing-machine analogues."
+}
+);

@@ -1380,3 +1380,171 @@ window.GATE_DATA.questions['dbms'].topics.find(function(t){return t.id==='dbms-r
   explanation: "First apply the selection sigma_Salary>50000 to filter rows: qualifying rows are Eid 2 (60000), Eid 3 (55000), Eid 5 (70000), and Eid 6 (65000) - 4 rows survive, with Dept values CS, EE, ME, and CS respectively. Then apply the projection pi_Dept: relational algebra projection uses SET semantics, meaning duplicate result tuples are automatically eliminated after keeping only the Dept column. The 4 selected rows yield the Dept values {CS, EE, ME, CS}, and after removing the duplicate CS, the distinct set is {CS, EE, ME} - exactly 3 tuples. This is the standard trap distinguishing pure relational algebra projection from a plain SQL SELECT Dept FROM Emp WHERE Salary > 50000 without DISTINCT, which under SQL's bag semantics would instead return all 4 rows including the repeated CS value; only RA projection (or SQL's SELECT DISTINCT) collapses it down to 3."
 }
 );
+
+window.GATE_DATA.questions['dbms'].topics.find(function(t){return t.id==='dbms-normalization';}).questions.push(
+{
+  id: 'dbms-normalization-x1',
+  q: 'Relation R(A,B,C,D) has functional dependency set F = {A->B, B->C, C->D, D->A}, forming a cycle. How many candidate keys does R have?',
+  options: ['1', '2', '4', '3'],
+  answer: 2,
+  marks: 2,
+  difficulty: 'hard',
+  type: 'numerical',
+  explanation: "Compute the closure of each single attribute, since the FDs form a cycle where every attribute eventually reaches every other. A+: A->B adds B, B->C adds C, C->D adds D, D->A already have A; A+ = {A,B,C,D}, all attributes, so A is a candidate key (a single attribute is automatically minimal). By the identical cyclic reasoning, B+ = {B,C,D,A} (via B->C->D->A) = all attributes, so B is also a candidate key. C+ = {C,D,A,B} = all, so C is a candidate key. D+ = {D,A,B,C} = all, so D is a candidate key. Every one of the four single attributes independently closes to the full attribute set, and no smaller (empty) subset can be a key, so all four are candidate keys. This cyclic FD pattern - where each attribute alone determines everything - is a well-known GATE trap that yields far more candidate keys than the composite-key patterns test-takers usually expect."
+},
+{
+  id: 'dbms-normalization-x2',
+  q: 'Relation R(A,B,C,D,E) has functional dependency set F = {AB->C, C->D, D->E, E->A}. How many candidate keys does R have?',
+  options: ['2', '4', '3', '5'],
+  answer: 1,
+  marks: 2,
+  difficulty: 'hard',
+  type: 'numerical',
+  explanation: "B never appears on the right-hand side of any FD, so B must belong to every candidate key. B alone closes to just {B}, so B must be paired with something. Testing AB: AB+ adds C (AB->C), then D (C->D), then E (D->E), then A already present - AB+ = all 5 attributes, and neither A alone nor B alone closes to everything, so AB is a minimal candidate key. Because C, D, E form a chain C->D->E->A that loops back to A, and A combined with B unlocks C via AB->C, ANY single one of {A,C,D,E} paired with B lets you traverse the entire cycle: BC+ reaches D,E,A then C already held; BD+ reaches E,A then C via AB->C; BE+ reaches A then C via AB->C, then D. Each of AB, BC, BD, BE closes to all 5 attributes and each is minimal (no singleton subset closes fully), giving exactly 4 candidate keys, all containing B."
+},
+{
+  id: 'dbms-normalization-x3',
+  q: 'Relation R(A,B,C,D) has functional dependency set F = {A->B, A->C, C->D}. The only candidate key is verified to be {A}. What is the highest normal form satisfied by R?',
+  options: ['1NF', '2NF', '3NF', 'BCNF'],
+  answer: 1,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'concept',
+  explanation: "Since the sole candidate key {A} is a single attribute, no partial dependency on a proper subset of the key is even possible, so 2NF is automatically satisfied once 1NF holds (assumed here). Checking 3NF requires every non-trivial FD X->Y to have either X as a superkey or Y as a prime attribute. A->B and A->C both have A as the determinant, which is the superkey, so both satisfy 3NF trivially. But C->D is the problem: C+ = {C,D} only, which is not all of R, so C is not a superkey; and D is not part of any candidate key, so D is not prime either. Neither exception condition holds, so C->D is a transitive dependency that violates 3NF. Since R satisfies 2NF but fails 3NF, the highest normal form R achieves is exactly 2NF - a textbook example of a transitive dependency (A determines C, C determines D, so A transitively determines D through a non-key attribute)."
+},
+{
+  id: 'dbms-normalization-x4',
+  q: 'Relation R(A,B,C,D,E) has FD set F = {A->B, B->C, CD->E}. R is decomposed into R1(A,B,C) and R2(C,D,E). Is this decomposition lossless-join?',
+  options: [
+    'Yes, since C+ = {C,D,E} covers R2',
+    'No, since the common attribute C alone closes only to {C}, which is neither a superkey of R1 nor of R2',
+    'Yes, since C appears in both relations, which is always sufficient',
+    'Cannot be determined without additional functional dependencies'
+  ],
+  answer: 1,
+  marks: 2,
+  difficulty: 'hard',
+  type: 'numerical',
+  explanation: "The lossless-join test for a binary decomposition into R1 and R2 requires that the common attribute set, R1 intersect R2, functionally determine ALL of R1 or ALL of R2 (using the closure under F, not just the FDs as literally stated). Here R1 intersect R2 = {C}, since C is the only attribute shared between R1(A,B,C) and R2(C,D,E). Compute C+ using F = {A->B, B->C, CD->E}: starting from {C}, no FD has C alone as its full left-hand side (CD->E needs D too, which is absent), so no FD can fire, and C+ = {C} - it never reaches A, B (needed for R1) or D, E (needed for R2). Since C+ covers neither R1's attribute set {A,B,C} nor R2's attribute set {C,D,E}, the lossless-join condition fails on both sides, and this decomposition is LOSSY: rejoining R1 and R2 via natural join on C can introduce spurious tuples not present in the original R."
+},
+{
+  id: 'dbms-normalization-x5',
+  q: 'Relation R(A,B,C) has FD set F = {A->B, B->C, C->A}. R is decomposed into R1(A,B) and R2(B,C). Is this decomposition dependency-preserving?',
+  options: [
+    'No, because C->A cannot be checked without physically joining R1 and R2',
+    'Yes, because C->A can be derived from the FDs projected onto R1 and R2 - specifically B->A (from B+ = {A,B,C} restricted to R1) together with C->B (from C+ restricted to R2) - without ever needing to join the relations',
+    'No, because A->B is lost when projecting onto R2',
+    'Cannot be determined from the given information'
+  ],
+  answer: 1,
+  marks: 2,
+  difficulty: 'hard',
+  type: 'numerical',
+  explanation: "Since F is a full cycle A->B->C->A, every single attribute's closure under F is the entire relation: A+ = B+ = C+ = {A,B,C}. Projecting F onto R1(A,B) means keeping only the parts of each closure restricted to {A,B}: A+ restricted gives A->B (already known), and B+ restricted to {A,B} gives B->A (new, since B+ includes A). So F1 = {A->B, B->A}. Projecting onto R2(B,C) similarly gives F2 = {B->C, C->B} (since B+ and C+ both include the other, restricted to {B,C}). Now check whether F1 union F2 implies the original C->A without joining: compute C+ using only F1 union F2 = {A->B, B->A, B->C, C->B}: start {C}, apply C->B to get {B,C}, apply B->A to get {A,B,C} - C->A is derivable purely from the projected dependencies. So the decomposition IS dependency-preserving."
+},
+{
+  id: 'dbms-normalization-x6',
+  q: 'Compute the minimal (canonical) cover of F = {A->BC, B->C, AB->D} on relation R(A,B,C,D). Which of the following is the resulting minimal cover?',
+  options: [
+    '{A->B, A->C, B->C, A->D}',
+    '{A->B, A->D, B->C}',
+    '{A->BC, B->C, A->D}',
+    '{A->B, A->C, AB->D}'
+  ],
+  answer: 1,
+  marks: 2,
+  difficulty: 'hard',
+  type: 'numerical',
+  explanation: "Step 1, split right-hand sides into singletons: A->BC becomes A->B and A->C, giving {A->B, A->C, B->C, AB->D}. Step 2, remove extraneous left-hand-side attributes: test AB->D for attribute A being extraneous by computing B+ using the full set - B+ = {B,C} (via B->C), which does not include D, so A is NOT extraneous. Test B being extraneous by computing A+ using the full set - A->B gives B, A->C gives C, and now with A and B both available AB->D fires, giving A+ = {A,B,C,D}, which includes D, so B IS extraneous; drop it, reducing AB->D to A->D. The set is now {A->B, A->C, B->C, A->D}. Step 3, remove redundant FDs: testing A->C, compute A+ using only {A->B, B->C, A->D} - A->B gives B, B->C gives C, A->D gives D, so A+ = {A,B,C,D} already includes C, meaning A->C is redundant; remove it. The remaining {A->B, B->C, A->D} has no further extraneous attributes or redundant FDs, giving the minimal cover with 3 dependencies."
+},
+{
+  id: 'dbms-normalization-x7',
+  q: 'An instance of R(A,B,C) contains exactly the tuples (1,1,1), (1,1,2), (2,2,1), (2,2,2). Which of the following functional dependencies is actually satisfied by this instance?',
+  options: ['A -> C', 'C -> A', 'A -> B', 'B -> C'],
+  answer: 2,
+  marks: 1,
+  difficulty: 'easy',
+  type: 'numerical',
+  explanation: "Check each candidate FD by scanning for any two tuples that agree on the determinant but disagree on the dependent. For A->B: tuples with A=1 both have B=1 (consistent), and the tuple with A=2 has B=2 (only one tuple, trivially consistent) - so A->B holds on this instance. For A->C: the two tuples with A=1 have C=1 and C=2 respectively - they agree on A but disagree on C, so A->C is VIOLATED. For C->A: the two tuples with C=1 have A=1 and A=2 respectively - they agree on C but disagree on A, so C->A is VIOLATED. For B->C: the two tuples with B=1 have C=1 and C=2 respectively - they agree on B but disagree on C, so B->C is VIOLATED. Only A->B survives the row-by-row check on this specific instance, so it is the correct answer; remember that satisfying an FD on one instance does not prove it holds on the schema in general, only that this particular data does not contradict it."
+},
+{
+  id: 'dbms-normalization-x8',
+  q: 'Relation R(A,B,C) has FD set F = {AB->C, C->A}, giving candidate keys AB and BC (verify: AB+ = ABC via AB->C; BC+ = ABC via C->A). The FD C->A violates BCNF since C+ = {A,C} is not a superkey. Applying the BCNF decomposition algorithm on C->A splits R into R1(A,C) and R2(B,C). Is this decomposition dependency-preserving?',
+  options: [
+    'Yes, since both original FDs project directly onto R1 and R2 unchanged',
+    'No, because AB->C cannot be verified from the FDs projected onto R1 and R2 without computing their join',
+    'Yes, because C->A alone already implies AB->C',
+    'No, because R1 and R2 are not even a lossless-join decomposition'
+  ],
+  answer: 1,
+  marks: 2,
+  difficulty: 'hard',
+  type: 'numerical',
+  explanation: "R1(A,C) inherits C->A directly (and its trivial converse-free closure), so F1 = {C->A}. R2(B,C) has only two attributes; checking whether B->C or C->B hold in F+ restricted to {B,C}: B+ under the original F is just {B} (no FD starts with B alone) and C+ is {A,C}, so neither B->C nor C->B holds - F2 has no non-trivial dependencies. Now test whether F1 union F2 = {C->A} implies the original AB->C: compute (AB)+ using only C->A - starting from {A,B}, no FD has A or B alone (or together) as a matching left-hand side within {C->A}, so (AB)+ stays {A,B}, never reaching C. Since AB->C cannot be derived from the projected dependencies without physically joining R1 and R2 back together, dependency preservation FAILS. (Note the decomposition is nonetheless lossless, since C+ = {A,C} makes C a superkey of R1, so option D's premise about losslessness is incorrect.)"
+},
+{
+  id: 'dbms-normalization-x9',
+  q: 'Relation R(A,B,C) has FD set F = {A->B, A->C}, and no other non-trivial dependencies hold. What is the highest normal form satisfied by R?',
+  options: ['1NF', '2NF', '3NF', 'BCNF'],
+  answer: 3,
+  marks: 1,
+  difficulty: 'medium',
+  type: 'concept',
+  explanation: "First find the candidate keys: B and C never appear on the left-hand side of any FD, so they cannot help form a key; A never appears on the right-hand side, so A must be in every key. A+ = {A,B,C} directly from A->B and A->C, which is all of R, so A alone is the sole candidate key. Since the key is a single attribute, 2NF is automatic (no proper non-empty subset of a singleton key exists, so partial dependency is impossible). For 3NF and BCNF, check every non-trivial FD: A->B has A as its determinant, and A is the (sole) candidate key, hence a superkey - condition satisfied. A->C likewise has A as determinant, again a superkey - condition satisfied. Since BCNF requires every determinant to be a superkey and both FDs already satisfy that stronger condition, R is in BCNF, which is the highest normal form in the hierarchy (BCNF implies 3NF implies 2NF implies 1NF), so R satisfies all four levels."
+},
+{
+  id: 'dbms-normalization-x10',
+  q: 'Relation R(A,B,C,D) has sole candidate key {A,B} (verify: A and B never appear as a right-hand side, so both are mandatory; AB+ = ABCD via AB->C and AB->D, and neither A nor B alone closes fully). Given FDs AB->C, AB->D, and additionally B->C holds. What is the highest normal form satisfied by R?',
+  options: ['1NF', '2NF', '3NF', 'BCNF'],
+  answer: 0,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'concept',
+  explanation: "The candidate key {A,B} is composite, so partial dependencies become possible: 2NF requires every non-prime attribute to be fully dependent on the ENTIRE candidate key, not just part of it. Here C and D are the non-prime attributes (A and B are prime, being the key itself). D depends only on the full key AB (via AB->D), which is fine. But C depends on B alone via the given FD B->C, and B is a proper subset of the candidate key AB - this is precisely a partial dependency, since C is fully determined by just part of the key rather than needing both A and B. This directly violates 2NF (AB->C becomes redundant information once B->C alone already pins down C, regardless of A's value). Since 2NF itself fails, R cannot satisfy 3NF or BCNF either (each higher normal form requires all lower ones), so the highest normal form R actually achieves is only 1NF."
+},
+{
+  id: 'dbms-normalization-x11',
+  q: 'Relation R(X,Y,Z) has FD set F = {XY->Z, Z->Y}. Verify the candidate keys are XY and XZ (X is mandatory since it never appears as an RHS; XY+ = XYZ via XY->Z; XZ+ = XYZ via Z->Y), making X, Y, and Z all prime attributes. What is the highest normal form satisfied by R?',
+  options: ['1NF', '2NF', '3NF', 'BCNF'],
+  answer: 2,
+  marks: 2,
+  difficulty: 'hard',
+  type: 'concept',
+  explanation: "Since both candidate keys, XY and XZ, are composite but every attribute of R (X, Y, and Z) belongs to at least one of them, there are no non-prime attributes at all, so 2NF holds automatically (2NF's partial-dependency restriction only applies to non-prime attributes). For 3NF, check each FD: XY->Z has XY as determinant, which is a superkey, satisfying 3NF directly. Z->Y has Z as determinant, and Z+ = {Y,Z} is not all of R, so Z is NOT a superkey - but 3NF's exception clause allows this as long as the dependent attribute is prime, and Y IS prime (it belongs to candidate key XY), so this FD also satisfies 3NF via the exception. Since every FD passes the 3NF test, R is in 3NF. However, BCNF has no such exception: Z->Y still requires Z to be a superkey, which it is not, so BCNF is violated. R is therefore in 3NF but not in BCNF - the highest normal form satisfied is exactly 3NF."
+},
+{
+  id: 'dbms-normalization-x12',
+  q: 'Relation R(A,B,C,D) has the single functional dependency AB->CD, and no other dependencies hold. How many candidate keys does R have?',
+  options: ['1', '2', '3', '4'],
+  answer: 0,
+  marks: 1,
+  difficulty: 'easy',
+  type: 'numerical',
+  explanation: "Neither A nor B ever appears on the right-hand side of any FD, so both must belong to every candidate key - they form the mandatory core. Computing (AB)+ using the only available FD: starting from {A,B}, AB->C D fires directly, giving (AB)+ = {A,B,C,D}, which is all of R, so AB is a superkey. Checking minimality: A+ alone = {A} (no FD has A alone as a matching left-hand side) and B+ alone = {B} (same reasoning), so neither singleton subset is a superkey, confirming AB is minimal. Since C and D never appear on the left-hand side of any FD, they can never help determine other attributes and so can never be part of any candidate key by themselves or in combination with anything else beyond AB. With no other functional dependencies given, AB is the unique candidate key, and R has exactly 1 candidate key."
+},
+{
+  id: 'dbms-normalization-x13',
+  q: 'F = {A->B, B->C, A->C} is defined on relation R(A,B,C). After removing all extraneous left-hand-side attributes and all redundant dependencies, how many functional dependencies remain in the minimal cover?',
+  options: ['3', '2', '1', '0'],
+  answer: 1,
+  marks: 1,
+  difficulty: 'medium',
+  type: 'numerical',
+  explanation: "All three FDs already have single-attribute right-hand sides, so no splitting is needed, and all left-hand sides are already single attributes, so no extraneous-attribute removal within any one FD is possible either. The only remaining step is checking for redundant FDs. Test A->C: temporarily remove it and compute A+ using only {A->B, B->C} - A->B gives B, then B->C gives C, so A+ = {A,B,C} already includes C without needing A->C directly; A->C is REDUNDANT (it is implied transitively) and gets dropped. Test A->B: temporarily remove it and compute A+ using only {B->C, A->C} - only A->C can fire from A, giving A+ = {A,C}, which does not include B, so A->B is NOT redundant and must stay. Test B->C: temporarily remove it and compute B+ using only {A->B, A->C} - no FD has B alone as its left-hand side, so B+ = {B}, missing C; B->C is NOT redundant and must stay. The minimal cover is {A->B, B->C}, containing exactly 2 dependencies."
+},
+{
+  id: 'dbms-normalization-x14',
+  q: 'Relation R(A,B,C,D,E) has FD set {A->B, A->C, A->D, A->E}, making A the sole candidate key. R is decomposed into R1(A,B,C) and R2(A,D,E). Is this decomposition lossless-join?',
+  options: [
+    'Yes, because the common attribute A is a superkey of R and hence trivially determines both R1 and R2 completely',
+    'No, because A alone cannot determine D and E without physically joining R1 and R2',
+    'Cannot be determined without separately checking the closures of D and E',
+    'No, because R1 and R2 do not share enough attributes for a safe rejoin'
+  ],
+  answer: 0,
+  marks: 1,
+  difficulty: 'easy',
+  type: 'concept',
+  explanation: "The common attribute set between R1(A,B,C) and R2(A,D,E) is {A}. The lossless-join test requires this common set to functionally determine all of R1 or all of R2 under F's closure. Since A->B, A->C, A->D, and A->E are all given directly, A+ = {A,B,C,D,E}, which is the entire attribute set of R - meaning A is in fact a superkey (indeed the sole candidate key) of the original relation. A superkey of R trivially determines every attribute of R, which certainly includes all of R1's attributes {A,B,C} and all of R2's attributes {A,D,E}. Since A->R1 (and equally A->R2) holds, the lossless-join condition is satisfied on both sides simultaneously, confirming the decomposition is lossless. This is the general and easily recognizable pattern: whenever a decomposition splits a relation along a key that is preserved whole in every fragment, the join is guaranteed lossless."
+}
+);
