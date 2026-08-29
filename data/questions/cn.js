@@ -2000,3 +2000,44 @@ window.GATE_DATA.questions['cn'].topics.find(function(t){return t.id==='cn-appli
   explanation: "A key design feature of the sockets API is the separation between the listening socket and the per-connection socket. The listening socket (created by socket(), bound by bind(), and marked passive by listen()) exists purely to receive and queue new incoming connection requests -- it is never used to actually exchange application data with a client. When accept() dequeues a completed connection, it creates and returns a distinct NEW socket descriptor that is bound specifically to that client's address and port pair; all subsequent send()/recv() calls for that client happen on this new descriptor. Critically, the original listening socket descriptor is left completely untouched and open, so the server's main loop can immediately call accept() again to pick up the next waiting client, which is exactly what allows a single server process (or thread pool) to serve many concurrent clients using one listening socket. This matches option 1."
 }
 );
+
+
+window.GATE_DATA.questions['cn'].topics.find(function(t){return t.id==='cn-transport';}).questions.push(
+{
+  id: 'cn-transport-v1',
+  q: 'A TCP sender\'s current sequence number is 2^32 - 1000 (i.e., 4294966296). It now sends a single segment carrying 5000 bytes of data. What is the sequence number of the next byte the sender will use after this segment, computed correctly modulo 2^32? (Enter your numerical answer.)',
+  options: [],
+  answer: 4000,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'hard',
+  type: 'numerical',
+  explanation: 'TCP sequence numbers live in a finite 32-bit space of size 2^32 = 4294967296, and all sequence-number arithmetic must be performed modulo 2^32 -- the space wraps back to 0 after the last value. Here the segment occupies byte positions starting at S = 4294966296 for L = 5000 bytes, so the next unused sequence number is (S + L) mod 2^32 = (4294966296 + 5000) mod 4294967296 = 4294971296 mod 4294967296. Since 4294971296 exceeds 2^32 by 4294971296 - 4294967296 = 4000, the sequence number wraps around and the next byte is numbered 4000, not the arithmetically "natural" but invalid value 4294971296. This wraparound is precisely why TCP implementations must use unsigned modular comparison (e.g., treating a - b as a signed 32-bit quantity) rather than plain integer comparison when deciding whether one sequence number is "ahead of" another.'
+},
+{
+  id: 'cn-transport-v2',
+  q: 'A TCP connection continuously sends data at the full capacity of a 100 Mbps link with no idle time. Approximately how many seconds does it take for the 32-bit sequence number space to wrap around completely, i.e., for the byte counter to cycle through all 2^32 positions and return to its starting value? (Enter your numerical answer, in seconds, correct to one decimal place.)',
+  options: [],
+  answer: 343.6,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'medium',
+  type: 'numerical',
+  explanation: 'The sequence number space covers exactly 2^32 bytes = 4294967296 bytes = 4294967296 x 8 bits = 34359738368 bits. At a sustained line rate of 100 Mbps = 100 x 10^6 bits per second, the time to transmit enough bytes to cycle through the entire space once is total bits divided by rate: 34359738368 / (100 x 10^6) = 343.59738368 seconds, which rounds to approximately 343.6 seconds (a little over 5.7 minutes). This calculation is the standard justification for why a 32-bit sequence field was historically considered adequate: even at then-typical link speeds, wraparound took minutes, not milliseconds, giving comfortable safety margin for old duplicate segments to disappear from the network before their sequence numbers could recur. At today\'s multi-gigabit link speeds this margin shrinks dramatically, which is one motivation for TCP extensions such as PAWS (Protection Against Wrapped Sequence numbers).'
+},
+{
+  id: 'cn-transport-v3',
+  q: 'Continuing from the previous scenario, TCP additionally enforces a Maximum Segment Lifetime (MSL), commonly assumed to be 120 seconds, after which any segment is presumed dead and discarded by the network. Why does combining the 32-bit sequence number space with an enforced MSL protect TCP from misinterpreting an old, delayed duplicate segment from an earlier incarnation of a connection as valid new data?',
+  options: [
+    'Because MSL guarantees zero packet loss, so duplicates can never occur in the first place',
+    'Because as long as the time for the sequence space to wrap around (here about 343.6 s) safely exceeds 2 x MSL (here 240 s), any old duplicate segment is guaranteed to have expired and been discarded before its sequence number can recur and be reused by a later, legitimate segment',
+    'Because MSL forces every segment to carry a timestamp, so sequence number reuse is irrelevant',
+    'Because the 32-bit space is large enough that wraparound never actually happens in practice'
+  ],
+  answer: 1,
+  marks: 2,
+  difficulty: 'hard',
+  type: 'concept',
+  explanation: 'A stray old segment could in principle linger in the network (e.g., stuck in a queue) and arrive late, after its connection incarnation has ended. If its sequence number were reused by a brand-new segment before the old one is guaranteed dead, the receiver could not tell them apart and might accept stale data as current. MSL bounds how long any segment can plausibly survive in the network before being dropped, so a stale segment is guaranteed gone after (at most) about one MSL, and safely gone after 2 x MSL accounting for round-trip effects. As long as the sequence-number wraparound period (about 343.6 s in the previous part) comfortably exceeds 2 x MSL (240 s here), no sequence number can be reused while an old duplicate carrying that same number could still legitimately be in flight -- so ambiguity is structurally impossible. This is exactly why the combination of a large-enough 32-bit space and a bounded MSL, rather than either alone, is what makes TCP sequence numbers safe; it also explains why extremely high-speed links (where wraparound becomes fast) need supplementary protection like PAWS.'
+}
+);

@@ -2309,3 +2309,59 @@ window.GATE_DATA.questions['dbms'].topics.find(function(t){return t.id==='dbms-t
   explanation: 'Build the precedence graph by finding all cross-transaction conflicts. Item A: R1(A) [op1] and W2(A) [op2] - different transactions, one write, op1 before op2 -> edge T1 -> T2. Item B: R1(B) [op3] and W3(B) [op4] - different transactions, one write, op3 before op4 -> edge T1 -> T3. Item C: only R2(C) [op5] appears - no other transaction touches C, so no conflict. Item D: only R3(D) [op6] appears - no other transaction touches D, so no conflict. T2 and T3 share no common data item (T2 touches A and C; T3 touches B and D), so there is no edge between T2 and T3 either direction. The precedence graph is therefore: T1 -> T2 and T1 -> T3, with no edge between T2 and T3 - this is acyclic, so S is conflict serializable. Counting valid topological orders: T1 must come first (it has incoming edges from nothing but points to both others), and then T2, T3 can appear in either relative order since they are unconstrained with respect to each other. This gives exactly 2 valid total orderings: T1,T2,T3 and T1,T3,T2.'
 }
 );
+
+
+window.GATE_DATA.questions['dbms'].topics.find(function(t){return t.id==='dbms-indexing';}).questions.push(
+{
+  id: 'dbms-indexing-v1',
+  q: 'A B+-tree of order 4 (each node has at most 4 child pointers, at most 3 keys; every non-root node must have at least ceil(4/2) = 2 child pointers, so a leaf must hold at least 2 entries) currently looks like this: root = [30, 60] with three leaf children -- Leaf1 = [10, 20], Leaf2 = [30, 40, 50], Leaf3 = [60, 70, 80] (leaves linked left to right). Key 20 is deleted from Leaf1. Leaf1 now holds only [10], which underflows (1 < minimum 2). Its right sibling Leaf2 currently holds 3 entries (above its minimum of 2) and can lend one. After correctly redistributing (borrowing) one entry from Leaf2 into Leaf1, what is the new separator key that appears in the root between Leaf1 and Leaf2? (Enter your numerical answer.)',
+  options: [],
+  answer: 40,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'hard',
+  type: 'numerical',
+  explanation: 'When a leaf underflows and a sibling has MORE than the minimum number of entries, the correct action is redistribution (borrowing), not merging -- merging is reserved for when no sibling has anything to spare. Here Leaf2 = [30, 40, 50] has 3 entries, one above its minimum of 2, so it can lend its smallest entry, 30, to the underflowing Leaf1. After the move: Leaf1 = [10, 30] (now has 2 entries, meeting the minimum) and Leaf2 = [40, 50] (still has 2 entries, still meeting the minimum). Because the separator key in the parent between two leaf children must always equal the smallest key of the RIGHT child (this is the defining invariant of a B+-tree, since leaves hold the actual data and internal keys only guide routing), the separator is updated from the old value 30 to Leaf2\'s new smallest key, 40. The root becomes [40, 60]. Choosing to borrow rather than merge whenever a sibling has spare capacity keeps the tree fuller and avoids unnecessary parent-key deletions.'
+},
+{
+  id: 'dbms-indexing-v2',
+  q: 'Continuing from the previous state -- root = [40, 60], Leaf1 = [10, 30], Leaf2 = [40, 50], Leaf3 = [60, 70, 80] -- key 10 is now deleted from Leaf1. Leaf1 becomes [30], underflowing again (1 < 2). Leaf1 has no left sibling (it is the leftmost leaf), and its only sibling, Leaf2 = [40, 50], holds exactly 2 entries -- its own minimum -- so it has nothing to spare. What rebalancing action must be taken, and how many entries does the resulting node contain? (Enter your numerical answer for the number of entries in the resulting node.)',
+  options: [],
+  answer: 3,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'hard',
+  type: 'numerical',
+  explanation: 'Because the only available sibling, Leaf2, is already sitting exactly at its minimum of 2 entries, lending an entry to Leaf1 would push Leaf2 itself into underflow -- so borrowing is not a legal option here. The correct action is instead to MERGE Leaf1 and Leaf2 into a single leaf: combine their entries to get [30, 40, 50], a node with 3 entries, which is comfortably within the leaf capacity of at most 3 for this order-4 tree. Merging a leaf pair also removes the separator key between them from the parent (here, the key 40 is deleted from the root), since only one child pointer now exists where there were two. This illustrates the general rule: attempt redistribution first because it is cheaper and keeps the tree fuller, but fall back to merging whenever every sibling of an underflowing node is already at its minimum occupancy.'
+},
+{
+  id: 'dbms-indexing-v3',
+  q: 'Under what condition does deleting a key from a B+-tree cause the OVERALL HEIGHT of the tree to decrease?',
+  options: [
+    'Whenever any single leaf node underflows after a deletion',
+    'Whenever two sibling leaves are merged, regardless of what happens at higher levels',
+    'When a merge (or key removal) at some level causes the root to be left with only a single child pointer and zero keys; the root is then deleted and its one remaining child becomes the new root',
+    'The height of a B+-tree never changes once the tree is built, only the number of leaves changes'
+  ],
+  answer: 2,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'concept',
+  explanation: 'Deletions that trigger a merge can cascade upward: merging two children removes one separator key from their parent, and if that removal itself drops the parent below its minimum key count, the parent must in turn borrow from or merge with ITS sibling, and so on up the tree. The tree\'s height only actually shrinks in the specific terminal case where this cascade reaches the root and leaves the root holding zero keys and exactly one remaining child pointer -- at that point the root node itself is deleted, and its sole child (which could be an internal node or, in a very small tree, a leaf) is promoted to become the new root, reducing every remaining root-to-leaf path length by one. A single leaf underflow or a single merge lower in the tree (as in the previous two questions) does not, by itself, change the height; it only changes height when the effect propagates all the way up and empties the root. This cascading-merge behaviour is why B+-tree deletion, unlike insertion-driven splitting, can occasionally ripple through every level of the tree at once.'
+},
+{
+  id: 'dbms-indexing-v4',
+  q: 'An extendible hashing scheme starts with global depth 1 (a directory with 2 entries, "0" and "1", indexed by the last 1 bit of each key\'s hash value) and bucket capacity 2 records. Currently: directory entry "0" points to bucket B0 (local depth 1) containing keys 4 and 12, whose 2-bit hash values are h(4) = 00 and h(12) = 10 respectively (both end in bit 0); directory entry "1" points to bucket B1 (local depth 1) containing key 7, with h(7) = 01. Now key 20 is inserted, with h(20) = 00. B0 is full, so it must split. What are (global depth after this insertion, local depth of the new bucket holding keys 4 and 20, number of directory entries that still point to the unsplit bucket B1) respectively?',
+  options: [
+    '(1, 1, 1)',
+    '(2, 2, 2)',
+    '(2, 1, 2)',
+    '(2, 2, 1)'
+  ],
+  answer: 1,
+  marks: 2,
+  difficulty: 'hard',
+  type: 'numerical',
+  explanation: 'Key 20 hashes to 00, which routes it to B0 = {4, 12}, already full at capacity 2 -- an overflow. Because B0\'s local depth (1) equals the current global depth (1), a simple split cannot be reflected by the existing directory, so the directory itself must double: global depth becomes 2, giving 4 entries "00", "01", "10", "11", each now read using 2 bits of the hash instead of 1. B0\'s contents (4, 12, and the new 20) are rehashed using 2 bits: h(4) = 00 and h(20) = 00 both go to a new bucket B00 = {4, 20}, while h(12) = 10 goes to a separate new bucket B10 = {12}; both new buckets get local depth 2 (one more than before, since they were just split). Directory entry "00" points to B00 and "10" points to B10. Bucket B1, holding key 7 with h(7) = 01, was NOT involved in this split, so it keeps local depth 1, and BOTH directory entries whose last bit is 1 -- namely "01" and "11" -- continue pointing to the same unsplit B1 (a bucket\'s local depth being one less than global depth is exactly what makes multiple directory entries share it). So the answer is (2, 2, 2), option 2.'
+}
+);

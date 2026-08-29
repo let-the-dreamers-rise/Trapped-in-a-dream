@@ -2231,3 +2231,32 @@ window.GATE_DATA.questions['os'].topics.find(function(t){return t.id==='os-file-
   explanation: 'RAID 0 (pure striping) needs at least 2 disks to spread data across, but since it stores no redundant information whatsoever, the loss of even a single disk destroys data, so it tolerates 0 failures. RAID 1 (mirroring) needs at least 2 disks, since it must keep a full duplicate copy, and it can survive the loss of 1 disk because the mirrored copy still contains all the data. RAID 5 (block-level striping with distributed parity) needs at least 3 disks, because it requires at least 2 disks worth of data plus 1 disk worth of parity information spread across the array to be able to reconstruct any single missing block via XOR; with only 2 disks there would be no way to distribute both data and parity meaningfully, so 3 is the practical minimum. RAID 5 tolerates exactly 1 disk failure (a second simultaneous failure loses data, since the parity XOR scheme can only recover one unknown value per stripe). This matches option 1 precisely.'
 }
 );
+
+
+window.GATE_DATA.questions['os'].topics.find(function(t){return t.id==='os-sync';}).questions.push(
+{
+  id: 'os-sync-v1',
+  q: 'Three tasks share a preemptive priority-based scheduler: L (low priority), M (medium priority), and H (high priority), with H able to preempt M and L, and M able to preempt L. At time t0, L starts running and immediately acquires a shared lock/resource. At time t1 (while L still holds the lock), H becomes ready and tries to acquire the same lock, but must block because L holds it. At time t2 (while H is still blocked and L would otherwise resume), M becomes ready, and M does NOT need the shared resource at all. With no special protocol in place (plain fixed-priority preemptive scheduling), which task actually executes on the CPU during the interval right after t2, until L eventually gets to run again?',
+  options: ['H, since it has the highest priority overall', 'L, since it already holds the CPU and the lock', 'M, since among all currently READY (non-blocked) tasks it has the highest priority -- H is not ready, it is blocked waiting on the lock', 'No task runs; the CPU is forced idle until the deadlock is detected'],
+  answer: 2,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'concept',
+  explanation: 'A fixed-priority preemptive scheduler always picks the highest-priority task among those that are currently READY to run -- being blocked (waiting on I/O, a lock, or any event) removes a task from consideration entirely, regardless of how high its priority is. At time t2, H is blocked on the lock held by L, so H is not a candidate at all. Between the two remaining tasks, M has higher priority than L, and M is ready with no blocking dependency, so the scheduler preempts L and runs M. This is the mechanical heart of priority inversion: L, which is holding the very resource that the highest-priority task H is waiting for, cannot make progress and release that resource because a merely medium-priority task M -- one that H does not even care about -- keeps grabbing the CPU ahead of it. The result is that H effectively waits behind M, a task with strictly lower priority than itself, which is exactly the inversion of the intended priority order. If M\'s execution is long or if more medium-priority tasks keep arriving, this inversion is UNBOUNDED, since nothing in the plain scheduler forces L to run and release the lock.'
+},
+{
+  id: 'os-sync-v2',
+  q: 'For the same three tasks L, M, H and the same scenario (L holds a lock, H blocks waiting for that lock, then M preempts L), the priority inheritance protocol is applied as the fix. Under priority inheritance, what happens at the moment H blocks on the lock held by L, and what is the resulting execution order of the three tasks?',
+  options: [
+    'H\'s priority is permanently given to L for the rest of L\'s lifetime; execution order becomes L, then H, then M',
+    'L temporarily inherits H\'s (higher) priority for as long as it holds the contested lock, so M can no longer preempt it; L finishes its critical section and releases the lock, L\'s priority drops back to normal, and then H runs, followed by M',
+    'M is blocked from running entirely until H finishes, regardless of the lock; execution order becomes H, then L, then M',
+    'Priority inheritance has no effect on execution order, only on bookkeeping; the order is unchanged: M, then L, then H'
+  ],
+  answer: 1,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'concept',
+  explanation: 'The priority inheritance protocol directly targets the mechanism that caused the inversion: the moment a higher-priority task (H) blocks waiting for a resource held by a lower-priority task (L), L\'s priority is temporarily and dynamically raised to match H\'s priority for as long as L continues to hold that resource. With L now effectively running at H\'s (high) priority, the medium-priority task M can no longer preempt it -- M\'s priority is lower than L\'s temporarily inherited priority, so the scheduler keeps L running. L completes its critical section quickly, releases the lock, and its priority immediately reverts to its original (low) level. At that point H, now unblocked, is the highest-priority ready task and runs immediately, and only afterward does M get a chance to run. The resulting order L (boosted), then H, then M bounds the duration of the priority inversion to, at worst, the length of L\'s critical section -- it cannot be extended indefinitely by an arbitrary number of unrelated medium-priority tasks the way the unprotected scenario could, which is precisely why this protocol was adopted (famously fixing the Mars Pathfinder priority-inversion bug in 1997).'
+}
+);

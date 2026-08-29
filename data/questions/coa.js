@@ -2045,3 +2045,65 @@ window.GATE_DATA.questions['coa'].topics.find(function(t){return t.id==='coa-pip
     explanation: 'This combines a cache-miss-driven CPI penalty with a branch-hazard CPI penalty into one effective CPI. I-cache miss contribution to CPI = miss rate × miss penalty = 0.04 × 20 = 0.80. Branch contribution to CPI = branch frequency × branch penalty = 0.10 × 2 = 0.20. Effective CPI = base CPI + cache contribution + branch contribution = 1 + 0.80 + 0.20 = 2.00. Average execution time per instruction = CPI × clock period = 2.00 × 2 ns = 4.00 ns. The trap is forgetting to add BOTH penalty sources into the same CPI before multiplying by the clock period, or multiplying each penalty by the clock period separately and then mismanaging the base-CPI term.'
   }
 );
+
+
+window.GATE_DATA.questions['coa'].topics.find(function(t){return t.id==='coa-pipelining';}).questions.push(
+{
+  id: 'coa-pipelining-v1',
+  q: 'A system enhancement is applicable to 60% of the execution time (f = 0.6) and, when it applies, speeds up that fraction of the work by a factor of s = 4. Using Amdahl\'s Law, Speedup = 1 / ((1 - f) + f/s), what is the overall speedup? (Enter your numerical answer, correct to two decimal places.)',
+  options: [],
+  answer: 1.82,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'medium',
+  type: 'numerical',
+  explanation: 'Amdahl\'s Law states that if a fraction f of a program\'s execution can be sped up by a factor s while the remaining fraction (1 - f) is untouched, the overall speedup is Speedup = 1 / ((1 - f) + f/s). Substituting f = 0.6 and s = 4: the unenhanced fraction contributes (1 - 0.6) = 0.4 to the denominator, and the enhanced fraction contributes f/s = 0.6/4 = 0.15. Summing gives 0.4 + 0.15 = 0.55, so Speedup = 1/0.55 = 1.8181... which rounds to 1.82. The key insight Amdahl\'s Law captures is that the unenhanced 40% of the program acts as a hard floor: no matter how large s becomes, that portion is untouched and continues to take 0.4 units of the original time, which is why the achievable speedup is far more modest than the raw acceleration factor s = 4 applied to only part of the workload.'
+},
+{
+  id: 'coa-pipelining-v2',
+  q: 'For the same enhancement applicable to a fraction f = 0.6 of execution time, what is the maximum possible speedup achievable if the enhanced portion could be sped up by an arbitrarily large factor (i.e., as s tends to infinity)? (Enter your numerical answer.)',
+  options: [],
+  answer: 2.5,
+  kind: 'nat',
+  marks: 1,
+  difficulty: 'easy',
+  type: 'numerical',
+  explanation: 'As s tends to infinity in Speedup = 1 / ((1 - f) + f/s), the term f/s tends to 0, since the enhanced portion effectively takes zero time no matter how much of it there originally was. The formula collapses to the limiting speedup Speedup_max = 1 / (1 - f). With f = 0.6, this gives Speedup_max = 1 / (1 - 0.6) = 1 / 0.4 = 2.5. This is the single most important qualitative consequence of Amdahl\'s Law: speedup is fundamentally capped by the fraction of the program that CANNOT be improved, regardless of how much engineering effort is poured into accelerating the improvable fraction. Making the enhanced part infinitely fast only ever yields a 2.5x overall speedup here, because the untouched 40% remains a fixed bottleneck.'
+},
+{
+  id: 'coa-pipelining-v3',
+  q: 'An enhancement speeds up the portion of execution it applies to by a factor of s = 5, and this yields an observed overall speedup of exactly 3. Using Amdahl\'s Law, what fraction f of the original execution time was affected by (applicable to) this enhancement? (Enter your numerical answer, correct to two decimal places.)',
+  options: [],
+  answer: 0.83,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'hard',
+  type: 'numerical',
+  explanation: 'Starting from Speedup = 1 / ((1 - f) + f/s) = 3 with s = 5, invert both sides: (1 - f) + f/5 = 1/3. Expand the left side: 1 - f + 0.2f = 1 - 0.8f, so the equation becomes 1 - 0.8f = 1/3. Solving: 0.8f = 1 - 1/3 = 2/3, giving f = (2/3) / 0.8 = (2/3) x (5/4) = 10/12 = 5/6 = 0.8333..., which rounds to 0.83. Verifying by substitution: with f = 5/6, (1 - f) = 1/6, and f/s = (5/6)/5 = 1/6, so the denominator is 1/6 + 1/6 = 2/6 = 1/3, and Speedup = 1/(1/3) = 3, exactly matching the given observed speedup. This "solve for f given observed speedup and s" variant is the algebraic inverse of the standard Amdahl computation and is a common way GATE disguises the same formula to test whether students can rearrange it rather than just plug into it.'
+}
+);
+
+window.GATE_DATA.questions['coa'].topics.find(function(t){return t.id==='coa-memory';}).questions.push(
+{
+  id: 'coa-memory-v1',
+  q: 'A system uses a TLB, a cache, and main memory with the following parameters: TLB access time = 20 ns, TLB hit ratio = 80%, cache access time = 10 ns, cache hit ratio = 90%, main memory access time = 100 ns (used both to fetch a page-table entry on a TLB miss, and to service data on a cache miss). Assume the cache is checked after address translation, and on a cache miss the requested word is fetched from main memory. What is the effective memory access time (EMAT), in ns? (Enter your numerical answer.)',
+  options: [],
+  answer: 60,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'hard',
+  type: 'numerical',
+  explanation: 'Solve this nested formula from the inside out. First find the effective time spent at the cache stage alone: EMAT_cache = (cache hit ratio x cache time) + (cache miss ratio x (cache time + memory time)) = (0.9 x 10) + (0.1 x (10 + 100)) = 9 + 0.1x110 = 9 + 11 = 20 ns. This is the expected time to resolve a reference once the physical address is known, whether or not it hits the cache. Now fold in the TLB: on a TLB hit (probability 0.8), the total time is TLB time + EMAT_cache = 20 + 20 = 40 ns. On a TLB miss (probability 0.2), a page-table entry must first be fetched from main memory before the cache stage can even begin, so the total time is TLB time + memory time (page table) + EMAT_cache = 20 + 100 + 20 = 140 ns. The overall EMAT is the probability-weighted average: EMAT = 0.8x40 + 0.2x140 = 32 + 28 = 60 ns. The essential trap is treating this as a flat weighted sum of three times instead of correctly nesting the cache-level computation inside each of the two TLB-outcome branches.'
+},
+{
+  id: 'coa-memory-v2',
+  q: 'A different system has: TLB access time = 10 ns, TLB hit ratio = 90%, cache access time = 5 ns, cache hit ratio = 95%, and main memory access time = 80 ns (used both for a page-table fetch on a TLB miss, and for data fetch on a cache miss). Following the same nested TLB-then-cache model as before, what is the effective memory access time (EMAT), in ns? (Enter your numerical answer.)',
+  options: [],
+  answer: 27,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'hard',
+  type: 'numerical',
+  explanation: 'First compute the cache-level effective time: EMAT_cache = (0.95 x 5) + (0.05 x (5 + 80)) = 4.75 + 0.05x85 = 4.75 + 4.25 = 9.0 ns. Next, build the two TLB-outcome branches using this value. TLB hit (probability 0.9): total time = TLB time + EMAT_cache = 10 + 9 = 19 ns. TLB miss (probability 0.1): total time = TLB time + memory time (for the page-table fetch) + EMAT_cache = 10 + 80 + 9 = 99 ns. Combining with the TLB hit/miss probabilities: EMAT = 0.9x19 + 0.1x99 = 17.1 + 9.9 = 27.0 ns. Notice this comes out to an exact round number, which is a useful self-check: when the weighted terms are designed to sum cleanly, a fractional or wildly off intermediate result is a strong signal that a term was misplaced in the nesting (for example, adding memory time on a TLB HIT, or forgetting to add EMAT_cache inside the TLB-miss branch rather than after averaging).'
+}
+);
