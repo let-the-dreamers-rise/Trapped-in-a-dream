@@ -1985,3 +1985,327 @@ window.GATE_DATA.questions['dbms'].topics.find(function(t){return t.id==='dbms-e
   explanation: 'Superkeys containing {W,X}: the remaining attributes {Y,Z} (2 attributes) are free, giving 2^2 = 4 superkeys. Superkeys containing {W,Y}: the remaining attributes {X,Z} (2 attributes) are free, giving 2^2 = 4 superkeys. Superkeys containing both {W,X} and {W,Y} at once, i.e. containing {W,X,Y}: the remaining attribute {Z} (1 attribute) is free, giving 2^1 = 2 superkeys. By inclusion-exclusion, total distinct superkeys = 4 + 4 - 2 = 6.'
 }
 );
+
+window.GATE_DATA.questions['dbms'].topics.find(function(t){return t.id==='dbms-ra-sql';}).questions.push(
+{
+  id: 'dbms-ra-sql-y1',
+  q: 'Which of the following statements about relational algebra operators are TRUE? (Select ALL that apply)',
+  options: [
+    'The natural join operator is commutative: R ⋈ S produces the same set of tuples as S ⋈ R (up to attribute ordering)',
+    'Selection distributes over union: σₚ(R ∪ S) = σₚ(R) ∪ σₚ(S), provided R and S are union-compatible',
+    'Projection is idempotent: πₗ(πₗ(R)) = πₗ(R) for the same attribute list L',
+    'The Cartesian product R × S is defined only when R and S have identical schemas'
+  ],
+  answers: [0, 1, 2],
+  marks: 2,
+  difficulty: 'medium',
+  type: 'concept',
+  explanation: 'Option A is true: natural join matches tuples on common attributes and the matching condition is symmetric in R and S, so the resulting tuple set is identical regardless of order (only column order in the output may differ). Option B is true: since union requires R and S to be union-compatible (same arity/domains), applying the same predicate p to each operand before or after the union selects exactly the same rows, so selection distributes over union. Option C is true: once a projection onto attribute list L has been performed, the result already contains only the columns in L, so projecting onto L again changes nothing - projection is idempotent. Option D is false: Cartesian product is defined for ANY two relations regardless of their schemas (it simply pairs every tuple of R with every tuple of S); the only practical requirement is that the two relations should not share attribute names to avoid ambiguity in the result, not that their schemas be identical.'
+},
+{
+  id: 'dbms-ra-sql-y2',
+  q: 'Which of the following statements about SQL semantics are TRUE? (Select ALL that apply)',
+  options: [
+    'In SQL, comparing any value to NULL using = yields UNKNOWN, never TRUE or FALSE',
+    'A LEFT OUTER JOIN preserves every row of the left table even when there is no matching row in the right table, padding the right-table columns with NULL',
+    'GROUP BY treats all NULL values appearing in the grouping column as belonging to a single group',
+    'The WHERE clause can filter rows based on the result of an aggregate function such as COUNT(*) or SUM(x)'
+  ],
+  answers: [0, 1, 2],
+  marks: 2,
+  difficulty: 'medium',
+  type: 'concept',
+  explanation: 'Option A is true: SQL uses three-valued logic, and any comparison involving NULL (including x = NULL) evaluates to UNKNOWN rather than TRUE or FALSE, which is why "= NULL" never matches rows (IS NULL must be used instead). Option B is true: this is the defining behavior of LEFT OUTER JOIN - unmatched left rows are still included in the output, with NULLs filling every right-table column. Option C is true: although two NULLs are never considered "equal" for comparison purposes, the SQL standard specifically groups all NULLs in the GROUP BY column(s) together into one group, treating them as indistinguishable for grouping purposes. Option D is false: aggregate functions are computed only after WHERE has already filtered rows and GROUP BY has formed groups, so WHERE cannot reference aggregate results - that filtering must be done in the HAVING clause instead.'
+},
+{
+  id: 'dbms-ra-sql-y3',
+  q: 'Which of the following statements about SQL set operations and subqueries are TRUE? (Select ALL that apply)',
+  options: [
+    'UNION automatically removes duplicate rows from the combined result, while UNION ALL retains all duplicates',
+    'INTERSECT returns the rows common to both queries, treating two NULLs as matching for the purpose of determining duplicate/common rows',
+    'A correlated subquery is evaluated exactly once for the entire outer query, independent of the current outer row',
+    'EXISTS returns TRUE as soon as the subquery produces at least one row, regardless of whether that row itself contains NULL values'
+  ],
+  answers: [0, 1, 3],
+  marks: 2,
+  difficulty: 'medium',
+  type: 'concept',
+  explanation: 'Option A is true: this is the defining distinction between the two operators - UNION performs duplicate elimination on the combined set, whereas UNION ALL simply concatenates all rows from both queries. Option B is true: for the specific purpose of row comparison in set operations (UNION/INTERSECT/EXCEPT), the SQL standard treats two NULLs in the same column position as matching, unlike ordinary WHERE-clause comparisons where NULL = NULL is UNKNOWN. Option C is false: a correlated subquery references a column from the outer query, so it must be conceptually re-evaluated once per outer row (using that row\'s values) rather than once for the whole query - this is exactly what distinguishes it from an uncorrelated subquery. Option D is true: EXISTS only checks for the presence of at least one returned row; it does not inspect the contents of that row, so even a row consisting entirely of NULLs still makes EXISTS evaluate to TRUE.'
+},
+{
+  id: 'dbms-ra-sql-y4',
+  q: 'Consider relations R(A,B) = {(1,10),(1,20),(2,10),(3,30)} and S(B,C) = {(10,100),(10,200),(20,300),(40,400)}. How many tuples are in the result of R ⋈ S (natural join on attribute B)? (Enter your numerical answer.)',
+  options: [],
+  answer: 5,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'hard',
+  type: 'numerical',
+  explanation: 'Match each tuple of R with tuples of S sharing the same B value. (1,10) matches S-tuples with B=10: (10,100) and (10,200) -> gives (1,10,100) and (1,10,200), 2 result tuples. (1,20) matches S-tuple (20,300) -> gives (1,20,300), 1 result tuple. (2,10) matches both B=10 tuples in S -> gives (2,10,100) and (2,10,200), 2 result tuples. (3,30) has B=30, which does not appear in S at all (S has B values 10,10,20,40) -> 0 result tuples. Total tuples = 2 + 1 + 2 + 0 = 5.'
+},
+{
+  id: 'dbms-ra-sql-y5',
+  q: 'Using the same relations R(A,B) = {(1,10),(1,20),(2,10),(3,30)} and S(B,C) = {(10,100),(10,200),(20,300),(40,400)} from the natural join R ⋈ S, how many rows satisfy R.A, S.C with S.C > 150 in the query "SELECT R.A, S.C FROM R, S WHERE R.B = S.B AND S.C > 150"? (Enter your numerical answer.)',
+  options: [],
+  answer: 3,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'hard',
+  type: 'numerical',
+  explanation: 'First compute R ⋈ S as in the previous question: (1,10,100), (1,10,200), (1,20,300), (2,10,100), (2,10,200) - 5 tuples total. Now apply the filter C > 150 on each: (1,10,100) has C=100, fails. (1,10,200) has C=200, passes. (1,20,300) has C=300, passes. (2,10,100) has C=100, fails. (2,10,200) has C=200, passes. Exactly 3 tuples pass the filter: (1,200), (1,300), (2,200) as (A,C) pairs. So the query returns 3 rows.'
+},
+{
+  id: 'dbms-ra-sql-y6',
+  q: 'Let R(A,B) = {(1,10),(1,20),(2,10),(3,30)} and T(B) = {(10),(20)}. How many tuples are in R ÷ T (relational division of R by T)? (Enter your numerical answer.)',
+  options: [],
+  answer: 1,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'hard',
+  type: 'numerical',
+  explanation: 'R ÷ T contains every A-value such that, for ALL B-values in T, the pair (A,B) appears in R. Group R by A: A=1 has B-values {10,20} - this set contains both required B-values {10,20} from T, so A=1 qualifies. A=2 has B-values {10} only - it is missing B=20 from T, so A=2 does not qualify. A=3 has B-values {30} - missing both required values, so A=3 does not qualify. Hence R ÷ T = {(1)}, which contains exactly 1 tuple.'
+}
+);
+
+window.GATE_DATA.questions['dbms'].topics.find(function(t){return t.id==='dbms-normalization';}).questions.push(
+{
+  id: 'dbms-normalization-y1',
+  q: 'Which of the following statements about normal forms are TRUE? (Select ALL that apply)',
+  options: [
+    'BCNF is strictly more restrictive than 3NF, so a relation in 3NF need not be in BCNF',
+    'A relation with a single-attribute candidate key is automatically free of partial-dependency (2NF) violations',
+    'Every relation that is in 3NF is also automatically in BCNF',
+    'Multivalued dependency issues (4NF violations) can exist even in a relation that already satisfies BCNF'
+  ],
+  answers: [0, 1, 3],
+  marks: 2,
+  difficulty: 'medium',
+  type: 'concept',
+  explanation: 'Option A is true: the normal form hierarchy is BCNF ⊆ 3NF, meaning every BCNF relation is in 3NF but the converse need not hold - there exist relations satisfying 3NF that still violate the stricter BCNF condition. Option B is true: a partial dependency requires a non-prime attribute to depend on a PROPER SUBSET of a composite candidate key; if the only candidate key is a single attribute, it has no proper non-empty subset to depend on, so partial dependency (hence 2NF violation) is structurally impossible. Option C is false: this reverses the correct containment - BCNF implies 3NF, not the other way around; a relation can satisfy 3NF (via its exception clause for prime attributes) while still having a non-superkey determinant, which violates BCNF. Option D is true: BCNF only addresses functional dependencies; multivalued dependencies are a separate, stronger constraint handled at 4NF, so a relation can be fully in BCNF and still contain a multivalued dependency that causes redundancy, requiring further decomposition to reach 4NF.'
+},
+{
+  id: 'dbms-normalization-y2',
+  q: 'Which of the following statements about lossless-join and dependency-preserving decomposition are TRUE? (Select ALL that apply)',
+  options: [
+    'A decomposition of R into R1 and R2 is lossless-join if and only if the common attributes (R1 ∩ R2) form a superkey of at least one of R1 or R2',
+    'A BCNF decomposition is always guaranteed to preserve every functional dependency of the original relation',
+    'The 3NF synthesis algorithm guarantees both a lossless-join and a dependency-preserving decomposition',
+    'Any decomposition of a relation into two sub-relations is automatically lossless-join'
+  ],
+  answers: [0, 2],
+  marks: 2,
+  difficulty: 'hard',
+  type: 'concept',
+  explanation: 'Option A is true: this is precisely the standard lossless-join test for a binary decomposition - if (R1 ∩ R2) → R1 or (R1 ∩ R2) → R2 holds (i.e. the shared attributes functionally determine one of the two pieces), then joining R1 and R2 back together reconstructs exactly the original relation with no spurious tuples. Option B is false: it is a well-known limitation that decomposing into BCNF can force the loss of some functional dependencies (they can no longer be checked without an expensive join), which is precisely why 3NF is sometimes preferred as a compromise that always preserves dependencies. Option C is true: the classical 3NF synthesis algorithm (built from a minimal cover of the FDs) is specifically designed to guarantee both properties simultaneously - lossless-join (by including a key of the original relation as one of the sub-schemas) and dependency preservation (by construction, since each FD from the minimal cover is preserved in some sub-schema). Option D is false: a decomposition is lossless only under the specific condition in option A; an arbitrary split of attributes into two sets can easily fail this condition and produce spurious tuples on rejoining.'
+},
+{
+  id: 'dbms-normalization-y3',
+  q: 'Which of the following statements about functional dependencies and Armstrong\'s axioms are TRUE? (Select ALL that apply)',
+  options: [
+    'Armstrong\'s axioms (reflexivity, augmentation, transitivity) are sound and complete for functional dependency inference',
+    'If X → Y and X → Z both hold, then X → YZ also holds (the union rule)',
+    'If X → Y holds, then XC → Y does NOT necessarily hold for an arbitrary attribute set C',
+    'A functional dependency X → Y is called trivial if Y is a subset of X'
+  ],
+  answers: [0, 1, 3],
+  marks: 2,
+  difficulty: 'medium',
+  type: 'concept',
+  explanation: 'Option A is true: Armstrong\'s axioms are a foundational result in relational theory - sound (they only derive FDs that truly hold) and complete (every FD that logically follows from a given set can be derived using just these three rules, possibly combined into derived rules like union, decomposition, and pseudo-transitivity). Option B is true: this is exactly the derived union rule - from X → Y, augmentation gives X → XY, and from X → Z, augmentation and transitivity combine to yield X → YZ; it is a standard, provable consequence of the axioms. Option C is false: augmentation states that X → Y implies XC → YC for any C, and then the decomposition rule (itself derivable from the axioms) reduces XC → YC to XC → Y - so XC → Y is ALWAYS guaranteed to hold whenever X → Y holds, regardless of what C is. Option D is true: this is the standard definition of a trivial functional dependency - if Y ⊆ X, then X → Y holds automatically in every possible relation instance (a tuple\'s own values obviously determine any subset of themselves), carrying no real informational constraint.'
+},
+{
+  id: 'dbms-normalization-y4',
+  q: 'Relation R(A,B,C,D) has functional dependencies AB → C, AB → D, and C → A. How many candidate keys does R have? (Enter your numerical answer.)',
+  options: [],
+  answer: 2,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'hard',
+  type: 'numerical',
+  explanation: 'Compute closures to find minimal keys. (AB)+: start {A,B}; AB → C adds C giving {A,B,C}; AB → D adds D giving {A,B,C,D} = all attributes, so AB is a superkey. Check minimality: A+ = {A} (no FD fires with just A) and B+ = {B}, neither is a superkey alone, so AB is minimal -> AB is a candidate key. Now test BC: (BC)+: start {B,C}; C → A adds A giving {A,B,C}; now AB → C (C already present) and AB → D fires since A,B both present, adding D, giving {A,B,C,D} = all attributes, so BC is also a superkey. Check minimality: B+ = {B} and C+ = {A,C} (via C→A only), neither is a superkey alone, so BC is minimal -> BC is also a candidate key. Check remaining pairs: AC+ = {A,C} (C→A adds nothing new, AB→C/D cannot fire without B) - not a superkey. AD+, BD+, CD+ similarly fail to reach all four attributes. No single attribute alone is a superkey either. Hence there are exactly 2 candidate keys: {A,B} and {B,C}.'
+},
+{
+  id: 'dbms-normalization-y5',
+  q: 'Relation R(A,B,C) has functional dependencies A → B, B → C, and C → A (a cyclic set of dependencies). How many candidate keys does R have? (Enter your numerical answer.)',
+  options: [],
+  answer: 3,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'hard',
+  type: 'numerical',
+  explanation: 'Compute the closure of each single attribute. A+: start {A}; A → B adds B giving {A,B}; B → C adds C giving {A,B,C} = all attributes, so {A} is a superkey, and being a single attribute it is trivially minimal -> {A} is a candidate key. B+: start {B}; B → C adds C giving {B,C}; C → A adds A giving {A,B,C} = all attributes, so {B} is also a candidate key by the same minimality argument. C+: start {C}; C → A adds A giving {A,C}; A → B adds B giving {A,B,C} = all attributes, so {C} is also a candidate key. Since each of the three single attributes individually closes to all attributes, and no proper (empty) subset of a single attribute can be a key, all three singleton sets {A}, {B}, {C} are minimal superkeys. Hence R has exactly 3 candidate keys.'
+},
+{
+  id: 'dbms-normalization-y6',
+  q: 'Relation R(A,B,C,D) has candidate key A (i.e. A is the only key) and functional dependencies A → B, A → C, and C → D. Since C → D violates BCNF (C is not a superkey of R), R is decomposed by removing D from the attributes determined transitively: R1(C,D) and R2(A,B,C). How many relations result from this BCNF decomposition in total? (Enter your numerical answer.)',
+  options: [],
+  answer: 2,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'hard',
+  type: 'numerical',
+  explanation: 'Identify the BCNF violation: A is the sole candidate key of R (A+ = {A,B,C,D} using A→B, A→C, then C→D), so any determinant other than a superset of A violates BCNF. Here C → D has C+ = {C,D} (via C→D only), which is not a superkey of R (it does not include A or B) - so this FD violates BCNF and must be removed by decomposition. Standard BCNF decomposition: split off R1 with the violating dependency\'s closure, R1(C,D) (attributes in C+), and R2 with the remaining attributes plus the determinant, R2(A,B,C) (all attributes minus D). Now check each piece: R1(C,D) has FD C→D with C as its own key - BCNF satisfied, trivially. R2(A,B,C) has FDs A→B, A→C with A as key, and A+ within R2 covers all of R2\'s attributes - BCNF satisfied. No further violations remain, so the decomposition terminates with exactly 2 relations: R1(C,D) and R2(A,B,C).'
+}
+);
+
+window.GATE_DATA.questions['dbms'].topics.find(function(t){return t.id==='dbms-indexing';}).questions.push(
+{
+  id: 'dbms-indexing-y1',
+  q: 'Which of the following statements about dense, sparse, and clustering indexes are TRUE? (Select ALL that apply)',
+  options: [
+    'A dense index has one index entry for every distinct search key value present in the data file',
+    'A sparse index can be built only on a data file that is physically ordered (sorted) on the indexing attribute',
+    'A clustering index requires the underlying data file to be physically sorted on the indexing attribute',
+    'A secondary index built on a non-ordering field is typically sparse in order to save storage space'
+  ],
+  answers: [0, 1, 2],
+  marks: 2,
+  difficulty: 'medium',
+  type: 'concept',
+  explanation: 'Option A is true: this is the defining property of a dense index - every distinct value of the search key that occurs in the file gets its own index entry, allowing direct lookup without scanning. Option B is true: a sparse index stores entries only for some records (typically one per block), so it can only locate the right neighborhood; the actual target record is then found by scanning forward, which is only correct if the file is physically sorted on that attribute. Option C is true: a clustering index is defined on the field that determines the physical, sorted order of the data file itself - by definition, this requires the file to actually be maintained in sorted order on that field. Option D is false: since a secondary index is built on a non-ordering field, the data file is NOT sorted on that field, so a sparse index (which relies on sequential scanning after locating the approximate block) cannot correctly locate records - secondary indexes must therefore be dense to guarantee every record can be found directly.'
+},
+{
+  id: 'dbms-indexing-y2',
+  q: 'Which of the following statements about B+-tree and B-tree index structures are TRUE? (Select ALL that apply)',
+  options: [
+    'In a B+-tree, all actual record pointers reside only in the leaf nodes, while internal nodes store only routing (copy) keys',
+    'A B-tree stores data pointers in both internal nodes and leaf nodes, unlike a B+-tree which reserves them for leaves only',
+    'Leaf nodes in a B+-tree are typically linked together in a sequence to support efficient range queries',
+    'For the same node capacity, a B+-tree internal node has a smaller fan-out than an equivalent B-tree internal node, because B+-trees duplicate keys'
+  ],
+  answers: [0, 1, 2],
+  marks: 2,
+  difficulty: 'medium',
+  type: 'concept',
+  explanation: 'Option A is true: this is the core structural distinction of a B+-tree - internal nodes exist purely to guide the search (holding copies of keys as separators), while every actual data/record pointer is stored exclusively at the leaf level. Option B is true: a classical B-tree stores a data pointer alongside every key at every level (internal or leaf), so a search can terminate early at an internal node, whereas a B+-tree always descends all the way to a leaf. Option C is true: B+-tree leaves are chained together via next-leaf pointers specifically so that, once a range query locates the starting leaf, all subsequent qualifying records can be retrieved by following leaf links sequentially rather than re-traversing the tree. Option D is false: because B+-tree internal nodes store ONLY keys (no data pointers), each internal node can pack in more keys per unit of node size compared to a B-tree internal node (which must also reserve space for data pointers) - this actually gives B+-trees a HIGHER fan-out, not a lower one, which is precisely why B+-trees are preferred for disk-based indexing.'
+},
+{
+  id: 'dbms-indexing-y3',
+  q: 'Which of the following statements about hashing and multilevel indexes are TRUE? (Select ALL that apply)',
+  options: [
+    'In static hashing, the number of buckets is fixed at the time the file is created',
+    'Extendible hashing uses a directory of pointers to buckets, and this directory can double in size to resolve bucket overflow',
+    'A multilevel index reduces the number of disk I/Os needed for a search compared to an equivalent single-level index over the same data',
+    'Hashing is generally more efficient than a B+-tree index for answering range queries (e.g. retrieving all keys between 10 and 50)'
+  ],
+  answers: [0, 1, 2],
+  marks: 2,
+  difficulty: 'medium',
+  type: 'concept',
+  explanation: 'Option A is true: static hashing fixes the number of buckets (and hence the hash function\'s range) at file-creation time, which is exactly why it suffers from overflow chains as the file grows - it cannot adapt bucket count without a full reorganization. Option B is true: extendible hashing keeps a directory of 2^d pointers (d = global depth) to buckets; when a bucket overflows and its local depth equals the global depth, the directory doubles in size so it can distinguish the split buckets with one more bit. Option C is true: a multilevel index recursively indexes the index itself, so that instead of one large linear scan/binary search over a big first-level index, the search descends through a small number of small levels, each fitting in one disk block - this cuts down the number of block accesses needed. Option D is false: hashing scatters keys pseudo-randomly across buckets specifically to give fast O(1) point lookups, which destroys any notion of key ordering - so a range query using a hash index must essentially scan all buckets, making it far worse than a B+-tree, whose sorted leaf chain directly supports efficient range retrieval.'
+},
+{
+  id: 'dbms-indexing-y4',
+  q: 'A B+-tree has order p = 5, meaning each node can have at most 5 child pointers. What is the maximum number of keys that can be stored in a single leaf node? (Enter your numerical answer.)',
+  options: [],
+  answer: 4,
+  kind: 'nat',
+  marks: 1,
+  difficulty: 'easy',
+  type: 'numerical',
+  explanation: 'For a B+-tree of order p, a leaf node holds at most (p - 1) keys, since a leaf does not need the extra tree-pointer slot that internal nodes reserve for the (p)-th child - it instead uses its last slot for the next-leaf chaining pointer, still yielding p - 1 data-key slots. With p = 5, the maximum number of keys per leaf is 5 - 1 = 4.'
+},
+{
+  id: 'dbms-indexing-y5',
+  q: 'For the same B+-tree of order p = 5, what is the minimum number of child pointers required in a non-root internal node (to satisfy the B+-tree occupancy rule)? (Enter your numerical answer.)',
+  options: [],
+  answer: 3,
+  kind: 'nat',
+  marks: 1,
+  difficulty: 'medium',
+  type: 'numerical',
+  explanation: 'The B+-tree occupancy rule requires every non-root internal node to be at least half full: it must have at least ceil(p / 2) child pointers, where p is the order (maximum pointers). With p = 5, ceil(5 / 2) = ceil(2.5) = 3. So a non-root internal node must have at least 3 child pointers (and correspondingly at least 2 keys, one fewer than the pointer count).'
+},
+{
+  id: 'dbms-indexing-y6',
+  q: 'A B+-tree of order p = 5 has leaves that can each hold at most 4 keys (as computed above). If the tree must index exactly 100 records, and every leaf except possibly the last is packed to its maximum capacity, what is the minimum number of leaf nodes required? (Enter your numerical answer.)',
+  options: [],
+  answer: 25,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'hard',
+  type: 'numerical',
+  explanation: 'Each leaf holds at most 4 keys (one entry per indexed record), and packing leaves as full as possible minimizes their count. The minimum number of leaves needed is ceil(total records / max keys per leaf) = ceil(100 / 4) = ceil(25) = 25. Since 100 divides evenly by 4 (25 x 4 = 100 exactly), all 25 leaves can be completely full with no partially filled leaf needed, confirming the minimum is exactly 25.'
+}
+);
+
+window.GATE_DATA.questions['dbms'].topics.find(function(t){return t.id==='dbms-transactions';}).questions.push(
+{
+  id: 'dbms-transactions-y1',
+  q: 'Which of the following statements about the ACID properties of transactions are TRUE? (Select ALL that apply)',
+  options: [
+    'Atomicity ensures that a transaction is executed completely (all its operations) or not at all',
+    'Durability guarantees that once a transaction commits, its effects survive any subsequent system crash',
+    'Isolation guarantees that concurrent transactions produce a result equivalent to some serial execution, and this is achieved solely as a side effect of Atomicity',
+    'Consistency means a transaction, if run alone starting from a consistent database state, leaves the database in a consistent state when it finishes'
+  ],
+  answers: [0, 1, 3],
+  marks: 2,
+  difficulty: 'medium',
+  type: 'concept',
+  explanation: 'Option A is true: this is the definition of atomicity - a transaction is treated as a single indivisible unit, so the system guarantees either full commit of every operation or a complete rollback with no partial effects visible. Option B is true: durability specifically concerns post-commit guarantees - once the commit is acknowledged, the changes are persisted (typically via write-ahead logging) so they survive crashes, power loss, or restarts. Option C is false: isolation is a distinct property from atomicity and is enforced by concurrency control mechanisms (locking, timestamp ordering, MVCC, etc.), not as an automatic byproduct of atomicity - a system could guarantee atomicity of individual transactions while still allowing interleaved execution that violates isolation (e.g. dirty reads) if no concurrency control were applied. Option D is true: this is precisely the consistency property - it is defined relative to a transaction executed in isolation, requiring only that consistent-in implies consistent-out; maintaining consistency under concurrent execution is the job of isolation, not consistency itself.'
+},
+{
+  id: 'dbms-transactions-y2',
+  q: 'Which of the following statements about locking-based concurrency control protocols are TRUE? (Select ALL that apply)',
+  options: [
+    'Strict Two-Phase Locking (Strict 2PL) releases all of a transaction\'s locks only at commit or abort time',
+    'Two-Phase Locking (2PL) guarantees conflict serializability but does not, by itself, prevent deadlocks',
+    'Under 2PL, a transaction is permitted to acquire a brand-new lock after it has already released some other lock',
+    'Strict 2PL prevents cascading rollbacks (cascading aborts) from occurring'
+  ],
+  answers: [0, 1, 3],
+  marks: 2,
+  difficulty: 'medium',
+  type: 'concept',
+  explanation: 'Option A is true: this is the defining feature of Strict 2PL - all exclusive (and typically all) locks are held until the transaction actually commits or aborts, rather than being released as soon as they are logically no longer needed. Option B is true: 2PL (having a growing phase where locks are only acquired, followed by a shrinking phase where locks are only released) guarantees that the resulting schedules are conflict serializable, but it says nothing about preventing transactions from waiting on each other in a cycle, so deadlocks remain possible and must be handled separately (detection or prevention schemes). Option C is false: this directly violates the two-phase rule that defines 2PL - once a transaction releases even a single lock, it enters the shrinking phase and is forbidden from acquiring any further new locks; allowing this would forfeit the serializability guarantee. Option D is true: because Strict 2PL holds all locks (including write locks) until commit, no other transaction can ever read or overwrite an uncommitted (dirty) value, which eliminates the very dependency that causes cascading rollbacks.'
+},
+{
+  id: 'dbms-transactions-y3',
+  q: 'Which of the following statements about serializability and recoverability of schedules are TRUE? (Select ALL that apply)',
+  options: [
+    'A schedule is conflict serializable if and only if its precedence (serialization) graph is acyclic',
+    'Every conflict-serializable schedule is also view-serializable, since view serializability is a strictly more general (less restrictive) condition',
+    'A recoverable schedule requires that a transaction commits only after every transaction whose changes it read has already committed',
+    'Every serial schedule (one with no interleaving of operations from different transactions) can fail to be recoverable'
+  ],
+  answers: [0, 1, 2],
+  marks: 2,
+  difficulty: 'medium',
+  type: 'concept',
+  explanation: 'Option A is true: this is the standard theorem connecting the two notions - building the precedence graph from all conflicting operation pairs and checking it for cycles is exactly the algorithmic test for conflict serializability; acyclic means serializable, a cycle means not. Option B is true: conflict serializability is a sufficient but not necessary condition for view serializability - every conflict-serializable schedule is automatically view-serializable, but there exist view-serializable schedules (typically involving blind writes) that are not conflict-serializable, making view serializability the strictly larger, more permissive class. Option C is true: this is exactly the definition of recoverability - it prevents a scenario where a transaction commits after reading a value from a transaction that later aborts, which would leave no way to undo the already-committed reader\'s effects. Option D is false: a serial schedule has absolutely no interleaving between transactions, so a transaction only ever reads data from transactions that have already fully completed (committed or aborted) before it even begins - there is no possibility of reading an uncommitted value, so every serial schedule is trivially and always recoverable.'
+},
+{
+  id: 'dbms-transactions-y4',
+  q: 'How many distinct serial schedules are possible for a set of 4 transactions T1, T2, T3, and T4 (each executed in full, one after another, in some order)? (Enter your numerical answer.)',
+  options: [],
+  answer: 24,
+  kind: 'nat',
+  marks: 1,
+  difficulty: 'easy',
+  type: 'numerical',
+  explanation: 'A serial schedule for n transactions corresponds to one full permutation (ordering) of those n transactions, since each transaction runs to completion before the next begins. The number of distinct permutations of 4 transactions is 4! = 4 x 3 x 2 x 1 = 24. Hence there are 24 distinct serial schedules for T1, T2, T3, T4.'
+},
+{
+  id: 'dbms-transactions-y5',
+  q: 'Consider the schedule S with operations in this order: (1) R1(A), (2) W2(A), (3) R1(B), (4) W2(B), (5) R3(A). How many conflicting pairs of operations does S contain, where a conflicting pair is defined as two operations from DIFFERENT transactions accessing the SAME data item, with at least one of them being a write? (Enter your numerical answer.)',
+  options: [],
+  answer: 3,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'hard',
+  type: 'numerical',
+  explanation: 'List operations by data item. Item A is touched by: R1(A) [op 1], W2(A) [op 2], R3(A) [op 5]. Check each cross-transaction pair on A: (op1,op2)=R1(A)-W2(A): different transactions (T1,T2), one is a write -> conflict. (op1,op5)=R1(A)-R3(A): different transactions but BOTH are reads -> not a conflict (read-read never conflicts). (op2,op5)=W2(A)-R3(A): different transactions (T2,T3), one is a write -> conflict. Item B is touched by: R1(B) [op 3], W2(B) [op 4]. Check: (op3,op4)=R1(B)-W2(B): different transactions (T1,T2), one is a write -> conflict. Total conflicting pairs = (op1,op2) + (op2,op5) + (op3,op4) = 3.'
+},
+{
+  id: 'dbms-transactions-y6',
+  q: 'Consider schedule S with operations in order: (1) R1(A), (2) W2(A), (3) R1(B), (4) W3(B), (5) R2(C), (6) R3(D), running transactions T1, T2, T3. Build the precedence graph from all conflicting operation pairs, then count how many total orderings (serial schedules) of T1, T2, T3 are consistent with that precedence graph. (Enter your numerical answer.)',
+  options: [],
+  answer: 2,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'hard',
+  type: 'numerical',
+  explanation: 'Build the precedence graph by finding all cross-transaction conflicts. Item A: R1(A) [op1] and W2(A) [op2] - different transactions, one write, op1 before op2 -> edge T1 -> T2. Item B: R1(B) [op3] and W3(B) [op4] - different transactions, one write, op3 before op4 -> edge T1 -> T3. Item C: only R2(C) [op5] appears - no other transaction touches C, so no conflict. Item D: only R3(D) [op6] appears - no other transaction touches D, so no conflict. T2 and T3 share no common data item (T2 touches A and C; T3 touches B and D), so there is no edge between T2 and T3 either direction. The precedence graph is therefore: T1 -> T2 and T1 -> T3, with no edge between T2 and T3 - this is acyclic, so S is conflict serializable. Counting valid topological orders: T1 must come first (it has incoming edges from nothing but points to both others), and then T2, T3 can appear in either relative order since they are unconstrained with respect to each other. This gives exactly 2 valid total orderings: T1,T2,T3 and T1,T3,T2.'
+}
+);
