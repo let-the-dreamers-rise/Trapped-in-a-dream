@@ -1817,3 +1817,542 @@ window.GATE_DATA.questions['engmath'].topics.find(function(t){return t.id==='eng
   explanation: "Standardize: Z = (X - mu)/sigma = (60 - 50)/5 = 10/5 = 2. So P(X > 60) = P(Z > 2). By definition, the standard normal CDF Phi(z) = P(Z <= z), so P(Z > 2) = 1 - P(Z <= 2) = 1 - Phi(2). This matches option B. Options C and D involve Phi(-2), which by the symmetry of the standard normal equals 1 - Phi(2) as well (since Phi(-z) = 1 - Phi(z) for the symmetric standard normal) - so option D, '1 - Phi(-2)', actually simplifies to 1 - (1-Phi(2)) = Phi(2), which is a DIFFERENT (and wrong) value, illustrating why it's important to carefully track the direction of the inequality and the sign of z rather than pattern-matching superficially similar expressions."
 }
 );
+
+
+window.GATE_DATA.questions['engmath'].topics.find(function(t){return t.id==='engmath-discrete-logic';}).questions.push(
+{
+  id: 'engmath-discrete-logic-y1',
+  q: 'Let p, q, r be propositions. Which of the following statements are TAUTOLOGIES (true for every truth assignment)? (Select ALL that apply)',
+  options: ['(p -> q) <-> (~q -> ~p)', 'p -> (q -> p)', '(p AND ~p) -> q', '(p OR q) -> p'],
+  answers: [0, 1, 2],
+  marks: 2,
+  difficulty: 'medium',
+  type: 'concept',
+  explanation: "Option A: p->q and its contrapositive ~q->~p are logically equivalent, so the biconditional is always true - a tautology. Option B: p->(q->p) is true whenever p is true (the consequent q->p is then automatically true), and when p is false the whole implication is vacuously true - so it is a tautology (this is the well-known 'positive antecedent' axiom scheme). Option C: (p AND ~p) is always false, and 'False -> q' is always true regardless of q - a classic tautology (ex falso quodlibet). Option D: (p OR q) -> p is FALSE when p is false and q is true (antecedent true, consequent false), so it is not a tautology - it is only a contingency. Hence A, B, and C are tautologies while D is not."
+},
+{
+  id: 'engmath-discrete-logic-y2',
+  q: 'Consider the argument with premises: (1) p -> q, (2) q -> r, (3) p. Which of the following can be validly concluded? (Select ALL that apply)',
+  options: ['r', 'q', 'p -> r', '~p'],
+  answers: [0, 1, 2],
+  marks: 2,
+  difficulty: 'easy',
+  type: 'concept',
+  explanation: "From premises (1) p->q and (3) p, Modus Ponens gives q, so option B is valid. From that derived q and premise (2) q->r, Modus Ponens again gives r, so option A is valid. Since p->q and q->r are given, transitivity (hypothetical syllogism) gives p->r directly, so option C is valid. Option D, ~p, contradicts premise (3) which asserts p is true outright; a valid argument cannot conclude the negation of one of its own premises, so ~p is not derivable (and asserting it would make the premise set inconsistent, not the conclusion). Hence A, B, and C are the valid conclusions."
+},
+{
+  id: 'engmath-discrete-logic-y3',
+  q: 'Which of the following pairs of logical expressions are logically EQUIVALENT to each other for all propositions p and q? (Select ALL that apply)',
+  options: ['~(p -> q) and (p AND ~q)', '~(p AND q) and (~p OR ~q)', 'p -> q and ~p OR q', 'p XOR q and p <-> q'],
+  answers: [0, 1, 2],
+  marks: 2,
+  difficulty: 'medium',
+  type: 'concept',
+  explanation: "Option A: p->q is equivalent to ~p OR q, so its negation ~(p->q) = ~(~p OR q) = p AND ~q by De Morgan - the pair is equivalent. Option B is exactly De Morgan's law for AND: ~(p AND q) = ~p OR ~q - equivalent. Option C restates the standard material-implication identity p->q = ~p OR q - equivalent. Option D pairs XOR with the biconditional, but these are logical NEGATIONS of each other, not equivalents: p XOR q is true exactly when p and q differ, while p<->q is true exactly when they agree - they take opposite truth values on every row of the truth table, so they are not equivalent. Hence A, B, and C are valid equivalences and D is not."
+},
+{
+  id: 'engmath-discrete-logic-y4',
+  q: 'How many rows are in the truth table of a well-formed propositional formula that contains exactly 5 distinct propositional variables?',
+  options: [],
+  answer: 32,
+  kind: 'nat',
+  marks: 1,
+  difficulty: 'easy',
+  type: 'numerical',
+  explanation: "A truth table lists every possible combination of truth values (True/False) for each of the propositional variables involved. With n distinct boolean variables, each can independently take 2 values, so the total number of rows (assignments) is 2^n. Here n = 5, so the number of rows is 2^5 = 32. This is a standard combinatorial fact used throughout propositional logic: the size of the truth table grows exponentially with the number of variables, which is exactly why exhaustive truth-table checking becomes impractical for formulas with many variables (e.g., 2^20 rows for 20 variables), motivating more efficient techniques such as resolution or DPLL-style SAT solving instead of brute-force enumeration."
+},
+{
+  id: 'engmath-discrete-logic-y5',
+  q: 'In a class of students, every student who likes Logic (L) also likes Discrete Math (D), i.e., L -> D. If exactly 18 students like Logic and exactly 30 students like Discrete Math, and the class has exactly 40 students in total, what is the MAXIMUM possible number of students who like NEITHER Logic nor Discrete Math?',
+  options: [],
+  answer: 10,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'medium',
+  type: 'numerical',
+  explanation: "Since L -> D for every student, the set of students who like Logic is a SUBSET of the set who like Discrete Math (L subset of D), so |L union D| = |D| = 30 exactly (all 18 Logic-likers are already counted among the 30 Discrete-Math-likers; there is no additional union contribution). The number who like neither is total minus |L union D| = 40 - 30 = 10. This value is actually forced (not just a maximum) given the subset constraint, since |L union D| is fixed at 30 regardless of how the 18 are distributed within the 30, as long as L subset of D holds; the answer is therefore exactly 10, achieved (and only achieved) under the given implication constraint."
+},
+{
+  id: 'engmath-discrete-logic-y6',
+  q: 'A propositional formula uses the connectives {AND, OR} only (no NOT) over variables p and q. How many pairwise DISTINCT boolean functions of 2 variables can be built using only AND and OR (including the trivial constant-like combinations reachable this way, but counting only functions realizable from p and q using solely AND/OR, without negation or constants)?',
+  options: [],
+  answer: 4,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'hard',
+  type: 'numerical',
+  explanation: "With only monotone connectives AND and OR applied to the two variables p and q (no negation, no constants introduced), every formula built is a MONOTONE boolean function of p and q: increasing an input from 0 to 1 never decreases the output. The realizable functions from {p, q} using AND/OR closure are exactly: p (ignore q), q (ignore p), p AND q, and p OR q. Any AND/OR combination of these projections collapses back into one of these four via absorption laws (e.g., p AND (p OR q) = p, p OR (p AND q) = p, (p AND q) OR p = p, etc.), so no new distinct function is generated beyond these four. Hence exactly 4 distinct boolean functions are realizable, matching the count of monotone functions generated by the free distributive lattice on 2 generators restricted to non-constant, non-negated projections and their AND/OR combination."
+}
+);
+
+
+window.GATE_DATA.questions['engmath'].topics.find(function(t){return t.id==='engmath-sets-relations';}).questions.push(
+{
+  id: 'engmath-sets-relations-y1',
+  q: 'Let A = {1, 2, 3} and let R = {(1,1), (2,2), (3,3), (1,2), (2,1)} be a relation on A. Which of the following properties does R satisfy? (Select ALL that apply)',
+  options: ['Reflexive', 'Symmetric', 'Transitive', 'Antisymmetric'],
+  answers: [0, 1, 2],
+  marks: 2,
+  difficulty: 'medium',
+  type: 'concept',
+  explanation: "Reflexive: (1,1), (2,2), (3,3) are all present, so R is reflexive. Symmetric: the only off-diagonal pairs are (1,2) and (2,1), and both are present together, so R is symmetric. Transitive: check every chain - (1,2) and (2,1) give (1,1) which is present; (2,1) and (1,2) give (2,2) which is present; (1,1) with (1,2) gives (1,2), present; (1,2) with (2,2) gives (1,2), present; all other chains involving 3 only use (3,3) which closes trivially. No violation exists, so R is transitive (in fact R is the equivalence relation merging {1,2} into one class and {3} into another). Antisymmetric requires that (a,b) and (b,a) in R with a not equal to b never both occur, but (1,2) and (2,1) are both present with 1 not equal to 2, violating antisymmetry. So R is reflexive, symmetric, and transitive, but not antisymmetric."
+},
+{
+  id: 'engmath-sets-relations-y2',
+  q: 'Which of the following statements about equivalence relations and partitions are TRUE? (Select ALL that apply)',
+  options: ['Every equivalence relation on a set induces a partition of that set into equivalence classes', 'Every partition of a set induces an equivalence relation on that set (elements related iff they lie in the same block)', 'The intersection of two equivalence relations on the same set is always an equivalence relation on that set', 'Every relation that is symmetric and transitive must also be reflexive'],
+  answers: [0, 1, 2],
+  marks: 2,
+  difficulty: 'medium',
+  type: 'concept',
+  explanation: "Statement A is the Fundamental Theorem relating equivalence relations to partitions: the equivalence classes of any equivalence relation are pairwise disjoint and cover the set, forming a partition - true. Statement B is the converse direction of the same theorem: defining a~b iff a and b are in the same block of a given partition always yields a valid equivalence relation - true. Statement C is true because reflexivity, symmetry, and transitivity are each preserved under intersection: if both relations relate (a,a), so does the intersection, and similarly for symmetric/transitive chains checked in both relations simultaneously. Statement D is the classic FALSE trap: a relation can be vacuously symmetric and transitive without being reflexive, e.g., R = {(1,2),(2,1)} on {1,2,3} is symmetric and transitive on its domain of application but 3 has no pairs at all (not reflexive), or more simply the empty relation on a nonempty set is symmetric and transitive but not reflexive. So A, B, and C are true; D is false."
+},
+{
+  id: 'engmath-sets-relations-y3',
+  q: 'Let f: A -> B be a function. Which of the following statements are TRUE in general? (Select ALL that apply)',
+  options: ['If f is a bijection, then f has a well-defined inverse function f^-1: B -> A', 'If f is injective and A and B are finite sets with |A| = |B|, then f is also surjective', 'The composition of two injective functions (when composable) is always injective', 'If f is surjective, then f must also be injective'],
+  answers: [0, 1, 2],
+  marks: 2,
+  difficulty: 'medium',
+  type: 'concept',
+  explanation: "Statement A is a standard theorem: a function has an inverse function if and only if it is a bijection (both injective and surjective), so a bijection always has a well-defined f^-1 - true. Statement B follows from the pigeonhole principle applied to finite sets: an injection between finite sets of equal cardinality must hit every element of the codomain (otherwise the image would have fewer than |A| elements while being injective, a contradiction), so it is automatically surjective - true. Statement C is true: if f: A->B and g: B->C are both injective, then g(f(a1))=g(f(a2)) implies f(a1)=f(a2) (since g is injective) implies a1=a2 (since f is injective), so g o f is injective. Statement D is false in general - surjectivity and injectivity are independent properties; a classic counterexample is f: {1,2,3} -> {1,2} with f(1)=1, f(2)=2, f(3)=2, which is surjective (both elements of B are hit) but not injective (f(2)=f(3)). So A, B, and C are true; D is false."
+},
+{
+  id: 'engmath-sets-relations-y4',
+  q: 'Let A be a set with |A| = 3 and B a set with |B| = 4. How many distinct relations are there from A to B?',
+  options: [],
+  answer: 4096,
+  kind: 'nat',
+  marks: 1,
+  difficulty: 'easy',
+  type: 'numerical',
+  explanation: "A relation from A to B is defined as any subset of the Cartesian product A x B. Since |A| = 3 and |B| = 4, the Cartesian product A x B has |A| * |B| = 3 * 4 = 12 ordered pairs. The number of subsets of a set with n elements is 2^n, so the number of relations from A to B (i.e., the number of subsets of A x B) is 2^12 = 4096. This counting principle generalizes the earlier truth-table counting idea: each of the 12 possible ordered pairs is independently either included in the relation or excluded from it, giving 2 choices per pair and 2^12 total relations."
+},
+{
+  id: 'engmath-sets-relations-y5',
+  q: 'What is the total number of distinct equivalence relations that can be defined on a set with exactly 4 elements?',
+  options: [],
+  answer: 15,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'hard',
+  type: 'numerical',
+  explanation: "The number of equivalence relations on a set with n elements equals the number of ways to partition that set into non-empty, unordered, disjoint blocks, which is given by the Bell number B(n). For n = 4, the partitions by shape are: one block of size 4 (1 way: {1234}), one block of size 3 and one of size 1 (4 ways, choosing which single element is separate), two blocks of size 2 (3 ways: {12|34, 13|24, 14|23}), one block of size 2 and two blocks of size 1 (6 ways, choosing the pair: C(4,2)=6), and four blocks of size 1 (1 way, all singletons). Summing: 1 + 4 + 3 + 6 + 1 = 15. So B(4) = 15, meaning there are exactly 15 distinct equivalence relations on a 4-element set."
+},
+{
+  id: 'engmath-sets-relations-y6',
+  q: 'Let A = {1, 2, 3, 4}. How many relations on A are BOTH reflexive AND symmetric?',
+  options: [],
+  answer: 64,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'medium',
+  type: 'numerical',
+  explanation: "A relation on A is a subset of A x A, which has 16 ordered pairs total: 4 diagonal pairs (a,a) and 12 off-diagonal pairs, which form 6 unordered pairs {(i,j),(j,i)} for i < j (since C(4,2) = 6). Reflexivity forces all 4 diagonal pairs (a,a) to be present - this is fixed, no choice. Symmetry forces that for each off-diagonal unordered pair {i,j}, either BOTH (i,j) and (j,i) are included or NEITHER is included - so each of the 6 unordered off-diagonal pairs contributes exactly one independent binary choice (include the pair or not). With 6 independent binary choices, the total count is 2^6 = 64. Thus there are exactly 64 relations on a 4-element set that are simultaneously reflexive and symmetric."
+}
+);
+
+
+window.GATE_DATA.questions['engmath'].topics.find(function(t){return t.id==='engmath-groups';}).questions.push(
+{
+  id: 'engmath-groups-y1',
+  q: 'Which of the following statements about groups are TRUE in general? (Select ALL that apply)',
+  options: ['Every group of prime order is cyclic', 'Every subgroup of a cyclic group is cyclic', 'The identity element of a group is unique', 'Every abelian group is cyclic'],
+  answers: [0, 1, 2],
+  marks: 2,
+  difficulty: 'medium',
+  type: 'concept',
+  explanation: "Statement A is true by Lagrange's theorem: if |G| = p (prime), any non-identity element has order dividing p, so its order must be p itself, meaning that element generates the whole group - G is cyclic. Statement B is a standard theorem: every subgroup of a cyclic group Z_n (or infinite cyclic Z) is itself cyclic, generated by the smallest positive power/multiple lying in the subgroup. Statement C is a basic group axiom consequence: if e and e' were both identities, e = e*e' = e', so the identity is unique. Statement D is FALSE - being abelian does not imply cyclic; the Klein four-group V4 = Z2 x Z2 is abelian (every element commutes) but is not cyclic since no single element has order 4 (every non-identity element has order 2). So A, B, and C are true; D is false."
+},
+{
+  id: 'engmath-groups-y2',
+  q: 'Consider the cyclic group (Z6, +) = {0,1,2,3,4,5} under addition modulo 6. Which of the following elements are GENERATORS of Z6 (i.e., have order 6)? (Select ALL that apply)',
+  options: ['1', '2', '3', '5'],
+  answers: [0, 3],
+  marks: 2,
+  difficulty: 'easy',
+  type: 'concept',
+  explanation: "In the cyclic group Z_n under addition, an element k generates the whole group if and only if gcd(k, n) = 1, and its order is n/gcd(k,n). Here n = 6. For k=1: gcd(1,6)=1, so order = 6/1 = 6 - a generator. For k=2: gcd(2,6)=2, so order = 6/2 = 3 - not a generator (2 only generates the subgroup {0,2,4}). For k=3: gcd(3,6)=3, so order = 6/3 = 2 - not a generator (3 only generates {0,3}). For k=5: gcd(5,6)=1, so order = 6/1 = 6 - a generator. This matches Euler's totient count: phi(6) = 2, and indeed exactly 2 elements (1 and 5) are generators, consistent with options A and D being the only correct ones."
+},
+{
+  id: 'engmath-groups-y3',
+  q: 'Let phi: G -> H be a group homomorphism between groups G and H, with kernel K = ker(phi) and image Im(phi). Which of the following are ALWAYS TRUE? (Select ALL that apply)',
+  options: ['phi(e_G) = e_H, where e_G and e_H are the identity elements of G and H', 'K = ker(phi) is a subgroup of G', 'Im(phi) is a subgroup of H', 'phi must be injective (one-to-one)'],
+  answers: [0, 1, 2],
+  marks: 2,
+  difficulty: 'medium',
+  type: 'concept',
+  explanation: "Statement A is a basic property provable from homomorphism axioms: phi(e_G) = phi(e_G * e_G) = phi(e_G)*phi(e_G), and cancelling phi(e_G) in H gives phi(e_G) = e_H - always true. Statement B is a standard theorem: the kernel is always a subgroup of G (it is closed under the operation, contains e_G by statement A, and closed under inverses since phi(g^-1) = phi(g)^-1). Statement C is likewise standard: the image is always a subgroup of H, since it is closed under H's operation and inverses because phi is a homomorphism. Statement D is FALSE in general - a homomorphism need not be injective; for example, the trivial homomorphism sending every element of G to e_H is a valid homomorphism but is injective only when G itself is trivial. In fact phi is injective if and only if ker(phi) = {e_G}, which is not guaranteed for an arbitrary homomorphism. So A, B, and C are always true; D is not."
+},
+{
+  id: 'engmath-groups-y4',
+  q: 'In the group (Z12, +) of integers modulo 12 under addition, what is the order of the element 4?',
+  options: [],
+  answer: 3,
+  kind: 'nat',
+  marks: 1,
+  difficulty: 'easy',
+  type: 'numerical',
+  explanation: "In the cyclic group Z_n under addition, the order of an element k is given by n / gcd(k, n) - the smallest positive number of times you must add k to itself (mod n) to reach 0. Here n = 12 and k = 4, so gcd(4, 12) = 4, giving order = 12 / 4 = 3. We can verify directly: 4+4=8 (mod 12), 4+4+4=12=0 (mod 12), so indeed 3 additions of 4 return to the identity 0, and no smaller positive number of additions does (1 copy gives 4, 2 copies give 8, neither is 0). Hence the order of the element 4 in (Z12, +) is 3."
+},
+{
+  id: 'engmath-groups-y5',
+  q: 'The Klein four-group V4 = {e, a, b, c} has identity e, and every non-identity element satisfies x*x = e. How many elements of V4 have order exactly 2?',
+  options: [],
+  answer: 3,
+  kind: 'nat',
+  marks: 1,
+  difficulty: 'easy',
+  type: 'numerical',
+  explanation: "The order of an element x is the smallest positive integer n such that x^n = e. The identity element e always has order 1 (by definition, e^1 = e). In V4, every one of the three non-identity elements a, b, c satisfies x*x = e (given), meaning x^2 = e but x^1 = x is not equal to e (since a, b, c are distinct from the identity), so each of a, b, c has order exactly 2. Since there are exactly 3 non-identity elements in this group of order 4 (|V4| = 4, minus the identity leaves 3 elements), and each one individually has order 2, the total count of elements of order exactly 2 is 3."
+},
+{
+  id: 'engmath-groups-y6',
+  q: 'How many distinct subgroups does the cyclic group (Z12, +) (integers modulo 12 under addition) have, including the trivial subgroup {0} and Z12 itself?',
+  options: [],
+  answer: 6,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'medium',
+  type: 'numerical',
+  explanation: "A fundamental theorem of cyclic groups states that a cyclic group of order n has exactly one subgroup for each positive divisor of n, and no others - there is a bijective correspondence between the subgroups of Z_n and the positive divisors of n (the subgroup of order d being the unique subgroup generated by n/d). Here n = 12, and the positive divisors of 12 are 1, 2, 3, 4, 6, and 12 - that is 6 divisors in total. These correspond to the subgroups of orders 1, 2, 3, 4, 6, and 12 respectively (e.g., {0} of order 1, {0,6} of order 2, {0,4,8} of order 3, {0,3,6,9} of order 4, {0,2,4,6,8,10} of order 6, and Z12 itself of order 12). Hence Z12 has exactly 6 distinct subgroups."
+}
+);
+
+
+window.GATE_DATA.questions['engmath'].topics.find(function(t){return t.id==='engmath-graph-theory';}).questions.push(
+{
+  id: 'engmath-graph-theory-y1',
+  q: 'Which of the following statements about simple undirected graphs are TRUE? (Select ALL that apply)',
+  options: ['The sum of degrees of all vertices in a graph equals twice the number of edges', 'In any graph, the number of vertices of odd degree is always even', 'A tree with n vertices has exactly n-1 edges', 'Every connected graph with n vertices has at least n edges'],
+  answers: [0, 1, 2],
+  marks: 2,
+  difficulty: 'easy',
+  type: 'concept',
+  explanation: "Statement A is the Handshake Lemma: every edge contributes exactly 2 to the total degree sum (one for each endpoint), so sum of degrees = 2|E| - always true. Statement B follows directly from A: since the sum of all degrees is even (twice the edge count), and the sum of even-degree vertices' contributions is automatically even, the sum of odd-degree vertices' contributions must also be even, which is only possible if there is an even NUMBER of odd-degree vertices - always true. Statement C is the defining edge-count property of a tree: a tree is a connected acyclic graph, and it is a standard theorem that any tree on n vertices has exactly n-1 edges. Statement D is FALSE - it directly contradicts C: a tree is itself a connected graph with only n-1 edges, which is LESS than n, so 'at least n edges' fails for trees (the minimal connected graphs). So A, B, and C are true; D is false."
+},
+{
+  id: 'engmath-graph-theory-y2',
+  q: 'Which of the following statements about bipartite and planar graphs are TRUE? (Select ALL that apply)',
+  options: ['A graph is bipartite if and only if it contains no cycle of odd length', 'Every tree is a bipartite graph', 'A simple planar graph on n >= 3 vertices has at most 3n - 6 edges', 'The complete graph K5 (5 vertices, all pairs connected) is planar'],
+  answers: [0, 1, 2],
+  marks: 2,
+  difficulty: 'medium',
+  type: 'concept',
+  explanation: "Statement A is the standard characterization theorem of bipartite graphs: a graph can be 2-colored (bipartitioned) if and only if it has no odd-length cycle - always true. Statement B is true because trees are acyclic (contain no cycles at all, odd or even), so vacuously they satisfy the odd-cycle-free condition of statement A and are therefore bipartite. Statement C is Euler's formula consequence for planar graphs: for any simple connected planar graph with n >= 3 vertices, the edge count is bounded by |E| <= 3n - 6 (derived from V - E + F = 2 combined with each face being bounded by at least 3 edges) - true, and this bound extends to any simple planar graph (not just connected ones, since adding components only tightens it). Statement D is FALSE - K5 is the classical example of a NON-planar graph (one of the two graphs, along with K3,3, whose absence as a minor characterizes planarity by Kuratowski's theorem); indeed K5 has 10 edges but the planar bound for n=5 is 3(5)-6=9, so K5 exceeds the bound and cannot be planar. So A, B, and C are true; D is false."
+},
+{
+  id: 'engmath-graph-theory-y3',
+  q: 'Which of the following statements about Eulerian and Hamiltonian graphs are TRUE? (Select ALL that apply)',
+  options: ['A connected graph has an Eulerian circuit if and only if every vertex has even degree', 'A connected graph has an Eulerian path (not necessarily closed) if and only if it has exactly 0 or exactly 2 vertices of odd degree', 'Every Hamiltonian graph must also be Eulerian', 'A connected graph with exactly two vertices of odd degree has an Eulerian path'],
+  answers: [0, 1, 3],
+  marks: 2,
+  difficulty: 'medium',
+  type: 'concept',
+  explanation: "Statement A is Euler's classical theorem: a connected graph admits a closed walk using every edge exactly once (an Eulerian circuit) if and only if every vertex has even degree - true. Statement B extends this: an open Eulerian path (using every edge exactly once but not necessarily returning to the start) exists if and only if the graph has exactly 0 odd-degree vertices (giving a circuit) or exactly 2 odd-degree vertices (the path must start and end at these two) - true. Statement D is simply the '2 odd vertices' case of statement B restated, and is therefore also true - a graph with exactly two odd-degree vertices does have an Eulerian path. Statement C is FALSE - Hamiltonian (visiting every VERTEX exactly once) and Eulerian (traversing every EDGE exactly once) are independent properties with no implication either way; for instance, the graph formed by two triangles sharing a single vertex is Eulerian (every vertex has even degree) but not Hamiltonian (the shared vertex would need to be visited twice to reach both triangles), and conversely many Hamiltonian graphs have vertices of odd degree and are not Eulerian. So A, B, and D are true; C is false."
+},
+{
+  id: 'engmath-graph-theory-y4',
+  q: 'A simple undirected graph has exactly 6 vertices, and every vertex has degree exactly 4. How many edges does this graph have?',
+  options: [],
+  answer: 12,
+  kind: 'nat',
+  marks: 1,
+  difficulty: 'easy',
+  type: 'numerical',
+  explanation: "By the Handshake Lemma, the sum of the degrees of all vertices in a graph equals twice the number of edges: sum(degrees) = 2|E|. Here there are 6 vertices, each with degree exactly 4, so the sum of degrees = 6 * 4 = 24. Solving 24 = 2|E| gives |E| = 24/2 = 12. Hence the graph has exactly 12 edges. (Such a graph is an example of a 4-regular graph on 6 vertices, e.g., the octahedron graph or the complement of a perfect matching structure, and this edge count is a necessary consequence of the degree sequence regardless of the specific graph's structure.)"
+},
+{
+  id: 'engmath-graph-theory-y5',
+  q: 'A tree has exactly 20 vertices. How many edges does this tree have?',
+  options: [],
+  answer: 19,
+  kind: 'nat',
+  marks: 1,
+  difficulty: 'easy',
+  type: 'numerical',
+  explanation: "A tree is defined as a connected, acyclic graph. A fundamental and well-known theorem of graph theory states that any tree with n vertices has exactly n - 1 edges - this can be proven by induction, since adding each new vertex to a tree (while keeping it connected and acyclic) requires adding exactly one new edge connecting it to the existing structure, starting from a single vertex with 0 edges. Here n = 20, so the number of edges is 20 - 1 = 19. This edge count is the minimum needed to keep a graph on n vertices connected, and also the maximum it can have while remaining acyclic - a tree sits at exactly this unique boundary value."
+},
+{
+  id: 'engmath-graph-theory-y6',
+  q: 'What is the total number of edges in the complete graph K7 (a simple graph on 7 vertices where every pair of distinct vertices is connected by an edge)?',
+  options: [],
+  answer: 21,
+  kind: 'nat',
+  marks: 1,
+  difficulty: 'easy',
+  type: 'numerical',
+  explanation: "In the complete graph K_n, every one of the n vertices is connected to every other vertex by exactly one edge, so the number of edges equals the number of ways to choose 2 distinct vertices out of n to form an edge, i.e., C(n, 2) = n(n-1)/2. Here n = 7, so the number of edges is C(7,2) = 7*6/2 = 42/2 = 21. This also matches the Handshake Lemma check: in K7, every vertex has degree n-1 = 6 (connected to all other 6 vertices), so the sum of degrees is 7*6 = 42, and the number of edges is 42/2 = 21, confirming the result."
+}
+);
+
+
+window.GATE_DATA.questions['engmath'].topics.find(function(t){return t.id==='engmath-combinatorics';}).questions.push(
+{
+  id: 'engmath-combinatorics-y1',
+  q: 'Which of the following counting statements are TRUE? (Select ALL that apply)',
+  options: ['The number of ways to arrange n distinct objects in a row is n!', 'The number of r-element combinations chosen from n distinct objects is n! / (r! (n-r)!)', 'By the Pigeonhole Principle, if n+1 objects are placed into n boxes, at least one box must contain 2 or more objects', 'The number of permutations of n distinct objects taken r at a time equals C(n, r)'],
+  answers: [0, 1, 2],
+  marks: 2,
+  difficulty: 'easy',
+  type: 'concept',
+  explanation: "Statement A is the basic factorial counting rule for arranging n distinct objects in a sequence: n choices for the first position, n-1 for the second, and so on, giving n * (n-1) * ... * 1 = n! - true. Statement B is the standard formula for combinations (order does not matter): C(n,r) = n!/(r!(n-r)!) - true. Statement C is a direct statement of the Pigeonhole Principle: distributing n+1 items into n containers forces at least one container to receive at least ceiling((n+1)/n) = 2 items - true. Statement D is FALSE - it confuses permutations with combinations: the number of ORDERED arrangements (permutations) of n objects taken r at a time is P(n,r) = n!/(n-r)!, which is r! times LARGER than C(n,r) (since each combination of r objects can be arranged in r! different orders). Only when r=0 or r=1 do P(n,r) and C(n,r) coincide, but not in general. So A, B, and C are true; D is false."
+},
+{
+  id: 'engmath-combinatorics-y2',
+  q: 'Which of the following identities involving binomial coefficients C(n,k) = n! / (k!(n-k)!) are TRUE for all valid n and k? (Select ALL that apply)',
+  options: ['Sum_{k=0}^{n} C(n,k) = 2^n', "Pascal's rule: C(n,k) = C(n-1,k-1) + C(n-1,k)", 'Sum_{k=0}^{n} (-1)^k C(n,k) = 0 for n >= 1', 'C(n,k) = C(n, n-k+1) for all 0 <= k <= n'],
+  answers: [0, 1, 2],
+  marks: 2,
+  difficulty: 'medium',
+  type: 'concept',
+  explanation: "Statement A follows from the Binomial Theorem by setting x=y=1 in (x+y)^n = sum C(n,k) x^k y^(n-k): this gives 2^n = sum_{k=0}^n C(n,k) - true, and it also counts the total number of subsets of an n-element set. Statement B is Pascal's Rule, derived by conditioning on whether a specific element is included (C(n-1,k-1) ways) or excluded (C(n-1,k) ways) from a k-subset - true, and it is the basis of Pascal's Triangle. Statement C follows from the Binomial Theorem with x=1, y=-1: (1-1)^n = 0 = sum_{k=0}^n (-1)^k C(n,k) for n >= 1 - true. Statement D is FALSE - the correct symmetry identity is C(n,k) = C(n, n-k) (choosing k elements to include is equivalent to choosing n-k elements to exclude), NOT C(n, n-k+1), which is generally a different (shifted) binomial coefficient. So A, B, and C are true identities; D is not."
+},
+{
+  id: 'engmath-combinatorics-y3',
+  q: 'Let D(n) denote the number of derangements (permutations with no fixed points) of n distinct objects, with D(0) = 1. Which of the following statements are TRUE? (Select ALL that apply)',
+  options: ['D(n) satisfies the recurrence D(n) = (n-1)[D(n-1) + D(n-2)] for n >= 2', 'D(1) = 0', 'D(2) = 1', 'D(3) = 3'],
+  answers: [0, 1, 2],
+  marks: 2,
+  difficulty: 'hard',
+  type: 'concept',
+  explanation: "Statement A is the standard derangement recurrence, derivable via inclusion-exclusion or combinatorial argument on where element n maps - true. Statement B is true by direct enumeration: with 1 object, the only permutation is the identity itself, which necessarily fixes that object, so there are 0 derangements, D(1) = 0. Statement C is true by enumeration: with 2 objects {1,2}, the permutations are (1,2) [identity, has fixed points] and (2,1) [swaps both, no fixed points] - exactly 1 derangement, so D(2) = 1. Statement D is FALSE - the actual value is D(3) = 2, not 3: with objects {1,2,3}, the derangements are (2,3,1) and (3,1,2) only (mapping 1->2->3->1 and 1->3->2->1), giving exactly 2 derangements; this can also be verified via the recurrence D(3) = (3-1)[D(2)+D(1)] = 2*(1+0) = 2. So A, B, and C are true; D is false since D(3) = 2, not 3."
+},
+{
+  id: 'engmath-combinatorics-y4',
+  q: 'How many distinct arrangements (permutations) are there of all the letters in the word STATISTICS (which has 10 letters: S appears 3 times, T appears 3 times, A appears 1 time, I appears 2 times, C appears 1 time)?',
+  options: [],
+  answer: 50400,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'medium',
+  type: 'numerical',
+  explanation: "The number of distinct arrangements of a multiset with n total items containing repeated elements is given by the multinomial coefficient n! / (n1! * n2! * ... * nk!), where ni is the count of each repeated symbol. The word STATISTICS has 10 letters total with S occurring 3 times, T occurring 3 times, I occurring 2 times, and A and C each occurring once. So the count is 10! / (3! * 3! * 1! * 2! * 1!) = 3628800 / (6 * 6 * 1 * 2 * 1) = 3628800 / 72 = 50400. This division by the factorials of the repeat-counts corrects for the overcounting that would occur if all 10 letters were treated as distinguishable (which would give 10! arrangements), since swapping identical letters among themselves produces no new distinguishable word."
+},
+{
+  id: 'engmath-combinatorics-y5',
+  q: 'From a standard deck of 52 playing cards (which contains exactly 4 aces), how many distinct 5-card hands contain EXACTLY 3 aces?',
+  options: [],
+  answer: 4512,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'medium',
+  type: 'numerical',
+  explanation: "To form a 5-card hand with exactly 3 aces, we must choose 3 of the 4 available aces AND choose the remaining 2 cards from the 48 non-ace cards, with the two choices being independent so their counts multiply. The number of ways to choose 3 aces from 4 is C(4,3) = 4. The number of ways to choose 2 non-ace cards from the remaining 48 cards is C(48,2) = 48*47/2 = 2256/2 = 1128. By the multiplication principle, the total number of such hands is 4 * 1128 = 4512. This ensures we get exactly 3 aces (not 4, and not fewer) since the other 2 cards are explicitly restricted to be drawn only from the 48 non-ace cards."
+},
+{
+  id: 'engmath-combinatorics-y6',
+  q: 'In how many distinct ways can 8 different people be seated around a circular table, if seatings that are rotations of each other are considered the SAME arrangement?',
+  options: [],
+  answer: 5040,
+  kind: 'nat',
+  marks: 1,
+  difficulty: 'medium',
+  type: 'numerical',
+  explanation: "For circular permutations of n distinct objects where rotations are considered identical, the standard technique is to fix one object's position (to eliminate the rotational symmetry) and then arrange the remaining n-1 objects linearly relative to it, giving (n-1)! distinct arrangements. This works because each of the n! linear arrangements corresponds to exactly n circular rotations of the same seating, so dividing n! by n gives (n-1)!. Here n = 8, so the number of distinct circular seatings is (8-1)! = 7! = 5040. Note that if reflections (clockwise vs counterclockwise) were also considered identical, the count would further halve to 7!/2 = 2520, but the problem here only asks about rotational equivalence, so 5040 is the correct count."
+}
+);
+
+
+window.GATE_DATA.questions['engmath'].topics.find(function(t){return t.id==='engmath-linear-algebra';}).questions.push(
+{
+  id: 'engmath-linear-algebra-y1',
+  q: 'A 3x3 matrix A has eigenvalues 2, 3, and 5 (counted with multiplicity). Which of the following statements are TRUE? (Select ALL that apply)',
+  options: ['det(A) = 30', 'trace(A) = 10', 'A is invertible', 'A has 0 as one of its eigenvalues'],
+  answers: [0, 1, 2],
+  marks: 2,
+  difficulty: 'medium',
+  type: 'concept',
+  explanation: "Statement A uses the theorem that the determinant of a square matrix equals the product of its eigenvalues (with multiplicity): det(A) = 2 * 3 * 5 = 30 - true. Statement B uses the theorem that the trace equals the sum of the eigenvalues: trace(A) = 2 + 3 + 5 = 10 - true. Statement C follows because a matrix is invertible if and only if 0 is NOT an eigenvalue (equivalently, det(A) is not equal to 0); since det(A) = 30 which is nonzero, A is invertible - true. Statement D is FALSE - it directly contradicts the given eigenvalues (2, 3, 5), none of which is 0, and is also inconsistent with statement C's conclusion that A is invertible (an invertible matrix can never have 0 as an eigenvalue, since that would make det(A) = 0). So A, B, and C are true; D is false."
+},
+{
+  id: 'engmath-linear-algebra-y2',
+  q: 'Which of the following statements about eigenvalues and matrices are TRUE in general? (Select ALL that apply)',
+  options: ['The eigenvalues of a real symmetric matrix are always real numbers', 'Eigenvectors corresponding to distinct eigenvalues of a real symmetric matrix are orthogonal to each other', 'The determinant of a square matrix equals the product of all its eigenvalues (counted with multiplicity)', 'If a square matrix is invertible, then 0 must be one of its eigenvalues'],
+  answers: [0, 1, 2],
+  marks: 2,
+  difficulty: 'medium',
+  type: 'concept',
+  explanation: "Statement A is the Spectral Theorem guarantee: every real symmetric matrix has only real eigenvalues (never complex), a cornerstone result used throughout applications like PCA and vibration analysis - true. Statement B is also part of the Spectral Theorem: for a real symmetric matrix, eigenvectors belonging to different eigenvalues are automatically orthogonal - true. Statement C is a standard determinant-eigenvalue relationship, provable from the characteristic polynomial det(A - lambda*I) evaluated appropriately - true. Statement D is FALSE - it states the exact opposite of the correct relationship: a matrix is invertible precisely when 0 is NOT an eigenvalue (since det(A) = product of eigenvalues, and det(A) = 0 iff at least one eigenvalue is 0, which would make A singular/non-invertible). So A, B, and C are true; D is false."
+},
+{
+  id: 'engmath-linear-algebra-y3',
+  q: 'Which of the following statements about matrix rank and linear independence are TRUE? (Select ALL that apply)',
+  options: ['For an m x n matrix A, rank(A) + nullity(A) = n (the Rank-Nullity Theorem)', 'If an m x n matrix A has rank(A) = n (full column rank), then the columns of A are linearly independent', 'A square matrix is invertible if and only if its determinant is nonzero', 'The rank of an m x n matrix can exceed min(m, n)'],
+  answers: [0, 1, 2],
+  marks: 2,
+  difficulty: 'medium',
+  type: 'concept',
+  explanation: "Statement A is the Rank-Nullity Theorem, a fundamental result of linear algebra relating the dimension of the column space (rank) and the null space (nullity) to the number of columns n - true. Statement B follows directly from the definition of rank as the dimension of the column space: if rank(A) = n equals the total number of columns, then no column can be expressed as a linear combination of the others, meaning the columns are linearly independent - true. Statement C is the standard invertibility criterion via determinants - true. Statement D is FALSE - the rank of any m x n matrix is always bounded above by min(m, n), since the rank cannot exceed the number of rows (the row space has dimension at most m) nor the number of columns (the column space has dimension at most n); it is mathematically impossible for rank to exceed this minimum. So A, B, and C are true; D is false."
+},
+{
+  id: 'engmath-linear-algebra-y4',
+  q: 'What is the determinant of the matrix [[2, 3], [4, 1]]?',
+  options: [],
+  answer: -10,
+  kind: 'nat',
+  marks: 1,
+  difficulty: 'easy',
+  type: 'numerical',
+  explanation: "For a 2x2 matrix [[a,b],[c,d]], the determinant is computed as ad - bc. Here a=2, b=3, c=4, d=1, so det = (2)(1) - (3)(4) = 2 - 12 = -10. This value being nonzero also confirms the matrix is invertible (has full rank 2), and its magnitude represents the (signed) area scaling factor that this matrix applies to unit areas under the corresponding linear transformation, with the negative sign indicating an orientation reversal."
+},
+{
+  id: 'engmath-linear-algebra-y5',
+  q: 'What is the rank of the matrix [[1, 2, 3], [2, 4, 6], [1, 1, 1]]?',
+  options: [],
+  answer: 2,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'medium',
+  type: 'numerical',
+  explanation: "To find the rank, reduce the matrix to row echelon form. Row 2 = [2,4,6] = 2 * Row 1 = 2*[1,2,3], so Row 2 is a linear multiple of Row 1 and becomes a zero row after the operation R2 -> R2 - 2*R1, giving [0,0,0]. The remaining nonzero rows are Row 1 = [1,2,3] and Row 3 = [1,1,1]. These two rows are not proportional to each other (there is no scalar k such that [1,1,1] = k*[1,2,3], since that would require k=1 from the first entry but k=0.5 from the second entry, a contradiction), so they are linearly independent. After elimination, exactly 2 nonzero, linearly independent rows remain, so the rank of the matrix is 2."
+},
+{
+  id: 'engmath-linear-algebra-y6',
+  q: 'A 4x4 matrix has eigenvalues 1, -2, 3, and 4 (counted with multiplicity). What is the determinant of this matrix?',
+  options: [],
+  answer: -24,
+  kind: 'nat',
+  marks: 1,
+  difficulty: 'easy',
+  type: 'numerical',
+  explanation: "The determinant of a square matrix equals the product of all its eigenvalues, counted with multiplicity: det(A) = lambda1 * lambda2 * lambda3 * lambda4. Here the eigenvalues are 1, -2, 3, and 4, so det(A) = 1 * (-2) * 3 * 4 = -2 * 3 * 4 = -6 * 4 = -24. This follows from the fact that det(A) = det(A - 0*I) equals the characteristic polynomial evaluated at lambda = 0 up to a sign of (-1)^n, or equivalently from writing A in a basis of eigenvectors (if diagonalizable) as a diagonal matrix whose determinant is simply the product of its diagonal (eigenvalue) entries. Hence det(A) = -24."
+}
+);
+
+
+window.GATE_DATA.questions['engmath'].topics.find(function(t){return t.id==='engmath-calculus';}).questions.push(
+{
+  id: 'engmath-calculus-y1',
+  q: 'Which of the following statements about continuity and differentiability of real functions are TRUE? (Select ALL that apply)',
+  options: ['If a function is differentiable at a point, it must be continuous at that point', 'If a function is continuous at a point, it must be differentiable at that point', 'The function f(x) = |x| is continuous everywhere but not differentiable at x = 0', "Rolle's Theorem requires f to be continuous on [a,b], differentiable on (a,b), and f(a) = f(b)"],
+  answers: [0, 2, 3],
+  marks: 2,
+  difficulty: 'medium',
+  type: 'concept',
+  explanation: "Statement A is a fundamental theorem: differentiability at a point implies continuity there (differentiability is a strictly stronger condition), since the existence of the limit defining the derivative forces the function's value to change continuously - true. Statement B is FALSE - this is the classic converse trap: continuity does NOT imply differentiability. Statement C provides exactly this counterexample: f(x) = |x| is continuous at x=0 (no jump or break), but the left-hand derivative there is -1 while the right-hand derivative is +1, so the derivative does not exist at x=0 - true, and it directly disproves B. Statement D correctly states the three hypotheses of Rolle's Theorem (continuity on the closed interval, differentiability on the open interval, and equal endpoint values), all of which are necessary for the conclusion that some c in (a,b) has f'(c)=0 - true. So A, C, and D are true; B is false."
+},
+{
+  id: 'engmath-calculus-y2',
+  q: 'Which of the following statements about limits and sequences are TRUE? (Select ALL that apply)',
+  options: ["L'Hopital's Rule can be applied to indeterminate forms of type 0/0 or infinity/infinity", 'If lim_{x->a} f(x) exists (as a finite value), then f must be continuous at x = a', 'Every convergent sequence of real numbers is bounded', 'Every bounded sequence of real numbers is convergent'],
+  answers: [0, 2],
+  marks: 2,
+  difficulty: 'medium',
+  type: 'concept',
+  explanation: "Statement A correctly describes the applicability conditions of L'Hopital's Rule, which resolves indeterminate limit forms 0/0 and infinity/infinity by differentiating numerator and denominator separately - true. Statement B is FALSE - the limit of f as x approaches a can exist as a finite value even if f is not defined at a, or is defined but with a different value there (a 'removable discontinuity'); continuity additionally requires f(a) to be defined AND equal to that limit, which is a strictly stronger condition. Statement C is a standard theorem: every convergent sequence must be bounded, because a convergent sequence eventually stays arbitrarily close to its limit, and only finitely many terms can lie outside a bounded neighborhood of it - true. Statement D is FALSE - boundedness alone does not guarantee convergence; the classic counterexample is the sequence a_n = (-1)^n, which is bounded (between -1 and 1) but oscillates forever between -1 and 1 without converging to any single limit. So A and C are true; B and D are false."
+},
+{
+  id: 'engmath-calculus-y3',
+  q: 'Which of the following statements about integration are TRUE? (Select ALL that apply)',
+  options: ['If f is continuous on [a,b], then f is Riemann integrable on [a,b]', 'The Fundamental Theorem of Calculus states that if f is continuous, then d/dx of the integral from a to x of f(t) dt equals f(x)', 'If the integral from a to b of f(x) dx equals 0, then f(x) = 0 for every x in [a,b]', 'The Mean Value Theorem for integrals states that for f continuous on [a,b], there exists some c in [a,b] such that f(c) equals (1/(b-a)) times the integral from a to b of f(x) dx'],
+  answers: [0, 1, 3],
+  marks: 2,
+  difficulty: 'medium',
+  type: 'concept',
+  explanation: "Statement A is a standard integrability theorem: every function continuous on a closed bounded interval is Riemann integrable on that interval - true. Statement B correctly states the First Fundamental Theorem of Calculus, which establishes that differentiation and integration are inverse operations for continuous integrands - true. Statement C is FALSE - a definite integral evaluating to 0 does NOT require the function to be identically 0; the classic counterexample is any odd function, such as f(x) = x on [-1,1], whose positive and negative area contributions exactly cancel to give an integral of 0, even though f(x) = x is nonzero everywhere except at x=0. Statement D correctly states the Mean Value Theorem for Integrals, which guarantees such a point c exists precisely because f's average value over [a,b] must be attained somewhere by a continuous function on that interval (by the Intermediate Value Theorem applied to the average) - true. So A, B, and D are true; C is false."
+},
+{
+  id: 'engmath-calculus-y4',
+  q: 'Evaluate the limit: lim_{x -> 0} sin(3x) / x.',
+  options: [],
+  answer: 3,
+  kind: 'nat',
+  marks: 1,
+  difficulty: 'easy',
+  type: 'numerical',
+  explanation: "This limit can be evaluated using the standard fact that lim_{u -> 0} sin(u)/u = 1. Rewrite sin(3x)/x as 3 * [sin(3x)/(3x)] by multiplying and dividing by 3. As x -> 0, the substitution u = 3x also gives u -> 0, so sin(3x)/(3x) = sin(u)/u -> 1. Therefore the overall limit is 3 * 1 = 3. Alternatively, this can be confirmed using L'Hopital's Rule since the limit is of indeterminate form 0/0: differentiating numerator and denominator with respect to x gives lim_{x->0} [3cos(3x)] / 1 = 3*cos(0) = 3*1 = 3, confirming the same answer."
+},
+{
+  id: 'engmath-calculus-y5',
+  q: 'Let f(x) = x^3 - 3x. What is the value of f\'(2), the derivative of f evaluated at x = 2?',
+  options: [],
+  answer: 9,
+  kind: 'nat',
+  marks: 1,
+  difficulty: 'easy',
+  type: 'numerical',
+  explanation: "First, differentiate f(x) = x^3 - 3x term by term using the power rule: f'(x) = 3x^2 - 3. Now substitute x = 2: f'(2) = 3(2)^2 - 3 = 3(4) - 3 = 12 - 3 = 9. Hence the derivative of f at x=2 is 9, meaning that at the point x=2, the function is increasing at an instantaneous rate of 9 units of f per unit of x - since this value is positive, the function is locally increasing at x=2 (consistent with x=2 being past the local minimum of f, which occurs at x=1 where f'(x)=0)."
+},
+{
+  id: 'engmath-calculus-y6',
+  q: 'Evaluate the definite integral: integral from x=0 to x=2 of x^2 dx.',
+  options: [],
+  answer: 2.6667,
+  tolerance: 0.01,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'easy',
+  type: 'numerical',
+  explanation: "Using the power rule for integration, the antiderivative of x^2 is x^3/3. By the Fundamental Theorem of Calculus, the definite integral from 0 to 2 is [x^3/3] evaluated at the upper limit minus at the lower limit: (2^3)/3 - (0^3)/3 = 8/3 - 0 = 8/3. As a decimal, 8/3 = 2.6666..., which rounds to approximately 2.6667. This represents the exact area under the curve y = x^2 between x=0 and x=2, and can be sanity-checked by noting it should be somewhat less than the area of the bounding rectangle 2*4=8 (since x^2 is convex and lies below its secant line's average height over most of the interval, but the exact value 8/3 ≈ 2.67 reflects the specific cubic growth of the antiderivative)."
+}
+);
+
+
+window.GATE_DATA.questions['engmath'].topics.find(function(t){return t.id==='engmath-probability';}).questions.push(
+{
+  id: 'engmath-probability-y1',
+  q: 'Let A and B be two events in a sample space. Which of the following statements are TRUE in general? (Select ALL that apply)',
+  options: ['P(A union B) = P(A) + P(B) - P(A intersect B), always', 'If A and B are mutually exclusive, then P(A intersect B) = 0', 'If A and B are independent, then P(A intersect B) = P(A) * P(B)', 'If A and B are mutually exclusive, then A and B must also be independent'],
+  answers: [0, 1, 2],
+  marks: 2,
+  difficulty: 'medium',
+  type: 'concept',
+  explanation: "Statement A is the general Inclusion-Exclusion formula for the union of two events, which always holds regardless of any relationship between A and B (it corrects for double-counting the overlap) - true. Statement B is the definition of mutually exclusive (disjoint) events: they cannot both occur simultaneously, so their intersection is the empty event with probability 0 - true. Statement C is the definition of independence for two events - true by definition. Statement D is FALSE - mutually exclusive events with nonzero individual probabilities are actually the OPPOSITE of independent: if A and B are mutually exclusive, P(A intersect B) = 0, but P(A)*P(B) is nonzero (assuming both events have positive probability), so P(A intersect B) is not equal to P(A)*P(B) - they fail the independence condition. Intuitively, knowing A occurred tells you definitively that B did NOT occur, which is strong (negative) dependence, not independence. So A, B, and C are true; D is false."
+},
+{
+  id: 'engmath-probability-y2',
+  q: 'Let X and Y be random variables. Which of the following statements are TRUE in general? (Select ALL that apply)',
+  options: ['E[X + Y] = E[X] + E[Y], regardless of whether X and Y are independent', 'Var(X + Y) = Var(X) + Var(Y), regardless of whether X and Y are independent', 'If X and Y are independent, then E[XY] = E[X] * E[Y]', 'For any random variable X, Var(X) = E[X^2] - (E[X])^2'],
+  answers: [0, 2, 3],
+  marks: 2,
+  difficulty: 'medium',
+  type: 'concept',
+  explanation: "Statement A is the Linearity of Expectation, which holds UNCONDITIONALLY - it requires no independence assumption whatsoever, since expectation is a linear operator on the underlying probability measure - true. Statement C is a standard consequence of independence: independent random variables satisfy E[XY] = E[X]*E[Y] (their joint distribution factors, so the expectation of the product factors too) - true. Statement D is the standard computational formula for variance, derivable by expanding Var(X) = E[(X-E[X])^2] = E[X^2] - 2*E[X]*E[X] + (E[X])^2 = E[X^2] - (E[X])^2 - always true for any random variable. Statement B is FALSE in general - unlike expectation, variance of a sum requires independence (or at least zero covariance) to simply add: the general formula is Var(X+Y) = Var(X) + Var(Y) + 2*Cov(X,Y), and this reduces to Var(X)+Var(Y) only when Cov(X,Y)=0 (e.g., when X,Y are independent), not in general. So A, C, and D are true; B is false."
+},
+{
+  id: 'engmath-probability-y3',
+  q: 'Which of the following statements about standard probability distributions are TRUE? (Select ALL that apply)',
+  options: ['For a Binomial(n,p) random variable, the mean is np and the variance is np(1-p)', 'For a Poisson(lambda) random variable, both the mean and the variance equal lambda', 'The sum of two independent Poisson random variables with parameters lambda1 and lambda2 is itself Poisson with parameter lambda1 + lambda2', 'For a continuous Uniform distribution on [a,b], the mean (a+b)/2 is always strictly greater than the median'],
+  answers: [0, 1, 2],
+  marks: 2,
+  difficulty: 'medium',
+  type: 'concept',
+  explanation: "Statement A gives the standard mean and variance formulas for the Binomial distribution, derivable by summing n independent Bernoulli(p) trials (each with mean p, variance p(1-p)) - true. Statement B gives the well-known special property of the Poisson distribution: uniquely among common distributions, its mean and variance are both exactly equal to its single parameter lambda - true. Statement C is the Poisson additivity property (reproductive property): the sum of independent Poisson random variables is Poisson with the summed rate parameter, provable via convolution of their probability mass functions or via moment generating functions - true. Statement D is FALSE - the Uniform distribution on [a,b] is symmetric about its midpoint (a+b)/2, so the mean and the median COINCIDE exactly at (a+b)/2; the mean is never strictly greater than the median for this symmetric distribution, they are always equal. So A, B, and C are true; D is false."
+},
+{
+  id: 'engmath-probability-y4',
+  q: 'Two fair six-sided dice are rolled independently. What is the probability that the sum of the two dice equals 7? (Give your answer as a decimal.)',
+  options: [],
+  answer: 0.1667,
+  tolerance: 0.01,
+  kind: 'nat',
+  marks: 1,
+  difficulty: 'easy',
+  type: 'numerical',
+  explanation: "When two fair dice are rolled, there are 6 * 6 = 36 equally likely outcomes in the sample space. The outcomes that sum to 7 are: (1,6), (2,5), (3,4), (4,3), (5,2), (6,1) - exactly 6 favorable outcomes (this is the maximum count for any sum with two dice, since 7 is the sum with the most ways to form it, being the midpoint value). So the probability is 6/36 = 1/6 = 0.1666..., which rounds to approximately 0.1667. This is a classic and frequently tested result in introductory probability, illustrating counting favorable outcomes over total outcomes in a discrete uniform sample space."
+},
+{
+  id: 'engmath-probability-y5',
+  q: 'A box contains 5 red balls and 3 blue balls (8 balls total). Two balls are drawn at random WITHOUT replacement. What is the probability that BOTH balls drawn are red? (Give your answer as a decimal.)',
+  options: [],
+  answer: 0.3571,
+  tolerance: 0.01,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'medium',
+  type: 'numerical',
+  explanation: "The total number of ways to choose 2 balls from 8 (regardless of color) is C(8,2) = 8*7/2 = 28. The number of ways to choose 2 red balls from the 5 available red balls is C(5,2) = 5*4/2 = 10. Since each pair of balls is equally likely to be drawn, the probability both are red is the ratio of favorable to total outcomes: 10/28 = 5/14 = 0.35714..., which rounds to approximately 0.3571. Alternatively, using sequential conditional probability: P(1st red) = 5/8, and given the first was red, P(2nd red | 1st red) = 4/7 (4 red balls remain out of 7 total), so P(both red) = (5/8)*(4/7) = 20/56 = 5/14, confirming the same value 0.3571."
+},
+{
+  id: 'engmath-probability-y6',
+  q: 'A random variable X follows a Binomial distribution with parameters n = 10 and p = 0.3. What is E[X], the expected value of X?',
+  options: [],
+  answer: 3,
+  kind: 'nat',
+  marks: 1,
+  difficulty: 'easy',
+  type: 'numerical',
+  explanation: "For a Binomial(n, p) random variable, which models the number of successes in n independent Bernoulli(p) trials, the expected value is given by the standard formula E[X] = n * p. This follows from linearity of expectation applied to the sum of n indicator variables (one per trial), each with expectation p, since E[X] = E[sum of indicators] = sum of E[indicator_i] = n*p regardless of any independence assumption. Here n = 10 and p = 0.3, so E[X] = 10 * 0.3 = 3. This means that, on average, we expect exactly 3 successes out of 10 trials when each trial independently succeeds with probability 0.3."
+}
+);

@@ -835,7 +835,7 @@ window.GATE_DATA.questions['algo'].topics.push({
   name: 'Sorting & Searching',
   theory: {
     intro: "Sorting and searching form the most concretely testable part of the algorithms syllabus: every algorithm has a name, a known best/worst/average time, and a known stability and space profile, so GATE can ask sharp, unambiguous questions about them. Two big ideas anchor this topic. First, comparison-based sorting has a provable Omega(n log n) worst-case lower bound — no comparison sort can ever beat this, which is why merge sort and heapsort at Theta(n log n) are considered asymptotically optimal, and why beating n log n (as counting, radix, and bucket sort do) requires abandoning pure comparisons in favor of exploiting known structure in the keys. Second, searching and selection (finding the kth smallest element) each have their own tight bounds: binary search needs about log2(n) comparisons, and selection can be done in linear time either on average (quickselect) or even in the worst case (median-of-medians). Expect 2-4 marks from this area most years, often as numerical questions.",
-    core: "The comparison-sort lower bound. Any correct sorting algorithm that only compares pairs of elements (never inspects their bit patterns or numeric value directly) can be modeled as a binary decision tree: each internal node is one comparison, each root-to-leaf path is one possible execution, and each leaf must correspond to a distinct final ordering of the input. Since there are n! possible permutations of n distinct elements, and the algorithm must be able to output every one of them for some input, the tree needs at least n! leaves. A binary tree with L leaves must have height at least log2(L) (since a tree of height h has at most 2^h leaves). So the worst-case number of comparisons is at least log2(n!), and by Stirling's approximation log2(n!) = Theta(n log n). This proves Omega(n log n) is unavoidable for ANY comparison-based sort — merge sort and heapsort, both Theta(n log n) in the worst case, are therefore asymptotically optimal comparison sorts, and no cleverness can produce a comparison sort that is, say, Theta(n) in the worst case.\n\n• Stability and in-place classification. A sort is STABLE if it preserves the relative order of elements with equal keys — important when sorting records by one field while wanting ties to keep their prior order (e.g. re-sorting an already-name-sorted list by department). A sort is IN-PLACE if it uses only O(1) (or O(log n), counting recursion stack) extra memory beyond the input array. Insertion sort, bubble sort: stable and in-place. Selection sort: in-place but NOT stable (its characteristic long-distance swap can jump an equal element past another equal one). Merge sort: stable but NOT in-place (needs Theta(n) auxiliary space for merging). Quicksort and heapsort: in-place but NOT stable. Counting sort and radix sort: stable, but NOT in-place (need auxiliary count/output arrays). Bucket sort: stable if a stable method sorts within each bucket, and also not in-place.\n\n• Best/worst/average cases. Insertion sort and bubble sort: best case O(n) (already sorted, with an early-exit check), worst and average O(n^2). Selection sort: O(n^2) in ALL cases — it always scans the remaining unsorted portion fully regardless of input order, so its performance doesn't depend on input arrangement. Merge sort and heapsort: Theta(n log n) in best, worst, AND average cases — their performance never depends on input arrangement. Quicksort: best and average case Theta(n log n), but worst case Theta(n^2), triggered when the chosen pivot is always the minimum or maximum remaining element (classically, a fixed first-element pivot on an already-sorted array).\n\n• Non-comparison sorts and their conditions. Counting sort assumes keys are integers in a known bounded range [0, k); it counts occurrences of each key value, then computes prefix sums to place elements directly, running in Theta(n + k) time and space. It is efficient only when k = O(n); if k is much larger than n (e.g. k = n^2), the k term dominates and it loses its advantage. Radix sort sorts multi-digit (or multi-character) keys by repeatedly applying a STABLE sort (typically counting sort) one digit position at a time, from least significant to most significant digit; for n keys with d digits each in base b, it runs in Theta(d(n + b)) time — if d is a small constant and b = O(n), this is Theta(n), beating the comparison-sort lower bound because it never directly compares two whole keys. Bucket sort assumes keys are roughly uniformly distributed over a known range (classically real numbers in [0,1)); it distributes elements into k buckets, sorts each bucket (often with insertion sort, since buckets are expected to be small), and concatenates — giving expected time Theta(n + k), but a worst case of Theta(n^2) if the distribution assumption fails and all elements land in a single bucket.\n\n• Binary search comparison counting. Searching a sorted array of n elements by repeatedly halving the search range takes at most floor(log2(n)) + 1 comparisons in the worst case (equivalently, ceil(log2(n+1))), since each comparison eliminates roughly half the remaining candidates.\n\n• Selection (finding the kth smallest). Quickselect (Hoare's selection algorithm), which partitions like quicksort but recurses into only the one side containing the target rank, achieves EXPECTED Theta(n) time with a randomly chosen pivot, but degrades to worst-case Theta(n^2) under adversarial pivot choices (mirroring quicksort's own worst case). The median-of-medians (BFPRT) algorithm removes this risk: it splits the array into groups of 5, finds each group's median by brute force, recursively finds the median of those medians, and uses that as the pivot — this guarantees the pivot always eliminates a constant fraction of the array, giving worst-case Theta(n) time via the recurrence T(n) = T(n/5) + T(7n/10) + O(n), which solves to Theta(n) because the two recursive fractions sum to 9/10 < 1."
+    core: "The comparison-sort lower bound. Any correct sorting algorithm that only compares pairs of elements (never inspects their bit patterns or numeric value directly) can be modeled as a binary decision tree: each internal node is one comparison, each root-to-leaf path is one possible execution, and each leaf must correspond to a distinct final ordering of the input. Since there are n! possible permutations of n distinct elements, and the algorithm must be able to output every one of them for some input, the tree needs at least n! leaves. A binary tree with L leaves must have height at least log2(L) (since a tree of height h has at most 2^h leaves). So the worst-case number of comparisons is at least log2(n!), and by the Stirling approximation log2(n!) = Theta(n log n). This proves Omega(n log n) is unavoidable for ANY comparison-based sort — merge sort and heapsort, both Theta(n log n) in the worst case, are therefore asymptotically optimal comparison sorts, and no cleverness can produce a comparison sort that is, say, Theta(n) in the worst case.\n\n• Stability and in-place classification. A sort is STABLE if it preserves the relative order of elements with equal keys — important when sorting records by one field while wanting ties to keep their prior order (e.g. re-sorting an already-name-sorted list by department). A sort is IN-PLACE if it uses only O(1) (or O(log n), counting recursion stack) extra memory beyond the input array. Insertion sort, bubble sort: stable and in-place. Selection sort: in-place but NOT stable (its characteristic long-distance swap can jump an equal element past another equal one). Merge sort: stable but NOT in-place (needs Theta(n) auxiliary space for merging). Quicksort and heapsort: in-place but NOT stable. Counting sort and radix sort: stable, but NOT in-place (need auxiliary count/output arrays). Bucket sort: stable if a stable method sorts within each bucket, and also not in-place.\n\n• Best/worst/average cases. Insertion sort and bubble sort: best case O(n) (already sorted, with an early-exit check), worst and average O(n^2). Selection sort: O(n^2) in ALL cases — it always scans the remaining unsorted portion fully regardless of input order, so its performance doesn't depend on input arrangement. Merge sort and heapsort: Theta(n log n) in best, worst, AND average cases — their performance never depends on input arrangement. Quicksort: best and average case Theta(n log n), but worst case Theta(n^2), triggered when the chosen pivot is always the minimum or maximum remaining element (classically, a fixed first-element pivot on an already-sorted array).\n\n• Non-comparison sorts and their conditions. Counting sort assumes keys are integers in a known bounded range [0, k); it counts occurrences of each key value, then computes prefix sums to place elements directly, running in Theta(n + k) time and space. It is efficient only when k = O(n); if k is much larger than n (e.g. k = n^2), the k term dominates and it loses its advantage. Radix sort sorts multi-digit (or multi-character) keys by repeatedly applying a STABLE sort (typically counting sort) one digit position at a time, from least significant to most significant digit; for n keys with d digits each in base b, it runs in Theta(d(n + b)) time — if d is a small constant and b = O(n), this is Theta(n), beating the comparison-sort lower bound because it never directly compares two whole keys. Bucket sort assumes keys are roughly uniformly distributed over a known range (classically real numbers in [0,1)); it distributes elements into k buckets, sorts each bucket (often with insertion sort, since buckets are expected to be small), and concatenates — giving expected time Theta(n + k), but a worst case of Theta(n^2) if the distribution assumption fails and all elements land in a single bucket.\n\n• Binary search comparison counting. Searching a sorted array of n elements by repeatedly halving the search range takes at most floor(log2(n)) + 1 comparisons in the worst case (equivalently, ceil(log2(n+1))), since each comparison eliminates roughly half the remaining candidates.\n\n• Selection (finding the kth smallest). Quickselect (Hoare's selection algorithm), which partitions like quicksort but recurses into only the one side containing the target rank, achieves EXPECTED Theta(n) time with a randomly chosen pivot, but degrades to worst-case Theta(n^2) under adversarial pivot choices (mirroring quicksort's own worst case). The median-of-medians (BFPRT) algorithm removes this risk: it splits the array into groups of 5, finds each group's median by brute force, recursively finds the median of those medians, and uses that as the pivot — this guarantees the pivot always eliminates a constant fraction of the array, giving worst-case Theta(n) time via the recurrence T(n) = T(n/5) + T(7n/10) + O(n), which solves to Theta(n) because the two recursive fractions sum to 9/10 < 1."
     ,
     strategy: "GATE's sorting/searching questions repeat a small set of shapes every year. First, stability/in-place classification tables: memorize the six-way split (stable+in-place: insertion, bubble; in-place but unstable: selection, quick, heap; stable but not in-place: merge, counting, radix) cold, since questions often ask 'which of the following is NOT stable' or mix two properties in one option to trap you. Second, best/worst/average tables: the two facts worth memorizing hardest are that selection sort is Theta(n^2) unconditionally (input order never helps it) and that merge sort/heapsort are Theta(n log n) unconditionally (input order never hurts them) — quicksort is the only common sort whose case actually depends on the input AND the pivot rule. Third, counting/radix/bucket questions test whether you can identify the PRECONDITION (bounded integer range for counting sort, fixed digit count for radix sort, uniform distribution for bucket sort) that lets a sort beat the Omega(n log n) comparison lower bound — remember these sorts don't contradict the lower bound, since they never directly compare two full keys against each other. Fourth, binary search comparison-counting numericals: practice computing floor(log2 n) + 1 quickly for round numbers like n = 16, 32, 64, 100, 1000. Fifth, selection/quickselect questions testing the average-vs-worst-case gap, mirroring quicksort's own gap. Worked mini-example: for n = 1,000,000 keys, comparison sort needs at least log2(1000000!) ≈ Theta(n log n) ≈ 20 million comparisons in the worst case, while radix sort on, say, 7-digit decimal keys needs only Theta(d(n+b)) = Theta(7 × (1000000 + 10)), i.e. proportional to n, not n log n — the concrete payoff of exploiting key structure instead of pure comparison."
   },
@@ -855,7 +855,7 @@ window.GATE_DATA.questions['algo'].topics.push({
       q: "The proof that comparison sorting requires Omega(n log n) comparisons models execution as a binary decision tree. Which statement correctly completes the proof?",
       options: [
         "The tree must have exactly n leaves, one per input element, giving height Omega(log n)",
-        "The tree must have at least n! leaves (one per possible output permutation), and a binary tree with L leaves has height at least log2(L), giving height Omega(n log n) by Stirling's approximation",
+        "The tree must have at least n! leaves (one per possible output permutation), and a binary tree with L leaves has height at least log2(L), giving height Omega(n log n) by the Stirling approximation",
         "The tree must have at least 2^n leaves because each comparison doubles the number of reachable states, giving height exactly n",
         "The tree's height is irrelevant; only the number of internal nodes determines the running time"
       ],
@@ -863,7 +863,7 @@ window.GATE_DATA.questions['algo'].topics.push({
       marks: 2,
       difficulty: 'hard',
       type: 'concept',
-      explanation: "The correct argument: the algorithm must be able to correctly sort every one of the n! possible input permutations, and each distinct permutation must end at a distinct leaf of the decision tree (since a sorting algorithm cannot output the same fixed final arrangement for two different input orderings and still be correct in general — the leaf must record the specific rearrangement needed). So the tree needs at least n! leaves. Since a binary tree of height h has at most 2^h leaves, we need 2^h >= n!, i.e. h >= log2(n!), and Stirling's approximation gives log2(n!) = Theta(n log n). Option A undercounts drastically — n leaves would only be enough to identify n outcomes, not n! of them. Option C's '2^n leaves' claim is a common but wrong intuition; the tree's leaf count is driven by the number of DISTINCT OUTCOMES the algorithm must produce (n!), not by doubling per comparison in the abstract. Option D is wrong because the running time (worst-case comparisons) is exactly the tree's height, i.e. the longest root-to-leaf path, which is precisely what the argument bounds."
+      explanation: "The correct argument: the algorithm must be able to correctly sort every one of the n! possible input permutations, and each distinct permutation must end at a distinct leaf of the decision tree (since a sorting algorithm cannot output the same fixed final arrangement for two different input orderings and still be correct in general — the leaf must record the specific rearrangement needed). So the tree needs at least n! leaves. Since a binary tree of height h has at most 2^h leaves, we need 2^h >= n!, i.e. h >= log2(n!), and the Stirling approximation gives log2(n!) = Theta(n log n). Option A undercounts drastically — n leaves would only be enough to identify n outcomes, not n! of them. Option C's '2^n leaves' claim is a common but wrong intuition; the tree's leaf count is driven by the number of DISTINCT OUTCOMES the algorithm must produce (n!), not by doubling per comparison in the abstract. Option D is wrong because the running time (worst-case comparisons) is exactly the tree's height, i.e. the longest root-to-leaf path, which is precisely what the argument bounds."
     },
     {
       id: 'algo-sorting-searching-q3',
@@ -1671,5 +1671,410 @@ window.GATE_DATA.questions['algo'].topics.find(function(t){return t.id==='algo-s
   difficulty: 'medium',
   type: 'numerical',
   explanation: 'First count inversions in [5,1,4,2,3] (0-indexed) by checking every pair where the earlier element exceeds the later one: (5,1), (5,4), (5,2), (5,3), (4,2), (4,3) are all inversions; (1,4), (1,2), (1,3), (2,3) are not. Total inversions = 6. Now trace insertion sort directly: start [5,1,4,2,3]. Insert 1: it swaps leftward past 5, giving [1,5,4,2,3], 1 swap. Insert 4: it swaps leftward past 5 only (4 is not smaller than 1, so it stops there), giving [1,4,5,2,3], 1 swap. Insert 2: it swaps leftward past 5 then past 4 (stopping at 1), giving [1,2,4,5,3], 2 swaps. Insert 3: it swaps leftward past 5 then past 4 (stopping at 2), giving [1,2,3,4,5], 2 swaps. Total swaps = 1+1+2+2 = 6, exactly matching the 6 inversions counted directly. This confirms the general theorem that insertion sort\'s adjacent-swap count always equals the array\'s total inversion count, since each swap resolves precisely one out-of-order adjacent pair and no others.'
+}
+);
+
+window.GATE_DATA.questions['algo'].topics.find(function(t){return t.id==='algo-asymptotic';}).questions.push(
+{
+  id: 'algo-asymptotic-y1',
+  q: 'Which of the following statements about asymptotic notation are TRUE? (Select ALL that apply)',
+  options: [
+    'If f(n) = O(g(n)) then g(n) = Omega(f(n))',
+    'n^2 = O(n^3)',
+    '2^n = O(n^2)',
+    'If f(n) = Theta(g(n)) then f(n) = O(g(n)) and f(n) = Omega(g(n))'
+  ],
+  answers: [0, 1, 3],
+  marks: 2,
+  difficulty: 'medium',
+  type: 'concept',
+  explanation: 'Option A is TRUE: this is a direct consequence of the definitions -- f = O(g) means f is eventually bounded above by a constant multiple of g, which is exactly the statement that g is bounded below by a constant multiple of f, i.e. g = Omega(f). Option B is TRUE: O is not a strict order, so a loose but valid upper bound like n^2 = O(n^3) holds since n^2 <= 1*n^3 for all n >= 1. Option C is FALSE: 2^n is an exponential function and n^2 is a polynomial; any exponential with base greater than 1 eventually exceeds any polynomial, so 2^n = omega(n^2), which contradicts 2^n = O(n^2). Option D is TRUE: this is precisely the formal definition of Theta -- f = Theta(g) is defined as f = O(g) AND f = Omega(g) holding simultaneously.'
+},
+{
+  id: 'algo-asymptotic-y2',
+  q: 'Which of the following recurrences solve to Theta(n log n)? (Select ALL that apply)',
+  options: [
+    'T(n) = 2T(n/2) + n',
+    'T(n) = 2T(n/2) + n log n',
+    'T(n) = T(n/2) + T(n/2) + n',
+    'T(n) = 3T(n/3) + n'
+  ],
+  answers: [0, 2, 3],
+  marks: 2,
+  difficulty: 'medium',
+  type: 'concept',
+  explanation: 'Option A is TRUE: this is the classic merge-sort recurrence, a=2,b=2 gives n^(log_2 2)=n, and f(n)=n matches n^1*(log n)^0, which is Master theorem Case 2 with k=0, giving Theta(n^(log n)^1) = Theta(n log n). Option B is FALSE: here f(n) = n log n = n^1*(log n)^1, which is Case 2 with k=1, giving Theta(n log^2 n), not Theta(n log n) -- adding the extra log factor to f(n) adds an extra log factor to the answer. Option C is TRUE: T(n/2)+T(n/2) is exactly 2T(n/2), so this is identical to option A and solves to Theta(n log n). Option D is TRUE: here a=3,b=3, so n^(log_3 3) = n^1 = n, and f(n) = n matches n^1*(log n)^0 exactly, again Case 2 with k=0, giving Theta(n log n).'
+},
+{
+  id: 'algo-asymptotic-y3',
+  q: 'For functions f(n) = n^2, g(n) = n^2 log n, h(n) = 2^n, k(n) = n!, which of the following comparisons are TRUE? (Select ALL that apply)',
+  options: [
+    'f(n) = o(g(n))',
+    'g(n) = O(h(n))',
+    'h(n) = Omega(k(n))',
+    'k(n) = omega(h(n))'
+  ],
+  answers: [0, 1, 3],
+  marks: 2,
+  difficulty: 'hard',
+  type: 'concept',
+  explanation: 'Option A is TRUE: dividing f by g gives n^2/(n^2 log n) = 1/log n, which tends to 0 as n grows, so f is little-o of g -- f grows strictly slower. Option B is TRUE: g(n) = n^2 log n is a polynomial times a polylog factor, and any such function is eventually dominated by any exponential with base greater than 1, so g(n) = O(h(n)) (in fact g = o(h)). Option C is FALSE: factorial growth n! eventually outpaces any fixed-base exponential 2^n (by the Stirling approximation n! is roughly (n/e)^n, which dwarfs 2^n for large n), so h(n) = o(k(n)), meaning h is NOT Omega(k) -- h is much smaller, not larger or equal in order. Option D is TRUE: since n! grows strictly faster than 2^n for all sufficiently large n and the ratio k(n)/h(n) diverges to infinity, k(n) = omega(h(n)) holds by the little-omega definition.'
+},
+{
+  id: 'algo-asymptotic-y4',
+  q: 'Consider the loop: for (i = 1; i <= n; i = i * 3) { for (j = 1; j <= i; j++) { count++; } } executed with n = 27. What is the exact final value of count? (Enter your numerical answer.)',
+  options: [],
+  answer: 40,
+  kind: 'nat',
+  marks: 1,
+  difficulty: 'easy',
+  type: 'numerical',
+  explanation: 'Trace the outer loop variable i: it starts at 1 and triples each iteration, so it takes the values 1, 3, 9, 27; the next value would be 81, which exceeds 27, so the loop stops after i = 27. For each value of i the inner loop executes exactly i times, incrementing count by i. So count accumulates 1 (from i=1) + 3 (from i=3) + 9 (from i=9) + 27 (from i=27) = 40. This is a geometric series 1+3+9+27 = (3^4-1)/(3-1) = 80/2 = 40, confirming the direct sum.'
+},
+{
+  id: 'algo-asymptotic-y5',
+  q: 'The recurrence T(n) = 3T(n/2) + n^2 with base case T(1) = 1 is evaluated exactly (not asymptotically). What is the value of T(4)? (Enter your numerical answer.)',
+  options: [],
+  answer: 37,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'medium',
+  type: 'numerical',
+  explanation: 'Compute bottom-up using the exact recurrence. T(1) = 1 (given). T(2) = 3*T(1) + 2^2 = 3*1 + 4 = 7. T(4) = 3*T(2) + 4^2 = 3*7 + 16 = 21 + 16 = 37. Note this is a direct numerical evaluation of the recurrence relation, distinct from finding its asymptotic Theta-class (which by the Master theorem would be Theta(n^2) since f(n)=n^2 polynomially dominates n^(log_2 3) which is about n^1.585, satisfying Case 3).'
+},
+{
+  id: 'algo-asymptotic-y6',
+  q: 'A nested loop compares every pair (i, j) with 1 <= i < j <= n exactly once. For n = 5, how many total comparisons are performed? (Enter your numerical answer.)',
+  options: [],
+  answer: 10,
+  kind: 'nat',
+  marks: 1,
+  difficulty: 'easy',
+  type: 'numerical',
+  explanation: 'The number of pairs (i, j) with i < j drawn from n = 5 elements is exactly C(5, 2) = 5!/(2!*3!) = (5*4)/2 = 10. Enumerating directly confirms it: with elements indexed 1..5, the pairs are (1,2),(1,3),(1,4),(1,5),(2,3),(2,4),(2,5),(3,4),(3,5),(4,5) -- that is 4+3+2+1 = 10 pairs. This is the standard Theta(n^2) all-pairs comparison count that appears throughout sorting and pattern-matching analysis.'
+}
+);
+
+window.GATE_DATA.questions['algo'].topics.find(function(t){return t.id==='algo-divide-conquer';}).questions.push(
+{
+  id: 'algo-divide-conquer-y1',
+  q: 'Which of the following algorithms use the divide-and-conquer paradigm? (Select ALL that apply)',
+  options: [
+    'Merge Sort',
+    'Quicksort',
+    'Dijkstra\\u2019s shortest path algorithm',
+    'Binary Search'
+  ],
+  answers: [0, 1, 3],
+  marks: 1,
+  difficulty: 'easy',
+  type: 'concept',
+  explanation: 'Merge Sort is a textbook divide-and-conquer algorithm: it divides the array into two halves, conquers each half recursively, and combines them with a merge step -- TRUE. Quicksort is also divide-and-conquer: it partitions the array around a pivot (divide) and recursively sorts each partition (conquer), with no combine step needed since the partition already places elements correctly -- TRUE. Dijkstra\\u2019s algorithm is a greedy algorithm that repeatedly extracts the minimum-distance vertex from a priority queue; it does not divide the problem into independent subproblems, so it is NOT divide-and-conquer -- FALSE. Binary Search is divide-and-conquer: it compares the target with the middle element and recurses into only one half, discarding the other -- TRUE.'
+},
+{
+  id: 'algo-divide-conquer-y2',
+  q: 'Which of the following statements about Strassen\\u2019s matrix multiplication algorithm are TRUE? (Select ALL that apply)',
+  options: [
+    'It multiplies two n x n matrices using 7 multiplications of (n/2) x (n/2) submatrices instead of the naive 8',
+    'Its time complexity is Theta(n^(log2 7)), approximately Theta(n^2.81)',
+    'It is asymptotically slower than the standard Theta(n^3) matrix multiplication algorithm',
+    'It uses additional submatrix additions and subtractions to combine the 7 products into the final result'
+  ],
+  answers: [0, 1, 3],
+  marks: 2,
+  difficulty: 'medium',
+  type: 'concept',
+  explanation: 'Strassen\\u2019s key insight is reducing the 8 recursive multiplications of the naive divide-and-conquer approach to just 7, at the cost of extra additions -- TRUE. Solving T(n) = 7T(n/2) + Theta(n^2) via the Master theorem (Case 1, since n^2 = O(n^(log2 7 - e))) gives Theta(n^(log2 7)), and log2 7 is approximately 2.807 -- TRUE. It is asymptotically FASTER than Theta(n^3), not slower, since n^2.81 < n^3 for large n, so the statement claiming it is slower is FALSE. The reduction from 8 to 7 multiplications is only possible because Strassen introduces roughly 18 extra Theta(n^2) matrix additions and subtractions to combine the 7 products correctly -- TRUE.'
+},
+{
+  id: 'algo-divide-conquer-y3',
+  q: 'Consider quicksort with a standard in-place partitioning scheme. Which of the following statements are TRUE? (Select ALL that apply)',
+  options: [
+    'Worst-case time complexity is Theta(n^2), which occurs for example on an already-sorted array when the pivot is always chosen as the first element',
+    'Best-case and average-case time complexity is Theta(n log n)',
+    'Quicksort is a stable sorting algorithm in its standard in-place implementation',
+    'Randomized pivot selection improves the expected-case time guarantee regardless of the input\\u2019s initial order'
+  ],
+  answers: [0, 1, 3],
+  marks: 2,
+  difficulty: 'medium',
+  type: 'concept',
+  explanation: 'When the pivot is always the smallest or largest remaining element (e.g. first-element pivot on sorted input), each partition splits n elements into sizes 0 and n-1, giving the recurrence T(n)=T(n-1)+Theta(n), which solves to Theta(n^2) -- TRUE. When partitions are reasonably balanced (best case exactly balanced, average case balanced enough in expectation), the recurrence resembles T(n)=2T(n/2)+Theta(n), giving Theta(n log n) -- TRUE. Quicksort\\u2019s standard in-place partitioning can swap equal elements past each other, changing their relative order, so it is NOT stable -- FALSE, making this option\\u2019s claim wrong. Randomized pivot selection (e.g. choosing a uniformly random element as pivot) makes the expected running time Theta(n log n) for ANY input, because the bad case now depends on random choices rather than a fixed adversarial input order -- TRUE.'
+},
+{
+  id: 'algo-divide-conquer-y4',
+  q: 'Applying the Master theorem to T(n) = 4T(n/2) + n^2 log n places it in Case 2, giving T(n) = Theta(n^2 * (log n)^(k+1)). What is the value of k? (Enter your numerical answer.)',
+  options: [],
+  answer: 1,
+  kind: 'nat',
+  marks: 1,
+  difficulty: 'medium',
+  type: 'numerical',
+  explanation: 'Here a=4 and b=2, so n^(log_b a) = n^(log_2 4) = n^2. The driving function is f(n) = n^2 log n, which matches the Case 2 template n^(log_b a) * (log n)^k with k=1, since n^2 log n = n^2 * (log n)^1. Case 2 of the Master theorem then gives T(n) = Theta(n^(log_b a) * (log n)^(k+1)) = Theta(n^2 * (log n)^2). So k = 1.'
+},
+{
+  id: 'algo-divide-conquer-y5',
+  q: 'Standard (top-down) merge sort is run on an array of 8 elements. Using the fact that merging two sorted subarrays of sizes p and q takes at most p+q-1 comparisons, what is the worst-case total number of comparisons across the entire sort? (Enter your numerical answer.)',
+  options: [],
+  answer: 17,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'medium',
+  type: 'numerical',
+  explanation: 'With n=8, the recursion splits into 3 levels of merges. Level 1 (leaves to pairs): 4 merges of two size-1 subarrays each, each costing at most 1+1-1=1 comparison, total 4*1=4. Level 2 (pairs to quads): 2 merges of two size-2 subarrays each, each costing at most 2+2-1=3, total 2*3=6. Level 3 (quads to the full array): 1 merge of two size-4 subarrays, costing at most 4+4-1=7. Summing across levels: 4+6+7 = 17. This matches the general worst-case formula n*log2(n) - n + 1 = 8*3 - 8 + 1 = 24-8+1 = 17 for n a power of 2.'
+},
+{
+  id: 'algo-divide-conquer-y6',
+  q: 'Using the standard iterative binary search formula, what is the worst-case number of comparisons needed to search for a value in a sorted array of 16 elements (search may end in either success or failure)? (Enter your numerical answer.)',
+  options: [],
+  answer: 5,
+  kind: 'nat',
+  marks: 1,
+  difficulty: 'easy',
+  type: 'numerical',
+  explanation: 'The worst-case number of comparisons for binary search on n elements is floor(log2 n) + 1. For n=16, log2 16 = 4 exactly, so the worst case is 4 + 1 = 5. Verifying by tracing subarray sizes through repeated halving: 16 -> 8 -> 4 -> 2 -> 1 -> 0, which requires one comparison at each of the sizes 16, 8, 4, 2, 1 before the search space becomes empty (failure) or a match is found -- that is 5 comparisons in the worst case.'
+}
+);
+
+window.GATE_DATA.questions['algo'].topics.find(function(t){return t.id==='algo-greedy';}).questions.push(
+{
+  id: 'algo-greedy-y1',
+  q: 'Which of the following problems can be solved OPTIMALLY using a greedy approach? (Select ALL that apply)',
+  options: [
+    'Fractional Knapsack',
+    '0/1 Knapsack',
+    'Minimum Spanning Tree (via Prim\\u2019s or Kruskal\\u2019s algorithm)',
+    'Activity Selection Problem'
+  ],
+  answers: [0, 2, 3],
+  marks: 1,
+  difficulty: 'easy',
+  type: 'concept',
+  explanation: 'Fractional Knapsack is solved optimally by greedily taking items in decreasing order of value-to-weight ratio, since fractions of items are allowed and there is no combinatorial interaction to worry about -- TRUE. 0/1 Knapsack does NOT admit an optimal greedy solution because items must be taken whole; a locally best ratio choice can block a better combination later, so dynamic programming is required for optimality -- FALSE. Minimum Spanning Tree is a classic greedy success story: both Prim\\u2019s (grow one tree, always add the cheapest connecting edge) and Kruskal\\u2019s (always add the cheapest edge that does not form a cycle) are provably optimal by the cut property and cycle property -- TRUE. Activity Selection is optimally solved by greedily picking the activity with the earliest finish time at each step, which is a proven optimal greedy strategy -- TRUE.'
+},
+{
+  id: 'algo-greedy-y2',
+  q: 'Which of the following statements about Huffman coding are TRUE? (Select ALL that apply)',
+  options: [
+    'It always produces an optimal (minimum expected length) prefix-free code for a given set of symbol frequencies',
+    'It repeatedly merges the two nodes with the smallest frequencies into a new combined node',
+    'The resulting code is always a fixed-length code, with every symbol getting the same number of bits',
+    'A symbol with strictly higher frequency never gets a strictly longer codeword than a symbol with lower frequency'
+  ],
+  answers: [0, 1, 3],
+  marks: 2,
+  difficulty: 'medium',
+  type: 'concept',
+  explanation: 'Huffman coding is proven optimal among all prefix-free (instantaneous) codes for a given frequency distribution, minimizing the expected number of bits -- TRUE. The core greedy step of Huffman\\u2019s algorithm is exactly to repeatedly extract the two least-frequent nodes and merge them into a parent node whose frequency is their sum -- TRUE. Huffman coding produces a VARIABLE-length code by design (that is its whole point -- frequent symbols get short codes, rare symbols get long codes), so calling it fixed-length is FALSE. It is a standard property/invariant of the Huffman construction that codeword length is non-increasing as frequency increases -- a higher-frequency symbol never ends up with a strictly longer code than a lower-frequency one -- TRUE.'
+},
+{
+  id: 'algo-greedy-y3',
+  q: 'Which of the following statements about Kruskal\\u2019s and Prim\\u2019s MST algorithms are TRUE? (Select ALL that apply)',
+  options: [
+    'Kruskal\\u2019s algorithm processes edges in increasing order of weight and uses a Union-Find (disjoint set) structure to avoid forming cycles',
+    'Prim\\u2019s algorithm grows a single tree by repeatedly adding the minimum-weight edge that connects the current tree to a new, unvisited vertex',
+    'Both algorithms always produce the exact same unique MST for any weighted connected graph',
+    'If all edge weights in a connected graph are pairwise distinct, the MST of that graph is unique'
+  ],
+  answers: [0, 1, 3],
+  marks: 2,
+  difficulty: 'medium',
+  type: 'concept',
+  explanation: 'This is the standard description of Kruskal\\u2019s algorithm: sort edges by weight, and use Union-Find to add an edge only when its endpoints are in different components (avoiding cycles) -- TRUE. This is the standard description of Prim\\u2019s algorithm: maintain a growing tree and always attach the cheapest edge leaving the tree to a vertex not yet included -- TRUE. When edge weights include ties, there can be multiple distinct MSTs of the same total weight, and Kruskal\\u2019s and Prim\\u2019s can break ties differently and select different edge sets, so claiming they ALWAYS produce the identical MST is FALSE. When all weights are distinct, the cut property guarantees a unique minimum edge crossing every cut, which forces the MST to be unique -- TRUE.'
+},
+{
+  id: 'algo-greedy-y4',
+  q: 'Run Kruskal\\u2019s algorithm on a graph with 5 vertices {A,B,C,D,E} and edges A-B(1), B-C(2), C-D(3), D-E(4), A-E(5), A-C(6). What is the total weight of the resulting Minimum Spanning Tree? (Enter your numerical answer.)',
+  options: [],
+  answer: 10,
+  kind: 'nat',
+  marks: 1,
+  difficulty: 'easy',
+  type: 'numerical',
+  explanation: 'Sort edges by weight: A-B(1), B-C(2), C-D(3), D-E(4), A-E(5), A-C(6). Process in order: add A-B(1) -- connects {A,B}; add B-C(2) -- connects {A,B,C}; add C-D(3) -- connects {A,B,C,D}; add D-E(4) -- connects {A,B,C,D,E}, all 5 vertices now in one component using exactly 4 edges (n-1 = 4 for n=5), so the MST is complete. The remaining edges A-E(5) and A-C(6) are skipped since they would form cycles. Total MST weight = 1+2+3+4 = 10.'
+},
+{
+  id: 'algo-greedy-y5',
+  q: 'Four symbols have frequencies a=5, b=9, c=12, d=13. Using Huffman coding, what is the total weighted code length (sum over symbols of frequency times assigned codeword length) of the resulting optimal code? (Enter your numerical answer.)',
+  options: [],
+  answer: 78,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'medium',
+  type: 'numerical',
+  explanation: 'Build the Huffman tree bottom-up. Merge the two smallest frequencies, a=5 and b=9, into a node "ab" of weight 14. Remaining nodes: c=12, d=13, ab=14. Merge the two smallest, c=12 and d=13, into a node "cd" of weight 25. Remaining nodes: ab=14, cd=25. Merge these into the root of weight 39. Every merge cost is added: 14 + 25 + 39 = 78, which equals the total weighted path length of the optimal code. Cross-checking by codeword length: a and b are both at depth 2 (root -> ab -> leaf), and c and d are also both at depth 2 (root -> cd -> leaf), so every symbol gets a 2-bit code, giving weighted length 2*(5+9+12+13) = 2*39 = 78, confirming the answer.'
+},
+{
+  id: 'algo-greedy-y6',
+  q: 'Using the greedy earliest-finish-time strategy for Activity Selection, given activities with (start, finish) times (1,3), (2,5), (4,7), (6,8), (8,9), what is the maximum number of mutually non-overlapping activities that can be selected? (Enter your numerical answer.)',
+  options: [],
+  answer: 3,
+  kind: 'nat',
+  marks: 1,
+  difficulty: 'easy',
+  type: 'numerical',
+  explanation: 'Sort activities by finish time (already sorted here): (1,3), (2,5), (4,7), (6,8), (8,9). Greedily select (1,3), finish=3. Next, skip (2,5) since its start=2 < 3 overlaps with the selected activity. Select (4,7) since its start=4 >= 3, new finish=7. Skip (6,8) since its start=6 < 7 overlaps. Select (8,9) since its start=8 >= 7, new finish=9. The selected set is {(1,3), (4,7), (8,9)}, a total of 3 activities, and no more can be added since these already partition the timeline greedily and optimally.'
+}
+);
+
+window.GATE_DATA.questions['algo'].topics.find(function(t){return t.id==='algo-dp';}).questions.push(
+{
+  id: 'algo-dp-y1',
+  q: 'Which of the following problems are typically solved using dynamic programming, owing to overlapping subproblems and optimal substructure? (Select ALL that apply)',
+  options: [
+    '0/1 Knapsack',
+    'Longest Common Subsequence',
+    'Fractional Knapsack',
+    'Matrix Chain Multiplication'
+  ],
+  answers: [0, 1, 3],
+  marks: 1,
+  difficulty: 'easy',
+  type: 'concept',
+  explanation: '0/1 Knapsack has overlapping subproblems (the same (item index, remaining capacity) pair recurs across branches) and optimal substructure, so it is solved with DP in O(nW) time -- TRUE. Longest Common Subsequence is a canonical DP problem: the DP table entry for a prefix pair is reused across many recursive calls, and an optimal LCS is built from optimal LCS of prefixes -- TRUE. Fractional Knapsack does NOT need DP because the greedy ratio-based strategy already gives an optimal solution in O(n log n), and there are no overlapping subproblems to exploit -- FALSE. Matrix Chain Multiplication is a classic interval DP problem: the optimal parenthesization of a subchain is reused across multiple larger subchains, giving genuine overlapping subproblems -- TRUE.'
+},
+{
+  id: 'algo-dp-y2',
+  q: 'Which of the following statements about dynamic programming are TRUE? (Select ALL that apply)',
+  options: [
+    'Memoization (top-down) and tabulation (bottom-up) are two standard implementation strategies for DP',
+    'DP is applicable only when a problem\\u2019s subproblems do NOT overlap',
+    'The standard 0/1 Knapsack DP solution runs in pseudo-polynomial time O(nW), where W is the knapsack capacity',
+    'Optimal substructure means an optimal solution to a problem can be constructed from optimal solutions to its subproblems'
+  ],
+  answers: [0, 2, 3],
+  marks: 2,
+  difficulty: 'medium',
+  type: 'concept',
+  explanation: 'Memoization caches results of a recursive top-down solution, while tabulation fills a table iteratively bottom-up; both are standard, widely taught ways to implement the same DP recurrence -- TRUE. DP is applicable precisely WHEN subproblems DO overlap (so caching saves repeated work); if subproblems never overlap, plain divide-and-conquer without memoization already suffices, so this statement has it backwards and is FALSE. The 0/1 Knapsack DP table has dimensions n x W, filled in O(1) per cell, giving O(nW) time, which is pseudo-polynomial because it depends on the numeric VALUE of W, not just the number of bits used to represent it -- TRUE. This is precisely the standard definition of optimal substructure used to justify DP and greedy algorithms alike -- TRUE.'
+},
+{
+  id: 'algo-dp-y3',
+  q: 'Which of the following are TRUE about the Longest Common Subsequence (LCS) problem for two strings of lengths m and n? (Select ALL that apply)',
+  options: [
+    'The standard DP solution runs in Theta(mn) time and Theta(mn) space',
+    'If the two strings share no characters at all, the LCS length is 0',
+    'LCS requires the common subsequence to consist of characters that are contiguous in both original strings',
+    'The length of the LCS is always at most min(m, n)'
+  ],
+  answers: [0, 1, 3],
+  marks: 2,
+  difficulty: 'medium',
+  type: 'concept',
+  explanation: 'The classic LCS DP fills an (m+1) x (n+1) table with O(1) work per cell, giving Theta(mn) time and, without space optimization, Theta(mn) space -- TRUE. If the two strings have no character in common at all, no non-empty subsequence can be shared, so the LCS length must be exactly 0 -- TRUE. A subsequence, by definition, need NOT be contiguous -- it only preserves relative order while allowing gaps; requiring contiguity describes a "substring", not a "subsequence", so this statement is FALSE and describes a different problem. Since a subsequence of a string of length m can have length at most m, the LCS (a subsequence of both strings) can be no longer than the shorter of the two input lengths, i.e. at most min(m,n) -- TRUE.'
+},
+{
+  id: 'algo-dp-y4',
+  q: 'Using dynamic programming, compute the length of the Longest Common Subsequence (LCS) of the strings X = "ABCBDAB" and Y = "BDCABA". (Enter your numerical answer.)',
+  options: [],
+  answer: 4,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'medium',
+  type: 'numerical',
+  explanation: 'This is a standard worked LCS example. Filling the DP table for X="ABCBDAB" (length 7) against Y="BDCABA" (length 6), where dp[i][j] = dp[i-1][j-1]+1 if X[i]=Y[j], else max(dp[i-1][j], dp[i][j-1]), the final entry dp[7][6] evaluates to 4. One valid longest common subsequence achieving this length is "BCBA" (B at X-position2/Y-position1, C at X-position3/Y-position3, B at X-position4/Y-position5... one needs to track indices carefully, but any of several length-4 subsequences such as "BDAB" or "BCBA" can be verified to appear, in order, within both strings, and no length-5 common subsequence exists, confirming the DP table value of 4.'
+},
+{
+  id: 'algo-dp-y5',
+  q: '0/1 Knapsack: capacity W=10, items given as (weight, value) pairs: (2,3), (3,4), (4,5), (5,6). Using dynamic programming, what is the maximum total value achievable without exceeding the capacity? (Enter your numerical answer.)',
+  options: [],
+  answer: 13,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'medium',
+  type: 'numerical',
+  explanation: 'With only 4 items, all 16 subsets can be checked directly (as the DP table would implicitly do). The subset {(2,3), (3,4), (5,6)} has total weight 2+3+5=10 (fits exactly) and total value 3+4+6=13. Checking all other weight-feasible subsets: {(2,3),(3,4),(4,5)} has weight 9, value 12; {(3,4),(4,5)} has weight 7, value 9; {(2,3),(4,5)} has weight 6, value 8; {(4,5),(5,6)} has weight 9, value 11; no feasible subset exceeds value 13. So the DP table\\u2019s final answer, dp[4][10], equals 13.'
+},
+{
+  id: 'algo-dp-y6',
+  q: 'Matrix Chain Multiplication: three matrices A1 (10x20), A2 (20x30), A3 (30x40) are to be multiplied together. Using dynamic programming to find the optimal parenthesization, what is the minimum total number of scalar multiplications required? (Enter your numerical answer.)',
+  options: [],
+  answer: 18000,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'medium',
+  type: 'numerical',
+  explanation: 'There are only two ways to parenthesize a chain of 3 matrices, and the DP evaluates both. Parenthesization ((A1 A2) A3): computing A1*A2 (dimensions 10x20 times 20x30) costs 10*20*30=6000 and yields a 10x30 matrix; multiplying that by A3 (10x30 times 30x40) costs 10*30*40=12000. Total = 6000+12000 = 18000. Parenthesization (A1 (A2 A3)): computing A2*A3 (20x30 times 30x40) costs 20*30*40=24000 and yields a 20x40 matrix; multiplying A1 by that (10x20 times 20x40) costs 10*20*40=8000. Total = 24000+8000 = 32000. The DP takes the minimum of the two, so the optimal cost is min(18000, 32000) = 18000, achieved by the parenthesization ((A1 A2) A3).'
+}
+);
+
+window.GATE_DATA.questions['algo'].topics.find(function(t){return t.id==='algo-graph';}).questions.push(
+{
+  id: 'algo-graph-y1',
+  q: 'For a graph with V vertices and E edges represented using an adjacency list, which of the following statements about BFS and DFS traversal are TRUE? (Select ALL that apply)',
+  options: [
+    'Both BFS and DFS run in O(V+E) time using the adjacency list representation',
+    'BFS uses a queue while DFS uses a stack (or, equivalently, recursion)',
+    'In an unweighted graph, BFS from a source always finds shortest paths measured by number of edges',
+    'DFS visits vertices in non-decreasing order of their distance (number of edges) from the source'
+  ],
+  answers: [0, 1, 2],
+  marks: 2,
+  difficulty: 'medium',
+  type: 'concept',
+  explanation: 'With an adjacency list, both BFS and DFS visit every vertex once and scan every edge once, giving O(V+E) time for both -- TRUE. BFS explicitly maintains a FIFO queue of vertices to visit next, while DFS explores as deep as possible before backtracking, implemented either with an explicit stack or via recursion (which uses the call stack) -- TRUE. BFS explores the graph in increasing "layers" of distance from the source, so the first time it reaches a vertex is guaranteed to be via a shortest (fewest-edges) path in an unweighted graph -- TRUE. DFS has NO such layer-by-layer guarantee; it can plunge deep along one branch reaching a far vertex long before visiting a much closer one, so DFS does NOT visit vertices in order of distance from the source -- FALSE, this property belongs to BFS only.'
+},
+{
+  id: 'algo-graph-y2',
+  q: 'For a weighted directed graph that may contain negative edge weights but no negative-weight cycle, which of the following statements are TRUE? (Select ALL that apply)',
+  options: [
+    'Dijkstra\\u2019s algorithm may give incorrect shortest-path results if negative edge weights are present',
+    'The Bellman-Ford algorithm correctly computes shortest paths even with negative edge weights, provided there is no negative cycle',
+    'Bellman-Ford runs in O(V*E) time',
+    'Dijkstra\\u2019s algorithm can be used, unmodified, to detect the presence of a negative-weight cycle'
+  ],
+  answers: [0, 1, 2],
+  marks: 2,
+  difficulty: 'medium',
+  type: 'concept',
+  explanation: 'Dijkstra\\u2019s algorithm relies on the greedy assumption that once a vertex is finalized with its shortest distance, no later relaxation can improve it; negative edges can violate this assumption, producing incorrect results -- TRUE. Bellman-Ford relaxes all edges V-1 times, which is proven sufficient to compute correct shortest paths in a graph with negative edges as long as no negative cycle is reachable -- TRUE. Bellman-Ford performs V-1 rounds of relaxing all E edges, giving O(V*E) time -- TRUE. Dijkstra\\u2019s algorithm has no mechanism to detect negative cycles at all -- it simply may produce wrong (or non-terminating, in variants without proper finalization) results on such graphs; the standard cycle-detection tool is the extra V-th relaxation round in Bellman-Ford, not Dijkstra -- FALSE.'
+},
+{
+  id: 'algo-graph-y3',
+  q: 'For a connected, undirected, weighted graph in which ALL edge weights are pairwise DISTINCT, which of the following statements about its Minimum Spanning Tree (MST) are TRUE? (Select ALL that apply)',
+  options: [
+    'The MST of the graph is unique',
+    'The globally minimum-weight edge in the graph must be included in every MST',
+    'The globally maximum-weight edge in the graph can never be part of the MST',
+    'For any cycle in the graph, the maximum-weight edge on that cycle is never part of the (unique) MST'
+  ],
+  answers: [0, 1, 3],
+  marks: 2,
+  difficulty: 'hard',
+  type: 'concept',
+  explanation: 'With all weights distinct, the cut property guarantees a unique lightest edge crossing every cut, which forces a single, unique MST -- TRUE. The globally minimum-weight edge is the lightest edge across the cut separating its two endpoints from everything else, so by the cut property it must be in every MST -- TRUE. This is FALSE: if the maximum-weight edge is a bridge (the only edge connecting some vertex or subcomponent to the rest of the graph), it MUST be included in every spanning tree regardless of its weight, so it can indeed be part of the MST -- "never" is too strong a claim. The cycle property states that the maximum-weight edge on any cycle can be safely excluded from the MST because a cheaper path around the rest of the cycle always connects the same vertices, so this maximum-cycle-edge is never part of the (here, unique) MST -- TRUE.'
+},
+{
+  id: 'algo-graph-y4',
+  q: 'A directed acyclic graph (DAG) has vertices {1, 2, 3} and edges 1->2 and 1->3 (no edge between 2 and 3 in either direction). How many distinct valid topological orderings does this DAG have? (Enter your numerical answer.)',
+  options: [],
+  answer: 2,
+  kind: 'nat',
+  marks: 1,
+  difficulty: 'easy',
+  type: 'numerical',
+  explanation: 'Vertex 1 has edges to both 2 and 3, so it must appear before both of them in any valid topological order. There is no edge between 2 and 3 in either direction, so their relative order is unconstrained and either can come first. Enumerating explicitly: the two valid orderings are [1,2,3] and [1,3,2]. Both respect all edge constraints (1 before 2, and 1 before 3), so there are exactly 2 distinct topological orderings.'
+},
+{
+  id: 'algo-graph-y5',
+  q: 'Run Kruskal\\u2019s algorithm on a graph with 4 vertices {P,Q,R,S} and edges P-Q(4), Q-R(2), R-S(3), P-S(5), P-R(6), Q-S(7). What is the total weight of the resulting Minimum Spanning Tree? (Enter your numerical answer.)',
+  options: [],
+  answer: 9,
+  kind: 'nat',
+  marks: 1,
+  difficulty: 'easy',
+  type: 'numerical',
+  explanation: 'Sort edges by weight: Q-R(2), R-S(3), P-Q(4), P-S(5), P-R(6), Q-S(7). Process in order: add Q-R(2) -- connects {Q,R}; add R-S(3) -- connects {Q,R,S}; add P-Q(4) -- connects {P,Q,R,S}, all 4 vertices now in one component using exactly 3 edges (n-1=3 for n=4), so the MST is complete. The remaining edges P-S(5), P-R(6), Q-S(7) are skipped since each would form a cycle. Total MST weight = 2+3+4 = 9.'
+},
+{
+  id: 'algo-graph-y6',
+  q: 'Using Dijkstra\\u2019s algorithm starting from vertex A, find the shortest-path distance to vertex D in a graph with edges A-B(2), A-C(5), B-C(1), B-D(7), C-D(3) (all edges undirected with the given weights). (Enter your numerical answer.)',
+  options: [],
+  answer: 6,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'medium',
+  type: 'numerical',
+  explanation: 'Initialize dist[A]=0. Direct edge A-B gives dist[B]=2. Direct edge A-C gives dist[C]=5, but via B: dist[B]+B-C = 2+1=3, which is shorter, so dist[C]=3. Now consider D: via B directly, dist[B]+B-D = 2+7=9; via C, dist[C]+C-D = 3+3=6. The minimum of these two candidate paths to D is 6, so dist[D]=6, achieved via the path A-B-C-D with edge weights 2+1+3=6.'
 }
 );

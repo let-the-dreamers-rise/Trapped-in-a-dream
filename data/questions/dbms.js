@@ -1904,3 +1904,84 @@ window.GATE_DATA.questions['dbms'].topics.find(function(t){return t.id==='dbms-t
   explanation: "Both basic 2PL and Strict 2PL guarantee conflict-serializability (option A) purely from the two-phase lock discipline itself, and neither variant prevents deadlock or starvation (options B and D) - those require separate detection/prevention mechanisms layered on top, regardless of which locking discipline is used underneath. The distinguishing feature of STRICT 2PL specifically is holding all EXCLUSIVE (write) locks until the transaction actually commits or aborts, rather than releasing them as soon as the shrinking phase begins as basic 2PL permits. This guarantees that no other transaction can read or overwrite a data item that some transaction has written until that writer's fate (commit or abort) is finally decided - which is precisely the definition of a strict schedule. Since strict schedules are automatically cascadeless (no dirty reads are ever possible) and automatically recoverable (strict implies both), Strict 2PL delivers all three properties as a direct consequence of its stricter lock-holding policy, which basic 2PL alone does not ensure."
 }
 );
+
+window.GATE_DATA.questions['dbms'].topics.find(function(t){return t.id==='dbms-er';}).questions.push(
+{
+  id: 'dbms-er-y1',
+  q: 'Relation R(A,B,C,D) has {A,B} as its ONLY candidate key. Which of the following statements are TRUE? (Select ALL that apply)',
+  options: [
+    '{A,B,C} is a superkey of R',
+    '{A,B} is the only candidate key of R',
+    '{A} is a candidate key of R',
+    'R has exactly 4 superkeys in total'
+  ],
+  answers: [0, 1, 3],
+  marks: 2,
+  difficulty: 'medium',
+  type: 'concept',
+  explanation: 'Option A is true: any superset of a candidate key is a superkey, and {A,B,C} contains {A,B}. Option B is true by the problem statement itself - it directly tells us {A,B} is the unique candidate key, so no other minimal unique set exists. Option C is false: if {A} alone were a candidate key it would be a proper subset of {A,B} that is already unique, contradicting the given minimality of {A,B} as THE candidate key - the problem explicitly rules out any smaller unique set. Option D is true by direct counting: every superkey must contain the candidate key {A,B}, and the remaining attributes {C,D} are free to be present or absent, giving 2^(4-2) = 2^2 = 4 superkeys: {A,B}, {A,B,C}, {A,B,D}, {A,B,C,D}.'
+},
+{
+  id: 'dbms-er-y2',
+  q: 'Which of the following statements about weak entity sets and M:N relationships in ER-to-relational mapping are TRUE? (Select ALL that apply)',
+  options: [
+    'A weak entity set must have total participation in its identifying relationship',
+    'The primary key of the table representing a weak entity set includes the primary key of its owner entity set',
+    'A weak entity set can have a candidate key derived purely from its own attributes',
+    'Every M:N relationship set requires a separate table in the relational mapping'
+  ],
+  answers: [0, 1, 3],
+  marks: 2,
+  difficulty: 'medium',
+  type: 'concept',
+  explanation: 'Option A is true: a weak entity exists only in the context of its owner, so it must appear in the identifying relationship - this is precisely total participation, always. Option B is true: because the discriminator (partial key) only distinguishes weak entities sharing the same owner, the full key of the mapped table must be the owner primary key concatenated with the discriminator. Option C is false and contradicts the very definition of a weak entity: if it had its own candidate key it would qualify as a strong entity set instead. Option D is true: an M:N relationship can never be folded into either participating entity table because neither side can hold a single-valued foreign key for a many-valued association in both directions, so a dedicated junction table is always mandatory, regardless of participation constraints.'
+},
+{
+  id: 'dbms-er-y3',
+  q: 'Which of the following statements about relational model integrity constraints are TRUE? (Select ALL that apply)',
+  options: [
+    'A NULL value is permitted in a foreign key attribute unless it is explicitly declared NOT NULL',
+    'Referential integrity requires every non-NULL foreign key value to match some primary key value in the referenced relation',
+    'The primary key of a relation may contain a NULL value if the relation happens to have only one candidate key',
+    'Every relation has at least one superkey, namely the set of all its attributes'
+  ],
+  answers: [0, 1, 3],
+  marks: 2,
+  difficulty: 'easy',
+  type: 'concept',
+  explanation: 'Option A is true: unlike primary key attributes, a foreign key attribute is permitted to be NULL (meaning "no reference") unless the schema designer adds an explicit NOT NULL constraint on it. Option B is true and is exactly the statement of referential integrity - it applies to non-NULL foreign key values, since a NULL foreign key represents the absence of a reference and is exempt from the match requirement. Option C is false: entity integrity forbids NULL in ANY primary key attribute unconditionally - this rule does not relax even if the primary key is the relation\'s only candidate key; in fact having only one candidate key makes the NULL prohibition more critical, not less, since there is no alternate key to fall back on for identification. Option D is true: since a relation is a set of tuples, no two tuples can be identical, so the full attribute set always uniquely identifies every tuple and is therefore always a superkey (from which at least one minimal candidate key can be extracted).'
+},
+{
+  id: 'dbms-er-y4',
+  q: 'Relation R has attributes {A,B,C,D} and exactly two candidate keys: {A} and {B,C}. Using inclusion-exclusion over their supersets, compute the total number of superkeys of R. (Enter your numerical answer.)',
+  options: [],
+  answer: 10,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'hard',
+  type: 'numerical',
+  explanation: 'Superkeys containing {A}: the remaining attributes {B,C,D} (3 attributes) are each free to include or exclude, giving 2^3 = 8 superkeys. Superkeys containing {B,C}: the remaining attributes {A,D} (2 attributes) are free, giving 2^2 = 4 superkeys. Superkeys containing BOTH {A} and {B,C}, i.e. containing {A,B,C}: the remaining attribute {D} (1 attribute) is free, giving 2^1 = 2 superkeys. By inclusion-exclusion, total distinct superkeys = 8 + 4 - 2 = 10.'
+},
+{
+  id: 'dbms-er-y5',
+  q: 'An ER design has: strong entity sets Employee and Department; an M:N relationship WorksIn between Employee and Department; a 1:1 relationship Manages between Department and Employee in which Department participates totally (every department has exactly one manager) and Employee participates partially; and a weak entity set Dependent owned by Employee via an identifying relationship. What is the minimum number of tables needed in the relational mapping? (Enter your numerical answer.)',
+  options: [],
+  answer: 4,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'hard',
+  type: 'numerical',
+  explanation: 'Count table by table. (1) Employee gets its own table (strong entity). (2) Department gets its own table (strong entity). That is 2 so far. (3) WorksIn is M:N, so it mandatorily gets its own junction table holding (Eno, Dno) - 3 so far. (4) Manages is 1:1 with Department participating totally, so it is folded into the Department table as a NOT NULL manager-employee foreign key - no new table needed, still 3. (5) Dependent is a weak entity owned by Employee, so it gets its own table containing the Employee owner key plus the discriminator - this adds 1 more table, bringing the total to 4. Hence the minimum is 4 tables: Employee, Department (with embedded manager FK), WorksIn, and Dependent.'
+},
+{
+  id: 'dbms-er-y6',
+  q: 'Relation R has attributes {W,X,Y,Z} and exactly two candidate keys: {W,X} and {W,Y}. Using inclusion-exclusion over their supersets, compute the total number of superkeys of R. (Enter your numerical answer.)',
+  options: [],
+  answer: 6,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'hard',
+  type: 'numerical',
+  explanation: 'Superkeys containing {W,X}: the remaining attributes {Y,Z} (2 attributes) are free, giving 2^2 = 4 superkeys. Superkeys containing {W,Y}: the remaining attributes {X,Z} (2 attributes) are free, giving 2^2 = 4 superkeys. Superkeys containing both {W,X} and {W,Y} at once, i.e. containing {W,X,Y}: the remaining attribute {Z} (1 attribute) is free, giving 2^1 = 2 superkeys. By inclusion-exclusion, total distinct superkeys = 4 + 4 - 2 = 6.'
+}
+);

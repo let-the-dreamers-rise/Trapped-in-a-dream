@@ -1593,3 +1593,177 @@ window.GATE_DATA.questions['apti'].topics.find(function(t){return t.id==='apti-v
 
 
 window.GATE_DATA.questions['apti'].topics.find(function(t){return t.id==='apti-data-spatial';}).theory.deep = 'GROWTH RATE COMPARISON WITHOUT FULL DIVISION\n• To compare which of two quantities grew faster between two years, compare (new-old)/old as fractions using cross-multiplication instead of computing decimal percentages: A grew faster than B if (newA-oldA) x oldB > (newB-oldB) x oldA.\n• Approximate percentage change fast by rounding to the nearest convenient fraction: a rise from 240 to 288 is 48/240 = 1/5 = 20%, spotted instantly by noticing 48 is exactly one-fifth of 240.\n• When comparing many years/categories at once (as in a bar chart), rank by eyeballing bar-height ratios first, and only compute exact percentages for the top 2-3 contenders that look close.\n• FAST ROUTE: cross-multiply the two differences-over-bases instead of converting both to decimals. SLOW ROUTE: computing each percentage to two decimal places and then comparing.\n• CAGR shortcut: for a compounding growth from V0 to Vn over n years, CAGR = (Vn/V0)^(1/n) - 1; for quick estimation, use the rule that doubling in n years corresponds roughly to CAGR = 70/n percent (rule of 70).\n\nPIE CHART TO VALUE CONVERSION\n• A pie chart\'s degree measure and percentage measure are directly proportional: 3.6 degrees = 1% (since 360 degrees = 100%).\n• To convert a slice\'s degrees to its actual value: value = (degrees/360) x total, or equivalently (percentage/100) x total.\n• Fast common angle-to-percent conversions: 36 degrees = 10%, 72 degrees = 20%, 90 degrees = 25%, 108 degrees = 30%, 144 degrees = 40%, 180 degrees = 50%.\n• When comparing two pie slices directly, skip computing absolute values and just compare degree measures or percentages directly, since the total cancels out in a ratio.\n• FAST ROUTE: memorize the degree-to-percent anchors above and read off values instantly. SLOW ROUTE: converting every slice\'s raw degree count through a full division by 360 each time.\n• Example: A pie chart shows total sales of 7200 units, with the "Electronics" slice occupying 108 degrees. FAST: 108 degrees = 30% (since 108/3.6=30), so value = 0.3 x 7200 = 2160. SLOW: compute 108/360 x 7200 as a single long division.\n\nTABLE AND BAR-GRAPH SPEED READING\n• For tables with multiple years/categories, scan for the row/column with the extreme (max/min) value first if the question asks for "highest" or "lowest" — do not compute every cell.\n• For "average" questions across a row or column, use the deviation-from-assumed-mean method: pick a round number close to the values, sum the deviations (which can be negative), and add the average deviation back to the assumed mean, avoiding large-number addition.\n• Ratio-based bar comparisons: when two bars are close in height, estimate the ratio visually (e.g., "roughly 4:5") before computing exact numbers, since GATE DI answer options are usually spaced far enough apart that estimation resolves the choice.\n• FAST ROUTE: use assumed-mean deviation method for averages of large numbers. SLOW ROUTE: adding all raw values directly and dividing by count.\n\nDIRECTION SENSE AND DISTANCE IN SPATIAL DI\n• Combine displacement vectors as in direction-sense reasoning: track net East-West and North-South components separately, then apply Pythagoras only once at the end for straight-line distance.\n• For "shortest distance to return" questions, the answer is always the straight-line (Euclidean) distance from current position to start, not the sum of the path already walked.\n• Recognize common Pythagorean triples to skip square-root calculation: 3-4-5, 6-8-10, 5-12-13, 8-15-17, 7-24-25, 9-12-15.\n• FAST ROUTE: recognize the leg lengths match a known triple and read off the hypotenuse directly. SLOW ROUTE: computing sqrt(a^2+b^2) by hand digit by digit.\n\nCUBE, DICE AND FIGURE-COUNTING SPATIAL FORMULAS\n• For an n x n x n painted cube cut into unit cubes: corners (3 faces) = 8 always; edges (2 faces) = 12(n-2); faces (1 face) = 6(n-2)^2; fully interior (0 faces) = (n-2)^3; total = n^3 (use as a cross-check).\n• Standard dice rule: opposite faces of a normal die always sum to 7 (1-6, 2-5, 3-4) — use this instantly for "which face is opposite" die questions instead of physically rotating the die in your head.\n• Cube net folding: in any straight run of four consecutive squares in a net, the 1st and 3rd squares become opposite faces, and the 2nd and 4th become opposite faces; any square left outside the 4-run pairs with the other leftover square by elimination (since a cube has exactly 3 opposite pairs).\n• Mirror and water images: a mirror image flips left-right (horizontal flip) as if reflected in a vertical mirror; a water image flips top-bottom (vertical flip) as if reflected in a horizontal surface below the figure — do not confuse the two axes.\n• Figure counting (triangles/squares in a complex figure): count systematically by size — first count all smallest unit shapes, then all shapes formed by combining exactly 2 units, then 4 units, etc., rather than trying to spot every shape at once.\n• FAST ROUTE: apply the fixed formula/rule (die opposite-faces-sum-to-7, cube net strip rule) directly. SLOW ROUTE: mentally folding or rotating the figure from scratch every time.\n\nWORKED EXAMPLES: FAST VS SLOW\n1) A pie chart of total expenditure 18000 shows "Rent" at 90 degrees. Find the rent amount. FAST: 90 degrees = 25% (memorized anchor), so rent = 0.25 x 18000 = 4500. SLOW: compute 90/360 x 18000 via long division to get the same 4500.\n2) Sales grew from 1500 in Year 1 to 1800 in Year 2, and from 2000 to 2300 in another product over the same period. Which grew faster in percentage terms? FAST: cross-multiply differences over bases: 300 x 2000 = 600000 vs 300 x 1500 = 450000; since 600000 > 450000, the first product\'s percentage growth (300/1500=20%) beats the second\'s (300/2000=15%) — confirmed without computing either decimal. SLOW: convert both to exact percentages (20% and 15%) via separate divisions, then compare.\n3) A person walks 6 km North, then 8 km East. How far is he from the start? FAST: recognize the 6-8-10 Pythagorean triple, so distance = 10 km instantly. SLOW: compute sqrt(6^2+8^2) = sqrt(36+64) = sqrt(100) step by step.\n\nTIME TRAPS\n• Pie chart degrees and percentages are directly proportional (3.6 degrees per percent) — forgetting this and dividing by 360 every single time wastes precious seconds versus using memorized anchors.\n• When comparing growth rates across categories, do not eyeball absolute differences — a bigger absolute increase can still be a smaller percentage increase if the base is much larger.\n• Mirror image flips horizontally, water image flips vertically — swapping these two is one of the most common spatial-reasoning errors.\n• Die opposite-faces-sum-to-7 applies ONLY to a standard die; some GATE questions explicitly describe a non-standard die, so always check the question\'s given face arrangement first before applying the shortcut.\n• In cube-painting problems, the corner-cube count is always exactly 8 regardless of n — a frequent wrong answer scales this with cube size.\n• For "average" questions over large tabular numbers, always use the assumed-mean deviation shortcut rather than summing large raw numbers directly, to avoid arithmetic slips under time pressure.\n• Distance/direction questions ask for straight-line displacement from start, not total distance walked along the path — a very common misread.';
+
+window.GATE_DATA.questions['apti'].topics.find(function(t){return t.id==='apti-quant';}).questions.push(
+  {
+    id: 'apti-quant-y1',
+    q: 'A shopkeeper marks up the cost price of an article by 30%. He then allows two successive discounts of 10% and 5% on the marked price, after which the final selling price is Rs. 1111.50. Find the cost price of the article, in rupees. (Enter your numerical answer.)',
+    options: [],
+    answer: 1000,
+    kind: 'nat',
+    marks: 2,
+    difficulty: 'hard',
+    type: 'numerical',
+    explanation: 'Chain the three multiplying factors: markup of 30% gives 1.30, and the two successive discounts give 0.90 and 0.95. Net factor = 1.30 x 0.90 x 0.95 = 1.1115. So Selling Price = CP x 1.1115, giving CP = 1111.50 / 1.1115 = 1000. Fast route: never add or subtract the three percentages; multiply the factors in one line and divide the given SP by the combined factor directly to isolate CP.'
+  },
+  {
+    id: 'apti-quant-y2',
+    q: 'A alone can finish a job in 10 days and B alone in 20 days. A and B work together for the first 2 days, after which B leaves and C joins A. C is thrice as efficient as B. A and C together finish the remaining work. Find the total number of days taken to complete the entire job. (Enter your numerical answer.)',
+    options: [],
+    answer: 4.8,
+    kind: 'nat',
+    marks: 2,
+    difficulty: 'hard',
+    type: 'numerical',
+    explanation: 'Take total work as 100 units (LCM-friendly). A\'s rate = 10 units/day, B\'s rate = 5 units/day. In the first 2 days together they do (10+5) x 2 = 30 units, leaving 70 units. B leaves and C joins, with C\'s rate = 3 x B\'s rate = 15 units/day, so A and C together do 10 + 15 = 25 units/day. Time for the remaining 70 units = 70/25 = 2.8 days. Total time = 2 + 2.8 = 4.8 days. Fast route: convert everyone to units/day using a convenient total work so every rate is a whole number, then just add and divide.'
+  },
+  {
+    id: 'apti-quant-y3',
+    q: 'A boat\'s speed in still water is 15 km/h and the speed of the stream is 3 km/h. The boat travels a certain distance downstream and returns to the starting point, taking a total of 4 hours 30 minutes. Find the one-way downstream distance, in km. (Enter your numerical answer.)',
+    options: [],
+    answer: 32.4,
+    kind: 'nat',
+    marks: 2,
+    difficulty: 'hard',
+    type: 'numerical',
+    explanation: 'Downstream speed = 15 + 3 = 18 km/h, upstream speed = 15 - 3 = 12 km/h. Let the one-way distance be d. Total time = d/18 + d/12 = 4.5 hours. Using LCM 36: 2d/36 + 3d/36 = 5d/36 = 4.5, so d = 4.5 x 36/5 = 32.4 km. Check: 32.4/18 = 1.8 h and 32.4/12 = 2.7 h, summing to 4.5 h, which matches. Fast route: always combine the two fractional times over a common denominator built from the two speeds rather than solving separately.'
+  },
+  {
+    id: 'apti-quant-y4',
+    q: 'A bag contains 6 red, 4 blue, and 5 green balls. Two balls are drawn at random without replacement. Find the probability that both balls drawn are of the same colour. (Enter your answer correct to two decimal places.)',
+    options: [],
+    answer: 0.3,
+    kind: 'nat',
+    marks: 2,
+    difficulty: 'medium',
+    type: 'numerical',
+    explanation: 'Total balls = 15, so total ways to pick 2 = C(15,2) = 105. Favourable (same colour) ways = C(6,2) + C(4,2) + C(5,2) = 15 + 6 + 10 = 31. Probability = 31/105 = 0.2952..., which rounds to 0.30. Fast route: compute each same-colour combination separately and add them before dividing once by the total, rather than computing three separate probabilities and adding fractions with different denominators.'
+  },
+  {
+    id: 'apti-quant-y5',
+    q: 'The table below shows a company\'s revenue (in Rs. crore) across four quarters of a year:\nQ1 = 240, Q2 = 300, Q3 = 270, Q4 = 330.\nFind the percentage increase in revenue from Q1 to Q4. (Enter your numerical answer.)',
+    options: [],
+    answer: 37.5,
+    kind: 'nat',
+    marks: 1,
+    difficulty: 'medium',
+    type: 'numerical',
+    explanation: 'Percentage increase = (Q4 - Q1)/Q1 x 100 = (330 - 240)/240 x 100 = 90/240 x 100 = 37.5%. Fast route: recognise 90/240 simplifies to 3/8, and 3/8 = 37.5% directly from the standard fraction-to-percentage table, avoiding long division.'
+  },
+  {
+    id: 'apti-quant-y6',
+    q: 'A container has 80 litres of pure milk. 20 litres of the milk is withdrawn and replaced with water. This withdraw-and-replace process (withdrawing 20 litres of the mixture and replacing it with water) is repeated once more. How much milk is finally left in the container?',
+    options: ['45 litres', '40 litres', '48 litres', '50 litres'],
+    answer: 0,
+    marks: 2,
+    difficulty: 'hard',
+    type: 'numerical',
+    explanation: 'For repeated dilution, final quantity of the original liquid = Initial x (1 - withdrawn/total)^n, where n is the number of repetitions. Here (1 - 20/80) = 0.75, and after 2 repetitions: 80 x 0.75^2 = 80 x 0.5625 = 45 litres. Fast route: apply the replacement formula directly instead of tracking milk and water quantities separately at each of the two steps.'
+  },
+  {
+    id: 'apti-quant-y7',
+    q: 'In how many ways can the letters of the word "MANAGEMENT" be arranged so that all the vowels always come together?',
+    options: ['7560', '3780', '15120', '5040'],
+    answer: 0,
+    marks: 2,
+    difficulty: 'hard',
+    type: 'numerical',
+    explanation: 'MANAGEMENT has 10 letters: M(2), A(2), N(2), G(1), E(2), T(1). The vowels are A, A, E, E (4 vowels); the consonants are M, M, N, N, G, T (6 consonants). Bundle the vowels into one block, giving 7 units to arrange (6 consonants + 1 block) with M and N each repeated twice: 7!/(2!2!) = 5040/4 = 1260. Within the block, the 4 vowels A,A,E,E can be arranged in 4!/(2!2!) = 6 ways. Total = 1260 x 6 = 7560. Fast route: always bundle the "must be together" group into a single unit first, arrange the outer units accounting for repeats, then multiply by the internal arrangements of the bundle.'
+  },
+  {
+    id: 'apti-quant-y8',
+    q: 'A shopkeeper allows a discount of 20% on the marked price of an article and still makes a profit of 20%. If the marked price is Rs. 1500, find the cost price.',
+    options: ['Rs. 1000', 'Rs. 1100', 'Rs. 960', 'Rs. 1200'],
+    answer: 0,
+    marks: 1,
+    difficulty: 'medium',
+    type: 'numerical',
+    explanation: 'Selling price after discount = 1500 x 0.80 = Rs. 1200. Since this SP still gives a 20% profit on cost price, SP = CP x 1.20, so CP = 1200/1.20 = Rs. 1000. Fast route: compute the actual SP from the marked price and discount first, then divide by the profit factor once to get CP directly, rather than setting up CP as an unknown from the start.'
+  }
+);
+
+window.GATE_DATA.questions['apti'].topics.find(function(t){return t.id==='apti-logical';}).questions.push(
+  {
+    id: 'apti-logical-y1',
+    q: 'In how many different ways can 4 boys and 4 girls be seated in a row such that boys and girls occupy alternate seats? (Enter your numerical answer.)',
+    options: [],
+    answer: 1152,
+    kind: 'nat',
+    marks: 2,
+    difficulty: 'hard',
+    type: 'concept',
+    explanation: 'Alternate seating can start with either a boy or a girl in seat 1, giving 2 choices for which gender occupies the odd seats. Once the pattern is fixed, the 4 boys can be arranged among the 4 boy-seats in 4! = 24 ways, and the 4 girls among the 4 girl-seats in 4! = 24 ways, independently. Total arrangements = 2 x 4! x 4! = 2 x 24 x 24 = 1152. Fast route: always multiply by 2 for the starting-gender choice before multiplying the two independent internal arrangements, since forgetting the factor of 2 is the most common slip in alternate-seating counts.'
+  },
+  {
+    id: 'apti-logical-y2',
+    q: 'In how many ways can 6 distinct people be seated around a circular table such that two particular persons always sit next to each other? (Enter your numerical answer.)',
+    options: [],
+    answer: 48,
+    kind: 'nat',
+    marks: 2,
+    difficulty: 'hard',
+    type: 'concept',
+    explanation: 'Treat the two particular persons who must sit together as a single block, leaving 5 units (4 other individuals + 1 block) to arrange around the circle. Circular arrangements of 5 distinct units = (5-1)! = 24. Within the block, the two people can swap places in 2! = 2 ways. Total = 24 x 2 = 48. Fast route: for circular "together" restrictions, always reduce by (n-1)! for the bundled units first, then multiply separately by the internal arrangement of the bundle, exactly as in a linear "together" problem except the outer arrangement uses (n-1)! instead of n!.'
+  },
+  {
+    id: 'apti-logical-y3',
+    q: 'A group of 5 friends is to be split into two teams for a game, one team of 2 members and one team of 3 members. In how many distinct ways can this split be made? (Enter your numerical answer.)',
+    options: [],
+    answer: 10,
+    kind: 'nat',
+    marks: 1,
+    difficulty: 'medium',
+    type: 'concept',
+    explanation: 'Since the two teams have different sizes (2 and 3), simply choosing which 2 friends form the smaller team automatically determines the remaining 3 for the larger team, so no division for identical-group overcounting is needed. Number of ways = C(5,2) = 10. Fast route: whenever the two groups have unequal sizes, compute just one combination (the smaller group is usually easiest) and stop; only divide by 2 for double-counting when both groups are the same size.'
+  },
+  {
+    id: 'apti-logical-y4',
+    q: 'Statements: All pens are pencils. Some pencils are erasers. No eraser is a sharpener.\nConclusions:\nI. Some pens are erasers.\nII. No pen is a sharpener.\nIII. Some pencils are not sharpeners.\nWhich of the conclusions logically follow from the statements?',
+    options: ['Only III follows', 'Only I and II follow', 'Only II and III follow', 'None of the conclusions follow'],
+    answer: 0,
+    marks: 2,
+    difficulty: 'hard',
+    type: 'concept',
+    explanation: 'Pens is a subset of pencils, and some pencils overlap with erasers, but that overlap is not guaranteed to include any pens, so conclusion I (some pens are erasers) does not definitely follow. Conclusion II (no pen is a sharpener) fails because only erasers are barred from sharpeners; pencils in general (and hence pens) have no stated relation to sharpeners outside that eraser overlap. Conclusion III does follow: since some pencils are erasers, and no eraser is a sharpener, those specific pencils that are erasers are definitely not sharpeners, which is exactly "some pencils are not sharpeners." This is the classic valid syllogism form (Some A are B, No B are C, therefore Some A are not C). Fast route: chain a valid "Some...No" pair directly into a "Some are not" conclusion, and reject any conclusion that requires an overlap the statements never guarantee.'
+  },
+  {
+    id: 'apti-logical-y5',
+    q: 'Pointing to a photograph, Rohan said, "She is the daughter of my grandfather\'s only son." Rohan has no brothers. How is the girl in the photograph related to Rohan?',
+    options: ['Sister', 'Daughter', 'Cousin', 'Mother'],
+    answer: 0,
+    marks: 1,
+    difficulty: 'medium',
+    type: 'concept',
+    explanation: 'Rohan\'s grandfather\'s only son, given that Rohan is the grandson (not the son) of that grandfather and has no brothers, must be Rohan\'s own father, since there is exactly one son of the grandfather in this family line. The girl in the photograph is therefore the daughter of Rohan\'s father, which makes her Rohan\'s sister. Fast route: translate the relation description into "father" or "mother" using the "only son/daughter" clue first, then take one more step to the final relation, rather than trying to hold the whole chain in your head at once.'
+  },
+  {
+    id: 'apti-logical-y6',
+    q: 'Two persons P and Q start walking from the same point. P walks 6 km East and then 8 km North. Q walks 8 km West and then 6 km South from the same starting point. What is the straight-line distance between the final positions of P and Q?',
+    options: ['14 sqrt(2) km (approx. 19.8 km)', '20 km', '28 km', '10 sqrt(2) km'],
+    answer: 0,
+    marks: 2,
+    difficulty: 'hard',
+    type: 'concept',
+    explanation: 'Taking the start as the origin with East as positive x and North as positive y: P ends at (6, 8). Q ends at (-8, -6). The horizontal separation is 6 - (-8) = 14, and the vertical separation is 8 - (-6) = 14. Distance = sqrt(14^2 + 14^2) = sqrt(392) = 14 sqrt(2), approximately 19.8 km. Fast route: convert each person\'s path into a single (x,y) coordinate first, then apply Pythagoras once on the two coordinate differences instead of trying to visualise the combined path geometrically.'
+  },
+  {
+    id: 'apti-logical-y7',
+    q: 'At what time between 4 o\'clock and 5 o\'clock will the minute hand and the hour hand of a clock be exactly opposite each other (180 degrees apart)?',
+    options: ['4:54 and 6/11 minutes', '4:45', '4:50 and 5/11 minutes', '4:59 and 1/11 minutes'],
+    answer: 0,
+    marks: 2,
+    difficulty: 'hard',
+    type: 'concept',
+    explanation: 'The angle between the hands is |30H - 5.5M| degrees. For opposite hands this angle equals 180. With H = 4: |120 - 5.5M| = 180. Since 120 - 5.5M = -180 gives a negative M before 4 o\'clock (invalid here), take 5.5M - 120 = 180, so 5.5M = 300, giving M = 300/5.5 = 54 and 6/11 minutes. So the hands are opposite at 4:54 and 6/11 minutes. Fast route: set up the single absolute-value equation |30H - 5.5M| = 180 with the known hour, solve for M directly, and pick the root that lies between 0 and 60 minutes.'
+  },
+  {
+    id: 'apti-logical-y8',
+    q: 'In a certain code, all members of a city\'s "Elite Chess Club" are required to have won at least one district-level tournament as a condition of membership. Aman has won three district-level tournaments but has never applied to any club. Which of the following can be logically concluded?',
+    options: ['Aman must be a member of the Elite Chess Club', 'Aman has won more tournaments than every club member', 'Winning district-level tournaments does not by itself guarantee membership in the Elite Chess Club', 'The Elite Chess Club has a strict limit on total membership'],
+    answer: 2,
+    marks: 2,
+    difficulty: 'hard',
+    type: 'concept',
+    explanation: 'The statement gives a necessary condition for membership (winning at least one tournament), not a sufficient one, so winning tournaments does not automatically make someone a member; Aman winning three tournaments does not force him into the club, especially since he never applied. Concluding "Aman must be a member" reverses the direction of the conditional, a classic logical trap. The only conclusion that is definitely and directly supported is that satisfying the tournament requirement alone does not guarantee membership. Fast route: whenever a rule is phrased as "all members satisfy X," treat X as necessary-not-sufficient, and reject any conclusion that assumes satisfying X is enough to grant the status.'
+  }
+);

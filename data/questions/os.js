@@ -1727,3 +1727,271 @@ window.GATE_DATA.questions['os'].topics.find(function(t){return t.id==='os-file-
   explanation: 'Flash memory cells used in SSDs have a finite endurance: each cell can only tolerate a limited number of write/erase cycles before it starts to degrade and eventually fails to reliably retain data. If writes were always directed to the same physical cells (e.g., always overwriting the "same" logical block in place), those specific cells would wear out far faster than the rest of the drive, leading to premature failure of just that region even while most of the drive remains lightly used. Wear levelling is the SSD firmware\'s strategy of spreading write and erase operations evenly across ALL available cells over time (often by remapping logical block addresses to different physical locations on each write), maximising the drive\'s overall usable lifespan. This concern has no equivalent in classical HDD theory, since magnetic platters do not wear out from repeated writes in the same way.'
 }
 );
+
+window.GATE_DATA.questions['os'].topics.find(function(t){return t.id==='os-processes';}).questions.push(
+{
+  id: 'os-processes-y1',
+  q: 'Which of the following statements about the fork() system call are TRUE? (Select ALL that apply)',
+  options: ['fork() returns 0 in the child process and the child\'s PID (a positive value) in the parent process', 'The child process begins execution from the statement immediately following the fork() call, not from the beginning of main()', 'fork() guarantees that the parent process always finishes executing before the child process starts', 'A negative return value from fork() indicates that process creation failed'],
+  answers: [0, 1, 3],
+  marks: 2,
+  difficulty: 'medium',
+  type: 'concept',
+  explanation: 'Option A is TRUE: fork() returns twice -- 0 in the newly created child, and the child\'s actual PID (a positive integer) in the parent -- this is exactly how calling code distinguishes which process it is running in. Option B is TRUE: the child is a near-identical duplicate of the parent\'s address space at the moment of the call, so it resumes execution at the instruction right after fork(), never restarting main() from scratch. Option C is FALSE: fork() makes no guarantee whatsoever about execution order between parent and child afterward -- the OS scheduler may run either one first, interleave them, or run them on separate cores simultaneously; code that assumes a fixed order without explicit synchronization (e.g. wait()) is buggy. Option D is TRUE: a negative return value (typically -1) signals that fork() failed (e.g., due to resource limits), and in that case no child process was created at all.'
+},
+{
+  id: 'os-processes-y2',
+  q: 'A process is currently multithreaded using the one-to-one threading model. Which of the following statements are TRUE? (Select ALL that apply)',
+  options: ['Each user thread is mapped to a distinct kernel thread, so the kernel scheduler is directly aware of every thread', 'True parallel execution of the process\'s threads on multiple CPU cores is possible', 'If one thread makes a blocking system call, every other thread of the same process is also blocked', 'Creating a new thread under this model requires a system call, making it more expensive than creating a user-level-only thread'],
+  answers: [0, 1, 3],
+  marks: 2,
+  difficulty: 'medium',
+  type: 'concept',
+  explanation: 'Option A is TRUE: in the one-to-one model, every user thread has its own corresponding kernel thread, so the kernel scheduler sees and manages each one individually, unlike many-to-one. Option B is TRUE: because each thread is independently visible to the kernel, the OS can schedule several of a process\'s threads simultaneously on separate cores, giving genuine parallelism. Option C is FALSE: this is precisely the many-to-one problem -- under one-to-one, if one thread blocks on a system call, only that thread\'s kernel thread blocks; the other kernel threads (and hence other user threads) remain independently schedulable and keep running. Option D is TRUE: since each thread needs kernel-side bookkeeping (its own kernel stack and scheduler entry), creating it requires a system call and kernel involvement, unlike a purely user-space thread under many-to-one, making one-to-one thread creation costlier.'
+},
+{
+  id: 'os-processes-y3',
+  q: 'Consider the code: fork(); fork(); fork(); (three sequential, unconditional fork() calls, none inside any if/loop). How many TOTAL processes exist after all three calls complete, including the original process? (Enter your numerical answer.)',
+  options: [],
+  answer: 8,
+  kind: 'nat',
+  marks: 1,
+  difficulty: 'easy',
+  type: 'numerical',
+  explanation: 'Each of the three fork() calls is unconditional and sequential, meaning every process alive at that point in the code (the original plus all children created so far) executes that same line and forks again. This is the standard doubling rule: n sequential unconditional fork() calls yield 2^n total processes. Tracing step by step: start with 1 process (P0). After fork() #1: P0 forks C1, giving 2 processes. After fork() #2: both P0 and C1 independently fork, giving 4 processes. After fork() #3: all 4 processes (P0, C1, and the two children created in step 2) independently fork again, giving 8 processes. So total = 2^3 = 8.'
+},
+{
+  id: 'os-processes-y4',
+  q: 'Consider the code: if(fork()==0){ fork(); } fork(); How many TOTAL processes exist after this code finishes executing, including the original process? (Enter your numerical answer.)',
+  options: [],
+  answer: 6,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'hard',
+  type: 'numerical',
+  explanation: 'Trace it process by process. Start: P0 (the original process). Line 1, fork(): P0 forks C1. P0 sees a nonzero return (C1\'s PID), so the if-condition is false for P0 and it skips the inner fork(). C1 sees 0 returned, so the if-condition is TRUE for C1, and C1 executes the inner fork(), creating C2. After the if-block: the surviving processes are {P0, C1, C2} -- three processes. All three of these then reach the final unconditional fork() (outside the if), and since it is unconditional, each of the three independently forks one more child: P0 forks C3, C1 forks C4, C2 forks C5. Final total = original 3 processes (P0, C1, C2) + 3 new children (C3, C4, C5) = 6 processes.'
+},
+{
+  id: 'os-processes-y5',
+  q: 'A system uses the many-to-many threading model to map 6 user-level threads belonging to one process onto kernel threads, with the constraint that at most 4 kernel threads may be active for this process at any time. What is the MAXIMUM number of this process\'s threads that could be running in true parallel on separate CPU cores at a single instant (assuming at least 4 cores are available)? (Enter your numerical answer.)',
+  options: [],
+  answer: 4,
+  kind: 'nat',
+  marks: 1,
+  difficulty: 'medium',
+  type: 'numerical',
+  explanation: 'In the many-to-many model, m user threads are multiplexed onto n <= m kernel threads, and the kernel can only ever schedule as many threads of a process onto distinct cores simultaneously as there are DISTINCT kernel threads backing them -- the kernel has no visibility into user threads that share a single kernel thread and cannot run two user threads sharing one kernel thread on two different cores at once. Here there are 6 user threads but only 4 kernel threads available for this process, so no matter how many cores are physically free, at most 4 of the process\'s user threads can be genuinely running in parallel at any one instant (one per available kernel thread); the remaining 2 user threads must be waiting their turn to be multiplexed onto a kernel thread.'
+},
+{
+  id: 'os-processes-y6',
+  q: 'A parent process executes: pid_t p1 = fork(); if (p1 == 0) { fork(); exit(0); } fork(); wait(NULL); How many child processes does the ORIGINAL parent process directly wait for using this single wait(NULL) call (i.e., how many of its own direct children does the parent create in total)? (Enter your numerical answer.)',
+  options: [],
+  answer: 2,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'hard',
+  type: 'numerical',
+  explanation: 'Count only the DIRECT children of the original parent process P0, not grandchildren. Line 1, fork() (p1 = fork()): P0 creates its first direct child, call it C1 (p1==0 inside C1, p1==C1\'s PID inside P0). Inside the if-block, only C1 (where p1==0) executes: C1 calls fork() again, creating C2 -- but C2 is a child OF C1, not a direct child of P0, so it does not count toward P0\'s direct-child count. C1 then calls exit(0) and terminates, never reaching the line below the if-block. Meanwhile P0 (where p1 != 0) skips the if-block entirely and proceeds to the final unconditional fork(), creating its SECOND direct child, C3. So P0 has exactly 2 direct children: C1 and C3. A single wait(NULL) call only reaps one terminated child at a time, but the question asks how many direct children exist in total (which determines how many wait() calls would eventually be needed) -- that count is 2.'
+}
+);
+
+window.GATE_DATA.questions['os'].topics.find(function(t){return t.id==='os-scheduling';}).questions.push(
+{
+  id: 'os-scheduling-y1',
+  q: 'Which of the following statements about CPU scheduling algorithms are TRUE? (Select ALL that apply)',
+  options: ['Non-preemptive SJF minimizes the average waiting time among all non-preemptive scheduling algorithms, provided all processes are available at time 0', 'Round Robin scheduling with a time quantum larger than every process\'s burst time degenerates into essentially FCFS behavior', 'Priority scheduling is immune to starvation regardless of whether aging is used', 'In preemptive priority scheduling, a running process can be preempted the instant a higher-priority process arrives'],
+  answers: [0, 1, 3],
+  marks: 2,
+  difficulty: 'medium',
+  type: 'concept',
+  explanation: 'Option A is TRUE: it is a proven result that, given a fixed set of processes all available at time 0, non-preemptive SJF produces the minimum possible average waiting time among non-preemptive algorithms, since running the shortest job first minimizes the cumulative time other jobs spend waiting behind long jobs. Option B is TRUE: if the quantum exceeds every process\'s total burst time, every process finishes in its very first (and only) allotted slice before the quantum expires, so processes run to completion in arrival/queue order exactly like FCFS -- no process is ever preempted mid-burst. Option C is FALSE: plain priority scheduling (without aging) can starve low-priority processes indefinitely if a continuous stream of higher-priority processes keeps arriving; aging is specifically the fix introduced to prevent this by gradually raising a waiting process\'s priority over time. Option D is TRUE: this is the defining feature of PREEMPTIVE priority scheduling -- unlike the non-preemptive variant, the scheduler immediately preempts the currently running process the moment a higher-priority process enters the ready queue.'
+},
+{
+  id: 'os-scheduling-y2',
+  q: 'Which of the following statements about the time quantum in Round Robin scheduling are TRUE? (Select ALL that apply)',
+  options: ['Decreasing the time quantum always decreases the total number of context switches', 'If the time quantum is made very small, context-switching overhead can become significant relative to useful CPU execution time', 'The choice of time quantum affects only turnaround time and never the number of context switches', 'A time quantum that is too large can make Round Robin behave more like FCFS, increasing the waiting time experienced by short processes stuck behind long ones'],
+  answers: [1, 3],
+  marks: 2,
+  difficulty: 'medium',
+  type: 'concept',
+  explanation: 'Option A is FALSE: it has the relationship backwards -- a SMALLER time quantum means each process gets preempted after less work, so the same total burst work requires MORE round-trips through the ready queue, INCREASING the number of context switches, not decreasing it. Option B is TRUE: this is the classic quantum-too-small pitfall -- if the quantum approaches the fixed context-switch cost, the CPU spends a large fraction of its time performing switches rather than executing process instructions, hurting overall throughput even though responsiveness improves. Option C is FALSE: the quantum size directly determines how often processes are preempted and re-queued, so it clearly affects the number of context switches as well as turnaround time -- these are not independent. Option D is TRUE: as the quantum grows large enough that most processes finish within one slice, Round Robin\'s behavior converges toward FCFS, meaning a short process queued behind a long one must wait almost the long process\'s entire burst, worsening its individual waiting time.'
+},
+{
+  id: 'os-scheduling-y3',
+  q: 'Four processes arrive as follows and are scheduled using FCFS (First-Come-First-Served): P1 (arrival 0, burst 5), P2 (arrival 1, burst 3), P3 (arrival 2, burst 8), P4 (arrival 3, burst 6). What is the average waiting time across all four processes? (Enter your numerical answer.)',
+  options: [],
+  answer: 5.75,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'medium',
+  type: 'numerical',
+  explanation: 'FCFS services processes strictly in arrival order, back to back, with no preemption. Gantt chart: P1 runs 0 to 5 (waiting = start - arrival = 0 - 0 = 0). P2 must wait until P1 finishes at 5 even though it arrived at 1, running 5 to 8 (waiting = 5 - 1 = 4). P3 arrived at 2 but waits until 8, running 8 to 16 (waiting = 8 - 2 = 6). P4 arrived at 3 but waits until 16, running 16 to 22 (waiting = 16 - 3 = 13). Sum of waiting times = 0 + 4 + 6 + 13 = 23. Average waiting time = 23 / 4 = 5.75. (Tolerance allowed for this decimal average.)'
+},
+{
+  id: 'os-scheduling-y4',
+  q: 'Four processes all arrive at time 0 with burst times P1=6, P2=8, P3=7, P4=3, and are scheduled using non-preemptive SJF (Shortest Job First). What is the average waiting time across all four processes? (Enter your numerical answer.)',
+  options: [],
+  answer: 7,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'medium',
+  type: 'numerical',
+  explanation: 'Since all processes arrive simultaneously at time 0, non-preemptive SJF simply runs them in increasing order of burst time: P4 (3), P1 (6), P3 (7), P2 (8). Gantt chart: P4 runs 0 to 3 (waiting = 0). P1 runs 3 to 9 (waiting = 3, the time it sat idle before P4 finished). P3 runs 9 to 16 (waiting = 9). P2 runs 16 to 24 (waiting = 16). Sum of waiting times = 0 + 3 + 9 + 16 = 28. Average waiting time = 28 / 4 = 7.'
+},
+{
+  id: 'os-scheduling-y5',
+  q: 'Four processes P1, P2, P3, P4 all arrive at time 0 with burst times 5, 4, 8, 2 respectively, and are scheduled using Round Robin with time quantum = 4 (ready queue order: P1, P2, P3, P4, and newly arriving/re-queued processes are always appended to the back of the queue). What is the average waiting time across all four processes? (Enter your numerical answer.)',
+  options: [],
+  answer: 9.25,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'hard',
+  type: 'numerical',
+  explanation: 'Trace the queue with remaining bursts P1=5, P2=4, P3=8, P4=2. t=0: run P1 for its full quantum of 4 (remaining becomes 1), queue is now [P2, P3, P4, P1(1)], clock at t=4. t=4: run P2 for its remaining 4 units, P2 finishes exactly at t=8 (completion=8), queue [P3, P4, P1(1)]. t=8: run P3 for a full quantum of 4 (remaining becomes 4), queue [P4, P1(1), P3(4)], clock at t=12. t=12: run P4 for its remaining 2 units (less than the quantum), P4 finishes at t=14 (completion=14), queue [P1(1), P3(4)]. t=14: run P1 for its remaining 1 unit, P1 finishes at t=15 (completion=15), queue [P3(4)]. t=15: run P3 for its remaining 4 units, P3 finishes at t=19 (completion=19). Completion times: P1=15, P2=8, P3=19, P4=14. Since all arrived at 0, turnaround = completion time for each: P1=15, P2=8, P3=19, P4=14. Waiting = turnaround - burst: P1 = 15-5=10, P2 = 8-4=4, P3 = 19-8=11, P4 = 14-2=12. Sum = 10+4+11+12 = 37. Average waiting time = 37/4 = 9.25.'
+},
+{
+  id: 'os-scheduling-y6',
+  q: 'Four processes arrive as follows and are scheduled using preemptive SJF (SRTF -- Shortest Remaining Time First): P1 (arrival 0, burst 8), P2 (arrival 1, burst 4), P3 (arrival 2, burst 9), P4 (arrival 3, burst 5). What is the average waiting time across all four processes? (Enter your numerical answer.)',
+  options: [],
+  answer: 6.5,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'hard',
+  type: 'numerical',
+  explanation: 'Trace remaining times at each arrival/decision point. t=0: only P1 (remaining 8) present, it runs. t=1: P2 arrives (burst 4); since P2\'s 4 < P1\'s remaining 7, preempt P1 and run P2. t=2: P3 arrives (burst 9); P2\'s remaining is 4-1=3, which is less than 9, so P2 continues. t=3: P4 arrives (burst 5); P2\'s remaining is 4-2=2, still less than 5, so P2 continues and finishes its remaining 2 units, completing at t=5. At t=5, remaining times are P1=7, P3=9, P4=5; shortest is P4, so run P4; no new arrivals occur, and P4 runs to completion at t=10 (since 7 and 9 both exceed P4\'s burst throughout). At t=10, remaining times are P1=7, P3=9; shortest is P1, runs to completion at t=17. Finally P3 runs alone from t=17 to t=26. Completion times: P1=17, P2=5, P3=26, P4=10. Turnaround = completion - arrival: P1=17-0=17, P2=5-1=4, P3=26-2=24, P4=10-3=7. Waiting = turnaround - burst: P1=17-8=9, P2=4-4=0, P3=24-9=15, P4=7-5=2. Sum = 9+0+15+2 = 26. Average waiting time = 26/4 = 6.5. This is a well-known GATE-style SRTF example.'
+}
+);
+
+window.GATE_DATA.questions['os'].topics.find(function(t){return t.id==='os-sync';}).questions.push(
+{
+  id: 'os-sync-y1',
+  q: 'Which of the following statements about semaphores are TRUE? (Select ALL that apply)',
+  options: ['A binary semaphore can take only the values 0 and 1', 'A counting semaphore\'s value, when negative, indicates the number of processes currently blocked waiting on it (under the convention where wait() always decrements the value)', 'The wait() and signal() operations do not need to be atomic for a semaphore to correctly provide mutual exclusion', 'Spinlocks (busy-waiting) can be preferable to blocking on multiprocessor systems when the expected wait is shorter than the cost of a context switch'],
+  answers: [0, 1, 3],
+  marks: 2,
+  difficulty: 'medium',
+  type: 'concept',
+  explanation: 'Option A is TRUE: a binary semaphore is restricted by definition to exactly two values, 0 and 1, functioning like a simple lock, unlike a counting semaphore which can range over any integer. Option B is TRUE: under the common convention where wait() unconditionally decrements the semaphore\'s value (even below zero) and signal() unconditionally increments it, a negative value\'s magnitude directly equals the number of processes currently blocked waiting for a signal(). Option C is FALSE: if wait() and signal() were not executed atomically, two processes could interleave their read-modify-write of the semaphore value and both could see it as available, completely breaking the mutual exclusion guarantee -- atomicity of these operations (typically enforced via hardware instructions or disabling interrupts) is essential and non-negotiable. Option D is TRUE: on a multiprocessor, if a lock is expected to be held only briefly, spinning (busy-waiting) on another core can be cheaper than the overhead of a full context switch to put the waiting process to sleep and later resume it -- this is exactly why spinlocks are used inside real operating system kernels for short critical sections.'
+},
+{
+  id: 'os-sync-y2',
+  q: 'Which of the following statements about monitors are TRUE? (Select ALL that apply)',
+  options: ['A monitor automatically guarantees mutual exclusion among all its procedures, without the programmer explicitly coding separate wait/signal calls for that exclusion', 'A condition variable holds an integer value on which arithmetic operations like increment and decrement can be performed, just like a counting semaphore', 'Calling signal() on a condition variable with no process currently waiting on it has no effect, unlike signal() on a semaphore, which always increments its counter regardless', 'Monitors can be implemented using semaphores, but semaphores can never be implemented using monitors'],
+  answers: [0, 2],
+  marks: 2,
+  difficulty: 'medium',
+  type: 'concept',
+  explanation: 'Option A is TRUE: a monitor is a high-level synchronization construct in which the compiler/runtime automatically ensures that only one process at a time can be executing any of the monitor\'s procedures -- the programmer never has to write explicit wait(mutex)/signal(mutex) pairs for this basic mutual exclusion, unlike raw semaphore-based code. Option B is FALSE: a condition variable has no integer value of its own and supports only wait() and signal() (sometimes named differently) to block on, and wake, a condition -- it cannot be incremented, decremented, or tested for a numeric value the way a counting semaphore can. Option C is TRUE: a condition-variable signal() that finds no process waiting is simply lost/has no effect, whereas a semaphore\'s signal() unconditionally increments its counter even if no process is currently waiting, so a later wait() can consume that increment immediately -- this is a key semantic difference between the two mechanisms. Option D is FALSE in its second half: both directions are possible -- monitors can be built from semaphores, and conversely a semaphore\'s wait/signal behavior can also be implemented using a monitor with an internal counter and a condition variable, a standard textbook construction.'
+},
+{
+  id: 'os-sync-y3',
+  q: 'A counting semaphore S is initialized to 5. During a program\'s execution, wait(S) is called 9 times in total and signal(S) is called 4 times in total (in some interleaved order). What is the final value of S? (Enter your numerical answer.)',
+  options: [],
+  answer: 0,
+  kind: 'nat',
+  marks: 1,
+  difficulty: 'easy',
+  type: 'numerical',
+  explanation: 'Regardless of the actual interleaving order of the calls, the final value of a counting semaphore depends only on the total counts of wait() and signal() calls, since each wait() decrements the value by exactly 1 and each signal() increments it by exactly 1: final value = initial value - (number of wait calls) + (number of signal calls) = 5 - 9 + 4 = 0.'
+},
+{
+  id: 'os-sync-y4',
+  q: 'A counting semaphore S used for producer-consumer signaling is initialized to 0. The producer calls signal(S) a total of 6 times, and the consumer calls wait(S) a total of 4 times. What is the final value of S? (Enter your numerical answer.)',
+  options: [],
+  answer: 2,
+  kind: 'nat',
+  marks: 1,
+  difficulty: 'easy',
+  type: 'numerical',
+  explanation: 'Final value = initial value + (number of signal calls) - (number of wait calls) = 0 + 6 - 4 = 2. This positive value of 2 correctly represents that the producer has made 2 more "items available" signals than the consumer has yet consumed, so 2 units remain available for the consumer to immediately wait() on without blocking.'
+},
+{
+  id: 'os-sync-y5',
+  q: 'A counting semaphore mutex is initialized to 2, allowing up to 2 processes into a critical section concurrently. Exactly 5 processes call wait(mutex) at essentially the same time, before any of them has called signal(mutex). How many of these 5 processes end up BLOCKED, waiting for the semaphore? (Enter your numerical answer.)',
+  options: [],
+  answer: 3,
+  kind: 'nat',
+  marks: 1,
+  difficulty: 'medium',
+  type: 'numerical',
+  explanation: 'The semaphore starts at 2, meaning exactly 2 of the 5 requesting processes can successfully decrement it to 0 and proceed into the critical section without blocking (the value goes 2 -> 1 -> 0 for these first two successful wait() calls). Every subsequent wait() call by the remaining processes finds the semaphore already at or below 0 and must block. Number blocked = total requesting processes - initial semaphore value = 5 - 2 = 3.'
+},
+{
+  id: 'os-sync-y6',
+  q: 'What is the minimum initial value that a counting semaphore mutex must be given so that AT MOST 4 processes can be inside the critical section it guards at any single instant, assuming no process calls signal(mutex) before entering? (Enter your numerical answer.)',
+  options: [],
+  answer: 4,
+  kind: 'nat',
+  marks: 1,
+  difficulty: 'easy',
+  type: 'numerical',
+  explanation: 'A counting semaphore used to bound concurrent access allows exactly as many processes to successfully complete wait() (decrementing without blocking) as its initial value, before the value reaches 0 and all further wait() calls block. To allow at most 4 processes into the critical section simultaneously (and no more), the semaphore must be initialized to exactly 4 -- any smaller initial value would restrict access to fewer than 4 processes, and any larger value would incorrectly permit more than 4 processes in at once.'
+}
+);
+
+window.GATE_DATA.questions['os'].topics.find(function(t){return t.id==='os-deadlock';}).questions.push(
+{
+  id: 'os-deadlock-y1',
+  q: 'Which of the following correctly describe one of the four necessary (Coffman) conditions for deadlock to occur? (Select ALL that apply)',
+  options: ['Mutual exclusion: at least one resource involved must be held in a non-shareable mode', 'Hold and wait: a process must be holding at least one resource while simultaneously waiting to acquire additional resources currently held by other processes', 'No preemption: a resource cannot be forcibly taken away from the process holding it; it can only be released voluntarily by that process', 'Circular wait: at least two processes must each be requesting a resource held by the other, without necessarily forming a complete closed chain'],
+  answers: [0, 1, 2],
+  marks: 2,
+  difficulty: 'medium',
+  type: 'concept',
+  explanation: 'Option A is TRUE: mutual exclusion requires that at least one of the contested resources be non-shareable, so that only one process can hold it at a time -- if every resource involved were freely shareable, no process would ever need to wait for it. Option B is TRUE: hold and wait means a process already holds one or more resources while it blocks waiting to acquire further resources, which is precisely the situation that lets resources accumulate in the hands of blocked processes. Option C is TRUE: no preemption means the OS cannot yank a resource away from its current holder to give it to another process; the holder must release it voluntarily after finishing, which is exactly what allows a resource to remain locked up indefinitely by a stuck process. Option D is FALSE as stated: genuine circular wait requires a full CLOSED chain of two or more processes, P1 waiting on a resource held by P2, P2 waiting on a resource held by P3, ..., and finally some process waiting on a resource held by P1, closing the loop -- merely having two processes each want something the other holds without the chain actually closing is not sufficient; a proper cycle must exist.'
+},
+{
+  id: 'os-deadlock-y2',
+  q: 'Which of the following statements about deadlock handling strategies are TRUE? (Select ALL that apply)',
+  options: ['Deadlock prevention works by ensuring that at least one of the four necessary conditions for deadlock can never hold in the system', 'The Banker\'s algorithm is a deadlock AVOIDANCE algorithm that requires each process to declare its maximum possible resource need in advance', 'Deadlock detection algorithms are meant to be combined with deadlock prevention, since prevention alone never guarantees efficient resource usage', 'In a resource-allocation graph where every resource type has only a single instance, the presence of a cycle is both necessary and sufficient to conclude that a deadlock exists'],
+  answers: [0, 1, 3],
+  marks: 2,
+  difficulty: 'medium',
+  type: 'concept',
+  explanation: 'Option A is TRUE: since ALL four Coffman conditions must hold simultaneously for a deadlock to be possible, prevention strategies work by structurally eliminating (or making impossible) at least one condition -- for instance, requiring processes to request all resources upfront eliminates hold-and-wait. Option B is TRUE: the Banker\'s algorithm grants a resource request only if the resulting state remains "safe" (some sequence exists in which every process can still eventually finish), and this safety check fundamentally requires knowing each process\'s maximum possible future need in advance. Option C is FALSE: detection-and-recovery is typically used as an ALTERNATIVE to prevention/avoidance in systems that choose to allow deadlocks to occur occasionally and instead periodically check for and break them, precisely because prevention and avoidance schemes tend to under-utilize resources or add significant runtime overhead -- combining full prevention with detection is largely redundant. Option D is TRUE: this is a special-case theorem -- for resource-allocation graphs where every resource type has exactly one instance, a cycle in the graph is both a necessary and a sufficient condition for deadlock (this equivalence does NOT hold when resource types have multiple instances, where a cycle is necessary but not sufficient).'
+},
+{
+  id: 'os-deadlock-y3',
+  q: 'A system has 4 processes, each of which may request a maximum of 3 instances of a single resource type. What is the minimum total number of resource instances that must be available in the system to guarantee that deadlock can NEVER occur? (Enter your numerical answer.)',
+  options: [],
+  answer: 9,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'medium',
+  type: 'numerical',
+  explanation: 'The standard sufficient condition to guarantee deadlock-freedom for a single resource type is: total instances >= sum over all processes of (max need of that process - 1), plus 1 more instance. With n processes each having identical maximum need m, this simplifies to R = n(m-1) + 1. Here n=4 and m=3, so R = 4 x (3-1) + 1 = 4 x 2 + 1 = 9. Intuitively, with 9 instances, even in the worst case where every process holds one less than its maximum (i.e., each holds 2, totaling 8 instances allocated), at least 1 instance remains free -- guaranteeing that at least one process can obtain its full remaining need and complete, releasing its resources and allowing all others to eventually finish too.'
+},
+{
+  id: 'os-deadlock-y4',
+  q: 'A system has 3 processes P1, P2, P3 with maximum resource needs of 4, 5, and 6 instances respectively, of a single resource type. What is the minimum total number of resource instances that must be available to guarantee deadlock can NEVER occur? (Enter your numerical answer.)',
+  options: [],
+  answer: 13,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'medium',
+  type: 'numerical',
+  explanation: 'For processes with DIFFERENT maximum needs, the general sufficient condition is: R = sum over all processes of (max_i - 1) + 1. Here: (P1: 4-1=3) + (P2: 5-1=4) + (P3: 6-1=5) = 3+4+5 = 12, then add 1 more instance: R = 12 + 1 = 13. With 13 instances, the absolute worst case has each process holding exactly one less than its maximum (3+4+5=12 instances allocated in total), leaving at least 1 instance free -- guaranteeing that at least one process (whichever one still needs only that 1 more instance to reach its maximum) can complete, then release its resources so the remaining processes can proceed in turn.'
+},
+{
+  id: 'os-deadlock-y5',
+  q: 'A system has a single resource type with 3 instances currently AVAILABLE. Four processes have remaining (Need = Max - Allocation) values of P1=2, P2=5, P3=1, P4=4. Using the first step of the Banker\'s algorithm safety check, how many of these 4 processes could have their ENTIRE remaining need satisfied immediately using only the currently available instances (i.e., Need <= Available), without waiting for any other process to release resources first? (Enter your numerical answer.)',
+  options: [],
+  answer: 2,
+  kind: 'nat',
+  marks: 1,
+  difficulty: 'medium',
+  type: 'numerical',
+  explanation: 'The Banker\'s algorithm safety check repeatedly looks for a process whose remaining Need is less than or equal to the currently Available instances. Compare each process\'s Need against Available=3: P1 needs 2 <= 3, satisfiable immediately. P2 needs 5 > 3, NOT satisfiable immediately (must wait for a release). P3 needs 1 <= 3, satisfiable immediately. P4 needs 4 > 3, NOT satisfiable immediately. So exactly 2 processes (P1 and P3) could have their full remaining need met right now using only the currently available instances, without any process first having to finish and release resources back into the pool.'
+},
+{
+  id: 'os-deadlock-y6',
+  q: 'A resource-allocation graph has 3 processes (P1, P2, P3) and 3 resource types (R1, R2, R3), each resource type having exactly ONE instance. The graph contains the edges: P1 requests R1 (held by P2), P2 requests R2 (held by P3), and P3 requests R3 (held by P1), forming a closed cycle P1-R1-P2-R2-P3-R3-P1. How many processes are involved in this deadlock? (Enter your numerical answer.)',
+  options: [],
+  answer: 3,
+  kind: 'nat',
+  marks: 1,
+  difficulty: 'easy',
+  type: 'numerical',
+  explanation: 'Since every resource type here has exactly a single instance, the presence of a cycle in the resource-allocation graph is both a necessary and a sufficient condition for deadlock (this equivalence holds only in the single-instance-per-resource-type case). The cycle traced is P1 -> R1 -> P2 -> R2 -> P3 -> R3 -> P1, which passes through all three processes P1, P2, and P3 before closing back on itself -- each one is simultaneously holding a resource that the next process in the cycle needs, and each is blocked waiting for the process ahead of it, so all 3 processes are deadlocked together.'
+}
+);
