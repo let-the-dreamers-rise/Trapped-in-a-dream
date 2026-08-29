@@ -2293,3 +2293,48 @@ window.GATE_DATA.questions['compiler'].topics.find(function(t){return t.id==='co
     explanation: 'The first two statements, t1 = a*b and t2 = a*b, are on the SAME (old) value of a and b, so they are identical redundant computations: the DAG merges them into one node, meaning only 1 multiply is actually needed for both (t2 becomes just a copy/reference to t1\'s value). Then a is reassigned by "a = t3", which invalidates the old a-node for future computations — any later use of "a" refers to the NEW value. The later statement t4 = a * b uses this NEW a, so it is a different multiplication (different operand value for a) and cannot be merged with the earlier a*b node; it needs its own, second multiply instruction. So after CSE, exactly 2 distinct multiply operations remain: one shared node for the first two (old-a) multiplications, and one separate node for the later (new-a) multiplication.'
   }
 );
+window.GATE_DATA.questions['compiler'].topics.find(function(t){return t.id==='compiler-optimization';}).questions.push(
+  {
+    id: 'compiler-optimization-g1',
+    q: 'Consider the basic block of four three-address statements: S1: t1 = a + b; S2: t2 = t1 * c; S3: a = t2 - d; S4: t3 = a + b. Only t3 is live on exit from this block (i.e., LiveOut(S4) = {t3}). Using backward live-variable data-flow analysis (LiveIn(S) = use(S) union (LiveOut(S) - def(S))), what is LiveIn(S1), the set of variables live at the ENTRY to the block?',
+    options: ['{a, b, c, d}', '{a, b, c, d, t1, t2, t3}', '{t1, t2, t3}', '{a, b}'],
+    answer: 0,
+    marks: 2,
+    difficulty: 'hard',
+    type: 'concept',
+    explanation: 'Working backward from the exit: LiveOut(S4) = {t3} (given). LiveIn(S4) = use(S4) U (LiveOut(S4) - def(S4)) = {a,b} U ({t3}-{t3}) = {a,b}. So LiveOut(S3) = LiveIn(S4) = {a,b}. LiveIn(S3) = use(S3) U (LiveOut(S3)-def(S3)) = {t2,d} U ({a,b}-{a}) = {t2,d,b}. So LiveOut(S2) = {t2,d,b}. LiveIn(S2) = use(S2) U (LiveOut(S2)-def(S2)) = {t1,c} U ({t2,d,b}-{t2}) = {t1,c,d,b}. So LiveOut(S1) = {t1,c,d,b}. LiveIn(S1) = use(S1) U (LiveOut(S1)-def(S1)) = {a,b} U ({t1,c,d,b}-{t1}) = {a,b,c,d}. So exactly a, b, c, and d must be live before the block executes -- all four are needed as inputs somewhere downstream, while the temporaries t1, t2, t3 are all produced and consumed entirely within the block itself, matching option 1.'
+  },
+  {
+    id: 'compiler-optimization-g2',
+    q: 'Using the same basic block as before -- S1: t1 = a + b; S2: t2 = t1 * c; S3: a = t2 - d; S4: t3 = a + b -- with LiveOut(S4) = {t3} as the only variable live on exit, how many distinct variables are live immediately AFTER S2 executes (i.e., in LiveOut(S2), which equals LiveIn(S3))? (Enter your numerical answer.)',
+    options: [],
+    answer: 3,
+    kind: 'nat',
+    marks: 2,
+    difficulty: 'hard',
+    type: 'numerical',
+    explanation: 'Computing backward from the exit: LiveOut(S4) = {t3}. LiveIn(S4) = use(S4) U (LiveOut(S4)-def(S4)) = {a,b} U ({t3}-{t3}) = {a,b}, so LiveOut(S3) = {a,b}. LiveIn(S3) = use(S3) U (LiveOut(S3)-def(S3)) = {t2,d} U ({a,b}-{a}) = {t2,d,b}. Since LiveOut(S2) is defined to equal LiveIn(S3) (S3 is S2\'s only successor in this straight-line block), LiveOut(S2) = {t2,d,b}, which contains exactly 3 distinct variables: t2, d, and b. This makes sense operationally: right after S2 computes t2, that value (t2) is still needed by S3, d is needed by S3 for the subtraction, and b is still needed later by S4 -- while a and t1 are not needed again until they are freshly produced or consumed elsewhere, so they do not appear in this particular live set.'
+  },
+  {
+    id: 'compiler-optimization-g3',
+    q: 'A basic block computes: t1 = b * c; t2 = b * c; t3 = t1 + t2; t4 = b * c; and b, c are never reassigned anywhere in the block. After applying local common-subexpression elimination (recognizing that all three "b * c" computations are identical since their operands never change), how many actual multiplication (*) instructions remain in the optimized code? (Enter your numerical answer.)',
+    options: [],
+    answer: 1,
+    kind: 'nat',
+    marks: 2,
+    difficulty: 'medium',
+    type: 'numerical',
+    explanation: 'CSE builds a DAG (or value-numbering table) of expressions computed in the block. Since b and c are never redefined between the three statements, all three occurrences of "b * c" (in the definitions of t1, t2, and t4) refer to exactly the same operand values and therefore compute exactly the same result -- they all collapse into a SINGLE shared DAG node. Only one physical multiply instruction needs to actually execute this computation; every other reference to that same value (used to define t2, t3\'s operands, and t4) simply reuses the already-computed result rather than recomputing it. So after CSE, exactly 1 multiplication instruction remains in the block (the addition in t3 = t1 + t2 is a separate, non-redundant operation and is unaffected by this particular elimination).'
+  },
+  {
+    id: 'compiler-optimization-g4',
+    q: 'A basic block contains the five three-address statements: S1: t1 = a + b; S2: t2 = a + b; S3: t3 = t1 - c; S4: a = t3; S5: t4 = a + b; with a, b, c never redefined before S4. After applying local common-subexpression elimination (removing any statement whose right-hand-side expression is an exact duplicate of an earlier still-valid computation, and redirecting any of its later uses to the earlier temporary), how many three-address statements remain in the optimized block? (Enter your numerical answer.)',
+    options: [],
+    answer: 4,
+    kind: 'nat',
+    marks: 2,
+    difficulty: 'hard',
+    type: 'numerical',
+    explanation: 'S1 (t1 = a + b) is the first computation of a + b using the original value of a, so it is kept as-is. S2 (t2 = a + b) uses the SAME still-valid values of a and b (a has not yet been reassigned at this point), so it is an exact duplicate of S1 and can be eliminated entirely, with S2\'s temporary t2 simply becoming an alias for t1 wherever it might have been used later (here it is not used again, so it is just dropped). S3 (t3 = t1 - c) is a distinct computation and is kept. S4 (a = t3) reassigns a, which invalidates the earlier a + b node for any FUTURE use of a, so it is kept (it is not redundant, and it also matters for correctness). S5 (t4 = a + b) now uses the NEW value of a (post-reassignment), so it is a genuinely different computation from S1\'s a + b and must be kept as its own instruction. Counting the surviving statements: S1, S3, S4, S5 -- that is 4 statements remaining out of the original 5, with only the truly redundant S2 removed.'
+  }
+);

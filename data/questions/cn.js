@@ -1968,3 +1968,35 @@ window.GATE_DATA.questions['cn'].topics.find(function(t){return t.id==='cn-appli
   explanation: "We need c = 4^7 mod 33. Computing via repeated squaring: 4^1 = 4, 4^2 = 16, 4^3 = 4^2 x 4 = 64 mod 33 = 31, 4^4 = 31 x 4 = 124 mod 33 = 124 - 99 = 25, 4^5 = 25 x 4 = 100 mod 33 = 100 - 99 = 1, so 4^5 ≡ 1 (mod 33), meaning powers of 4 modulo 33 cycle with period 5. Then 4^7 = 4^(5+2) = 4^5 x 4^2 ≡ 1 x 16 = 16 (mod 33). So the ciphertext is c = 16."
 }
 );
+window.GATE_DATA.questions['cn'].topics.find(function(t){return t.id==='cn-application';}).questions.push(
+{
+  id: "cn-application-g1",
+  q: "In the standard Berkeley sockets API for a TCP-based client-server application, what is the correct ORDER of system calls made by the SERVER and by the CLIENT respectively to establish a connection?",
+  options: ["Server: socket -> bind -> listen -> accept; Client: socket -> connect", "Server: socket -> connect -> listen -> bind; Client: socket -> accept", "Server: bind -> socket -> accept -> listen; Client: connect -> socket", "Server: socket -> listen -> bind -> accept; Client: connect -> socket"],
+  answer: 0,
+  marks: 1,
+  difficulty: "easy",
+  type: "concept",
+  explanation: "On the server side, the sequence must be: socket() to create an endpoint (an unbound, unnamed file descriptor for communication), bind() to associate that socket with a specific local IP address and port number so clients know where to find it, listen() to mark the socket as passive/willing to accept incoming connection requests and set up a backlog queue for pending connections, and finally accept() to pull the next completed connection off that queue and hand back a brand-new socket for talking to that specific client. On the client side, only two calls are needed: socket() to create its own endpoint, and connect() to actively initiate the three-way TCP handshake toward the server's known IP address and port. bind() is optional on the client (the OS auto-assigns an ephemeral port if omitted), and listen()/accept() are meaningless for a client since it does not passively wait for incoming connections. This makes option 1 exactly correct."
+},
+{
+  id: "cn-application-g2",
+  q: "Which of the following statements correctly describes the BLOCKING behavior of the accept() socket call on a TCP server?",
+  options: ["accept() blocks the calling process until a connection request arrives from some client and the three-way handshake for it completes, at which point it returns a NEW socket descriptor dedicated to that connection", "accept() never blocks; it returns immediately with an error if no client has connected yet", "accept() blocks until the server's ENTIRE listen backlog queue becomes completely full", "accept() blocks only if the server has not yet called socket(), and returns instantly otherwise regardless of pending connections"],
+  answer: 0,
+  marks: 1,
+  difficulty: "medium",
+  type: "concept",
+  explanation: "By default, accept() is a blocking call: if no completed connection is currently waiting in the listening socket's backlog queue, the calling server process is suspended (put to sleep by the OS) until a client's connection request arrives and the underlying TCP three-way handshake for it finishes. Once such a connection becomes available, accept() wakes up, dequeues it, and returns a brand-new socket descriptor that is specific to that one client connection -- all further communication with that client happens over this new socket, not the original listening socket. This default blocking behavior can be changed by marking the listening socket as non-blocking, in which case accept() would instead return immediately with an EWOULDBLOCK/EAGAIN error if nothing is pending, but that is a non-default configuration. The other options misdescribe the trigger condition for blocking, so option 1 is correct."
+},
+{
+  id: "cn-application-g3",
+  q: "When a TCP server's accept() call successfully returns after a client connects, what exactly does it return, and what happens to the ORIGINAL listening socket used to call accept()?",
+  options: ["accept() returns a new socket descriptor dedicated to communicating with that one specific client, while the original listening socket descriptor is completely unaffected and remains open, ready to accept further incoming connections from other clients", "accept() returns the very same listening socket descriptor, which must now be used exclusively for that one client, permanently ending the server's ability to accept any further connections", "accept() returns the connecting client's process ID (PID) rather than any socket descriptor", "accept() automatically closes the listening socket and returns no usable value at all"],
+  answer: 0,
+  marks: 1,
+  difficulty: "easy",
+  type: "concept",
+  explanation: "A key design feature of the sockets API is the separation between the listening socket and the per-connection socket. The listening socket (created by socket(), bound by bind(), and marked passive by listen()) exists purely to receive and queue new incoming connection requests -- it is never used to actually exchange application data with a client. When accept() dequeues a completed connection, it creates and returns a distinct NEW socket descriptor that is bound specifically to that client's address and port pair; all subsequent send()/recv() calls for that client happen on this new descriptor. Critically, the original listening socket descriptor is left completely untouched and open, so the server's main loop can immediately call accept() again to pick up the next waiting client, which is exactly what allows a single server process (or thread pool) to serve many concurrent clients using one listening socket. This matches option 1."
+}
+);
