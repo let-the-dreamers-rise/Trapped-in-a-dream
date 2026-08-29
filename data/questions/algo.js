@@ -2309,3 +2309,132 @@ window.GATE_DATA.questions['algo'].topics.find(function(t){return t.id==='algo-s
   explanation: 'After 6 pushes, the stack holds 6 elements. multipop(4) requests 4 pops; since the stack has 6 (>=4) elements, all 4 requested pops execute, leaving 2 elements on the stack. Then 2 pushes bring the stack back up to 4 elements. multipop(10) requests 10 pops, but the stack only has 4 elements, so it pops all 4 available elements (stopping when empty) and leaves the stack empty. Total individual pops executed = 4 (first multipop) + 4 (second multipop) = 8. This illustrates the amortized aggregate-method argument: across any sequence of pushes and multipops, the total number of pop operations can never exceed the total number of push operations (here 8 pushes total, matching exactly 8 pops), so each operation is O(1) amortized even though a single multipop can cost O(n) in the worst case.'
 }
 );
+
+window.GATE_DATA.questions['algo'].topics.find(function(t){return t.id==='algo-graph';}).questions.push(
+{
+  id: 'algo-graph-u1',
+  q: 'A disjoint-set (union-find) data structure uses BOTH union by rank AND path compression. Over a sequence of m union/find operations on a universe of n elements, what is the amortized time per operation?',
+  options: [
+    'O(log n) per operation',
+    'O(α(n)) per operation, where α is the inverse Ackermann function (effectively constant for all practical n)',
+    'O(sqrt(n)) per operation',
+    'O(n) per operation'
+  ],
+  answer: 1,
+  marks: 1,
+  difficulty: 'medium',
+  type: 'concept',
+  explanation: 'With union by rank alone, a single tree has height O(log n), giving O(log n) per find. Adding path compression (every node visited during a find is re-attached directly to the root) improves this further: Tarjan showed that the total cost of m operations on n elements is O(m α(n)), where α is the inverse Ackermann function. α(n) grows so slowly that it is less than 5 for any n conceivable in practice (up to values vastly larger than the number of atoms in the universe), so the amortized cost per operation is effectively O(1), though technically it is not a true constant. This is the standard GATE-tested result: union by rank + path compression together give near-linear O(m α(n)) total time, better than either heuristic alone (each alone gives O(log n) amortized).'
+},
+{
+  id: 'algo-graph-u2',
+  q: 'Starting with 8 singleton elements {0,1,2,3,4,5,6,7}, union-by-rank (no path compression triggered) is applied with these calls in order: union(0,1), union(2,3), union(4,5), union(0,2), union(4,6), union(0,4). Union-by-rank convention: when ranks differ, the lower-rank root is attached under the higher-rank root; when ranks are equal, the second argument\'s root is attached under the first argument\'s root and the first root\'s rank increases by 1. What is the value of parent[6] after all six unions? (Enter your numerical answer.)',
+  options: [],
+  answer: 4,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'hard',
+  type: 'numerical',
+  explanation: 'Trace step by step (rank in brackets). union(0,1): ranks 0=0, ranks tie, so parent[1]=0, rank[0]=1. union(2,3): tie, parent[3]=2, rank[2]=1. union(4,5): tie, parent[5]=4, rank[4]=1. union(0,2): rank[0]=1 = rank[2]=1, tie, so parent[2]=0, rank[0]=2. union(4,6): root of 4 is 4 (rank 1), root of 6 is 6 (rank 0); rank[4]>rank[6], so parent[6]=4 directly (6 attaches under 4). union(0,4): root of 0 is 0 (rank 2), root of 4 is 4 (rank 1); rank[0]>rank[4], so parent[4]=0 -- but this only updates parent[4], NOT parent[6], because no find() call traverses through 6 to trigger path compression. So parent[6] remains 4 even though the logical root of 6\'s set is now 0 (reachable via 6->4->0). The trap is assuming parent[6] becomes 0 immediately; without an intervening find(6), the tree pointer is not updated. Final answer: parent[6] = 4.'
+},
+{
+  id: 'algo-graph-u3',
+  q: 'Starting with 10 singleton elements {0,1,...,9}, the following union operations are performed in order: union(0,1), union(2,3), union(1,2), union(4,5), union(6,7), union(5,6), union(0,4), union(2,6). How many distinct components (disjoint sets) remain after all 8 union calls? (Enter your numerical answer.)',
+  options: [],
+  answer: 3,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'medium',
+  type: 'numerical',
+  explanation: 'Track sets as they merge. union(0,1): {0,1}. union(2,3): {2,3}. union(1,2): merges {0,1} with {2,3} -> {0,1,2,3}. union(4,5): {4,5}. union(6,7): {6,7}. union(5,6): merges {4,5} with {6,7} -> {4,5,6,7}. union(0,4): merges {0,1,2,3} with {4,5,6,7} -> {0,1,2,3,4,5,6,7}. union(2,6): both 2 and 6 are already in the same component (the big merged set), so this union is REDUNDANT and does not reduce the component count -- a classic case Kruskal-style algorithms must detect via find() to avoid creating a cycle. Elements 8 and 9 were never touched and remain singleton components. A general rule: with n elements and s SUCCESSFUL (non-redundant) unions, components = n - s. Here s = 7 successful unions (the 8th was redundant), so components = 10 - 7 = 3: {0,1,2,3,4,5,6,7}, {8}, {9}.'
+},
+{
+  id: 'algo-graph-u4',
+  q: 'Kruskal\'s MST algorithm is implemented using a disjoint-set (union-find) data structure with union by rank and path compression, on a graph with V vertices and E edges. What dominates the overall time complexity?',
+  options: [
+    'O(E log E) from sorting the edges by weight, since the union-find operations only add a near-linear O(E α(V)) overhead',
+    'O(V^2) from scanning an adjacency matrix for the minimum edge at each step',
+    'O(E α(V)) from the union-find calls, which dominates over the cost of sorting',
+    'O(V log V) from maintaining a priority queue of vertices'
+  ],
+  answer: 0,
+  marks: 1,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: 'Kruskal\'s algorithm has two phases: (1) sort all E edges by weight, costing O(E log E); (2) process edges in sorted order, using find() to check whether the two endpoints are already connected (skip if so, to avoid a cycle) and union() to merge them when an edge is accepted, over E edges. With union by rank and path compression, this second phase costs O(E α(V)), which is nearly linear and asymptotically much smaller than O(E log E) for any non-trivial E. Since O(E log E) = O(E log V) (because E <= V^2 implies log E = O(log V)), the sorting step is the dominant term, giving overall Kruskal complexity O(E log E) = O(E log V). Options describing O(V^2) or O(V log V) describe Prim\'s variants (matrix-based or heap-based), not Kruskal\'s, and are not applicable here since Kruskal\'s does not use a priority queue over vertices at all.'
+},
+{
+  id: 'algo-graph-u5',
+  q: 'A disjoint-set data structure uses NEITHER union by rank/size NOR path compression -- every union simply attaches one root arbitrarily under the other, and finds never compress paths. What is the worst-case height of a resulting tree after n-1 unions have merged n singleton elements into a single set?',
+  options: [
+    'O(1), since union just changes one pointer',
+    'O(log n), matching the balanced case',
+    'O(sqrt(n)), matching Shell sort\'s gap behavior',
+    'O(n), when unions are chosen adversarially to always attach the current root under a new node'
+  ],
+  answer: 3,
+  marks: 1,
+  difficulty: 'medium',
+  type: 'concept',
+  explanation: 'Without union by rank or size, nothing prevents a large tree from being attached beneath a small one. Consider the adversarial sequence union(1,0), union(2,1), union(3,2), ..., union(n-1,n-2), where each call attaches the existing (growing) tree\'s root under the newly introduced element\'s root. This produces a single degenerate chain: 0 is a child of 1, which is a child of 2, ..., up to n-1, giving a tree of height exactly n-1 = O(n). A find() on element 0 in this structure then costs O(n) in the worst case, since it must walk the entire chain to the root, even though path compression alone (without rank) can still bound the AMORTIZED cost to O(log n) per operation over a full sequence -- but the single-operation WORST CASE height, absent the rank/size heuristic, remains O(n). This is exactly why union by rank (or size) is essential: it guarantees O(log n) height on its own, regardless of path compression.'
+}
+);
+
+window.GATE_DATA.questions['algo'].topics.find(function(t){return t.id==='algo-sorting-searching';}).questions.push(
+{
+  id: 'algo-sorting-searching-u1',
+  q: 'A text of length n = 11 and a pattern of length m = 4 are compared using the naive (brute-force) string matching algorithm, which slides the pattern one position at a time and compares characters left to right, stopping a comparison run at the first mismatch. Consider the absolute worst case: text = "aaaaaaaaaaa" (11 a\'s) and pattern = "aaab" (matches the first 3 characters at every alignment, then mismatches on the 4th). What is the TOTAL number of character comparisons performed across all alignments? (Enter your numerical answer.)',
+  options: [],
+  answer: 32,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'medium',
+  type: 'numerical',
+  explanation: 'The naive algorithm tries every possible starting alignment of the pattern within the text: there are n - m + 1 = 11 - 4 + 1 = 8 such alignments (shifts 0 through 7). At each alignment, since the text is all a\'s and the pattern is "aaab", the first 3 characters (a,a,a) match successfully but the 4th character comparison (text has \'a\', pattern has \'b\') fails, so exactly 4 comparisons are performed before moving to the next shift -- this is the worst case because the algorithm cannot exit early. Total comparisons = (number of alignments) x (comparisons per alignment) = 8 x 4 = 32. In general, the worst-case comparison count for naive string matching is (n-m+1)*m, which is Theta(nm) when m is a constant fraction of n -- this is why KMP and Rabin-Karp were developed to beat the naive algorithm\'s quadratic worst case.'
+},
+{
+  id: 'algo-sorting-searching-u2',
+  q: 'What is the correct KMP failure function (prefix function / lps array) for the pattern P = "AABAAAB" (indices 0 to 6)?',
+  options: [
+    '[0, 1, 0, 1, 2, 2, 3]',
+    '[0, 1, 0, 1, 2, 3, 3]',
+    '[0, 1, 1, 1, 2, 2, 3]',
+    '[0, 0, 0, 1, 2, 2, 3]'
+  ],
+  answer: 0,
+  marks: 2,
+  difficulty: 'hard',
+  type: 'numerical',
+  explanation: 'Compute pi[i] = length of the longest proper prefix of P[0..i] that is also a suffix of P[0..i], using the standard KMP recurrence with pointer k. pi[0]=0 by definition. i=1 (\'A\'): k=0, P[0]=\'A\' matches, k becomes 1, pi[1]=1. i=2 (\'B\'): k=1, P[1]=\'A\' != \'B\', fall back to k=pi[0]=0; P[0]=\'A\' != \'B\'; pi[2]=0. i=3 (\'A\'): k=0, P[0]=\'A\' matches, k=1, pi[3]=1. i=4 (\'A\'): k=1, P[1]=\'A\' matches, k=2, pi[4]=2. i=5 (\'A\'): k=2, P[2]=\'B\' != \'A\', fall back to k=pi[1]=1; P[1]=\'A\' matches, k=2, pi[5]=2. i=6 (\'B\'): k=2, P[2]=\'B\' matches, k=3, pi[6]=3. Final array: [0,1,0,1,2,2,3]. The common trap is assuming pi[5] should be 3 (option B) by naively extending the run of A\'s without correctly falling back through pi[1] first, or misjudging the mismatch at i=2.'
+},
+{
+  id: 'algo-sorting-searching-u3',
+  q: 'The Knuth-Morris-Pratt (KMP) string matching algorithm searches for a pattern of length m within a text of length n. What is its overall worst-case time complexity, including preprocessing?',
+  options: [
+    'O(n*m), same as the naive algorithm in the worst case',
+    'O(n+m): O(m) to build the failure function plus O(n) for the scan, since the text pointer never backtracks',
+    'O(n log m), from a binary-search-like matching step',
+    'O(m log m) only, independent of the text length n'
+  ],
+  answer: 1,
+  marks: 1,
+  difficulty: 'easy',
+  type: 'concept',
+  explanation: 'KMP has two phases. Preprocessing builds the failure function (prefix function / lps array) for the pattern in O(m) time using the same amortized argument as the main scan. The matching phase scans the text with a pointer i that NEVER moves backward -- on a mismatch, only the pattern pointer k jumps back using the failure function (k = pi[k-1]), and each such fallback can be charged against a PRIOR successful advance of k, so the total work across the whole scan is O(n) (amortized, since k increases at most n times total across the whole scan and each fallback strictly decreases k, bounding total fallbacks by total advances). Combining both phases gives O(n+m) overall, a strict asymptotic improvement over the naive algorithm\'s O(nm) worst case, and this is precisely why KMP is preferred whenever repeated or adversarial patterns could trigger the naive algorithm\'s quadratic blowup.'
+},
+{
+  id: 'algo-sorting-searching-u4',
+  q: 'The Rabin-Karp string matching algorithm uses a rolling hash to search for a pattern of length m in a text of length n. Which statement correctly describes its core idea and a key pitfall?',
+  options: [
+    'It hashes the pattern once and each length-m window of the text using an incrementally updatable ("rolling") hash; a hash match does NOT guarantee a true match (a "spurious hit" from a hash collision), so the algorithm must verify with an explicit character-by-character comparison before accepting a match',
+    'It builds a suffix tree of the text in O(n) time and looks up the pattern directly, guaranteeing O(m) worst-case search with no possibility of false positives',
+    'It compares the pattern against every window using full character comparisons but skips ahead using a failure function computed from the pattern, exactly like KMP',
+    'It sorts all length-m substrings of the text and binary searches for the pattern, giving O(n log n) time with no risk of false matches'
+  ],
+  answer: 0,
+  marks: 1,
+  difficulty: 'medium',
+  type: 'concept',
+  explanation: 'Rabin-Karp computes a numeric hash of the pattern and, using a rolling-hash update (typically treating the window as a number in some base, e.g. polynomial hashing mod a prime), incrementally recomputes the hash of each successive length-m window of the text in O(1) per shift after an O(m) initial computation, rather than rehashing from scratch. If the window\'s hash does NOT equal the pattern\'s hash, no match is possible there (safely skip). If the hashes DO match, this is only a candidate -- a spurious hit can occur due to hash collisions (different substrings mapping to the same hash value), so the algorithm must perform an explicit O(m) character-by-character verification before confirming a true match. Average-case time is O(n+m) with a good hash function and modulus, but worst case degrades to O(nm) if many spurious hits occur (e.g., a poorly chosen hash or an adversarial/all-same-character text), which is precisely why hash and modulus choice matters in practice.'
+}
+);

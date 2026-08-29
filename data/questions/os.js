@@ -1106,7 +1106,7 @@ window.GATE_DATA.questions['os'] = {
           marks: 1,
           difficulty: 'medium',
           type: 'concept',
-          explanation: 'SCAN, by definition, always sweeps the head all the way out to the disk\\u2019s physical boundary (cylinder 0 or the maximum cylinder number) before reversing direction, even if the last actual pending request in that direction was serviced well before reaching that boundary -- this trailing movement to and from the boundary is essentially wasted, since no request is being serviced during it. LOOK is a practical optimisation: it "looks ahead" at the remaining request queue and reverses direction immediately once it has serviced the LAST pending request in the current direction, never actually travelling all the way to the boundary unless a request genuinely exists there. This makes LOOK\\u2019s total head movement less than or equal to SCAN\\u2019s for any given request queue, as demonstrated numerically in questions 8 and 10 above (328 for SCAN versus 280 for LOOK on the identical queue).'
+          explanation: 'SCAN sweeps the head all the way out to the disk\\u2019s physical boundary in its CURRENT direction of travel before reversing, even if the last pending request in that direction was serviced well before the boundary -- that trailing run to the edge is wasted movement. LOOK is the practical optimisation: it "looks ahead" at the request queue and reverses as soon as the LAST pending request in the current direction is serviced, never touching the boundary unless a request actually sits there. Convention note for numericals (the one used by Galvin and standard GATE answer keys, and by question 8 here): total head movement is counted until the final request is serviced, so the boundary is touched on each full sweep in progress, but the simulation stops at the last serviced request -- SCAN does not tack on a final run to the far boundary after all requests are done. With that convention, LOOK\\u2019s total movement is always less than or equal to SCAN\\u2019s (328 for SCAN versus 280 for LOOK on the identical queue in questions 8 and 10).'
         },
         {
           id: 'os-file-disk-q14',
@@ -2185,5 +2185,49 @@ window.GATE_DATA.questions['os'].topics.find(function(t){return t.id==='os-deadl
   difficulty: 'easy',
   type: 'numerical',
   explanation: 'Since every resource type here has exactly a single instance, the presence of a cycle in the resource-allocation graph is both a necessary and a sufficient condition for deadlock (this equivalence holds only in the single-instance-per-resource-type case). The cycle traced is P1 -> R1 -> P2 -> R2 -> P3 -> R3 -> P1, which passes through all three processes P1, P2, and P3 before closing back on itself -- each one is simultaneously holding a resource that the next process in the cycle needs, and each is blocked waiting for the process ahead of it, so all 3 processes are deadlocked together.'
+}
+);
+window.GATE_DATA.questions['os'].topics.find(function(t){return t.id==='os-file-disk';}).questions.push(
+{
+  id: 'os-file-disk-g1',
+  q: 'A RAID 5 array is built from 5 disks, each with a capacity of 1 TB, using block-level striping with distributed parity. What is the total usable storage capacity available to the user, in TB? (Enter your numerical answer.)',
+  options: [],
+  answer: 4,
+  kind: 'nat',
+  marks: 1,
+  difficulty: 'easy',
+  type: 'numerical',
+  explanation: 'RAID 5 distributes both data and parity information across all N disks in the array rather than dedicating a whole disk to parity, but the TOTAL amount of space consumed by parity across the array is exactly equivalent to the capacity of one disk, since each stripe contains exactly one parity block spread somewhere among the N disks. So out of N disks of capacity C each, the usable (data) capacity is (N-1) x C. Here N = 5 disks and C = 1 TB, giving usable capacity = (5-1) x 1 = 4 TB. The remaining 1 TB worth of space (spread across all disks) is consumed by parity information, which is what allows the array to reconstruct the contents of any single failed disk.'
+},
+{
+  id: 'os-file-disk-g2',
+  q: 'Which statement correctly distinguishes disk striping (as used in RAID 0) from disk mirroring (as used in RAID 1)?',
+  options: ['Striping distributes data across multiple disks purely to improve read/write performance and provides no redundancy, whereas mirroring duplicates the same data on two or more disks to provide fault tolerance at the cost of usable capacity', 'Striping duplicates the same data on every disk for redundancy, while mirroring splits data blocks across disks purely for speed with no fault tolerance', 'Both striping and mirroring provide identical fault tolerance because both techniques use more than one physical disk', 'Mirroring always requires a minimum of 3 disks while striping requires only 2 disks'],
+  answer: 0,
+  marks: 1,
+  difficulty: 'easy',
+  type: 'concept',
+  explanation: 'Striping (RAID 0) breaks data into blocks and spreads consecutive blocks across multiple disks so that reads and writes can happen in parallel, giving a significant performance boost, but it stores each piece of data on only ONE disk, so the failure of any single disk in the array destroys data with no way to recover it -- RAID 0 therefore provides zero fault tolerance despite using multiple disks. Mirroring (RAID 1), in contrast, writes an identical, complete copy of the data onto two or more separate disks; if one disk fails, the other mirrored copy still holds all the data intact, giving full fault tolerance against a single-disk failure. The tradeoff is capacity: with mirroring, only half (for 2-way mirroring) of the total raw disk space is usable, since every byte is duplicated, whereas striping wastes none of the raw capacity on redundancy. This exactly matches option 1: striping favors performance with no redundancy, mirroring favors redundancy at a capacity cost.'
+},
+{
+  id: 'os-file-disk-g3',
+  q: 'A RAID 5 array stores three data blocks on three separate disks with the bit patterns 10110011, 11001010, and 01010101, plus a parity block computed as the bitwise XOR of these three data blocks stored on a fourth disk. The disk holding the SECOND data block (11001010) then fails. The RAID controller reconstructs the missing block by XORing the parity block together with the two surviving data blocks. What is the DECIMAL value of the reconstructed block? (Enter your numerical answer.)',
+  options: [],
+  answer: 202,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'hard',
+  type: 'numerical',
+  explanation: 'First compute the parity block P = d1 XOR d2 XOR d3, where d1 = 10110011, d2 = 11001010, d3 = 01010101. d1 XOR d2 = 01111001, then XORing with d3 gives P = 01111001 XOR 01010101 = 00101100. When d2 fails, RAID 5 reconstructs it as d2 = P XOR d1 XOR d3 (XOR is its own inverse and commutative/associative, so removing d1 and d3 from the parity recovers exactly the missing operand). Computing this: P XOR d1 = 00101100 XOR 10110011 = 10011111, then XOR d3 = 10011111 XOR 01010101 = 11001010. This recovers exactly the original bit pattern of d2, 11001010, which converted to decimal is 128+64+8+2 = 202. This illustrates the core RAID 5 recovery mechanism: parity is simply the XOR checksum of all data blocks in a stripe, so any single missing block can always be recovered by XORing the parity with all the surviving blocks.'
+},
+{
+  id: 'os-file-disk-g4',
+  q: 'What is the minimum number of physical disks required to implement RAID 0, RAID 1, and RAID 5 respectively, and which of these levels can survive the failure of at least one disk without losing data?',
+  options: ['RAID 0 needs a minimum of 2 disks (no fault tolerance), RAID 1 needs a minimum of 2 disks (tolerates 1 disk failure), and RAID 5 needs a minimum of 3 disks (tolerates 1 disk failure)', 'RAID 0 needs a minimum of 3 disks, RAID 1 needs a minimum of 4 disks, and RAID 5 needs only 2 disks, with only RAID 0 tolerating a failure', 'All three RAID levels require a minimum of 4 disks and all three tolerate exactly 2 simultaneous disk failures', 'RAID 0 and RAID 5 both tolerate 2 disk failures while RAID 1 tolerates none at all'],
+  answer: 0,
+  marks: 1,
+  difficulty: 'medium',
+  type: 'concept',
+  explanation: 'RAID 0 (pure striping) needs at least 2 disks to spread data across, but since it stores no redundant information whatsoever, the loss of even a single disk destroys data, so it tolerates 0 failures. RAID 1 (mirroring) needs at least 2 disks, since it must keep a full duplicate copy, and it can survive the loss of 1 disk because the mirrored copy still contains all the data. RAID 5 (block-level striping with distributed parity) needs at least 3 disks, because it requires at least 2 disks worth of data plus 1 disk worth of parity information spread across the array to be able to reconstruct any single missing block via XOR; with only 2 disks there would be no way to distribute both data and parity meaningfully, so 3 is the practical minimum. RAID 5 tolerates exactly 1 disk failure (a second simultaneous failure loses data, since the parity XOR scheme can only recover one unknown value per stripe). This matches option 1 precisely.'
 }
 );
