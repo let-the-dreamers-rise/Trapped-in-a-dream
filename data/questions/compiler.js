@@ -1929,3 +1929,367 @@ window.GATE_DATA.questions['compiler'].topics.find(function(t){return t.id==='co
     explanation: 'Translating the boolean test a < b in jump-code style produces exactly two conditional/unconditional jump instructions: instruction 1 is "if a < b goto _" (its target added to B.truelist) and instruction 2 is "goto _" (its target added to B.falselist). Then the then-branch "x = 1;" contributes exactly one more instruction: instruction 3, "x = 1". A marker nonterminal placed right after "(B)" records that instruction 3 is where the then-branch code begins, so backpatch(B.truelist, 3) fills instruction 1\'s target with 3; B.falselist (instruction 2) is left in S.nextlist to be patched later against whatever follows the whole if statement. Counting all generated instructions: 2 (for the test) + 1 (for the then-branch) = 3 instructions in total.'
   }
 );
+
+window.GATE_DATA.questions['compiler'].topics.find(function(t){return t.id==='compiler-icg';}).questions.push(
+  {
+    id: 'compiler-icg-y1',
+    q: 'Which of the following statements about three-address code (TAC) generation are TRUE? (Select ALL that apply)',
+    options: [
+      'A quadruple representation stores (op, arg1, arg2, result) explicitly, so it does not need a separate symbol-table lookup to relocate temporaries when statements are reordered',
+      'A triple representation refers to the result of an instruction by the position (index) of that instruction, which makes reordering triples during optimization awkward because every reference to a moved instruction must be updated',
+      'Short-circuit (jumping) code for boolean expressions can produce a program with fewer instructions on the executed path than always evaluating and testing an explicit 0/1 value',
+      'Backpatching is a technique that requires two full passes over the source program: one pass to generate code with all jump targets left blank, and a second pass over the source to fill them in'
+    ],
+    answers: [0, 1, 2],
+    marks: 2,
+    difficulty: 'medium',
+    type: 'concept',
+    explanation: 'Option 1 is true: because a quadruple names its result as an explicit temporary/variable field, moving a quadruple around (e.g. during common-subexpression elimination or code motion) does not disturb any other quadruple, since nothing refers to it positionally. Option 2 is true: a triple has no separate result field and is instead referred to by other triples using its own index/position in the triple array (i.e. "(op, arg1, arg2)" where an arg can be "the result of triple #5"); if triples are reordered for optimization, every such positional reference must be patched, which is exactly the well-known drawback of triples versus quadruples. Option 3 is true: short-circuit/jumping code for something like "if (a<b) then ... " never has to explicitly materialize a boolean 0/1 value and then test it — it jumps directly to the true or false branch, which is often strictly fewer instructions than computing an explicit truth value into a temporary and then branching on that temporary. Option 4 is false: backpatching operates entirely within a single pass over the source/parse — it leaves the *target field* of jump instructions blank when a label is not yet known and fills those in later using label-list bookkeeping (truelist/falselist/nextlist), but it never requires re-scanning the source program a second time; it only requires a second look at the *already generated* instruction list, not the source text.'
+  },
+  {
+    id: 'compiler-icg-y2',
+    q: 'Which of the following statements about Directed Acyclic Graphs (DAGs) used for basic-block optimization are TRUE? (Select ALL that apply)',
+    options: [
+      'A DAG node is created for every occurrence of an operator in a basic block, even if an identical computation on identical operands already has a node',
+      'DAG construction for a basic block naturally performs common-subexpression elimination, since a repeated computation on the same live operand values is represented by reusing the existing node',
+      'Leaves of the DAG represent initial values of variables and constants that enter the basic block',
+      'A DAG can be used to detect that an assignment to a variable is dead (its value is never used) if the corresponding node has no remaining live identifiers attached to it and nothing after it in the block uses that node'
+    ],
+    answers: [1, 2, 3],
+    marks: 2,
+    difficulty: 'medium',
+    type: 'concept',
+    explanation: 'Option 1 is false: this is precisely what a DAG avoids — before creating a new node for an operator, the DAG construction algorithm checks whether a node computing the same operator on the same current operand nodes already exists, and reuses it instead of duplicating it; that reuse is the whole point of building a DAG rather than a plain tree/list of instructions. Option 2 is true: reusing an existing node for a repeated identical computation (with unchanged operand values) is exactly common-subexpression elimination performed as a side effect of DAG construction. Option 3 is true: leaves are created for the values that are live on entry to the block — the initial values of variables — and for constants; interior nodes represent operators applied to these. Option 4 is true: if a node is labeled only with a variable whose value is later overwritten before ever being read (i.e. its list of attached identifiers becomes empty and no later leaf/interior node uses it), that assignment is dead code and can be removed since it has no observable effect within (or after) the block.'
+  },
+  {
+    id: 'compiler-icg-y3',
+    q: 'A one-address-code (accumulator-style) statement-by-statement translator, with no common-subexpression elimination across statements, generates TAC for the sequence: t1 = a + b; t2 = t1 * c; t3 = a + b; t4 = t2 - t3; How many TAC instructions are generated in total for this sequence exactly as written (treat each of the four given assignment statements as needing exactly one TAC instruction each, since each right-hand side already has at most one operator)? (Enter your numerical answer.)',
+    options: [],
+    answer: 4,
+    kind: 'nat',
+    marks: 1,
+    difficulty: 'easy',
+    type: 'numerical',
+    explanation: 'Each of the four statements already has a right-hand side with at most one operator (a+b, t1*c, a+b, t2-t3), so the naive per-statement generator emits exactly one three-address instruction per statement with no splitting needed: (1) t1 = a + b, (2) t2 = t1 * c, (3) t3 = a + b, (4) t4 = t2 - t3. That is exactly 4 instructions in total (note that without CSE, statement 3 is regenerated in full even though it duplicates statement 1 — DAG-based construction would instead reuse t1, but a naive one-pass generator does not).'
+  },
+  {
+    id: 'compiler-icg-y4',
+    q: 'Consider the expression (a + b) * (a + b) + (a - b) translated into a DAG for a single basic block, where a and b are the only live variables entering the block. Counting only the interior (operator) nodes of the DAG (not the leaf nodes for a and b), how many distinct interior nodes does the DAG contain, given that identical subexpressions on identical operands are represented by a single shared node? (Enter your numerical answer.)',
+    options: [],
+    answer: 4,
+    kind: 'nat',
+    marks: 2,
+    difficulty: 'medium',
+    type: 'numerical',
+    explanation: 'The two occurrences of "a + b" are structurally identical and operate on the same unchanged leaves a and b, so DAG construction represents both with a single shared "+" node, N1 = a+b, instead of building it twice. The multiplication needs its own interior node, N2 = N1 * N1, reusing N1 as both operands. The subtraction a - b is a different operator applied to a and b, so it cannot share N1 (only identical operator AND identical operands are merged); it gets its own node N3 = a - b. Finally the outer addition needs one more node, N4 = N2 + N3, which is the DAG root. Listing all interior nodes: N1 (a+b, shared), N2 (square of N1), N3 (a-b), N4 (final sum) — exactly 4 distinct interior nodes. Without sharing, a plain expression tree would have needed 5 operator nodes (two separate a+b nodes, one multiply, one subtract, one outer add); DAG sharing removes exactly the one duplicate a+b node, giving 5 - 1 = 4, which matches.'
+  },
+  {
+    id: 'compiler-icg-y5',
+    q: 'Using backpatching for the boolean expression (a < b) || (c < d) inside "if" translation, with jumping (short-circuit) code where the OR operator is translated so that the first operand\'s falselist falls through to evaluate the second operand, how many conditional/unconditional jump instructions are generated for evaluating this boolean expression alone (not counting the then/else branch bodies)? (Enter your numerical answer.)',
+    options: [],
+    answer: 4,
+    kind: 'nat',
+    marks: 2,
+    difficulty: 'medium',
+    type: 'numerical',
+    explanation: 'Short-circuit jumping code for E1 || E2 generates: for E1 = (a<b): "if a<b goto _" (true jump, goes straight to E1.truelist, which becomes part of the whole expression\'s truelist) and "goto _" (false jump, goes to E1.falselist) — 2 instructions. E1.falselist is backpatched to fall through to the code for E2 (no extra instruction needed for that fallthrough). For E2 = (c<d): "if c<d goto _" (true jump, added to E2.truelist) and "goto _" (false jump, added to E2.falselist) — 2 more instructions. E1.truelist and E2.truelist are merged into the overall expression\'s truelist; E2.falselist becomes the overall falselist. Total jump instructions = 2 (for E1) + 2 (for E2) = 4.'
+  }
+);
+
+window.GATE_DATA.questions['compiler'].topics.find(function(t){return t.id==='compiler-runtime';}).questions.push(
+  {
+    id: 'compiler-runtime-y1',
+    q: 'Which of the following statements about storage-allocation strategies for procedure activations are TRUE? (Select ALL that apply)',
+    options: [
+      'Stack allocation can be used for a language whose procedures may not be recursive as well as for one whose procedures may be recursive',
+      'A language that allows a nested procedure to return a reference to a local variable declared in an enclosing procedure, and to keep using that reference after the enclosing procedure has returned, cannot safely use pure stack allocation for that variable',
+      'Static allocation binds a name to a storage location once, at compile time, for the entire execution of the program, which makes it fundamentally incompatible with any form of recursion in the language as a whole',
+      'Heap allocation is needed to support arbitrary lifetimes for data, such as objects whose extent is not tied to the activation of the procedure that created them'
+    ],
+    answers: [0, 1, 3],
+    marks: 2,
+    difficulty: 'medium',
+    type: 'concept',
+    explanation: 'Option 1 is true: stack allocation is a general implementation strategy for activation records that works whether or not the language permits recursion — recursive calls simply push more frames onto the same stack; non-recursive languages just never need more than a bounded stack depth for that reason. Option 2 is true: this is the classic dangling-reference problem — if a variable\'s storage is popped off the stack when its owning activation returns, any surviving reference to it becomes invalid; languages that allow this pattern (e.g. returning a pointer/closure over a local) must give that variable heap or otherwise extended lifetime, not pure stack storage. Option 3 is false: static allocation is incompatible with recursion only for the specific names that would need multiple simultaneous live instances (a recursive procedure\'s own locals cannot be purely static, since each active call needs its own copy); it does not make the entire program static allocation impossible in general — non-recursive parts of a program can still use static allocation even in a language whose other procedures recurse (mixed strategies are common, e.g. Fortran-style static locals for non-recursive routines). Option 4 is true: heap allocation exists precisely to give storage a lifetime independent of any particular procedure activation, letting an object outlive the call that created it, up until it is explicitly freed or garbage collected.'
+  },
+  {
+    id: 'compiler-runtime-y2',
+    q: 'Which of the following statements about access links (static links) versus control links (dynamic links) in activation records are TRUE? (Select ALL that apply)',
+    options: [
+      'The control link always points to the activation record of the caller, i.e. the activation that is dynamically resuming control when the current procedure returns',
+      'The access link is used to support non-local (lexically scoped) name access by pointing to the activation record of the lexically enclosing procedure\'s most recent activation',
+      'In a language with no nested procedure declarations (procedures cannot be defined inside other procedures), access links are unnecessary because non-local data can be reached directly through global/static storage or one level of the control-link chain',
+      'The access link and the control link always point to the same activation record for every call, regardless of the nesting structure of the program'
+    ],
+    answers: [0, 1, 2],
+    marks: 2,
+    difficulty: 'medium',
+    type: 'concept',
+    explanation: 'Option 1 is true: the control (dynamic) link records the caller\'s activation record so that control can return there, and it always reflects the actual call sequence at run time regardless of how procedures are lexically nested in the source. Option 2 is true: the access (static) link is built specifically to support lexical scoping — it points to the activation of the lexically (textually) enclosing procedure\'s most recent invocation, letting a nested procedure walk a chain of access links to reach nonlocal variables declared in enclosing scopes, independent of the actual call chain. Option 3 is true: without nested procedure declarations, every procedure\'s nonlocal names are either global (reachable via a single fixed area) or are truly local, so there is no lexical-nesting chain to traverse, making access links pointless — this is exactly why C, which disallows nested functions, has no need for static links. Option 4 is false: this is only true in the trivial case where each call\'s caller happens to also be its lexically enclosing procedure; in general (e.g. a deeply nested inner procedure called directly from main, or mutual/indirect recursion), the caller (control link target) and the lexically enclosing activation (access link target) are different activation records, which is the whole reason two separate links are needed.'
+  },
+  {
+    id: 'compiler-runtime-y3',
+    q: 'A procedure P calls itself recursively 5 times before hitting its base case (i.e. there are 6 total activations of P alive at the deepest point: the initial call plus 5 recursive calls). If each activation record for P occupies exactly 40 bytes on the runtime stack, how many bytes of stack space are occupied by P\'s activation records at the point of maximum recursion depth (ignore any other frames on the stack)? (Enter your numerical answer.)',
+    options: [],
+    answer: 240,
+    kind: 'nat',
+    marks: 1,
+    difficulty: 'easy',
+    type: 'numerical',
+    explanation: 'At maximum depth there are 6 simultaneously live activations of P (the original call plus the 5 recursive calls before the base case returns), and each one needs its own 40-byte activation record since stack allocation gives every live activation independent storage. Total stack space used by P\'s frames = 6 x 40 = 240 bytes.'
+  },
+  {
+    id: 'compiler-runtime-y4',
+    q: 'Consider nested procedures: MAIN contains procedure A (nesting depth 1 relative to MAIN), and A contains procedure B (nesting depth 2 relative to MAIN). If B is called directly from MAIN (not through A), how many access-link (static-link) hops must be followed starting from B\'s own activation record to reach the activation record of A (B\'s lexically immediately enclosing procedure), assuming B\'s access link always correctly points to the most recent activation of its lexically enclosing procedure regardless of who actually called it? (Enter your numerical answer.)',
+    options: [],
+    answer: 1,
+    kind: 'nat',
+    marks: 2,
+    difficulty: 'medium',
+    type: 'numerical',
+    explanation: 'The access link is set up based on lexical (static) nesting, not the dynamic call chain — regardless of who actually calls B at run time, B\'s access link is always made to point to the most recent activation of B\'s lexically enclosing procedure, which is A (since B is declared textually inside A). So exactly 1 hop along B\'s own access link reaches A\'s activation record directly, even though B was called from MAIN rather than from A. (Note: for this to be correct in general, the calling convention must locate the correct enclosing A-activation via A\'s own access link chain at the call site in MAIN, but from B\'s own frame, only 1 hop is needed to reach A.)'
+  },
+  {
+    id: 'compiler-runtime-y5',
+    q: 'A garbage collector using reference counting maintains a count of incoming references for each heap object. Starting from an object X with reference count 3, the following events occur in order: (1) one reference to X is dropped, (2) a new reference to X is created, (3) two references to X are dropped, (4) one more reference to X is dropped. Assuming the count is decremented/incremented exactly once per such event and X is collected the instant its count reaches 0, what is X\'s reference count immediately after event (4), or 0 if X was already collected before event (4) (in which case answer 0)? (Enter your numerical answer.)',
+    options: [],
+    answer: 0,
+    kind: 'nat',
+    marks: 2,
+    difficulty: 'medium',
+    type: 'numerical',
+    explanation: 'Start: count = 3. Event 1 (drop): 3 - 1 = 2. Event 2 (new reference): 2 + 1 = 3. Event 3 (drop two references): 3 - 2 = 1. Event 4 (drop one more): 1 - 1 = 0. The count never hit 0 before event 4 (it was 2, 3, then 1 after event 3), so X survives through event 3 and is collected exactly at event 4, when the count reaches 0. The final/reported count is 0.'
+  }
+);
+
+window.GATE_DATA.questions['compiler'].topics.find(function(t){return t.id==='compiler-optimization';}).questions.push(
+  {
+    id: 'compiler-optimization-y1',
+    q: 'Which of the following statements about local versus global common-subexpression elimination (CSE) are TRUE? (Select ALL that apply)',
+    options: [
+      'Local CSE, performed via a DAG over a single basic block, can only detect and eliminate redundant computations whose operands have not been redefined between the two occurrences within that same block',
+      'Global CSE across basic blocks requires data-flow analysis (such as available-expressions analysis) because whether an expression is redundant at a later block depends on the paths taken through the control-flow graph to reach it',
+      'An expression is available at a program point if it has been computed on every path reaching that point and none of its operands have been redefined since the last such computation on any of those paths',
+      'Global CSE is always safe to apply even without checking for redefinitions along intervening paths, since any two textually identical expressions in a program must compute the same value everywhere'
+    ],
+    answers: [0, 1, 2],
+    marks: 2,
+    difficulty: 'medium',
+    type: 'concept',
+    explanation: 'Option 1 is true: within one basic block a DAG merges nodes for the same operator on the same current operand values, but if an operand is reassigned between two textually identical computations, the second occurrence gets a fresh node (using the new operand value) rather than being merged, so redefinitions correctly block the optimization locally. Option 2 is true: once you leave a single block, whether an expression\'s earlier computed value is still valid at a later point depends on what happens along every possible control-flow path between the two points (was an operand redefined on some path? was the expression itself not computed on some path?), which is exactly the kind of question available-expressions data-flow analysis is designed to answer. Option 3 is true: this is the standard definition of the available-expressions data-flow property, used as the safety condition for global CSE. Option 4 is false: two textually identical expressions can compute different values at different points if any operand has been reassigned in between (e.g. on some but not all paths, or via aliasing/pointer effects), which is precisely why global CSE cannot be applied blindly by pattern-matching text and must instead consult data-flow information.'
+  },
+  {
+    id: 'compiler-optimization-y2',
+    q: 'Which of the following statements about loop optimizations are TRUE? (Select ALL that apply)',
+    options: [
+      'Loop-invariant code motion moves a computation whose operands never change inside the loop body from inside the loop to a preheader block that executes once before the loop starts',
+      'Strength reduction typically replaces a more expensive operation inside a loop (such as multiplication driven by a loop index) with a cheaper equivalent operation (such as addition), usually by introducing a new induction variable updated incrementally',
+      'Induction-variable elimination can remove a variable from a loop entirely if its only use was to help compute another induction variable that has itself been replaced or is no longer needed after strength reduction',
+      'Loop-invariant code motion is unsound in general and can never be safely applied to any expression that involves a load from memory, even if that memory location is never written to inside the loop'
+    ],
+    answers: [0, 1, 2],
+    marks: 2,
+    difficulty: 'medium',
+    type: 'concept',
+    explanation: 'Option 1 is true: this is exactly the definition of loop-invariant code motion — hoisting a computation whose value would be identical on every iteration (because its operands are not modified inside the loop) out to a preheader that runs once, saving that recomputation on every subsequent iteration. Option 2 is true: strength reduction on an induction variable such as i in "t = i * c" (with i incremented by 1 each iteration) introduces a new variable t that is instead incremented by c each iteration (t = t + c), replacing a multiply with a cheaper add, which is the textbook strength-reduction transformation. Option 3 is true: after strength reduction, the original induction variable may become dead if its only remaining purpose was to drive the now-replaced computation (and it is not used for the loop test or elsewhere), letting induction-variable elimination remove it entirely, reducing the number of live variables and updates per iteration. Option 4 is false: loop-invariant code motion can be safely applied to a memory load as long as the compiler can prove (via alias analysis or other means) that the memory location is not written anywhere reachable inside the loop and the load cannot fault differently at a different point — this "can never" absolute claim is too strong; such analyses and hoisting of loop-invariant loads are routinely and safely performed by real optimizing compilers.'
+  },
+  {
+    id: 'compiler-optimization-y3',
+    q: 'A basic block contains the following TAC instructions in order: t1 = a + b; t2 = a + b; t3 = t1 * c; t4 = t2 * c; t5 = t3 + t4; After building a DAG for this block and eliminating common subexpressions (merging identical operator/operand nodes), how many distinct interior (operator) nodes remain in the DAG? (Enter your numerical answer.)',
+    options: [],
+    answer: 3,
+    kind: 'nat',
+    marks: 2,
+    difficulty: 'medium',
+    type: 'numerical',
+    explanation: 'a+b is computed identically for both t1 and t2 (same operator, same unchanged operands a and b), so DAG construction merges them into one shared node N1 = a+b (used for both t1 and t2). Then t3 = t1*c and t4 = t2*c both reduce to N1*c since t1 and t2 both point to N1 — this is also the exact same operator on the exact same operand node N1 and the same c, so it too collapses to a single shared node N2 = N1*c (serving as both t3 and t4). Finally t5 = t3+t4 becomes N2+N2, which needs its own node N3 = N2+N2 (a distinct new operator application, even though both operands happen to be the same node). Total distinct interior nodes: N1 (a+b), N2 (N1*c), N3 (N2+N2) = 3.'
+  },
+  {
+    id: 'compiler-optimization-y4',
+    q: 'For the loop "for (i = 0; i < n; i = i + 1) { x = a[i]; y = b + c; z = z + y; }" where a, b, c are never modified inside the loop body and n is not modified inside the loop, how many of the three assignment statements inside the loop body (x = a[i]; y = b + c; z = z + y;) are loop-invariant computations eligible to be hoisted to a preheader (consider the right-hand-side computation of each statement; a statement counts as loop-invariant only if its right-hand side\'s value is guaranteed identical on every iteration)? (Enter your numerical answer.)',
+    options: [],
+    answer: 1,
+    kind: 'nat',
+    marks: 2,
+    difficulty: 'medium',
+    type: 'numerical',
+    explanation: 'x = a[i]: the right-hand side depends on i, which changes every iteration, so this is NOT loop-invariant. y = b + c: both b and c are never modified inside the loop, so b+c computes the exact same value on every iteration — this IS loop-invariant and can be hoisted (y can be computed once in the preheader). z = z + y: the right-hand side depends on z, which is itself reassigned by this very statement every iteration (it accumulates), so its value is different each iteration — this is NOT loop-invariant. Exactly 1 of the 3 statements (y = b + c) is loop-invariant.'
+  },
+  {
+    id: 'compiler-optimization-y5',
+    q: 'A control-flow graph has basic blocks B1 (entry) -> B2, B1 -> B3, B2 -> B4, B3 -> B4, B4 -> B5 (exit). The expression "a + b" is computed (and a, b are not redefined afterward on that path) in B2 and also in B3, but is NOT computed in B1 or B4, and a, b are never redefined anywhere in the graph. Using the available-expressions data-flow equations (an expression is available at the entry of a block only if it is available in IN of every predecessor, intersected appropriately), is "a + b" available at the entry of B4? Answer 1 for yes (available) or 0 for no (not available). (Enter your numerical answer.)',
+    options: [],
+    answer: 1,
+    kind: 'nat',
+    marks: 2,
+    difficulty: 'hard',
+    type: 'numerical',
+    explanation: 'Available expressions use a "meet = intersection" data-flow framework (an expression is available at a point only if it is available along every path reaching that point). B4\'s predecessors are B2 and B3. Since a+b is computed in B2 (and a, b are never redefined after, including within B2 itself before exit and afterward), a+b is available at the exit of B2 (OUT(B2) contains a+b). Symmetrically, a+b is computed in B3 with no later redefinition of a or b, so a+b is available at the exit of B3 (OUT(B3) contains a+b) too. Since a+b is available along BOTH paths into B4 (via B2 and via B3), the intersection IN(B4) = OUT(B2) ∩ OUT(B3) still contains a+b. Therefore a+b IS available at the entry of B4. Answer: 1.'
+  }
+);
+
+window.GATE_DATA.questions['compiler'].topics.find(function(t){return t.id==='compiler-lexical';}).questions.push(
+  {
+    id: 'compiler-lexical-z7',
+    q: 'Consider building a DFA for the token pattern of unsigned integer or floating-point literals given by the regular expression digit+ ( . digit+ )? ( (e|E) (+|-)? digit+ )? via Thompson construction followed by subset construction. Which of the following statements about the resulting minimized DFA are TRUE? (Select ALL that apply)',
+    options: [
+      'The DFA needs at least one state that is reached only after seeing a "." following one or more digits, distinguishing "12" (still possibly extendable to "12.3") from "12." (decimal point already seen)',
+      'After the DFA has consumed characters matching "digit+ . digit+ e", if the very next character is not a digit and not a sign, the DFA can safely reject and there is no valid completion of the token from that state',
+      'The DFA must accept in a state reached right after consuming just the exponent marker "e" alone, before any exponent digit is seen, because the "e" alone could itself be the end of a valid numeric token',
+      'A single DFA state can correctly represent both "just finished the integer part, no decimal point or exponent seen yet" and "just finished an exponent digit", because both are accepting states with identical outgoing transitions on all subsequent input'
+    ],
+    answers: [0, 1],
+    marks: 2,
+    difficulty: 'hard',
+    type: 'concept',
+    explanation: 'Option 1 is true: the grammar treats "the digits before a decimal point" and "having just consumed a decimal point" as distinguishable prefixes (one still needs at least one digit to complete the fractional part if it continues with ".", the other is mid-token expecting mandatory fractional digits before it can accept again), so the automaton needs separate states to track this, e.g. distinguishing "read digit+" (accepting) from "read digit+ ." (not accepting, must see a digit next) from "read digit+ . digit+" (accepting again). Option 2 is true: once "digit+ . digit+ e" has been consumed, the grammar requires either an optional sign then mandatory exponent digits; if the next character is neither a sign nor a digit, no continuation can complete a valid token from that point (the "e" was consumed expecting to be followed eventually by digits), so rejection at this state is correct — this state is a non-accepting "trap toward digits/sign" state. Option 3 is false: the exponent marker "e" is only valid if followed (after an optional sign) by at least one digit — "digit+ . digit+ e" alone (with nothing after) is NOT a complete legal token per the given regex, since (e|E)(+|-)?digit+ requires the digit+ at the end; so the state right after just "e" must be non-accepting. Option 4 is false: even though both states might individually be accepting, they must be DISTINCT states because their outgoing transitions differ — "just finished the integer part" can transition to "." (decimal point, valid) or to "e"/"E" (valid, entering exponent) while "just finished an exponent digit" can only transition to another digit (to extend the exponent) and has no valid "." transition at all (a second decimal point after an exponent digit is invalid); different future behavior means they cannot be merged into one state even under minimization.'
+  },
+  {
+    id: 'compiler-lexical-z8',
+    q: 'A lexical analyzer for a language defines the keyword "int" and also allows general identifiers matching [a-zA-Z][a-zA-Z0-9]*, with the rule (as in most real scanners) that keywords take priority over the identifier pattern whenever both match the same maximal-munch lexeme. Given the input stream "integer = 5;" (11 characters before the space, i.e. i-n-t-e-g-e-r), how many tokens of type IDENTIFIER or KEYWORD are produced from scanning just the word "integer" (before the "=" sign), applying maximal munch correctly? (Enter your numerical answer.)',
+    options: [],
+    answer: 1,
+    kind: 'nat',
+    marks: 2,
+    difficulty: 'hard',
+    type: 'numerical',
+    explanation: 'This question tests the classic maximal-munch + keyword-priority interaction, which is a common source of scanner bugs and GATE-style trick questions. Maximal munch says the scanner must first find the LONGEST prefix of the remaining input matching ANY token pattern before applying any priority rule between competing patterns of the SAME length. Although "int" matches the KEYWORD pattern after only 3 characters, the identifier pattern [a-zA-Z][a-zA-Z0-9]* can continue matching through all 7 characters "integer" (i-n-t-e-g-e-r), which is strictly longer than the 3-character match "int". Maximal munch always prefers the longest match regardless of what rule matched it, so the scanner continues past "int" and matches the full 7-character lexeme "integer", which does NOT equal the keyword "int" and therefore is classified as a single IDENTIFIER token, not as the KEYWORD "int" followed by an identifier "eger". The keyword-vs-identifier priority rule only applies as a tie-breaker WHEN two patterns match the identical (same-length) lexeme, which is not the case here. So exactly 1 token (one IDENTIFIER, "integer") is produced.'
+  }
+);
+
+window.GATE_DATA.questions['compiler'].topics.find(function(t){return t.id==='compiler-parsing';}).questions.push(
+  {
+    id: 'compiler-parsing-z7',
+    q: 'Consider the ambiguous dangling-else-shaped grammar S -> i S | i S e S | a, where i, e, a are terminals (if, else, other-statement) used to build an SLR(1) parsing table. In the canonical LR(0)/SLR(1) automaton, there exists a state reached after seeing "i S" (having just reduced/shifted into an S following an i) that contains both the item S -> i S . (a completed item ready to reduce) and the item S -> i S . e S (ready to shift on e). Which of the following statements about this state are TRUE? (Select ALL that apply)',
+    options: [
+      'This state has a shift-reduce conflict on lookahead symbol e if e is in FOLLOW(S), because the parser could either shift the e (per S -> i S . e S) or reduce by S -> i S (per S -> i S ., if e is in FOLLOW(S))',
+      'Standard practice for this specific grammar is to resolve the conflict by preferring shift over reduce, which has the effect of associating a dangling else with the nearest unmatched if, matching the usual semantics of nested if-else in languages like C',
+      'This shift-reduce conflict can never occur in any SLR(1) table for this grammar because SLR(1) parsers are guaranteed to be conflict-free for every grammar that is unambiguous',
+      'If the parser generator instead always chooses reduce over shift whenever this conflict arises, the resulting parser would associate every "else" with the outermost (first, farthest) unmatched "if" rather than the nearest one'
+    ],
+    answers: [0, 1, 3],
+    marks: 2,
+    difficulty: 'hard',
+    type: 'concept',
+    explanation: 'Option 1 is true: this is exactly the textbook dangling-else shift-reduce conflict — in the state after "i S", seeing lookahead e, the parser item set contains both a shift action (continue matching S -> i S . e S, i.e. this if has a matching else) and, since e in FOLLOW(S), a reduce action (finish S -> i S ., treating the if as already complete with no else attached here). Option 2 is true: essentially every real parser generator (yacc, bison, etc.) resolves this specific, well-known conflict by defaulting to shift, and shifting here is exactly what causes the else to bind to the nearest enclosing unmatched if, which is the conventional and expected semantics. Option 3 is false: this grammar is ambiguous (it is the canonical dangling-else ambiguous grammar), so it is not SLR(1) at all in the sense of being automatically conflict-free — SLR(1) table construction for this grammar DOES produce this real shift-reduce conflict, which must be broken by an explicit disambiguating rule (like shift-preference); SLR(1) offers no guarantee of conflict-freedom for ambiguous grammars. Option 4 is true: if reduce is chosen instead of shift at this point, the inner if gets "closed" (reduced) before it ever gets a chance to see the following e, so the else instead attaches to whichever if is still open further out — effectively binding every dangling else to the outermost enclosing if rather than the nearest one, which is the opposite (and non-standard) behavior compared to shift-preference.'
+  },
+  {
+    id: 'compiler-parsing-z8',
+    q: 'A grammar has productions E -> E + T | T and T -> T * F | F and F -> ( E ) | id. In the canonical LR(1) (or LALR(1)) automaton for this grammar, consider the state reached after the parser has shifted "id" while trying to parse the input "id * id + id" from the very start. From that state (having just shifted the first id, with the entire rest "* id + id" plus end-of-input still to come), the parser must reduce F -> id regardless of what the next lookahead symbol is, because id only ever appears in the single production F -> id, so there is no ambiguity about which production to reduce by at this point. Given this, how many DISTINCT terminal symbols appear in FOLLOW(F) restricted to just {+, *, ), $} that could legally serve as the lookahead validating the reduce action F -> id in a correctly built LR table for this grammar (count how many of these four symbols can immediately follow F in some valid derivation)? (Enter your numerical answer.)',
+    options: [],
+    answer: 4,
+    kind: 'nat',
+    marks: 2,
+    difficulty: 'hard',
+    type: 'numerical',
+    explanation: 'FOLLOW(F) is computed from where F is used: F appears as T -> T * F (so whatever follows T also constrains here, and directly nothing new) and F -> ( E ) contributes ")" via E inside parens, and F itself is used inside T -> F and T -> T * F, so FOLLOW(F) = FOLLOW(T). FOLLOW(T) comes from E -> T (so FOLLOW(T) includes FOLLOW(E)) and E -> E + T (so FOLLOW(T) also includes FOLLOW(E) again) and T -> T * F (so FOLLOW(T) includes "*" itself, since T * F means after the first T comes "*"). FOLLOW(E) includes "$" (start symbol end-marker), ")" (from F -> ( E ), whatever follows the closing paren position, i.e. right after E inside "(E)" comes ")"), and "+" (from E -> E + T, after the first E comes "+"). So FOLLOW(E) = {+, ), $}, and FOLLOW(T) = FOLLOW(E) union {*} = {+, *, ), $}, and FOLLOW(F) = FOLLOW(T) = {+, *, ), $}. All four of the listed symbols +, *, ), $ are in FOLLOW(F), so all 4 of the restricted set {+, *, ), $} can validly serve as reduce-lookaheads for F -> id in an SLR(1)/LALR(1) table (this reduce action fires on any of these four lookaheads). Count = 4.'
+  }
+);
+
+window.GATE_DATA.questions['compiler'].topics.find(function(t){return t.id==='compiler-sdt';}).questions.push(
+  {
+    id: 'compiler-sdt-z7',
+    q: 'Given the SDD: E -> E1 + T { E.val = E1.val + T.val }; E -> T { E.val = T.val }; T -> T1 * F { T.val = T1.val * F.val }; T -> F { T.val = F.val }; F -> ( E ) { F.val = E.val }; F -> digit { F.val = digit.lexval }, evaluate this SDT bottom-up on the nested expression (2 + 3) * (4 + 1). What is the final E.val at the root of the parse tree? (Enter your numerical answer.)',
+    options: [],
+    answer: 25,
+    kind: 'nat',
+    marks: 2,
+    difficulty: 'hard',
+    type: 'numerical',
+    explanation: 'This is standard left-to-right, standard-precedence arithmetic evaluation via the grammar\'s S-attributed rules, matching normal operator precedence (* binds tighter than +, and parentheses group). Innermost: F -> (E) for "(2+3)" requires evaluating E -> T -> F(2) then E1+T i.e. E.val = 2+3 = 5, so this F.val = 5. Similarly F -> (E) for "(4+1)" gives E.val = 4+1 = 5, so this F.val = 5. The outer structure is T -> T1 * F where T1.val (from the first parenthesized group, routed through T->F->(...)) = 5 and F.val (second parenthesized group) = 5, so T.val = 5 * 5 = 25. Finally E -> T gives E.val = T.val = 25. The root E.val = 25.'
+  },
+  {
+    id: 'compiler-sdt-z8',
+    q: 'Using the same SDD as above (E -> E1+T, E -> T, T -> T1*F, T -> F, F -> (E), F -> digit, all S-attributed with the natural evaluation rules) on the expression 2 * (3 + 4 * 5) - if this grammar also included E -> E1 - T { E.val = E1.val - T.val }, what would be the final E.val for 2 * (3 + 4 * 5) - 1 (evaluated with the usual precedence: * before +, before -, left-to-right for equal precedence, and parentheses grouping)? (Enter your numerical answer.)',
+    options: [],
+    answer: 45,
+    kind: 'nat',
+    marks: 2,
+    difficulty: 'hard',
+    type: 'numerical',
+    explanation: 'Evaluate inside-out following the grammar\'s built-in precedence (T handles * at tighter binding than E\'s + and -, and F -> (E) groups parens). Inside the parentheses: "3 + 4 * 5" first evaluates T -> T1*F for "4*5" giving T.val = 20 (since * binds tighter, F.val for digit 4 times F.val for digit 5), then E -> E1+T combines with the T -> F for digit 3, giving E.val = 3 + 20 = 23 inside the parens; so F.val for "(3+4*5)" = 23. Next, "2 * (3+4*5)" is T -> T1*F with T1.val = 2 (from T->F->digit 2) and F.val = 23, giving T.val = 2*23 = 46. This T reduces up through E -> T to give an E.val of 46 for everything before the trailing "- 1". Finally the outer E -> E1 - T applies with E1.val = 46 and the final T.val = 1 (from digit 1), giving the root E.val = 46 - 1 = 45.'
+  }
+);
+
+window.GATE_DATA.questions['compiler'].topics.find(function(t){return t.id==='compiler-icg';}).questions.push(
+  {
+    id: 'compiler-icg-z7',
+    q: 'For the expression a = (b - c) + (b - c) * (b - c), using DAG-based TAC generation (identical subexpressions on unchanged operands share one node) and then linearizing the DAG into three-address code with one instruction per distinct interior node plus the final assignment, how many TAC instructions are generated in total, including the final assignment to a? (Enter your numerical answer.)',
+    options: [],
+    answer: 4,
+    kind: 'nat',
+    marks: 2,
+    difficulty: 'hard',
+    type: 'numerical',
+    explanation: 'DAG interior nodes: N1 = b - c (all three occurrences of "b - c" share this single node since b, c are never reassigned). N2 = N1 * N1 (for the multiplication of the second and third occurrences). N3 = N1 + N2 (the outer addition). That is 3 interior nodes, each linearized to one TAC instruction (t1 = b - c; t2 = t1 * t1; t3 = t1 + t2), plus one final instruction a = t3. Total = 3 + 1 = 4 instructions.'
+  },
+  {
+    id: 'compiler-icg-z8',
+    q: 'Translating the nested boolean expression if ((a < b) && (c < d)) then S1 else S2 using backpatching (short-circuit jumping code, where && short-circuits: if the first operand is false, the second is never evaluated and control goes straight to the false branch), how many total jump instructions (conditional plus unconditional) are generated for evaluating just the boolean test "(a < b) && (c < d)" itself, not counting any instructions inside S1 or S2? (Enter your numerical answer.)',
+    options: [],
+    answer: 4,
+    kind: 'nat',
+    marks: 2,
+    difficulty: 'hard',
+    type: 'numerical',
+    explanation: 'For E1 = (a<b): "if a<b goto _" (true jump, into E1.truelist) and "goto _" (false jump, into E1.falselist) = 2 instructions. Since this is &&, E1.truelist is backpatched to fall through directly into the code for E2 (no extra instruction), while E1.falselist becomes part of the overall falselist (short-circuiting straight to the else branch). For E2 = (c<d): "if c<d goto _" (true jump, into E2.truelist) and "goto _" (false jump, into E2.falselist) = 2 more instructions. E2.truelist becomes the overall truelist (backpatched to S1) and E1.falselist merged with E2.falselist becomes the overall falselist (backpatched to S2). Total jump instructions = 2 + 2 = 4.'
+  }
+);
+
+window.GATE_DATA.questions['compiler'].topics.find(function(t){return t.id==='compiler-runtime';}).questions.push(
+  {
+    id: 'compiler-runtime-z7',
+    q: 'Which of the following statements about parameter-passing mechanisms and their runtime implementation are TRUE? (Select ALL that apply)',
+    options: [
+      'Call-by-value-result (copy-restore) copies the argument\'s value in at call time into a local, and copies the local\'s final value back out to the actual argument at return time, so it can behave differently from call-by-reference when aliasing is involved',
+      'Call-by-reference passes the address (l-value) of the actual argument, so any assignment to the formal parameter inside the callee is immediately visible through any alias of the same actual argument during the call, not just after return',
+      'Call-by-name, as used conceptually in Algol 60, re-evaluates the actual argument expression textually at every use of the formal parameter inside the callee, which can change behavior compared to call-by-value if the argument expression has side effects or depends on mutable state',
+      'Call-by-value always requires heap allocation for the copied argument, since a stack-allocated copy would be destroyed before the callee could read it'
+    ],
+    answers: [0, 1, 2],
+    marks: 2,
+    difficulty: 'hard',
+    type: 'concept',
+    explanation: 'Option 1 is true: copy-restore copies in at entry and copies back out at exit, so intermediate writes are not visible through any alias during the call, and if the actual argument was also modified through another alias during the call, the final copy-back can overwrite that with a stale value — a well-known difference from true call-by-reference. Option 2 is true: because the callee operates directly on the address of the actual argument, every write during the call is immediately observable through any other name (alias) referring to the same storage, unlike copy-restore where visibility is deferred to the return. Option 3 is true: call-by-name substitutes the unevaluated argument expression (with proper renaming to avoid capture, per the "Jensen\'s device" style semantics) at every textual use of the parameter, so an argument with side effects or one referencing a changing index variable is literally re-evaluated fresh each time, producing behavior that can differ substantially from binding the argument\'s value once at call time. Option 4 is false: call-by-value copies the argument\'s value into the callee\'s own activation record, which is ordinary stack-allocated storage exactly like any other local/parameter of that call — there is nothing about copying a value that requires heap allocation; the copy lives exactly as long as the callee\'s stack frame, which is precisely long enough.'
+  },
+  {
+    id: 'compiler-runtime-z8',
+    q: 'A program has procedure MAIN calling A, A calling B, and B calling A again (so activations on the stack, deepest first, are: A(2nd), B, A(1st), MAIN). If each activation record size is: MAIN = 60 bytes, A = 50 bytes, B = 70 bytes, what is the total stack space (in bytes) occupied by all currently live activation records at this point (MAIN, A(1st), B, A(2nd) all still active due to the call chain)? (Enter your numerical answer.)',
+    options: [],
+    answer: 230,
+    kind: 'nat',
+    marks: 2,
+    difficulty: 'hard',
+    type: 'numerical',
+    explanation: 'At this point in the call chain, four activations are simultaneously live and occupy stack space: MAIN (60 bytes) + A\'s first activation (50 bytes) + B (70 bytes) + A\'s second, recursive activation (50 bytes, its own independent frame since stack allocation gives each activation independent storage even for the same procedure). Total = 60 + 50 + 70 + 50 = 230 bytes.'
+  }
+);
+
+window.GATE_DATA.questions['compiler'].topics.find(function(t){return t.id==='compiler-optimization';}).questions.push(
+  {
+    id: 'compiler-optimization-z7',
+    q: 'Which of the following statements about data-flow analysis for optimization (using reaching definitions and available expressions as examples) are TRUE? (Select ALL that apply)',
+    options: [
+      'Reaching definitions uses "meet = union" (a definition reaches a point if it reaches along AT LEAST ONE path), whereas available expressions uses "meet = intersection" (an expression is available only if it is available along EVERY path)',
+      'The reaching-definitions analysis is used to build def-use chains, which support optimizations such as constant propagation and detecting possibly-uninitialized variable uses',
+      'Because available expressions uses intersection at merge points, adding more incoming paths to a control-flow join point can never increase the set of expressions available there, only keep it the same or shrink it',
+      'Both reaching definitions and available expressions are forward data-flow problems, propagating information in the same direction as program execution'
+    ],
+    answers: [0, 1, 2, 3],
+    marks: 2,
+    difficulty: 'hard',
+    type: 'concept',
+    explanation: 'Option 1 is true: reaching definitions is an "any path" (may) analysis using union at confluence points (a definition reaches if it survives along some path), while available expressions is an "all paths" (must) analysis using intersection (an expression is available only if every path guarantees it), the two canonical examples of may- versus must-analysis. Option 2 is true: reaching definitions directly supports building def-use and use-def chains, which in turn enable constant propagation, dead-code elimination, and detecting uses of variables with no reaching definition (a proxy for possibly-uninitialized use). Option 3 is true: since IN at a join is the intersection of all predecessors\' OUT sets, adding another incoming edge can only intersect with (never add sets to) the existing result, so the available set at that join can only shrink or stay the same, never grow, as more paths merge in. Option 4 is true: both are forward problems — information about definitions/expressions flows from a block\'s entry to its exit and onward to successors, following the natural direction of control flow, unlike backward problems such as live-variable analysis.'
+  },
+  {
+    id: 'compiler-optimization-z8',
+    q: 'A basic block computes: t1 = a * b; t2 = a * b; t3 = t1 + c; a = t3; t4 = a * b; t5 = t4 - c; After performing local common-subexpression elimination on this block (treating a as redefined by the "a = t3" statement, which invalidates any earlier node using the OLD value of a for future reuse), how many multiplication (*) operations remain in the optimized code for this block (count each surviving distinct multiply computation once, i.e. count the number of TAC multiply instructions needed after CSE, not counting multiplications that get reused via a shared temporary)? (Enter your numerical answer.)',
+    options: [],
+    answer: 2,
+    kind: 'nat',
+    marks: 2,
+    difficulty: 'hard',
+    type: 'numerical',
+    explanation: 'The first two statements, t1 = a*b and t2 = a*b, are on the SAME (old) value of a and b, so they are identical redundant computations: the DAG merges them into one node, meaning only 1 multiply is actually needed for both (t2 becomes just a copy/reference to t1\'s value). Then a is reassigned by "a = t3", which invalidates the old a-node for future computations — any later use of "a" refers to the NEW value. The later statement t4 = a * b uses this NEW a, so it is a different multiplication (different operand value for a) and cannot be merged with the earlier a*b node; it needs its own, second multiply instruction. So after CSE, exactly 2 distinct multiply operations remain: one shared node for the first two (old-a) multiplications, and one separate node for the later (new-a) multiplication.'
+  }
+);
