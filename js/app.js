@@ -156,6 +156,9 @@
     var quota = plan ? plan.quota : 60;
     var pct = Math.min(100, Math.round(answered / quota * 100));
     var html = '';
+    if (d > 60) {
+      html += '<div class="card" style="border-color:var(--warn)"><b style="color:var(--warn)">🧊 Content freeze (Day 60+).</b> <span class="small muted">Toppers stop new topics in the last 30 days. Revision, mocks and mistake-book only — the syllabus you know beats the syllabus you skimmed.</span></div>';
+    }
     html += '<div class="card"><h2>Day ' + d + ' of 90 — ' + esc(plan ? plan.title : 'Grind') + '</h2>' +
       '<div class="muted small">Phase ' + (plan ? plan.phase : '-') + (plan && plan.mock ? ' · <b style="color:var(--warn)">MOCK DAY — target ' + plan.target + '/100</b>' : '') + '</div>' +
       '<div class="progress-track"><div class="progress-fill" style="width:' + pct + '%"></div></div>' +
@@ -181,8 +184,30 @@
         '<p class="small muted">🕉️ ' + esc(astro.mantra) + '</p>' +
         '<p class="small muted">✨ Today\'s ritual: ' + esc(astro.ritual) + '</p></div>';
     }
-    html += '<div class="card"><h3>🕐 The 12-hour day (tap to expand)</h3><div id="tmpl" class="small muted" style="display:none;white-space:pre-wrap">' + (DATA.dayTemplate || []).join('\n') + '</div></div>';
+    html += '<div class="card"><h3>🍅 Focus timer</h3><div class="btn-row">' +
+      '<button class="btn" id="pomo-25">25 min sprint</button><button class="btn ghost" id="pomo-45">45 min deep</button></div>' +
+      '<div id="pomo-display" class="small muted" style="margin-top:8px">Focus blocks completed: ' + (S.pomo || 0) + '. Phone in another room, then press start.</div></div>';
+    html += '<div class="card"><h3>🕐 The 15-hour day (tap to expand)</h3><div id="tmpl" class="small muted" style="display:none;white-space:pre-wrap">' + (DATA.dayTemplate || []).join('\n') + '</div></div>';
     $view.innerHTML = html;
+    var pomoTimer = null;
+    function startPomo(mins) {
+      if (pomoTimer) clearInterval(pomoTimer);
+      var left = mins * 60;
+      var disp = document.getElementById('pomo-display');
+      pomoTimer = setInterval(function () {
+        left--;
+        if (!document.getElementById('pomo-display')) { clearInterval(pomoTimer); return; }
+        if (left <= 0) {
+          clearInterval(pomoTimer); pomoTimer = null;
+          S.pomo = (S.pomo || 0) + 1; save();
+          disp.innerHTML = '✅ Block done! Total: ' + S.pomo + '. Take a 5–10 min REAL break (move, water, no phone).';
+        } else {
+          disp.textContent = '⏳ ' + Math.floor(left / 60) + ':' + String(left % 60).padStart(2, '0') + ' — single task, nothing else exists.';
+        }
+      }, 1000);
+    }
+    document.getElementById('pomo-25').addEventListener('click', function () { startPomo(25); });
+    document.getElementById('pomo-45').addEventListener('click', function () { startPomo(45); });
     $view.querySelectorAll('input[data-task]').forEach(function (cb) {
       cb.addEventListener('change', function () {
         var c = S.planChecks[d] || {}; c[cb.getAttribute('data-task')] = cb.checked; S.planChecks[d] = c; save();
@@ -429,8 +454,16 @@
     return sample(ga1, 5).concat(sample(ga2, 5), weightedSample(core1, 25), weightedSample(core2, 30));
   }
   function viewMockLanding() {
-    var html = '<div class="card"><h2>📝 Full mock test</h2><p class="muted small">65 questions · 100 marks · 3 hours · real GATE negative marking (−1/3 on 1-mark, −2/3 on 2-mark MCQs). No pausing — treat it like the real hall.</p>' +
-      '<div class="btn-row"><button class="btn good" id="start-mock">Start mock now</button></div></div>';
+    var last = S.mocks[S.mocks.length - 1];
+    var blocked = last && last.wrong > 0 && (last.tagged || 0) < last.wrong;
+    var html = '<div class="card"><h2>📝 Full mock test</h2><p class="muted small">65 questions · 100 marks · 3 hours · real GATE negative marking (−1/3 on 1-mark, −2/3 on 2-mark MCQs). No pausing — treat it like the real hall.</p>';
+    if (blocked) {
+      html += '<div class="feedback-banner no small">🔒 Your last mock has ' + (last.wrong - (last.tagged || 0)) + ' untagged mistakes. Toppers never take a new mock before dissecting the last one — analyse every wrong answer first.</div>' +
+        '<div class="btn-row"><button class="btn ghost" id="unlock-mock">I analysed every mistake on paper — unlock</button></div>';
+    } else {
+      html += '<div class="btn-row"><button class="btn good" id="start-mock">Start mock now</button></div>';
+    }
+    html += '</div>';
     if (S.mocks.length) {
       html += '<div class="card"><h3>Your mock history</h3>';
       S.mocks.slice().reverse().forEach(function (m) {
@@ -439,7 +472,10 @@
       html += '<p class="muted small">Curve to beat: 50 by Day 30 · 70 by Day 60 · 90 by Day 85.</p></div>';
     }
     $view.innerHTML = html;
-    document.getElementById('start-mock').addEventListener('click', runMock);
+    var sm = document.getElementById('start-mock');
+    if (sm) sm.addEventListener('click', runMock);
+    var um = document.getElementById('unlock-mock');
+    if (um) um.addEventListener('click', function () { last.tagged = last.wrong; save(); viewMockLanding(); });
   }
   function runMock() {
     var paper = buildMock();
@@ -546,6 +582,8 @@
         $view.querySelectorAll('[data-tag]').forEach(function (b) {
           b.addEventListener('click', function () {
             S.mistakes[b.getAttribute('data-tag')]++;
+            var lm = S.mocks[S.mocks.length - 1];
+            if (lm) lm.tagged = (lm.tagged || 0) + 1;
             save();
             var row = $view.querySelector('[data-tag-row="' + b.getAttribute('data-qi') + '"]');
             if (row) row.innerHTML = '<span class="pill">tagged: ' + b.getAttribute('data-tag') + '</span>';
