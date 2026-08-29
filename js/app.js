@@ -69,9 +69,10 @@
   }
 
   // Infinite queue for a topic: due-wrong first → unseen → recycle (weakest first) with generated interleave.
-  function nextQuestion(topicId, sessionSeen) {
+  function nextQuestion(topicId, sessionSeen, diffFilter) {
     var entry = topicById(topicId);
     var qs = entry ? entry.topic.questions : [];
+    if (diffFilter && diffFilter !== 'all') qs = qs.filter(function (qq) { return qq.difficulty === diffFilter; });
     var due = [], unseen = [], rest = [];
     qs.forEach(function (qq) {
       if (sessionSeen[qq.id]) { rest.push(qq); return; }
@@ -295,16 +296,22 @@
   // ---------- QUIZ (infinite topic practice) ----------
   function viewQuiz(tid) {
     var e = topicById(tid); if (!e) return viewSubjects();
-    var sessionSeen = {}; var num = 0; var right = 0;
+    var sessionSeen = {}; var num = 0; var right = 0; var diffFilter = 'all'; var qStart = 0;
+    function filterBar() {
+      return '<div class="theory-tabs" style="margin-top:8px">' + ['all', 'easy', 'medium', 'hard'].map(function (d) {
+        return '<button data-df="' + d + '" class="' + (diffFilter === d ? 'active' : '') + '">' + d + '</button>';
+      }).join('') + '</div>';
+    }
     function ask() {
       num++;
-      var qq = nextQuestion(tid, sessionSeen);
-      if (!qq) { $view.innerHTML = '<div class="card"><h2>No questions here yet</h2><p class="muted">This topic\'s bank is still loading in a future update.</p></div>'; return; }
+      var qq = nextQuestion(tid, sessionSeen, diffFilter);
+      if (!qq) { $view.innerHTML = '<button class="back-link" id="back">‹ ' + esc(e.topic.name) + '</button>' + filterBar() + '<div class="card"><h2>No ' + (diffFilter !== 'all' ? diffFilter + ' ' : '') + 'questions here yet</h2><p class="muted">Try another difficulty filter.</p></div>'; wireCommon(); return; }
+      qStart = Date.now();
       sessionSeen[qq.id] = true;
       var L = S.leitner[qq.id];
       var repeatTag = (L && L.seen > 0 && qq.type !== 'generated') ? '<span class="pill">repeat</span>' : '';
       var genTag = qq.type === 'generated' ? '<span class="pill gen">∞ generated</span>' : '';
-      var html = '<button class="back-link" id="back">‹ ' + esc(e.topic.name) + '</button>' +
+      var html = '<button class="back-link" id="back">‹ ' + esc(e.topic.name) + '</button>' + filterBar() +
         '<div class="quiz-meta"><span>Q' + num + ' · ' + right + ' correct</span><span><span class="pill ' + qq.difficulty + '">' + qq.difficulty + '</span><span class="pill">' + qq.marks + ' mark' + (qq.marks > 1 ? 's' : '') + '</span>' + kindPill(qq) + repeatTag + genTag + '</span></div>' +
         '<div class="card"><div class="q-text">' + esc(qq.q) + '</div><div id="opts">';
       var kind = qKind(qq);
@@ -319,9 +326,13 @@
       }
       html += '</div><div id="after"></div></div>';
       $view.innerHTML = html;
-      document.getElementById('back').addEventListener('click', function () { nav('topic', tid); });
+      wireCommon();
       function settle(ok, chosen) {
         if (ok) right++;
+        var secs = Math.round((Date.now() - qStart) / 1000);
+        S.speed = S.speed || { n: 0, total: 0 };
+        S.speed.n++; S.speed.total += secs;
+        var budget = qq.marks * 108; // GATE avg ≈ 1.8 min per mark
         recordAnswer(qq, ok, tid);
         $view.querySelectorAll('.opt').forEach(function (bb, j) {
           bb.disabled = true;
@@ -334,12 +345,28 @@
         if (goBtn) goBtn.disabled = true;
         var natIn = document.getElementById('nat-in');
         if (natIn) natIn.disabled = true;
+        var speedNote = secs > budget ? ' · ⏱ ' + secs + 's (over the ~' + budget + 's exam budget — speed this pattern up)' : ' · ⏱ ' + secs + 's ✓';
         document.getElementById('after').innerHTML =
-          '<div class="feedback-banner ' + (ok ? 'ok' : 'no') + '">' + (ok ? '✅ Correct!' : '❌ Not quite — read why, this one WILL come back') + '</div>' +
+          '<div class="feedback-banner ' + (ok ? 'ok' : 'no') + '">' + (ok ? '✅ Correct!' : '❌ Not quite — read why, this one WILL come back') + speedNote + '</div>' +
           '<div class="explain"><b>' + answerLabel(qq) + '</b>\n' + esc(qq.explanation || '') + '</div>' +
-          '<div class="btn-row"><button class="btn" id="next">Next question →</button></div>';
+          '<div class="btn-row"><button class="btn" id="next">Next question →</button>' +
+          (qq.type !== 'generated' ? '<button class="btn ghost" id="flag-q">🚩 Doubtful?</button>' : '') + '</div>';
         document.getElementById('next').addEventListener('click', ask);
+        var fb = document.getElementById('flag-q');
+        if (fb) fb.addEventListener('click', function () {
+          S.flags = S.flags || {};
+          S.flags[qq.id] = { topic: tid, when: Date.now() };
+          save();
+          fb.textContent = '🚩 Flagged'; fb.disabled = true;
+        });
         window.scrollTo(0, 0);
+      }
+      function wireCommon() {
+        var bk = document.getElementById('back');
+        if (bk) bk.addEventListener('click', function () { nav('topic', tid); });
+        $view.querySelectorAll('[data-df]').forEach(function (b) {
+          b.addEventListener('click', function () { diffFilter = b.getAttribute('data-df'); num--; ask(); });
+        });
       }
       if (kind === 'mcq') {
         $view.querySelectorAll('.opt').forEach(function (b) {
@@ -554,6 +581,8 @@
       '<div class="stat"><div class="num">' + (totalAtt ? Math.round(totalCor / totalAtt * 100) : 0) + '%</div><div class="lbl">overall accuracy</div></div>' +
       '<div class="stat"><div class="num">' + mastered + '/' + totalQ + '</div><div class="lbl">questions mastered</div></div>' +
       '<div class="stat"><div class="num">' + (S.mocks.length ? S.mocks[S.mocks.length - 1].score : '—') + '</div><div class="lbl">latest mock /100</div></div>' +
+      '<div class="stat"><div class="num">' + (S.speed && S.speed.n ? Math.round(S.speed.total / S.speed.n) + 's' : '—') + '</div><div class="lbl">avg time / question</div></div>' +
+      '<div class="stat"><div class="num">' + Object.keys(S.flags || {}).length + '</div><div class="lbl">flagged doubtful</div></div>' +
       '</div></div>';
     var mk = S.mistakes;
     if (mk && (mk.concept + mk.silly + mk.time) > 0) {
@@ -601,7 +630,36 @@
       });
       html += '<p class="muted small">Targets: Day 30 → 50 · Day 60 → 70 · Day 85+ → 90.</p></div>';
     }
+    // backup & restore — localStorage is fragile; never lose 90 days of grind
+    html += '<div class="card"><h3>💾 Backup & restore</h3>' +
+      '<p class="muted small">Your progress lives only on this device. Export it weekly — paste the code somewhere safe (notes app, email to yourself).</p>' +
+      '<div class="btn-row"><button class="btn ghost" id="exp-btn">Export progress</button><button class="btn ghost" id="imp-btn">Import</button></div>' +
+      '<textarea id="backup-box" style="display:none;width:100%;margin-top:10px;background:var(--card2);color:var(--text);border:1px solid #33396b;border-radius:10px;padding:10px;min-height:90px;font-size:12px"></textarea>' +
+      '<div class="btn-row" id="imp-row" style="display:none"><button class="btn good" id="imp-go">Restore from pasted code</button></div></div>';
     $view.innerHTML = html;
+    var box = document.getElementById('backup-box');
+    document.getElementById('exp-btn').addEventListener('click', function () {
+      box.style.display = 'block';
+      document.getElementById('imp-row').style.display = 'none';
+      box.value = JSON.stringify(S);
+      box.select();
+      try { document.execCommand('copy'); } catch (e) {}
+      if (navigator.clipboard) navigator.clipboard.writeText(box.value).catch(function () {});
+      alert('Progress code copied to clipboard (also shown below). Save it somewhere safe.');
+    });
+    document.getElementById('imp-btn').addEventListener('click', function () {
+      box.style.display = 'block'; box.value = ''; box.placeholder = 'Paste your backup code here';
+      document.getElementById('imp-row').style.display = 'flex';
+    });
+    document.getElementById('imp-go').addEventListener('click', function () {
+      try {
+        var data = JSON.parse(box.value);
+        if (!data || typeof data !== 'object' || (!data.leitner && !data.startDate)) throw new Error('bad');
+        if (!confirm('Replace current progress with this backup?')) return;
+        localStorage.setItem('gate_r1', JSON.stringify(data));
+        location.reload();
+      } catch (e) { alert('That does not look like a valid backup code.'); }
+    });
     $view.querySelectorAll('[data-topic]').forEach(function (el) {
       el.addEventListener('click', function () { nav('quiz', el.getAttribute('data-topic')); });
     });
