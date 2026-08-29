@@ -922,11 +922,11 @@ window.GATE_DATA.questions['toc'].topics.find(function(t){return t.id==='toc-cfl
   id: 'toc-cfl-x5',
   q: 'Convert the grammar S -> AB, A -> aA | a, B -> bB | b to Chomsky Normal Form. How many terminal-producing productions (of the form X -> a single terminal) appear in a correct CNF version?',
   options: ['1', '2', '3', '4'],
-  answer: 1,
+  answer: 3,
   marks: 2,
   difficulty: 'medium',
   type: 'numerical',
-  explanation: "In CNF, every terminal must be introduced by its own dedicated production of the form X -> a, and there are exactly two distinct terminals used in this grammar, a and b. Introduce Xa -> a and Xb -> b, then rewrite every production so terminals appear only via these single-symbol substitutions: A -> aA becomes A -> Xa A (using Xa in place of the raw terminal), A -> a becomes A -> Xa (already terminal-only, kept as is since a single terminal on the right is already legal CNF), similarly B -> bB becomes B -> Xb B and B -> b stays B -> Xb, and S -> AB is already binary. Counting the productions whose right-hand side is a single terminal: Xa -> a and Xb -> b - exactly 2, regardless of how many other productions reference Xa or Xb as a nonterminal on other right-hand sides. This illustrates that CNF conversion introduces exactly one terminal-production per distinct terminal symbol used in the original grammar."
+  explanation: "Only productions whose right-hand side mixes a terminal with another symbol need substitution. A -> aA has length 2 and mixes terminal a with nonterminal A, so it must become A -> Xa A with a new helper Xa -> a; likewise B -> bB becomes B -> Xb B with Xb -> b. But A -> a and B -> b already have a single terminal on the right-hand side, which is already legal CNF (RHS must be two nonterminals or one terminal) - they are left completely unchanged, NOT rewritten to A -> Xa or B -> Xb (doing so would create a unit production A -> Xa, which is disallowed in CNF and would just have to be eliminated straight back to A -> a anyway). So the final CNF grammar is: S -> AB, A -> Xa A, A -> a, B -> Xb B, B -> b, Xa -> a, Xb -> b. The terminal-producing productions are A -> a, B -> b, Xa -> a, and Xb -> b - four distinct productions, one pre-existing per nonterminal (A, B) plus one newly introduced per terminal symbol (Xa, Xb). The common mistake is forgetting that the original A -> a and B -> b survive unchanged alongside the new helper productions, undercounting 2 instead of 4."
 },
 {
   id: 'toc-cfl-x6',
