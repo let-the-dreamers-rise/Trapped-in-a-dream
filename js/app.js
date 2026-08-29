@@ -22,7 +22,8 @@
   S.mocks = S.mocks || [];           // {dateISO, day, score, max, correct, wrong, skipped}
   S.streak = S.streak || { last: null, count: 0 };
 
-  function todayKey() { var d = new Date(); return d.toISOString().slice(0, 10); }
+  function localKey(d) { return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); }
+  function todayKey() { return localKey(new Date()); }
   function missionDay() {
     if (!S.startDate) return null;
     var ms = new Date(todayKey()) - new Date(S.startDate);
@@ -62,7 +63,7 @@
     // streak
     if (S.streak.last !== k) {
       var y = new Date(); y.setDate(y.getDate() - 1);
-      S.streak.count = (S.streak.last === y.toISOString().slice(0, 10)) ? S.streak.count + 1 : 1;
+      S.streak.count = (S.streak.last === localKey(y)) ? S.streak.count + 1 : 1;
       S.streak.last = k;
     }
     save(); renderChips();
