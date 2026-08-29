@@ -1559,6 +1559,70 @@ window.GATE_DATA.questions['os'].topics.find(function(t){return t.id==='os-memor
   difficulty: 'easy',
   type: 'concept',
   explanation: 'In pure segmentation, each segment table entry records a BASE (the starting physical address of that segment) and a LIMIT (the size/length of that segment). A logical address is given as (segment number, offset); to translate it, the hardware looks up the segment\'s base and limit, and CHECKS that the offset is strictly less than the limit -- if the offset is within bounds, the physical address is base+offset; if the offset equals or exceeds the limit, a protection violation (segmentation fault) is raised, since the reference falls outside that segment\'s legitimately allocated space. This per-segment bounds checking is one of segmentation\'s natural advantages: it maps directly onto a program\'s logical divisions and can enforce access protection independently for each one (e.g., marking code segments read-only).'
+},
+{
+  id: 'os-memory-y1',
+  q: 'Which of the following statements about paging and segmentation are TRUE? (Select ALL that apply)',
+  options: ['Paging can suffer from internal fragmentation (wasted space in the last allocated page) but not from external fragmentation', 'Segmentation can suffer from external fragmentation since segments have varying sizes and physical memory can become chopped into unusable gaps', 'Paging requires the physical frames allocated to a process to be contiguous in physical memory', 'Choosing a page size that is a power of 2 simplifies address translation, since the logical address can be split into page number and offset by simple bit extraction rather than division'],
+  answers: [0, 1, 3],
+  marks: 2,
+  difficulty: 'medium',
+  type: 'concept',
+  explanation: 'Option A is TRUE: since a process is allocated whole pages, the last page it uses is rarely filled exactly, wasting the unused remainder inside that page (internal fragmentation) -- but because any free frame anywhere in physical memory can be used for any page, paging does not suffer external fragmentation. Option B is TRUE: segments are variable-sized, so as segments are allocated and freed over time, physical memory can end up with scattered free holes too small individually to satisfy a new segment request, which is external fragmentation. Option C is FALSE: this is exactly the opposite of paging\'s key benefit -- a process\'s pages can be scattered across ANY available frames anywhere in physical memory, with the page table recording the mapping for each page independently; no contiguity is required. Option D is TRUE: with a power-of-2 page size, the low-order bits of the logical address directly form the offset and the remaining high-order bits directly form the page number, needing no division or modulo operation in hardware -- this is precisely why page sizes are always chosen as powers of 2 in practice.'
+},
+{
+  id: 'os-memory-y2',
+  q: 'Which of the following statements about dynamic memory partitioning strategies (first-fit, best-fit, worst-fit) are TRUE? (Select ALL that apply)',
+  options: ['Best-fit searches the entire free-block list to find the smallest hole that is still large enough for the request, which can leave many tiny, unusable leftover fragments scattered across memory', 'Worst-fit deliberately allocates from the largest available hole, leaving a bigger leftover fragment that is statistically more likely to be usable for a future request', 'First-fit allocates from the first hole encountered that is large enough, scanning the free list from the beginning (or from where the last search left off) each time', 'Best-fit is always the fastest of the three strategies to execute, since it only ever needs to examine the first hole it encounters'],
+  answers: [0, 1, 2],
+  marks: 2,
+  difficulty: 'medium',
+  type: 'concept',
+  explanation: 'Option A is TRUE: best-fit\'s defining behaviour is scanning every free hole to find the smallest one that still satisfies the request, which minimises leftover space per allocation but tends to generate a large number of extremely small, practically useless leftover fragments over time. Option B is TRUE: worst-fit intentionally picks the LARGEST hole and carves the request out of it, on the reasoning that the remaining leftover piece is itself still large enough to be useful later, rather than shrinking into a sliver. Option C is TRUE: first-fit simply takes the earliest hole in the list that fits, which is why it is generally the fastest of the three to execute despite not always producing the least wasted space. Option D is FALSE: this describes first-fit\'s behaviour, not best-fit\'s -- best-fit must examine every hole in the free list (or at least continue scanning to confirm no smaller sufficient hole exists) before deciding, making it the slowest of the three to execute, not the fastest.'
+},
+{
+  id: 'os-memory-y3',
+  q: 'A system uses paging with a 32-bit logical address space and a page size of 4 KB. How many bits of the logical address are used to represent the page number? (Enter your numerical answer.)',
+  options: [],
+  answer: 20,
+  kind: 'nat',
+  marks: 1,
+  difficulty: 'easy',
+  type: 'numerical',
+  explanation: 'The page OFFSET field must be large enough to address every byte within a single page: since the page size is 4 KB = 2^12 bytes, the offset requires 12 bits. Since the total logical address is 32 bits, the remaining bits form the page number field: 32 - 12 = 20 bits. This means the logical address space contains 2^20 (about 1 million) pages, each addressed by a distinct 20-bit page number, with the low-order 12 bits selecting the exact byte within whichever page is referenced.'
+},
+{
+  id: 'os-memory-y4',
+  q: 'A process has a logical address space of 2^22 bytes. The page size is 2^12 bytes, and each page table entry occupies 4 bytes. Assuming a single-level page table with one entry per page, what is the total size of this process\'s page table, in bytes? (Enter your numerical answer.)',
+  options: [],
+  answer: 4096,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'medium',
+  type: 'numerical',
+  explanation: 'The number of pages in the process\'s address space equals the address space size divided by the page size: 2^22 / 2^12 = 2^10 = 1024 pages. Since a single-level page table needs exactly one entry per page, and each entry occupies 4 bytes, the total page table size = number of pages x entry size = 1024 x 4 = 4096 bytes (i.e., exactly one page\'s worth, 4 KB, of page-table storage in this particular case).'
+},
+{
+  id: 'os-memory-y5',
+  q: 'A process of size 6500 bytes is allocated memory using paging with a page size of 2048 bytes. What is the internal fragmentation, in bytes, wasted in the last (partially filled) page allocated to this process? (Enter your numerical answer.)',
+  options: [],
+  answer: 1692,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'medium',
+  type: 'numerical',
+  explanation: 'Number of pages needed = ceil(6500 / 2048) = ceil(3.174) = 4 pages, so the process is allocated 4 x 2048 = 8192 bytes total. The first 3 pages are completely filled, consuming 3 x 2048 = 6144 bytes; the 4th (last) page holds only the remaining 6500 - 6144 = 356 bytes of actual process data. Internal fragmentation is the wasted, unused space within that last allocated page: 2048 - 356 = 1692 bytes, which is memory reserved for the process but never actually used, characteristic of any paging scheme whenever a process size is not an exact multiple of the page size.'
+},
+{
+  id: 'os-memory-y6',
+  q: 'A computer has a physical memory of 512 MB, divided into frames of size 4 KB each. How many bits are required to represent the frame number in a physical address? (Enter your numerical answer.)',
+  options: [],
+  answer: 17,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'medium',
+  type: 'numerical',
+  explanation: 'Total number of frames = physical memory size / frame size = 512 MB / 4 KB = 2^29 bytes / 2^12 bytes = 2^17 frames. Since there are 2^17 distinct frames that must each be uniquely addressable, the frame number field of a physical address requires exactly 17 bits (2^17 = 131,072 distinct frame numbers), with the remaining 12 bits of the physical address forming the offset within whichever frame is selected.'
 }
 );
 
@@ -1642,6 +1706,70 @@ window.GATE_DATA.questions['os'].topics.find(function(t){return t.id==='os-virtu
   difficulty: 'easy',
   type: 'concept',
   explanation: 'The dirty (modified) bit is set by hardware automatically whenever a page is WRITTEN to after being loaded into memory. If a page\'s dirty bit is still 0 at eviction time, this means the in-memory copy is identical to whatever is already stored on disk (either the page was never modified since loading, or it was loaded fresh and read-only so far), so the OS can safely discard the in-memory copy WITHOUT writing it back to disk first -- saving a potentially expensive disk I/O operation. If the dirty bit were 1, the modified contents would need to be written back to disk before the frame could be safely reused for something else, or those changes would be permanently lost. The page table entry for the evicted page must still be updated (marked invalid) regardless of the dirty bit\'s value, so option B is not something that can be skipped.'
+},
+{
+  id: 'os-virtual-memory-y1',
+  q: 'Which of the following statements about demand paging and thrashing are TRUE? (Select ALL that apply)',
+  options: ['A page fault occurs on every single memory reference made by a process under demand paging', 'Increasing the degree of multiprogramming beyond the point where physical memory can supply each process with enough frames for its working set can cause thrashing', 'The working-set model attempts to keep in memory exactly the set of pages a process has referenced within the most recent time window, to reduce page faults', 'Belady\'s anomaly refers to the phenomenon (occurring only for certain replacement algorithms, such as FIFO) where increasing the number of allocated frames can, counter-intuitively, increase the number of page faults'],
+  answers: [1, 2, 3],
+  marks: 2,
+  difficulty: 'medium',
+  type: 'concept',
+  explanation: 'Option A is FALSE: a page fault occurs only when a referenced page is NOT currently resident in physical memory; the entire point of demand paging is that most references, after the working set has been loaded, are satisfied directly from memory without faulting at all. Option B is TRUE: as more processes compete for a fixed pool of frames, each process\'s allocation can shrink below what its working set actually needs, causing constant page faulting and swapping that leaves little CPU time for real progress -- this is thrashing. Option C is TRUE: the working-set model explicitly defines a process\'s working set as the pages referenced in the last Delta references (a sliding window), and tries to keep exactly that set resident to minimise fault frequency. Option D is TRUE: Belady\'s anomaly is the specific, counter-intuitive result that for some replacement algorithms (famously FIFO), adding MORE frames can INCREASE the total page fault count on certain reference strings -- it does not occur for stack algorithms like LRU or Optimal, which are proven to never exhibit it.'
+},
+{
+  id: 'os-virtual-memory-y2',
+  q: 'Which of the following statements about the Translation Lookaside Buffer (TLB) are TRUE? (Select ALL that apply)',
+  options: ['A TLB miss always necessarily means that a page fault will also occur for that reference', 'The TLB acts as a small, fast hardware cache holding only a subset of the full page table\'s (virtual page number -> frame number) mappings, to speed up the common case of address translation', 'On a process context switch, TLB entries belonging to the previous process may need to be flushed (or distinguished via an address-space identifier, ASID) to prevent one process from incorrectly reusing another process\'s stale translations', 'The TLB hit ratio has no measurable effect on a system\'s effective memory access time'],
+  answers: [1, 2],
+  marks: 2,
+  difficulty: 'medium',
+  type: 'concept',
+  explanation: 'Option A is FALSE: a TLB miss only means the translation was not cached in the TLB, forcing a page-table walk in memory -- but the page itself may well still be present in physical memory, in which case the walk succeeds and no page fault occurs at all (a page fault only happens if the PAGE ITSELF is absent from memory, which is a separate, rarer event than a mere TLB miss). Option B is TRUE: exactly this is the TLB\'s purpose -- a small associative hardware cache of the most recently/frequently used page-table entries, avoiding a full memory-resident page-table walk on every reference. Option C is TRUE: without some mechanism, translations cached from one process\'s address space could be wrongly applied to another process after a context switch; systems either flush the TLB entirely on switch or tag entries with an ASID so multiple processes\' entries can coexist safely and only the correct process\'s entries are matched. Option D is FALSE: the TLB hit ratio directly and heavily determines effective memory access time, since a hit costs only a fast TLB lookup plus one memory access while a miss costs the TLB lookup plus a full (possibly multi-level) page-table walk plus the data access -- a lower hit ratio directly increases EMAT.'
+},
+{
+  id: 'os-virtual-memory-y3',
+  q: 'A system has TLB hit ratio 0.8, TLB access time 20 ns, and main memory access time 100 ns. The system uses a single-level page table, so a TLB miss requires 1 memory access for the page-table lookup followed by 1 more memory access for the actual data. What is the Effective Memory Access Time (EMAT), in ns? (Enter your numerical answer.)',
+  options: [],
+  answer: 140,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'medium',
+  type: 'numerical',
+  explanation: 'On a TLB hit (probability 0.8): cost = TLB access + 1 data access = 20 + 100 = 120 ns. On a TLB miss (probability 0.2): cost = TLB access (failed) + 1 page-table access + 1 data access = 20 + 100 + 100 = 220 ns. EMAT = 0.8 x 120 + 0.2 x 220 = 96 + 44 = 140 ns. As with any TLB-based EMAT computation, the miss branch must always include the failed TLB lookup time itself (20 ns) in addition to the extra memory accesses needed to complete translation and then fetch the data.'
+},
+{
+  id: 'os-virtual-memory-y4',
+  q: 'For the page reference string 1,2,3,4,1,2,5,1,2,3,4,5 with exactly 3 frames (all initially empty), using FIFO page replacement, how many total page faults occur? (Enter your numerical answer.)',
+  options: [],
+  answer: 9,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'medium',
+  type: 'numerical',
+  explanation: 'Trace with a FIFO queue of capacity 3 (fault count in brackets): ref 1 -> fault, frames{1} [1]. ref 2 -> fault, frames{1,2} [2]. ref 3 -> fault, frames{1,2,3} [3]. ref 4 -> fault, evict oldest (1), frames{2,3,4} [4]. ref 1 -> fault, evict oldest (2), frames{3,4,1} [5]. ref 2 -> fault, evict oldest (3), frames{4,1,2} [6]. ref 5 -> fault, evict oldest (4), frames{1,2,5} [7]. ref 1 -> HIT (1 present). ref 2 -> HIT (2 present). ref 3 -> fault, evict oldest (1), frames{2,5,3} [8]. ref 4 -> fault, evict oldest (2), frames{5,3,4} [9]. ref 5 -> HIT (5 present). Total page faults = 9.'
+},
+{
+  id: 'os-virtual-memory-y5',
+  q: 'For the same page reference string 1,2,3,4,1,2,5,1,2,3,4,5 with exactly 3 frames (all initially empty), using LRU (Least Recently Used) page replacement, how many total page faults occur? (Enter your numerical answer.)',
+  options: [],
+  answer: 10,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'hard',
+  type: 'numerical',
+  explanation: 'Trace with recency tracked (most-recent-first; fault count in brackets): ref1->fault,{1},recency[1][1]. ref2->fault,{1,2},recency[2,1][2]. ref3->fault,{1,2,3},recency[3,2,1][3]. ref4->fault, evict LRU=1, {2,3,4}, recency[4,3,2][4]. ref1->fault, evict LRU=2, {3,4,1}, recency[1,4,3][5]. ref2->fault, evict LRU=3, {4,1,2}, recency[2,1,4][6]. ref5->fault, evict LRU=4, {1,2,5}, recency[5,2,1][7]. ref1->HIT, recency becomes[1,5,2]. ref2->HIT, recency becomes[2,1,5]. ref3->fault, evict LRU=5, {1,2,3}, recency[3,2,1][8]. ref4->fault, evict LRU=1, {2,3,4}, recency[4,3,2][9]. ref5->fault, evict LRU=2, {3,4,5}, recency[5,4,3][10]. Total LRU page faults = 10 -- notably worse than FIFO\'s 9 faults on this particular string, illustrating that LRU is not universally better than FIFO fault-for-fault on every individual reference string, even though it is never worse in Belady\'s-anomaly-proof stack-algorithm sense across increasing frame counts.'
+},
+{
+  id: 'os-virtual-memory-y6',
+  q: 'For the same page reference string 1,2,3,4,1,2,5,1,2,3,4,5 with exactly 3 frames (all initially empty), using OPTIMAL (Belady\'s) page replacement, how many total page faults occur? (Enter your numerical answer.)',
+  options: [],
+  answer: 7,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'hard',
+  type: 'numerical',
+  explanation: 'Trace, always evicting the resident page used furthest in the future (or never again) (fault count in brackets): ref1->fault,{1}[1]. ref2->fault,{1,2}[2]. ref3->fault,{1,2,3}[3]. ref4->fault: among {1,2,3}, next uses are 1@pos5, 2@pos6, 3@pos10 -- evict 3 (farthest), {1,2,4}[4]. ref1(pos5)->HIT. ref2(pos6)->HIT. ref5(pos7)->fault: among {1,2,4}, next uses are 1@pos8, 2@pos9, 4=none (no future use) -- evict 4, {1,2,5}[5]. ref1(pos8)->HIT. ref2(pos9)->HIT. ref3(pos10)->fault: among {1,2,5}, 1 and 2 have no future use at all while 5 is used again at pos12 -- evict 1 (no future use), {2,5,3}[6]. ref4(pos11)->fault: among {2,5,3}, 2 and 3 have no future use while 5 is used at pos12 -- evict 2, {5,3,4}[7]. ref5(pos12)->HIT (5 still resident). Total optimal page faults = 7, confirming Optimal is provably the best possible (fewest faults) among all three algorithms compared on this string: FIFO=9, LRU=10, Optimal=7.'
 }
 );
 
@@ -1725,6 +1853,70 @@ window.GATE_DATA.questions['os'].topics.find(function(t){return t.id==='os-file-
   difficulty: 'easy',
   type: 'concept',
   explanation: 'Flash memory cells used in SSDs have a finite endurance: each cell can only tolerate a limited number of write/erase cycles before it starts to degrade and eventually fails to reliably retain data. If writes were always directed to the same physical cells (e.g., always overwriting the "same" logical block in place), those specific cells would wear out far faster than the rest of the drive, leading to premature failure of just that region even while most of the drive remains lightly used. Wear levelling is the SSD firmware\'s strategy of spreading write and erase operations evenly across ALL available cells over time (often by remapping logical block addresses to different physical locations on each write), maximising the drive\'s overall usable lifespan. This concern has no equivalent in classical HDD theory, since magnetic platters do not wear out from repeated writes in the same way.'
+},
+{
+  id: 'os-file-disk-y1',
+  q: 'Which of the following statements about disk-scheduling algorithms are TRUE? (Select ALL that apply)',
+  options: ['SSTF (Shortest Seek Time First) can cause starvation of requests that are physically far from the current head position, if a steady stream of closer requests keeps arriving', 'The SCAN algorithm services pending requests in one direction until it reaches the end of the disk, then reverses direction and services requests on the way back', 'C-SCAN tends to give more uniform waiting times across all cylinders than plain SCAN, because it always sweeps in one direction and treats the disk as a circular list, jumping back to the start without servicing on the return', 'FCFS (First-Come-First-Served) disk scheduling always produces the minimum possible total head movement for any given request sequence'],
+  answers: [0, 1, 2],
+  marks: 2,
+  difficulty: 'medium',
+  type: 'concept',
+  explanation: 'Option A is TRUE: SSTF always jumps to whichever pending request is currently closest to the head, so a request sitting far away can be repeatedly passed over indefinitely as long as closer requests keep arriving nearer the head -- this is SSTF\'s well-known starvation risk, favouring average seek time over fairness. Option B is TRUE: this is the definition of SCAN (the "elevator algorithm") -- it sweeps fully across the disk in one direction, servicing every request along the way, then reverses at the boundary and sweeps back. Option C is TRUE: because C-SCAN always services requests only while moving in a single fixed direction and then returns to the beginning without servicing on that return trip, cylinders near either end of the disk experience much more consistent gaps between services than under SCAN, where cylinders near the reversal points get serviced twice in quick succession. Option D is FALSE: FCFS services requests strictly in arrival order regardless of their physical position, which can produce wildly erratic head movement (repeatedly darting back and forth across the disk) -- it provides no seek-time optimisation at all and is essentially never the minimum-movement schedule except by coincidence.'
+},
+{
+  id: 'os-file-disk-y2',
+  q: 'Which of the following statements about file allocation methods are TRUE? (Select ALL that apply)',
+  options: ['Contiguous allocation supports fast sequential AND direct (random) access, but suffers from external fragmentation as files are created and deleted over time', 'Linked allocation eliminates external fragmentation entirely, but does not support efficient direct (random) access to an arbitrary block', 'Indexed allocation requires the overhead of maintaining a separate index block (holding pointers to all of a file\'s data blocks) for every file', 'A FAT-based file system stores each file\'s "next block" pointer physically inside that file\'s own data blocks, exactly the same way plain linked allocation does'],
+  answers: [0, 1, 2],
+  marks: 2,
+  difficulty: 'medium',
+  type: 'concept',
+  explanation: 'Option A is TRUE: because a contiguously-allocated file occupies one unbroken run of blocks, both sequential access (just keep reading the next physical block) and direct access (block k is simply start-block + k) are fast -- but as files of varying sizes are created and removed, the free space fragments into scattered holes, none of which may be large enough for a new file (external fragmentation), even though total free space may be ample. Option B is TRUE: linked allocation\'s blocks can be scattered absolutely anywhere, so there is no notion of needing a large contiguous run and hence no external fragmentation -- but reaching block k requires following k "next" pointers one at a time starting from the first block, making direct access slow and proportional to k. Option C is TRUE: indexed allocation\'s entire benefit (fast direct access without contiguity) comes precisely from maintaining a dedicated index block per file that lists pointers to every one of that file\'s data blocks, which is itself extra storage overhead not needed by contiguous or plain linked allocation. Option D is FALSE: this is the key structural difference between FAT and plain linked allocation -- FAT centralises ALL files\' "next block" chaining information into one single system-wide table (the File Allocation Table) kept separately from the data blocks, rather than embedding a pointer inside each individual data block as linked allocation does.'
+},
+{
+  id: 'os-file-disk-y3',
+  q: 'A disk has cylinders numbered 0-199. The head is currently at cylinder 50. Pending requests are at cylinders 10, 70, 90, 130, 20. Using SSTF (Shortest Seek Time First) scheduling, what is the total head movement (in cylinders) needed to service all requests? (Enter your numerical answer.)',
+  options: [],
+  answer: 200,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'medium',
+  type: 'numerical',
+  explanation: 'SSTF always services whichever pending request is currently nearest to the head. From 50: distances are 10(40), 70(20), 90(40), 130(80), 20(30) -- nearest is 70, move there (movement so far = 20). From 70, remaining {10,90,130,20}: distances 10(60),90(20),130(60),20(50) -- nearest is 90, move there (movement = 20+20 = 40). From 90, remaining {10,130,20}: distances 10(80),130(40),20(70) -- nearest is 130, move there (movement = 40+40 = 80). From 130, remaining {10,20}: distances 10(120),20(110) -- nearest is 20, move there (movement = 80+110 = 190). From 20, remaining {10}: distance 10(10), move there (movement = 190+10 = 200). Total head movement = 200 cylinders.'
+},
+{
+  id: 'os-file-disk-y4',
+  q: 'Using the same setup (cylinders 0-199, head at 50, pending requests at 10, 70, 90, 130, 20), but now using the SCAN algorithm with the head initially moving toward INCREASING cylinder numbers (continuing to the disk boundary at cylinder 199 before reversing), what is the total head movement (in cylinders)? (Enter your numerical answer.)',
+  options: [],
+  answer: 338,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'hard',
+  type: 'numerical',
+  explanation: 'SCAN continues in its current direction (increasing) all the way to the disk\'s boundary before reversing, servicing every pending request encountered along the way. Moving up from 50, it services 70, 90, 130 in order, then continues to the physical end of the disk at cylinder 199 (even though no request lies exactly there): movement for this leg = 199 - 50 = 149. It then reverses direction and sweeps all the way down to service the remaining requests 20 and then 10: movement for this leg = 199 - 10 = 189. Total head movement = 149 + 189 = 338 cylinders. (Note this is substantially more than SSTF\'s 200 for the same request set, since SCAN\'s mandatory trip to the far boundary at 199 -- where no request actually waits -- is pure overhead that a seek-time-greedy algorithm like SSTF or LOOK would avoid.)'
+},
+{
+  id: 'os-file-disk-y5',
+  q: 'A file system uses a fixed block size of 512 bytes. A file has a total size of 5000 bytes. Assuming whole blocks must be allocated (no sub-block allocation), how many disk blocks are allocated to store this file? (Enter your numerical answer.)',
+  options: [],
+  answer: 10,
+  kind: 'nat',
+  marks: 1,
+  difficulty: 'easy',
+  type: 'numerical',
+  explanation: 'The number of blocks needed is ceil(file size / block size) = ceil(5000 / 512) = ceil(9.765625) = 10 blocks. Since a file system can only allocate whole blocks (it cannot allocate a fractional block), any file whose size is not an exact multiple of the block size still consumes one full extra block to hold the remainder -- here 10 blocks total (10 x 512 = 5120 bytes of space reserved), with the last block holding only 5000 - 9x512 = 392 bytes of actual file data and the remaining 120 bytes of that final block wasted as internal fragmentation.'
+},
+{
+  id: 'os-file-disk-y6',
+  q: 'An inode has 8 direct block pointers and 1 single indirect pointer (no double or triple indirect pointer). Block size is 2 KB, and each block pointer occupies 4 bytes. What is the maximum file size (in number of blocks) that this inode structure can address? (Enter your numerical answer.)',
+  options: [],
+  answer: 520,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'medium',
+  type: 'numerical',
+  explanation: 'Pointers per block = block size / pointer size = 2048 / 4 = 512. The 8 direct pointers directly contribute 8 data blocks. The single indirect pointer points to one block that itself holds 512 pointers, each pointing to one data block, contributing 512 data blocks. Total maximum file size = direct blocks + single-indirect blocks = 8 + 512 = 520 blocks. Since there is no double or triple indirect pointer in this inode, 520 blocks is the absolute maximum file size addressable, regardless of how much larger the underlying disk itself might be.'
 }
 );
 

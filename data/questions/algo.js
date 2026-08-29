@@ -1174,11 +1174,11 @@ window.GATE_DATA.questions['algo'].topics.find(function(t){return t.id==='algo-d
   id: 'algo-divide-conquer-x3',
   q: 'An algorithm computes a^n (integer exponentiation) using the recurrence: if n is even, compute a^(n/2) once and square it; if n is odd, compute a^(n-1) and multiply by a once more. What is T(n), the number of multiplications, in the worst case (e.g. n a power of 2 plus 1, forcing repeated odd steps)?',
   options: ['Theta(log n)', 'Theta(n)', 'Theta(sqrt(n))', 'Theta(n log n)'],
-  answer: 1,
+  answer: 0,
   marks: 2,
   difficulty: 'hard',
   type: 'numerical',
-  explanation: 'The intended fast-exponentiation recurrence T(n) = T(n/2) + O(1) (halving on even n) gives the desired Theta(log n), but this question describes a flawed variant where an ODD n only decrements by 1 (T(n) = T(n-1) + O(1)) rather than being paired efficiently with the halving step. Consider n of the form 2^k + 1 repeated: after one odd step n becomes 2^k, then one halving step gives 2^(k-1) + ... but if odd steps can recur consecutively in the worst construction (e.g. n, n-1, n-2, ... never landing on an even number for many steps is impossible for integers, but a poor implementation that always treats results as "odd-like" or an adversarial sequence of exponents each just below a power of 2), the chain of decrement-by-1 steps can dominate, giving Theta(n) multiplications in that degenerate worst case, far worse than the Theta(log n) of a correctly balanced fast-exponentiation scheme. This question tests recognizing when a superficially divide-and-conquer recurrence secretly degenerates into a linear unrolling.'
+  explanation: 'Whenever n is odd, n-1 is necessarily EVEN (odd minus 1 is always even), so an odd step can never be immediately followed by another odd step -- every odd step is followed by at least one halving step. This means the sequence of n-values can contain at most one odd (decrement) step for every halving step, so at most 2*log2(n) steps are needed in total to reach the base case: T(n) = T(n-1) + O(1) on odd n, T(n) = T(n/2) + O(1) on even n, and unrolling shows the count of steps is bounded by roughly 2 log2(n). Concretely, for n = 2^k + 1 the trace is n -> n-1 = 2^k -> 2^(k-1) -> ... -> 1, taking k+1 = log2(n-1)+1 steps -- still Theta(log n), not Theta(n). So this recurrence, despite the odd branch only subtracting 1 instead of halving, still solves to Theta(log n): the decrement step can never repeat twice in a row, so it never accumulates into a linear number of steps. Option B (Theta(n)) would require many CONSECUTIVE decrement-by-1 steps, which is impossible here since decrementing an odd number always produces an even number, guaranteeing a halving step immediately after.'
 },
 {
   id: 'algo-divide-conquer-x4',
@@ -2076,5 +2076,236 @@ window.GATE_DATA.questions['algo'].topics.find(function(t){return t.id==='algo-g
   difficulty: 'medium',
   type: 'numerical',
   explanation: 'Initialize dist[A]=0. Direct edge A-B gives dist[B]=2. Direct edge A-C gives dist[C]=5, but via B: dist[B]+B-C = 2+1=3, which is shorter, so dist[C]=3. Now consider D: via B directly, dist[B]+B-D = 2+7=9; via C, dist[C]+C-D = 3+3=6. The minimum of these two candidate paths to D is 6, so dist[D]=6, achieved via the path A-B-C-D with edge weights 2+1+3=6.'
+}
+);
+
+window.GATE_DATA.questions['algo'].topics.find(function(t){return t.id==='algo-sorting-searching';}).questions.push(
+{
+  id: 'algo-sorting-searching-y1',
+  q: 'Regarding comparison-based sorting algorithms and stability, which of the following statements are TRUE? (Select ALL that apply)',
+  options: [
+    'Any comparison-based sorting algorithm requires Omega(n log n) comparisons in the worst case',
+    'Merge sort is a stable sorting algorithm (equal-key elements retain their original relative order)',
+    'The standard in-place implementation of quicksort (e.g. Lomuto or Hoare partitioning) is stable',
+    'Counting sort achieves O(n+k) time by directly comparing pairs of elements to each other'
+  ],
+  answers: [0, 1],
+  marks: 2,
+  difficulty: 'medium',
+  type: 'concept',
+  explanation: 'The decision-tree argument shows any comparison sort must have at least n! leaves (one per permutation), and a binary tree with n! leaves has height Omega(log(n!)) = Omega(n log n), so every comparison-based sort needs Omega(n log n) comparisons in the worst case -- TRUE. Merge sort\\u2019s merge step, when it takes from the left subarray on ties, never reorders equal elements relative to each other, so it is stable -- TRUE. Standard in-place quicksort swaps elements across the pivot during partitioning, which can and generally does move an element past an equal-valued element, destroying their original relative order -- it is NOT stable in its typical in-place form -- FALSE. Counting sort achieves its O(n+k) bound precisely by AVOIDING comparisons between elements: it uses each element\\u2019s value as an index into a frequency/count array, which is why it can beat the Omega(n log n) comparison-sort lower bound -- FALSE.'
+},
+{
+  id: 'algo-sorting-searching-y2',
+  q: 'Regarding binary search on an array, which of the following statements are TRUE? (Select ALL that apply)',
+  options: [
+    'Binary search requires the input array to already be sorted for its correctness guarantee to hold',
+    'Binary search runs in O(log n) time in the worst case on an array of size n',
+    'Binary search can be applied to a singly linked list of n elements and still achieve O(log n) time using the same index-halving approach as on arrays',
+    'The worst-case recurrence for binary search is T(n) = T(n/2) + O(1), which solves to O(log n)'
+  ],
+  answers: [0, 1, 3],
+  marks: 2,
+  difficulty: 'medium',
+  type: 'concept',
+  explanation: 'Binary search relies on comparing the target to a midpoint and discarding half the remaining range based on sort order; on an unsorted array this logic is invalid and can miss the target -- sortedness is required -- TRUE. Each comparison halves the search range, so after O(log n) halvings the range shrinks to a constant size, giving O(log n) worst-case time -- TRUE. A singly linked list has no O(1) random access to an arbitrary index, so even locating the "middle" element takes O(n) time by walking pointers, which destroys the O(log n) bound; binary search needs array-like random access (or a balanced-BST-like structure) to be efficient -- FALSE. Each call does O(1) work (one comparison) and recurses on a problem of half the size, so T(n) = T(n/2) + O(1); applying the Master theorem (or direct unrolling) gives T(n) = O(log n) -- TRUE.'
+},
+{
+  id: 'algo-sorting-searching-y3',
+  q: 'Regarding a binary MIN-heap stored as a 0-indexed array and heapsort built on it, which of the following statements are TRUE? (Select ALL that apply)',
+  options: [
+    'For a node at index i, its two children are located at indices 2i+1 and 2i+2',
+    'Building a heap from an unsorted array of n elements via bottom-up heapify takes O(n) time',
+    'Heapsort has O(n log n) time complexity in the worst case',
+    'Heapsort is a stable sorting algorithm'
+  ],
+  answers: [0, 1, 2],
+  marks: 2,
+  difficulty: 'medium',
+  type: 'concept',
+  explanation: 'This is the standard 0-indexed array encoding of a complete binary tree: left child at 2i+1, right child at 2i+2 (and parent of i at floor((i-1)/2)) -- TRUE. Although each of the n/2 leaf-adjacent calls to sift-down might seem to cost O(log n), the vast majority of nodes are near the bottom of the tree with very short sift-down paths; summing the work across all levels gives a geometric-like series that totals O(n), not O(n log n) -- TRUE. Heapsort repeatedly extracts the minimum (or maximum, for a max-heap variant) and sifts down, n times, each costing O(log n), for O(n log n) total, and this bound holds in the worst case (heapsort has no bad-input degeneration like quicksort) -- TRUE. Heapsort repeatedly swaps the root with a distant array position during extraction, which routinely reorders equal-valued elements relative to each other -- it is NOT stable -- FALSE.'
+},
+{
+  id: 'algo-sorting-searching-y4',
+  q: 'What is the maximum number of comparisons needed by binary search in the worst case (element not present) to search a sorted array of 32 elements? (Enter your numerical answer.)',
+  options: [],
+  answer: 6,
+  kind: 'nat',
+  marks: 1,
+  difficulty: 'easy',
+  type: 'numerical',
+  explanation: 'Track the size of the remaining search range across each comparison, starting at 32: comparison 1 narrows 32 to 16; comparison 2 narrows 16 to 8; comparison 3 narrows 8 to 4; comparison 4 narrows 4 to 2; comparison 5 narrows 2 to 1; comparison 6 narrows 1 to 0, at which point the loop terminates (element absent). Counting each narrowing step as one comparison gives a total of 6 comparisons, matching the general worst-case formula floor(log2 n) + 1 = floor(log2 32) + 1 = 5 + 1 = 6.'
+},
+{
+  id: 'algo-sorting-searching-y5',
+  q: 'How many inversions (pairs i<j with arr[i] > arr[j]) does the array [8, 4, 2, 1] contain? (Enter your numerical answer.)',
+  options: [],
+  answer: 6,
+  kind: 'nat',
+  marks: 1,
+  difficulty: 'easy',
+  type: 'numerical',
+  explanation: 'The array [8,4,2,1] is sorted in strictly decreasing order, so every one of its C(4,2) = 6 pairs is an inversion. Listing them explicitly (by position, 0-indexed): (0,1):8>4, (0,2):8>2, (0,3):8>1, (1,2):4>2, (1,3):4>1, (2,3):2>1 -- all 6 pairs qualify. This matches the general fact that a strictly decreasing array of length n has the maximum possible n(n-1)/2 inversions, here 4*3/2 = 6.'
+},
+{
+  id: 'algo-sorting-searching-y6',
+  q: 'The array [5, 3, 8, 4, 2] is sorted using standard selection sort (repeatedly find the minimum of the remaining unsorted suffix and swap it into place, skipping the swap when the minimum is already in place). How many actual element swaps are performed in total? (Enter your numerical answer.)',
+  options: [],
+  answer: 3,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'medium',
+  type: 'numerical',
+  explanation: 'Start: [5,3,8,4,2]. Pass i=0: minimum of the whole array is 2 at index 4; swap positions 0 and 4 -> [2,3,8,4,5] (swap #1). Pass i=1: minimum of [3,8,4,5] (indices 1-4) is 3, already at index 1, so no swap is performed. Pass i=2: minimum of [8,4,5] (indices 2-4) is 4 at index 3; swap positions 2 and 3 -> [2,3,4,8,5] (swap #2). Pass i=3: minimum of [8,5] (indices 3-4) is 5 at index 4; swap positions 3 and 4 -> [2,3,4,5,8] (swap #3). The array is now fully sorted after exactly 3 actual swaps (the i=1 pass needed no swap since the minimum was already correctly placed).'
+}
+);
+
+window.GATE_DATA.questions['algo'].topics.find(function(t){return t.id==='algo-asymptotic';}).questions.push(
+{
+  id: 'algo-asymptotic-z7',
+  q: 'A recurrence is defined as T(n) = 2*T(floor(n/2)) + n for n > 1, with T(1) = 1. What is the value of T(6)? (Enter your numerical answer.)',
+  options: [],
+  answer: 16,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'hard',
+  type: 'numerical',
+  explanation: 'Compute bottom-up using floor division. T(1)=1. T(2)=2*T(1)+2=2*1+2=4. T(3)=2*T(floor(3/2))+3=2*T(1)+3=2*1+3=5. T(4)=2*T(2)+4=2*4+4=12. T(5)=2*T(floor(5/2))+5=2*T(2)+5=2*4+5=13. T(6)=2*T(3)+6=2*5+6=16. So T(6)=16.'
+},
+{
+  id: 'algo-asymptotic-z8',
+  q: 'A binary counter starts at 0 (all bits 0) and is incremented 8 times in a row (reaching binary value 1000, i.e. decimal 8). Counting each bit that flips (0-to-1 or 1-to-0) during each increment, what is the TOTAL number of bit flips across all 8 increments? (Enter your numerical answer.)',
+  options: [],
+  answer: 15,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'hard',
+  type: 'numerical',
+  explanation: 'Trace every increment in binary and count flipped bits: 0000->0001 flips 1 bit; 0001->0010 flips 2 bits; 0010->0011 flips 1 bit; 0011->0100 flips 3 bits; 0100->0101 flips 1 bit; 0101->0110 flips 2 bits; 0110->0111 flips 1 bit; 0111->1000 flips 4 bits. Summing: 1+2+1+3+1+2+1+4 = 15 total bit flips. This matches the amortized-analysis result that bit 0 flips every increment (8 times), bit 1 flips every 2nd increment (4 times), bit 2 every 4th (2 times), bit 3 every 8th (1 time): 8+4+2+1 = 15, confirming that binary counter increments cost O(1) amortized time despite occasional O(log n) worst-case flips.'
+}
+);
+
+window.GATE_DATA.questions['algo'].topics.find(function(t){return t.id==='algo-divide-conquer';}).questions.push(
+{
+  id: 'algo-divide-conquer-z7',
+  q: 'A recurrence is defined as T(n) = 3*T(floor(n/2)) + n for n > 1, with T(1) = 1. What is the value of T(10)? (Enter your numerical answer.)',
+  options: [],
+  answer: 70,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'hard',
+  type: 'numerical',
+  explanation: 'Compute bottom-up with floor division. T(1)=1. T(2)=3*T(1)+2=3+2=5. T(3)=3*T(1)+3=3+3=6 (floor(3/2)=1). T(4)=3*T(2)+4=15+4=19. T(5)=3*T(2)+5=15+5=20 (floor(5/2)=2). T(6)=3*T(3)+6=18+6=24. T(7)=3*T(3)+7=18+7=25 (floor(7/2)=3). T(8)=3*T(4)+8=57+8=65. T(9)=3*T(4)+9=57+9=66 (floor(9/2)=4). T(10)=3*T(5)+10=60+10=70 (floor(10/2)=5). So T(10)=70.'
+},
+{
+  id: 'algo-divide-conquer-z8',
+  q: 'What is the maximum (worst-case) total number of element comparisons performed by standard top-down merge sort when sorting an array of exactly 6 elements? (Enter your numerical answer.)',
+  options: [],
+  answer: 11,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'hard',
+  type: 'numerical',
+  explanation: 'Merge sort on 6 elements splits into two halves of size 3 each. Each size-3 half further splits into sizes 2 and 1: sorting the size-2 half costs 1 comparison, and merging that sorted pair with the single leftover element costs at most (2+1-1)=2 comparisons in the worst case, so each size-3 subproblem costs at most 1+2=3 comparisons. With two such size-3 subproblems (3+3=6 comparisons) plus the final merge of the two sorted size-3 lists, which costs at most (3+3-1)=5 comparisons in the worst case, the grand total is 3+3+5=11 comparisons. This matches the general worst-case merge sort comparison formula n*ceil(log2 n) - 2^ceil(log2 n) + 1 = 6*3 - 8 + 1 = 11.'
+}
+);
+
+window.GATE_DATA.questions['algo'].topics.find(function(t){return t.id==='algo-greedy';}).questions.push(
+{
+  id: 'algo-greedy-z7',
+  q: 'A connected undirected graph has vertices {A,B,C,D} and edges A-B(1), B-C(2), C-D(3), A-D(4), A-C(5). First, the weight of edge C-D is increased from 3 to 10, and all other edges keep their original weights. What is the total weight of the Minimum Spanning Tree AFTER this change? (Enter your numerical answer.)',
+  options: [],
+  answer: 7,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'hard',
+  type: 'numerical',
+  explanation: 'After the change the edges are A-B(1), B-C(2), C-D(10), A-D(4), A-C(5). Run Kruskal\\u2019s algorithm on the sorted list A-B(1), B-C(2), A-D(4), A-C(5), C-D(10): add A-B(1) -> {A,B}; add B-C(2) -> {A,B,C}; A-D(4) connects D, giving {A,B,C,D} using exactly 3 edges (n-1=3 for 4 vertices), so the MST is complete without ever needing C-D. Total MST weight = 1+2+4 = 7. (For reference, before the change the MST used edges A-B(1), B-C(2), C-D(3) for weight 6; raising C-D\\u2019s weight above 4 forces Kruskal to substitute A-D(4) in its place, raising the MST weight from 6 to 7.)'
+},
+{
+  id: 'algo-greedy-z8',
+  q: 'Using Huffman coding, six symbols have frequencies a=5, b=9, c=12, d=13, e=16, f=45. Building the optimal prefix-free code by greedily merging the two smallest-frequency nodes at each step (standard Huffman construction), what is the total weighted code length (sum of frequency times code-length over all symbols, equivalently the sum of all internal-node merge costs)? (Enter your numerical answer.)',
+  options: [],
+  answer: 224,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'hard',
+  type: 'numerical',
+  explanation: 'Repeatedly merge the two smallest frequencies, recording each merge cost (sum of the two merged values), and reinsert the sum. Start: {5,9,12,13,16,45}. Merge 5+9=14 (cost 14) -> {12,13,14,16,45}. Merge 12+13=25 (cost 25) -> {14,16,25,45}. Merge 14+16=30 (cost 30) -> {25,30,45}. Merge 25+30=55 (cost 55) -> {45,55}. Merge 45+55=100 (cost 100) -> {100}, construction complete. The total weighted code length equals the sum of all merge costs (a standard identity, since each merge cost counts every original frequency once for each level it rises through): 14+25+30+55+100 = 224.'
+}
+);
+
+window.GATE_DATA.questions['algo'].topics.find(function(t){return t.id==='algo-dp';}).questions.push(
+{
+  id: 'algo-dp-z7',
+  q: 'Solve the 0/1 knapsack problem for items with (weight, value) pairs (1,1), (3,4), (4,5), (5,7) and knapsack capacity 7 (each item may be taken at most once). What is the maximum total value achievable? (Enter your numerical answer.)',
+  options: [],
+  answer: 9,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'hard',
+  type: 'numerical',
+  explanation: 'Build the DP table dp[c] = best value using capacity c, processing items one at a time from high capacity to low (standard 0/1 knapsack). After item (1,1): dp = [0,1,1,1,1,1,1,1] for c=0..7. After item (3,4): dp = [0,1,1,4,5,5,5,5]. After item (4,5): dp = [0,1,1,4,5,6,6,9] (dp[7] becomes dp[3]+5 = 4+5 = 9). After item (5,7): dp[7] stays max(9, dp[2]+7=1+7=8) = 9; final dp[7] = 9. Sanity check by direct combination: choosing items (3,4) and (4,5) uses weight 3+4=7 (exactly capacity) for value 4+5=9, which is indeed the best combination (e.g. (1,1)+(5,7) uses weight 6 for value 8, which is worse). Maximum value = 9.'
+},
+{
+  id: 'algo-dp-z8',
+  q: 'A recurrence is defined as T(n) = T(floor(n/3)) + T(floor(2n/3)) + n for n >= 2, with T(0) = 0 and T(1) = 1. What is the value of T(9)? (Enter your numerical answer.)',
+  options: [],
+  answer: 33,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'hard',
+  type: 'numerical',
+  explanation: 'Compute bottom-up with floor division. T(0)=0, T(1)=1. T(2)=T(0)+T(1)+2=0+1+2=3 (floor(2/3)=0, floor(4/3)=1). T(3)=T(1)+T(2)+3=1+3+3=7. T(4)=T(1)+T(2)+4=1+3+4=8 (floor(4/3)=1, floor(8/3)=2). T(5)=T(1)+T(3)+5=1+7+5=13 (floor(5/3)=1, floor(10/3)=3). T(6)=T(2)+T(4)+6=3+8+6=17. T(7)=T(2)+T(4)+7=3+8+7=18 (floor(7/3)=2, floor(14/3)=4). T(8)=T(2)+T(5)+8=3+13+8=24 (floor(8/3)=2, floor(16/3)=5). T(9)=T(3)+T(6)+9=7+17+9=33 (floor(9/3)=3, floor(18/3)=6). So T(9)=33.'
+}
+);
+
+window.GATE_DATA.questions['algo'].topics.find(function(t){return t.id==='algo-graph';}).questions.push(
+{
+  id: 'algo-graph-z7',
+  q: 'A connected undirected graph has vertices {W,X,Y,Z} and edges W-X(2), X-Y(3), Y-Z(1), W-Z(6), W-Y(4), X-Z(5). The weight of edge W-X is then increased from 2 to 10, and all other edges keep their original weights. What is the total weight of the Minimum Spanning Tree AFTER this change? (Enter your numerical answer.)',
+  options: [],
+  answer: 8,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'hard',
+  type: 'numerical',
+  explanation: 'After the change the edges are W-X(10), X-Y(3), Y-Z(1), W-Z(6), W-Y(4), X-Z(5). Sort by weight: Y-Z(1), X-Y(3), W-Y(4), X-Z(5), W-Z(6), W-X(10). Run Kruskal\\u2019s algorithm: add Y-Z(1) -> {Y,Z}; add X-Y(3) -> {X,Y,Z}; add W-Y(4) connects W -> {W,X,Y,Z} using exactly 3 edges (n-1=3 for 4 vertices), MST complete. Total MST weight = 1+3+4 = 8. (Before the change, the original MST used Y-Z(1), W-X(2), X-Y(3) for weight 6; raising W-X above 4 forces Kruskal to substitute W-Y(4) in its place.)'
+},
+{
+  id: 'algo-graph-z8',
+  q: 'An initially empty dynamic array starts with capacity 1 and doubles its capacity (1, 2, 4, 8, 16, ...) via a full copy of all existing elements whenever a push is attempted on a full array, before inserting the new element. Starting from empty, after exactly 10 push operations, what is the TOTAL number of element copies performed across all resizes (amortized analysis; count only copies made during resizing, not the final insertions)? (Enter your numerical answer.)',
+  options: [],
+  answer: 15,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'hard',
+  type: 'numerical',
+  explanation: 'Track size and capacity through each push. Push 1: size 0 < capacity 1, no resize, size becomes 1. Push 2: size 1 = capacity 1 (full), resize to capacity 2 copying 1 element, then insert, size becomes 2. Push 3: size 2 = capacity 2 (full), resize to capacity 4 copying 2 elements, insert, size becomes 3. Pushes 4: size 3 < 4, no resize, size becomes 4. Push 5: size 4 = capacity 4 (full), resize to capacity 8 copying 4 elements, insert, size becomes 5. Pushes 6,7,8: sizes 5,6,7 all < 8, no resize; after push 8, size = 8. Push 9: size 8 = capacity 8 (full), resize to capacity 16 copying 8 elements, insert, size becomes 9. Push 10: size 9 < 16, no resize. Total copies = 1+2+4+8 = 15, illustrating that although a single resize costs O(n), the total copying cost over n pushes is O(n), giving O(1) amortized cost per push.'
+}
+);
+
+window.GATE_DATA.questions['algo'].topics.find(function(t){return t.id==='algo-sorting-searching';}).questions.push(
+{
+  id: 'algo-sorting-searching-z7',
+  q: 'A recurrence is defined as T(n) = 2*T(floor(n/2)) + (n-1) for n > 1, with T(0) = 0 and T(1) = 0. What is the value of T(7)? (Enter your numerical answer.)',
+  options: [],
+  answer: 10,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'hard',
+  type: 'numerical',
+  explanation: 'Compute bottom-up with floor division. T(0)=0, T(1)=0. T(2)=2*T(1)+1=0+1=1. T(3)=2*T(1)+2=0+2=2 (floor(3/2)=1). T(4)=2*T(2)+3=2*1+3=5. T(5)=2*T(2)+4=2*1+4=6 (floor(5/2)=2). T(6)=2*T(3)+5=2*2+5=9. T(7)=2*T(3)+6=2*2+6=10 (floor(7/2)=3). So T(7)=10 (this matches the worst-case comparison count for a merge-sort-like divide step costing n-1 comparisons per merge).'
+},
+{
+  id: 'algo-sorting-searching-z8',
+  q: 'An initially empty stack undergoes this sequence of operations: 6 individual push operations, then one multipop(4) (pop up to 4 elements, stopping early only if the stack becomes empty), then 2 individual push operations, then one multipop(10). What is the TOTAL number of individual pop operations actually executed across both multipop calls? (Enter your numerical answer.)',
+  options: [],
+  answer: 8,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'hard',
+  type: 'numerical',
+  explanation: 'After 6 pushes, the stack holds 6 elements. multipop(4) requests 4 pops; since the stack has 6 (>=4) elements, all 4 requested pops execute, leaving 2 elements on the stack. Then 2 pushes bring the stack back up to 4 elements. multipop(10) requests 10 pops, but the stack only has 4 elements, so it pops all 4 available elements (stopping when empty) and leaves the stack empty. Total individual pops executed = 4 (first multipop) + 4 (second multipop) = 8. This illustrates the amortized aggregate-method argument: across any sequence of pushes and multipops, the total number of pop operations can never exceed the total number of push operations (here 8 pushes total, matching exactly 8 pops), so each operation is O(1) amortized even though a single multipop can cost O(n) in the worst case.'
 }
 );

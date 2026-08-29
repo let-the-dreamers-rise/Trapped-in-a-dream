@@ -1376,6 +1376,116 @@ window.GATE_DATA.questions['apti'].topics.find(function(t){return t.id==='apti-v
     difficulty: 'medium',
     type: 'concept',
     explanation: '"Tread carefully" means to proceed cautiously in a sensitive situation, which fits advising a new intern to be careful before challenging a long-established workflow. "Jump the gun" means acting prematurely without adequate preparation, which is advice the sentence is warning against, not recommending. "Go the extra mile" means putting in additional effort, and "cut corners" means doing something in a cheaper or easier but lower-quality way, neither of which relates to caution around proposing sensitive changes. Matching the idiom meaning to the situational tone described, here caution around a sensitive, established system, is more reliable than matching on any single keyword in the sentence.'
+  },
+  {
+    id: 'apti-verbal-y1',
+    q: 'Statement: All new employees at TechCorp who complete the mandatory ethics training receive a certification badge. Raj has a certification badge. Which of the following can be logically concluded?',
+    options: [
+      'Raj completed the mandatory ethics training.',
+      'Raj is a new employee at TechCorp.',
+      "Nothing can be concluded about Raj's training status from the given statement alone.",
+      'Raj did not complete the mandatory ethics training.'
+    ],
+    answer: 2,
+    marks: 2,
+    difficulty: 'hard',
+    type: 'concept',
+    explanation: 'The statement gives a one-directional conditional: completing training guarantees a badge (training -> badge), but it never states that a badge is given ONLY to those who complete the training. Observing the effect (Raj has a badge) does not let you infer the stated cause (Raj completed training), since the badge could have been awarded through some other unstated route. This is the classic "affirming the consequent" trap. Concluding "Raj completed the training" or "Raj is a new employee" both assume the converse of the given rule, which was never stated, so the only logically safe answer is that nothing can be determined. Fastest route: whenever a statement reads "if X then Y," check whether the question tries to reason backward from Y to X — that reversal is valid only if the original statement was explicitly "only if" or "if and only if."'
+  },
+  {
+    id: 'apti-verbal-y2',
+    q: 'In a small survey, every respondent who preferred tea over coffee also reported drinking more than three cups of a hot beverage daily. Ravi drinks four cups of a hot beverage daily. Which of the following must be true?',
+    options: [
+      'Ravi prefers tea over coffee.',
+      'Ravi prefers coffee over tea.',
+      'It cannot be determined whether Ravi prefers tea or coffee.',
+      'Ravi drinks fewer than three cups daily.'
+    ],
+    answer: 2,
+    marks: 2,
+    difficulty: 'hard',
+    type: 'concept',
+    explanation: 'The survey establishes only one direction: preferring tea implies drinking more than three cups (tea-preference -> more than 3 cups). It does not say that everyone who drinks more than three cups prefers tea, so coffee-lovers could just as easily drink four or more cups. Ravi satisfying the "more than three cups" condition tells us nothing about which beverage he prefers, since that condition could be met by tea-drinkers and coffee-drinkers alike. Both "prefers tea" and "prefers coffee" require information not given, so only "cannot be determined" is logically safe. Fastest route: rewrite the statement as an arrow (A -> B) and check which of the four options tries to reason from B back to A without justification — that reversal is the trap in nearly every such question.'
+  },
+  {
+    id: 'apti-verbal-y3',
+    q: "The committee's decision to indefinitely postpone the merger, despite months of painstaking negotiation, left the shareholders feeling ______.",
+    options: ['vindicated', 'disillusioned', 'emboldened', 'indifferent'],
+    answer: 1,
+    marks: 1,
+    difficulty: 'hard',
+    type: 'concept',
+    explanation: '"Despite months of painstaking negotiation" sets up an expectation of a positive outcome (the merger going through), and "indefinitely postpone" defeats that expectation, so the blank must capture a sense of disappointed hope. "Disillusioned" precisely means having one\'s positive expectations shattered by an unwelcome reality, matching the contrast set up by "despite." "Vindicated" means proven right, which fits neither the effort invested nor the negative outcome; "emboldened" means made more confident, the opposite of a stalled deal\'s effect; and "indifferent" contradicts the emotional weight implied by "months of painstaking negotiation." Fastest route: locate the contrast signal ("despite"), determine the positive expectation it sets up, and pick the word describing the emotional collapse of exactly that expectation.'
+  },
+  {
+    id: 'apti-verbal-y4',
+    q: 'Argument: The number of bicycle accidents in the city fell by 20% last year after the city introduced mandatory helmet laws. Therefore, the helmet law caused the decline in accidents. Which of the following, if true, would most weaken this argument?',
+    options: [
+      'Most cyclists in the city already owned helmets before the law was introduced.',
+      'The number of cyclists on the road fell by 25% last year due to a new metro line opening.',
+      'The helmet law included a monetary fine for non-compliance.',
+      'Neighboring cities without helmet laws saw a slight increase in accidents.'
+    ],
+    answer: 1,
+    marks: 2,
+    difficulty: 'hard',
+    type: 'concept',
+    explanation: 'The argument assumes the helmet law is the cause of fewer accidents, but a drop in accidents could also occur simply because fewer people were cycling at all. If the number of cyclists fell by 25% due to an unrelated cause (the new metro line), a 20% drop in accident count would be fully explained by fewer people being on bicycles in the first place, independent of any safety effect from helmets. This directly supplies an alternative cause for the observed effect, which is the strongest way to weaken a causal claim. Option 0 suggests the law had little marginal effect but does not explain why accidents actually fell; option 2 is irrelevant to causation; option 3 is weak supporting evidence, not a direct alternative explanation. Fastest route: for "cause X leads to effect Y" arguments, the strongest weakener is always an option that offers a different plausible cause for Y that has nothing to do with X.'
+  },
+  {
+    id: 'apti-verbal-y5',
+    q: 'Studies show that employees who take a 10-minute walk after lunch report higher afternoon productivity than those who do not. A company concluded that mandating a 10-minute post-lunch walk for all employees will boost overall productivity. Which of the following, if true, would most strengthen this conclusion?',
+    options: [
+      'Employees who already walk after lunch tend to have healthier diets overall.',
+      'The observed productivity boost is not explained by any other kind of short break taken after lunch.',
+      'Most employees dislike walking outdoors in cold weather.',
+      'Post-lunch walks are somewhat more pleasant in summer than in winter.'
+    ],
+    answer: 1,
+    marks: 2,
+    difficulty: 'hard',
+    type: 'concept',
+    explanation: 'The company\'s conclusion assumes that it is specifically the act of walking, not just taking any break, that produces the productivity boost. If any other kind of short break produced the same effect, then mandating a walk specifically would be an unjustified and overly narrow prescription. Ruling out that alternative explanation, that other short breaks do not produce the same benefit, directly supports the claim that the walk itself (and not merely stepping away from work) is responsible, which strengthens the causal link the company relies on. The other options describe unrelated side factors (diet, weather preference, seasonal comfort) that do not address whether the walk itself is the true cause. Fastest route: to strengthen a causal claim, look for the option that eliminates the most obvious alternative explanation for the observed effect.'
+  },
+  {
+    id: 'apti-verbal-y6',
+    q: "The senior diplomat's remarks were carefully ______, revealing almost nothing concrete despite appearing to answer every question asked.",
+    options: ['forthright', 'equivocal', 'impulsive', 'candid'],
+    answer: 1,
+    marks: 1,
+    difficulty: 'hard',
+    type: 'concept',
+    explanation: '"Equivocal" describes language that is deliberately ambiguous or non-committal, allowing a speaker to appear responsive while actually conveying no firm information, exactly what "appearing to answer every question" while "revealing almost nothing concrete" describes. "Forthright" and "candid" both mean direct and open, the opposite of the vagueness described; "impulsive" describes acting without forethought, which contradicts "carefully," a word signaling deliberate control rather than a lack of it. Fastest route: when a sentence explicitly says a quality was exercised "carefully" alongside a description of evasiveness, the blank must mean deliberate vagueness, not mere bluntness or spontaneity.'
+  },
+  {
+    id: 'apti-verbal-y7',
+    q: 'Passage: "Not all engineers are excellent programmers, but every excellent programmer at the firm holds an engineering degree." Which of the following must be true based on this passage?',
+    options: [
+      'Some engineers are not excellent programmers.',
+      'All engineers are excellent programmers.',
+      'No engineers are excellent programmers.',
+      'Excellent programmers do not need an engineering degree.'
+    ],
+    answer: 0,
+    marks: 1,
+    difficulty: 'hard',
+    type: 'concept',
+    explanation: 'The phrase "not all engineers are excellent programmers" is logically identical in meaning to "some engineers are not excellent programmers" — this is a direct restatement, not an inference requiring extra reasoning. The second clause, that every excellent programmer holds an engineering degree, is a separate one-directional conditional and does not by itself imply anything about whether all, none, or some engineers are excellent programmers, ruling out options 1 and 2. Option 3 directly contradicts the second clause. Fastest route: check first whether any option is simply a rephrasing of a given statement using standard logical equivalences ("not all X are Y" = "some X are not Y") before searching for a more complex derived inference.'
+  },
+  {
+    id: 'apti-verbal-y8',
+    q: "A nutritionist argues: 'Every long-distance runner I have studied eats a high-carbohydrate diet the night before a race. Therefore, eating a high-carbohydrate diet the night before a race is necessary to run long distances successfully.' Which of the following best identifies a flaw in the nutritionist's reasoning?",
+    options: [
+      'It assumes that a practice common among a studied group is therefore necessary for success in that activity.',
+      'It fails to define what counts as a long-distance race.',
+      'It does not specify the exact quantity of carbohydrates consumed.',
+      'It contradicts established nutritional science.'
+    ],
+    answer: 0,
+    marks: 2,
+    difficulty: 'hard',
+    type: 'concept',
+    explanation: 'The nutritionist observed a pattern common to a sample of runners and then leaped from "commonly practiced by successful runners" to "necessary for success," without ruling out that success could occur without this practice, or that the practice is merely correlated with (rather than a cause of) success. This is a classic sampling-to-necessity overreach: observing that X is present in every studied case of Y does not establish that X is required for Y, since the sample may be incomplete or the two may share an unrelated common cause. Options 1 and 2 raise minor definitional nitpicks that do not address the core logical leap, and option 3 is an unsupported claim not implied by the passage. Fastest route: whenever an argument moves from "every case I observed has property X" to "X is necessary," check whether the argument has actually shown that success is impossible without X, which it almost never does.'
   }
 );
 
@@ -1579,6 +1689,94 @@ window.GATE_DATA.questions['apti'].topics.find(function(t){return t.id==='apti-d
     difficulty: 'hard',
     type: 'concept',
     explanation: 'Apply the straight-run rule to the horizontal strip B, C, D, E (positions 1, 2, 3, 4): the 1st and 3rd squares are opposite, giving B opposite D, and the 2nd and 4th squares are opposite, giving C opposite E. This accounts for two of the three opposite pairs among the six faces using the reliable strip rule alone. The two remaining squares, A and F, have not yet been paired with anything, since each is attached to a different square (A above C, F below D) rather than sharing one attachment point, so a fresh straight-run cannot be formed between them directly. However, since a cube has exactly three pairs of opposite faces and two pairs are already accounted for, the only two faces left over, A and F, must form the third and final pair by elimination, so F is opposite A.'
+  },
+  {
+    id: 'apti-data-spatial-y1',
+    q: "A company's quarterly revenue (in Rs. lakh) is: Branch A: Q1 = 40, Q2 = 55; Branch B: Q1 = 60, Q2 = 66; Branch C: Q1 = 50, Q2 = 45; Branch D: Q1 = 70, Q2 = 77. For how many of these branches did the revenue growth from Q1 to Q2 exceed 10%? (Enter your numerical answer.)",
+    options: [],
+    answer: 1,
+    kind: 'nat',
+    marks: 2,
+    difficulty: 'hard',
+    type: 'numerical',
+    explanation: "Compute each branch's growth ratio: A = 55/40 = 1.375, a 37.5% rise, which exceeds 10%. B = 66/60 = 1.10, exactly a 10% rise, not strictly exceeding it. C = 45/50 = 0.90, a fall, not a rise at all. D = 77/70 = 1.10, exactly 10%, also not exceeding. Only Branch A strictly exceeds a 10% growth rate, so the count is 1. Fastest route: convert each Q2/Q1 ratio to a percentage change in one division per branch, and be careful with the word 'exceed' — an exact 10% growth does not count, since it is equal to, not greater than, the threshold."
+  },
+  {
+    id: 'apti-data-spatial-y2',
+    q: "A student's marks (out of 100) with subject credit weights are: Maths 80 (weight 4), Physics 70 (weight 3), Chemistry 90 (weight 2), English 60 (weight 1). What is the weighted average percentage mark, rounded to the nearest whole number? (Enter your numerical answer.)",
+    options: [],
+    answer: 77,
+    kind: 'nat',
+    marks: 2,
+    difficulty: 'hard',
+    type: 'numerical',
+    explanation: 'Weighted average = (sum of mark x weight) / (sum of weights). Numerator = 80x4 + 70x3 + 90x2 + 60x1 = 320 + 210 + 180 + 60 = 770. Denominator = 4 + 3 + 2 + 1 = 10. Weighted average = 770/10 = 77. Fastest route: multiply each mark by its weight and add all products in one running total before dividing once by the total weight, rather than computing a plain unweighted average, which would wrongly treat every subject as equally important.'
+  },
+  {
+    id: 'apti-data-spatial-y3',
+    q: 'A cube of side 4 cm is painted red on all six faces and then cut into 1 cm x 1 cm x 1 cm smaller cubes. How many of the smaller cubes have exactly one face painted? (Enter your numerical answer.)',
+    options: [],
+    answer: 24,
+    kind: 'nat',
+    marks: 2,
+    difficulty: 'hard',
+    type: 'concept',
+    explanation: 'For an n x n x n cube cut into unit cubes, the small cubes with exactly one painted face lie in the interior of each face (excluding the edge and corner cubes of that face), and there are (n-2)^2 such cubes per face, across all 6 faces. Here n = 4, so (n-2)^2 = 2^2 = 4 per face, and 6 faces give 6 x 4 = 24. Fastest route: memorize the three standard cube-cutting counts directly — corner cubes (3 faces painted) = 8 always, edge cubes (2 faces painted) = 12(n-2), face cubes (1 face painted) = 6(n-2)^2, interior cubes (0 faces painted) = (n-2)^3 — and simply substitute n, rather than counting positions manually.'
+  },
+  {
+    id: 'apti-data-spatial-y4',
+    q: 'A cube of side 5 cm is painted on all six faces and then cut into 1 cm x 1 cm x 1 cm smaller cubes. How many of the smaller cubes have no face painted at all? (Enter your numerical answer.)',
+    options: [],
+    answer: 27,
+    kind: 'nat',
+    marks: 2,
+    difficulty: 'hard',
+    type: 'concept',
+    explanation: 'Unpainted small cubes form the solid interior block once the outer painted layer is removed from all six sides, giving a smaller cube of side (n-2) units. Here n = 5, so the interior cube has side 3, containing 3^3 = 27 unit cubes. Fastest route: use the memorized formula (n-2)^3 for zero-painted-face cubes directly instead of visualizing layer removal each time; it applies for any n >= 2, and gives 0 automatically whenever n is 2 or less, since there is no interior left to unpaint.'
+  },
+  {
+    id: 'apti-data-spatial-y5',
+    q: 'A table lists the number of defective items found in five inspection batches: Batch 1 = 3, Batch 2 = 7, Batch 3 = 5, Batch 4 = 9, Batch 5 = 6. If each defective item costs the company Rs. 250 to rework, what is the total rework cost for all batches combined, in rupees? (Enter your numerical answer.)',
+    options: [],
+    answer: 7500,
+    kind: 'nat',
+    marks: 1,
+    difficulty: 'medium',
+    type: 'numerical',
+    explanation: 'First sum the defective counts across all batches: 3 + 7 + 5 + 9 + 6 = 30. Then multiply the total count by the per-item cost: 30 x 250 = 7500. Fastest route: always total the quantity column first and multiply once by the unit rate at the end, rather than computing a rework cost per batch and adding five separate products, which takes longer and multiplies the chance of an arithmetic slip.'
+  },
+  {
+    id: 'apti-data-spatial-y6',
+    q: 'Starting from point P, a man walks 8 km north, then 6 km east, then 8 km south. What is the shortest distance, in km, between his final position and point P? (Enter your numerical answer.)',
+    options: [],
+    answer: 6,
+    kind: 'nat',
+    marks: 1,
+    difficulty: 'medium',
+    type: 'concept',
+    explanation: 'Track net displacement along each axis separately: north-south movement is 8 km north then 8 km south, which cancels exactly to a net vertical displacement of 0. East-west movement is a single 6 km east, giving a net horizontal displacement of 6 km. With zero net vertical displacement, the straight-line distance from P equals the horizontal displacement alone, which is 6 km. Fastest route: sum all north/south moves and all east/west moves separately into two net values first, and only invoke the Pythagorean theorem (hypotenuse of the two nets) when both net values are non-zero; here one net value is exactly zero, so the answer is simply the other leg.'
+  },
+  {
+    id: 'apti-data-spatial-y7',
+    q: 'A survey of 200 people recorded their preferred mode of commute: Car = 60, Bus = 50, Bike = 40, Walk = 30, Other = 20. What percentage of respondents preferred either Bus or Bike? (Enter your numerical answer.)',
+    options: [],
+    answer: 45,
+    kind: 'nat',
+    marks: 1,
+    difficulty: 'medium',
+    type: 'numerical',
+    explanation: 'Add the Bus and Bike counts: 50 + 40 = 90. Express this as a percentage of the total 200 respondents: (90/200) x 100 = 45%. Fastest route: for an "either/or" share question on a frequency table, add only the relevant category counts first and divide by the grand total once, rather than computing each category\'s percentage separately and adding the two percentages, which is an extra, unnecessary step.'
+  },
+  {
+    id: 'apti-data-spatial-y8',
+    q: 'A cyclist starts at point X, rides 5 km east, then 12 km north, then 5 km west, then 4 km north. What is the straight-line distance, in km, from X to the cyclist\'s final position? (Enter your numerical answer.)',
+    options: [],
+    answer: 16,
+    kind: 'nat',
+    marks: 2,
+    difficulty: 'hard',
+    type: 'concept',
+    explanation: 'Track east-west and north-south movement separately: 5 km east followed later by 5 km west cancels exactly, giving a net east-west displacement of 0. The two northward legs add directly: 12 km + 4 km = 16 km net displacement north. Since the net east-west component is zero, the straight-line distance from X equals the net north-south displacement alone, which is 16 km. Fastest route: net out same-axis movements (east cancels west, north adds with north) before reaching for the Pythagorean theorem; a theorem is only needed when both final net components are non-zero.'
   }
 );
 

@@ -1786,3 +1786,262 @@ window.GATE_DATA.questions['coa'].topics.find(function(t){return t.id==='coa-dat
     explanation: 'The clock period must be at least as long as the sum of all delays that must complete within one control step: 8 + 2 + 1 + 1 = 12 ns. This is the standard rule that the clock period equals the worst-case combinational path delay between clocked registers, not any single component in isolation. With 5 control steps needed to complete the instruction, total execution time = (number of control steps) × (clock period) = 5 × 12 = 60 ns. A common error is using only the largest individual delay (8 ns) as the clock period instead of summing all delays that occur serially within one control step.'
   }
 );
+
+window.GATE_DATA.questions['coa'].topics.find(function(t){return t.id==='coa-pipelining';}).questions.push(
+  {
+    id: 'coa-pipelining-y1',
+    q: 'Which of the following statements about hazards in a simple 5-stage in-order pipeline (single write-back stage, in-order issue and completion) are TRUE? (Select ALL that apply)',
+    options: [
+      'A RAW (Read After Write) hazard can occur when an instruction needs a register value that an earlier, not-yet-completed instruction has not yet produced.',
+      'A WAR (Write After Read) hazard can occur in this simple in-order pipeline because instructions may read their source registers out of program order.',
+      'A structural hazard arises when two instructions in different pipeline stages require the same hardware resource in the same clock cycle.',
+      'A control hazard arises because the branch outcome and target address may not be known until several stages after the branch is fetched.'
+    ],
+    answers: [0, 2, 3],
+    marks: 2,
+    difficulty: 'medium',
+    type: 'concept',
+    explanation: 'Option 1 is true: this is the defining RAW/true-dependency hazard, the only hazard type that reflects a genuine program dependency. Option 2 is FALSE: in a simple in-order pipeline where every instruction reads its operands in the same relative stage and writes back in the same relative (later) stage, in program order, a later instruction can never read a register before an earlier instruction that is still ahead of it has read its own — WAR hazards require reads and writes to complete out of program order, which cannot happen here. Option 3 is true: this is the standard definition of a structural hazard, e.g., a shared single memory port needed by both instruction fetch and a data access in the same cycle. Option 4 is true: control hazards exist precisely because branch resolution typically happens in a later stage than fetch, leaving the fetch stage uncertain about which instruction to fetch next.'
+  },
+  {
+    id: 'coa-pipelining-y2',
+    q: 'Which of the following statements about forwarding (bypassing) in a pipelined datapath are TRUE? (Select ALL that apply)',
+    options: [
+      'Forwarding routes a result directly from a pipeline stage\'s output latch to an earlier stage\'s input, without waiting for a register-file write and subsequent read.',
+      'With full EX/MEM-to-EX and MEM/WB-to-EX forwarding paths, a load-use hazard in a classic 5-stage pipeline can always be completely eliminated with zero stall cycles.',
+      'MEM/WB-to-EX forwarding supplies a value produced by the instruction two positions earlier in program order to the instruction currently in the EX stage.',
+      'Forwarding alone is sufficient to make WAR and WAW hazards impossible in any pipelined processor, including out-of-order designs.'
+    ],
+    answers: [0, 2],
+    marks: 2,
+    difficulty: 'medium',
+    type: 'concept',
+    explanation: 'Option 1 is true: this is the definition of forwarding/bypassing — it exists specifically to skip the register-file round trip. Option 2 is FALSE: a LOAD produces its result only at the end of the MEM stage, but an immediately following dependent instruction needs that value at the start of its own EX stage, one cycle earlier than any forwarding path can deliver it — exactly one stall cycle remains unavoidable in the classic 5-stage design unless the compiler fills the slot with independent work. Option 3 is true: EX/MEM-to-EX forwarding covers the immediately preceding instruction, while MEM/WB-to-EX forwarding covers the instruction two positions earlier. Option 4 is FALSE: forwarding is a data-hazard mitigation technique for RAW dependencies in the pipeline\'s normal data path; WAR and WAW hazards are a separate concern that arises specifically in out-of-order or multi-write-port designs, and forwarding paths do not by themselves prevent those from existing in such designs.'
+  },
+  {
+    id: 'coa-pipelining-y3',
+    q: 'Which of the following statements about control-hazard handling techniques are TRUE? (Select ALL that apply)',
+    options: [
+      'Under a predict-not-taken scheme, a pipeline penalty is incurred only when the branch turns out to actually be taken.',
+      'Under a predict-taken scheme, a pipeline penalty is incurred only when the branch turns out to actually not be taken (i.e., on misprediction).',
+      'Delayed branching relies on the compiler filling the delay slot(s) after a branch with instruction(s) that must execute regardless of the branch outcome.',
+      'Simply stalling the pipeline until every branch resolves has zero performance cost, since the pipeline remains fully utilized during the wait.'
+    ],
+    answers: [0, 1, 2],
+    marks: 2,
+    difficulty: 'medium',
+    type: 'concept',
+    explanation: 'Option 1 is true: predict-not-taken speculatively fetches the fall-through path, so a penalty (flush) only occurs when the branch is actually taken and the speculation was wrong. Option 2 is true: predict-taken speculatively fetches from the branch target, so a penalty only occurs when the branch is not taken after all. Option 3 is true: this is exactly how delayed branching hides part of the control hazard — useful independent work is scheduled into the slot(s) that execute unconditionally. Option 4 is FALSE: stalling until resolution means the pipeline fetches no useful new instructions for that many cycles — those cycles are pure lost throughput (the branch penalty), not full utilization.'
+  },
+  {
+    id: 'coa-pipelining-y4',
+    q: 'A processor has an 8-stage pipeline. It executes 200 instructions with no stalls. What is the total pipelined execution time, measured in clock cycles? (Enter your numerical answer.)',
+    options: [],
+    answer: 207,
+    kind: 'nat',
+    marks: 1,
+    difficulty: 'easy',
+    type: 'numerical',
+    explanation: 'Ideal (no-stall) pipelined execution time for n instructions on a k-stage pipeline is (k + n − 1) cycles: the first instruction takes k cycles to clear all stages, and thereafter one additional instruction completes every subsequent cycle. Here k = 8, n = 200, so total = 8 + 200 − 1 = 207 cycles. The common error is using k × n (500 × ... no, 8×200=1600, the fully sequential non-pipelined figure) instead of the pipelined formula, or forgetting the "−1" and reporting 208.'
+  },
+  {
+    id: 'coa-pipelining-y5',
+    q: 'A 5-stage pipelined CPU has a base CPI of 1. 20% of all instructions are load instructions immediately followed by a dependent instruction, each incurring exactly 1 stall cycle (load-use hazard), and 5% of all instructions are taken branches incurring exactly 1 stall cycle each. The equivalent non-pipelined machine has a CPI of 5, and both machines use the same clock period. What is the resulting speedup of the pipelined machine over the non-pipelined machine? (Enter your numerical answer.)',
+    options: [],
+    answer: 4,
+    kind: 'nat',
+    marks: 2,
+    difficulty: 'medium',
+    type: 'numerical',
+    explanation: 'CPIpipelined = base CPI + stall contributions = 1 + (0.20 × 1) + (0.05 × 1) = 1 + 0.20 + 0.05 = 1.25. Since both machines share the same clock period, Speedup = CPInon-pipelined / CPIpipelined = 5 / 1.25 = 4. This is the standard two-step GATE computation: first build up CPIpipelined from every hazard\'s frequency times its per-occurrence penalty, then divide the reference (non-pipelined) CPI by it. Forgetting to add both hazard contributions (using only one of the two 20%/5% terms) is the usual source of error.'
+  },
+  {
+    id: 'coa-pipelining-y6',
+    q: 'In a classic 5-stage pipeline (IF, ID, EX, MEM, WB) with full forwarding implemented (EX/MEM-to-EX and MEM/WB-to-EX), a LOAD instruction is immediately followed in program order by an ADD instruction that uses the loaded register as a source operand. How many stall (bubble) cycles must be inserted before the ADD can proceed through EX? (Enter your numerical answer.)',
+    options: [],
+    answer: 1,
+    kind: 'nat',
+    marks: 1,
+    difficulty: 'easy',
+    type: 'numerical',
+    explanation: 'The LOAD\'s value is only available at the end of its MEM stage. The immediately following ADD needs that value at the start of its own EX stage, which — with no stall — would occur one cycle before the LOAD\'s MEM stage completes. Even with full forwarding available, this exact one-cycle gap (the "load-use hazard") cannot be closed by any forwarding path, since there is nothing yet computed to forward earlier; exactly one stall cycle must be inserted (unless the compiler reorders code to fill it with independent work), after which MEM/WB or EX/MEM forwarding delivers the value in time.'
+  }
+);
+
+window.GATE_DATA.questions['coa'].topics.find(function(t){return t.id==='coa-memory';}).questions.push(
+  {
+    id: 'coa-memory-y1',
+    q: 'Which of the following statements about cache mapping schemes are TRUE? (Select ALL that apply)',
+    options: [
+      'In a direct-mapped cache, each main-memory block maps to exactly one specific cache line, determined by the block\'s index bits.',
+      'A fully associative cache has no index field at all; the entire address portion beyond the block offset serves as the tag.',
+      'An n-way set-associative cache reduces to a direct-mapped cache when n = 1, and reduces to a fully associative cache when the number of sets equals 1.',
+      'For a fixed total cache size and fixed block size, increasing the associativity increases the number of sets in the cache.'
+    ],
+    answers: [0, 1, 2],
+    marks: 2,
+    difficulty: 'medium',
+    type: 'concept',
+    explanation: 'Option 1 is true: direct mapping computes a fixed line index from the address, so every block that maps there must use that exact line, causing conflict misses when multiple blocks collide. Option 2 is true: fully associative placement allows a block to occupy any line, so there is no index field — the full remaining address is the tag, searched associatively across all lines. Option 3 is true: direct-mapped and fully associative are the two extreme special cases of n-way set-associative mapping (n = 1 and number-of-sets = 1 respectively). Option 4 is FALSE and reversed: for fixed cache size and block size, number of sets = (cache size / block size) / n, so INCREASING n (associativity) DECREASES the number of sets, not increases it — it increases the number of lines grouped per set instead.'
+  },
+  {
+    id: 'coa-memory-y2',
+    q: 'Which of the following statements about cache write policies are TRUE? (Select ALL that apply)',
+    options: [
+      'Write-through updates both the cache and main memory on every single write, keeping main memory always consistent with the cache.',
+      'Write-back marks a modified cache line as dirty and defers writing it to main memory until that line is evicted.',
+      'For a write-heavy workload with good locality (many repeated writes to the same block before eviction), write-through typically generates LESS total memory-bus traffic than write-back.',
+      'Write-allocate (fetch-on-write-miss) is typically paired with write-back, while no-write-allocate (write-around) is typically paired with write-through.'
+    ],
+    answers: [0, 1, 3],
+    marks: 2,
+    difficulty: 'medium',
+    type: 'concept',
+    explanation: 'Option 1 is true: this is the definition of write-through, guaranteeing memory consistency at the cost of traffic on every write. Option 2 is true: this is the definition of write-back — traffic to memory happens only at eviction, and only if the dirty bit is set. Option 3 is FALSE and backwards: with good locality, a block absorbs many writes in the cache before eventually being written back just once under write-back, whereas write-through pushes every single one of those writes to memory immediately — write-back generates dramatically LESS traffic in exactly this scenario. Option 4 is true: write-allocate brings the block into the cache on a write miss so subsequent writes hit in the cache (pairing naturally with write-back\'s deferred-traffic philosophy), while no-write-allocate sends the write straight to memory without caching it (pairing naturally with write-through, which is already going to memory on every write regardless).'
+  },
+  {
+    id: 'coa-memory-y3',
+    q: 'Which of the following statements about cache replacement policies are TRUE? (Select ALL that apply)',
+    options: [
+      'LRU (Least Recently Used) evicts the line that has gone unused for the longest time, requiring extra recency-tracking hardware/bits per set.',
+      'FIFO evicts the oldest-loaded line in the set, regardless of how recently it was actually accessed.',
+      'Belady\'s optimal (MIN) replacement algorithm is directly implementable in real online hardware because it only needs the recent access history, not future accesses.',
+      'Random replacement is generally the most expensive of LRU, FIFO, and Random to implement in hardware.'
+    ],
+    answers: [0, 1],
+    marks: 2,
+    difficulty: 'medium',
+    type: 'concept',
+    explanation: 'Option 1 is true: LRU exploits temporal locality by tracking recency, but that tracking cost (counters or stack bits per set) grows with associativity. Option 2 is true: FIFO simply evicts based on load order, ignoring subsequent accesses entirely, which is why it can sometimes evict a heavily-reused line. Option 3 is FALSE: Belady\'s MIN algorithm evicts the line that will NOT be used for the longest time in the FUTURE — this requires knowledge of the future reference sequence, which is not available online, so it serves only as a theoretical lower-bound benchmark, never an implementable real policy. Option 4 is FALSE and reversed: random replacement needs no recency or order tracking at all, making it the CHEAPEST of the three to implement, while LRU is the most expensive due to its tracking hardware.'
+  },
+  {
+    id: 'coa-memory-y4',
+    q: 'A two-level cache system has: L1 hit time = 2 ns, L1 local miss rate = 8%; L2 hit time = 15 ns, L2 local miss rate = 25% (of requests that reach L2); main memory access time = 100 ns. What is the Average Memory Access Time (AMAT) in ns? (Enter your numerical answer.)',
+    options: [],
+    answer: 5.2,
+    kind: 'nat',
+    marks: 2,
+    difficulty: 'medium',
+    type: 'numerical',
+    tolerance: 0.05,
+    explanation: 'AMAT = L1 hit time + L1 miss rate × (L2 hit time + L2 local miss rate × Main memory time) = 2 + 0.08 × (15 + 0.25 × 100) = 2 + 0.08 × (15 + 25) = 2 + 0.08 × 40 = 2 + 3.2 = 5.2 ns. The L2 miss rate used here must be the LOCAL rate (misses among requests that already missed L1), not the global rate; using the global rate (0.08 × 0.25 = 0.02) directly against main memory time alone, while skipping the L2 hit-time term, is the usual error that produces a wrong lower figure.'
+  },
+  {
+    id: 'coa-memory-y5',
+    q: 'A byte-addressable main memory is 1 GB (2^30 bytes). A direct-mapped cache has a total size of 64 KB (2^16 bytes) with a block size of 32 bytes (2^5 bytes). How many tag bits are in each cache line\'s address partition? (Enter your numerical answer.)',
+    options: [],
+    answer: 14,
+    kind: 'nat',
+    marks: 2,
+    difficulty: 'medium',
+    type: 'numerical',
+    explanation: 'Total address width = log2(2^30) = 30 bits. Offset bits o = log2(block size) = log2(32) = 5. Number of cache lines = cache size / block size = 2^16 / 2^5 = 2^11 = 2048, so index bits i = log2(2048) = 11. Tag bits t = total address bits − index bits − offset bits = 30 − 11 − 5 = 14. Address layout check: 14 + 11 + 5 = 30 ✓. A common mistake is using the cache size directly as if it were the number of lines (forgetting to divide by block size first) when computing the index-bit count.'
+  },
+  {
+    id: 'coa-memory-y6',
+    q: 'A CPU\'s L1 cache has a miss rate of 5% (fraction of all CPU memory references that miss L1). Of those L1 misses, the L2 cache\'s local miss rate is 40% (fraction of L1-miss requests that also miss L2). What is the GLOBAL miss rate of L2, expressed as a percentage of ALL original CPU memory references (e.g., enter 5 to mean 5%)? (Enter your numerical answer.)',
+    options: [],
+    answer: 2,
+    kind: 'nat',
+    marks: 2,
+    difficulty: 'medium',
+    type: 'numerical',
+    explanation: 'Global L2 miss rate = L1 miss rate × L2 local miss rate = 0.05 × 0.40 = 0.02 = 2% of all original CPU references miss both L1 and L2. The trap here is confusing this global figure with the given local figure (40%) — the local rate is relative only to requests that ALREADY missed L1, while the global rate is relative to the entire original reference stream, and the two are related by exactly this multiplication, never by addition or by using either rate alone.'
+  }
+);
+
+window.GATE_DATA.questions['coa'].topics.find(function(t){return t.id==='coa-io';}).questions.push(
+  {
+    id: 'coa-io-y1',
+    q: 'Which of the following statements comparing programmed I/O, interrupt-driven I/O, and DMA are TRUE? (Select ALL that apply)',
+    options: [
+      'Programmed I/O requires the CPU to busy-wait (poll) a device status bit before it can transfer each data item.',
+      'Interrupt-driven I/O allows the CPU to perform other useful work between successive data transfers, unlike pure programmed I/O.',
+      'DMA still requires the CPU itself to move every individual data word between the device and memory, exactly as in programmed I/O.',
+      'DMA typically interrupts the CPU only once, at the completion of an entire block transfer, rather than once per transferred word.'
+    ],
+    answers: [0, 1, 3],
+    marks: 2,
+    difficulty: 'medium',
+    type: 'concept',
+    explanation: 'Option 1 is true: programmed I/O\'s defining trait is the CPU actively spinning on a status/ready bit before every single transfer. Option 2 is true: interrupt-driven I/O frees the CPU to execute other instructions until the device signals readiness, which is precisely its advantage over busy-waiting programmed I/O. Option 3 is FALSE: DMA\'s entire purpose is to offload data movement to a dedicated DMA controller, which drives the buses directly between device and memory without CPU involvement in each word\'s transfer — the CPU only sets up the transfer beforehand. Option 4 is true: the DMA controller notifies the CPU with a single interrupt only when the whole programmed block transfer is complete, drastically reducing interrupt overhead compared to interrupting once per word.'
+  },
+  {
+    id: 'coa-io-y2',
+    q: 'Which of the following statements about interrupt mechanisms are TRUE? (Select ALL that apply)',
+    options: [
+      'In vectored interrupts, the interrupting device itself supplies, or is used to directly look up, the address of its own interrupt service routine.',
+      'In non-vectored interrupts, all interrupt sources share one fixed common entry address, and software must then poll devices in priority order to find the actual source.',
+      'Interrupt latency depends only on the time to jump to the ISR address and never depends on finishing the currently executing instruction.',
+      'Daisy-chaining and vectored-priority schemes are hardware techniques used to resolve priority among multiple simultaneous interrupt requests.'
+    ],
+    answers: [0, 1, 3],
+    marks: 2,
+    difficulty: 'medium',
+    type: 'concept',
+    explanation: 'Option 1 is true: vectoring specifically means the device identifies its own ISR address (directly or via a small vector table), avoiding a software search. Option 2 is true: without vectoring, every interrupt lands at the same fixed handler, which must then poll each device in a fixed priority order to determine who actually requested service. Option 3 is FALSE: interrupt latency includes the time for the CPU to finish (or at least reach a safe boundary in) its current instruction and save the necessary state before it can even begin jumping to the ISR — it is not simply the jump time alone. Option 4 is true: both are hardware-arbitration mechanisms specifically designed to grant/acknowledge the highest-priority pending interrupt request when several arrive together.'
+  },
+  {
+    id: 'coa-io-y3',
+    q: 'Which of the following statements about DMA-based data transfer are TRUE? (Select ALL that apply)',
+    options: [
+      'In cycle stealing, the DMA controller takes individual memory bus cycles only when the CPU is not using the bus, or by briefly delaying the CPU cycle by cycle.',
+      'In burst/block mode DMA, the controller holds the memory bus for the entire transfer\'s duration, fully blocking ordinary CPU-memory accesses during that period.',
+      'The fraction of memory bandwidth consumed by a cycle-stealing DMA controller is computed by dividing the DMA transfer rate by the CPU\'s instruction execution clock rate.',
+      'Effective CPU execution time increases under active DMA cycle stealing, because a fraction of the memory cycles the CPU needs are instead consumed by the DMA controller.'
+    ],
+    answers: [0, 1, 3],
+    marks: 2,
+    difficulty: 'medium',
+    type: 'concept',
+    explanation: 'Option 1 is true: this is the defining behaviour of cycle stealing — fine-grained, per-cycle bus sharing rather than a long exclusive hold. Option 2 is true: burst/block mode trades CPU responsiveness for transfer speed by holding the bus continuously until the whole block completes. Option 3 is FALSE: the correct denominator is the MEMORY cycle rate (1 / memory cycle time), since the contention being measured is specifically for memory bus cycles, not for CPU instruction-execution cycles — using the CPU clock rate gives a physically wrong fraction. Option 4 is true: every memory cycle taken by the DMA controller is one the CPU\'s own instruction stream cannot use that cycle, stretching out the CPU\'s effective execution time proportionally to the fraction of cycles stolen.'
+  },
+  {
+    id: 'coa-io-y4',
+    q: 'A DMA controller transfers data at a rate of 2 × 10^6 words per second, consuming exactly one memory cycle per word transferred. The main memory cycle time is 100 ns. If a CPU task would take 20 ms of computation with no DMA activity, what is the effective time (in ms) for that task while the DMA transfer is active? (Enter your numerical answer.)',
+    options: [],
+    answer: 25,
+    kind: 'nat',
+    marks: 2,
+    difficulty: 'medium',
+    type: 'numerical',
+    explanation: 'Memory can perform 1 / (100 × 10^-9 s) = 1 × 10^7 cycles per second. Fraction of memory cycles stolen by DMA = (2 × 10^6) / (1 × 10^7) = 0.2 = 20%. Effective CPU task time = original time / (1 − fraction stolen) = 20 ms / (1 − 0.2) = 20 / 0.8 = 25 ms. The frequent slip is dividing by the CPU\'s own clock rate instead of the memory cycle rate, or forgetting to divide by (1 − fraction) and instead simply adding the fraction\'s worth of extra time.'
+  },
+  {
+    id: 'coa-io-y5',
+    q: 'A disk rotates at 6000 RPM, has 400 sectors per track, and has an average seek time of 6 ms. What is the average service time (in ms) to read one randomly located sector, counting seek time plus average rotational latency plus the transfer time for that single sector? (Enter your numerical answer.)',
+    options: [],
+    answer: 11.025,
+    kind: 'nat',
+    marks: 2,
+    difficulty: 'medium',
+    type: 'numerical',
+    tolerance: 0.01,
+    explanation: 'Time for one full revolution = 60 / RPM = 60 / 6000 = 0.01 s = 10 ms. Average rotational latency = half a revolution = 10 / 2 = 5 ms. Transfer time per sector = (time per revolution) / (sectors per track) = 10 ms / 400 = 0.025 ms. Total service time = seek + rotational latency + transfer = 6 + 5 + 0.025 = 11.025 ms. A common slip is forgetting the average rotational latency is HALF a revolution (using the full 10 ms instead of 5 ms), or converting RPM to seconds incorrectly by using 1/RPM instead of 60/RPM.'
+  },
+  {
+    id: 'coa-io-y6',
+    q: 'An interrupt-driven I/O scheme incurs a fixed overhead of 200 CPU cycles per interrupt (covering state save, dispatch to the ISR, and state restore), and the device generates exactly one interrupt per word transferred. To transfer a block of 5000 words this way, how many CPU cycles are spent purely on interrupt overhead (excluding the cycles used for the actual data-movement instructions inside each ISR)? (Enter your numerical answer.)',
+    options: [],
+    answer: 1000000,
+    kind: 'nat',
+    marks: 1,
+    difficulty: 'easy',
+    type: 'numerical',
+    explanation: 'Each of the 5000 words triggers one interrupt, and each interrupt costs a fixed 200 cycles of pure overhead (independent of the data-movement instructions themselves). Total overhead = 5000 × 200 = 1,000,000 cycles. This stark number is exactly why interrupt-driven I/O is unattractive for very frequent, small transfers compared to DMA, which would incur this per-event overhead only once for the entire block rather than once per word.'
+  }
+);
+
+window.GATE_DATA.questions['coa'].topics.find(function(t){return t.id==='coa-pipelining';}).questions.push(
+  {
+    id: 'coa-pipelining-z7',
+    q: 'A 5-stage pipelined processor (clock period 2 ns) has a base CPI of 1. Its L1 instruction cache has a miss rate of 4%, and every I-cache miss stalls the pipeline for 20 extra cycles (miss penalty). Separately, 10% of instructions are taken branches with a 2-cycle penalty each under predict-not-taken. What is the average time (in ns) to execute one instruction? (Enter your numerical answer.)',
+    options: [],
+    answer: 4,
+    kind: 'nat',
+    marks: 2,
+    difficulty: 'hard',
+    type: 'numerical',
+    explanation: 'This combines a cache-miss-driven CPI penalty with a branch-hazard CPI penalty into one effective CPI. I-cache miss contribution to CPI = miss rate × miss penalty = 0.04 × 20 = 0.80. Branch contribution to CPI = branch frequency × branch penalty = 0.10 × 2 = 0.20. Effective CPI = base CPI + cache contribution + branch contribution = 1 + 0.80 + 0.20 = 2.00. Average execution time per instruction = CPI × clock period = 2.00 × 2 ns = 4.00 ns. The trap is forgetting to add BOTH penalty sources into the same CPI before multiplying by the clock period, or multiplying each penalty by the clock period separately and then mismanaging the base-CPI term.'
+  }
+);
