@@ -78,7 +78,22 @@ Source: [GoClasses analysis](https://www.goclasses.in/blog/a-strategic-analysis-
 
 ## 7. ACTIONABLE FOR THE APP
 
-(To be filled after full research pass.)
+Derived from the pattern data above plus 2026 shift analyses ([PW Live](https://www.pw.live/gate/exams/gate-exam-analysis-2026), [Collegedunia](https://collegedunia.com/exams/gate/paper-analysis), [Prepp](https://prepp.in/news/e-1529-gate-2026-analysis), [GoClasses](https://www.goclasses.in/blog/a-strategic-analysis-of-subject-wise-weightage-trends-in-gate-cse-2023-2025)). **Important new datapoint:** reported GATE 2026 CS shift analyses show a swing back to **~45 MCQ + ~20 NAT with MSQ count near zero in at least one shift** — the opposite of the 2024 MSQ peak (~20 MSQ). Treat the MCQ/MSQ/NAT split as *volatile per shift*, not a fixed constant; only 65 Q / 30×1-mark / 35×2-mark are safe to hard-code.
+
+1. **Default full-length mock composition (the "balanced 2023–2025 shape")**: 65 Q = **34 MCQ + 15 MSQ + 16 NAT**, locked to 30 one-mark + 35 two-mark. Ship this as the app's default template so a user's average mock matches the multi-year centroid rather than any single outlier year.
+2. **Ship three additional mock "profiles" instead of one fixed generator**, so students are never blindsided by a shift swing:
+   - *MSQ-heavy (2024-style)*: 30 MCQ / 20 MSQ / 15 NAT
+   - *MCQ+NAT-heavy (2026-style)*: 45 MCQ / 2 MSQ / 18 NAT
+   - *Balanced (default)*: 34 / 15 / 16
+   Rotate profiles across a user's mock series (e.g. 60% balanced, 20% each extreme) and surface the profile name post-attempt so students learn each format's rhythm.
+3. **Randomise the split within a band, not to a fixed number**: generate MCQ 30–45, MSQ 0–20, NAT 15–20, then clamp to 65. Hard-coding a single split trains a false expectation that the real exam has repeatedly broken.
+4. **Over-weight NAT drills in the numeric-heavy subjects** — dedicated NAT-only practice sets for **Computer Organization & Architecture** (cache hit/miss and effective access time, pipeline cycle counts, addressing/instruction size), **Operating Systems** (scheduling turnaround/waiting time, page-fault counts, semaphore/deadlock resource counts), **Computer Networks** (subnetting/CIDR block sizes, bandwidth-delay product, sliding-window efficiency, CRC), **Engineering Mathematics** (probability, expectation, linear algebra eigenvalues, combinatorics counting) and **DBMS** (relational-algebra/SQL tuple counts, B/B+ tree order and node counts). These five should carry roughly **2× the NAT density** of the rest of the syllabus in the question bank.
+5. **Over-weight MSQ drills in the statement-truth subjects** — **Theory of Computation** (closure properties, decidability, regular vs CFL membership), **Algorithms** (asymptotics, which greedy/DP claims hold), **Programming & Data Structures** (pointer/output "which are true" sets), **Digital Logic** (functional completeness, minimisation claims) and **Compiler Design** (LL/LR grammar properties). Target ~2× MSQ density here. Author these as 4-statement items with a *variable* number of correct options (1–4) so students cannot pattern-match on "usually two are right".
+6. **Score MSQ/NAT with zero negative marking and MCQ with −1/3 and −2/3, and expose an explicit "risk coach"**: because MSQ and NAT are free to guess, the app should flag every *unattempted* MSQ/NAT at review time as pure lost expected value, and separately flag MCQ guesses made below a confidence threshold. This single behavioural nudge is worth several marks and almost no competitor mock platform surfaces it.
+7. **Implement NAT answers as a tolerance band, never string equality**: store `answer ± tolerance` (default ±0.01, per-question override up to ±0.05, plus an integer-only mode), accept a leading `-`, strip trailing zeros, and reject non-numeric input at entry the way the real CBT does. Also record the *raw typed string* so analytics can distinguish a conceptual error from a rounding/precision error — the latter needs a totally different remediation.
+8. **Topic hot-spots to over-weight in the question bank** (highest marks-per-hour-of-study across 2021–2026): Programming & Data Structures (trees, heaps, graph traversal, pointer semantics — the fastest-rising subject, 6→15 marks), COA (cache + pipelining, reliably 8–12 marks), Computer Networks (TCP/IP layers, subnetting, flow control), Operating Systems (scheduling, synchronisation, virtual memory), and Discrete Maths/Engg Maths (~13 fixed marks — guaranteed return). Aptitude at a fixed 15 marks deserves a permanent daily 10-question drill: it is the cheapest 15 marks in the paper and is routinely under-practised.
+9. **Do not model inter-question dependencies** in the current-format generator (no linked/common-data pairs post-2016). Keep any such logic behind a separate "Legacy PYQ (pre-2016)" mode flag if that archive is ever added.
+10. **Track per-user accuracy separately by question type**, not just by subject. The failure modes are different: MCQ errors are usually concept gaps, MSQ errors are usually incomplete option-checking (student found one correct statement and stopped), and NAT errors are usually arithmetic/precision. Surface all three as separate lines on the analytics dashboard and route each to a different drill type.
 
 ---
 ## Sources
@@ -87,3 +102,7 @@ Source: [GoClasses analysis](https://www.goclasses.in/blog/a-strategic-analysis-
 - https://www.goclasses.in/blog/a-strategic-analysis-of-subject-wise-weightage-trends-in-gate-cse-2023-2025
 - https://www.gateexam.info/gate-subject-wise-weightage-for-cse-2025-2020/
 - https://www.pw.live/gate/exams/gate-cse-subject-wise-weightage
+- https://www.pw.live/gate/exams/gate-exam-analysis-2026
+- https://collegedunia.com/exams/gate/paper-analysis
+- https://prepp.in/news/e-1529-gate-2026-analysis
+- https://www.shiksha.com/engineering/gate-exam-analysis
