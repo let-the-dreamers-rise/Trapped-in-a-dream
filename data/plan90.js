@@ -100,23 +100,27 @@ window.GATE_DATA = window.GATE_DATA || {};
   days.sort(function (a, b) { return a.day - b.day; });
   window.GATE_DATA.plan = days;
 
-  // The daily 12-hour ADHD-friendly block template shown on the Today screen
+  // The daily 15-hour ADHD-friendly block template shown on the Today screen.
+  // 15 h is sustainable ONLY with real breaks, a nap, movement and 7 h sleep — skip those and week 3 breaks you.
   window.GATE_DATA.dayTemplate = [
-    '06:30–07:00  Wake, water, 10 min movement. No phone scrolling.',
-    '07:00–08:30  Block 1 — NEW theory (hardest thing first, brain is freshest)',
-    '08:30–09:00  Breakfast + walk (real break, not reels)',
-    '09:00–10:30  Block 2 — Questions on the theory you just read',
-    '10:30–10:50  Break',
-    '10:50–12:20  Block 3 — Questions continued / second topic theory',
-    '12:20–13:30  Lunch + 20 min nap (set alarm)',
-    '13:30–15:00  Block 4 — Topic quiz to 85% accuracy',
-    '15:00–15:20  Break',
-    '15:20–16:50  Block 5 — Mixed/PYQ-style practice',
-    '16:50–17:30  Exercise / shower',
-    '17:30–19:00  Block 6 — Wrong-answer redo queue',
-    '19:00–20:00  Dinner',
-    '20:00–21:00  Block 7 — Aptitude drills',
-    '21:00–21:45  Block 8 — Paper recall + formula sheet',
-    '21:45–22:30  Wind down. Same sleep time every night.'
+    '05:30–06:00  Wake, water, 10 min movement, cold face wash. No phone scrolling.',
+    '06:00–07:30  Block 1 — NEW theory (hardest topic first, brain is freshest)',
+    '07:30–08:00  Breakfast + walk (real break, not reels)',
+    '08:00–09:30  Block 2 — Questions on the theory you just read',
+    '09:30–09:45  Break (move, water)',
+    '09:45–11:15  Block 3 — Second topic theory (Deep dive)',
+    '11:15–11:30  Break',
+    '11:30–13:00  Block 4 — Questions on second topic',
+    '13:00–14:00  Lunch + 20 min nap (set alarm — the nap is mandatory)',
+    '14:00–15:30  Block 5 — Topic quiz to 85% accuracy',
+    '15:30–15:45  Break',
+    '15:45–17:15  Block 6 — Mixed/PYQ-style practice, timed',
+    '17:15–17:45  Exercise / shower (non-negotiable — this pays for the evening blocks)',
+    '17:45–19:15  Block 7 — Wrong-answer redo queue',
+    '19:15–20:00  Dinner',
+    '20:00–21:15  Block 8 — Aptitude drills + discrete warm-up',
+    '21:15–21:30  Break',
+    '21:30–22:30  Block 9 — Paper recall + formula sheet from memory',
+    '22:30–23:00  Wind down, same sleep time every night. 6.5 h sleep minimum.'
   ];
 })();
