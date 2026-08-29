@@ -1695,3 +1695,276 @@ window.GATE_DATA.questions['cn'].topics.find(function(t){return t.id==='cn-basic
   explanation: "First convert the SNR from decibels to a linear ratio: SNR(dB) = 10 log10(SNR_linear), so 30 = 10 log10(SNR_linear) gives SNR_linear = 10^3 = 1000. Shannon's capacity formula is C = B log2(1 + SNR_linear) = 4000 x log2(1001). Since log2(1001) = ln(1001)/ln(2) ≈ 6.9088/0.6931 ≈ 9.9676, C ≈ 4000 x 9.9676 ≈ 39,870 bits per second ≈ 39.87 kbps. A common error is plugging the SNR in decibels directly into log2(1 + SNR) without converting to the linear ratio first, which produces a drastically wrong (much smaller) capacity; because this involves an irrational logarithm, small rounding variation (roughly ±0.3 kbps) around 39.87 kbps should be accepted."
 }
 );
+
+
+window.GATE_DATA.questions['cn'].topics.find(function(t){return t.id==='cn-datalink';}).questions.push(
+{
+  id: "cn-datalink-z1",
+  q: "Which of the following statements about CRC (Cyclic Redundancy Check) error detection are TRUE? (Select ALL that apply)",
+  options: ["For a generator polynomial of degree r, the CRC remainder appended to the message is exactly r bits long", "CRC computation uses ordinary carry-based binary addition and subtraction rather than modulo-2 (XOR) arithmetic", "A CRC of degree r can detect all burst errors of length less than or equal to r", "If the generator polynomial has (x+1) as a factor, the CRC can detect all errors that flip an odd number of bits"],
+  answers: [0, 2, 3],
+  marks: 2,
+  difficulty: "medium",
+  type: "multi-select",
+  explanation: "Option one is TRUE: a generator of degree r produces a remainder of exactly r bits, which is why r zero bits are appended before division and then replaced by this r-bit remainder. Option two is FALSE: CRC division is performed with modulo-2 (XOR-based) arithmetic, which has no carries or borrows; this is precisely what makes CRC division efficient and well-defined regardless of overflow. Option three is TRUE: any burst error confined to r or fewer consecutive bits changes the received polynomial by an amount that is not divisible by a degree-r generator, so it is always caught. Option four is TRUE: a generator with (x+1) as a factor detects any error pattern with an odd number of inverted bits, because such a pattern, viewed as a polynomial, cannot be evenly divisible by (x+1) (an odd-weight polynomial never vanishes at x=1 in GF(2))."
+},
+{
+  id: "cn-datalink-z2",
+  q: "Consider Go-Back-N (GBN) and Selective Repeat (SR) protocols using n bits for sequence numbers. Which of the following statements are TRUE? (Select ALL that apply)",
+  options: ["The maximum sender window size for GBN is 2^n - 1", "The maximum sender window size for SR is 2^n - 1, the same as GBN", "In SR, the sender and receiver window sizes must satisfy Ws + Wr <= 2^n", "GBN requires the receiver to buffer out-of-order frames, while SR does not"],
+  answers: [0, 2],
+  marks: 2,
+  difficulty: "medium",
+  type: "multi-select",
+  explanation: "Option one is TRUE: GBN uses a cumulative-ACK receiver with an effective receiver window of 1, so the sender window is bounded by 2^n - 1 to avoid ambiguity between a new frame and a retransmitted old one. Option two is FALSE: SR's bound is stricter, Ws = Wr <= 2^(n-1) (half the sequence space), not 2^n - 1; conflating the two bounds is the most common error in this topic. Option three is TRUE: SR requires Ws + Wr <= 2^n so that the sender's and receiver's windows never overlap enough to make an old retransmitted frame look like a new one when the receiver buffers out-of-order arrivals. Option four is FALSE and reversed: it is SR that buffers out-of-order frames at the receiver so lost frames can be selectively retransmitted, while GBN's receiver discards any frame that is not the next expected one and relies on the sender going back N frames."
+}
+);
+
+
+window.GATE_DATA.questions['cn'].topics.find(function(t){return t.id==='cn-datalink';}).questions.push(
+{
+  id: "cn-datalink-z3",
+  q: "A stop-and-wait link has bandwidth 1 Mbps and one-way propagation delay 20 ms. Frames are 1000 bits each, and the ACK transmission time and processing delay are negligible. What is the efficiency (utilization) of this link, as a percentage? (Enter your numerical answer; a small tolerance is allowed.)",
+  options: [],
+  answer: 2.44,
+  kind: "nat",
+  marks: 2,
+  difficulty: "medium",
+  type: "numerical",
+  explanation: "Transmission delay Tt = L/R = 1000 / (1 x 10^6) = 0.001 s = 1 ms. Let a = Tp/Tt = 20/1 = 20. Stop-and-wait efficiency is U = 1/(1+2a) = 1/(1+40) = 1/41 ≈ 0.02439 = 2.44%. This low efficiency shows why a single-frame-at-a-time stop-and-wait scheme wastes most of the link's capacity when the propagation delay is large relative to the transmission time; a sliding window would be needed to raise utilization toward 100%."
+},
+{
+  id: "cn-datalink-z4",
+  q: "A Go-Back-N protocol must support a sender window size of at least 63 frames to achieve 100% link utilization. What is the minimum number of bits n required for the sequence number field? (Enter your numerical answer.)",
+  options: [],
+  answer: 6,
+  kind: "nat",
+  marks: 1,
+  difficulty: "medium",
+  type: "numerical",
+  explanation: "Go-Back-N bounds the sender window as Ws <= 2^n - 1. We need 2^n - 1 >= 63, i.e., 2^n >= 64 = 2^6, so the smallest satisfying n is 6. With n = 6, the sequence space has 64 values and the maximum usable window is 2^6 - 1 = 63, exactly meeting the requirement; n = 5 would only allow 2^5 - 1 = 31 frames, which is insufficient."
+},
+{
+  id: "cn-datalink-z5",
+  q: "A 1,000,000-bit file is sent using stop-and-wait ARQ over a link with bandwidth 500 kbps and one-way propagation delay 10 ms. Frames are 1000 bits each, and ACK transmission time and processing delay are negligible. What is the total time, in seconds, to transfer the entire file? (Enter your numerical answer.)",
+  options: [],
+  answer: 22,
+  kind: "nat",
+  marks: 2,
+  difficulty: "medium",
+  type: "numerical",
+  explanation: "Transmission delay per frame Tt = 1000 / (500 x 10^3) = 0.002 s = 2 ms. Each frame requires a full round trip before the next can be sent: time per frame = Tt + 2Tp = 2 ms + 2(10 ms) = 22 ms. The file splits into 1,000,000 / 1000 = 1000 frames. Total time = 1000 x 22 ms = 22,000 ms = 22 s. This illustrates why stop-and-wait is so costly over high-delay links: nearly all of each 22 ms slot is spent waiting for the ACK rather than transmitting."
+},
+{
+  id: "cn-datalink-z6",
+  q: "In slotted ALOHA, the average number of transmission attempts per frame time (including retransmissions) is G = 1. What is the resulting throughput S, as a percentage? (Enter your numerical answer; a small tolerance is allowed.)",
+  options: [],
+  answer: 36.79,
+  kind: "nat",
+  marks: 1,
+  difficulty: "medium",
+  type: "numerical",
+  explanation: "Slotted ALOHA throughput is S = G x e^(-G). At G = 1, S = 1 x e^(-1) ≈ 0.36788, i.e., about 36.79%. This is the well-known maximum throughput of slotted ALOHA, achieved exactly at G = 1; moving G away from 1 in either direction (more or fewer attempts per frame time) reduces S below this peak. It is roughly double pure ALOHA's maximum of 1/(2e) ≈ 18.4%, because slotting halves the vulnerable period from 2 frame-times to 1 frame-time."
+}
+);
+
+window.GATE_DATA.questions['cn'].topics.find(function(t){return t.id==='cn-network';}).questions.push(
+{
+  id: "cn-network-z1",
+  q: "Which of the following statements about IPv4 fragmentation are TRUE? (Select ALL that apply)",
+  options: ["The Fragment Offset field measures the position of the fragment's data in units of 8 bytes", "All fragments of a datagram, except possibly the last, must carry a data payload that is a multiple of 8 bytes", "Reassembly of fragments is normally performed by intermediate routers along the path, not by the final destination", "All fragments derived from one original datagram carry the same value in the Identification field"],
+  answers: [0, 1, 3],
+  marks: 2,
+  difficulty: "medium",
+  type: "multi-select",
+  explanation: "Option one is TRUE: the 13-bit Fragment Offset field is defined in units of 8 bytes, so the actual byte offset is the field value multiplied by 8. Option two is TRUE: because the offset is measured in 8-byte units, every fragment's data size must be a multiple of 8 bytes so its successor's offset lands on an exact unit boundary; only the final fragment (which carries whatever bytes remain) is exempt. Option three is FALSE: reassembly happens only at the final destination host, never at intermediate routers, since routers may not see all fragments (they can take different paths) and reassembling mid-path would be wasted work if a later hop fragments further. Option four is TRUE: the Identification field is copied unchanged into every fragment of a given original datagram so the destination can group fragments correctly, especially when multiple datagrams' fragments interleave in transit."
+},
+{
+  id: "cn-network-z2",
+  q: "Which of the following statements comparing distance-vector and link-state routing are TRUE? (Select ALL that apply)",
+  options: ["Distance-vector routing uses the Bellman-Ford algorithm, while link-state routing uses Dijkstra's algorithm", "In link-state routing, each router floods its link states to all other routers so that every router can build a full topology map", "Distance-vector routing is immune to the count-to-infinity problem", "Link-state routing generally converges faster than distance-vector routing after a topology change"],
+  answers: [0, 1, 3],
+  marks: 2,
+  difficulty: "medium",
+  type: "multi-select",
+  explanation: "Option one is TRUE: this is the defining algorithmic distinction, distance-vector protocols like RIP run a distributed Bellman-Ford computation, while link-state protocols like OSPF run Dijkstra's shortest-path algorithm locally on a full topology map. Option two is TRUE: link-state routers flood their local link-state information to every other router in the area, giving each router identical global topology knowledge from which it independently computes routes. Option three is FALSE: distance-vector routing is well known to suffer from the count-to-infinity problem when a link fails, since routers can keep incrementing each other's stale distance estimates before the failure information propagates correctly. Option four is TRUE: because link-state routing gives every router immediate, complete topology information via flooding, it converges faster and more reliably after a change than distance-vector routing, which relies on slower iterative exchanges between neighbors."
+},
+{
+  id: "cn-network-z3",
+  q: "An organization is assigned the address block 172.16.0.0/20 and must divide it into 16 equal-sized subnets. How many usable host addresses are available per subnet? (Enter your numerical answer.)",
+  options: [],
+  answer: 254,
+  kind: "nat",
+  marks: 2,
+  difficulty: "medium",
+  type: "numerical",
+  explanation: "A /20 block has 32 - 20 = 12 host bits, giving 2^12 = 4096 total addresses. To create 16 = 2^4 equal subnets, 4 bits must be borrowed from the host portion, extending the prefix from /20 to /24. Each subnet then has 32 - 24 = 8 host bits, i.e., 2^8 = 256 addresses, of which the subnet (network) address and the broadcast address are reserved, leaving 256 - 2 = 254 usable host addresses per subnet."
+},
+{
+  id: "cn-network-z4",
+  q: "A datagram carries 3800 bytes of data (excluding its 20-byte IP header) and must cross a link whose MTU allows at most 600 bytes of data per fragment (600 is already a multiple of 8). How many fragments are required to carry this datagram across the link? (Enter your numerical answer.)",
+  options: [],
+  answer: 7,
+  kind: "nat",
+  marks: 2,
+  difficulty: "medium",
+  type: "numerical",
+  explanation: "Each fragment (except possibly the last) can carry at most 600 bytes of data, since 600 is already a multiple of 8 as required by the Fragment Offset unit. The number of fragments needed is ceil(3800 / 600) = ceil(6.333) = 7. The first six fragments each carry 600 bytes (600 x 6 = 3600 bytes), and the seventh (last) fragment carries the remaining 3800 - 3600 = 200 bytes, which need not be a multiple of 8 since it is the final fragment."
+},
+{
+  id: "cn-network-z5",
+  q: "Continuing the previous scenario (3800 bytes of data, fragments of 600 bytes each except the last), what is the Fragment Offset value, in the 8-byte units used in the IP header, of the 3rd fragment? (Enter your numerical answer.)",
+  options: [],
+  answer: 150,
+  kind: "nat",
+  marks: 2,
+  difficulty: "medium",
+  type: "numerical",
+  explanation: "Fragment 1 carries data bytes 0 to 599 (offset field = 0/8 = 0). Fragment 2 carries data bytes 600 to 1199 (offset field = 600/8 = 75). Fragment 3 therefore starts at byte 1200 of the original data, giving Fragment Offset = 1200 / 8 = 150. The Fragment Offset field always stores the starting byte position of a fragment's data divided by 8, since the field is defined in 8-byte units."
+},
+{
+  id: "cn-network-z6",
+  q: "A network 10.0.0.0/8 must be divided into subnets such that there are at least 500 subnets, each supporting at least 100 usable hosts. What is the minimum number of subnet bits that must be borrowed from the host portion (i.e., new prefix length minus 8)? (Enter your numerical answer.)",
+  options: [],
+  answer: 9,
+  kind: "nat",
+  marks: 2,
+  difficulty: "medium",
+  type: "numerical",
+  explanation: "To support at least 500 subnets, the number of subnet bits s must satisfy 2^s >= 500; since 2^8 = 256 is too small and 2^9 = 512 suffices, s = 9. Checking the host requirement: /8 originally has 24 host bits, and borrowing 9 leaves 24 - 9 = 15 host bits, giving 2^15 - 2 = 32,766 usable hosts per subnet, which comfortably satisfies the requirement of at least 100 hosts. Hence the minimum number of subnet bits is 9."
+}
+);
+
+window.GATE_DATA.questions['cn'].topics.find(function(t){return t.id==='cn-transport';}).questions.push(
+{
+  id: "cn-transport-z1",
+  q: "Which of the following statements about TCP flow control and congestion control are TRUE? (Select ALL that apply)",
+  options: ["Flow control protects the receiver from being overwhelmed, while congestion control protects the network from being overloaded", "The sender's effective sending window is given by min(cwnd, rwnd)", "Congestion control is governed by the receiver-advertised window size (rwnd) alone", "On a retransmission timeout, TCP sets cwnd to 1 MSS and restarts slow start, regardless of the cwnd value at the time of the loss"],
+  answers: [0, 1, 3],
+  marks: 2,
+  difficulty: "medium",
+  type: "multi-select",
+  explanation: "Option one is TRUE: this is the fundamental distinction between the two mechanisms, flow control (using rwnd) prevents a fast sender from overrunning a slow receiver's buffer, while congestion control (using cwnd) prevents the sender from overloading the shared network regardless of how much buffer the receiver has. Option two is TRUE: TCP always sends at most min(cwnd, rwnd) unacknowledged bytes, so whichever constraint is tighter governs the actual sending rate. Option three is FALSE: congestion control is governed by the sender-maintained congestion window cwnd, which reacts to network-side signals like loss, not by the receiver's advertised rwnd, which reflects only receiver buffer space. Option four is TRUE: regardless of how large cwnd had grown, a timeout is always treated as the most severe congestion signal, unconditionally resetting cwnd to 1 MSS and restarting slow start from scratch (though ssthresh is set to half of the cwnd value at the time of the loss)."
+},
+{
+  id: "cn-transport-z2",
+  q: "In TCP Reno, which of the following statements about congestion control reactions to packet loss are TRUE? (Select ALL that apply)",
+  options: ["On a timeout, ssthresh is set to half of cwnd at the time of loss, and cwnd is reset to 1 MSS", "On receiving three duplicate ACKs, ssthresh is set to half of cwnd at the time of loss, and cwnd is set directly to the new ssthresh value (fast recovery)", "A timeout is treated as a milder congestion signal than three duplicate ACKs, since the network state is less certain after a timeout", "After fast recovery from three duplicate ACKs, TCP resumes in congestion avoidance mode rather than restarting slow start"],
+  answers: [0, 1, 3],
+  marks: 2,
+  difficulty: "medium",
+  type: "multi-select",
+  explanation: "Option one is TRUE: a timeout halves ssthresh relative to the cwnd value at the moment of loss and drops cwnd all the way to 1 MSS, forcing a full slow-start restart. Option two is TRUE: three duplicate ACKs trigger TCP Reno's fast retransmit and fast recovery, which halves ssthresh the same way but sets cwnd directly to that new ssthresh value instead of collapsing to 1 MSS. Option three is FALSE and reversed: a timeout is treated as the MORE severe signal (since no ACKs at all are arriving, network conditions are highly uncertain), while three duplicate ACKs are a milder signal because they prove that some later segments are still successfully reaching the receiver. Option four is TRUE: after fast recovery sets cwnd = ssthresh, TCP Reno resumes directly in congestion avoidance (linear growth), skipping the exponential slow-start phase entirely, unlike the timeout case."
+},
+{
+  id: "cn-transport-z3",
+  q: "TCP Reno starts a connection with cwnd = 1 MSS and ssthresh = 32 MSS. Assuming no losses occur, what is the value of cwnd, in MSS, immediately after the 7th RTT? (Enter your numerical answer.)",
+  options: [],
+  answer: 34,
+  kind: "nat",
+  marks: 2,
+  difficulty: "hard",
+  type: "numerical",
+  explanation: "During slow start, cwnd doubles every RTT until it reaches ssthresh: after RTT1, cwnd=2; RTT2, cwnd=4; RTT3, cwnd=8; RTT4, cwnd=16; RTT5, cwnd=32 (this exactly reaches ssthresh=32, so slow start ends here and congestion avoidance begins from the next RTT). From RTT6 onward, cwnd grows by 1 MSS per RTT (congestion avoidance): RTT6, cwnd=33; RTT7, cwnd=34. So immediately after the 7th RTT, cwnd = 34 MSS. A common mistake is continuing to double cwnd past the point where it reaches ssthresh, or switching to additive growth one RTT too early or late."
+},
+{
+  id: "cn-transport-z4",
+  q: "The current EstimatedRTT is 80 ms and DevRTT is 10 ms. A new SampleRTT of 130 ms is measured. Using the standard constants alpha = 0.125 and beta = 0.25, what is the new RTO (retransmission timeout), in ms? (Enter your numerical answer; a small tolerance is allowed.)",
+  options: [],
+  answer: 166.25,
+  kind: "nat",
+  marks: 2,
+  difficulty: "hard",
+  type: "numerical",
+  explanation: "New EstimatedRTT = (1 - alpha) x EstimatedRTT + alpha x SampleRTT = 0.875 x 80 + 0.125 x 130 = 70 + 16.25 = 86.25 ms. The deviation term uses the absolute difference between the new sample and the OLD EstimatedRTT: |130 - 80| = 50 ms. New DevRTT = (1 - beta) x DevRTT + beta x 50 = 0.75 x 10 + 0.25 x 50 = 7.5 + 12.5 = 20 ms. Finally, RTO = EstimatedRTT + 4 x DevRTT = 86.25 + 4 x 20 = 86.25 + 80 = 166.25 ms. The factor of 4 on DevRTT is what gives TCP extra safety margin against RTT jitter before it times out."
+},
+{
+  id: "cn-transport-z5",
+  q: "A file of size 62 MSS must be transmitted using TCP slow start only, starting with cwnd = 1 MSS and doubling every RTT with no losses and no ssthresh limit (assume the entire cwnd worth of data is sent and acknowledged each round before the next begins). What is the minimum number of RTTs required so that the cumulative data sent reaches at least 62 MSS? (Enter your numerical answer.)",
+  options: [],
+  answer: 6,
+  kind: "nat",
+  marks: 2,
+  difficulty: "hard",
+  type: "numerical",
+  explanation: "In round k of pure slow start, the amount sent in that round is 2^(k-1) MSS (1, 2, 4, 8, ...), so the cumulative data sent after k RTTs is 1+2+4+...+2^(k-1) = 2^k - 1 MSS. We need the smallest k with 2^k - 1 >= 62, i.e., 2^k >= 63. Since 2^5 = 32 (too small, cumulative = 31) and 2^6 = 64 (cumulative = 63 >= 62), the minimum number of RTTs is 6. This geometric-sum reasoning, rather than treating growth as linear, is what GATE numericals on slow-start transfer time are testing."
+},
+{
+  id: "cn-transport-z6",
+  q: "In a TCP Reno connection, cwnd has grown to 24 MSS when three duplicate ACKs are received, triggering fast retransmit and fast recovery. What is the value of cwnd, in MSS, immediately after fast recovery completes? (Enter your numerical answer.)",
+  options: [],
+  answer: 12,
+  kind: "nat",
+  marks: 1,
+  difficulty: "medium",
+  type: "numerical",
+  explanation: "On three duplicate ACKs, TCP Reno sets the new ssthresh to half of the cwnd value at the moment of loss: ssthresh = 24 / 2 = 12 MSS. Fast recovery then sets cwnd directly to this new ssthresh value (rather than collapsing to 1 MSS as a timeout would), so cwnd = 12 MSS immediately after fast recovery, and the connection resumes growing linearly from there under congestion avoidance."
+}
+);
+
+window.GATE_DATA.questions['cn'].topics.find(function(t){return t.id==='cn-application';}).questions.push(
+{
+  id: "cn-application-z1",
+  q: "Which of the following statements about HTTP connection modes are TRUE? (Select ALL that apply)",
+  options: ["Non-persistent HTTP without parallel connections requires 2 RTTs per object: one for the TCP handshake and one for the request/response", "Persistent HTTP without pipelining requires a new TCP handshake for every object requested", "Persistent HTTP with pipelining can fetch the base page and all n embedded objects in roughly 2 RTTs total (1 for the handshake plus 1 for all pipelined requests/responses), independent of n", "Recursive DNS resolution requires the client itself to individually contact the root, TLD, and authoritative servers"],
+  answers: [0, 2],
+  marks: 2,
+  difficulty: "medium",
+  type: "multi-select",
+  explanation: "Option one is TRUE: with non-persistent HTTP and no parallelism, every object needs its own new TCP connection, costing 1 RTT for the handshake plus 1 RTT for the request and the start of the response, i.e., 2 RTT per object. Option two is FALSE: the defining feature of persistent HTTP is that a single TCP connection is reused for the whole session, so only one handshake RTT is paid in total, not one per object. Option three is TRUE: with pipelining, after the one-time handshake RTT, the client can fire all requests back-to-back without waiting for each response, so (idealized) the base page and all embedded objects arrive within roughly one more RTT, giving about 2 RTT total regardless of how many objects there are. Option four is FALSE and reversed: in recursive DNS resolution, the client contacts only its local resolver once (1 RTT from the client's perspective), and it is the local resolver that performs the iterative work of contacting root, TLD, and authoritative servers on the client's behalf."
+},
+{
+  id: "cn-application-z2",
+  q: "Which of the following statements about RSA public-key cryptography are TRUE? (Select ALL that apply)",
+  options: ["The public exponent e must be chosen to be coprime to phi(n) = (p-1)(q-1), not to n itself", "The private exponent d is the modular multiplicative inverse of e modulo phi(n)", "For N users to each have a pairwise secure symmetric channel with every other user, the number of keys required grows linearly with N", "A message can be digitally signed by encrypting it with the sender's own private key, and anyone can verify it using the sender's public key"],
+  answers: [0, 1, 3],
+  marks: 2,
+  difficulty: "medium",
+  type: "multi-select",
+  explanation: "Option one is TRUE: RSA correctness (via Euler's theorem) requires gcd(e, phi(n)) = 1, i.e., e coprime to phi(n) = (p-1)(q-1), not merely coprime to n itself; this is a frequent point of confusion. Option two is TRUE: the private exponent d is defined as the value satisfying e x d ≡ 1 (mod phi(n)), found via the extended Euclidean algorithm. Option three is FALSE: full pairwise symmetric key distribution among N users needs N(N-1)/2 distinct keys, which grows quadratically, not linearly; it is asymmetric (public-key) schemes that need only one key pair per user, giving linear growth. Option four is TRUE: digital signatures reverse the usual RSA roles, the sender encrypts (signs) with their own private key, and anyone can decrypt (verify) using the sender's public key, confirming the message could only have come from that private key's holder."
+},
+{
+  id: "cn-application-z3",
+  q: "A web page consists of 1 base HTML file and 9 embedded objects, all hosted on the same server, and the DNS name is already cached. Using non-persistent HTTP with no parallel connections and RTT = 40 ms, what is the total time, in ms, to load the entire page (ignore transmission times and object sizes)? (Enter your numerical answer.)",
+  options: [],
+  answer: 800,
+  kind: "nat",
+  marks: 2,
+  difficulty: "medium",
+  type: "numerical",
+  explanation: "With non-persistent HTTP and no parallelism, each of the base page and the 9 embedded objects requires its own new TCP connection, costing 2 RTT each (1 RTT for the handshake, 1 RTT for the request/response). Total objects = 1 base page + 9 embedded = 10. Total time = 2 x 10 x RTT = 2 x 10 x 40 ms = 800 ms."
+},
+{
+  id: "cn-application-z4",
+  q: "For the same page (1 base file plus 9 embedded objects, RTT = 40 ms, DNS already cached), what is the total page load time, in ms, using persistent HTTP with pipelining? (Enter your numerical answer.)",
+  options: [],
+  answer: 80,
+  kind: "nat",
+  marks: 2,
+  difficulty: "medium",
+  type: "numerical",
+  explanation: "Persistent HTTP with pipelining needs only 1 RTT to establish the single TCP connection (the handshake), and then, idealizing that the server can respond quickly enough, roughly 1 more RTT to send all pipelined requests and receive all the responses regardless of the number of objects. Total time = 2 x RTT = 2 x 40 ms = 80 ms, ten times faster than the non-persistent, non-pipelined case for this same page, which is exactly the contrast GATE likes to test."
+},
+{
+  id: "cn-application-z5",
+  q: "In RSA, let p = 3, q = 11, and public exponent e = 7. What is the private exponent d, i.e., the smallest positive integer satisfying e x d congruent to 1 (mod phi(n))? (Enter your numerical answer.)",
+  options: [],
+  answer: 3,
+  kind: "nat",
+  marks: 2,
+  difficulty: "medium",
+  type: "numerical",
+  explanation: "n = p x q = 3 x 11 = 33, and phi(n) = (p-1)(q-1) = 2 x 10 = 20. We need d such that 7d ≡ 1 (mod 20). Testing d = 3: 7 x 3 = 21, and 21 mod 20 = 1, which satisfies the requirement. Checking gcd(7, 20) = 1 confirms e = 7 was a valid choice, so d = 3 is indeed the modular inverse of e modulo phi(n)."
+},
+{
+  id: "cn-application-z6",
+  q: "Using the RSA parameters p = 3, q = 11 (so n = 33) and public exponent e = 7, encrypt the plaintext message m = 4. What is the ciphertext c = m^e mod n? (Enter your numerical answer.)",
+  options: [],
+  answer: 16,
+  kind: "nat",
+  marks: 2,
+  difficulty: "hard",
+  type: "numerical",
+  explanation: "We need c = 4^7 mod 33. Computing via repeated squaring: 4^1 = 4, 4^2 = 16, 4^3 = 4^2 x 4 = 64 mod 33 = 31, 4^4 = 31 x 4 = 124 mod 33 = 124 - 99 = 25, 4^5 = 25 x 4 = 100 mod 33 = 100 - 99 = 1, so 4^5 ≡ 1 (mod 33), meaning powers of 4 modulo 33 cycle with period 5. Then 4^7 = 4^(5+2) = 4^5 x 4^2 ≡ 1 x 16 = 16 (mod 33). So the ciphertext is c = 16."
+}
+);
