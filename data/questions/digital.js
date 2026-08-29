@@ -1005,6 +1005,72 @@ window.GATE_DATA.questions['digital'].topics.find(function(t){return t.id==='dig
 }
 );
 
+window.GATE_DATA.questions['digital'].topics.find(function(t){return t.id==='digital-boolean';}).questions.push(
+{
+  id: 'digital-boolean-y1',
+  q: "Which of the following single-gate types are functionally complete (universal) on their own — i.e. any Boolean function can be built using only that gate type? (Select ALL that apply)",
+  options: ["NAND", "NOR", "XOR", "OR"],
+  answers: [0, 1],
+  marks: 1,
+  difficulty: 'easy',
+  type: 'concept',
+  explanation: "NAND is universal: NOT(A)=NAND(A,A), OR and AND can both be built from chains of NAND gates, so any function is reachable — this is why NAND is correct. NOR is universal by the dual argument: NOT(A)=NOR(A,A), and AND/OR can both be built from NOR chains — so NOR is also correct. XOR is NOT universal alone: every combination of XOR gates fed by the input variables outputs 0 when all inputs are 0 (0⊕0=0), so XOR alone can never produce the constant function 1 or NOT of a single variable using only that variable and XOR with itself (A⊕A=0 always), meaning XOR fails to reach the full function space — so XOR is excluded. OR is NOT universal alone: OR gates can never produce a 0 output unless every input is 0, and more importantly OR cannot realize NOT (inverting a signal) since OR(A,A)=A, not A' — so OR is excluded. Only NAND and NOR qualify."
+},
+{
+  id: 'digital-boolean-y2',
+  q: "Let f(A,B) = A ⊕ B (XOR). Which of the following Boolean expressions are equal to f(A,B) for all values of A and B? (Select ALL that apply)",
+  options: ["A'B + AB'", "(A+B)·(AB)'", "(A'+B)·(A+B')", "(A+B)' + (AB)'"],
+  answers: [0, 1],
+  marks: 2,
+  difficulty: 'medium',
+  type: 'concept',
+  explanation: "Checking each expression against the XOR truth table (f=0,1,1,0 for AB=00,01,10,11): Option 1, A'B+AB', is literally the standard XOR sum-of-products definition, so it trivially equals f (0,1,1,0) — correct. Option 2, (A+B)(AB)', is the classic 'OR AND-ed with NAND' identity for XOR: at AB=00, (0)(1)=0; at 01, (1)(1)=1; at 10, (1)(1)=1; at 11, (1)(0)=0 — matches f exactly, so it is correct. Option 3, (A'+B)(A+B'), expands to A'B'+AB (evaluate: at AB=00 it gives (1)(1)=1, but f(0,0)=0 — mismatch), so this is actually the XNOR function, not XOR — incorrect. Option 4, (A+B)'+(AB)', simplifies via De Morgan/absorption to A'+B' (at AB=00: (1)+(1)=1, but f(0,0)=0 — mismatch), which is the NAND function, not XOR — incorrect. Only options 1 and 2 equal XOR."
+},
+{
+  id: 'digital-boolean-y3',
+  q: "Which of the following statements about NAND and NOR gates are correct? (Select ALL that apply)",
+  options: ["The NAND gate alone is functionally complete", "The NOR gate alone is functionally complete", "A two-level NAND-NAND circuit realizes a sum-of-products (SOP) expression", "A two-level NOR-NOR circuit realizes a sum-of-products (SOP) expression"],
+  answers: [0, 1, 2],
+  marks: 2,
+  difficulty: 'medium',
+  type: 'concept',
+  explanation: "NAND alone is functionally complete (can build NOT, AND, OR from NAND gates alone), so option 1 is correct. NOR alone is functionally complete by the dual construction, so option 2 is correct. A two-level NAND-NAND network is algebraically equivalent to AND-OR (apply double negation: NAND-NAND = AND-OR after canceling the double inversion at the second level), which directly realizes a sum-of-products expression — so option 3 is correct. A two-level NOR-NOR network, by the dual argument, is equivalent to OR-AND, which realizes a product-of-sums (POS) expression, NOT an SOP expression — so option 4 is incorrect."
+},
+{
+  id: 'digital-boolean-y4',
+  q: "What is the minimum number of literals required in the minimal sum-of-products (SOP) expression for the 4-variable Boolean function f(A,B,C,D) = Σm(0,2,8,10)? (Enter your numerical answer.)",
+  options: [],
+  answer: 2,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'medium',
+  type: 'numerical',
+  explanation: "List the minterms in binary (order A,B,C,D): m0=0000, m2=0010, m8=1000, m10=1010. In every one of these four minterms, B=0 and D=0, while A and C independently range over all four combinations {00,01,10,11} — meaning this set is exactly 'all rows where B=0 and D=0', regardless of A and C. This is a valid K-map grouping of size 4 (a quad), so the minimal SOP reduces to the single term B'D'. Counting literals in B'D' gives exactly 2 literals (B' and D'), so the minimum literal count is 2."
+},
+{
+  id: 'digital-boolean-y5',
+  q: "What is the minimum number of 2-input NAND gates required to implement a 2-input XOR gate using only NAND gates? (Enter your numerical answer.)",
+  options: [],
+  answer: 4,
+  kind: 'nat',
+  marks: 1,
+  difficulty: 'medium',
+  type: 'numerical',
+  explanation: "The standard minimal NAND-only realization of XOR uses 4 NAND gates: gate 1 computes N1 = NAND(A,B); gate 2 computes N2 = NAND(A,N1); gate 3 computes N3 = NAND(B,N1); gate 4 computes the final output = NAND(N2,N3) = A⊕B. This can be verified against the XOR truth table for all 4 input combinations and holds exactly. No 3-gate (or fewer) all-NAND circuit can realize XOR, which is why 4 is the well-known minimum for this classic construction."
+},
+{
+  id: 'digital-boolean-y6',
+  q: "What is the total number of literals in the minimal SOP expression for the 3-variable majority function f(A,B,C) = Σm(3,5,6,7) (output is 1 when at least 2 of the 3 inputs are 1)? (Enter your numerical answer.)",
+  options: [],
+  answer: 6,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'medium',
+  type: 'numerical',
+  explanation: "Plotting minterms 3(011), 5(101), 6(110), 7(111) on a K-map and grouping adjacent pairs gives three overlapping pairs: {3,7} groups to BC, {5,7} groups to AC, {6,7} groups to AB — all three are essential prime implicants since minterm 7 alone cannot cover the others, and each of 3, 5, 6 is covered only by its respective pair. The minimal SOP is therefore AB + AC + BC, with no further reduction possible (this is the standard 3-variable majority function). Counting literals: AB (2) + AC (2) + BC (2) = 6 literals total."
+}
+);
+
 window.GATE_DATA.questions['digital'].topics.find(function(t){return t.id==='digital-combinational';}).questions.push(
 {
   id: 'digital-combinational-x1',
@@ -1125,6 +1191,72 @@ window.GATE_DATA.questions['digital'].topics.find(function(t){return t.id==='dig
   difficulty: 'easy',
   type: 'numerical',
   explanation: "This is the exact dual of building an 8-to-1 MUX from 2-to-1 MUXes. The first level uses 1 DEMUX, splitting the single input into 2 branches based on the MSB select bit. The second level uses 2 DEMUXes (one per branch from level 1), splitting each branch further using the middle select bit, giving 4 branches. The third level uses 4 DEMUXes (one per branch from level 2), splitting using the LSB select bit, giving the final 8 outputs. Total DEMUXes = 1 + 2 + 4 = 7, matching the general formula (2^n - 1) 1-to-2 DEMUXes needed to build a 1-to-2^n DEMUX tree — the same count structure as the internal nodes of a complete binary tree with 8 leaves, and numerically identical to the 2:1-MUX-tree count for an 8:1 MUX."
+}
+);
+
+window.GATE_DATA.questions['digital'].topics.find(function(t){return t.id==='digital-combinational';}).questions.push(
+{
+  id: 'digital-combinational-y1',
+  q: "Which of the following are examples of purely combinational (memoryless) circuits, whose output depends only on the current inputs? (Select ALL that apply)",
+  options: ["Multiplexer", "Full adder", "JK flip-flop", "Decoder"],
+  answers: [0, 1, 3],
+  marks: 1,
+  difficulty: 'easy',
+  type: 'concept',
+  explanation: "A multiplexer's output at any instant is a function only of its current data and select inputs, with no internal memory of past inputs — it is combinational, so option 1 is correct. A full adder's Sum and Carry-out at any instant depend only on the current A, B, and Cin values, with no stored state — it is combinational, so option 2 is correct. A JK flip-flop, in contrast, is a sequential (memory) element: its next output Q depends on both its current inputs J, K AND its own previous stored state, and it only updates on a clock edge — so option 3 is incorrect, as it does not belong in this list. A decoder's output lines are a pure function of its current input code with no stored state — it is combinational, so option 4 is correct."
+},
+{
+  id: 'digital-combinational-y2',
+  q: "For a full adder with inputs A, B, Cin producing Sum and Cout, which of the following Boolean expressions are correct? (Select ALL that apply)",
+  options: ["Sum = A ⊕ B ⊕ Cin", "Cout = AB + BCin + ACin", "Sum = AB + Cin", "Cout = A ⊕ B ⊕ Cin"],
+  answers: [0, 1],
+  marks: 1,
+  difficulty: 'easy',
+  type: 'concept',
+  explanation: "The standard full adder equations are Sum = A ⊕ B ⊕ Cin and Cout = AB + BCin + ACin (the majority function of the three inputs), both derivable directly from the full adder truth table — so options 1 and 2 are correct. Option 3, Sum = AB + Cin, is not the Sum expression at all (e.g. at A=0,B=0,Cin=1 this gives Sum=1, matching, but at A=1,B=1,Cin=0 this gives Sum=1+0=1 while the true Sum is 1⊕1⊕0=0 — mismatch), so it is incorrect. Option 4, Cout = A ⊕ B ⊕ Cin, is actually the Sum formula, not Cout (e.g. at A=1,B=1,Cin=1, true Cout=1 but A⊕B⊕Cin=1⊕1⊕1=1, yet at A=1,B=0,Cin=0, true Cout=0 while A⊕B⊕Cin=1 — mismatch), so it is incorrect."
+},
+{
+  id: 'digital-combinational-y3',
+  q: "Which of the following statements about decoders and multiplexers are correct? (Select ALL that apply)",
+  options: ["A decoder with n inputs and 2^n outputs (no enable) activates exactly one output line for each distinct input combination", "A multiplexer with n select lines can route one of 2^n data inputs to a single output line", "A decoder combined with external OR gates can implement any Boolean function expressed in canonical sum-of-minterms form", "A multiplexer has more output lines than input lines"],
+  answers: [0, 1, 2],
+  marks: 2,
+  difficulty: 'medium',
+  type: 'concept',
+  explanation: "An n-to-2^n decoder produces a unique one-hot output pattern (exactly one output = 1) for each of the 2^n possible input codes, which is its defining property — option 1 is correct. A multiplexer with n select lines chooses among exactly 2^n data inputs and routes the selected one to its single output — option 2 is correct. Since each decoder output line corresponds to exactly one minterm, ORing together the decoder outputs corresponding to the minterms where a function is 1 realizes that function directly — this is the standard 'decoder + OR gates' implementation method, so option 3 is correct. A multiplexer always has exactly ONE output line regardless of how many select or data inputs it has (a 2^n-to-1 MUX has 2^n data inputs, n select inputs, but only 1 output) — so option 4, claiming more outputs than inputs, is incorrect."
+},
+{
+  id: 'digital-combinational-y4',
+  q: "Using the standard multiplexer-based method of realizing a Boolean function of n variables with a 2^(n-1)-to-1 MUX (where one variable is applied to the data inputs and the rest are select lines), how many select lines are needed to realize a 5-variable Boolean function? (Enter your numerical answer.)",
+  options: [],
+  answer: 4,
+  kind: 'nat',
+  marks: 1,
+  difficulty: 'easy',
+  type: 'numerical',
+  explanation: "In the standard MUX-implementation technique, one of the n variables is resolved by feeding the appropriate literal (0, 1, the variable, or its complement) to the data inputs, while the remaining (n-1) variables are connected to the select lines of a 2^(n-1)-to-1 MUX. For n=5 variables, this leaves n-1 = 4 variables to serve as select lines, requiring a 16-to-1 MUX with exactly 4 select lines."
+},
+{
+  id: 'digital-combinational-y5',
+  q: "What is the minimum number of 2-input NAND gates required to implement a 2-to-1 multiplexer, whose output is Y = S'A + SB (S is the select line, A and B are data inputs), using only NAND gates? (Enter your numerical answer.)",
+  options: [],
+  answer: 4,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'medium',
+  type: 'numerical',
+  explanation: "Y = S'A + SB is a 2-term SOP expression, which a two-level NAND-NAND circuit realizes directly (equivalent to AND-OR). Gate 1 is a NAND-based inverter producing S' = NAND(S,S). Gate 2 computes NAND(S',A) and gate 3 computes NAND(S,B) — these are the first-level NAND gates standing in for the AND terms. Gate 4 is the final NAND combining the outputs of gates 2 and 3, which (by the NAND-NAND = AND-OR equivalence) produces exactly S'A + SB. This totals 1 (inverter) + 2 (first level) + 1 (final) = 4 NAND gates, which is the standard minimal count for this realization."
+},
+{
+  id: 'digital-combinational-y6',
+  q: "A full adder is constructed using two half adders and one OR gate (the standard textbook composition). Counting only the two half adders, how many 2-input XOR gates are used in total? (Enter your numerical answer.)",
+  options: [],
+  answer: 2,
+  kind: 'nat',
+  marks: 1,
+  difficulty: 'easy',
+  type: 'numerical',
+  explanation: "Each half adder consists of exactly one 2-input XOR gate (producing its Sum output) and one 2-input AND gate (producing its Carry output). The standard full-adder-from-two-half-adders design uses: half adder 1 (A XOR B), half adder 2 (that result XOR Cin) to produce the final Sum, plus an OR gate combining the two half adders' carry outputs to produce Cout. Since each of the two half adders contributes exactly one XOR gate, the total number of XOR gates used is 1 + 1 = 2."
 }
 );
 
@@ -1251,6 +1383,72 @@ window.GATE_DATA.questions['digital'].topics.find(function(t){return t.id==='dig
 }
 );
 
+window.GATE_DATA.questions['digital'].topics.find(function(t){return t.id==='digital-sequential';}).questions.push(
+{
+  id: 'digital-sequential-y1',
+  q: "Which of the following statements about a JK flip-flop are correct? (Select ALL that apply)",
+  options: ["When J=K=1, the flip-flop toggles its output on every active clock edge", "When J=K=0, the flip-flop holds its previous state", "When J=1, K=0, the next state is always 0 regardless of the present state", "The JK flip-flop resolves the 'forbidden' S=R=1 condition of the SR latch by making J=K=1 produce toggling instead of an undefined state"],
+  answers: [0, 1, 3],
+  marks: 1,
+  difficulty: 'easy',
+  type: 'concept',
+  explanation: "J=K=1 is the defined toggle condition for a JK flip-flop: Q(next) = Q', flipping on every active clock edge — option 1 is correct. J=K=0 is the defined hold condition: Q(next) = Q, so the flip-flop retains its previous state — option 2 is correct. J=1, K=0 is the SET condition, meaning Q(next) = 1 always (not 0), so option 3's claim that the next state is always 0 is incorrect. The JK flip-flop is specifically designed to fix the SR latch's forbidden S=R=1 case: by feeding back Q and Q' into the gating logic, J=K=1 produces a well-defined toggle rather than the SR latch's undefined/oscillating output — option 4 is correct."
+},
+{
+  id: 'digital-sequential-y2',
+  q: "Which of the following flip-flop characteristic equations are correctly matched to their flip-flop type? (Select ALL that apply)",
+  options: ["SR flip-flop: Q(next) = S + R'Q (with the constraint that S and R are never both 1)", "D flip-flop: Q(next) = D", "JK flip-flop: Q(next) = JQ + K'Q'", "T flip-flop: Q(next) = T ⊕ Q"],
+  answers: [0, 1, 3],
+  marks: 2,
+  difficulty: 'medium',
+  type: 'concept',
+  explanation: "The SR flip-flop's characteristic equation Q(next) = S + R'Q correctly reproduces its behavior (set when S=1, hold when S=R=0, reset when R=1,S=0) subject to the standard restriction that S=R=1 is disallowed — option 1 is correct. The D flip-flop simply outputs Q(next) = D by definition, always following the D input regardless of previous state — option 2 is correct. The correct JK characteristic equation is Q(next) = JQ' + K'Q, not JQ + K'Q' as stated in option 3 (check J=1,K=1: correct formula gives Q'+Q=1, i.e. toggle, but the given wrong formula gives Q+0=Q, i.e. incorrectly implies hold) — so option 3 is incorrect. The T flip-flop toggles when T=1 and holds when T=0, which is exactly captured by Q(next) = T ⊕ Q (at T=0, Q⊕0=Q, hold; at T=1, Q⊕1=Q', toggle) — option 4 is correct."
+},
+{
+  id: 'digital-sequential-y3',
+  q: "A MOD-6 synchronous counter is to be built using flip-flops. Which of the following statements about this design are correct? (Select ALL that apply)",
+  options: ["It requires exactly 3 flip-flops, since 2^2=4 < 6 ≤ 2^3=8", "It has 2 unused (invalid) states out of the 8 states 3 flip-flops can represent", "It counts through binary states 0 to 7 without ever skipping any state", "A reset-based design forces the counter back to state 0 immediately after reaching count 5"],
+  answers: [0, 1, 3],
+  marks: 2,
+  difficulty: 'medium',
+  type: 'concept',
+  explanation: "Since 2^2=4 is too few states to reach 6, but 2^3=8 is enough, a MOD-6 counter needs the smallest n with 2^n ≥ 6, which is n=3 flip-flops — option 1 is correct. With 3 flip-flops there are 8 total possible states (0-7), but a MOD-6 counter only uses states 0 through 5, leaving 2 states (6 and 7) unused/invalid — option 2 is correct. A MOD-6 counter, by definition, cycles only through 0,1,2,3,4,5 and then returns to 0 — it deliberately skips states 6 and 7, so option 3's claim that it counts 0 to 7 without skipping is incorrect. The standard reset-based (asynchronous or synchronous clear) MOD-6 design detects state 5 (or state 6, depending on the design variant) and forces the counter back to 0 on the next clock, producing the repeating sequence 0,1,2,3,4,5,0,1,... — option 4 is correct."
+},
+{
+  id: 'digital-sequential-y4',
+  q: "A counter is designed to count 0,1,2,...,11 and then reset back to 0 on the next clock pulse (i.e. it cycles through exactly the decimal values 0 through 11). What is the modulus N of this counter? (Enter your numerical answer.)",
+  options: [],
+  answer: 12,
+  kind: 'nat',
+  marks: 1,
+  difficulty: 'easy',
+  type: 'numerical',
+  explanation: "The modulus of a counter equals the total number of distinct states it cycles through before repeating. Counting the states 0,1,2,3,4,5,6,7,8,9,10,11 gives exactly 12 distinct values (from 0 up to and including 11), so N = 12."
+},
+{
+  id: 'digital-sequential-y5',
+  q: "What is the minimum number of flip-flops required to design a synchronous MOD-13 counter? (Enter your numerical answer.)",
+  options: [],
+  answer: 4,
+  kind: 'nat',
+  marks: 1,
+  difficulty: 'easy',
+  type: 'numerical',
+  explanation: "The minimum number of flip-flops n needed for a MOD-N counter must satisfy 2^n ≥ N. For N=13: 2^3=8 is insufficient (8 < 13), but 2^4=16 is sufficient (16 ≥ 13). Therefore the minimum number of flip-flops required is n=4."
+},
+{
+  id: 'digital-sequential-y6',
+  q: "A 4-bit MOD-16 up-counter built from negative-edge-triggered T flip-flops starts at state 0000 (decimal 0). What is the decimal value of the counter's state after exactly 25 clock pulses? (Enter your numerical answer.)",
+  options: [],
+  answer: 9,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'medium',
+  type: 'numerical',
+  explanation: "A MOD-16 counter increments by 1 on each clock pulse and wraps around every 16 counts (since it can only represent values 0 through 15 with 4 bits). After 25 pulses starting from 0, the resulting state is 25 mod 16. Computing this: 25 = 1×16 + 9, so 25 mod 16 = 9. Therefore the counter's decimal state after 25 pulses is 9."
+}
+);
+
 window.GATE_DATA.questions['digital'].topics.find(function(t){return t.id==='digital-number-systems';}).questions.push(
 {
   id: 'digital-number-systems-x1',
@@ -1374,6 +1572,72 @@ window.GATE_DATA.questions['digital'].topics.find(function(t){return t.id==='dig
 }
 );
 
+window.GATE_DATA.questions['digital'].topics.find(function(t){return t.id==='digital-number-systems';}).questions.push(
+{
+  id: 'digital-number-systems-y1',
+  q: "Which of the following are valid schemes for representing negative numbers in binary? (Select ALL that apply)",
+  options: ["Sign-magnitude", "1's complement", "2's complement", "Excess/offset binary is used only for representing unsigned numbers"],
+  answers: [0, 1, 2],
+  marks: 1,
+  difficulty: 'easy',
+  type: 'concept',
+  explanation: "Sign-magnitude uses a dedicated sign bit plus a magnitude field to represent negative numbers — a standard valid scheme, option 1 is correct. 1's complement represents a negative number by inverting all bits of its positive counterpart — a standard valid scheme, option 2 is correct. 2's complement represents a negative number by inverting all bits and adding 1 — the most widely used scheme in modern hardware, option 3 is correct. Excess/offset binary (biased representation) is actually used specifically to represent SIGNED numbers (both positive and negative) using an unsigned encoding with a fixed bias subtracted — for example IEEE 754 floating-point exponents use excess-127/excess-1023 to represent signed exponent values — so the claim in option 4 that it is used 'only for unsigned numbers' is incorrect."
+},
+{
+  id: 'digital-number-systems-y2',
+  q: "Which of the following statements about n-bit 2's complement representation are correct? (Select ALL that apply)",
+  options: ["The representable range is -2^(n-1) to +2^(n-1)-1", "There is exactly one representation for zero", "The number of representable negative values equals the number of representable positive values (excluding zero)", "The most significant bit (MSB) indicates sign: 1 for negative, 0 for non-negative"],
+  answers: [0, 1, 3],
+  marks: 2,
+  difficulty: 'medium',
+  type: 'concept',
+  explanation: "The standard n-bit 2's complement range is from -2^(n-1) to +2^(n-1)-1, an asymmetric range with one extra negative value — option 1 is correct. 2's complement has a single unique bit pattern (all zeros) for zero, unlike sign-magnitude or 1's complement which have two — option 2 is correct. The count of negative values is 2^(n-1) (from -1 down to -2^(n-1)), while the count of positive values excluding zero is only 2^(n-1)-1 (from 1 up to 2^(n-1)-1) — these are NOT equal, there is exactly one more negative value than positive value, so option 3 is incorrect. The MSB does correctly indicate the sign in 2's complement: 1 for negative numbers and 0 for zero/positive numbers — option 4 is correct."
+},
+{
+  id: 'digital-number-systems-y3',
+  q: "Which of the following statements about n-bit 1's complement representation are correct? (Select ALL that apply)",
+  options: ["It has two distinct representations for zero: all-0s and all-1s", "Its representable range is -(2^(n-1)-1) to +(2^(n-1)-1)", "Negating a number is performed by inverting all of its bits", "An end-around carry is never needed when adding two 1's complement numbers"],
+  answers: [0, 1, 2],
+  marks: 2,
+  difficulty: 'medium',
+  type: 'concept',
+  explanation: "1's complement famously has two representations for zero: all-0s (+0) and all-1s (-0) — option 1 is correct. Because of this dual-zero, the usable magnitude range shrinks symmetrically to -(2^(n-1)-1) through +(2^(n-1)-1) — option 2 is correct. Negation in 1's complement is defined exactly as bit-inversion (complementing every bit of the number) — option 3 is correct. However, an end-around carry IS required when adding two 1's complement numbers: if the addition produces a carry out of the MSB, that carry bit must be added back into the LSB to get the correct result — this is a well-known necessary correction step, so option 4's claim that it is 'never needed' is incorrect."
+},
+{
+  id: 'digital-number-systems-y4',
+  q: "What is the decimal value represented by the 8-bit 2's complement number 11010110? (Enter your numerical answer.)",
+  options: [],
+  answer: -42,
+  kind: 'nat',
+  marks: 1,
+  difficulty: 'easy',
+  type: 'numerical',
+  explanation: "Since the MSB is 1, this represents a negative number. Using the invert-and-add-1 method: invert 11010110 to get 00101001, then add 1 to get 00101010, which is 32+8+2 = 42 in decimal. So the original number represents -42. Cross-checking with the weighted-MSB method: 11010110 unsigned = 128+64+16+4+2 = 214; subtracting 256 (the 2's complement correction for the negative MSB) gives 214-256 = -42, confirming the answer."
+},
+{
+  id: 'digital-number-systems-y5',
+  q: "An 8-bit exponent field is encoded in excess-127 (bias-127) format with the bit pattern 10000101. What is the true signed decimal value it represents? (Enter your numerical answer.)",
+  options: [],
+  answer: 6,
+  kind: 'nat',
+  marks: 1,
+  difficulty: 'easy',
+  type: 'numerical',
+  explanation: "In excess-127 encoding, the true signed value equals the unsigned binary value of the stored pattern minus the bias of 127. The unsigned value of 10000101 is 128+4+1 = 133. Subtracting the bias: 133 - 127 = 6. So the encoded pattern represents the true signed value +6."
+},
+{
+  id: 'digital-number-systems-y6',
+  q: "What is the decimal (base-10) equivalent of the hexadecimal number 2AF? (Enter your numerical answer.)",
+  options: [],
+  answer: 687,
+  kind: 'nat',
+  marks: 1,
+  difficulty: 'easy',
+  type: 'numerical',
+  explanation: "Converting hex 2AF to decimal using positional weights (16^2, 16^1, 16^0): 2×256 = 512, A(=10)×16 = 160, F(=15)×1 = 15. Summing these: 512 + 160 + 15 = 687."
+}
+);
+
 window.GATE_DATA.questions['digital'].topics.find(function(t){return t.id==='digital-arithmetic';}).questions.push(
 {
   id: 'digital-arithmetic-x1',
@@ -1494,5 +1758,71 @@ window.GATE_DATA.questions['digital'].topics.find(function(t){return t.id==='dig
   difficulty: 'hard',
   type: 'concept',
   explanation: "Each floating-point operand carries a small ABSOLUTE rounding/representation error that is proportional to its own magnitude (since floating point guarantees roughly constant RELATIVE precision, not constant absolute precision — recall the ULP grows with magnitude). When two large, nearly-equal numbers are subtracted, their large magnitudes cancel out in the exact mathematical subtraction, but each operand's small absolute error does NOT cancel out along with it (the errors are independent, not equal and opposite) — so the leftover absolute error stays roughly the same size while the TRUE result has become much smaller. That same fixed-size absolute error is now a much larger fraction of the smaller result, meaning the RELATIVE precision of the subtraction's output has collapsed even though no individual step technically violated IEEE 754's rounding guarantees. This is why numerically stable algorithms deliberately avoid subtracting two nearly-equal large quantities whenever a mathematically equivalent but cancellation-free reformulation is available."
+}
+);
+
+window.GATE_DATA.questions['digital'].topics.find(function(t){return t.id==='digital-arithmetic';}).questions.push(
+{
+  id: 'digital-arithmetic-y1',
+  q: "Which of the following statements about the IEEE 754 single-precision (32-bit) floating-point format are correct? (Select ALL that apply)",
+  options: ["It uses 1 sign bit, 8 exponent bits, and 23 mantissa (fraction) bits", "The exponent bias is 127", "A biased exponent field of all 1s together with a nonzero mantissa represents NaN", "The implicit leading bit of a normalized mantissa is always 0"],
+  answers: [0, 1, 2],
+  marks: 1,
+  difficulty: 'easy',
+  type: 'concept',
+  explanation: "IEEE 754 single precision is defined with exactly 1 sign bit + 8 exponent bits + 23 mantissa bits = 32 bits total — option 1 is correct. The 8-bit exponent field uses a bias of 127 (excess-127), so the true exponent is the stored value minus 127 — option 2 is correct. A biased exponent of all 1s (255) combined with a nonzero mantissa is the reserved encoding for NaN (all 1s with a zero mantissa instead represents infinity) — option 3 is correct. For a NORMALIZED floating-point number, the implicit (hidden) leading bit of the mantissa is always 1, not 0 (this is what lets the format store 23 explicit bits but effectively represent 24 bits of precision) — so option 4 is incorrect."
+},
+{
+  id: 'digital-arithmetic-y2',
+  q: "Which of the following statements about overflow detection in n-bit 2's complement addition are correct? (Select ALL that apply)",
+  options: ["Overflow occurs when two operands of the same sign produce a result of the opposite sign", "Overflow can occur when adding a positive number and a negative number", "Overflow is detected when the carry INTO the MSB differs from the carry OUT of the MSB", "Overflow never occurs during unsigned binary addition, only during signed addition"],
+  answers: [0, 2],
+  marks: 2,
+  difficulty: 'medium',
+  type: 'concept',
+  explanation: "The classic sign-based overflow rule states that adding two numbers of the SAME sign and getting a result of the OPPOSITE sign indicates overflow (the true mathematical sum exceeded the representable range) — option 1 is correct. Adding a positive and a negative number can never cause overflow, because the true sum's magnitude is always less than or equal to the larger operand's magnitude, which is already representable — so option 2 is incorrect. The carry-based overflow rule (equivalent to the sign-based rule) states that overflow occurs exactly when the carry bit going INTO the MSB position differs from the carry bit coming OUT of the MSB position — option 3 is correct. Unsigned binary addition does have its own overflow condition — it occurs precisely when there is a carry out of the MSB (indicating the true sum exceeded the maximum unsigned value) — so option 4's claim that overflow 'never occurs' in unsigned addition is incorrect."
+},
+{
+  id: 'digital-arithmetic-y3',
+  q: "Which of the following statements about signed binary multiplication and division are correct? (Select ALL that apply)",
+  options: ["Multiplying two n-bit numbers can require up to 2n bits to represent the exact result", "Booth's algorithm is used to speed up and simplify signed multiplication in 2's complement representation", "Integer division by zero produces a well-defined result of 0 in standard binary arithmetic", "In the restoring division algorithm, if the partial remainder becomes negative after a trial subtraction, the divisor is added back (restored) before proceeding"],
+  answers: [0, 1, 3],
+  marks: 2,
+  difficulty: 'medium',
+  type: 'concept',
+  explanation: "The product of two n-bit numbers can be as large as (2^n - 1)^2, which in general requires up to 2n bits to represent exactly without truncation or overflow — option 1 is correct. Booth's algorithm is the standard technique for efficiently handling signed multiplication in 2's complement by scanning pairs of bits and reducing the number of required additions/subtractions — option 2 is correct. Division by zero is mathematically undefined and is NOT given a defined result of 0 in standard binary arithmetic — hardware typically flags it as an exception or error condition rather than silently returning 0 — so option 3 is incorrect. In the restoring division algorithm, exactly as stated, whenever a trial subtraction makes the partial remainder negative, the divisor is added back to restore the previous (correct) remainder before the algorithm shifts and proceeds to the next bit — option 4 is correct."
+},
+{
+  id: 'digital-arithmetic-y4',
+  q: "In IEEE 754 single-precision format, what is the biased exponent field value (expressed as an unsigned decimal integer) used to represent the decimal number 8.0? (Enter your numerical answer.)",
+  options: [],
+  answer: 130,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'medium',
+  type: 'numerical',
+  explanation: "8.0 in binary is 1000.0, which normalizes to 1.000 × 2^3 (moving the binary point 3 places left). The true (unbiased) exponent is therefore 3. IEEE 754 single precision stores the exponent with a bias of 127, so the stored biased exponent field equals the true exponent plus the bias: 3 + 127 = 130."
+},
+{
+  id: 'digital-arithmetic-y5',
+  q: "Add the two 6-bit 2's complement numbers 011011 (decimal 27) and 010110 (decimal 22). What is the decimal value of the 6-bit result, interpreted as a signed 2's complement number? (Enter your numerical answer.)",
+  options: [],
+  answer: -15,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'hard',
+  type: 'numerical',
+  explanation: "Adding the bit patterns directly: 011011 + 010110 = 110001 (binary addition, keeping only 6 bits, no bit is lost since the true sum 49 fits in 6 unsigned bits). Interpreting 110001 as a signed 6-bit 2's complement number: the MSB is 1, so it is negative. Inverting and adding 1: invert 110001 to get 001110, add 1 to get 001111 = 15, so the value is -15. This is the classic signed-overflow example: the true mathematical sum 27+22=49 exceeds the maximum representable positive value in 6-bit 2's complement (+31), so the result wraps around and is misread as -15 — demonstrating why overflow detection is essential in signed addition (two positive operands here incorrectly yield a negative result, which is exactly the sign-based overflow condition)."
+},
+{
+  id: 'digital-arithmetic-y6',
+  q: "In the IEEE 754 double-precision (64-bit) floating-point format, how many bits are allocated to the exponent field? (Enter your numerical answer.)",
+  options: [],
+  answer: 11,
+  kind: 'nat',
+  marks: 1,
+  difficulty: 'easy',
+  type: 'numerical',
+  explanation: "IEEE 754 double precision uses a 64-bit layout consisting of 1 sign bit, 11 exponent bits, and 52 mantissa (fraction) bits (1 + 11 + 52 = 64). The 11-bit exponent field uses a bias of 1023, allowing it to represent a much wider exponent range than the 8-bit exponent field of single precision."
 }
 );
