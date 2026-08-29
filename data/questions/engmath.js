@@ -2219,6 +2219,30 @@ window.GATE_DATA.questions['engmath'].topics.find(function(t){return t.id==='eng
   explanation: "The determinant of a square matrix equals the product of all its eigenvalues, counted with multiplicity: det(A) = lambda1 * lambda2 * lambda3 * lambda4. Here the eigenvalues are 1, -2, 3, and 4, so det(A) = 1 * (-2) * 3 * 4 = -2 * 3 * 4 = -6 * 4 = -24. This follows from the fact that det(A) = det(A - 0*I) equals the characteristic polynomial evaluated at lambda = 0 up to a sign of (-1)^n, or equivalently from writing A in a basis of eigenvectors (if diagonalizable) as a diagonal matrix whose determinant is simply the product of its diagonal (eigenvalue) entries. Hence det(A) = -24."
 }
 );
+window.GATE_DATA.questions['engmath'].topics.find(function(t){return t.id==='engmath-linear-algebra';}).questions.push(
+{
+  id: 'engmath-linear-algebra-g1',
+  q: 'Using Doolittle\'s LU decomposition (L is unit lower triangular with 1s on its diagonal, U is upper triangular) on the matrix A = [[4, 3], [6, 3]], so that A = LU, what is the value of u22 (the (2,2) entry of U)?',
+  options: [],
+  answer: -1.5,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'medium',
+  type: 'numerical',
+  explanation: "In Doolittle's method for a 2x2 matrix, U's first row equals A's first row directly: u11 = 4, u12 = 3. The multiplier l21 is computed as l21 = a21 / u11 = 6/4 = 1.5. Then u22 is obtained by eliminating: u22 = a22 - l21 * u12 = 3 - (1.5)(3) = 3 - 4.5 = -1.5. Verifying by multiplying back: L = [[1,0],[1.5,1]] and U = [[4,3],[0,-1.5]]. Row 1 of LU = [4,3], matching A's row 1. Row 2 of LU = [1.5*4 + 1*0, 1.5*3 + 1*(-1.5)] = [6, 4.5 - 1.5] = [6, 3], which exactly matches A's row 2 = [6,3]. This confirms u22 = -1.5 is correct."
+},
+{
+  id: 'engmath-linear-algebra-g2',
+  q: 'Using Doolittle\'s LU decomposition (L unit lower triangular, U upper triangular) on the matrix A = [[2, 1, 1], [4, 3, 3], [8, 7, 9]], so that A = LU, what is the value of l32 (the (3,2) entry of L)?',
+  options: [],
+  answer: 3,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'hard',
+  type: 'numerical',
+  explanation: "Row 1 of U equals row 1 of A: u11=2, u12=1, u13=1. The first-column multipliers are l21 = a21/u11 = 4/2 = 2 and l31 = a31/u11 = 8/2 = 4. Eliminating row 2: u22 = a22 - l21*u12 = 3 - 2*1 = 1, and u23 = a23 - l21*u13 = 3 - 2*1 = 1. Now l32 is found by eliminating row 3 against row 2: l32 = (a32 - l31*u12) / u22 = (7 - 4*1) / 1 = 3/1 = 3. Verifying by reconstructing LU with L = [[1,0,0],[2,1,0],[4,3,1]] and U = [[2,1,1],[0,1,1],[0,0,2]] (where u33 = a33 - l31*u13 - l32*u23 = 9-4-3 = 2): row 3 of LU = 4*(2,1,1) + 3*(0,1,1) + 1*(0,0,2) = (8,4,4)+(0,3,3)+(0,0,2) = (8,7,9), which exactly matches A's row 3. This confirms l32 = 3."
+}
+);
 
 
 window.GATE_DATA.questions['engmath'].topics.find(function(t){return t.id==='engmath-calculus';}).questions.push(
@@ -2354,5 +2378,30 @@ window.GATE_DATA.questions['engmath'].topics.find(function(t){return t.id==='eng
   difficulty: 'easy',
   type: 'numerical',
   explanation: "For a Binomial(n, p) random variable, which models the number of successes in n independent Bernoulli(p) trials, the expected value is given by the standard formula E[X] = n * p. This follows from linearity of expectation applied to the sum of n indicator variables (one per trial), each with expectation p, since E[X] = E[sum of indicators] = sum of E[indicator_i] = n*p regardless of any independence assumption. Here n = 10 and p = 0.3, so E[X] = 10 * 0.3 = 3. This means that, on average, we expect exactly 3 successes out of 10 trials when each trial independently succeeds with probability 0.3."
+}
+);
+window.GATE_DATA.questions['engmath'].topics.find(function(t){return t.id==='engmath-probability';}).questions.push(
+{
+  id: 'engmath-probability-g1',
+  q: 'A random variable X follows an Exponential distribution with rate parameter lambda = 0.5. What is the median of X, rounded to 3 decimal places?',
+  options: [],
+  answer: 1.386,
+  tolerance: 0.01,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'medium',
+  type: 'numerical',
+  explanation: "The median m of a continuous random variable satisfies P(X <= m) = 0.5. For an Exponential(lambda) distribution, the CDF is F(x) = 1 - e^(-lambda*x) for x >= 0. Setting F(m) = 0.5 gives 1 - e^(-lambda*m) = 0.5, so e^(-lambda*m) = 0.5, and taking the natural log of both sides: -lambda*m = ln(0.5) = -ln(2), so m = ln(2)/lambda. This is the standard closed-form median formula for the exponential distribution. Substituting lambda = 0.5: m = ln(2)/0.5 = 0.693147.../0.5 = 1.386294..., which rounds to 1.386. Note this median is strictly less than the mean of the exponential distribution (1/lambda = 2 here), which is expected since the exponential distribution is right-skewed, pulling its mean above its median."
+},
+{
+  id: 'engmath-probability-g2',
+  q: 'A random variable X follows a Binomial distribution with parameters n = 10 and p = 0.4. What is the mode of X (the value of X with the highest probability mass)?',
+  options: [],
+  answer: 4,
+  kind: 'nat',
+  marks: 1,
+  difficulty: 'medium',
+  type: 'numerical',
+  explanation: "For a Binomial(n, p) distribution, the mode can be found from the ratio of consecutive probabilities: P(X=k)/P(X=k-1) = [(n-k+1)/k] * [p/(1-p)]. This ratio is >= 1 (i.e., probability is still increasing) precisely when k <= (n+1)p. So the mode is the largest integer k satisfying k <= (n+1)p, i.e., mode = floor((n+1)p), as long as (n+1)p is not itself an integer (in which case there are two equally likely modes, (n+1)p and (n+1)p - 1). Here (n+1)p = 11 * 0.4 = 4.4, which is not an integer, so the mode is floor(4.4) = 4. Sanity check: since 4.4 lies between 4 and 5, the probability mass function is still increasing up through k=4 (since 4 <= 4.4) but starts decreasing after k=4 (since 5 > 4.4), confirming k = 4 is the single peak of the distribution."
 }
 );
