@@ -2365,3 +2365,87 @@ window.GATE_DATA.questions['dbms'].topics.find(function(t){return t.id==='dbms-i
   explanation: 'Key 20 hashes to 00, which routes it to B0 = {4, 12}, already full at capacity 2 -- an overflow. Because B0\'s local depth (1) equals the current global depth (1), a simple split cannot be reflected by the existing directory, so the directory itself must double: global depth becomes 2, giving 4 entries "00", "01", "10", "11", each now read using 2 bits of the hash instead of 1. B0\'s contents (4, 12, and the new 20) are rehashed using 2 bits: h(4) = 00 and h(20) = 00 both go to a new bucket B00 = {4, 20}, while h(12) = 10 goes to a separate new bucket B10 = {12}; both new buckets get local depth 2 (one more than before, since they were just split). Directory entry "00" points to B00 and "10" points to B10. Bucket B1, holding key 7 with h(7) = 01, was NOT involved in this split, so it keeps local depth 1, and BOTH directory entries whose last bit is 1 -- namely "01" and "11" -- continue pointing to the same unsplit B1 (a bucket\'s local depth being one less than global depth is exactly what makes multiple directory entries share it). So the answer is (2, 2, 2), option 2.'
 }
 );
+
+window.GATE_DATA.questions['dbms'].topics.find(function(t){return t.id==='dbms-er';}).questions.push(
+{
+  id: 'dbms-er-f1',
+  q: 'Study the ER diagram below and determine the minimum number of relational tables needed to represent it.',
+  figure: '<svg viewBox="0 0 400 260" width="100%" style="max-width:420px;height:auto" xmlns="http://www.w3.org/2000/svg"><rect x="10" y="20" width="90" height="40" fill="none" stroke="currentColor"/><text x="55" y="45" font-size="12" text-anchor="middle" fill="currentColor">Student</text><rect x="300" y="20" width="90" height="40" fill="none" stroke="currentColor"/><text x="345" y="45" font-size="12" text-anchor="middle" fill="currentColor">Course</text><rect x="155" y="205" width="90" height="40" fill="none" stroke="currentColor"/><text x="200" y="230" font-size="12" text-anchor="middle" fill="currentColor">Teacher</text><path d="M165 40 L200 15 L235 40 L200 65 Z" fill="none" stroke="currentColor"/><text x="200" y="43" font-size="11" text-anchor="middle" fill="currentColor">Enrolls</text><line x1="100" y1="40" x2="165" y2="40" stroke="currentColor"/><text x="115" y="33" font-size="11" fill="currentColor">M</text><line x1="235" y1="40" x2="300" y2="40" stroke="currentColor"/><text x="280" y="33" font-size="11" fill="currentColor">N</text><path d="M295 145 L330 122 L365 145 L330 168 Z" fill="none" stroke="currentColor"/><text x="330" y="149" font-size="11" text-anchor="middle" fill="currentColor">Teaches</text><line x1="245" y1="215" x2="295" y2="150" stroke="currentColor"/><text x="255" y="200" font-size="11" fill="currentColor">1</text><line x1="365" y1="145" x2="345" y2="60" stroke="currentColor"/><line x1="371" y1="140" x2="351" y2="55" stroke="currentColor"/><text x="358" y="100" font-size="11" fill="currentColor">N</text></svg>',
+  options: [
+    '3 tables',
+    '4 tables',
+    '5 tables',
+    '6 tables'
+  ],
+  answer: 1,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: "The diagram shows Student M--N Course through Enrolls, and Teacher 1--N Course through Teaches, with a double line from Course to Teaches indicating Course participates totally in Teaches (every course has an assigned teacher). Enrolls is a many-to-many relationship, so it mandatorily gets its own junction table Enrolls(Sid, Cid) - no single-valued foreign key on either side can capture a many-valued association in both directions, regardless of participation constraints. Teaches is one-to-many with Course as the 'many' side, so its foreign key (teacher_id) is folded directly into the Course table; the total participation of Course only means this column can be declared NOT NULL, it does not create a separate table. Counting up: Student, Course (carrying teacher_id), Teacher, and Enrolls gives exactly 4 tables - the minimum possible for this design."
+},
+{
+  id: 'dbms-er-f2',
+  q: 'In the ER diagram fragment shown, the edge from Warehouse to the relationship Stores is labelled 1, the edge from Stores to Item is labelled N, and the Item-to-Stores edge is drawn as a double line. Which statement correctly describes the constraint depicted?',
+  figure: '<svg viewBox="0 0 380 140" width="100%" style="max-width:420px;height:auto" xmlns="http://www.w3.org/2000/svg"><rect x="10" y="45" width="100" height="40" fill="none" stroke="currentColor"/><text x="60" y="70" font-size="12" text-anchor="middle" fill="currentColor">Warehouse</text><path d="M150 45 L190 20 L230 45 L190 70 Z" fill="none" stroke="currentColor"/><text x="190" y="49" font-size="11" text-anchor="middle" fill="currentColor">Stores</text><rect x="270" y="45" width="100" height="40" fill="none" stroke="currentColor"/><text x="320" y="70" font-size="12" text-anchor="middle" fill="currentColor">Item</text><line x1="110" y1="65" x2="150" y2="49" stroke="currentColor"/><text x="122" y="55" font-size="11" fill="currentColor">1</text><line x1="230" y1="49" x2="270" y2="60" stroke="currentColor"/><line x1="232" y1="55" x2="272" y2="66" stroke="currentColor"/><text x="245" y="45" font-size="11" fill="currentColor">N</text></svg>',
+  options: [
+    'Each warehouse stores at most one item, and every item must be stored in some warehouse',
+    'Each item is stored in at most one warehouse, a single warehouse may store many items, and every item must be stored in some warehouse',
+    'Each item is stored in at most one warehouse, but some items may not be stored in any warehouse at all',
+    'A warehouse and an item share a many-to-many storage relationship'
+  ],
+  answer: 1,
+  marks: 1,
+  difficulty: 'easy',
+  type: 'pyq-style',
+  explanation: "In this cardinality notation, the label adjacent to an entity on its connecting edge states how many instances of that entity a single relationship instance can bind to, so '1' next to Warehouse and 'N' next to Item together mean one warehouse can be associated with many items, i.e. Warehouse:Item is a 1:N relationship - each Item is stored in at most one Warehouse, while a Warehouse may store many Items. The double line on the Item-to-Stores edge denotes total participation of Item in Stores, meaning every Item entity must appear in at least one Stores relationship instance (no item can exist unstored). Combining both facts gives option B exactly. Option A reverses the direction of the cardinality; option C wrongly claims partial participation despite the double line; option D misreads a 1:N relationship as M:N."
+}
+);
+
+window.GATE_DATA.questions['dbms'].topics.find(function(t){return t.id==='dbms-indexing';}).questions.push(
+{
+  id: 'dbms-indexing-f1',
+  q: 'The figure shows a full leaf node of a B+-tree of order 5 (each leaf holds at most 4 keys). Key 25 is inserted into this leaf, causing it to overflow and split. After the split, what are the contents of the two resulting leaf nodes, and which key is copied up to the parent?',
+  figure: '<svg viewBox="0 0 340 130" width="100%" style="max-width:420px;height:auto" xmlns="http://www.w3.org/2000/svg"><rect x="20" y="20" width="240" height="40" fill="none" stroke="currentColor"/><line x1="80" y1="20" x2="80" y2="60" stroke="currentColor"/><line x1="140" y1="20" x2="140" y2="60" stroke="currentColor"/><line x1="200" y1="20" x2="200" y2="60" stroke="currentColor"/><text x="50" y="45" font-size="13" text-anchor="middle" fill="currentColor">10</text><text x="110" y="45" font-size="13" text-anchor="middle" fill="currentColor">20</text><text x="170" y="45" font-size="13" text-anchor="middle" fill="currentColor">30</text><text x="230" y="45" font-size="13" text-anchor="middle" fill="currentColor">40</text><line x1="260" y1="40" x2="300" y2="40" stroke="currentColor"/><polygon points="300,35 310,40 300,45" fill="currentColor"/><text x="20" y="90" font-size="12" fill="#35d0ba">Insert key 25 into this leaf</text><line x1="140" y1="100" x2="140" y2="115" stroke="#35d0ba"/><polygon points="135,115 140,125 145,115" fill="#35d0ba"/></svg>',
+  options: [
+    'Left leaf {10,20,25}, right leaf {30,40}; key 30 is copied up to the parent (30 remains in the right leaf too)',
+    'Left leaf {10,20}, right leaf {25,30,40}; key 25 is copied up to the parent',
+    'Left leaf {10,20,25,30}, right leaf {40}; key 40 is moved up to the parent',
+    'Left leaf {10,20,25}, right leaf {30,40}; key 30 is moved up (deleted from the leaf) to the parent'
+  ],
+  answer: 0,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: "Inserting 25 into the full leaf {10,20,30,40} gives the sorted list {10,20,25,30,40}, which has 5 keys and overflows the 4-key leaf capacity, forcing a split. The standard B+-tree leaf split rule sends the first ceil(5/2)=3 keys to the left node and the remaining 2 keys to the right node: left = {10,20,25}, right = {30,40}. Crucially, a LEAF split COPIES the first key of the new right leaf (30) up into the parent as a separator - it does not remove 30 from the leaf, because leaf nodes must retain every actual data key for range scans and sequential access via the leaf chain. This is the key distinction from an INTERNAL node split, where the middle key is instead moved up and removed from the child, since internal nodes hold only routing keys, not data."
+},
+{
+  id: 'dbms-indexing-f2',
+  q: 'The figure shows a B+-tree with a root node, one index (internal) level below it, and a leaf level at the bottom, with leaf nodes linked in a chain for range scans. Assuming each node occupies one disk block and a search always starts at the root and descends level by level to the correct leaf, how many disk block accesses are needed for an exact-match search?',
+  figure: '<svg viewBox="0 0 360 200" width="100%" style="max-width:420px;height:auto" xmlns="http://www.w3.org/2000/svg"><rect x="140" y="10" width="80" height="30" fill="none" stroke="currentColor"/><text x="180" y="30" font-size="12" text-anchor="middle" fill="currentColor">Root</text><rect x="60" y="80" width="80" height="30" fill="none" stroke="currentColor"/><text x="100" y="100" font-size="11" text-anchor="middle" fill="currentColor">Idx A</text><rect x="220" y="80" width="80" height="30" fill="none" stroke="currentColor"/><text x="260" y="100" font-size="11" text-anchor="middle" fill="currentColor">Idx B</text><line x1="160" y1="40" x2="105" y2="80" stroke="currentColor"/><line x1="200" y1="40" x2="255" y2="80" stroke="currentColor"/><rect x="10" y="150" width="70" height="30" fill="none" stroke="currentColor"/><rect x="110" y="150" width="70" height="30" fill="none" stroke="currentColor"/><rect x="200" y="150" width="70" height="30" fill="none" stroke="currentColor"/><rect x="290" y="150" width="70" height="30" fill="none" stroke="currentColor"/><line x1="45" y1="180" x2="115" y2="180" stroke="currentColor"/><line x1="145" y1="180" x2="205" y2="180" stroke="currentColor"/><line x1="235" y1="180" x2="295" y2="180" stroke="currentColor"/><line x1="85" y1="110" x2="45" y2="150" stroke="currentColor"/><line x1="115" y1="110" x2="145" y2="150" stroke="currentColor"/><line x1="245" y1="110" x2="235" y2="150" stroke="currentColor"/><line x1="275" y1="110" x2="325" y2="150" stroke="currentColor"/></svg>',
+  options: ['1', '2', '3', '4'],
+  answer: 2,
+  marks: 1,
+  difficulty: 'easy',
+  type: 'pyq-style',
+  explanation: "The figure shows exactly three levels of nodes that must be visited on the way from the root to any leaf: the Root node, one Index-level node (Idx A or Idx B, chosen by comparing the search key against the root's routing keys), and finally the target Leaf node that actually stores the record pointer. Since each node occupies one disk block and the search reads exactly one node per level on this unique root-to-leaf path, the total number of disk block accesses for an exact-match search equals the number of levels, which is 3 here (Root, Index, Leaf). The leaf-to-leaf chain links shown at the bottom exist only to speed up range scans and sequential access after the first leaf is found - they are not traversed during a plain exact-match lookup, so they do not add to this count."
+}
+);
+
+window.GATE_DATA.questions['dbms'].topics.find(function(t){return t.id==='dbms-transactions';}).questions.push(
+{
+  id: 'dbms-transactions-f1',
+  q: 'The precedence (serialization) graph for a schedule S over transactions T1, T2, T3 is shown, where an edge Ti -> Tj means a conflicting operation of Ti precedes a conflicting operation of Tj on the same data item. Based on this graph, is S conflict serializable?',
+  figure: '<svg viewBox="0 0 260 220" width="100%" style="max-width:380px;height:auto" xmlns="http://www.w3.org/2000/svg"><defs><marker id="arw" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" fill="currentColor"/></marker></defs><circle cx="60" cy="40" r="26" fill="none" stroke="currentColor"/><text x="60" y="46" font-size="14" text-anchor="middle" fill="currentColor">T1</text><circle cx="200" cy="40" r="26" fill="none" stroke="currentColor"/><text x="200" y="46" font-size="14" text-anchor="middle" fill="currentColor">T2</text><circle cx="130" cy="170" r="26" fill="none" stroke="currentColor"/><text x="130" y="176" font-size="14" text-anchor="middle" fill="currentColor">T3</text><line x1="86" y1="40" x2="174" y2="40" stroke="currentColor" marker-end="url(#arw)"/><line x1="184" y1="63" x2="147" y2="146" stroke="currentColor" marker-end="url(#arw)"/><line x1="112" y1="148" x2="75" y2="64" stroke="currentColor" marker-end="url(#arw)"/></svg>',
+  options: [
+    'Yes, conflict serializable; equivalent serial order is T1, T2, T3',
+    'Yes, conflict serializable; equivalent serial order is T3, T2, T1',
+    'No, not conflict serializable, because the precedence graph contains the cycle T1 -> T2 -> T3 -> T1',
+    'Yes, conflict serializable, since exactly one edge exists between every pair of transactions'
+  ],
+  answer: 2,
+  marks: 1,
+  difficulty: 'easy',
+  type: 'pyq-style',
+  explanation: "The fundamental theorem for conflict serializability states that a schedule is conflict serializable if and only if its precedence graph is acyclic; when it is acyclic, any topological order of the graph gives an equivalent serial schedule. Here the arrows form T1 -> T2, T2 -> T3, and T3 -> T1, which is a directed cycle visiting all three transactions and returning to the start. A cycle means there is no consistent linear ordering of the transactions that respects every conflict simultaneously (T1 would need to precede T2, which would need to precede T3, which would need to precede T1 - a contradiction), so no equivalent serial schedule exists. Hence S is NOT conflict serializable. The mere presence of an edge between every pair of transactions (option D) is irrelevant to serializability - only the absence of a cycle matters."
+}
+);

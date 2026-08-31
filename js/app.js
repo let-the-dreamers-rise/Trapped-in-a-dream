@@ -103,7 +103,7 @@
   function renderChips() {
     var d = missionDay();
     document.getElementById('day-chip').textContent = d ? ('Day ' + d + '/90') : 'Set start';
-    document.getElementById('streak-chip').textContent = '🔥 ' + (S.streak.count || 0);
+    document.getElementById('streak-chip').textContent = (S.streak.count || 0) + ' day streak';
   }
   document.querySelectorAll('#tabbar .tab').forEach(function (b) {
     b.addEventListener('click', function () { nav(b.getAttribute('data-nav')); });
@@ -134,7 +134,7 @@
     var d = missionDay();
     if (!S.startDate) {
       $view.innerHTML =
-        '<div class="card"><h2>🎯 Mission: GATE Rank 1 in 90 days</h2>' +
+        '<div class="card"><div class="eyebrow">Mission</div><h2>GATE Rank 1 in 90 days</h2>' +
         '<p class="muted">Every subject. Every topic. Theory + unlimited questions with full explanations. Score targets: 50/100 by Day 30 → 90+/100 by Day 90.</p>' +
         '<hr class="sep"><h3>When is Day 1?</h3>' +
         '<input type="date" id="start-date" value="' + todayKey() + '">' +
@@ -158,37 +158,47 @@
     var pct = Math.min(100, Math.round(answered / quota * 100));
     var html = '';
     if (d > 60) {
-      html += '<div class="card" style="border-color:var(--warn)"><b style="color:var(--warn)">🧊 Content freeze (Day 60+).</b> <span class="small muted">Toppers stop new topics in the last 30 days. Revision, mocks and mistake-book only — the syllabus you know beats the syllabus you skimmed.</span></div>';
+      html += '<div class="card" style="border-color:var(--warn)"><b style="color:var(--warn)">Content freeze &mdash; Day 60+.</b> <span class="small muted">Toppers stop new topics in the last 30 days. Revision, mocks and mistake-book only — the syllabus you know beats the syllabus you skimmed.</span></div>';
     }
-    html += '<div class="card"><h2>Day ' + d + ' of 90 — ' + esc(plan ? plan.title : 'Grind') + '</h2>' +
-      '<div class="muted small">Phase ' + (plan ? plan.phase : '-') + (plan && plan.mock ? ' · <b style="color:var(--warn)">MOCK DAY — target ' + plan.target + '/100</b>' : '') + '</div>' +
-      '<div class="progress-track"><div class="progress-fill" style="width:' + pct + '%"></div></div>' +
-      '<div class="small muted">' + answered + ' / ' + quota + ' questions solved today</div></div>';
+    var grid = '';
+    for (var gi = 1; gi <= 90; gi++) grid += '<i class="' + (gi < d ? 'done' : (gi === d ? 'now' : '')) + '"></i>';
+    html += '<div class="card">' +
+      '<div class="eyebrow">Day of mission</div>' +
+      '<div class="hero-day"><span class="hero-num">' + String(d).padStart(2, '0') + '</span>' +
+      '<span class="hero-of">/90</span>' +
+      '<span class="hero-right"><span class="n">' + (90 - d) + '</span><div class="eyebrow" style="margin:2px 0 0">Days left</div></span></div>' +
+      '<div class="day-grid">' + grid + '</div></div>' +
+      '<div class="card"><h3>' + esc(plan ? plan.title : 'Grind') +
+      (plan && plan.mock ? ' · <span style="color:var(--accent)">Mock day — target ' + plan.target + '/100</span>' : '') + '</h3>' +
+      '<div class="hero-day"><span class="hero-num" style="font-size:52px">' + answered + '</span>' +
+      '<span class="hero-of">/' + quota + ' Q</span>' +
+      '<span class="hero-right"><div class="eyebrow" style="margin:0">Phase ' + (plan ? plan.phase : '-') + '</div></span></div>' +
+      '<div class="progress-track"><div class="progress-fill" style="width:' + pct + '%"></div></div></div>';
 
     if (plan) {
-      html += '<div class="card"><h3>✅ Today\'s objectives</h3>';
+      html += '<div class="card"><h3>Today\'s objectives</h3>';
       var checks = S.planChecks[d] || {};
       plan.tasks.forEach(function (t, i) {
         html += '<label class="task-line"><input type="checkbox" data-task="' + i + '" ' + (checks[i] ? 'checked' : '') + '><span>' + esc(t.text) + '</span></label>';
       });
       html += '<div class="btn-row">';
       (plan.focus || []).forEach(function (f) {
-        if (BANK[f]) html += '<button class="btn" data-go-subject="' + f + '">Open ' + esc(BANK[f].subject) + '</button>';
+        if (BANK[f]) html += '<button class="btn" data-go-subject="' + f + '">' + esc(BANK[f].subject.split(' ')[0]) + '</button>';
       });
       if (plan.mock) html += '<button class="btn good" data-go-mock="1">Take today\'s mock</button>';
       html += '</div></div>';
     }
     if (astro) {
-      html += '<div class="card astro-card"><h3>♓ Pisces daily — Meena rashi</h3>' +
+      html += '<div class="card astro-card"><h3>Pisces daily &mdash; Meena rashi</h3>' +
         '<p class="small">' + esc(astro.focus) + '</p><hr class="sep">' +
         '<p class="small muted">🎨 Lucky colour: <b>' + astro.color + '</b> · 🔢 Lucky number: <b>' + astro.number + '</b> · ⏰ Best study window: <b>' + astro.time + '</b></p>' +
         '<p class="small muted">🕉️ ' + esc(astro.mantra) + '</p>' +
         '<p class="small muted">✨ Today\'s ritual: ' + esc(astro.ritual) + '</p></div>';
     }
-    html += '<div class="card"><h3>🍅 Focus timer</h3><div class="btn-row">' +
+    html += '<div class="card"><h3>Focus timer</h3><div class="btn-row">' +
       '<button class="btn" id="pomo-25">25 min sprint</button><button class="btn ghost" id="pomo-45">45 min deep</button></div>' +
       '<div id="pomo-display" class="small muted" style="margin-top:8px">Focus blocks completed: ' + (S.pomo || 0) + '. Phone in another room, then press start.</div></div>';
-    html += '<div class="card"><h3>🕐 The 15-hour day (tap to expand)</h3><div id="tmpl" class="small muted" style="display:none;white-space:pre-wrap">' + (DATA.dayTemplate || []).join('\n') + '</div></div>';
+    html += '<div class="card"><h3>The 15-hour day &mdash; tap to expand</h3><div id="tmpl" class="small muted" style="display:none;white-space:pre-wrap">' + (DATA.dayTemplate || []).join('\n') + '</div></div>';
     $view.innerHTML = html;
     var pomoTimer = null;
     function startPomo(mins) {
@@ -201,7 +211,7 @@
         if (left <= 0) {
           clearInterval(pomoTimer); pomoTimer = null;
           S.pomo = (S.pomo || 0) + 1; save();
-          disp.innerHTML = '✅ Block done! Total: ' + S.pomo + '. Take a 5–10 min REAL break (move, water, no phone).';
+          disp.innerHTML = 'Block done. Total: ' + S.pomo + '. Take a 5–10 min REAL break (move, water, no phone).';
         } else {
           disp.textContent = '⏳ ' + Math.floor(left / 60) + ':' + String(left % 60).padStart(2, '0') + ' — single task, nothing else exists.';
         }
@@ -229,7 +239,7 @@
     return Math.round(st.correct / st.attempts * 100);
   }
   function viewSubjects() {
-    var html = '<h2 style="margin-bottom:12px">📚 Full GATE CS&IT syllabus</h2>';
+    var html = '<div class="card"><h3>Full GATE CS&amp;IT syllabus</h3></div>';
     SUBJECT_ORDER.forEach(function (k) {
       var s = BANK[k]; if (!s) return;
       var nQ = 0, att = 0, cor = 0;
@@ -273,7 +283,7 @@
       (t.theory && t.theory.deep ? '<button data-tt="deep">Deep dive</button>' : '') +
       '<button data-tt="strategy">Exam strategy</button></div>' +
       '<div class="card"><div class="theory-body" id="tbody"></div></div>' +
-      '<button class="btn block good" id="practice">🚀 Practice this topic (infinite quiz)</button>';
+      '<button class="btn block good" id="practice">Practice &mdash; infinite quiz</button>';
     $view.innerHTML = html;
     var body = document.getElementById('tbody');
     function show(k) {
@@ -286,6 +296,13 @@
     });
     document.getElementById('back').addEventListener('click', function () { nav('subject', e.subject); });
     document.getElementById('practice').addEventListener('click', function () { nav('quiz', tid); });
+  }
+
+  // Figures: questions may carry an inline SVG diagram (automata, circuits, graphs, Gantt...).
+  // Content is authored in this repo's own data files, so it is rendered as-is.
+  function figureHtml(qq) {
+    if (!qq.figure) return '';
+    return '<div class="q-fig">' + qq.figure + '</div>';
   }
 
   // ---------- question kinds (GATE 2026 pattern: MCQ / MSQ / NAT) ----------
@@ -339,7 +356,7 @@
       var genTag = qq.type === 'generated' ? '<span class="pill gen">∞ generated</span>' : '';
       var html = '<button class="back-link" id="back">‹ ' + esc(e.topic.name) + '</button>' + filterBar() +
         '<div class="quiz-meta"><span>Q' + num + ' · ' + right + ' correct</span><span><span class="pill ' + qq.difficulty + '">' + qq.difficulty + '</span><span class="pill">' + qq.marks + ' mark' + (qq.marks > 1 ? 's' : '') + '</span>' + kindPill(qq) + repeatTag + genTag + '</span></div>' +
-        '<div class="card"><div class="q-text">' + esc(qq.q) + '</div><div id="opts">';
+        '<div class="card"><div class="q-text">' + esc(qq.q) + '</div>' + figureHtml(qq) + '<div id="opts">';
       var kind = qKind(qq);
       if (kind === 'nat') {
         html += '<input type="number" step="any" id="nat-in" placeholder="Type your numerical answer" inputmode="decimal">' +
@@ -371,19 +388,19 @@
         if (goBtn) goBtn.disabled = true;
         var natIn = document.getElementById('nat-in');
         if (natIn) natIn.disabled = true;
-        var speedNote = secs > budget ? ' · ⏱ ' + secs + 's (over the ~' + budget + 's exam budget — speed this pattern up)' : ' · ⏱ ' + secs + 's ✓';
+        var speedNote = secs > budget ? ' &middot; ' + secs + 's (over the ~' + budget + 's exam budget — speed this pattern up)' : ' &middot; ' + secs + 's on pace';
         document.getElementById('after').innerHTML =
-          '<div class="feedback-banner ' + (ok ? 'ok' : 'no') + '">' + (ok ? '✅ Correct!' : '❌ Not quite — read why, this one WILL come back') + speedNote + '</div>' +
+          '<div class="feedback-banner ' + (ok ? 'ok' : 'no') + '">' + (ok ? 'Correct' : 'Wrong &mdash; read why, this one comes back') + speedNote + '</div>' +
           '<div class="explain"><b>' + answerLabel(qq) + '</b>\n' + esc(qq.explanation || '') + '</div>' +
           '<div class="btn-row"><button class="btn" id="next">Next question →</button>' +
-          (qq.type !== 'generated' ? '<button class="btn ghost" id="flag-q">🚩 Doubtful?</button>' : '') + '</div>';
+          (qq.type !== 'generated' ? '<button class="btn ghost" id="flag-q">Flag as doubtful</button>' : '') + '</div>';
         document.getElementById('next').addEventListener('click', ask);
         var fb = document.getElementById('flag-q');
         if (fb) fb.addEventListener('click', function () {
           S.flags = S.flags || {};
           S.flags[qq.id] = { topic: tid, when: Date.now() };
           save();
-          fb.textContent = '🚩 Flagged'; fb.disabled = true;
+          fb.textContent = 'Flagged'; fb.disabled = true;
         });
         window.scrollTo(0, 0);
       }
@@ -457,9 +474,9 @@
   function viewMockLanding() {
     var last = S.mocks[S.mocks.length - 1];
     var blocked = last && last.wrong > 0 && (last.tagged || 0) < last.wrong;
-    var html = '<div class="card"><h2>📝 Full mock test</h2><p class="muted small">65 questions · 100 marks · 3 hours · real GATE negative marking (−1/3 on 1-mark, −2/3 on 2-mark MCQs). No pausing — treat it like the real hall.</p>';
+    var html = '<div class="card"><h2>Full mock test</h2><p class="muted small">65 questions · 100 marks · 3 hours · real GATE negative marking (−1/3 on 1-mark, −2/3 on 2-mark MCQs). No pausing — treat it like the real hall.</p>';
     if (blocked) {
-      html += '<div class="feedback-banner no small">🔒 Your last mock has ' + (last.wrong - (last.tagged || 0)) + ' untagged mistakes. Toppers never take a new mock before dissecting the last one — analyse every wrong answer first.</div>' +
+      html += '<div class="feedback-banner no small">Locked &mdash; your last mock has ' + (last.wrong - (last.tagged || 0)) + ' untagged mistakes. Toppers never take a new mock before dissecting the last one — analyse every wrong answer first.</div>' +
         '<div class="btn-row"><button class="btn ghost" id="unlock-mock">I analysed every mistake on paper — unlock</button></div>';
     } else {
       html += '<div class="btn-row"><button class="btn good" id="start-mock">Start mock now</button></div>';
@@ -490,7 +507,7 @@
       var it = paper[idx]; var qq = it.q;
       var kind = qKind(qq);
       var html = header() + '<div class="card">' + kindPill(qq) + (kind === 'mcq' ? '<span class="pill">MCQ · −ve marking</span>' : '<span class="pill gen">no −ve marking</span>') +
-        '<div class="q-text" style="margin-top:8px">' + esc(qq.q) + '</div><div>';
+        '<div class="q-text" style="margin-top:8px">' + esc(qq.q) + '</div>' + figureHtml(qq) + '<div>';
       if (kind === 'nat') {
         html += '<input type="number" step="any" id="mock-nat" inputmode="decimal" placeholder="Type numerical answer" value="' + (answers[idx] !== undefined ? esc(answers[idx]) : '') + '">';
       } else {
@@ -545,7 +562,7 @@
       score = Math.round(score * 100) / 100;
       S.mocks.push({ dateISO: new Date().toISOString(), day: missionDay(), score: score, max: 100, correct: correct, wrong: wrong, skipped: skipped });
       save();
-      var verdict = score >= 90 ? '🏆 Rank-1 territory. Hold the line.' : score >= 70 ? '💪 Strong — now hunt down every mark you dropped.' : score >= 50 ? '📈 On curve for month 1. Analyse every mistake for 2 hours.' : '🔥 Below curve. Do not panic — list every wrong topic and drill them THIS week.';
+      var verdict = score >= 90 ? 'Rank-1 territory. Hold the line.' : score >= 70 ? 'Strong &mdash; now hunt down every mark you dropped.' : score >= 50 ? 'On curve for month 1. Analyse every mistake for 2 hours.' : 'Below curve. Do not panic &mdash; list every wrong topic and drill them THIS week.';
       var html = '<div class="card"><h2>Mock result: ' + score + ' / 100</h2>' +
         '<div class="stat-grid"><div class="stat"><div class="num">' + correct + '</div><div class="lbl">correct</div></div>' +
         '<div class="stat"><div class="num">' + wrong + '</div><div class="lbl">wrong (−ve marked)</div></div>' +
@@ -561,7 +578,7 @@
         paper.forEach(function (it, i) {
           var a = answers[i]; var qq = it.q; var kind = qKind(qq);
           var ok = a === undefined ? false : (kind === 'nat' ? natMatches(qq, a) : kind === 'msq' ? msqMatches(qq, a) : a === qq.answer);
-          h += '<div class="card"><div class="q-text">Q' + (i + 1) + '. ' + esc(qq.q) + '</div>';
+          h += '<div class="card"><div class="q-text">Q' + (i + 1) + '. ' + esc(qq.q) + '</div>' + figureHtml(qq);
           (qq.options || []).forEach(function (o, j) {
             var isRight = kind === 'msq' ? qq.answers.indexOf(j) >= 0 : j === qq.answer;
             var wasPicked = kind === 'msq' ? (Array.isArray(a) && a.indexOf(j) >= 0) : j === a;
@@ -614,7 +631,7 @@
         var L = S.leitner[qq.id]; if (L && L.box >= 3) mastered++;
       });
     });
-    var html = '<h2 style="margin-bottom:12px">📈 Progress</h2>' +
+    var html = '<div class="card"><h3>Progress</h3></div>' +
       '<div class="card"><div class="stat-grid">' +
       '<div class="stat"><div class="num">' + totalAtt + '</div><div class="lbl">questions answered</div></div>' +
       '<div class="stat"><div class="num">' + (totalAtt ? Math.round(totalCor / totalAtt * 100) : 0) + '%</div><div class="lbl">overall accuracy</div></div>' +
@@ -625,7 +642,7 @@
       '</div></div>';
     var mk = S.mistakes;
     if (mk && (mk.concept + mk.silly + mk.time) > 0) {
-      html += '<div class="card"><h3>🧠 Mock mistake anatomy</h3><div class="stat-grid" style="grid-template-columns:1fr 1fr 1fr">' +
+      html += '<div class="card"><h3>Mock mistake anatomy</h3><div class="stat-grid" style="grid-template-columns:1fr 1fr 1fr">' +
         '<div class="stat"><div class="num">' + mk.concept + '</div><div class="lbl">concept gaps</div></div>' +
         '<div class="stat"><div class="num">' + mk.silly + '</div><div class="lbl">silly slips</div></div>' +
         '<div class="stat"><div class="num">' + mk.time + '</div><div class="lbl">time traps</div></div></div>' +
@@ -639,7 +656,7 @@
     });
     weak.sort(function (a, b) { return a.acc - b.acc; });
     if (weak.length) {
-      html += '<div class="card"><h3>🎯 Your weakest topics — drill these first</h3>';
+      html += '<div class="card"><h3>Weakest topics &mdash; drill these first</h3>';
       weak.slice(0, 5).forEach(function (w) {
         var e2 = topicById(w.tid);
         html += '<div class="list-item" data-topic="' + w.tid + '" style="margin-bottom:8px"><div class="grow"><div class="title small">' + esc(e2 ? e2.topic.name : w.tid) + '</div>' +
@@ -670,7 +687,7 @@
       html += '<p class="muted small">Targets: Day 30 → 50 · Day 60 → 70 · Day 85+ → 90.</p></div>';
     }
     // backup & restore — localStorage is fragile; never lose 90 days of grind
-    html += '<div class="card"><h3>💾 Backup & restore</h3>' +
+    html += '<div class="card"><h3>Backup &amp; restore</h3>' +
       '<p class="muted small">Your progress lives only on this device. Export it weekly — paste the code somewhere safe (notes app, email to yourself).</p>' +
       '<div class="btn-row"><button class="btn ghost" id="exp-btn">Export progress</button><button class="btn ghost" id="imp-btn">Import</button></div>' +
       '<textarea id="backup-box" style="display:none;width:100%;margin-top:10px;background:var(--card2);color:var(--text);border:1px solid #33396b;border-radius:10px;padding:10px;min-height:90px;font-size:12px"></textarea>' +
@@ -707,14 +724,14 @@
   // ---------- PLAN ----------
   function viewPlan() {
     var d = missionDay() || 0;
-    var html = '<h2 style="margin-bottom:6px">🗓️ The 90-day battle plan</h2>' +
-      '<p class="muted small" style="margin-bottom:12px">Phase 1 (D1–30): learn fast, mock to 50. Phase 2 (D31–60): finish syllabus, mock to 70. Phase 3 (D61–90): revise + mock to 90+. Tap a day to see its objectives.</p>';
+    var html = '<div class="card"><h3>The 90-day battle plan</h3>' +
+      '<p class="muted small">Phase 1 (D1–30): learn fast, mock to 50. Phase 2 (D31–60): finish syllabus, mock to 70. Phase 3 (D61–90): revise + mock to 90+. Tap a day to see its objectives.</p></div>';
     (DATA.plan || []).forEach(function (p) {
       var checks = S.planChecks[p.day] || {};
       var doneCt = Object.keys(checks).filter(function (k) { return checks[k]; }).length;
       var allDone = doneCt >= p.tasks.length;
       html += '<div class="day-row' + (p.day === d ? ' today' : '') + (allDone ? ' done' : '') + '" data-day="' + p.day + '">' +
-        '<div class="day-num">D' + p.day + (p.mock ? ' 📝' : '') + '</div>' +
+        '<div class="day-num">D' + p.day + (p.mock ? '' : '') + '</div>' +
         '<div class="grow"><div class="small" style="font-weight:700">' + esc(p.title) + '</div>' +
         '<div class="muted small">' + doneCt + '/' + p.tasks.length + ' done · quota ' + p.quota + ' Qs' + (p.target ? ' · target ' + p.target + '/100' : '') + '</div>' +
         '<div class="day-detail" style="display:none" data-detail="' + p.day + '"></div></div></div>';

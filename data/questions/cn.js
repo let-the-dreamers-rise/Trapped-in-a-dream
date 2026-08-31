@@ -2041,3 +2041,61 @@ window.GATE_DATA.questions['cn'].topics.find(function(t){return t.id==='cn-trans
   explanation: 'A stray old segment could in principle linger in the network (e.g., stuck in a queue) and arrive late, after its connection incarnation has ended. If its sequence number were reused by a brand-new segment before the old one is guaranteed dead, the receiver could not tell them apart and might accept stale data as current. MSL bounds how long any segment can plausibly survive in the network before being dropped, so a stale segment is guaranteed gone after (at most) about one MSL, and safely gone after 2 x MSL accounting for round-trip effects. As long as the sequence-number wraparound period (about 343.6 s in the previous part) comfortably exceeds 2 x MSL (240 s here), no sequence number can be reused while an old duplicate carrying that same number could still legitimately be in flight -- so ambiguity is structurally impossible. This is exactly why the combination of a large-enough 32-bit space and a bounded MSL, rather than either alone, is what makes TCP sequence numbers safe; it also explains why extremely high-speed links (where wraparound becomes fast) need supplementary protection like PAWS.'
 }
 );
+
+window.GATE_DATA.questions['cn'].topics.find(function(t){return t.id==='cn-network';}).questions.push(
+{
+  id: 'cn-network-f1',
+  q: 'A /24 network 10.0.4.0/24 is divided into four equal-sized /26 subnets as shown. Host H has IP address 10.0.4.150/26. Which subnet does Host H belong to?',
+  figure: '<svg viewBox="0 0 380 190" width="100%" style="max-width:420px;height:auto" xmlns="http://www.w3.org/2000/svg"><rect x="20" y="20" width="80" height="50" fill="none" stroke="currentColor"/><text x="60" y="42" font-size="11" text-anchor="middle" fill="currentColor">Subnet 1</text><text x="60" y="58" font-size="9" text-anchor="middle" fill="currentColor">.0-.63</text><rect x="110" y="20" width="80" height="50" fill="none" stroke="currentColor"/><text x="150" y="42" font-size="11" text-anchor="middle" fill="currentColor">Subnet 2</text><text x="150" y="58" font-size="9" text-anchor="middle" fill="currentColor">.64-.127</text><rect x="200" y="20" width="80" height="50" fill="none" stroke="currentColor"/><text x="240" y="42" font-size="11" text-anchor="middle" fill="currentColor">Subnet 3</text><text x="240" y="58" font-size="9" text-anchor="middle" fill="currentColor">.128-.191</text><rect x="290" y="20" width="80" height="50" fill="none" stroke="currentColor"/><text x="330" y="42" font-size="11" text-anchor="middle" fill="currentColor">Subnet 4</text><text x="330" y="58" font-size="9" text-anchor="middle" fill="currentColor">.192-.255</text><circle cx="180" cy="140" r="6" fill="#35d0ba"/><text x="190" y="130" font-size="11" fill="#35d0ba">Host H</text><text x="80" y="150" font-size="11" fill="currentColor">10.0.4.150 / 26</text></svg>',
+  options: ['Subnet 1', 'Subnet 2', 'Subnet 3', 'Subnet 4'],
+  answer: 2,
+  marks: 1,
+  difficulty: 'easy',
+  type: 'pyq-style',
+  explanation: "A /26 mask leaves 6 host bits, so each subnet spans 2^6=64 consecutive addresses. Splitting 10.0.4.0/24 into four /26 blocks gives ranges 10.0.4.0-63 (Subnet 1), 10.0.4.64-127 (Subnet 2), 10.0.4.128-191 (Subnet 3), and 10.0.4.192-255 (Subnet 4), exactly as labelled in the figure. Host H's address 10.0.4.150 falls strictly between 128 and 191, so it belongs to Subnet 3. A quick way to verify: 150 in binary is 10010110; the /26 mask keeps the top 2 host-portion bits as part of the network id, i.e. the third octet's low-order bits 10 (binary, from 150 = 128+16+4+2) place it in the third quarter of the range, confirming Subnet 3 (128-191)."
+},
+{
+  id: 'cn-network-f2',
+  q: 'The figure shows a subnet labelled with the address block 192.168.10.0/28. Based on the /28 mask shown, how many usable host addresses are available in this subnet?',
+  figure: '<svg viewBox="0 0 300 100" width="100%" style="max-width:380px;height:auto" xmlns="http://www.w3.org/2000/svg"><rect x="40" y="20" width="220" height="50" fill="none" stroke="currentColor"/><text x="150" y="42" font-size="13" text-anchor="middle" fill="currentColor">192.168.10.0 / 28</text><text x="150" y="60" font-size="10" text-anchor="middle" fill="currentColor">Subnet mask: 255.255.255.240</text></svg>',
+  options: ['16', '14', '30', '8'],
+  answer: 1,
+  marks: 1,
+  difficulty: 'easy',
+  type: 'pyq-style',
+  explanation: "A /28 prefix leaves 32-28=4 host bits, giving 2^4=16 total addresses in the block (192.168.10.0 through 192.168.10.15). Of these, the very first address (192.168.10.0) is reserved as the network (subnet) identifier and the very last address (192.168.10.15) is reserved as the directed broadcast address, so neither can be assigned to a host interface. Subtracting these two reserved addresses gives 16-2=14 usable host addresses, which can be assigned to actual devices on this subnet. This '2^h - 2' formula (h = number of host bits) is the standard computation for usable hosts in classless (CIDR) addressing, and is one of the most frequently tested GATE CN numericals."
+}
+);
+
+window.GATE_DATA.questions['cn'].topics.find(function(t){return t.id==='cn-datalink';}).questions.push(
+{
+  id: 'cn-datalink-f1',
+  q: 'The timeline below shows a sliding-window data-link protocol with window size W=4. The sender transmits frames back-to-back until the window is exhausted, then must wait for an acknowledgment before sending more. Based on the timeline, how many data frames does the sender transmit before it must pause and wait for the first acknowledgment?',
+  figure: '<svg viewBox="0 0 380 150" width="100%" style="max-width:420px;height:auto" xmlns="http://www.w3.org/2000/svg"><text x="10" y="20" font-size="11" fill="currentColor">Sender</text><line x1="10" y1="30" x2="10" y2="140" stroke="currentColor"/><text x="330" y="20" font-size="11" fill="currentColor">Receiver</text><line x1="340" y1="30" x2="340" y2="140" stroke="currentColor"/><rect x="15" y="35" width="55" height="16" fill="none" stroke="currentColor"/><text x="42" y="47" font-size="10" text-anchor="middle" fill="currentColor">F0</text><rect x="15" y="55" width="55" height="16" fill="none" stroke="currentColor"/><text x="42" y="67" font-size="10" text-anchor="middle" fill="currentColor">F1</text><rect x="15" y="75" width="55" height="16" fill="none" stroke="currentColor"/><text x="42" y="87" font-size="10" text-anchor="middle" fill="currentColor">F2</text><rect x="15" y="95" width="55" height="16" fill="none" stroke="currentColor"/><text x="42" y="107" font-size="10" text-anchor="middle" fill="currentColor">F3</text><text x="15" y="130" font-size="10" fill="#35d0ba">Window W=4 exhausted, sender pauses</text><line x1="70" y1="43" x2="340" y2="95" stroke="currentColor" stroke-dasharray="3,2"/><text x="200" y="70" font-size="9" fill="currentColor">ACK0 returns</text></svg>',
+  options: ['2', '3', '4', '5'],
+  answer: 2,
+  marks: 1,
+  difficulty: 'easy',
+  type: 'pyq-style',
+  explanation: "In a sliding-window protocol, the sender is permitted to have at most W unacknowledged frames outstanding at any time; it can transmit frames continuously, without waiting for individual acknowledgments, only until this window is full. The timeline shows exactly four frames (F0, F1, F2, F3) sent back-to-back before the sender stops, which matches the given window size W=4. Only once the first acknowledgment (ACK0) arrives back does the window slide forward, freeing a slot and allowing the sender to transmit the next frame (F4). So the sender transmits exactly 4 frames before it is forced to pause and wait, directly reflecting the window size shown in the figure."
+}
+);
+
+window.GATE_DATA.questions['cn'].topics.find(function(t){return t.id==='cn-transport';}).questions.push(
+{
+  id: 'cn-transport-f1',
+  q: 'The plot shows TCP congestion window (cwnd, in segments) versus RTT number for a connection with ssthresh=8. cwnd doubles each RTT during slow start until it reaches ssthresh, after which it increases by 1 segment per RTT (congestion avoidance). What is the value of cwnd at the marked point (RTT=5), and which phase is the connection in there?',
+  figure: '<svg viewBox="0 0 340 220" width="100%" style="max-width:420px;height:auto" xmlns="http://www.w3.org/2000/svg"><line x1="40" y1="180" x2="320" y2="180" stroke="currentColor"/><line x1="40" y1="180" x2="40" y2="10" stroke="currentColor"/><text x="180" y="205" font-size="11" text-anchor="middle" fill="currentColor">RTT number</text><text x="12" y="100" font-size="11" fill="currentColor" transform="rotate(-90 12 100)">cwnd</text><text x="35" y="195" font-size="9" text-anchor="middle" fill="currentColor">0</text><text x="80" y="195" font-size="9" text-anchor="middle" fill="currentColor">1</text><text x="120" y="195" font-size="9" text-anchor="middle" fill="currentColor">2</text><text x="160" y="195" font-size="9" text-anchor="middle" fill="currentColor">3</text><text x="200" y="195" font-size="9" text-anchor="middle" fill="currentColor">4</text><text x="240" y="195" font-size="9" text-anchor="middle" fill="currentColor">5</text><text x="280" y="195" font-size="9" text-anchor="middle" fill="currentColor">6</text><polyline points="80,164 120,148 160,116 200,52 240,36 280,20" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="80" cy="164" r="3" fill="currentColor"/><circle cx="120" cy="148" r="3" fill="currentColor"/><circle cx="160" cy="116" r="3" fill="currentColor"/><circle cx="200" cy="52" r="3" fill="currentColor"/><circle cx="240" cy="36" r="5" fill="#35d0ba"/><circle cx="280" cy="20" r="3" fill="currentColor"/><line x1="240" y1="180" x2="240" y2="36" stroke="#35d0ba" stroke-dasharray="3,2"/><line x1="40" y1="52" x2="200" y2="52" stroke="currentColor" stroke-dasharray="2,3"/><text x="42" y="48" font-size="9" fill="currentColor">ssthresh=8</text></svg>',
+  options: [
+    'cwnd = 16, still in slow start',
+    'cwnd = 9, in congestion avoidance (additive increase)',
+    'cwnd = 8, in slow start',
+    'cwnd = 9, still in slow start (doubling)'
+  ],
+  answer: 1,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: "During slow start, cwnd doubles every RTT: starting at 1, it goes 1 (RTT1), 2 (RTT2), 4 (RTT3), 8 (RTT4) - at RTT4 it reaches ssthresh=8, so slow start ends there. From RTT4 onward the connection switches to congestion avoidance, where cwnd grows by only 1 segment per RTT (additive increase) instead of doubling. So at RTT5, cwnd = 8 + 1 = 9, and the connection is in congestion avoidance, not slow start. The marked point in the figure sits just past the dashed ssthresh=8 line, consistent with the curve's slope visibly flattening from exponential (doubling) to linear (+1 per RTT) right after RTT4 - the classic slow-start-to-congestion-avoidance transition tested in GATE CN."
+}
+);
