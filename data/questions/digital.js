@@ -1826,3 +1826,145 @@ window.GATE_DATA.questions['digital'].topics.find(function(t){return t.id==='dig
   explanation: "IEEE 754 double precision uses a 64-bit layout consisting of 1 sign bit, 11 exponent bits, and 52 mantissa (fraction) bits (1 + 11 + 52 = 64). The 11-bit exponent field uses a bias of 1023, allowing it to represent a much wider exponent range than the 8-bit exponent field of single precision."
 }
 );
+
+// ---- Figure-based GATE questions (auto-appended) ----
+window.GATE_DATA.questions['digital'].topics.find(function(t){return t.id==='digital-combinational';}).questions.push(
+{
+  id: 'digital-combinational-f1',
+  q: "The logic circuit below has inputs A, B, C. Based on the gate diagram (an AND gate combining A and B, a NOT gate inverting A, a second AND gate combining A' and C, and an OR gate combining both AND-gate outputs to produce F), the output F equals:",
+  figure: '<svg viewBox="0 0 380 220" width="100%" style="max-width:380px;height:auto" xmlns="http://www.w3.org/2000/svg"><g stroke="currentColor" stroke-width="1.5" fill="none"><path d="M20 42H110"/><path d="M30 42V150H70"/><path d="M20 82H110"/><path d="M118 150H190"/><path d="M20 185H190"/><path d="M175 60H270L285 72"/><path d="M260 170H270L285 158"/><path d="M110 30H150A25 25 0 0 1 150 90H110Z"/><path d="M70 130L110 150L70 170Z"/><path d="M190 140H230A30 30 0 0 1 230 200H190Z"/><path d="M285 50Q307 50 337 115Q307 180 285 180Q301 115 285 50Z"/><path d="M337 115H365"/></g><circle cx="115" cy="150" r="4" fill="none" stroke="currentColor" stroke-width="1.5"/><g font-size="14" fill="currentColor"><text x="4" y="46">A</text><text x="4" y="86">B</text><text x="4" y="189">C</text><text x="370" y="120">F</text></g></svg>',
+  options: ["AB + A'C", "AB + AC", "A'B + AC", "AB' + A'C"],
+  answer: 0,
+  marks: 1,
+  difficulty: 'easy',
+  type: 'pyq-style',
+  explanation: "Tracing the diagram: the top AND gate takes A and B directly, giving AB. The small circle (bubble) on the NOT gate inverts A to produce A', and this A' feeds the second AND gate together with C, giving A'C. The OR gate then combines the two AND outputs, so F = AB + A'C. Option (b) AB + AC is wrong because it ignores the inverter entirely — it would be the circuit's output only if the NOT gate were removed. Option (c) A'B + AC swaps which literal gets inverted and which AND gate C belongs to. Option (d) AB' + A'C wrongly inverts B instead of leaving the first AND gate uninverted. Reading such diagrams systematically — gate by gate, from inputs to output — avoids these near-miss traps, which GATE frequently uses as distractors in circuit-to-expression questions."
+},
+{
+  id: 'digital-combinational-f2',
+  q: "A 4:1 multiplexer is built as a tree of three 2:1 multiplexers, as shown. The two lower 2:1 muxes are both controlled by select line S0 and carry data inputs D0=0, D1=1 (upper mux) and D2=1, D3=0 (lower mux). Their outputs feed a top-level 2:1 mux controlled by S1, which produces F. With S1 = A and S0 = B, the circuit realizes:",
+  figure: '<svg viewBox="0 0 380 220" width="100%" style="max-width:380px;height:auto" xmlns="http://www.w3.org/2000/svg"><g stroke="currentColor" stroke-width="1.5" fill="none"><path d="M10 25H80"/><path d="M10 55H80"/><path d="M10 105H80"/><path d="M10 135H80"/><path d="M55 170V59H80"/><path d="M55 139H80"/><path d="M140 40H200L230 68"/><path d="M140 120H200L230 113"/><path d="M265 165V124"/><path d="M300 90H350"/><path d="M80 15L80 65L140 52.5L140 27.5Z"/><path d="M80 95L80 145L140 132.5L140 107.5Z"/><path d="M230 45L230 135L300 112.5L300 67.5Z"/></g><g font-size="13" fill="currentColor"><text x="0" y="29">0</text><text x="0" y="59">1</text><text x="0" y="109">1</text><text x="0" y="139">0</text><text x="35" y="185">S0=B</text><text x="245" y="185">S1=A</text><text x="356" y="94">F</text></g></svg>',
+  options: ["AB", "A + B", "A XOR B", "A XNOR B"],
+  answer: 2,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: "The upper mux selects between D0=0 and D1=1 using S0=B, so its output X = B (X=0 when B=0, X=1 when B=1). The lower mux selects between D2=1 and D3=0 using the same S0=B, so its output Y = B' (Y=1 when B=0, Y=0 when B=1). The top mux then selects X when S1=A=0 and Y when A=1, so F = X when A=0 and F = Y when A=1. Tabulating: (A,B)=(0,0)→F=X=0; (0,1)→F=X=1; (1,0)→F=Y=1; (1,1)→F=Y=0. This truth table (0,1,1,0) is exactly A XOR B. This is a classic GATE construction technique: any 2-variable function can be realized with a 4:1 mux tree by placing the correct constants or literals on the data lines, and tracing which value survives to the output for each select combination is the fastest way to identify the realized function without building a full truth table from scratch."
+},
+{
+  id: 'digital-combinational-f3',
+  q: "A 2-to-4 line decoder (inputs A, B; active-high outputs D0 = A'B', D1 = A'B, D2 = AB', D3 = AB) has its D0 and D3 outputs connected to a 2-input OR gate to produce F, as shown (D1 and D2 are left unconnected). The function F realized is:",
+  figure: '<svg viewBox="0 0 380 200" width="100%" style="max-width:380px;height:auto" xmlns="http://www.w3.org/2000/svg"><g stroke="currentColor" stroke-width="1.5" fill="none"><path d="M15 70H60"/><path d="M15 120H60"/><path d="M130 35H190L230 72"/><path d="M130 75H150"/><path d="M130 115H150"/><path d="M130 155H190L230 138"/><path d="M282 105H335"/><rect x="60" y="20" width="70" height="150"/><path d="M230 60Q252 60 282 105Q252 150 230 150Q246 105 230 60Z"/></g><g font-size="12" fill="currentColor"><text x="70" y="45">2-to-4</text><text x="78" y="60">DEC</text><text x="0" y="74">A</text><text x="0" y="124">B</text><text x="132" y="30">D0</text><text x="152" y="70">D1</text><text x="152" y="110">D2</text><text x="132" y="170">D3</text><text x="345" y="109" font-size="14">F</text></g></svg>',
+  options: ["A AND B", "A OR B", "A XOR B", "A XNOR B"],
+  answer: 3,
+  marks: 1,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: "D0 is asserted only for input combination AB=00 (D0 = A'B'), and D3 is asserted only for AB=11 (D3 = AB). ORing these two decoder outputs gives F = A'B' + AB, which is 1 exactly when A and B agree (both 0 or both 1) and 0 when they differ. That truth table is the definition of the XNOR (equivalence) function, so F = A XNOR B. This is a standard GATE construction: a decoder followed by an OR gate over a chosen subset of minterm lines directly implements the sum of those minterms, so decoder-plus-OR questions reduce to identifying which minterms are being combined. Contrast with option (c): ORing D1 (A'B) and D2 (AB') instead would have given A XOR B, since those two lines represent the case where A and B disagree — the classic trap in this question family is confusing which pair of decoder outputs corresponds to XOR versus XNOR."
+},
+{
+  id: 'digital-combinational-f4',
+  q: "A full adder is built from two half adders and an OR gate as shown: HA1 takes inputs A and B and produces sum S1 and carry C1; HA2 takes S1 and Cin and produces the final Sum and carry C2; the OR gate combines C1 and C2 to produce Cout. The Boolean expression for Cout is:",
+  figure: '<svg viewBox="0 0 340 200" width="100%" style="max-width:380px;height:auto" xmlns="http://www.w3.org/2000/svg"><g stroke="currentColor" stroke-width="1.5" fill="none"><path d="M10 35H40"/><path d="M10 75H40"/><path d="M110 35H180"/><path d="M110 75V142H150"/><path d="M195 178V75H180"/><path d="M250 35H300"/><path d="M250 75V168H150"/><path d="M195 155H230"/><rect x="40" y="20" width="70" height="70"/><rect x="180" y="20" width="70" height="70"/><path d="M150 130Q168 130 195 155Q168 180 150 180Q163 155 150 130Z"/></g><g font-size="13" fill="currentColor"><text x="0" y="39">A</text><text x="0" y="79">B</text><text x="55" y="60">HA1</text><text x="195" y="60">HA2</text><text x="122" y="30">S1</text><text x="303" y="39">Sum</text><text x="175" y="196">Cin</text><text x="234" y="159">Cout</text></g></svg>',
+  options: ["AB + BCin + ACin", "AB + BCin", "A'B + BCin + ACin", "AB + BCin + ACin'"],
+  answer: 0,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: "HA1 produces S1 = A XOR B and C1 = AB. HA2 takes S1 and Cin and produces C2 = S1 . Cin = (A XOR B).Cin. The OR gate gives Cout = C1 + C2 = AB + (A XOR B)Cin. Expanding (A XOR B)Cin = (AB' + A'B)Cin = AB'Cin + A'BCin, so Cout = AB + AB'Cin + A'BCin. Checking this against AB + BCin + ACin on all 8 input rows confirms they are identical (both equal 1 exactly when at least two of A, B, Cin are 1) — this is the well-known majority function, which is exactly what a carry-out should be: a carry is generated whenever a majority of the three bits being added are 1. Option (b) drops the ACin term and fails whenever A=1, Cin=1, B=0. Options (c) and (d) each flip the sign of one literal and fail on simple test rows such as A=B=1, Cin=0."
+},
+{
+  id: 'digital-combinational-f5',
+  q: "In the NAND-NAND circuit shown (NAND1 takes A, B; NAND2 takes B, C; NAND3 takes the outputs of NAND1 and NAND2 to produce F), what is the value of F when A = 1, B = 0, C = 1?",
+  figure: '<svg viewBox="0 0 340 190" width="100%" style="max-width:380px;height:auto" xmlns="http://www.w3.org/2000/svg"><g stroke="currentColor" stroke-width="1.5" fill="none"><path d="M10 33H60"/><path d="M10 58H60"/><path d="M30 58V123H60"/><path d="M10 148H60"/><path d="M125 45H133"/><path d="M125 135H133"/><path d="M133 45H160L190 73"/><path d="M133 135H160L190 108"/><path d="M264 90H310"/><path d="M60 20H100A25 25 0 0 1 100 70H60Z"/><path d="M60 110H100A25 25 0 0 1 100 160H60Z"/><path d="M190 55H225A35 35 0 0 1 225 125H190Z"/><circle cx="129" cy="45" r="4"/><circle cx="129" cy="135" r="4"/><circle cx="264" cy="90" r="4"/></g><g font-size="13" fill="currentColor"><text x="0" y="37">A</text><text x="0" y="62">B</text><text x="0" y="152">C</text><text x="316" y="94">F</text></g></svg>',
+  options: ["0", "1", "A", "C"],
+  answer: 0,
+  marks: 1,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: "Evaluate stage by stage. NAND1 = (A.B)' = (1.0)' = 0' = 1. NAND2 = (B.C)' = (0.1)' = 0' = 1. NAND3 = (NAND1 . NAND2)' = (1.1)' = 1' = 0. So F = 0 for the given inputs. Algebraically, by De Morgan's law NAND3's output is NAND1' + NAND2' = (AB) + (BC) = AB + BC = B(A+C), so this circuit realizes F = B(A+C) — a two-level NAND-NAND network implementing an AND-OR (sum-of-products) function, a standard equivalence tested in GATE. Since B = 0 here, F = 0 regardless of A and C, which is exactly what both the gate-by-gate evaluation and the simplified expression B(A+C) predict. This double-check (raw gate evaluation vs. the simplified Boolean form) is the safest way to verify NAND-NAND circuit questions under exam pressure."
+}
+);
+
+window.GATE_DATA.questions['digital'].topics.find(function(t){return t.id==='digital-boolean';}).questions.push(
+{
+  id: 'digital-boolean-f1',
+  q: "For the 4-variable K-map of f(A, B, C, D) = Σm(0, 2, 3, 8, 10, 11) shown below (rows are AB in Gray-code order 00, 01, 11, 10; columns are CD in Gray-code order 00, 01, 11, 10), the minimal SOP expression is:",
+  figure: '<svg viewBox="0 0 380 270" width="100%" style="max-width:380px;height:auto" xmlns="http://www.w3.org/2000/svg"><g font-size="13" fill="currentColor" text-anchor="middle"><text x="20" y="30" font-size="11" text-anchor="start">AB/CD</text><text x="105" y="30">00</text><text x="175" y="30">01</text><text x="245" y="30">11</text><text x="315" y="30">10</text><text x="30" y="80">00</text><text x="30" y="130">01</text><text x="30" y="180">11</text><text x="30" y="230">10</text></g><path d="M70 50L70 250M140 50L140 250M210 50L210 250M280 50L280 250M350 50L350 250M70 50L350 50M70 100L350 100M70 150L350 150M70 200L350 200M70 250L350 250" stroke="currentColor" stroke-width="1.5" fill="none"/><g font-size="15" fill="currentColor" text-anchor="middle"><text x="105" y="81">1</text><text x="175" y="81">0</text><text x="245" y="81">1</text><text x="315" y="81">1</text><text x="105" y="131">0</text><text x="175" y="131">0</text><text x="245" y="131">0</text><text x="315" y="131">0</text><text x="105" y="181">0</text><text x="175" y="181">0</text><text x="245" y="181">0</text><text x="315" y="181">0</text><text x="105" y="231">1</text><text x="175" y="231">0</text><text x="245" y="231">1</text><text x="315" y="231">1</text></g></svg>',
+  options: ["B'D' + B'C", "BD' + BC", "B'D + BC'", "B'D' + BC'"],
+  answer: 0,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: "All the 1-cells lie in the AB=00 and AB=10 rows, i.e. wherever B=0; within those two rows every 1-cell is in column CD=00, 11 or 10 (every column except CD=01). The two rows AB=00 and AB=10 are adjacent (the K-map wraps top-to-bottom, and 00/10 differ only in A), so together they form one full group of 8 covering minterms 0, 2, 8, 10 (columns 00 and 10), giving the term B'D' (eliminating A and C, leaving B=0, D=0). A second group of 4 covers columns 11 and 10 across both rows (minterms 2, 3, 10, 11), giving the term B'C (eliminating A and D, leaving B=0, C=1). Together B'D' + B'C cover all six minterms and both are essential (minterm 0 is uniquely covered by B'D', and minterm 3 uniquely by B'C), so this is the minimal SOP. Option (b) inverts every literal's polarity; option (c) swaps C and D; option (d) mixes polarities incorrectly — all fail to cover minterm 0 or 11 correctly."
+},
+{
+  id: 'digital-boolean-f2',
+  q: "For the K-map of f(A, B, C, D) = Σm(0, 1, 2, 5, 7, 8, 9, 10, 13, 15) shown below, the total number of prime implicants is:",
+  figure: '<svg viewBox="0 0 380 270" width="100%" style="max-width:380px;height:auto" xmlns="http://www.w3.org/2000/svg"><g font-size="13" fill="currentColor" text-anchor="middle"><text x="20" y="30" font-size="11" text-anchor="start">AB/CD</text><text x="105" y="30">00</text><text x="175" y="30">01</text><text x="245" y="30">11</text><text x="315" y="30">10</text><text x="30" y="80">00</text><text x="30" y="130">01</text><text x="30" y="180">11</text><text x="30" y="230">10</text></g><path d="M70 50L70 250M140 50L140 250M210 50L210 250M280 50L280 250M350 50L350 250M70 50L350 50M70 100L350 100M70 150L350 150M70 200L350 200M70 250L350 250" stroke="currentColor" stroke-width="1.5" fill="none"/><g font-size="15" fill="currentColor" text-anchor="middle"><text x="105" y="81">1</text><text x="175" y="81">1</text><text x="245" y="81">0</text><text x="315" y="81">1</text><text x="105" y="131">0</text><text x="175" y="131">1</text><text x="245" y="131">1</text><text x="315" y="131">0</text><text x="105" y="181">0</text><text x="175" y="181">1</text><text x="245" y="181">1</text><text x="315" y="181">0</text><text x="105" y="231">1</text><text x="175" y="231">1</text><text x="245" y="231">0</text><text x="315" y="231">1</text></g></svg>',
+  options: ["2", "3", "4", "5"],
+  answer: 2,
+  marks: 2,
+  difficulty: 'hard',
+  type: 'pyq-style',
+  explanation: "Grouping the 1-cells: the two full corner/edge columns CD=00 combined with rows AB=00,10 (minterms 0,1,8,9, since column 00 and 01 together with rows 00 and 10 wrap) give B'C' covering {0,1,8,9}. The pattern B'D' covers columns CD=00 and 10 in rows AB=00,10, i.e. {0,2,8,10}. The pattern C'D covers column CD=01 in rows AB=00,01 (using the wrap on D fixed at 1, C fixed at 0), i.e. {1,5,9,13}. The pattern BD covers column CD=01 and 11 in rows AB=01,11, i.e. {5,7,13,15}. Careful Quine-McCluskey reduction confirms exactly four maximal groups (prime implicants): B'C', B'D', C'D and BD — no larger rectangle covers any of them, and none is a subset of another. Of these, B'D' and BD are essential (each is the only PI covering minterms 2,10 and 7,15 respectively), while B'C' and C'D are non-essential alternatives for covering the remaining minterms 1 and 9. The total prime implicant count is therefore 4."
+},
+{
+  id: 'digital-boolean-f3',
+  q: "For the K-map of f(A, B, C, D) = Σm(1, 5, 6, 7, 11, 12, 13, 15) shown below, how many of its prime implicants are essential prime implicants?",
+  figure: '<svg viewBox="0 0 380 270" width="100%" style="max-width:380px;height:auto" xmlns="http://www.w3.org/2000/svg"><g font-size="13" fill="currentColor" text-anchor="middle"><text x="20" y="30" font-size="11" text-anchor="start">AB/CD</text><text x="105" y="30">00</text><text x="175" y="30">01</text><text x="245" y="30">11</text><text x="315" y="30">10</text><text x="30" y="80">00</text><text x="30" y="130">01</text><text x="30" y="180">11</text><text x="30" y="230">10</text></g><path d="M70 50L70 250M140 50L140 250M210 50L210 250M280 50L280 250M350 50L350 250M70 50L350 50M70 100L350 100M70 150L350 150M70 200L350 200M70 250L350 250" stroke="currentColor" stroke-width="1.5" fill="none"/><g font-size="15" fill="currentColor" text-anchor="middle"><text x="105" y="81">0</text><text x="175" y="81">1</text><text x="245" y="81">0</text><text x="315" y="81">0</text><text x="105" y="131">0</text><text x="175" y="131">1</text><text x="245" y="131">1</text><text x="315" y="131">1</text><text x="105" y="181">1</text><text x="175" y="181">1</text><text x="245" y="181">1</text><text x="315" y="181">0</text><text x="105" y="231">0</text><text x="175" y="231">0</text><text x="245" y="231">1</text><text x="315" y="231">0</text></g></svg>',
+  options: ["2", "3", "4", "5"],
+  answer: 2,
+  marks: 2,
+  difficulty: 'hard',
+  type: 'pyq-style',
+  explanation: "Applying Quine-McCluskey to Σm(1,5,6,7,11,12,13,15) yields five prime implicants: A'C'D covering {1,5}, A'BC covering {6,7}, ACD covering {11,15}, ABC' covering {12,13}, and BD covering {5,7,13,15}. Checking essentiality minterm by minterm: minterm 1 is covered only by A'C'D (essential), minterm 6 only by A'BC (essential), minterm 11 only by ACD (essential), and minterm 12 only by ABC' (essential). BD, although a valid maximal group, covers only minterms {5,7,13,15}, every one of which is already covered by one of the four essential PIs above, so BD is never required in any minimal cover and is not essential. Hence 4 of the 5 prime implicants are essential, and the minimal SOP is simply the sum of those four essential PIs (A'C'D + A'BC + ACD + ABC'), with BD redundant. This pattern — four 2-cell essential PIs surrounding one larger but non-essential PI — is a favourite GATE trap for testing whether students blindly assume 'bigger group must be essential.'"
+},
+{
+  id: 'digital-boolean-f4',
+  q: "For the K-map of f(A, B, C, D) = Σm(4, 5, 6, 7, 12, 13, 14, 15) shown below, the minimal SOP expression is:",
+  figure: '<svg viewBox="0 0 380 270" width="100%" style="max-width:380px;height:auto" xmlns="http://www.w3.org/2000/svg"><g font-size="13" fill="currentColor" text-anchor="middle"><text x="20" y="30" font-size="11" text-anchor="start">AB/CD</text><text x="105" y="30">00</text><text x="175" y="30">01</text><text x="245" y="30">11</text><text x="315" y="30">10</text><text x="30" y="80">00</text><text x="30" y="130">01</text><text x="30" y="180">11</text><text x="30" y="230">10</text></g><path d="M70 50L70 250M140 50L140 250M210 50L210 250M280 50L280 250M350 50L350 250M70 50L350 50M70 100L350 100M70 150L350 150M70 200L350 200M70 250L350 250" stroke="currentColor" stroke-width="1.5" fill="none"/><g font-size="15" fill="currentColor" text-anchor="middle"><text x="105" y="81">0</text><text x="175" y="81">0</text><text x="245" y="81">0</text><text x="315" y="81">0</text><text x="105" y="131">1</text><text x="175" y="131">1</text><text x="245" y="131">1</text><text x="315" y="131">1</text><text x="105" y="181">1</text><text x="175" y="181">1</text><text x="245" y="181">1</text><text x="315" y="181">1</text><text x="105" y="231">0</text><text x="175" y="231">0</text><text x="245" y="231">0</text><text x="315" y="231">0</text></g></svg>',
+  options: ["B", "B'", "AB", "A'B"],
+  answer: 0,
+  marks: 1,
+  difficulty: 'easy',
+  type: 'pyq-style',
+  explanation: "The two middle rows, AB=01 and AB=11, are entirely filled with 1s across all four columns, while the top row (AB=00) and bottom row (AB=10) are entirely 0. Both rows AB=01 and AB=11 share B=1 (only A differs between them), so together they form one group of 8 cells spanning all values of A, C and D while B stays fixed at 1. By the K-map rule, a group of 2^3=8 cells eliminates 3 variables, leaving a single literal: B. So the minimal SOP is simply f = B. Option (b) B' is the complement and would be wrong since B=1 is exactly where the function is 1, not where it is 0. Options (c) AB and (d) A'B are each only a quarter of the ON-set (covering only 4 of the 8 minterms), so they under-cover the function — for instance minterm 4 (A=0,B=1,C=0,D=0) is missed by AB, and minterm 12 (A=1,B=1,C=0,D=0) is missed by A'B. Recognizing a K-map that reduces to a single literal is a fast, high-value pattern to spot immediately."
+}
+);
+
+window.GATE_DATA.questions['digital'].topics.find(function(t){return t.id==='digital-sequential';}).questions.push(
+{
+  id: 'digital-sequential-f1',
+  q: "A 3-bit synchronous binary counter is built from three flip-flops (FF0, FF1, FF2) all toggling on every clock pulse (T = 1), sharing a common CLK line. Their outputs Q0 and Q2 are fed into a 2-input AND gate, whose output drives the asynchronous CLR (clear) input of all three flip-flops, as shown. What is the modulus of this counter?",
+  figure: '<svg viewBox="0 0 340 150" width="100%" style="max-width:400px;height:auto" xmlns="http://www.w3.org/2000/svg"><g stroke="currentColor" stroke-width="1.5" fill="none"><path d="M10 140H265"/><path d="M65 140V120"/><path d="M165 140V120"/><path d="M265 140V120"/><path d="M65 60V48H265V60"/><path d="M165 48V60"/><path d="M100 90V18H140"/><path d="M300 90V33H165"/><path d="M180 25V48"/><path d="M100 90H120"/><path d="M200 90H220"/><path d="M300 90H320"/><rect x="30" y="60" width="70" height="60"/><rect x="130" y="60" width="70" height="60"/><rect x="230" y="60" width="70" height="60"/><path d="M140 10H165A15 15 0 0 1 165 40H140Z"/></g><g font-size="12" fill="currentColor"><text x="45" y="94">FF0</text><text x="145" y="94">FF1</text><text x="245" y="94">FF2</text><text x="123" y="94">Q0</text><text x="223" y="94">Q1</text><text x="323" y="94">Q2</text><text x="0" y="144">CLK</text><text x="145" y="24">CLR</text></g></svg>',
+  options: ["Mod-4", "Mod-5", "Mod-6", "Mod-8"],
+  answer: 1,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: "With T=1 on every flip-flop, the counter would naturally free-run through all 8 states 000 to 111 as a mod-8 counter. But the AND gate watches Q2 and Q0, and its output clears all three flip-flops the instant Q2Q1Q0 reaches 101 (decimal 5) — the state where both Q2=1 and Q0=1 first occur. So the counter counts 000, 001, 010, 011, 100, then on the next clock reaches 101 momentarily, which immediately triggers the asynchronous clear back to 000. Since 101 is cleared almost instantly and is never a stable, observable state, the counter effectively cycles through only 5 distinct stable states: 000, 001, 010, 011, 100. This is the standard technique for building a mod-N counter (N less than 2^n) from an n-bit binary counter: decode the target terminal count with an AND/NAND gate and route it to the asynchronous clear or preset inputs. Here the modulus is 5, not 6, because state 101 itself does not persist as a countable state — it is only a fleeting decode pulse."
+},
+{
+  id: 'digital-sequential-f2',
+  q: "The Moore state machine below detects two consecutive 1s in a serial input stream (state label shows state/output). Starting in state S0, what is the output sequence produced for the input sequence 1, 1, 1, 0 (one output bit per input bit, read after each transition)?",
+  figure: '<svg viewBox="0 0 400 230" width="100%" style="max-width:400px;height:auto" xmlns="http://www.w3.org/2000/svg"><g stroke="currentColor" stroke-width="1.5" fill="none"><circle cx="70" cy="100" r="28"/><circle cx="200" cy="100" r="28"/><circle cx="330" cy="100" r="28"/><path d="M98 100H172"/><path d="M228 100H302"/><path d="M50 78Q70 38 90 78"/><path d="M310 78Q330 38 350 78"/><path d="M186 122Q135 165 84 122"/><path d="M316 128Q200 215 80 132"/></g><path d="M164 95L172 100L164 105Z" fill="currentColor" stroke="none"/><path d="M294 95L302 100L294 105Z" fill="currentColor" stroke="none"/><path d="M92 114L84 122L94 128Z" fill="currentColor" stroke="none"/><path d="M88 124L80 132L90 138Z" fill="currentColor" stroke="none"/><g font-size="14" fill="currentColor" text-anchor="middle"><text x="70" y="105">S0/0</text><text x="200" y="105">S1/0</text><text x="330" y="105">S2/1</text><text x="135" y="92">1</text><text x="265" y="92">1</text><text x="70" y="35">0</text><text x="330" y="35">1</text><text x="135" y="158">0</text><text x="200" y="205">0</text></g></svg>',
+  options: ["0110", "0111", "1001", "0010"],
+  answer: 0,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: "In a Moore machine the output depends only on the current state, so after every input bit we read off the label of the state just entered. Starting at S0: input 1 moves S0 to S1 (output of S1 is 0); input 1 moves S1 to S2 (output of S2 is 1); input 1 keeps the machine at S2 via its self-loop, since two-or-more 1s stays at S2 (output remains 1); input 0 moves S2 back to S0 (output of S0 is 0). Reading the four outputs in order gives 0, 1, 1, 0, i.e. the string 0110. Option (b) 0111 would result if the machine incorrectly stayed at S2 forever after the third input regardless of the fourth bit's 0. Option (c) 1001 reverses the timing convention (using the state before the transition, which would make this a Mealy-style reading). Option (d) 0010 misplaces which input triggers the transition into S2. Getting the state-machine reading convention right — output of new state, one output per input symbol — is essential for all Moore-machine trace questions."
+},
+{
+  id: 'digital-sequential-f3',
+  q: "The timing diagram below shows the CLK signal and the D input to a positive-edge-triggered D flip-flop (Q starts at 0). Reading the value of D present at each of the five labelled rising clock edges, the resulting Q values sampled just after edges 1 through 5, written as a single bit string, are:",
+  figure: '<svg viewBox="0 0 350 130" width="100%" style="max-width:400px;height:auto" xmlns="http://www.w3.org/2000/svg"><g stroke="currentColor" stroke-width="1" stroke-dasharray="3,3" fill="none"><path d="M70 15V105"/><path d="M130 15V105"/><path d="M190 15V105"/><path d="M250 15V105"/><path d="M310 15V105"/></g><g stroke="currentColor" stroke-width="2" fill="none"><polyline points="40,40 70,40 70,20 100,20 100,40 130,40 130,20 160,20 160,40 190,40 190,20 220,20 220,40 250,40 250,20 280,20 280,40 310,40 310,20 340,20"/><polyline points="40,100 60,100 60,80 110,80 110,100 150,100 150,80 270,80 270,100 340,100"/></g><g font-size="12" fill="currentColor"><text x="5" y="33">CLK</text><text x="15" y="93">D</text><text x="70" y="118">1</text><text x="130" y="118">2</text><text x="190" y="118">3</text><text x="250" y="118">4</text><text x="310" y="118">5</text></g></svg>',
+  options: ["10110", "01011", "11010", "01101"],
+  answer: 0,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: "A positive-edge-triggered D flip-flop copies whatever value D holds at the instant of each rising clock edge into Q, and Q then holds that value until the next rising edge. Reading the D waveform at each dashed vertical line: at edge 1 (x=70) D has already risen to 1, so Q becomes 1. At edge 2 (x=130) D has fallen back to 0, so Q becomes 0. At edge 3 (x=190) D has risen to 1 again (and stays 1 through edges 3 and 4), so Q becomes 1. At edge 4 (x=250) D is still 1, so Q remains 1. At edge 5 (x=310) D has fallen to 0, so Q becomes 0. The resulting Q sequence is therefore 1, 0, 1, 1, 0, written as 10110. This question tests the key distinction between a D flip-flop (which simply follows D at the clock edge, unlike a latch that would continue tracking D whenever CLK is high) — a transparent latch would instead produce glitches whenever D changed while CLK was high, which does not apply here since the flip-flop is edge-triggered."
+}
+);

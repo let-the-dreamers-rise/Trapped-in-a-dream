@@ -83,6 +83,10 @@ hr.sep { border: 0; border-top: 1px solid var(--faint); margin: 14px 0; }
 .q-text { font-size: 17px; font-weight: 600; line-height: 1.45; white-space: pre-wrap; margin-bottom: 16px; }
 .q-fig { border: 1px solid var(--faint); padding: 14px; margin: 0 0 16px; overflow-x: auto; color: var(--text); text-align: center; }
 .q-fig svg { display: inline-block; max-width: 100%; height: auto; }
+/* Hollow shapes in diagrams (automata states, graph vertices, free-instance dots) get the
+   page ground so edges drawn underneath don't run through them. Strokes stay visible. */
+.q-fig svg circle[fill="none"], .q-fig svg rect[fill="none"], .q-fig svg ellipse[fill="none"],
+.q-fig svg circle:not([fill]), .q-fig svg ellipse:not([fill]) { fill: var(--bg); }
 .q-code { background: var(--card2); padding: 14px; font-family: ui-monospace, Menlo, Consolas, monospace; font-size: 13.5px; white-space: pre-wrap; overflow-x: auto; margin-bottom: 14px; }
 .opt { display: block; width: 100%; text-align: left; background: none; color: var(--text); border: 2px solid var(--faint); border-radius: 0; padding: 14px; font-family: inherit; font-size: 15px; margin-bottom: 10px; cursor: pointer; white-space: pre-wrap; }
 .opt:disabled { opacity: 1; }
