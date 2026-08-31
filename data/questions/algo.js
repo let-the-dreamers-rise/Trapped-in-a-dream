@@ -2438,3 +2438,82 @@ window.GATE_DATA.questions['algo'].topics.find(function(t){return t.id==='algo-s
   explanation: 'Rabin-Karp computes a numeric hash of the pattern and, using a rolling-hash update (typically treating the window as a number in some base, e.g. polynomial hashing mod a prime), incrementally recomputes the hash of each successive length-m window of the text in O(1) per shift after an O(m) initial computation, rather than rehashing from scratch. If the window\'s hash does NOT equal the pattern\'s hash, no match is possible there (safely skip). If the hashes DO match, this is only a candidate -- a spurious hit can occur due to hash collisions (different substrings mapping to the same hash value), so the algorithm must perform an explicit O(m) character-by-character verification before confirming a true match. Average-case time is O(n+m) with a good hash function and modulus, but worst case degrades to O(nm) if many spurious hits occur (e.g., a poorly chosen hash or an adversarial/all-same-character text), which is precisely why hash and modulus choice matters in practice.'
 }
 );
+window.GATE_DATA.questions['algo'].topics.find(function(t){return t.id==='algo-graph';}).questions.push(
+{
+  id: 'algo-graph-f1',
+  q: 'For the weighted undirected graph shown (vertices A-F, edge weights as labeled), what is the total weight of a Minimum Spanning Tree?',
+  figure: '<svg viewBox="0 0 220 320" width="100%" style="max-width:420px;height:auto" xmlns="http://www.w3.org/2000/svg"><g stroke="currentColor"><line x1="40" y1="40" x2="180" y2="40"/><line x1="40" y1="40" x2="110" y2="110"/><line x1="180" y1="40" x2="110" y2="110"/><line x1="180" y1="40" x2="180" y2="220"/><line x1="110" y1="110" x2="180" y2="220"/><line x1="110" y1="110" x2="40" y2="220"/><line x1="180" y1="220" x2="40" y2="220"/><line x1="180" y1="220" x2="110" y2="290"/><line x1="40" y1="220" x2="110" y2="290"/></g><g font-size="12" fill="currentColor" text-anchor="middle"><text x="110" y="32">4</text><text x="60" y="68">2</text><text x="160" y="68">1</text><text x="196" y="132">5</text><text x="155" y="158">8</text><text x="65" y="158">10</text><text x="110" y="235">2</text><text x="155" y="248">6</text><text x="65" y="248">3</text></g><g fill="none" stroke="currentColor"><circle cx="40" cy="40" r="15"/><circle cx="180" cy="40" r="15"/><circle cx="110" cy="110" r="15"/><circle cx="180" cy="220" r="15"/><circle cx="40" cy="220" r="15"/><circle cx="110" cy="290" r="15"/></g><g font-size="13" fill="currentColor" text-anchor="middle"><text x="40" y="44">A</text><text x="180" y="44">B</text><text x="110" y="114">C</text><text x="180" y="224">D</text><text x="40" y="224">E</text><text x="110" y="294">F</text></g></svg>',
+  options: ['13', '15', '11', '17'],
+  answer: 0,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: 'Run Kruskal\'s algorithm: sort edges by weight -- B-C(1), A-C(2), D-E(2), E-F(3), A-B(4), B-D(5), D-F(6), C-D(8), C-E(10). Add B-C(1): components {B,C}. Add A-C(2): connects A to {B,C}, giving {A,B,C}. Add D-E(2): components {D,E}. Add E-F(3): connects F, giving {D,E,F}. Add A-B(4): both endpoints already in {A,B,C} -- forms a cycle, skip. Add B-D(5): connects the two components {A,B,C} and {D,E,F} into one tree spanning all 6 vertices -- accept. At this point all 6 vertices are connected with 5 edges (B-C, A-C, D-E, E-F, B-D), so the process stops. Total weight = 1+2+2+3+5 = 13. The remaining edges (A-B=4, C-D=8, C-E=10, D-F=6) are all correctly rejected as they would close a cycle.'
+},
+{
+  id: 'algo-graph-f2',
+  q: 'For the same weighted graph, which edge is guaranteed to NOT appear in the Minimum Spanning Tree?',
+  figure: '<svg viewBox="0 0 220 320" width="100%" style="max-width:420px;height:auto" xmlns="http://www.w3.org/2000/svg"><g stroke="currentColor"><line x1="40" y1="40" x2="180" y2="40"/><line x1="40" y1="40" x2="110" y2="110"/><line x1="180" y1="40" x2="110" y2="110"/><line x1="180" y1="40" x2="180" y2="220"/><line x1="110" y1="110" x2="180" y2="220"/><line x1="110" y1="110" x2="40" y2="220"/><line x1="180" y1="220" x2="40" y2="220"/><line x1="180" y1="220" x2="110" y2="290"/><line x1="40" y1="220" x2="110" y2="290"/></g><g font-size="12" fill="currentColor" text-anchor="middle"><text x="110" y="32">4</text><text x="60" y="68">2</text><text x="160" y="68">1</text><text x="196" y="132">5</text><text x="155" y="158">8</text><text x="65" y="158">10</text><text x="110" y="235">2</text><text x="155" y="248">6</text><text x="65" y="248">3</text></g><g fill="none" stroke="currentColor"><circle cx="40" cy="40" r="15"/><circle cx="180" cy="40" r="15"/><circle cx="110" cy="110" r="15"/><circle cx="180" cy="220" r="15"/><circle cx="40" cy="220" r="15"/><circle cx="110" cy="290" r="15"/></g><g font-size="13" fill="currentColor" text-anchor="middle"><text x="40" y="44">A</text><text x="180" y="44">B</text><text x="110" y="114">C</text><text x="180" y="224">D</text><text x="40" y="224">E</text><text x="110" y="294">F</text></g></svg>',
+  options: ['B-C', 'A-C', 'D-E', 'C-D'],
+  answer: 3,
+  marks: 1,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: 'Consider the cycle A-C-D-B-A formed by edges A-C(2), C-D(8), D-B(5), B-A(4). By the cycle property of MSTs, the edge of maximum weight in any cycle can be excluded from some MST, and here C-D(8) is the STRICT maximum among the four cycle edges (2, 8, 5, 4) with no tie, so C-D cannot belong to any MST of this graph -- any spanning tree containing it could be improved by swapping it for a lighter edge on the same cycle. In contrast, B-C(1), A-C(2), and D-E(2) are each the unique lightest edge across every cycle they participate in (verified by running Kruskal\'s algorithm, which greedily selects all three), so all three are forced into every MST.'
+},
+{
+  id: 'algo-graph-f3',
+  q: 'How many DISTINCT Minimum Spanning Trees does the weighted graph shown have?',
+  figure: '<svg viewBox="0 0 220 320" width="100%" style="max-width:420px;height:auto" xmlns="http://www.w3.org/2000/svg"><g stroke="currentColor"><line x1="40" y1="40" x2="180" y2="40"/><line x1="40" y1="40" x2="110" y2="110"/><line x1="180" y1="40" x2="110" y2="110"/><line x1="180" y1="40" x2="180" y2="220"/><line x1="110" y1="110" x2="180" y2="220"/><line x1="110" y1="110" x2="40" y2="220"/><line x1="180" y1="220" x2="40" y2="220"/><line x1="180" y1="220" x2="110" y2="290"/><line x1="40" y1="220" x2="110" y2="290"/></g><g font-size="12" fill="currentColor" text-anchor="middle"><text x="110" y="32">4</text><text x="60" y="68">2</text><text x="160" y="68">1</text><text x="196" y="132">5</text><text x="155" y="158">8</text><text x="65" y="158">10</text><text x="110" y="235">2</text><text x="155" y="248">6</text><text x="65" y="248">3</text></g><g fill="none" stroke="currentColor"><circle cx="40" cy="40" r="15"/><circle cx="180" cy="40" r="15"/><circle cx="110" cy="110" r="15"/><circle cx="180" cy="220" r="15"/><circle cx="40" cy="220" r="15"/><circle cx="110" cy="290" r="15"/></g><g font-size="13" fill="currentColor" text-anchor="middle"><text x="40" y="44">A</text><text x="180" y="44">B</text><text x="110" y="114">C</text><text x="180" y="224">D</text><text x="40" y="224">E</text><text x="110" y="294">F</text></g></svg>',
+  options: ['1', '2', '3', '4'],
+  answer: 0,
+  marks: 2,
+  difficulty: 'hard',
+  type: 'pyq-style',
+  explanation: 'Two edge weights are tied here: A-C = 2 and D-E = 2. A tie only creates multiple MSTs if both tied edges could be swapped for an alternative edge of the SAME weight while keeping the tree acyclic and spanning. Checking exhaustively: A-C(2) is the only weight-2 edge touching the {A,B,C} side, and D-E(2) is the only weight-2 edge touching the {D,E,F} side -- neither has an alternative edge of equal weight that could replace it without disconnecting or forming a cycle. Since Kruskal\'s algorithm never faces a genuine choice at any tie (each tied edge is uniquely forced by connectivity at the moment it is considered), the MST with total weight 13 (edges B-C, A-C, D-E, E-F, B-D) is the ONLY minimum spanning tree -- exhaustively checking all 5-edge acyclic spanning subsets confirms no other subset also totals 13.'
+},
+{
+  id: 'algo-graph-f4',
+  q: 'Running Dijkstra\'s algorithm on the weighted graph shown with source vertex A, what is the shortest-path distance from A to F?',
+  figure: '<svg viewBox="0 0 220 320" width="100%" style="max-width:420px;height:auto" xmlns="http://www.w3.org/2000/svg"><g stroke="currentColor"><line x1="40" y1="40" x2="180" y2="40"/><line x1="40" y1="40" x2="110" y2="110"/><line x1="180" y1="40" x2="110" y2="110"/><line x1="180" y1="40" x2="180" y2="220"/><line x1="110" y1="110" x2="180" y2="220"/><line x1="110" y1="110" x2="40" y2="220"/><line x1="180" y1="220" x2="40" y2="220"/><line x1="180" y1="220" x2="110" y2="290"/><line x1="40" y1="220" x2="110" y2="290"/></g><g font-size="12" fill="currentColor" text-anchor="middle"><text x="110" y="32">4</text><text x="60" y="68">2</text><text x="160" y="68">1</text><text x="196" y="132">5</text><text x="155" y="158">8</text><text x="65" y="158">10</text><text x="110" y="235">2</text><text x="155" y="248">6</text><text x="65" y="248">3</text></g><g fill="none" stroke="currentColor"><circle cx="40" cy="40" r="15"/><circle cx="180" cy="40" r="15"/><circle cx="110" cy="110" r="15"/><circle cx="180" cy="220" r="15"/><circle cx="40" cy="220" r="15"/><circle cx="110" cy="290" r="15"/></g><g font-size="13" fill="currentColor" text-anchor="middle"><text x="40" y="44">A</text><text x="180" y="44">B</text><text x="110" y="114">C</text><text x="180" y="224">D</text><text x="40" y="224">E</text><text x="110" y="294">F</text></g></svg>',
+  options: ['13', '14', '10', '11'],
+  answer: 0,
+  marks: 2,
+  difficulty: 'hard',
+  type: 'pyq-style',
+  explanation: 'Initialize dist[A]=0, all others infinity. Finalize A(0). Relax neighbors: dist[B]=min(inf,4)=4, dist[C]=min(inf,2)=2. Finalize C(2) (smallest tentative). Relax from C: dist[B]=min(4, 2+1)=3, dist[D]=min(inf,2+8)=10, dist[E]=min(inf,2+10)=12. Finalize B(3). Relax from B: dist[D]=min(10,3+5)=8. Finalize D(8). Relax from D: dist[E]=min(12,8+2)=10, dist[F]=min(inf,8+6)=14. Finalize E(10). Relax from E: dist[F]=min(14,10+3)=13. Finalize F(13). So the shortest path is A-C-B-D-E-F with distance 2+1+5+2+3=13, cheaper than the direct-ish A-C-D-F route (2+8+6=16) or A-B-D-F (4+5+6=15).'
+},
+{
+  id: 'algo-graph-f5',
+  q: 'For the unweighted undirected graph shown, a Depth-First Search starts at vertex 1, and at each vertex it visits unvisited neighbors in increasing numeric order. What is the resulting DFS visit order?',
+  figure: '<svg viewBox="0 0 280 370" width="100%" style="max-width:420px;height:auto" xmlns="http://www.w3.org/2000/svg"><g stroke="currentColor"><line x1="110" y1="30" x2="40" y2="110"/><line x1="110" y1="30" x2="180" y2="110"/><line x1="40" y1="110" x2="110" y2="190"/><line x1="180" y1="110" x2="110" y2="190"/><line x1="180" y1="110" x2="180" y2="270"/><line x1="180" y1="270" x2="240" y2="330"/></g><g fill="none" stroke="currentColor"><circle cx="110" cy="30" r="15"/><circle cx="40" cy="110" r="15"/><circle cx="180" cy="110" r="15"/><circle cx="110" cy="190" r="15"/><circle cx="180" cy="270" r="15"/><circle cx="240" cy="330" r="15"/></g><g font-size="13" fill="currentColor" text-anchor="middle"><text x="110" y="34">1</text><text x="40" y="114">2</text><text x="180" y="114">3</text><text x="110" y="194">4</text><text x="180" y="274">5</text><text x="240" y="334">6</text></g></svg>',
+  options: ['1, 2, 4, 3, 5, 6', '1, 2, 3, 4, 5, 6', '1, 3, 2, 4, 5, 6', '1, 2, 4, 3, 6, 5'],
+  answer: 0,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: 'Start at 1 (visited=[1]). Its unvisited neighbors are 2 and 3; take the smaller, 2, and recurse (visited=[1,2]). From 2, unvisited neighbors are 1(visited) and 4; go to 4 (visited=[1,2,4]). From 4, neighbors are 2(visited) and 3(unvisited); go to 3 (visited=[1,2,4,3]). From 3, neighbors are 1(visited), 4(visited), 5(unvisited); go to 5 (visited=[1,2,4,3,5]). From 5, neighbors are 3(visited) and 6(unvisited); go to 6 (visited=[1,2,4,3,5,6]). From 6, only neighbor 5 is visited, so DFS backtracks all the way up with nothing left to explore. Final order: 1, 2, 4, 3, 5, 6. Note this differs from BFS from 1, which would give 1, 2, 3, 4, 5, 6 since BFS exhausts each level before descending.'
+},
+{
+  id: 'algo-graph-f6',
+  q: 'In the undirected graph shown (vertices P through V), how many articulation points (cut vertices) does the graph have?',
+  figure: '<svg viewBox="0 0 380 170" width="100%" style="max-width:420px;height:auto" xmlns="http://www.w3.org/2000/svg"><g stroke="currentColor"><line x1="30" y1="40" x2="30" y2="120"/><line x1="30" y1="40" x2="110" y2="80"/><line x1="30" y1="120" x2="110" y2="80"/><line x1="110" y1="80" x2="190" y2="80"/><line x1="190" y1="80" x2="270" y2="80"/><line x1="270" y1="80" x2="350" y2="40"/><line x1="270" y1="80" x2="350" y2="120"/><line x1="350" y1="40" x2="350" y2="120"/></g><g fill="none" stroke="currentColor"><circle cx="30" cy="40" r="15"/><circle cx="30" cy="120" r="15"/><circle cx="110" cy="80" r="15"/><circle cx="190" cy="80" r="15"/><circle cx="270" cy="80" r="15"/><circle cx="350" cy="40" r="15"/><circle cx="350" cy="120" r="15"/></g><g font-size="13" fill="currentColor" text-anchor="middle"><text x="30" y="44">P</text><text x="30" y="124">Q</text><text x="110" y="84">R</text><text x="190" y="84">S</text><text x="270" y="84">T</text><text x="350" y="44">U</text><text x="350" y="124">V</text></g></svg>',
+  options: ['1', '2', '3', '4'],
+  answer: 2,
+  marks: 2,
+  difficulty: 'hard',
+  type: 'pyq-style',
+  explanation: 'The graph consists of a triangle P-Q-R, a chain R-S-T, and a triangle T-U-V. Removing R disconnects the triangle {P,Q} from the rest of the graph, so R is an articulation point. Removing S disconnects {P,Q,R} from {T,U,V}, so S is an articulation point. Removing T disconnects {U,V}... wait, U and V remain connected to each other via the U-V edge even without T, but they become disconnected from the rest of the graph (P,Q,R,S) -- so T is also an articulation point. P, Q, U, and V are NOT articulation points because each sits inside a triangle: removing any one of them still leaves its two triangle-mates connected via the remaining triangle edge, and the rest of the graph is unaffected. So the articulation points are exactly {R, S, T} -- a count of 3.'
+},
+{
+  id: 'algo-graph-f7',
+  q: 'The DAG shown has edges 1->2, 1->3, 2->4, 3->4, 4->5. How many distinct topological orderings does this DAG have?',
+  figure: '<svg viewBox="0 0 220 280" width="100%" style="max-width:420px;height:auto" xmlns="http://www.w3.org/2000/svg"><defs><marker id="ah1" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" fill="currentColor"/></marker></defs><g stroke="currentColor" marker-end="url(#ah1)"><line x1="105" y1="45" x2="55" y2="88"/><line x1="115" y1="45" x2="165" y2="88"/><line x1="48" y1="115" x2="98" y2="158"/><line x1="172" y1="115" x2="122" y2="158"/><line x1="110" y1="175" x2="110" y2="228"/></g><g fill="none" stroke="currentColor"><circle cx="110" cy="30" r="15"/><circle cx="40" cy="100" r="15"/><circle cx="180" cy="100" r="15"/><circle cx="110" cy="170" r="15"/><circle cx="110" cy="240" r="15"/></g><g font-size="13" fill="currentColor" text-anchor="middle"><text x="110" y="34">1</text><text x="40" y="104">2</text><text x="180" y="104">3</text><text x="110" y="174">4</text><text x="110" y="244">5</text></g></svg>',
+  options: ['1', '2', '3', '4'],
+  answer: 1,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: 'Vertex 1 has in-degree 0 and must come first (it has no incoming edges and every other vertex depends on it transitively). Vertex 5 has out-degree 0 and, since it depends on 4 which depends on both 2 and 3, it must come last. The only real freedom is the relative order of 2 and 3: both have the same in-degree-0 status once vertex 1 is removed, and neither depends on the other (there is no edge between them in either direction), while both must precede 4. So the valid orderings are exactly 1,2,3,4,5 and 1,3,2,4,5 -- giving 2 distinct topological orderings. Any ordering placing 4 before either 2 or 3, or placing 1 anywhere but first, would violate an edge constraint.'
+}
+);
