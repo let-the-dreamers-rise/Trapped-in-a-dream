@@ -3165,3 +3165,163 @@ window.GATE_DATA.questions['algo'].topics.find(function(t){return t.id==='algo-d
   explanation: 'Computing f(3), f(4), ..., f(n) bottom-up, each requiring O(1) work given the previous three values already computed, takes a total of O(n) time across n-2 iterations. Because the recurrence only ever needs the most recent 3 values (a sliding window, not the entire history), maintaining just 3 variables (rather than a full array of size n) suffices, achieving O(1) auxiliary space -- this is the standard space-optimization trick for any DP recurrence whose dependency only reaches back a CONSTANT number of previous states (as opposed to something like LCS or knapsack, whose recurrences need an entire previous row and thus cannot be reduced below O(row size) space, or in special row-elimination cases like knapsack, reduced to O(W) via careful iteration order but not O(1)). This distinction -- constant-lookback recurrences reducible to O(1) space versus row-dependent recurrences needing O(row) space -- is a common space-complexity trap in DP questions.'
 }
 );
+window.GATE_DATA.questions['algo'].topics.find(function(t){return t.id==='algo-graph';}).questions.push(
+{
+  id: 'algo-graph-pyq1',
+  pyqYear: 2015,
+  q: 'A weighted undirected graph has vertices A,B,C,D,E and edges A-B(2), A-C(3), B-C(1), B-D(5), C-D(4), C-E(6), D-E(2). Using Kruskal\'s algorithm, what is the TOTAL WEIGHT of the Minimum Spanning Tree?',
+  options: [],
+  kind: 'nat',
+  answer: 9,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: 'Sort edges by weight ascending: B-C(1), A-B(2), D-E(2), A-C(3), C-D(4), B-D(5), C-E(6). Apply Kruskal\'s (add an edge only if it does not form a cycle, using union-find): add B-C(1) [components: {B,C},{A},{D},{E}]. Add A-B(2) [components: {A,B,C},{D},{E}]. Add D-E(2) [components: {A,B,C},{D,E}]. Add A-C(3): both A and C already in the same component -- SKIP (would form a cycle). Add C-D(4): connects {A,B,C} and {D,E} -- add it, completing the spanning tree with 4 edges for 5 vertices. MST edges are {B-C, A-B, D-E, C-D}, total weight = 1+2+2+4 = 9. Note the weights are NOT all distinct here (two edges of weight 2), so multiple MSTs of the same total weight 9 could exist depending on tie-breaking, but the minimum total weight itself is a fixed, well-defined value of 9 regardless of which edge is chosen first among ties.'
+},
+{
+  id: 'algo-graph-pyq2',
+  pyqYear: 2016,
+  q: 'For the directed weighted graph with vertices A(source),B,C,D,E and edges A-B(4), A-C(1), C-B(2), B-D(1), C-D(5), D-E(3), running Dijkstra\'s algorithm from A, what is the shortest distance from A to E?',
+  options: [],
+  kind: 'nat',
+  answer: 7,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: 'Initialize dist[A]=0, all others infinity. Finalize A(0), relax neighbors: dist[B]=min(inf,4)=4, dist[C]=min(inf,1)=1. Finalize C(1) (smallest tentative distance among unvisited). Relax from C: dist[B]=min(4, 1+2)=3, dist[D]=min(inf,1+5)=6. Finalize B(3). Relax from B: dist[D]=min(6, 3+1)=4. Finalize D(4). Relax from D: dist[E]=min(inf, 4+3)=7. Finalize E(7). So the shortest path A to E is A-C-B-D-E with total distance 1+2+1+3=7, which beats the alternative A-C-D-E (1+5+3=9) or A-B-D-E (4+1+3=8). This example specifically tests whether a candidate correctly re-relaxes B via the cheaper path through C rather than locking in the direct A-B(4) edge prematurely.'
+},
+{
+  id: 'algo-graph-pyq3',
+  pyqYear: 2017,
+  q: 'A directed graph with vertices S,A,B,C,D has edges S-A(6), S-B(7), A-B(8), A-C(5), A-D(-4), B-C(-3), B-D(9), C-A(-2), D-C(7), D-S(2). This graph contains a NEGATIVE-weight edge. Using Bellman-Ford from S, what is the shortest distance from S to D?',
+  options: [],
+  kind: 'nat',
+  answer: -2,
+  marks: 2,
+  difficulty: 'hard',
+  type: 'pyq-style',
+  explanation: 'Since the graph has a negative edge (A-D = -4) but NO negative-weight CYCLE (verified by running one extra relaxation pass after n-1=4 iterations and confirming no distance improves further), Bellman-Ford is required (Dijkstra would give wrong answers here since it assumes non-negative weights). Running the standard Bellman-Ford relaxation for n-1=4 rounds over all edges converges to: dist[S]=0, dist[A]=2 (via S-B-C-A: 7-3-2=2, cheaper than direct S-A=6), dist[B]=7 (direct S-B), dist[C]=4 (via S-B-C: 7-3=4), dist[D]=-2 (via S-B-C-A-D: 7-3-2-4=-2, cheaper than S-A-D=6-4=2). So the shortest distance from S to D is -2. This exact graph is the classic CLRS Bellman-Ford textbook example, specifically constructed so that the shortest path to D requires traversing through the negative edge A-D after first reaching A via a roundabout cheaper route through B and C, rather than directly.'
+},
+{
+  id: 'algo-graph-pyq4',
+  pyqYear: 2018,
+  q: 'A directed graph has a cycle 0->1(1), 1->2(-1), 2->0(-1). What happens when Bellman-Ford is run on this graph, and what happens if Dijkstra\'s algorithm is (incorrectly) applied to a graph with negative edges like this one?',
+  options: [
+    'Bellman-Ford correctly detects the negative-weight cycle (distances keep decreasing after n-1 iterations); Dijkstra can produce incorrect shortest-path distances since its greedy finalization assumes no negative edges',
+    'Both Bellman-Ford and Dijkstra fail identically and cannot be distinguished',
+    'Bellman-Ford cannot detect negative cycles; only Dijkstra can',
+    'Neither algorithm is affected by negative edge weights'
+  ],
+  answer: 0,
+  marks: 1,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: 'For this graph, the cycle 0->1->2->0 has total weight 1+(-1)+(-1) = -1, a genuine negative cycle, meaning distances along it can be made arbitrarily small by looping repeatedly, so no well-defined shortest path exists at all for vertices on/reachable-from this cycle. Bellman-Ford\'s standard detection mechanism runs exactly n-1 relaxation rounds (guaranteed sufficient for any negative-cycle-free graph with n vertices), then does ONE more pass: if any distance can still be improved, a negative cycle reachable from the source is confirmed to exist -- verified here, since further relaxation keeps reducing distances indefinitely. Dijkstra\'s algorithm, by contrast, greedily finalizes each vertex\'s distance the moment it is extracted as the current minimum, relying on the invariant that no unfinalized vertex could later offer a cheaper path -- an invariant that BREAKS with negative edges, since a not-yet-visited negative edge could retroactively improve an already-finalized vertex\'s distance, producing silently WRONG (not just undefined) results rather than an error or infinite loop.'
+},
+{
+  id: 'algo-graph-pyq5',
+  pyqYear: 2019,
+  q: 'A weighted undirected graph has vertices A,B,C,D,E and edges A-B(2), A-C(3), B-C(4), B-D(5), C-D(1), C-E(6), D-E(7) -- note all edge weights here are DISTINCT. What can be concluded about its Minimum Spanning Tree, and what is its total weight?',
+  options: ['The MST is unique (since all weights are distinct); total weight = 12', 'Multiple MSTs may exist; total weight = 12', 'The MST is unique; total weight = 15', 'Cannot determine uniqueness without running both Prim\'s and Kruskal\'s'],
+  answer: 0,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: 'Since all 7 edge weights (2,3,4,5,1,6,7) are pairwise DISTINCT, a standard theorem guarantees the MST is UNIQUE -- no tie-breaking ambiguity can arise at any step of Kruskal\'s or Prim\'s algorithm. Running Kruskal\'s: sort edges C-D(1), A-B(2), A-C(3), B-C(4), B-D(5), C-E(6), D-E(7). Add C-D(1) [components: {C,D},{A},{B},{E}]. Add A-B(2) [components: {C,D},{A,B},{E}]. Add A-C(3): connects {A,B} and {C,D} -- add [components: {A,B,C,D},{E}]. Add B-C(4): both endpoints already in {A,B,C,D} -- skip (cycle). Add B-D(5): also both in same component -- skip. Add C-E(6): connects {A,B,C,D} and {E} -- add, completing the spanning tree with 4 edges. Total weight = 1+2+3+6 = 12. Since the MST is provably unique here, this is THE minimum spanning tree, not merely one of several equal-weight options.'
+},
+{
+  id: 'algo-graph-pyq6',
+  pyqYear: 2020,
+  q: 'In an unweighted, undirected, connected graph with 7 vertices numbered 0-6 and edges forming a structure where vertex 0 connects to 1 and 2, vertices 1 and 2 both connect to 3, and vertex 3 connects to 4, which then connects to 5 and 6, a BFS starting from vertex 0 is performed. What is the shortest-path distance (in number of edges) from vertex 0 to vertex 5?',
+  options: [],
+  kind: 'nat',
+  answer: 4,
+  marks: 1,
+  difficulty: 'easy',
+  type: 'pyq-style',
+  explanation: 'BFS explores the graph level by level, guaranteeing that the first time a vertex is reached, it is via a SHORTEST path (in terms of edge count) from the source, since BFS exhausts all vertices at distance k before considering any vertex at distance k+1. Level 0: {0} (distance 0). Level 1: {1, 2} (distance 1, direct neighbors of 0). Level 2: {3} (distance 2, reached from both 1 and 2, but only counted once at its first-discovered distance). Level 3: {4} (distance 3, reached from 3, the only neighbor of 4 not yet visited). Level 4: {5, 6} (distance 4, both reached from 4). So the shortest-path distance from vertex 0 to vertex 5 is 4 edges, along the unique path 0-1-3-4-5 (or equivalently 0-2-3-4-5).'
+},
+{
+  id: 'algo-graph-pyq7',
+  pyqYear: 2021,
+  q: 'A DAG has vertices 0,1,2,3,4 with edges 0->1, 0->2, 0->3, 1->4, 2->4, 3->4 (vertex 0 is the unique source with three independent "middle" vertices 1,2,3, all feeding into the unique sink 4). How MANY distinct topological orderings does this DAG have?',
+  options: [],
+  kind: 'nat',
+  answer: 6,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: 'Vertex 0 has in-degree 0 and every other vertex depends on it (directly or transitively), so it MUST come first in any valid topological order. Vertex 4 has out-degree 0 and depends on all of 1, 2, and 3, so it MUST come last. The three middle vertices 1, 2, and 3 have NO edges among themselves (no edge like 1->2 or 2->3 exists), meaning they are mutually independent in the partial order and can be arranged in ANY relative order among themselves without violating any dependency constraint. The number of ways to arrange 3 mutually-independent elements is 3! = 6. So the total number of distinct topological orderings is 1 (fixed first) x 6 (free middle permutations) x 1 (fixed last) = 6. This is a standard technique for counting topological orderings: identify forced positions (sources/sinks with unique dependency chains) versus free "antichains" of mutually incomparable vertices, and multiply by the factorial of each such free group\'s size.'
+},
+{
+  id: 'algo-graph-pyq8',
+  pyqYear: 2022,
+  q: 'Which of the following statements about Depth-First Search (DFS) edge classification in a directed graph are TRUE? (Multiple Select Question)',
+  options: [
+    'A back edge connects a vertex to one of its ancestors in the DFS tree',
+    'A directed graph has a cycle if and only if a DFS of it produces at least one back edge',
+    'Forward and cross edges can both appear when DFS is run on a directed acyclic graph (DAG)',
+    'A cross edge always connects two vertices in the same DFS tree at the same depth'
+  ],
+  answers: [0, 1, 2],
+  marks: 2,
+  difficulty: 'hard',
+  type: 'pyq-style',
+  explanation: 'Statement 1 is TRUE by definition: a back edge in DFS goes from a vertex to one of its ANCESTORS in the current DFS tree (i.e., it points "backward" toward the root along the current recursion path). Statement 2 is TRUE and is a fundamental theorem: a directed graph contains a cycle if and only if a DFS traversal discovers at least one back edge -- this is precisely the mechanism used for cycle detection via DFS (checking for edges into "gray"/currently-on-stack vertices). Statement 3 is TRUE: forward edges (from an ancestor to a non-child descendant) and cross edges (connecting unrelated subtrees or different DFS trees, with no ancestor-descendant relationship) CAN both appear even in an acyclic graph -- a DAG can have zero back edges (consistent with being acyclic) while still having forward and cross edges depending on traversal order and edge structure. Statement 4 is FALSE: a cross edge can connect vertices at DIFFERENT depths, or even vertices in entirely DIFFERENT DFS trees (in a DFS forest, when the graph is disconnected or when directed edges point into an already-fully-explored subtree) -- there is no requirement that cross edges connect same-depth vertices.'
+},
+{
+  id: 'algo-graph-pyq9',
+  pyqYear: 2023,
+  q: 'A weighted undirected graph has 6 vertices and 9 edges. If it is known to be connected, how many edges does its Minimum Spanning Tree contain, and how many edges are NOT part of the MST?',
+  options: [],
+  kind: 'nat',
+  answer: 5,
+  marks: 1,
+  difficulty: 'easy',
+  type: 'pyq-style',
+  explanation: 'A spanning tree on any connected graph with V vertices always has exactly V-1 edges (a fundamental tree property: a tree with V nodes has exactly V-1 edges, being minimally connected with no cycles). Here V=6, so the MST has exactly 6-1 = 5 edges. Since the graph has 9 total edges, the number of edges NOT in the MST is 9 - 5 = 4 (these are the edges that Kruskal\'s algorithm would reject during processing because they would form a cycle with already-included edges, or equivalently, the edges Prim\'s algorithm never needs to add since it stops once all vertices are connected). This NAT question tests the basic but essential tree-edge-count identity that underlies correctness arguments for both Kruskal\'s and Prim\'s algorithms (both are designed to add EXACTLY V-1 edges and then terminate).'
+},
+{
+  id: 'algo-graph-pyq10',
+  pyqYear: 2024,
+  q: 'A connected undirected graph G has V vertices and E edges, and it is known that G contains at least one cycle. If T is a spanning tree of G, how many "non-tree" edges (edges of G not in T) does removing a spanning tree leave, and what is true about each such non-tree edge added back to T?',
+  options: [
+    'E - (V-1) non-tree edges remain; adding any single one back to T creates EXACTLY ONE cycle',
+    'E - V non-tree edges remain; adding any one back creates no cycle',
+    'V - E non-tree edges remain; adding any one back always creates two disjoint cycles',
+    'The number of non-tree edges cannot be determined without knowing the exact structure of G'
+  ],
+  answer: 0,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: 'Any spanning tree T of a connected graph with V vertices has exactly V-1 edges. So the number of non-tree edges is E - (V-1) = E - V + 1. Since G contains at least one cycle, E must be at least V (a connected graph is acyclic only when E = V-1, i.e., is itself already a tree), confirming E-(V-1) >= 1, i.e., at least one non-tree edge genuinely exists. For any single non-tree edge (u,v) added back into T: since T is a tree, there exists a UNIQUE path between u and v already within T, and adding the direct edge (u,v) creates exactly ONE additional cycle (the path in T from u to v, plus the new edge (u,v), forms exactly one simple cycle) -- no more, no fewer, because T itself has no other cycles to combine with. This "fundamental cycle" property (each non-tree edge, combined with the tree, induces exactly one unique cycle) underlies cycle-space arguments in graph theory and explains why Kruskal\'s algorithm correctly identifies "would create a cycle" via the union-find check.'
+},
+{
+  id: 'algo-graph-pyq11',
+  pyqYear: 2025,
+  q: 'For a directed graph with V vertices and E edges represented using an ADJACENCY LIST, what are the tight time complexities of (a) BFS/DFS traversal and (b) checking whether a specific edge (u,v) exists?',
+  options: [
+    'BFS/DFS: O(V+E); Edge existence check: O(degree(u)) in the worst case, i.e., up to O(V)',
+    'BFS/DFS: O(V*E); Edge existence check: O(1) always',
+    'BFS/DFS: O(V^2); Edge existence check: O(log V)',
+    'BFS/DFS: O(E); Edge existence check: O(V+E)'
+  ],
+  answer: 0,
+  marks: 1,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: 'With an adjacency LIST representation, BFS and DFS both visit every vertex once (O(V) total across all vertex-visits) and, for each vertex, scan its entire adjacency list exactly once (summing to O(E) total across all vertices, since the sum of all list lengths equals the total edge count, or 2E for undirected graphs, still O(E)) -- giving the well-known O(V+E) tight bound for both traversals. Checking whether edge (u,v) exists requires linearly scanning vertex u\'s adjacency list to search for v, which takes O(degree(u)) time in the worst case -- and since degree(u) can be as large as V-1 (in a dense graph or specifically if u connects to nearly every other vertex), this is O(V) in the worst case. This contrasts with an ADJACENCY MATRIX representation, where edge existence check is O(1) (direct array lookup) but traversal and matrix storage cost O(V^2) regardless of how sparse the actual graph is -- the classic space/query-time tradeoff between the two graph representations that GATE frequently tests.'
+},
+{
+  id: 'algo-graph-pyq12',
+  pyqYear: 2026,
+  q: 'Prim\'s algorithm for MST is implemented using a binary min-heap (priority queue) with decrease-key support, on a graph with V vertices and E edges. What is the tight time complexity?',
+  options: ['O(E log V)', 'O(V^2)', 'O(E + V log V)', 'O(V*E)'],
+  answer: 0,
+  marks: 2,
+  difficulty: 'hard',
+  type: 'pyq-style',
+  explanation: 'With a binary heap implementation, Prim\'s algorithm performs V EXTRACT-MIN operations (one per vertex added to the MST, each costing O(log V)) and, across the whole run, performs at most E DECREASE-KEY operations in total (each edge can trigger at most one decrease-key, when it offers a cheaper connection to a vertex not yet in the tree, and each decrease-key also costs O(log V) with a binary heap). Total time = O(V log V) for extractions + O(E log V) for decrease-keys = O((V+E) log V), which simplifies to O(E log V) for connected graphs where E >= V-1 (E dominates V asymptotically in this sum). This matches Kruskal\'s O(E log E) = O(E log V) (since E is at most V^2, log E = O(log V)) -- both classic MST algorithms land at the same O(E log V) tight bound with these standard data structures, though a FIBONACCI heap implementation of Prim\'s can improve decrease-key to O(1) amortized, achieving the better O(E + V log V) bound instead (a distinction sometimes tested at a more advanced level).'
+}
+);
