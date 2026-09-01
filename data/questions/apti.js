@@ -2699,3 +2699,353 @@ window.GATE_DATA.questions['apti'].topics.find(function(t){return t.id==='apti-d
     explanation: 'A vertical mirror flips each letter left-right, so only letters with a vertical line of symmetry (such as A, H, I, M, O, T, U, V, W, X, Y) look unchanged in shape. Checking each letter of "CODE" individually: C is symmetric about a horizontal axis but not a vertical one, so it changes in a vertical mirror; O is symmetric about both axes, so it remains unchanged; D has its flat edge on one side and curved edge on the other, so it is not vertically symmetric and changes shape; E has no vertical symmetry either and also changes. Only O remains visually unchanged as an individual letter shape. Fast route: check each letter of a word independently against the fixed list of vertically-symmetric letters, treating the "letter order reversal" (a separate, always-true effect of any mirror) as irrelevant to the question of which individual letter shapes stay visually the same.'
   }
 );
+
+window.GATE_DATA.questions['apti'].topics.find(function(t){return t.id==='apti-quant';}).questions.push(
+  {
+    id: 'apti-quant-h1',
+    q: 'A trader marks his goods 40% above cost price. During a clearance sale he offers two successive discounts of 10% and then 15% on the marked price. What is his overall profit percentage?',
+    options: ['7.1%', '15%', '9%', '5.5%'],
+    answer: 0,
+    marks: 2,
+    difficulty: 'hard',
+    type: 'numerical',
+    explanation: 'This is a three-factor chain: markup, then two successive discounts, all multiplying rather than adding. The overall selling-price factor on cost price is 1.40 x 0.90 x 0.85. Compute stepwise: 1.40 x 0.90 = 1.26, and 1.26 x 0.85 = 1.071. So the shopkeeper still sells at 1.071 times the cost price, meaning a net profit of 7.1%. Fast route: convert each percentage to a decimal multiplier immediately (markup adds, so 1 + 0.40; discounts subtract, so 1 - 0.10 and 1 - 0.15) and multiply all three in one line, never adding the raw percentages. The trap answers come from wrong shortcuts: 40 - 10 - 15 = 15% (treating percentages as additive, which is never valid across different bases), or discounting only once and forgetting the second stage (giving 9% from 1.40 x 0.90 - 1 without the final 0.85 factor), or averaging the two discounts into one 12.5% cut. Since each discount applies to a progressively smaller marked price, and the markup applies to the original cost, only sequential multiplication of all three factors gives the correct 7.1%, which is why the answer is far below the naive 15%.'
+  },
+  {
+    id: 'apti-quant-h2',
+    q: 'A can complete a work in 12 days and B can complete it in 24 days. They work together for 4 days. A then leaves, and B is joined by C; working together, B and C finish the remaining work in exactly 3 more days. In how many days could C alone complete the entire work?',
+    options: ['6 days', '8 days', '10 days', '9 days'],
+    answer: 1,
+    marks: 2,
+    difficulty: 'hard',
+    type: 'numerical',
+    explanation: 'Set up rates as fractions of work per day: A = 1/12, B = 1/24. Together for 4 days they complete 4 x (1/12 + 1/24) = 4 x (3/24) = 4 x (1/8) = 1/2 of the work, leaving exactly 1/2 remaining — this is the step most students skip, wrongly treating the remaining work as the full job. Now B and C together clear this 1/2 in 3 days, so their combined rate is (1/2)/3 = 1/6 per day. Since B alone contributes 1/24 per day, C\'s rate is 1/6 - 1/24 = 4/24 - 1/24 = 3/24 = 1/8 per day, so C alone needs 8 days. Fast route: use a common work-unit of 24 (LCM of 12 and 24), so A = 2 units/day, B = 1 unit/day; in 4 days A+B finish 4x3 = 12 units out of 24, leaving 12 units for B+C in 3 days, i.e. 4 units/day combined, so C alone does 4 - 1 = 3 units/day, taking 24/3 = 8 days. The trap answers assume the remaining work is the full job (giving a much smaller time) or forget to subtract B\'s own contribution before inverting for C.'
+  },
+  {
+    id: 'apti-quant-h3',
+    q: 'A boat\'s speed in still water is 10 km/h. It travels 24 km downstream and then returns the same 24 km upstream, and the total time for the round trip is 5 hours. Find the speed of the stream, in km/h. (Enter your numerical answer.)',
+    options: [],
+    answer: 2,
+    kind: 'nat',
+    marks: 2,
+    difficulty: 'hard',
+    type: 'numerical',
+    explanation: 'Let the stream speed be s km/h. Downstream speed is (10+s), upstream speed is (10-s). The round-trip time equation is 24/(10+s) + 24/(10-s) = 5. Combine the fractions over a common denominator: 24[(10-s)+(10+s)] / (100 - s^2) = 5, which simplifies to 24 x 20 / (100 - s^2) = 5, i.e. 480/(100-s^2) = 5, so 100 - s^2 = 96, giving s^2 = 4 and s = 2 km/h (rejecting the negative root, since speed cannot be negative, and s must also be less than 10 for the boat to move upstream at all). Fast route: recognize that the sum of the two time fractions always simplifies to 2 x (still-water speed) x distance / (still-water-speed^2 - stream-speed^2), so plug numbers directly into that ready-made formula instead of expanding partial fractions from scratch. The trap here is to average the downstream and upstream speeds as if the boat covered each leg in equal time (it does not, since upstream is slower and takes longer), or to solve a linear equation ignoring that the denominator is a difference of squares, which silently drops the valid root.'
+  },
+  {
+    id: 'apti-quant-h4',
+    q: 'A container holds 81 litres of pure milk. 27 litres of the mixture is withdrawn and replaced with water. This same process — withdraw 27 litres of the current mixture and replace with water — is repeated once more. How many litres of pure milk remain in the container after the second replacement? (Enter your numerical answer.)',
+    options: [],
+    answer: 36,
+    kind: 'nat',
+    marks: 2,
+    difficulty: 'hard',
+    type: 'numerical',
+    explanation: 'This is the repeated-dilution formula: after n replacements of x units from a total volume V, the remaining pure quantity is V x (1 - x/V)^n. Here V = 81, x = 27, n = 2, so the fraction of milk remaining is (1 - 27/81)^2 = (2/3)^2 = 4/9. Remaining milk = 81 x 4/9 = 36 litres. Fast route: track the multiplying fraction retained per step, (54/81) = 2/3, and square it directly for two identical replacements rather than tracking litres withdrawn at each stage separately. The classic trap is to assume each 27-litre withdrawal removes 27 litres of pure milk (since after the first replacement the container is a mixture, not pure milk), which would wrongly suggest 81 - 54 = 27 litres remain; that arithmetic only works for the very first withdrawal, when the container still holds pure milk, and fails for the second one where the withdrawn 27 litres is itself 2/3 milk, 1/3 water. The correct compounding factor approach is the only route to the right answer, 36 litres, not 27.'
+  },
+  {
+    id: 'apti-quant-h5',
+    q: 'The difference between the compound interest and the simple interest on a certain sum for 2 years at 10% per annum is Rs. 150. Find the sum (the principal). (Enter your numerical answer.)',
+    options: [],
+    answer: 15000,
+    kind: 'nat',
+    marks: 2,
+    difficulty: 'hard',
+    type: 'numerical',
+    explanation: 'For exactly 2 years, the identity CI - SI = P(r/100)^2 holds (this is because the only extra amount compound interest earns over simple interest, over two years, is the interest-on-first-year-interest term). Substituting r = 10 and the given difference of Rs. 150: 150 = P x (10/100)^2 = P x 0.01, so P = 150/0.01 = 15000. Fast route: memorize the 2-year identity directly instead of computing full CI and SI amounts separately and subtracting, which is far slower and more error-prone under exam time pressure. The trap is applying the 3-year identity, CI - SI = P(r/100)^2 (3 + r/100), which has an extra factor and would give a wrong (smaller) principal if mistakenly used here; another common slip is forgetting to square the rate and instead computing P x (10/100) = 1500, an order-of-magnitude error that a quick sanity check catches (a Rs. 150 gap after only 2 years at 10% strongly implies a principal in the thousands, not hundreds).'
+  },
+  {
+    id: 'apti-quant-h6',
+    q: 'A committee of 5 members is to be formed from a pool of 6 men and 4 women. In how many ways can this committee be formed if it must include at least 2 women? (Enter your numerical answer.)',
+    options: [],
+    answer: 186,
+    kind: 'nat',
+    marks: 2,
+    difficulty: 'hard',
+    type: 'numerical',
+    explanation: 'Split by the number of women w, which can range from 2 to 4 (not higher, since only 4 women exist), with men filling the rest: w=2 gives C(4,2) x C(6,3) = 6 x 20 = 120; w=3 gives C(4,3) x C(6,2) = 4 x 15 = 60; w=4 gives C(4,4) x C(6,1) = 1 x 6 = 6. Total = 120 + 60 + 6 = 186. Fast route: use the complement instead — total ways to pick any 5 from 10 is C(10,5) = 252, and subtract the cases with fewer than 2 women (w=0: C(6,5) = 6, and w=1: C(4,1) x C(6,4) = 4 x 15 = 60), giving 252 - 66 = 186, matching exactly and confirming the direct sum. The trap is forgetting the upper cap of w=4 and mistakenly summing an extra w=5 term (which is impossible since only 4 women are available), or computing "at least 2" as merely "exactly 2" and stopping after the first case, both of which understate the true count.'
+  },
+  {
+    id: 'apti-quant-h7',
+    q: 'Two fair dice are rolled together. Given that the sum of the two numbers shown is even, what is the probability that both dice show the same number?',
+    options: ['1/6', '1/3', '1/2', '2/3'],
+    answer: 1,
+    marks: 2,
+    difficulty: 'hard',
+    type: 'numerical',
+    explanation: 'This is a conditional probability question, so the sample space must shrink to only the outcomes satisfying the given condition, not the full 36 outcomes. The sum of two dice is even exactly when both dice are odd or both are even; since each die has 3 odd faces (1,3,5) and 3 even faces (2,4,6), the count of even-sum outcomes is 3x3 + 3x3 = 18 out of 36. Within this reduced space of 18 outcomes, count the doubles: (1,1), (2,2), (3,3), (4,4), (5,5), (6,6) — all six doubles automatically have an even sum, since a number added to itself is always even, so all 6 qualify. The conditional probability is 6/18 = 1/3. Fast route: recognize that every doublet already lies inside the "even sum" condition, so the numerator stays the fixed count of 6, and only the denominator shrinks from 36 to 18. The trap is computing 6/36 = 1/6, which is the unconditional probability of a double and ignores that the question restricts attention only to already-even-sum outcomes; this is the classic error of not re-normalizing the sample space once a condition is imposed.'
+  },
+  {
+    id: 'apti-quant-h8',
+    q: 'A solid right circular cylinder of radius 7 cm and height 10 cm has a hemisphere of the same radius fixed exactly onto one of its circular faces. Using pi = 22/7, find the total exposed surface area of the resulting solid, in cm^2.',
+    options: ['902', '1056', '748', '1210'],
+    answer: 0,
+    marks: 2,
+    difficulty: 'hard',
+    type: 'numerical',
+    explanation: 'When a hemisphere is fixed onto a cylinder\'s flat circular face, that shared circular face is completely covered on both sides and contributes zero exposed area — it must be dropped entirely, not counted once or twice. The exposed surface is: curved surface of the cylinder (2 x pi x r x h), the cylinder\'s other flat circular base (pi x r^2), and the curved surface of the hemisphere (2 x pi x r^2). With r=7, h=10, pi=22/7: curved cylinder = 2 x (22/7) x 7 x 10 = 440; flat base = (22/7) x 49 = 154; hemisphere curved = 2 x (22/7) x 49 = 308. Total = 440 + 154 + 308 = 902 cm^2. Fast route: since r=7 cancels the 7 in pi=22/7 cleanly, compute each term as a simple integer product without a calculator. The traps are well-populated here: including both the cylinder\'s top flat circle AND the hemisphere\'s flat base as if neither were hidden gives the inflated 1056 (double-counting a face that physically does not exist on the combined solid); forgetting the exposed bottom circle entirely gives 748; and treating the cap as a full sphere instead of a hemisphere gives 1210. Only careful accounting of exactly which faces remain physically visible yields 902.'
+  },
+  {
+    id: 'apti-quant-h9',
+    q: 'A dishonest dealer claims to sell rice at cost price, but he uses a rigged weight and gives only 800 grams of rice for every 1 kilogram he charges for. To appear generous, he also offers a further 5% discount on his invoiced price. What is his overall profit percentage?',
+    options: ['18.75%', '25%', '20%', '13.75%'],
+    answer: 0,
+    marks: 2,
+    difficulty: 'hard',
+    type: 'numerical',
+    explanation: 'Two effects combine here: a false-weight markup and a stated discount, and they must be applied to the correct bases. Let the true cost per gram be c. For every transaction, the dealer physically hands over only 800 g, so his actual cost of goods given is 800c. He invoices this as if it were 1000 g at cost price, so the invoiced price is 1000c; after a further 5% discount, the amount he actually collects is 1000c x 0.95 = 950c. His profit is what he collects minus what the goods actually cost him: 950c - 800c = 150c. Profit percentage must be computed on the true cost of goods given, 800c, not on the invoiced 1000c: 150c/800c x 100 = 18.75%. Fast route: treat the false weight as an automatic 25% profit factor (1000/800 = 1.25) with no discount, then apply the 5% discount as a further multiplying factor on the selling side only, giving overall factor 1.25 x 0.95 = 1.1875, i.e. 18.75% profit directly. The trap answers are 25% (false weight alone, ignoring the discount) and 20% (mistakenly computing profit as a fraction of the invoiced 1000c instead of the true cost 800c actually parted with).'
+  },
+  {
+    id: 'apti-quant-h10',
+    q: 'Train A is 100 m long and crosses a signal pole in 5 seconds. Train B is such that it crosses a 150 m long platform in 15 seconds, and its length works out to 75 m. If both trains now run on parallel tracks in the same direction, how long does the faster train take to completely cross the slower one?',
+    options: ['5 seconds', '25 seconds', '35 seconds', '45 seconds'],
+    answer: 2,
+    marks: 2,
+    difficulty: 'hard',
+    type: 'numerical',
+    explanation: 'First extract each train\'s speed. Train A crosses a pole (covering only its own length) of 100 m in 5 s, so its speed is 100/5 = 20 m/s. Train B covers its own length plus the 150 m platform in 15 s; with length 75 m, total distance is 75 + 150 = 225 m, so its speed is 225/15 = 15 m/s. When two trains move in the SAME direction, the relevant relative speed for one to overtake and clear the other is the DIFFERENCE of their speeds, 20 - 15 = 5 m/s, not the sum — the sum applies only when they move toward each other. The faster train must cover the combined length of both trains, 100 + 75 = 175 m, relative to the slower one, so time = 175/5 = 35 seconds. Fast route: compute each train\'s speed from its own crossing data first, then immediately identify the direction word ("same" vs "opposite") before choosing sum or difference of speeds — this single word decision is where most errors occur. The trap answer 5 seconds comes from using the sum of speeds (35 m/s) as if the trains were moving toward each other, which would be correct only for opposite directions; 25 and 45 seconds come from combining lengths or speeds incorrectly (e.g., using only one train\'s length, or averaging the speeds instead of differencing them).'
+  }
+);
+
+window.GATE_DATA.questions['apti'].topics.find(function(t){return t.id==='apti-logical';}).questions.push(
+  {
+    id: 'apti-logical-h1',
+    q: 'Six people A, B, C, D, E and F sit in a row facing north, numbered 1 to 6 from left to right. C sits at one of the two ends. Exactly two people sit between B and D. A sits immediately to the left of E. F does not sit adjacent to C. B sits to the left of D. F sits at the right end. How many people sit between C and D?',
+    options: ['2', '3', '4', '1'],
+    answer: 1,
+    marks: 2,
+    difficulty: 'hard',
+    type: 'concept',
+    explanation: 'Start with the most restrictive clues. F sits at the right end, so seat 6 = F. Since F does not sit adjacent to C, C cannot be in seat 5; combined with "C sits at one of the two ends," C must be at the left end, seat 1. "Exactly two people between B and D" means their seat numbers differ by exactly 3, and "B sits to the left of D" fixes the order, so the pair (B, D) must be one of (1,4), (2,5), (3,6). Seats 1 and 6 are already taken by C and F, so only (2,5) survives: B = 2, D = 5. That leaves seats 3 and 4 for A and E, and since "A sits immediately to the left of E," A = 3 and E = 4. The full arrangement is C(1), B(2), A(3), E(4), D(5), F(6). Between C (seat 1) and D (seat 5) sit seats 2, 3, 4 — that is B, A, E, three people. Fast route: always resolve the single most restrictive absolute clue (an end position) first, then use it to eliminate branches of the "exactly two between" clue instead of testing all three pairs blindly. The trap is stopping at "2 people between" style clues without checking which candidate pairs remain legal once the end seats are already occupied, which silently admits impossible arrangements.'
+  },
+  {
+    id: 'apti-logical-h2',
+    q: 'Six friends P, Q, R, S, T and U have distinct heights. S is the tallest of all. T is shorter than S but taller than R. Q is taller than only two of the other five people. U is taller than P but shorter than R. R is taller than Q. Who is the third tallest among the six friends?',
+    options: ['P', 'Q', 'R', 'T'],
+    answer: 2,
+    marks: 2,
+    difficulty: 'hard',
+    type: 'concept',
+    explanation: 'Rank heights 1 (shortest) to 6 (tallest). "S is the tallest" gives S = 6. "Q is taller than only two people" is a definitional trap: it fixes Q\'s absolute rank directly, since exactly two people being shorter than Q means Q is 3rd from the bottom, so Q = 3 (not 2, which would be the natural but wrong guess from misreading "only two"). "R is taller than Q" forces R into {4, 5} since 6 is taken. "T is shorter than S but taller than R" needs an integer strictly between R and 6; if R = 5, no integer lies strictly between 5 and 6, which is impossible, so R = 4, and then T must be strictly between 4 and 6, forcing T = 5. The only ranks left, 1 and 2, go to P and U; since "U is taller than P," P = 1 and U = 2. The full order from shortest to tallest is P, U, Q, R, T, S. Counting from the top: S is 1st tallest, T is 2nd tallest, R is 3rd tallest. Fast route: convert every "taller than only n people" phrase into an absolute rank immediately, since it is far more informative than a relative "taller than X" clue, and use it to prune the impossible branch (R=5) in one step rather than testing all orderings.'
+  },
+  {
+    id: 'apti-logical-h3',
+    q: 'Consider the three statements: (1) All squares are rectangles. (2) All rectangles are parallelograms. (3) Some parallelograms are rhombuses. Which conclusion definitely follows from these statements?',
+    options: ['All squares are parallelograms.', 'Some rhombuses are squares.', 'All parallelograms are squares.', 'No parallelogram is a rhombus.'],
+    answer: 0,
+    marks: 2,
+    difficulty: 'hard',
+    type: 'concept',
+    explanation: 'Chain the two universal statements first: "All squares are rectangles" places the square-circle entirely inside the rectangle-circle, and "All rectangles are parallelograms" places the rectangle-circle entirely inside the parallelogram-circle. Since the square-circle is inside the rectangle-circle, which is inside the parallelogram-circle, the square-circle must also be entirely inside the parallelogram-circle — this transitivity of "All A are B" and "All B are C" giving "All A are C" is always valid, so "All squares are parallelograms" definitely follows. The third statement, "Some parallelograms are rhombuses," only guarantees an overlap somewhere inside the parallelogram-circle; that rhombus-overlap region could sit entirely outside the (smaller) square-circle, so nothing about squares and rhombuses can be concluded — "Some rhombuses are squares" is only possible, not certain, and is the classic trap of treating a valid-sounding combination of a universal and a particular statement as guaranteed. "All parallelograms are squares" reverses a valid universal statement, which is never a legitimate conversion. "No parallelogram is a rhombus" directly contradicts the given "Some parallelograms are rhombuses." Fast route: chain only the universal (All-All) statements first, since that combination is always safe, and treat any conclusion involving a term from a "Some" statement as unproven unless a diagram forces it in every case.'
+  },
+  {
+    id: 'apti-logical-h4',
+    q: 'Consider the three statements: (1) Some doctors are teachers. (2) All teachers are readers. (3) No reader is a painter. Which conclusion definitely follows from these statements?',
+    options: ['Some doctors are readers.', 'No doctor is a painter.', 'Some painters are teachers.', 'All doctors are readers.'],
+    answer: 0,
+    marks: 2,
+    difficulty: 'hard',
+    type: 'concept',
+    explanation: 'Combine statement (1), a particular statement, with statement (2), a universal one: "Some doctors are teachers" and "All teachers are readers" together force that the specific doctors who are teachers must also be readers, so "Some doctors are readers" definitely follows — a particular-then-universal chain (Some A are B, All B are C, therefore Some A are C) is always valid. This is as far as the chain can safely go. "No doctor is a painter" over-claims: statement (3) tells us no reader is a painter, so the doctor-teachers (who are readers) are certainly not painters, but the remaining doctors who are NOT teachers have no stated connection to reading at all, so they might still be painters — the universal negative conclusion is not guaranteed, only a partial one ("some doctors are not painters") would be. "Some painters are teachers" is actually false in every valid diagram: since all teachers are readers and no reader is a painter, it follows validly that NO teacher is a painter, which is the opposite of this option. "All doctors are readers" over-generalizes a particular premise into a universal one, which is never valid. Fast route: track exactly how much quantifier strength survives each link in the chain — a "Some" premise can never produce an "All" conclusion, and this single check eliminates two of the four options instantly.'
+  },
+  {
+    id: 'apti-logical-h5',
+    q: 'In a coded family notation, "A + B" means A is the mother of B, "A - B" means A is the father of B, and "A x B" means A is the brother of B. If "P + Q - R x S" is true, how is P related to S?',
+    options: ['Grandmother', 'Grandfather', 'Mother', 'Aunt'],
+    answer: 0,
+    marks: 2,
+    difficulty: 'hard',
+    type: 'concept',
+    explanation: 'Decode the chain one link at a time, generation by generation. "P + Q" means P is the mother of Q, so P is one generation above Q. "Q - R" means Q is the father of R, placing R one generation below Q, and therefore two generations below P — P is R\'s paternal grandmother. "R x S" means R is the brother of S, which places S in the same generation as R, as R\'s sibling, and consequently as a child of the same parent Q, making S also a grandchild of P. Since P is female (established by "mother" in the first clue) and is two generations above S, P is S\'s grandmother — and this holds regardless of whether S is male or female, since "grandmother" is determined by P\'s own gender and generational gap, not by S\'s. Fast route: build a small generation ladder (P at the top, Q below P, R and S together below Q) the moment the symbols are decoded, rather than trying to track the relation verbally; the ladder makes the two-generation gap and the correct gendered title immediately visible. The trap is assuming a sibling clue like "R x S" might change the generational count (it does not — siblings always sit at the same level) or defaulting to "grandfather" out of habit despite P being explicitly established as female via the "mother" clue.'
+  },
+  {
+    id: 'apti-logical-h6',
+    q: 'In a coded family notation, "A $ B" means A is the father of B, "A # B" means A is the mother of B, "A @ B" means A is the husband of B, "A & B" means A is the daughter of B, and "A % B" means A is the son of B. If "J @ K, K & L, L % M" is true, how is J related to M?',
+    options: ['Grandson-in-law', 'Son-in-law', 'Grandson', 'Nephew'],
+    answer: 0,
+    marks: 2,
+    difficulty: 'hard',
+    type: 'concept',
+    explanation: 'Decode each link before combining: "J @ K" means J is the husband of K, so K is female and married to J. "K & L" means K is the daughter of L, placing L one generation above K. "L % M" means L is the son of M, placing M one generation above L, and therefore two generations above K — M is K\'s grandparent (specifically, since L is M\'s son, M could be L\'s father or mother, but either way M is K\'s paternal grandparent). K is thus the granddaughter of M. Since J is married to K, J is not a blood descendant of M at all, but a relation by marriage two generations down — the correct title is "grandson-in-law," the husband of a granddaughter, not "grandson" (which would wrongly claim a blood tie) and not "son-in-law" (which would wrongly place J only one generation down instead of two). Fast route: first build the generation ladder from the blood-relation clues alone (M above L above K), and only at the very end attach the marital clue (J to K) as a same-generation, non-blood link, adding "-in-law" to whatever blood title K herself holds relative to M. The trap is collapsing marriage and blood relations into the same step, which easily produces the wrong generational distance or wrongly upgrades an in-law into a blood relation.'
+  },
+  {
+    id: 'apti-logical-h7',
+    q: 'January 1, 2024 was a Monday. What day of the week was January 1, 2030?',
+    options: ['Monday', 'Tuesday', 'Sunday', 'Wednesday'],
+    answer: 1,
+    marks: 2,
+    difficulty: 'hard',
+    type: 'concept',
+    explanation: 'From January 1, 2024 to January 1, 2030 spans exactly 6 full years: 2024, 2025, 2026, 2027, 2028, 2029. The weekday shifts forward by 1 for each ordinary 365-day year and by 2 for each year containing a February 29 within the span (a leap year). Among these six years, 2024 and 2028 are leap years (divisible by 4 and not century-exceptions), so each contributes an extra day; 2025, 2026, 2027, 2029 are ordinary. Total forward shift = (6 years x 1 day each) + (2 leap years x 1 extra day each) = 6 + 2 = 8 days. Since weekdays cycle every 7 days, the net shift is 8 mod 7 = 1 day forward from Monday, landing on Tuesday. Fast route: count only ordinary years as +1 each, then add +1 more for every leap year that falls strictly within the interval (not the destination year itself, unless its own Feb 29 has already passed by the date in question — here Jan 1 is before Feb 29 in every year, so both 2024\'s and 2028\'s leap days lie fully inside the six-year span and both count). The trap is either forgetting to add extra days for leap years at all (giving 6 mod 7 = 6 days shift, i.e. Sunday) or overcounting by including 2030\'s own leap status (2030 is not a leap year and is also outside the counted span, so it must not be added).'
+  },
+  {
+    id: 'apti-logical-h8',
+    q: 'At what time between 7 o\'clock and 8 o\'clock are the hour hand and minute hand of a clock exactly opposite each other (180 degrees apart)?',
+    options: ['7 hours 5 5/11 minutes', '7 hours 10 10/11 minutes', '7 hours 16 4/11 minutes', '7 hours 21 9/11 minutes'],
+    answer: 0,
+    marks: 2,
+    difficulty: 'hard',
+    type: 'concept',
+    explanation: 'At H hours and M minutes, the hour hand is at angle 30H + 0.5M degrees and the minute hand is at 6M degrees. "Exactly opposite" means the two angles differ by 180 degrees: (30H + 0.5M) - 6M = 180 (choosing the sign so the result stays in range), i.e. 30H - 5.5M = 180. At 7 o\'clock, H = 7, so 210 - 5.5M = 180, giving 5.5M = 30, so M = 30/5.5 = 60/11 = 5 and 5/11 minutes. So the hands are opposite at 7 hours 5 5/11 minutes, shortly after 7:05. Fast route: memorize that hands are opposite exactly twice per hour-pair-cycle relative to the "coincide" formula, and that the opposite-angle condition simply replaces the coincidence equation\'s right-hand side of 0 with 180; solving 30H - 5.5M = 180 directly for M avoids re-deriving the angle formula from scratch under time pressure. The trap answers arise from using the coincidence formula\'s structure but misplacing the 180, or from solving 30H - 5.5M = -180 instead (which gives M = 70.9, outside the valid 0-60 range for this hour and must be discarded, not rounded into a wrong-looking answer choice).'
+  },
+  {
+    id: 'apti-logical-h9',
+    q: 'A cube of side 6 cm is painted red on all six faces and then cut into 1 cm x 1 cm x 1 cm unit cubes. How many of the unit cubes have at least one face painted red? (Enter your numerical answer.)',
+    options: [],
+    answer: 152,
+    kind: 'nat',
+    marks: 2,
+    difficulty: 'hard',
+    type: 'concept',
+    explanation: 'The total number of unit cubes is 6^3 = 216. Rather than separately counting corner cubes (3 faces painted), edge cubes (2 faces painted), and face cubes (1 face painted) and adding all three, use the complement: the only cubes with NO paint at all are the fully interior ones, forming a smaller (n-2) x (n-2) x (n-2) cube tucked one layer inside every face, giving (6-2)^3 = 4^3 = 64 unpainted cubes. "At least one face painted" is simply the complement of "zero faces painted," so the count is 216 - 64 = 152. Fast route: for any painted-and-cut cube problem asking for "at least one painted face," always compute total minus the interior (n-2)^3 term in one subtraction, rather than summing the three separate painted categories (8 corners + 12(n-2) edges + 6(n-2)^2 faces), which is more arithmetic and more error-prone even though it gives the same 152. The trap is manually summing corner, edge, and face cube counts and making an arithmetic slip in one of the three terms, or forgetting that "at least one" is best attacked by its complement rather than direct casework.'
+  },
+  {
+    id: 'apti-logical-h10',
+    q: 'A cube of side 4 cm has one pair of opposite faces painted red, the second pair of opposite faces painted blue, and the third pair of opposite faces painted green. The cube is then cut into 64 unit cubes of side 1 cm. How many unit cubes have exactly two faces painted, each a different color? (Enter your numerical answer.)',
+    options: [],
+    answer: 24,
+    kind: 'nat',
+    marks: 2,
+    difficulty: 'hard',
+    type: 'concept',
+    explanation: 'In any n x n x n cube cut into unit cubes, the unit cubes lying along an edge (excluding the two corners of that edge) have exactly two painted faces, and there are 12(n-2) such edge cubes in total, since a cube has 12 edges. Here n = 4, so 12 x (4-2) = 12 x 2 = 24 edge cubes. The extra twist in this problem — three different colors on the three axis-pairs of faces — is actually automatically satisfied by every edge cube: any edge of a cube is the meeting line of two faces that belong to two DIFFERENT axis-pairs (no edge is shared by two opposite faces, since opposite faces never touch), so the two painted faces on every edge cube necessarily come from two different color-pairs. This means the count of "exactly two faces painted, both different colors" is identical to the plain count of edge cubes, 24 — no further filtering is needed. Fast route: recognize that the standard edge-cube formula 12(n-2) already guarantees the two colors differ, since the only way to get two same-colored painted faces on one small cube would require it to touch two opposite faces of the big cube simultaneously, which is geometrically impossible for a unit cube. The trap is assuming the multi-color setup requires extra casework beyond the standard formula, wasting time re-deriving what the geometry already guarantees, or mistakenly including corner cubes (which have three painted faces, all three different colors here, not two).'
+  }
+);
+
+window.GATE_DATA.questions['apti'].topics.find(function(t){return t.id==='apti-verbal';}).questions.push(
+  {
+    id: 'apti-verbal-h1',
+    q: 'Argument: "The city should replace all its diesel buses with electric buses, because electric buses emit no tailpipe pollutants, and this will reduce air pollution along every bus route." Which of the following is an assumption necessary for this argument to hold?',
+    options: [
+      'Electric buses can complete the same daily routes as diesel buses without requiring diesel buses as backup.',
+      'Diesel buses are the single largest source of air pollution in the city.',
+      'Passengers generally prefer riding electric buses over diesel buses.',
+      'Electricity costs less per kilometre than diesel fuel.'
+    ],
+    answer: 0,
+    marks: 2,
+    difficulty: 'hard',
+    type: 'concept',
+    explanation: 'Apply the negation test to each option: negate it and check whether the argument collapses. Negating option 1 gives "electric buses cannot complete the same routes without diesel backup" — if true, diesel buses would still be running on those very routes, directly undermining the claim that replacing diesel with electric will reduce pollution "along every bus route." Since the argument falls apart when this is false, it is a necessary assumption. Negating option 2, "diesel buses are NOT the largest pollution source," leaves the argument completely intact — the argument never claimed diesel buses are the biggest polluter, only that replacing them helps, so this is irrelevant, not necessary. Option 3, passenger preference, has no bearing on the pollution claim at all. Option 4, relative cost, is a plausible reason to prefer electric buses on economic grounds, but the argument\'s conclusion is about air pollution, not cost, so it is unnecessary to the stated reasoning. Fastest route: negate each candidate assumption in turn and keep only the one whose negation actually breaks the argument\'s specific conclusion, not just any tangentially related fact.'
+  },
+  {
+    id: 'apti-verbal-h2',
+    q: 'Passage: "A study of 500 startup founders found that 68% of those who had a formal mentor during their first two years reported their company was still operating five years later, compared to 41% of founders without a formal mentor. The study did not control for founders\' prior industry experience or the amount of initial funding raised." Which of the following is the most defensible inference from this passage?',
+    options: [
+      'Having a formal mentor causes a startup to survive longer.',
+      'In this surveyed group, founders with a formal mentor reported a higher five-year survival rate than those without one.',
+      'Founders without mentors are doomed to fail within five years.',
+      'If every founder in the survey had been given a mentor, the overall survival rate would have reached 68%.'
+    ],
+    answer: 1,
+    marks: 2,
+    difficulty: 'hard',
+    type: 'concept',
+    explanation: 'Option 2 simply restates the reported correlation exactly as the passage states it, without adding anything beyond what was measured — a survival-rate difference was observed between the two groups in this study, and that is all that can be safely claimed. Option 1 commits the classic correlation-to-causation leap: the passage explicitly flags that industry experience and funding were not controlled for, so the mentor group might simply have contained more experienced or better-funded founders, who would likely have survived longer regardless of mentorship. Option 3 is directly contradicted by the numbers themselves — 41% of unmentored founders did survive five years, so "doomed to fail" is false, not merely unsupported. Option 4 is an unwarranted hypothetical extrapolation: it assumes the 68% figure would generalize to founders who currently lack mentors, ignoring that those founders may differ systematically (in experience or funding) from those who sought mentors in the first place. Fastest route: whenever a passage explicitly names confounding variables it did not control for, treat that as a direct signal to reject any causal-sounding option and keep only the option that reports the correlation as observed.'
+  },
+  {
+    id: 'apti-verbal-h3',
+    q: 'Statement: "Rainfall this monsoon has been 15% below the ten-year average, and reservoir levels in the region are currently at their lowest recorded level for this time of year." Which conclusion follows most directly from this statement, without requiring any additional assumption?',
+    options: [
+      'The low reservoir levels are entirely caused by the below-average rainfall.',
+      'Both the current rainfall and the current reservoir level are below their respective typical benchmarks for this time of year.',
+      'Next year\'s monsoon is also likely to be below average.',
+      'Water shortages will definitely occur in the region this year.'
+    ],
+    answer: 1,
+    marks: 2,
+    difficulty: 'hard',
+    type: 'concept',
+    explanation: 'Option 2 does nothing more than conjoin the two facts already given in the statement — rainfall is below its ten-year average, and reservoir level is below its typical level for this time of year — without introducing any new claim, making it the conclusion that follows most directly. Option 1 sounds like the natural real-world explanation, which is exactly what makes it the trap: it smuggles in an unstated assumption that below-average rainfall is the sole and complete cause of the low reservoir level, when the statement never rules out other contributing factors such as increased water usage, upstream diversions, or reduced snowmelt. Option 3 extrapolates a prediction about a future, entirely separate monsoon season, which the statement gives no basis for at all — past rainfall says nothing about next year\'s pattern. Option 4 uses the word "definitely" for an outcome that depends on many unstated factors, such as remaining reserves, alternative water sources, or conservation measures, none of which the statement addresses. Fastest route: when one option merely restates or conjoins the given facts and another offers a causal explanation that "feels obviously true," always prefer the plain restatement, since the causal option almost always smuggles in an assumption the passage never licenses.'
+  },
+  {
+    id: 'apti-verbal-h4',
+    q: 'The following five sentences form a coherent paragraph when arranged correctly. R: "Coral reefs cover less than one percent of the ocean floor, yet they support nearly a quarter of all marine species." P: "This disproportionate richness makes reefs one of the most biologically productive ecosystems on the planet." T: "However, reefs are highly sensitive to even small increases in water temperature." Q: "A rise of just one or two degrees Celsius can trigger coral bleaching, in which corals expel the algae that give them both color and nutrients." S: "If the warm conditions persist, bleached corals eventually starve and die, causing the wider ecosystem they support to collapse." What is the correct order?',
+    options: ['R, P, T, Q, S', 'R, T, P, Q, S', 'P, R, T, Q, S', 'R, P, Q, T, S'],
+    answer: 0,
+    marks: 2,
+    difficulty: 'hard',
+    type: 'concept',
+    explanation: 'R must open the paragraph since it introduces the topic (coral reefs and their species richness) with no pronoun or backward reference to anything earlier. P follows R directly because it explicitly refers back to "this disproportionate richness" — a phrase that only makes sense immediately after R has established the one-percent-yet-a-quarter contrast. T then pivots the paragraph with "however," introducing the new, contrasting idea of temperature sensitivity, which must come after the positive framing in R-P and before any elaboration of that sensitivity. Q naturally follows T because it explains the specific mechanism (bleaching) of the temperature sensitivity T just introduced. S closes the paragraph, describing the consequence of prolonged bleaching, and its opening phrase "if the warm conditions persist" presupposes that bleaching (introduced in Q) has already occurred. Fastest route: find the sentence with zero backward-pointing words (R) to anchor the start, then chase each explicit link word or phrase — "this disproportionate richness," "however," "if the warm conditions persist" — to chain the rest in one pass rather than testing every permutation.'
+  },
+  {
+    id: 'apti-verbal-h5',
+    q: 'The following five sentences form a coherent paragraph when arranged correctly. Q: "A placebo is a substance or treatment with no active therapeutic effect, such as a sugar pill." S: "Remarkably, patients given a placebo often report genuine improvement in their symptoms." P: "Researchers attribute this to the placebo effect, in which a patient\'s expectation of relief influences their actual physiological response." T: "Because of this effect, modern clinical trials compare a new drug against a placebo rather than against no treatment at all." R: "Only if the drug outperforms the placebo by a statistically significant margin is it considered genuinely effective." What is the correct order?',
+    options: ['Q, S, P, T, R', 'Q, P, S, T, R', 'S, Q, P, T, R', 'Q, S, T, P, R'],
+    answer: 0,
+    marks: 2,
+    difficulty: 'hard',
+    type: 'concept',
+    explanation: 'Q must open the paragraph since it defines the key term ("a placebo is...") before anything else can reference it, and carries no pronoun or backward link. S follows because it introduces the surprising observation ("remarkably, patients given a placebo often report genuine improvement"), which requires the definition from Q to already be in place, and "this" in the next sentence must refer to the improvement just described in S, not to the bare definition in Q — this is exactly why P cannot directly follow Q. P then explains the mechanism behind that improvement, since "this" in P ("researchers attribute this...") points back to the improvement reported in S. T follows P because "this effect" in T refers to the placebo effect P just named, and introduces its practical consequence for clinical trials. R closes the paragraph by adding the specific statistical criterion trials use, building directly on the trial-design idea T just introduced. Fastest route: track pronoun references like "this" precisely — in this paragraph "this" in P clearly points to the observed improvement (S), not the bare definition (Q), which is the detail that breaks the tempting but wrong order Q-P-S-T-R.'
+  },
+  {
+    id: 'apti-verbal-h6',
+    q: 'Which sentence uses "imply" and "infer" correctly?',
+    options: [
+      'From your tone, I infer that you are upset, though you never said so directly.',
+      'From your tone, I imply that you are upset, though you never said so directly.',
+      'Are you inferring that I am to blame for this mistake?',
+      'The report implies, based on the reader\'s careful analysis, a conclusion I never intended.'
+    ],
+    answer: 0,
+    marks: 1,
+    difficulty: 'hard',
+    type: 'concept',
+    explanation: '"Imply" is done by the source of information — a speaker, writer, or piece of evidence suggests something indirectly. "Infer" is done by the receiver of that information — a listener or reader draws a conclusion from indirect evidence. In option 1, the speaker is the one drawing a conclusion from someone else\'s tone, which is correctly labeled as inferring. Option 2 swaps the roles: the speaker cannot "imply" a conclusion about someone else\'s emotional state from that other person\'s tone — implying is something the tone itself (the source) would do, not the observer. Option 3 has the same swap: the person asking whether they are "to blame" is accusing the other party of suggesting blame, so the correct word is "implying" (are you implying that I am to blame), since the speaker of the accusation is the source suggesting the meaning, not the one drawing a conclusion. Option 4 muddles both roles into one confused sentence, attributing "implies" to the report while also crediting "the reader\'s careful analysis," conflating the source\'s act of implying with the reader\'s act of inferring in the same clause. Fastest route: mentally substitute "suggests" for "imply" and "concludes" for "infer" in each sentence — whichever substitution reads naturally, given who is the source and who is the audience, reveals the correct word.'
+  },
+  {
+    id: 'apti-verbal-h7',
+    q: 'Which sentence uses "comprise" and "compose" most correctly according to strict formal usage?',
+    options: [
+      'The committee is comprised of twelve members.',
+      'The committee comprises twelve members.',
+      'Twelve members comprise of the committee.',
+      'The committee composes twelve members.'
+    ],
+    answer: 1,
+    marks: 1,
+    difficulty: 'hard',
+    type: 'concept',
+    explanation: '"Comprise" means "to include" or "to consist of," and by strict formal usage it is used actively, with the whole as the subject and the parts as the object, and it never takes the word "of": "the committee comprises twelve members" (the whole comprises the parts) is exactly this correct pattern. "Compose," by contrast, means "to make up," and by strict usage runs in the opposite direction, with the parts as the subject: "twelve members compose the committee," not the reverse. Option 1, "is comprised of," is extremely common in everyday speech and increasingly accepted informally, but strict formal usage treats it as incorrect, since it forces "comprise" into a passive construction with "of," which contradicts the word\'s own built-in meaning of "to include" (a whole cannot be passively "included of" its parts). Option 3, "comprise of," compounds the same error in the wrong direction, using the parts as the subject while still incorrectly attaching "of." Option 4 misapplies "compose" with the whole as the subject and the parts as the object, exactly reversing the direction that word requires. Fastest route: remember that "comprise" always runs whole-to-parts and never takes "of," while "compose" always runs parts-to-whole; testing whether "of" is present and which noun is the subject settles all four options at once.'
+  },
+  {
+    id: 'apti-verbal-h8',
+    q: 'The minister\'s speech, though ______ in its promises, was widely seen as ______ on specifics, leaving journalists with more questions than answers.',
+    options: ['expansive .. vague', 'vague .. expansive', 'brief .. detailed', 'measured .. precise'],
+    answer: 0,
+    marks: 1,
+    difficulty: 'hard',
+    type: 'concept',
+    explanation: 'The sentence\'s final clause, "leaving journalists with more questions than answers," describes an outcome of frustration and unresolved detail, so the two blanks must together set up a contrast that produces exactly that result: a speech that sounded generous or wide-ranging in what it promised, but that supplied little concrete substance about how those promises would be met. "Expansive" (broad, generously wide-ranging) for the promises, paired with "vague" (unclear, lacking specifics) for the details, produces precisely this contrast and logically causes the stated outcome. "Vague .. expansive" reverses the roles nonsensically, claiming the promises were unclear but the specifics were extensive, which would not leave journalists confused about specifics at all. "Brief .. detailed" is internally consistent as a description but produces the opposite of the stated outcome, since detailed specifics would answer journalists\' questions, not multiply them. "Measured .. precise" describes a careful, exact speech, which directly contradicts a speech that leaves an audience with unanswered questions. Fastest route: read the consequence clause first ("more questions than answers") and work backward to find the only word pair whose logical contrast actually produces that specific effect, rather than picking words that merely sound formal or ministerial in register.'
+  },
+  {
+    id: 'apti-verbal-h9',
+    q: 'Passage: "Sales of the company\'s flagship product fell 12% last quarter. Critics claim this proves the product has lost its appeal among consumers. The company disputes this, arguing the decline has other causes." Which finding, if true, would most strengthen the company\'s argument that the decline is NOT due to loss of consumer appeal?',
+    options: [
+      'A key competitor launched a similar product at a lower price during the same quarter.',
+      'The company\'s marketing budget for the flagship product was cut by 20% at the start of the quarter.',
+      'Sales of the flagship product fell in every region where the company operates.',
+      'Independent customer satisfaction surveys for the flagship product this quarter showed ratings unchanged from the previous quarter, matching historical highs.'
+    ],
+    answer: 3,
+    marks: 2,
+    difficulty: 'hard',
+    type: 'concept',
+    explanation: 'The company needs to rebut a specific claim: that consumer APPEAL for the product has dropped. Option 4 measures appeal directly and finds it unchanged — customer satisfaction is still at historical highs — which most precisely undercuts the critics\' specific claim, since if consumers still rate the product as highly as ever, the sales dip cannot be attributed to reduced appeal. Option 1 is a plausible alternative cause (price competition) but, standing alone, does not rule out that appeal also declined somewhat relative to the flashier new entrant; it explains a possible trigger for switching without directly measuring whether appeal itself held steady, making it weaker and less direct than option 4. Option 2 is genuinely ambiguous: a marketing budget cut could just as easily be read as evidence supporting the critics (less visibility naturally depresses sales, and could itself be a response to declining interest) as it could support the company, so it does not cleanly strengthen either side. Option 3 actually strengthens the CRITICS, not the company: a decline occurring uniformly across every region is a hallmark of a broad, systemic drop in appeal, rather than a localized effect tied to a single region\'s competitor or economic condition, so it is the opposite of what the company needs. Fastest route: identify precisely which word in the dispute is being contested — here, "appeal" — and prefer the option that measures that exact quantity directly over options that only supply a plausible alternative story.'
+  },
+  {
+    id: 'apti-verbal-h10',
+    q: 'Passage: "A city\'s new bike-lane network was completed in March. Between April and September, the number of reported cycling accidents on those streets fell by 30% compared to the same six months the previous year. Bicycle traffic on those streets, measured by automated counters, increased by 45% over the same period." Which of the following is the most defensible inference from this passage?',
+    options: [
+      'The bike lanes caused a reduction in the accident rate per cyclist on those streets.',
+      'The accident count fell even as recorded bicycle traffic on those same streets rose, over the same comparison period.',
+      'Cycling has become completely safe on every street in the city.',
+      'The bike lanes are the only factor responsible for the change in accident numbers.'
+    ],
+    answer: 1,
+    marks: 2,
+    difficulty: 'hard',
+    type: 'concept',
+    explanation: 'Option 2 states only the two measured facts side by side, exactly as reported: accident counts dropped 30% while bicycle traffic on the same streets rose 45% in the same period, with no added interpretation. This is the safe, fully supported inference. Option 1 sounds compelling — and is likely true in the real world — but overreaches: it converts a raw accident-count comparison into a rate-per-cyclist claim (accidents per cyclist would have fallen even more sharply than 30%, since far more cyclists rode with fewer total accidents), and it assigns causation to "the bike lanes" specifically, when the passage never isolates the lanes from other simultaneous factors like weather, enforcement changes, or vehicle traffic shifts. Option 3 is a wild overreach in scope ("every street in the city," "completely safe") far beyond what a 30% accident reduction on specific streets could ever establish. Option 4 claims exclusive causation ("the only factor"), which the passage cannot support since it presents only two correlated statistics and rules out no alternative explanations. Fastest route: whenever a passage gives two raw counts (not rates) moving in opposite directions, the only fully safe inference is to state that exact juxtaposition; converting counts into an implied per-unit rate, or attaching a cause, is where the tempting but unsupported inferences slip in.'
+  }
+);

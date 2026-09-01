@@ -2895,3 +2895,382 @@ window.GATE_DATA.questions['cn'].topics.find(function(t){return t.id==='cn-basic
     explanation: "Each layer of the networking stack wraps the layer above's data with its own header (and sometimes trailer), and conventionally gives the resulting unit a distinct name. At the transport layer, TCP's PDU is called a segment (UDP's equivalent is often just called a datagram or message). At the network layer, the PDU is called a packet (or, especially for IP specifically, a datagram). At the data link layer, the PDU is called a frame, since it adds framing (delimiting) information plus a MAC header/trailer for hop-to-hop delivery. At the physical layer, data is transmitted as a raw stream of bits (or symbols), with no further structured PDU name. Getting this naming sequence backwards or scrambled, as the incorrect options do, is a common careless mistake on layer-terminology questions."
   }
 );
+
+window.GATE_DATA.questions['cn'].topics.find(function(t){return t.id==='cn-transport';}).questions.push(
+  {
+    id: 'cn-transport-h1',
+    q: "A TCP Reno sender starts a connection with cwnd = 1 MSS and ssthresh = 16 MSS, MSS = 512 bytes. cwnd doubles every RTT during slow start (capped at ssthresh, after which it switches to linear +1 MSS per RTT congestion avoidance). At the END of RTT 7 a retransmission timeout (RTO) occurs (no triple-dup-ack yet). The sender then restarts slow start from cwnd = 1 with a new ssthresh = (cwnd at the moment of timeout) / 2, rounded down, and again switches to congestion avoidance once cwnd reaches the new ssthresh. At the END of RTT 12 (while in congestion avoidance after the timeout) a triple-duplicate-ACK arrives; the sender halves cwnd (new ssthresh = floor(cwnd/2), cwnd is set to this new ssthresh via fast recovery) and resumes congestion avoidance (+1 MSS per RTT) from RTT 13 onward. What is the TOTAL number of data bytes transmitted by the sender across RTT 1 through RTT 14 inclusive (sum of cwnd, in MSS, over all 14 rounds, times MSS)? (Enter your numerical answer.)",
+    options: [],
+    answer: 35840,
+    kind: 'nat',
+    marks: 2,
+    difficulty: 'hard',
+    type: 'numerical',
+    explanation: "Trace cwnd (in MSS) round by round. Slow start doubles until it hits ssthresh = 16: RTT1=1, RTT2=2, RTT3=4, RTT4=8. RTT5 onward, slow start would give 16 which equals ssthresh, so RTT5=9, RTT6=10, RTT7=11 are already in congestion avoidance (once cwnd reaches ssthresh the increase becomes linear, +1 per RTT: 8 to 9, 9 to 10, 10 to 11). A timeout occurs at the end of RTT7 with cwnd = 11, so new ssthresh = floor(11/2) = 5 and cwnd resets to 1. RTT8=1, RTT9=2 (slow start doubling, capped at ssthresh 5), RTT10=4, RTT11=5 (would double to 8 but capped at ssthresh=5, so this is the round where it switches to CA). RTT12 = 5+1 = 6 (congestion avoidance). A triple-dup-ACK arrives at the end of RTT12 with cwnd=6, so new ssthresh = floor(6/2) = 3 and fast recovery sets cwnd = 3 for RTT13. RTT13=3, RTT14 = 3+1 = 4 (congestion avoidance resumes). The full 14-round trace is: 1,2,4,8,9,10,11,1,2,4,5,6,3,4. Summing gives 70 MSS. Total bytes = 70 x 512 = 35,840 bytes. The key traps are correctly identifying which round is the LAST slow-start round (the one that reaches, not exceeds, ssthresh) versus the first congestion-avoidance round, and applying the halving rule using the cwnd value AT the moment of loss detection, not one round before or after."
+  },
+  {
+    id: 'cn-transport-h2',
+    q: "A TCP connection uses a fixed window of 23 segments, each carrying an MSS of 1460 bytes of payload, over a path with RTT = 80 ms. In every window (cycle) sent, exactly 1 of the 23 segments is lost and must be retransmitted; the retransmission is detected and resent only after a full RTT has elapsed (i.e., the lost segment's retransmission consumes one additional, separate RTT beyond the RTT used to send the original window), and that retransmission always succeeds. All 23 segments are eventually delivered once per 2-RTT cycle. What is the connection's long-run effective throughput, in kbps (kilobits per second, where 1 kbps = 1000 bits/s)? (Enter your numerical answer; a small tolerance is allowed.)",
+    options: [],
+    answer: 1679,
+    kind: 'nat',
+    marks: 2,
+    difficulty: 'hard',
+    type: 'numerical',
+    tolerance: 5,
+    explanation: "Every cycle delivers all 23 segments' worth of payload but costs 2 RTTs of wall-clock time: 1 RTT to send the window (during which 22 of 23 arrive correctly) and 1 more RTT before the single lost segment is retransmitted and arrives. Bits delivered per cycle = 23 x 1460 x 8 = 268,640 bits. Time per cycle = 2 x 0.08 s = 0.16 s. Effective throughput = 268,640 / 0.16 = 1,679,000 bits/s = 1679 kbps (using 1 kbps = 1000 bps, not 1024). The trap is treating this as a simple window/RTT throughput (23 x 1460 x 8 / 0.08 = 3358 kbps) which ignores that the loss forces an entire extra RTT of dead time before the cycle can be considered complete and the next window sent -- effectively halving the naive throughput here, since exactly one extra RTT is spent per cycle regardless of how small the lost segment is."
+  },
+  {
+    id: 'cn-transport-h3',
+    q: "A path has bandwidth 10 Mbps (10 x 10^6 bps) and RTT 40 ms. Each TCP segment carries 1000 bytes of application payload plus 40 bytes of combined TCP+IP header overhead (so 1040 bytes actually cross the wire per segment). The sender's window size, in segments, must be chosen large enough that the total bytes placed on the wire per RTT (payload + headers together) is at least the path's bandwidth-delay product, so the pipe never runs dry. What is the minimum window size, in whole segments, that achieves this?",
+    options: ["47 segments", "48 segments", "49 segments", "50 segments"],
+    answer: 2,
+    marks: 2,
+    difficulty: 'hard',
+    type: 'numerical',
+    explanation: "The bandwidth-delay product sets the target in bits actually carried on the wire: BDP = 10 x 10^6 bps x 0.04 s = 400,000 bits = 50,000 bytes. Critically, this 50,000-byte target must be met by the TOTAL bytes on the wire, which includes the 40-byte header on every segment, not just payload -- a common trap is to divide 50,000 by the 1000-byte payload alone (giving 50 segments) and stop there. Each segment actually occupies 1000 + 40 = 1040 bytes of wire time. Dividing: 50,000 / 1040 = 48.08, so 48 segments would only place 48 x 1040 = 49,920 bytes on the wire, just short of the 50,000-byte target, leaving the pipe briefly idle. Rounding up to 49 segments places 49 x 1040 = 50,960 bytes on the wire per RTT, which is at least the 50,000-byte BDP, so 49 is the minimum window size (in segments) that keeps the pipe continuously full once header overhead is correctly counted."
+  },
+  {
+    id: 'cn-transport-h4',
+    q: "A file-transfer protocol numbers every byte it sends using a 32-bit sequence number field (so sequence numbers range over 2^32 distinct values before wrapping back to the starting value). It sends continuously at a steady rate of 1 Gbps (1 x 10^9 bits per second) with no idle time. Approximately how long, in seconds, does it take for the sequence number space to wrap around completely (i.e., for the byte counter to cycle through all 2^32 values and return to its starting value)? (Enter your numerical answer, to 2 decimal places; a small tolerance is allowed.)",
+    options: [],
+    answer: 34.36,
+    kind: 'nat',
+    marks: 2,
+    difficulty: 'hard',
+    type: 'numerical',
+    tolerance: 0.2,
+    explanation: "The sequence number field counts individual bytes (this is how TCP's 32-bit sequence numbers work), so the space wraps after exactly 2^32 = 4,294,967,296 bytes have been sent. At 1 Gbps, converting bytes to bits: 4,294,967,296 bytes x 8 bits/byte = 34,359,738,368 bits must be transmitted before wraparound. Time = bits / rate = 34,359,738,368 / (1 x 10^9) = 34.36 seconds (approximately). The traps here are, first, remembering that 1 Gbps means 10^9 bits/s (not 2^30), and second, that the sequence space is measured in BYTES while the transmission rate is given in BITS per second, so a byte-to-bit conversion is mandatory before dividing. This wraparound time is exactly why high-speed long-fat networks need protections like PAWS (Protection Against Wrapped Sequence numbers) -- at gigabit-and-above speeds, 32-bit TCP sequence numbers wrap in well under a minute, fast enough that an old, delayed duplicate segment from a previous wrap could plausibly still be in flight and collide with new data carrying the same sequence number."
+  },
+  {
+    id: 'cn-transport-h5',
+    q: "A TCP Reno sender starts with cwnd = 1 MSS, ssthresh = 6 MSS. Slow start doubles cwnd each RTT (capped at ssthresh, then switching to +1 MSS/RTT congestion avoidance). At the END of RTT 6 a timeout occurs; new ssthresh = floor(cwnd at timeout / 2), cwnd resets to 1, and slow start resumes (again switching to congestion avoidance once cwnd reaches the new ssthresh). Which of the following statements about this trace are TRUE? (Select all that apply.)",
+    options: [
+      "cwnd during RTT 4 is 6 MSS",
+      "The ssthresh in effect immediately after the RTT-6 timeout is 4 MSS",
+      "cwnd during RTT 9 is 4 MSS",
+      "cwnd during RTT 10 is 6 MSS"
+    ],
+    answers: [0, 1, 2],
+    marks: 2,
+    difficulty: 'hard',
+    type: 'msq',
+    kind: 'msq',
+    explanation: "Trace it: RTT1=1, RTT2=2, RTT3=4 (slow start doubling). RTT4 would double to 8, but this exceeds ssthresh=6, so it is capped at exactly 6 -- making option A true and marking RTT4 as the last slow-start round. RTT5 = 6+1 = 7, RTT6 = 7+1 = 8 (congestion avoidance, +1 per RTT). A timeout at the end of RTT6 with cwnd=8 sets new ssthresh = floor(8/2) = 4, confirming option B is true, and resets cwnd to 1. RTT7=1, RTT8=2 (slow start doubling, capped at new ssthresh=4), RTT9 would double to 4, which exactly equals ssthresh=4, so RTT9=4 -- confirming option C is true, and this is again the last slow-start round. RTT10 switches to congestion avoidance: 4+1 = 5, not 6, so option D is FALSE. The full trace is 1,2,4,6,7,8,1,2,4,5. Each option requires tracing to a different, specific round and correctly identifying whether that round is still doubling (slow start) or has already capped/switched to linear growth (congestion avoidance) -- getting the cap-then-switch boundary right for both the pre-timeout and post-timeout phases is what separates correct from incorrect answers here."
+  },
+  {
+    id: 'cn-transport-h6',
+    q: "A TCP sender's RTO estimator currently has EstimatedRTT = 100 ms and DevRTT = 50 ms. Using Jacobson's algorithm with alpha = 0.125 and beta = 0.25 (DevRTT_new = (1-beta) x DevRTT_old + beta x |SampleRTT - EstimatedRTT_old|, then EstimatedRTT_new = (1-alpha) x EstimatedRTT_old + alpha x SampleRTT), the sender observes three successive SampleRTT measurements, in order: 120 ms, 90 ms, 150 ms (updating both EstimatedRTT and DevRTT after each sample before processing the next). What is the resulting RTO (= EstimatedRTT + 4 x DevRTT) after all three samples have been processed, in ms? (Enter your numerical answer, to 1 decimal place; a small tolerance is allowed.)",
+    options: [],
+    answer: 261.1,
+    kind: 'nat',
+    marks: 2,
+    difficulty: 'hard',
+    type: 'numerical',
+    tolerance: 1.5,
+    explanation: "Apply the update in order, computing DevRTT before EstimatedRTT at each step (since DevRTT's formula uses the OLD EstimatedRTT). Sample 1 (120 ms): DevRTT = 0.75x50 + 0.25x|120-100| = 37.5+5 = 42.5; EstimatedRTT = 0.875x100 + 0.125x120 = 87.5+15 = 102.5. Sample 2 (90 ms): DevRTT = 0.75x42.5 + 0.25x|90-102.5| = 31.875+3.125 = 35.0; EstimatedRTT = 0.875x102.5 + 0.125x90 = 89.6875+11.25 = 100.9375. Sample 3 (150 ms): DevRTT = 0.75x35.0 + 0.25x|150-100.9375| = 26.25+12.2656 = 38.5156; EstimatedRTT = 0.875x100.9375 + 0.125x150 = 88.3203+18.75 = 107.0703. Final RTO = EstimatedRTT + 4xDevRTT = 107.0703 + 4x38.5156 = 107.0703+154.0625 = 261.13 ms. The trap is sequencing: each sample must fully update both quantities (DevRTT using the PREVIOUS round's EstimatedRTT, not the just-updated one) before the next sample is processed -- swapping the order or reusing a stale/updated value produces a different, wrong final RTO."
+  },
+  {
+    id: 'cn-transport-h7',
+    q: "A file of exactly 16,000,000 bits must be transferred over a connection using pure TCP slow start with no loss and no ssthresh cap (cwnd simply doubles every RTT, starting at cwnd=1 segment), MSS = 1400 bytes, RTT = 90 ms. The sender stops as soon as the cumulative number of segments sent (summed across completed RTTs) is enough to cover the whole file; assume the final, possibly partial, batch still completes within one RTT. How many total milliseconds does the transfer take (number of RTTs required, multiplied by RTT)? (Enter your numerical answer.)",
+    options: [],
+    answer: 990,
+    kind: 'nat',
+    marks: 2,
+    difficulty: 'hard',
+    type: 'numerical',
+    explanation: "First convert the file size from bits to bytes (a common trap): 16,000,000 bits / 8 = 2,000,000 bytes. At MSS = 1400 bytes, the number of segments needed is ceil(2,000,000 / 1400) = ceil(1428.57) = 1429 segments. With pure slow start (cwnd doubling from 1, no cap), the cumulative segments sent after n RTTs is 1+2+4+...+2^(n-1) = 2^n - 1. After 9 RTTs: 2^9-1 = 511 segments (not enough, since 511 < 1429). After 10 RTTs: 2^10-1 = 1023 segments (still short). After 11 RTTs: 2^11-1 = 2047 segments, which is >= 1429, so the file completes during the 11th RTT (the window of 1024 segments available in round 11 only needs to carry the remaining 1429-511 = 918 segments, well within its capacity, so it still finishes in that single RTT). Total time = 11 x 90 ms = 990 ms. The two traps stacked here are the bits-to-bytes conversion on the file size, and correctly finding the FIRST round whose cumulative total meets or exceeds the requirement rather than the round where cwnd itself first exceeds the segment count."
+  },
+  {
+    id: 'cn-transport-h8',
+    q: "A TCP connection running over Ethernet negotiates an MSS of 1448 bytes (1500-byte Ethernet MTU minus 20 bytes IP header, 20 bytes TCP header, and 12 bytes of TCP timestamp options). Each resulting Ethernet frame additionally carries 14 bytes of Ethernet header, a 4-byte CRC trailer, an 8-byte preamble/SFD, and a 12-byte inter-frame gap, none of which count as 'useful' application payload. If the physical link runs at a raw rate of 100 Mbps with segments sent back-to-back at full utilization, what is the resulting application-level goodput, in Mbps, to 2 decimal places? (Enter your numerical answer; a small tolerance is allowed.)",
+    options: [],
+    answer: 94.15,
+    kind: 'nat',
+    marks: 2,
+    difficulty: 'hard',
+    type: 'numerical',
+    tolerance: 0.3,
+    explanation: "Total overhead per frame, on top of the 1448-byte payload, comes from several layers that must all be added together: 20 (TCP header) + 20 (IP header) + 12 (TCP timestamp option) + 14 (Ethernet header) + 4 (CRC) + 8 (preamble+SFD) + 12 (inter-frame gap) = 90 bytes. So each frame actually occupies 1448 + 90 = 1538 bytes of wire time for only 1448 bytes of application payload. Goodput = raw rate x (payload / total frame size) = 100 Mbps x (1448/1538) = 100 x 0.94148... = 94.148 Mbps, i.e. approximately 94.15 Mbps. The trap is that most solvers remember TCP/IP header overhead (40 bytes) but forget that the physical and data-link layers ALSO consume real transmission time on the wire (preamble, inter-frame gap, CRC, Ethernet header) even though these bytes never appear in any 'segment size' the transport layer is aware of -- ignoring them overstates achievable goodput."
+  }
+);
+
+window.GATE_DATA.questions['cn'].topics.find(function(t){return t.id==='cn-network';}).questions.push(
+  {
+    id: 'cn-network-h1',
+    q: "An IP datagram of total length 4000 bytes (including a 20-byte IP header, so 3980 bytes of payload) must cross two links in sequence. Link 1 has an MTU of 1500 bytes; link 2 (further downstream) has a smaller MTU of 620 bytes. The datagram is first fragmented to fit link 1's MTU, and then EACH of those fragments is independently fragmented again (each still carries its own 20-byte IP header) to fit link 2's MTU, since fragments are never reassembled at intermediate routers. All fragment data sizes are rounded down to the nearest multiple of 8 bytes as required by the IP fragmentation rules. How many fragments in total finally arrive at the destination?",
+    options: [],
+    answer: 8,
+    kind: 'nat',
+    marks: 2,
+    difficulty: 'hard',
+    type: 'numerical',
+    explanation: "First fragmentation (MTU 1500): max data per fragment = 1500-20 = 1480 bytes, already a multiple of 8. Splitting 3980 bytes of payload: 1480+1480+1020 = 3 fragments (offsets in 8-byte units: 0, 185, 370). Second fragmentation (MTU 620): max data per fragment = 620-20 = 600 bytes (already a multiple of 8). Fragment 1 (1480 bytes of data) splits into ceil(1480/600) = 3 sub-fragments: 600+600+280. Fragment 2 (1480 bytes) likewise splits into 3 sub-fragments: 600+600+280. Fragment 3 (1020 bytes) splits into ceil(1020/600) = 2 sub-fragments: 600+420. Total final fragments = 3+3+2 = 8. The trap is remembering that each first-level fragment is a COMPLETE, independent IP datagram (with its own 20-byte header re-added), so the second MTU constraint applies to (header + that fragment's own data) all over again, not to the original 3980-byte payload as a whole -- and that fragment sizes must always be rounded down to a multiple of 8 at every stage, which is why 620-20=600 divides so conveniently here but would need rounding down in less friendly cases."
+  },
+  {
+    id: 'cn-network-h2',
+    q: "A router's forwarding table contains these four entries (network/prefix -> next hop): 192.168.0.0/16 -> A, 192.168.20.0/23 -> B, 192.168.21.0/24 -> C, 192.168.16.0/22 -> D. A packet arrives destined for 192.168.21.130. Applying longest-prefix-match routing, which next hop is selected?",
+    options: ["Next hop D (via 192.168.16.0/22)", "Next hop A (via 192.168.0.0/16)", "Next hop B (via 192.168.20.0/23)", "Next hop C (via 192.168.21.0/24)"],
+    answer: 3,
+    marks: 2,
+    difficulty: 'hard',
+    type: 'concept',
+    explanation: "Check each entry against 192.168.21.130 in binary. 192.168.16.0/22 covers the range 192.168.16.0 to 192.168.19.255 (the /22 mask fixes the third octet's top 6 bits, giving third-octet values 16-19) -- 21 falls OUTSIDE this range, so entry D does NOT match at all. 192.168.0.0/16 matches everything starting 192.168.x.x, so it DOES match. 192.168.20.0/23 covers third-octet values 20-21 (the /23 mask spans two consecutive /24s), so it DOES match 192.168.21.130. 192.168.21.0/24 matches only third-octet value exactly 21, so it also matches. Among the matching entries (/16, /23, /24), longest-prefix-match always prefers the entry with the MOST specific (longest) prefix length, which is the /24 entry, 192.168.21.0/24 -> next hop C. The trap is assuming the more 'obviously close' /22 entry (D) is relevant at all -- it must first be checked and rejected because 21 lies outside its actual covered range -- and then correctly picking the longest of the remaining matches rather than the first one found or the broadest one."
+  },
+  {
+    id: 'cn-network-h3',
+    q: "Three routers form a line: X -- Y -- Z, with link cost 1 on each link, running a distance-vector protocol (RIP-style, infinity = 16 hops, NO split-horizon/poison-reverse is used). Before any failure, X's distance to Z (via Y) is 2, and Y's distance to Z (direct link) is 1. The direct Y-Z link now fails. Y no longer has a working direct route, so it falls back to using its last-known information about X's distance to Z (which was 2) to compute a new route via X; X and Y then continue exchanging distance-vector updates in alternating rounds (Y updates using X's latest advertised distance, then X updates using Y's latest advertised distance, and so on), each new distance being 1 + (neighbor's last advertised distance to Z). How many total distance-vector update rounds (starting with Y's very first post-failure update) does it take before one of the routers' distance to Z first reaches or exceeds infinity (16)?",
+    options: [],
+    answer: 14,
+    kind: 'nat',
+    marks: 2,
+    difficulty: 'hard',
+    type: 'numerical',
+    explanation: "This is the classic distance-vector 'count-to-infinity' problem caused by a two-node routing loop with no split-horizon/poison-reverse protection. Round 1: Y updates its distance to Z as 1 + (X's last known distance, 2) = 3. Round 2: X updates as 1 + (Y's new distance, 3) = 4. Round 3: Y updates as 1 + 4 = 5. Round 4: X = 1+5 = 6. This ping-pongs, with each round's value being exactly (round number) + 2: round 1 gives 3, round 2 gives 4, ..., round n gives n+2. Setting n+2 >= 16 gives n >= 14, so round 14 (X's update, giving 1+15=16) is the first round where the count-to-infinity value reaches the defined infinity threshold of 16, at which point RIP declares the destination unreachable and the routers stop incrementing. This slow, hop-by-hop climb to infinity (rather than immediate failure detection) is precisely the pathology that split-horizon with poison-reverse is designed to eliminate for exactly this two-node loop shape."
+  },
+  {
+    id: 'cn-network-h4',
+    q: "A company is allocated the network 172.16.0.0/16 and must create exactly three subnets using VLSM: Sales needs at least 600 usable host addresses, Engineering needs at least 300, and IT needs at least 100. Each subnet must use the smallest power-of-2-sized block that can accommodate its host requirement (with the usual 2 addresses per block reserved for network and broadcast). What is the TOTAL number of addresses across all three subnet blocks that are NOT usable as host addresses (i.e., total addresses allocated minus total host requirement actually needed: (Sales block size - 600) + (Engineering block size - 300) + (IT block size - 100))?",
+    options: [],
+    answer: 664,
+    kind: 'nat',
+    marks: 2,
+    difficulty: 'hard',
+    type: 'numerical',
+    explanation: "For each subnet, find the smallest block size 2^k such that 2^k - 2 >= required hosts. Sales needs 600: 2^9-2=510 (too small), 2^10-2=1022 (enough), so Sales gets a 1024-address block (/22). Engineering needs 300: 2^8-2=254 (too small), 2^9-2=510 (enough), so Engineering gets a 512-address block (/23). IT needs 100: 2^6-2=62 (too small), 2^7-2=126 (enough), so IT gets a 128-address block (/25). The 'unused for hosts' figure per subnet is block size minus the STATED requirement (not minus the block's own usable-host count, since the question asks specifically for addresses beyond what was actually needed): Sales = 1024-600 = 424; Engineering = 512-300 = 212; IT = 128-100 = 28. Total = 424+212+28 = 664 addresses. The trap is picking the wrong block size by forgetting to reserve 2 addresses (network + broadcast) per block when checking whether a candidate power of 2 is 'big enough' -- e.g. assuming 512 addresses suffice for 510 exactly is fine for Engineering, but naively using 2^9=512 for Sales (600 hosts) without checking 512-2=510 < 600 would wrongly under-allocate."
+  },
+  {
+    id: 'cn-network-h5',
+    q: "An IP datagram carries a total payload of 3180 bytes (after the 20-byte IP header) and must be fragmented for a link with MTU 576 bytes (fragment data sizes rounded down to a multiple of 8). The fragments are numbered in order starting from fragment 1. In which fragment number does payload byte number 2900 (using 0-based byte numbering within the original payload, so bytes are numbered 0 through 3179) end up, and what is that fragment's Fragment Offset field value (in 8-byte units, as it would appear in the IP header)?",
+    options: ["Fragment 5, offset field 276", "Fragment 6, offset field 345", "Fragment 6, offset field 350", "Fragment 5, offset field 345"],
+    answer: 1,
+    marks: 2,
+    difficulty: 'hard',
+    type: 'numerical',
+    explanation: "Max data per fragment = 576-20 = 556, rounded down to a multiple of 8 gives 552 bytes per fragment. Splitting 3180 bytes of payload into 552-byte chunks: fragment 1 covers bytes 0-551 (offset field 0/8=0), fragment 2 covers 552-1103 (offset 552/8=69), fragment 3 covers 1104-1655 (offset 138), fragment 4 covers 1656-2207 (offset 207), fragment 5 covers 2208-2759 (offset 276), and fragment 6 covers the remaining 2760-3179, a final short fragment of only 420 bytes (offset 2760/8=345). Byte 2900 falls between 2760 and 3179, so it lands in fragment 6, whose Fragment Offset field value is 345 (in 8-byte units, since the offset field always measures in units of 8 bytes, not raw bytes). The trap is off-by-one errors in the boundary check (byte 2760 belongs to fragment 6, not fragment 5, since fragment 5 ends at byte 2759) and forgetting that the offset field itself is expressed in 8-byte units, not the raw byte position (2760/8=345, not 2760)."
+  },
+  {
+    id: 'cn-network-h6',
+    q: "A network administrator advertises four owned /24 blocks: 203.0.16.0/24, 203.0.17.0/24, 203.0.18.0/24, and 203.0.19.0/24, plus one unrelated block 203.0.24.0/24. The administrator wants to replace the four contiguous /24 announcements with the single smallest correct aggregate (supernet) route. Which statement correctly describes the valid aggregation and its consequence?",
+    options: [
+      "203.0.16.0/22 correctly aggregates exactly the four owned contiguous blocks (16-19); aggregating further to 203.0.16.0/21 would be INCORRECT because it would also claim reachability for 203.0.20.0/22 (addresses 20-23), which is not owned",
+      "203.0.16.0/21 is the correct aggregate since it is smaller in prefix-length notation and therefore more efficient",
+      "203.0.16.0/23 correctly aggregates all four blocks since /23 already spans multiple /24s",
+      "No valid aggregation exists because 203.0.24.0/24 is not contiguous with the other four blocks"
+    ],
+    answer: 0,
+    marks: 2,
+    difficulty: 'hard',
+    type: 'concept',
+    explanation: "A CIDR aggregate is only valid if it exactly covers the set of addresses actually owned, no more and no less (over-claiming can black-hole traffic for addresses that belong to someone else). 203.0.16.0/22 fixes the top 22 bits, which fixes the third octet to exactly 16 through 19 (since 16 in binary is a multiple of 4, i.e. correctly aligned on a /22 boundary) -- this exactly matches the four owned /24 blocks with nothing extra. Extending one bit further to /21 would fix the third octet to 16 through 23 (an 8-wide range), which would incorrectly include 203.0.20.0/24 through 203.0.23.0/24 -- addresses the administrator does not own (203.0.24.0/24 is a separate, non-contiguous block entirely outside even this wider range, and does not fix the alignment problem). /23 only spans a 2-wide range (either 16-17 or 18-19 depending on alignment), so it cannot cover all four blocks in one entry. The unrelated 203.0.24.0/24 block simply must continue to be advertised as its own separate route; it cannot be merged with the others since it is not adjacent to them and doing so would fail to reduce the advertisement to the minimal correct set."
+  },
+  {
+    id: 'cn-network-h7',
+    q: "Repeat the X -- Y -- Z line topology (link cost 1 each) and the Y-Z link failure scenario, but this time the routers use split-horizon WITH poison reverse: since X's only route to Z is via Y, X advertises to Y a distance of infinity for Z (poisoning the route in the direction it came from), even though X's own internal table shows a finite distance. When the direct Y-Z link fails, how many distance-vector update ROUNDS does it take before Y correctly determines that Z is unreachable (compare this to the 14 rounds needed without poison reverse)?",
+    options: ["1 round -- Y already knows, from X's poisoned advertisement, that X cannot help reach Z, so it marks Z unreachable immediately with no count-up", "14 rounds -- poison reverse only helps in larger topologies, not this one", "7 rounds -- poison reverse halves the count-to-infinity time but does not eliminate it", "It never converges -- poison reverse only prevents loops, it cannot detect unreachability"],
+    answer: 0,
+    marks: 2,
+    difficulty: 'hard',
+    type: 'concept',
+    explanation: "With poison reverse, X (which reaches Z only through Y) has ALREADY told Y, even before the failure, that its own distance to Z is infinity (this is the 'poison' -- a router always advertises infinity, not its real distance, back toward the neighbor it uses as its next hop for that destination, to prevent that neighbor from ever mistakenly using it as a fallback). So the moment Y's direct link to Z breaks, Y checks its other neighbor X's most recent advertisement for Z, finds it is already infinity, and immediately concludes Z is unreachable via X too -- no oscillating count-up is needed at all, converging in a single round. This is exactly why split-horizon with poison-reverse eliminates count-to-infinity for two-node loops. It is worth noting (though not needed to answer this question) that poison reverse does NOT fully solve count-to-infinity in larger loops (3 or more routers), where the poisoning information does not reach every router that needs it -- only for direct two-node back-and-forth loops like this one is the fix complete."
+  },
+  {
+    id: 'cn-network-h8',
+    q: "A 203.0.32.0/23 address block (512 total addresses) must be divided into the maximum possible number of equal-sized subnets using a single fixed subnet mask (FLSM), where every resulting subnet must support AT LEAST 25 usable host addresses. What is the maximum number of such equal-sized subnets that can be created from this block?",
+    options: [],
+    answer: 16,
+    kind: 'nat',
+    marks: 2,
+    difficulty: 'hard',
+    type: 'numerical',
+    explanation: "First find the smallest host-bit count h such that 2^h - 2 >= 25: with h=4, 2^4-2=14 (too small); with h=5, 2^5-2=30 (enough, since 30 >= 25). So each subnet must reserve 5 bits for hosts, meaning each subnet block is 2^5 = 32 addresses (30 usable hosts, comfortably meeting the 25-host requirement, since 25 is not itself a clean power-of-2-minus-2 value and forces rounding up to the next valid block size). The original /23 block has 512 total addresses. The maximum number of 32-address subnets that fit into 512 addresses is 512 / 32 = 16 subnets, each using a /27 mask (32-5=27). The trap is using 25 directly to size a 'perfect fit' subnet (which doesn't exist as a power of 2) instead of rounding UP to the next valid block size of 32 -- using an under-sized guess like 2^4=16 addresses (14 usable hosts) would fail to meet the 25-host requirement even though it would naively allow more (32) subnets."
+  }
+);
+
+window.GATE_DATA.questions['cn'].topics.find(function(t){return t.id==='cn-datalink';}).questions.push(
+  {
+    id: 'cn-datalink-h1',
+    q: "A sliding-window data link has a data rate of 1 Mbps in each direction, frame size 1000 bytes, ACK frame size 100 bits, one-way propagation delay 20 ms, and a fixed processing delay of 2 ms at EACH end (sender processing before sending, and receiver processing before it can emit the ACK). The window size is fixed at 5 frames. What is the resulting link utilization (efficiency), as a percentage, to 2 decimal places? (Enter your numerical answer; a small tolerance is allowed.)",
+    options: [],
+    answer: 76.78,
+    kind: 'nat',
+    marks: 2,
+    difficulty: 'hard',
+    type: 'numerical',
+    tolerance: 0.5,
+    explanation: "Frame transmission time Tf = (1000x8)/(1x10^6) = 8 ms. ACK transmission time Tack = 100/(1x10^6) = 0.1 ms (small, but NOT negligible here since the question explicitly asks for a precise percentage). One full cycle time (from starting to send the first frame of a window until its ACK is fully processed back) = Tf + propagation there + Tack + propagation back + processing delay at both ends = 8 + 20 + 0.1 + 20 + 2 + 2 = 52.1 ms. In that cycle, the sender can keep transmitting for W x Tf = 5 x 8 = 40 ms before it must stop and wait (since 40 ms of window-transmission is less than the 52.1 ms cycle time, the pipe is NOT kept continuously full). Efficiency = useful busy time / cycle time = 40/52.1 = 0.76775, i.e. 76.78%. The trap is including the small 0.1 ms ACK transmission time and the 4 ms of total processing delay, both of which are individually tiny but together shift the answer measurably from the 'ACK/processing negligible' textbook formula's 40/48=83.33% -- a difference of over 6 percentage points that a rushed solver would miss entirely."
+  },
+  {
+    id: 'cn-datalink-h2',
+    q: "A sender must transmit 12 frames, numbered 0 through 11, using a fixed window size of 4. Exactly two frames are lost in transmission: frame 2 and frame 8 (all other frames and all ACKs are delivered correctly). Assume that in both loss cases, by the time the loss is detected via timeout, the full window of 4 frames starting at the lost frame (i.e., the lost frame plus the next 3) has already been transmitted. Under Go-Back-N, ALL frames from the lost one onward that were already sent must be retransmitted; under Selective Repeat, only the actually-lost frame is retransmitted. How many MORE total frame transmissions (originals + retransmissions) does Go-Back-N require compared to Selective Repeat, for this entire 12-frame transfer?",
+    options: [],
+    answer: 6,
+    kind: 'nat',
+    marks: 2,
+    difficulty: 'hard',
+    type: 'numerical',
+    explanation: "Both protocols need 12 original transmissions regardless. For Go-Back-N: each of the two loss events forces retransmission of the full 4-frame window that was already in flight when the loss was detected (the lost frame plus the 3 that followed it, since the receiver discards all of those as out-of-order and the sender must resend everything from the lost frame onward) -- that is 4 extra transmissions per loss event, so 2 events x 4 = 8 extra transmissions, giving a GBN total of 12+8 = 20. For Selective Repeat: only the single actually-lost frame is retransmitted per event (the receiver buffers the correctly-received out-of-order frames instead of discarding them), so each loss event costs just 1 extra transmission, giving 2 extra total, for an SR total of 12+2 = 14. The difference is 20-14 = 6. The trap is forgetting that GBN's retransmission cost scales with the WINDOW SIZE at the moment of detection (here, 4 frames per event), not just with the number of actually-corrupted frames (which is only 2 events total) -- a larger window size would make GBN's penalty even worse relative to SR, which is exactly why SR is preferred on links with larger bandwidth-delay products despite its extra buffering complexity."
+  },
+  {
+    id: 'cn-datalink-h3',
+    q: "A CSMA/CD Ethernet-style network originally has a maximum cable length of 2000 m, signal propagation speed 2 x 10^8 m/s, and data rate 10 Mbps, giving some minimum frame size to guarantee collision detection. The network is then upgraded to BOTH a longer maximum cable length of 3500 m AND a higher data rate of 100 Mbps simultaneously. What is the new required minimum frame size, in bits, needed so that the sender can still always detect a collision before finishing transmission?",
+    options: [],
+    answer: 3500,
+    kind: 'nat',
+    marks: 2,
+    difficulty: 'hard',
+    type: 'numerical',
+    explanation: "The minimum frame size for reliable collision detection must satisfy: transmission time >= 2 x (one-way propagation delay), i.e. Fmin/R >= 2 x (d/v), so Fmin = 2 x d x R / v. Before the upgrade: Fmin = 2 x 2000 x (10x10^6) / (2x10^8) = 2 x 2000 x 0.05 = 200 bits. After the upgrade, BOTH d and R increase together: Fmin = 2 x 3500 x (100x10^6) / (2x10^8) = 2 x 3500 x 0.5 = 3500 bits. The trap is that increasing the data rate alone (10x) would already demand a 10x larger minimum frame just to keep pace, and increasing the cable length on top of that (1.75x) multiplies the requirement further (10 x 1.75 = 17.5x overall, taking 200 bits to 3500 bits) -- exactly the real-world engineering problem that forced Fast Ethernet (100 Mbps) standards to REDUCE maximum cable segment lengths rather than keep them the same as 10 Mbps Ethernet, since keeping both cable length and the higher rate simultaneously would demand an impractically large minimum frame size."
+  },
+  {
+    id: 'cn-datalink-h4',
+    q: "A sender wants to transmit the 10-bit data sequence 1101011011 using CRC error detection with the generator polynomial x^4 + x + 1 (which is the 5-bit pattern 10011). Using standard modulo-2 polynomial division (XOR-based long division, appending 4 zero bits to the data before dividing), what is the resulting 4-bit CRC remainder, expressed as a decimal integer (i.e., convert the 4-bit binary remainder to its decimal value)?",
+    options: [],
+    answer: 14,
+    kind: 'nat',
+    marks: 2,
+    difficulty: 'hard',
+    type: 'numerical',
+    explanation: "Append 4 zero bits (since the generator has degree 4) to the data, giving 11010110110000, then perform modulo-2 division (XOR at each step where the leading bit of the current remainder is 1) by the generator 10011. Carrying out the XOR-based long division bit by bit yields a final 4-bit remainder of 1110. Converting this binary remainder to decimal: 1110 in binary = 1x8 + 1x4 + 1x2 + 0x1 = 14. This remainder (1110) is what gets appended to the original data (giving the transmitted codeword 11010110111110) so that the receiver's division of the full received codeword by the same generator yields a zero remainder if no error occurred. The trap is that modulo-2 division uses XOR, not ordinary subtraction with borrowing -- a solver who performs standard binary long division (with borrows) instead of XOR-based division will get a completely different, incorrect remainder."
+  },
+  {
+    id: 'cn-datalink-h5',
+    q: "A link uses Selective Repeat ARQ with a 5-bit sequence number field (so sequence numbers range 0 to 31, 32 total values). Frame size is 1000 bits, data rate is 2 Mbps, and one-way propagation delay is 15 ms. The sender sets its window to the LARGEST value that is still safe for Selective Repeat (recall SR requires window size <= half the sequence number space, to avoid the receiver confusing a new frame with a retransmission of an old one). What is the resulting maximum achievable throughput, in bps, given this safe window size and no losses? (Enter your numerical answer; a small tolerance is allowed.)",
+    options: [],
+    answer: 524590,
+    kind: 'nat',
+    marks: 2,
+    difficulty: 'hard',
+    type: 'numerical',
+    tolerance: 2000,
+    explanation: "With a 5-bit sequence field, there are 2^5 = 32 total sequence numbers, and Selective Repeat's safety rule caps the window at half of that: 32/2 = 16 frames. Frame transmission time Tf = 1000/(2x10^6) = 0.5 ms. One full cycle (send frame, propagate, receive, ACK propagates back -- ignoring ACK transmission time and processing) = Tf + 2 x propagation = 0.5 + 2x15 = 30.5 ms. In that cycle the sender can push out W x Tf = 16 x 0.5 = 8 ms worth of frames before needing acknowledgement -- since 8 ms < 30.5 ms, the window is NOT large enough to keep the pipe continuously busy, so efficiency = 8/30.5 = 0.2623. Achievable throughput = efficiency x data rate = 0.2623 x 2,000,000 = 524,590 bps (approximately). The trap is assuming a larger window (e.g. using all 32 sequence numbers) would be allowed -- doing so would break Selective Repeat's correctness guarantee (the receiver could not distinguish a genuinely new frame from an old retransmitted duplicate), so the SAFE maximum of 16, not 32, must be used even though it leaves substantial bandwidth on the table here."
+  },
+  {
+    id: 'cn-datalink-h6',
+    q: "In a pure ALOHA network, 30 stations are active, and each station independently generates a new frame on average once every 50 frame-times (so each station's individual generation rate is 1/50 frames per frame-time, and G, the total average number of transmission attempts per frame-time including retransmissions, equals the sum across all stations). Frame size is 800 bits and the channel rate is 2 Mbps. Using pure ALOHA's throughput formula S = G x e^(-2G), what is the resulting successful throughput of the channel, in bps? (Enter your numerical answer, to the nearest 100; a small tolerance is allowed.)",
+    options: [],
+    answer: 361433,
+    kind: 'nat',
+    marks: 2,
+    difficulty: 'hard',
+    type: 'numerical',
+    tolerance: 2000,
+    explanation: "Total offered load G = 30 stations x (1/50 frame per frame-time each) = 30/50 = 0.6. Pure ALOHA's throughput fraction is S = G x e^(-2G) = 0.6 x e^(-1.2) = 0.6 x 0.301194 = 0.180716 (this represents the fraction of frame-times that carry a SUCCESSFUL transmission, out of all frame-times). One frame-time = frame size / rate = 800/(2x10^6) = 0.0004 s = 0.4 ms. The rate of successful frames per second = S / (frame-time in seconds) = 0.180716/0.0004 = 451.79 frames/sec. Converting to bits per second: 451.79 x 800 = 361,433 bps (approximately). The trap is applying the S = G x e^(-2G) formula (which gives a FRACTION, the utilization) and then forgetting to convert it into an actual bit rate by dividing by the frame-time and multiplying by frame size -- reporting 0.1807 or 18.07% alone is not a bps answer, and simply multiplying G x channel-rate (ignoring the exponential collision penalty entirely) would also be wrong."
+  },
+  {
+    id: 'cn-datalink-h7',
+    q: "A link uses Go-Back-N ARQ with a 4-bit sequence number field (sequence numbers 0 to 15, 16 total values; recall GBN's safe maximum window is (2^n - 1) where n is the number of sequence bits, since GBN's receiver only ever expects one specific next sequence number). Frame size is 2000 bits, data rate is 4 Mbps, and one-way propagation delay is 25 ms. Using the largest safe GBN window size for this sequence field, what is the resulting link efficiency, as a percentage, to 2 decimal places? (Enter your numerical answer; a small tolerance is allowed.)",
+    options: [],
+    answer: 14.85,
+    kind: 'nat',
+    marks: 2,
+    difficulty: 'hard',
+    type: 'numerical',
+    tolerance: 0.5,
+    explanation: "With a 4-bit sequence field, the safe maximum GBN window is 2^4 - 1 = 15 frames (one less than the full 16-value space, unlike Selective Repeat's half-the-space rule, because GBN's receiver has no buffering ambiguity to worry about beyond the one-off boundary case). Frame transmission time Tf = 2000/(4x10^6) = 0.5 ms. Cycle time = Tf + 2 x propagation delay = 0.5 + 2x25 = 50.5 ms. With window 15, the sender can push out W x Tf = 15 x 0.5 = 7.5 ms of frames per cycle -- since 7.5 ms is much less than the 50.5 ms cycle, efficiency = 7.5/50.5 = 0.14851, i.e. 14.85%. The trap is confusing GBN's safe-window rule (2^n - 1 = 15) with Selective Repeat's rule (2^(n-1) = 8) for the same sequence field size -- using SR's smaller window formula here, or a naively 'full' window of 16, both give a different, incorrect efficiency; getting the correct protocol-specific window-size ceiling right is the crux of the question."
+  },
+  {
+    id: 'cn-datalink-h8',
+    q: "A 14-bit data sequence 11010011101100 is protected using CRC-8 with generator polynomial x^8 + x^2 + x + 1 (the 9-bit pattern 100000111). The sender computes the correct 8-bit CRC remainder and appends it, forming a 22-bit codeword. During transmission, exactly two bits of this transmitted codeword are corrupted (flipped) by noise: the bit at position 3 and the bit at position 10 (using 0-based indexing from the left of the 22-bit codeword). The receiver divides the ENTIRE received (corrupted) 22-bit codeword by the same generator 100000111. What is the resulting 8-bit remainder, expressed as a decimal integer (a non-zero result means the receiver correctly detects that an error occurred)?",
+    options: [],
+    answer: 108,
+    kind: 'nat',
+    marks: 2,
+    difficulty: 'hard',
+    type: 'numerical',
+    explanation: "First compute the correct CRC-8 remainder for the original 14-bit data (appending 8 zero bits and dividing by 100000111 via XOR-based long division): this gives a remainder of 00100111, so the correctly transmitted 22-bit codeword is 1101001110110000100111. Now flip the bits at position 3 and position 10 of this codeword (0-indexed), producing the corrupted codeword 1100001110010000100111. The receiver performs the same modulo-2 division of this entire 22-bit corrupted string by the generator 100000111; carrying out the XOR-based long division yields a remainder of 01101100, which as a decimal integer is 64+32+8+4 = 108. Since this remainder is non-zero, the receiver correctly flags the frame as corrupted and discards it (or requests retransmission). The trap is realizing the receiver's check divides the WHOLE received codeword (data bits plus the appended CRC bits together), not just the original data portion re-computed fresh -- and that two independent bit flips at arbitrary positions will essentially always (though not with absolute mathematical certainty for every possible error pattern) produce a detectably non-zero remainder for a well-chosen generator polynomial like this one."
+  }
+);
+
+window.GATE_DATA.questions['cn'].topics.find(function(t){return t.id==='cn-basics';}).questions.push(
+  {
+    id: 'cn-basics-h1',
+    q: "A single 125,000-bit packet travels from source to destination through 2 intermediate routers (3 links total). Link 1: bandwidth 2 Mbps, propagation delay 10 ms, and the packet then waits 5 ms in a queue at the first router before being forwarded. Link 2: bandwidth 5 Mbps, propagation delay 8 ms, then waits 12 ms in a queue at the second router. Link 3: bandwidth 1 Mbps, propagation delay 15 ms (no further queueing, this is the last hop to the destination). What is the total end-to-end delay, in ms, for this packet (store-and-forward, one packet, not fragmented further)?",
+    options: [],
+    answer: 262.5,
+    kind: 'nat',
+    marks: 2,
+    difficulty: 'hard',
+    type: 'numerical',
+    explanation: "Each link contributes its own transmission delay (packet size / link bandwidth) plus its propagation delay, and each intermediate router adds whatever queueing delay the packet experiences there before being forwarded onward. Link 1: Tt = 125,000/(2x10^6) = 62.5 ms, plus propagation 10 ms, plus queueing 5 ms at router 1 = 77.5 ms. Link 2: Tt = 125,000/(5x10^6) = 25 ms, plus propagation 8 ms, plus queueing 12 ms at router 2 = 45 ms. Link 3: Tt = 125,000/(1x10^6) = 125 ms, plus propagation 15 ms, plus 0 queueing (final hop) = 140 ms. Total = 77.5+45+140 = 262.5 ms. The trap is that with three DIFFERENT bandwidths, the transmission delay must be recomputed fresh for each link using that link's own rate (the slowest link, Link 3 at 1 Mbps, dominates with 125 ms alone despite it having zero queueing) -- a solver who mistakenly reuses one link's transmission delay for all three, or forgets to add the router-specific queueing delays, will get the wrong total."
+  },
+  {
+    id: 'cn-basics-h2',
+    q: "A 2,000,000-bit message must cross a path with 6 links in series, each of bandwidth 4 Mbps and one-way propagation delay 4 ms. Compare (a) circuit switching, where a 25 ms setup delay reserves the whole path, after which the message flows as one continuous unit (its transmission delay counted once, plus the total end-to-end propagation delay summed once across all 6 links), versus (b) packet switching, where the message is split into 10 EQUAL packets and pipelined across the 6 links (total time = (links + packets - 1) x per-packet transmission time, plus the total end-to-end propagation delay, counted once, added on top). How many MORE milliseconds does the pipelined packet-switching approach take compared to circuit switching?",
+    options: [],
+    answer: 225,
+    kind: 'nat',
+    marks: 2,
+    difficulty: 'hard',
+    type: 'numerical',
+    explanation: "Circuit switching: whole-message transmission time = 2,000,000/(4x10^6) = 500 ms; total propagation = 6 x 4 = 24 ms; total = setup + transmission + propagation = 25+500+24 = 549 ms. Packet switching: each of the 10 packets carries 200,000 bits, so per-packet transmission time = 200,000/(4x10^6) = 50 ms; pipelining across 6 links with 10 packets takes (6+10-1) x 50 = 15 x 50 = 750 ms of transmission-related time, plus the same 24 ms of total propagation = 774 ms. Difference = 774-549 = 225 ms, meaning circuit switching is actually FASTER here despite its setup overhead. The trap is assuming packet switching, being 'modern' or 'pipelined', is automatically faster -- but circuit switching's one-time whole-message transmission (500 ms, paid only once regardless of hop count) can beat packet switching's per-hop-per-packet pipelining penalty ((links+packets-1) transmission slots) when the setup cost is small relative to the message size and the packet count is not large enough to amortize the (links-1) extra pipeline-fill slots."
+  },
+  {
+    id: 'cn-basics-h3',
+    q: "A noisy channel has bandwidth 3000 Hz and a signal-to-noise ratio of 25 dB. Using Shannon's capacity formula, what is the channel's maximum theoretical data rate, in bps? (Enter your numerical answer, to the nearest integer; a small tolerance is allowed since this involves converting dB and a logarithm.)",
+    options: [],
+    answer: 24928,
+    kind: 'nat',
+    marks: 2,
+    difficulty: 'hard',
+    type: 'numerical',
+    tolerance: 200,
+    explanation: "First convert the SNR from decibels to a plain linear ratio: SNR_dB = 10 log10(SNR), so 25 = 10 log10(SNR), giving SNR = 10^2.5 = 316.23 (NOT simply 25, and not a clean round number either -- this is the key trap, since many solvers either forget the conversion entirely and plug 25 straight into Shannon's formula, or round the dB-to-ratio conversion too aggressively). Shannon's capacity: C = B x log2(1+SNR) = 3000 x log2(317.23). Since log2(317.23) = ln(317.23)/ln(2) = 8.31 (approximately), C = 3000 x 8.31 = 24,928 bps (approximately). The two traps stacked here are: (1) SNR given in dB must be converted via 10^(dB/10) before use, never used directly as the linear ratio, and (2) the resulting linear SNR (316.23) is not a clean power of 2 minus 1, so log2(1+SNR) must be computed as a genuine (non-integer) logarithm rather than read off by inspection, making a calculator or log-table step unavoidable."
+  },
+  {
+    id: 'cn-basics-h4',
+    q: "A channel has bandwidth 4 kHz. It is first analyzed using Nyquist's noiseless-channel formula with 16 discrete signal levels, giving one candidate maximum data rate. Separately, the same channel is found to actually have a signal-to-noise ratio of 1000 (a plain ratio, not dB), giving a second candidate maximum data rate via Shannon's noisy-channel formula. What is the ACTUAL maximum achievable data rate on this real (noisy) channel, in bps -- i.e., whichever of the two candidate limits is the binding (smaller) constraint?",
+    options: [],
+    answer: 32000,
+    kind: 'nat',
+    marks: 2,
+    difficulty: 'hard',
+    type: 'numerical',
+    explanation: "Nyquist (noiseless) limit: C = 2B log2(M) = 2 x 4000 x log2(16) = 2 x 4000 x 4 = 32,000 bps. This is the maximum rate achievable purely from having 16 distinguishable signal levels, IGNORING any noise. Shannon (noisy) limit: C = B x log2(1+SNR) = 4000 x log2(1001) = 4000 x 9.968 = 39,872 bps (approximately). This is the absolute ceiling imposed by the channel's actual noise level, regardless of how many signal levels are used. Since a real, physical channel is subject to BOTH constraints simultaneously, the actually achievable rate is the SMALLER (more restrictive) of the two: min(32,000, 39,872) = 32,000 bps. The trap is computing only the Shannon limit (since the question mentions SNR) and reporting 39,872 bps as the answer -- but Nyquist's signal-level constraint (which depends on the actual modulation scheme in use, here just 16 levels) is here the binding, LOWER limit, and the true achievable rate can never exceed whichever of the two limits is smaller, since both represent hard physical/informational ceilings that must be simultaneously respected."
+  },
+  {
+    id: 'cn-basics-h5',
+    q: "A message of 800,000 bits is split into n equal-sized packets and sent, pipelined, across 5 store-and-forward links (all rate 2 Mbps, propagation ignored). Each packet, regardless of how small its data portion, carries a fixed 200-bit header overhead in addition to its share of the message data. Total time = (5 + n - 1) x [(800,000/n + 200) / (2x10^6)] seconds. As n increases, splitting into smaller packets first helps (better pipelining) but eventually hurts (header overhead dominates), so there is an optimal n that minimizes total time. What is the minimum achievable total transfer time, in milliseconds, at (or near) this optimal packetization? (Enter your numerical answer, to 1 decimal place; a small tolerance is allowed.)",
+    options: [],
+    answer: 425.7,
+    kind: 'nat',
+    marks: 2,
+    difficulty: 'hard',
+    type: 'numerical',
+    tolerance: 3,
+    explanation: "This is a genuine optimization: Total(n) = (5+n-1) x (800,000/n + 200) / (2x10^6) x 1000 ms. As n grows, each packet's transmission time falls (spreading the 800,000 bits thinner), which helps pipelining, but the fixed 200-bit header is paid n times over, so total header overhead grows linearly with n -- eventually swamping the benefit. Using calculus (or by evaluating the expression across a range of n and finding the minimum, since n must also be checked near the continuous optimum), the minimizing n works out to approximately n* = sqrt((links-1) x message_bits / header_bits) = sqrt(4 x 800,000/200) = sqrt(16,000) = 126.5, so checking n=126 or n=127 (both give essentially the same value since the function is very flat near its minimum) gives a minimum total time of approximately 425.7 ms. The trap is assuming 'more packets is always better for pipelining' and pushing n arbitrarily high -- but every additional packet also multiplies the fixed per-packet header overhead, so there is a genuine sweet spot, not a monotonic improvement, and finding it requires balancing the two competing effects rather than just applying the plain pipelining formula with an arbitrarily chosen n."
+  },
+  {
+    id: 'cn-basics-h6',
+    q: "A sender-receiver pair uses an ASYMMETRIC pair of links: the forward (data) link has bandwidth 10 Mbps and one-way propagation delay 30 ms, while the reverse (ACK) link has a much slower bandwidth of only 1 Mbps and the same 30 ms one-way propagation delay. A single data packet of 1500 bytes is sent forward, and its ACK is 400 bits, sent back on the slow reverse link. Accounting for the (non-negligible, given the slow reverse link) transmission time of BOTH the data packet and its ACK, what is the resulting round-trip-time-based bandwidth-delay product, in bytes, using the forward link's bandwidth as the 'pipe' capacity being measured (i.e., BDP = forward bandwidth x total measured RTT)?",
+    options: [],
+    answer: 77000,
+    kind: 'nat',
+    marks: 2,
+    difficulty: 'hard',
+    type: 'numerical',
+    explanation: "Total RTT = (forward transmission time) + (forward propagation) + (reverse ACK transmission time) + (reverse propagation). Forward transmission: 1500 bytes x 8 = 12,000 bits / (10x10^6 bps) = 1.2 ms. Forward propagation: 30 ms. Reverse ACK transmission: 400 bits / (1x10^6 bps) = 0.4 ms (this is the key non-negligible piece: on a fast, symmetric link this would be tiny, but the reverse link here is 10x slower, making even a 400-bit ACK take a noticeable 0.4 ms). Reverse propagation: 30 ms. Total RTT = 1.2+30+0.4+30 = 61.6 ms. BDP (using the forward link's bandwidth as the pipe capacity, and this RTT) = 10x10^6 bps x 0.0616 s = 616,000 bits = 77,000 bytes. The trap is assuming ACK transmission time is always negligible (a standard textbook simplification) -- it is NOT negligible here precisely because the ASYMMETRIC reverse link is far slower than the forward link, a realistic scenario (e.g. ADSL/cable uplinks) where ignoring the slow-link ACK time would understate the true RTT and therefore understate the BDP."
+  },
+  {
+    id: 'cn-basics-h7',
+    q: "A channel needs to sustain a target bit rate of 36 Mbps. Using Nyquist's formula, it is determined that using 64 discrete signal levels requires a minimum bandwidth of B = (target rate)/(2 x log2(64)). Once this minimum bandwidth is set, it turns out the channel's actual signal-to-noise ratio at that bandwidth is only 63 (a plain ratio, not dB). What is the MAXIMUM bit rate this channel can actually sustain once the noise limit (Shannon) is correctly checked against the Nyquist-derived bandwidth, in Mbps?",
+    options: [],
+    answer: 18,
+    kind: 'nat',
+    marks: 2,
+    difficulty: 'hard',
+    type: 'numerical',
+    explanation: "First find the Nyquist-required bandwidth for 36 Mbps using 64 levels (6 bits per symbol, since log2(64)=6): B = 36x10^6 / (2x6) = 3,000,000 Hz = 3 MHz. This is the bandwidth a noiseless channel would need to physically support 36 Mbps with 64-level signaling. But this same channel, at that 3 MHz bandwidth, has SNR = 63, so its actual Shannon (noise-limited) capacity is C = B x log2(1+SNR) = 3x10^6 x log2(64) = 3x10^6 x 6 = 18x10^6 = 18 Mbps. Since 18 Mbps (the noise ceiling) is LESS than the originally desired 36 Mbps, the channel physically CANNOT sustain the target rate no matter how the signaling is engineered -- the actual achievable maximum is 18 Mbps, half of what was hoped for. The trap is computing only the Nyquist bandwidth requirement (3 MHz) and stopping there, implicitly assuming the channel is noiseless and can therefore hit the full 36 Mbps target -- but Shannon's noise-imposed ceiling must always be separately checked, and whichever of the two limits (Nyquist's level-based bound or Shannon's noise-based bound) is SMALLER is the one that actually governs real achievable throughput."
+  },
+  {
+    id: 'cn-basics-h8',
+    q: "A 600,000-bit message is sent using pure message switching (NOT split into packets) across 3 heterogeneous store-and-forward links in series: link 1 at 3 Mbps, link 2 at 1.5 Mbps, link 3 at 6 Mbps. Each of the 2 intermediate switching nodes adds a fixed 2 ms nodal processing delay before forwarding the fully-received message onward (the final destination adds no such delay). Each link additionally has a 6 ms propagation delay. What is the total end-to-end delay, in ms, for this message to arrive?",
+    options: [],
+    answer: 722,
+    kind: 'nat',
+    marks: 2,
+    difficulty: 'hard',
+    type: 'numerical',
+    explanation: "Since the message is NOT split into packets (pure message switching), the entire 600,000 bits must be fully received at each intermediate node before any part of it can be forwarded onward -- so each link independently pays the FULL message's transmission time at that link's own (different) rate. Link 1: Tt = 600,000/(3x10^6) = 200 ms. Link 2: Tt = 600,000/(1.5x10^6) = 400 ms. Link 3: Tt = 600,000/(6x10^6) = 100 ms. Sum of transmission delays = 200+400+100 = 700 ms. Sum of propagation delays across 3 links = 3x6 = 18 ms. Sum of nodal processing delays at the 2 intermediate nodes (not the destination) = 2x2 = 4 ms. Total = 700+18+4 = 722 ms. The trap is that with three DIFFERENT link rates, the middle (slowest, 1.5 Mbps) link dominates the transmission-delay sum at 400 ms alone -- a solver who assumes all links share one 'representative' rate, or forgets that pure (unfragmented) message switching forces each hop to pay the FULL message transmission time rather than a pipelined fraction of it, will compute a substantially different, wrong total."
+  }
+);
