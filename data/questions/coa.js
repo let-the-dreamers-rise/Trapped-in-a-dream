@@ -2383,7 +2383,6 @@ window.GATE_DATA.questions['coa'].topics.find(function(t){return t.id==='coa-dat
   q: 'A multi-cycle processor with a 250 ps clock executes instructions in these cycle counts: load 5, store 4, ALU 4, branch 3. The instruction mix is 20% loads, 15% stores, 50% ALU and 15% branches. What is the average execution time per instruction?',
   options: ['1012.5 ps', '1000 ps', '900 ps', '1125 ps'],
   answer: 0,
-  kind: 'nat',
   marks: 2,
   difficulty: 'medium',
   type: 'pyq-style',
@@ -2849,5 +2848,168 @@ window.GATE_DATA.questions['coa'].topics.find(function(t){return t.id==='coa-mem
   difficulty: 'medium',
   type: 'pyq-style',
   explanation: 'All three block numbers alias to the very same line, since 0 mod 8 = 0, 8 mod 8 = 0, and 16 mod 8 = 0 -- despite the cache having 8 lines total, this particular working set of 3 blocks only ever uses 1 of them and repeatedly evicts itself. Walking the trace: block 0 (miss, fills line0), block 8 (miss, evicts 0), block 16 (miss, evicts 8), block 0 (miss, evicts 16, since 0 is no longer present), block 8 (miss), block 16 (miss), block 0 (miss), block 8 (miss) -- every single access is a miss, giving 0 hits out of 8. This is a classic cache-thrashing / conflict-miss scenario: even though the cache is far from full in absolute capacity, poor address alignment (all three blocks conflict-mapping to the same line) destroys temporal locality entirely, which is exactly why real caches use set-associativity to tolerate a handful of simultaneously "hot" but conflicting addresses.'
+}
+);
+
+window.GATE_DATA.questions['coa'].topics.find(function(t){return t.id==='coa-io';}).questions.push(
+{
+  id: 'coa-io-p1',
+  pyqYear: 2015,
+  q: 'A DMA controller uses cycle stealing: for every group of 5 CPU clock cycles, it steals exactly 1 cycle to transfer one word, leaving the CPU 4 cycles free in that group. What percentage of CPU cycles are stolen by the DMA during the transfer?',
+  options: ['20%', '25%', '80%', '5%'],
+  answer: 0,
+  marks: 1,
+  difficulty: 'easy',
+  type: 'pyq-style',
+  explanation: 'In cycle stealing, the DMA controller "borrows" individual bus cycles from the CPU rather than freezing it for the whole block transfer, so the CPU keeps making progress on its own program in between. Here, out of every group of 5 cycles, exactly 1 is stolen for the transfer, so the fraction stolen is 1/5 = 0.20, i.e. 20%. This is the direct opposite of burst-mode DMA, which would seize the bus continuously for the entire block transfer, stalling the CPU 100% of the time during that interval but finishing the transfer itself in less total wall-clock time -- cycle stealing sacrifices raw transfer speed to keep the CPU more responsive.'
+},
+{
+  id: 'coa-io-p2',
+  pyqYear: 2016,
+  q: 'A CPU has a 100 ns clock cycle. A DMA controller uses cycle stealing, taking exactly 1 CPU cycle for every word it transfers. If the DMA transfers a block of 10,000 words during a program\'s execution, by how much does this cycle stealing lengthen the program\'s total running time?',
+  options: ['1,000,000 ns', '100,000 ns', '10,000 ns', '10,000,000 ns'],
+  answer: 0,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: 'Each word transferred costs the CPU exactly 1 stolen cycle, so transferring 10,000 words steals 10,000 CPU cycles in total, regardless of how those stolen cycles are spread out over time. At 100 ns per cycle, the total extra time added to the program\'s execution is 10,000 x 100 ns = 1,000,000 ns (i.e. 1 millisecond). This directly demonstrates why cycle stealing is described as adding a small, distributed overhead rather than one large stall: the CPU program\'s instructions are individually delayed by single stolen cycles scattered throughout the transfer, but summed across the whole block, the total lost CPU time is exactly (number of words) x (cycles stolen per word) x (cycle time).'
+},
+{
+  id: 'coa-io-p3',
+  pyqYear: 2017,
+  q: 'A disk has a seek time of 6 ms, rotates at 6000 RPM, and has a sustained transfer rate of 50,000 bytes/ms (i.e. 50 MB/s using decimal MB). What is the total access time to read a 10,000-byte sector, assuming average rotational latency (half a revolution)?',
+  options: ['11.2 ms', '11.0 ms', '5.2 ms', '16 ms'],
+  answer: 0,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: 'Total disk access time is the sum of three components. Seek time is given directly as 6 ms. The rotational latency is, on average, half of one full revolution: at 6000 RPM the disk completes one revolution every 60,000/6000 = 10 ms, so average rotational latency is 10/2 = 5 ms. The transfer time is the sector size divided by the transfer rate: 10,000 bytes / 50,000 bytes-per-ms = 0.2 ms. Adding all three: 6 + 5 + 0.2 = 11.2 ms. This "seek + rotate + transfer" decomposition is the standard disk-timing formula, and it shows why transfer time is usually the smallest component for a single sector -- seek and rotational latency, both mechanical delays, dominate disk access time far more than the electronic data transfer itself.'
+},
+{
+  id: 'coa-io-p4',
+  pyqYear: 2018,
+  q: 'For the disk of the previous scenario (seek 6 ms, 6000 RPM giving 5 ms average rotational latency, transfer rate 50,000 bytes/ms, 10,000-byte sector, total access time 11.2 ms), what is the effective throughput for reading this single sector, expressed in bytes per millisecond?',
+  options: ['≈892.9 bytes/ms', '≈500 bytes/ms', '≈1785.7 bytes/ms', '≈50,000 bytes/ms'],
+  answer: 0,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: 'Effective throughput is NOT the same as the raw transfer rate quoted for the disk (50,000 bytes/ms), because that number only describes the speed of the data-transfer phase itself, ignoring the mechanical seek and rotational-latency overhead that must also be paid before any bytes move. The effective (real, end-to-end) throughput is instead the total useful data delivered divided by the TOTAL access time, including seek and rotation: 10,000 bytes / 11.2 ms ≈ 892.9 bytes/ms. This large gap between the raw transfer rate (50,000 bytes/ms) and the effective throughput (≈892.9 bytes/ms) is exactly why disks perform far better on large sequential transfers, which amortize one seek and one rotational latency over many sectors, than on many small scattered single-sector reads, where the fixed mechanical overhead dominates each individual access.'
+},
+{
+  id: 'coa-io-p5',
+  pyqYear: 2019,
+  q: 'An interrupt-driven I/O system handles 1000 device interrupts. Each interrupt requires 2 microseconds to save the CPU context, an ISR (interrupt service routine) body that runs for 5 microseconds, and 2 microseconds to restore the context afterward. What is the total CPU time consumed by servicing all 1000 interrupts?',
+  options: ['9000 microseconds', '5000 microseconds', '4000 microseconds', '7000 microseconds'],
+  answer: 0,
+  marks: 1,
+  difficulty: 'easy',
+  type: 'pyq-style',
+  explanation: 'Each individual interrupt costs the CPU three sequential phases: saving the interrupted program\'s context (2 us), running the actual interrupt-handling code (5 us), and restoring the saved context so the interrupted program can resume exactly where it left off (2 us). This gives 2 + 5 + 2 = 9 us per interrupt. Servicing 1000 such interrupts therefore costs 1000 x 9 = 9000 us in total CPU time. Note that the save and restore steps (4 us combined, or 4000 us across all 1000 interrupts) are pure overhead that does no useful work for the device -- they exist solely to make the interruption transparent to the interrupted program -- which is exactly why systems batching many small, frequent interrupts (versus fewer, larger ones) pay a proportionally larger overhead tax.'
+},
+{
+  id: 'coa-io-p6',
+  pyqYear: 2020,
+  q: 'A device transfers one word every 10 microseconds and the CPU must move 1000 words in total. Under programmed I/O (the CPU busy-waits, polling the device\'s status register continuously until each word is ready, then transfers it), the CPU is occupied for the entire 10-microsecond gap between words. Under interrupt-driven I/O, the CPU spends only 2 microseconds of actual work per word (handling the interrupt and moving the word) and is otherwise free to do other work. How many microseconds of CPU time does interrupt-driven I/O save compared to programmed I/O, for this whole transfer?',
+  options: ['8000 microseconds', '10000 microseconds', '2000 microseconds', '6000 microseconds'],
+  answer: 0,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: 'Under programmed I/O, the CPU is fully tied up busy-waiting for the entire 10 microsecond period between successive words, giving a total occupied time of 1000 x 10 = 10,000 microseconds for the whole transfer -- none of that busy-wait time is available for other useful work. Under interrupt-driven I/O, the CPU is freed to do other work during the gap and only spends 2 microseconds of actual overhead per word (handling the interrupt and moving the data), giving a total CPU-occupied time of 1000 x 2 = 2,000 microseconds. The CPU time saved by switching to interrupt-driven I/O is therefore 10,000 - 2,000 = 8,000 microseconds. This is precisely why programmed I/O (busy-waiting) is avoided for anything but the simplest or fastest devices: it wastes CPU cycles that interrupt-driven or DMA-based schemes can instead give back to other programs.'
+},
+{
+  id: 'coa-io-p7',
+  pyqYear: 2021,
+  q: 'A centralized parallel bus arbitration scheme must uniquely identify which one of 64 possible I/O devices is requesting the bus, using a priority encoder that outputs a binary device number. How many output bits does this encoder need?',
+  options: ['6', '5', '7', '64'],
+  answer: 0,
+  marks: 1,
+  difficulty: 'easy',
+  type: 'pyq-style',
+  explanation: 'A binary encoder must produce a distinct output code for each of the 64 possible requesting devices, and the minimum number of bits needed to represent 64 distinct values is ceil(log2 64) = 6, since 2^6 = 64 exactly matches the device count with no wasted codes. This is the same ceil(log2 .) sizing rule used throughout digital design, whether for register-file addressing, opcode field widths, or control-store next-address fields: the number of bits required to uniquely number N items is always the smallest n such that 2^n >= N. Centralized parallel arbitration like this is fast (one encoder decision per bus request cycle) but needs dedicated request/grant wiring to every device, unlike a daisy-chain scheme which needs only a single shared grant line but resolves priority more slowly, device by device.'
+},
+{
+  id: 'coa-io-p8',
+  pyqYear: 2022,
+  q: 'A DMA controller transfers a 1 MB (decimal, 1,000,000 byte) block of data in burst mode over a bus with an effective bandwidth of 200 MB/s (decimal). Assuming the bus can be used at its full rated bandwidth for the entire transfer, how long does the transfer take?',
+  options: ['5 ms', '2 ms', '0.5 ms', '20 ms'],
+  answer: 0,
+  marks: 1,
+  difficulty: 'easy',
+  type: 'pyq-style',
+  explanation: 'In burst-mode DMA, the controller seizes the bus for the entire block transfer without releasing it back to the CPU between individual words, so the CPU is completely stalled but the transfer itself completes as fast as the bus bandwidth allows. Transfer time is simply the total data size divided by the bandwidth: 1,000,000 bytes / (200,000,000 bytes/s) = 0.005 s = 5 ms. Burst mode is the fastest way to move a large contiguous block (compared to cycle stealing, which spreads the same transfer over a longer wall-clock time while sharing the bus with the CPU), which is exactly why it is preferred for large sequential transfers such as disk-to-memory DMA where minimizing total transfer time matters more than keeping the CPU responsive during the transfer.'
+},
+{
+  id: 'coa-io-p9',
+  pyqYear: 2023,
+  q: 'A disk rotates at 7200 RPM. What is its average rotational latency (assume it equals half of one full revolution)?',
+  options: [],
+  answer: 4.1667,
+  kind: 'nat',
+  marks: 1,
+  difficulty: 'easy',
+  type: 'pyq-style',
+  explanation: 'One full revolution takes 60,000 ms (i.e. 60 seconds, converted to milliseconds) divided by the RPM: 60,000 / 7200 = 8.333 ms per revolution. Average rotational latency assumes the disk head, on average, must wait for half a revolution before the desired sector arrives under it, so average latency = 8.333 / 2 ≈ 4.1667 ms. This "half of one revolution, on average" assumption is standard across GATE disk-performance questions: in the worst case a full revolution (8.333 ms here) might be needed if the target sector has just passed, and in the best case almost no wait is needed if the sector is about to arrive, so half a revolution is used as the expected (average-case) figure for performance calculations.'
+},
+{
+  id: 'coa-io-p10',
+  pyqYear: 2024,
+  q: 'A CPU with a 50 ns clock cycle is serviced by a DMA controller using cycle stealing, which steals exactly 1 CPU cycle for every 8-cycle group during a data transfer. What percentage of CPU cycles are stolen?',
+  options: ['12.5%', '8%', '20%', '87.5%'],
+  answer: 0,
+  marks: 1,
+  difficulty: 'easy',
+  type: 'pyq-style',
+  explanation: 'Out of every group of 8 CPU cycles, the DMA controller takes exactly 1 for its own transfer, so the fraction of cycles stolen is 1/8 = 0.125, i.e. 12.5%. Note that the CPU\'s clock period itself (50 ns here) does not change this percentage at all -- the fraction stolen depends only on the ratio "cycles stolen per group" to "total cycles per group," not on how long each individual cycle lasts. The clock period would only matter if the question instead asked for the absolute TIME lost to stealing (which would be the number of stolen cycles multiplied by 50 ns), rather than the percentage of cycles stolen.'
+},
+{
+  id: 'coa-io-p11',
+  pyqYear: 2025,
+  q: 'A disk has a seek time of 8 ms, rotates at 10,000 RPM, and has a transfer rate of 100,000 bytes/ms. What is the total access time to read a single 16,000-byte block, using average rotational latency?',
+  options: ['11.16 ms', '11 ms', '14 ms', '9.16 ms'],
+  answer: 0,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: 'One revolution at 10,000 RPM takes 60,000/10,000 = 6 ms, so the average rotational latency (half a revolution) is 6/2 = 3 ms. The transfer time for a 16,000-byte block at 100,000 bytes/ms is 16,000/100,000 = 0.16 ms. Adding all three components of disk access time: seek (8 ms) + average rotational latency (3 ms) + transfer time (0.16 ms) = 11.16 ms. As in every such problem, seek time and rotational latency together (11 ms of the 11.16 ms total here) dominate over the actual data transfer time (only 0.16 ms), which is why disks are so much more efficient when reads are large and sequential, amortizing the same fixed mechanical delay over far more transferred bytes.'
+},
+{
+  id: 'coa-io-p12',
+  pyqYear: 2026,
+  q: 'A real-time system requires that a device interrupt be fully serviced (from the moment the interrupt occurs to the moment the interrupted program resumes) within a hard deadline of 50 microseconds. The interrupt dispatch (recognizing and vectoring to the handler) takes 8 microseconds, saving the CPU context takes 5 microseconds, and restoring the context afterward takes another 5 microseconds. What is the maximum time budget left for the actual ISR body to run, while still meeting the deadline?',
+  options: ['32 microseconds', '37 microseconds', '42 microseconds', '18 microseconds'],
+  answer: 0,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: 'The total 50 microsecond deadline must cover every phase of interrupt handling: dispatch, context save, the ISR body itself, and context restore. Three of these phases are fixed overhead that does no device-specific work: dispatch (8 us) + context save (5 us) + context restore (5 us) = 18 us. Subtracting this fixed overhead from the total deadline leaves the maximum time available for the actual ISR body: 50 - 18 = 32 microseconds. This is the essence of real-time interrupt-latency budgeting: system designers must account for every layer of fixed overhead (vectoring, context save/restore) before knowing how much time is actually left for the device-specific handling code, and if that fixed overhead alone approached or exceeded the deadline, no ISR body, however fast, could ever meet the requirement.'
+},
+{
+  id: 'coa-io-p13',
+  pyqYear: 2015,
+  q: 'A system has 16 I/O devices. Under polled (software) interrupt handling, the CPU must check each device\'s status register in a fixed priority order until it finds the one requesting service, at 2 microseconds per check. Under vectored interrupt handling, the requesting device directly supplies its own identifying vector, needing only 1 check-equivalent regardless of device count. What is the worst-case device-identification time for polled interrupt handling (i.e. if the lowest-priority device, checked last, is the one requesting service)?',
+  options: ['32 microseconds', '16 microseconds', '2 microseconds', '30 microseconds'],
+  answer: 0,
+  marks: 1,
+  difficulty: 'easy',
+  type: 'pyq-style',
+  explanation: 'In the worst case for polled interrupt handling, the device actually requesting service is the very last one checked in priority order -- meaning the CPU must first check, and rule out, all 15 higher-priority devices before finally reaching the correct one, for a total of 16 checks (all 16 devices, including the requester itself). At 2 microseconds per check, this gives 16 x 2 = 32 microseconds in the absolute worst case. Vectored interrupts avoid this entire linear search: the device itself supplies an identifying vector (or address) directly to the CPU the moment its interrupt is acknowledged, so device identification takes a small, constant time regardless of how many devices exist or which one requested service -- a major reason vectored interrupts scale much better as device counts grow.'
+},
+{
+  id: 'coa-io-p14',
+  pyqYear: 2021,
+  q: 'A CPU must move 5000 words from a device to memory. Under programmed I/O, the CPU busy-waits and spends 4 microseconds per word (checking status and moving the data), fully occupying the CPU throughout. Under DMA with cycle stealing (1 CPU cycle of 100 ns stolen per word), the CPU is otherwise free to run its own program. What is the total CPU time consumed by programmed I/O, and what is the total CPU time consumed (stolen) by the DMA approach, for this whole transfer?',
+  options: [
+    'Programmed I/O: 20,000 microseconds; DMA: 500 microseconds',
+    'Programmed I/O: 5,000 microseconds; DMA: 5,000 microseconds',
+    'Programmed I/O: 20,000 microseconds; DMA: 20,000 microseconds',
+    'Programmed I/O: 500 microseconds; DMA: 20,000 microseconds'
+  ],
+  answer: 0,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: 'Under programmed I/O, the CPU is fully occupied for 4 microseconds per word for the entire transfer, giving 5000 x 4 = 20,000 microseconds of CPU time consumed with no other work possible during that period. Under DMA with cycle stealing, the CPU only loses 1 cycle (100 ns) per word to the DMA controller, and is free to execute its own instructions the rest of the time: total CPU time actually consumed by the DMA transfer is 5000 x 100 ns = 500,000 ns = 500 microseconds. The contrast is stark -- 20,000 microseconds of CPU time under programmed I/O versus only 500 microseconds under DMA, a 40x reduction -- which is exactly the performance argument for using DMA (rather than programmed I/O) whenever bulk data must move between a device and memory: it frees the CPU to do useful work throughout almost all of the transfer.'
 }
 );
