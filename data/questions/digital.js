@@ -1968,3 +1968,333 @@ window.GATE_DATA.questions['digital'].topics.find(function(t){return t.id==='dig
   explanation: "A positive-edge-triggered D flip-flop copies whatever value D holds at the instant of each rising clock edge into Q, and Q then holds that value until the next rising edge. Reading the D waveform at each dashed vertical line: at edge 1 (x=70) D has already risen to 1, so Q becomes 1. At edge 2 (x=130) D has fallen back to 0, so Q becomes 0. At edge 3 (x=190) D has risen to 1 again (and stays 1 through edges 3 and 4), so Q becomes 1. At edge 4 (x=250) D is still 1, so Q remains 1. At edge 5 (x=310) D has fallen to 0, so Q becomes 0. The resulting Q sequence is therefore 1, 0, 1, 1, 0, written as 10110. This question tests the key distinction between a D flip-flop (which simply follows D at the clock edge, unlike a latch that would continue tracking D whenever CLK is high) — a transparent latch would instead produce glitches whenever D changed while CLK was high, which does not apply here since the flip-flop is edge-triggered."
 }
 );
+
+window.GATE_DATA.questions['digital'].topics.find(function(t){return t.id==='digital-boolean';}).questions.push(
+{
+  id: 'digital-boolean-p1',
+  pyqYear: 2015,
+  q: "Simplify to a minimal sum-of-products form: f(A,B,C,D) = Σm(1,5,6,7,11,13,15) + d(3,9), where d denotes don't-care minterms.",
+  options: ["D + A'BC", "D + BC", "A'D + BC", "D + AB'C"],
+  answer: 0,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: "Plot the 1s at minterms 1, 5, 6, 7, 11, 13, 15 and mark 3 and 9 as don't-cares (X) on a 4-variable K-map. Every minterm with D=1 is {1,3,5,7,9,11,13,15}, and the ON-set plus don't-cares exactly fill this entire column (1,5,7,11,13,15 are 1s, and 3,9 are don't-cares treated as 1s to complete the group), so D by itself is a valid group of 8 covering all of them — a huge simplification using both don't-cares. The only 1 not yet covered is minterm 6 (0110), which is not in the D=1 column at all. Its only ON-set neighbour is minterm 7 (0111): both have A=0, B=1, C=1, differing only in D, so {6,7} forms a group giving the term A'BC (D is eliminated, and A, B, C stay fixed at 0,1,1). No larger group is possible for minterm 6, since minterm 4 (0100) and minterm 14 (1110) are neither 1s nor don't-cares. Hence the minimal SOP is D + A'BC — D handles every D=1 minterm and A'BC additionally covers minterm 6. Option 'D + BC' drops the A' literal, which would wrongly also claim to cover minterm 14 (1110, where BC=1 but the function is 0 there); check D+BC at minterm 14: D=0 and BC=1, giving 1, but f(14) is not in the ON-set, so this option is wrong. The other two options mis-assign a literal and fail to reproduce minterm 6 exactly."
+},
+{
+  id: 'digital-boolean-p2',
+  pyqYear: 2016,
+  q: "The minimal product-of-sums (POS) form of f(A,B,C,D) = ΠM(0,2,4,6,9,11,13,15) is:",
+  options: ["(A+D)(A'+D')", "(A+D')(A'+D)", "(A+B)(C+D)", "(B+D)(B'+D')"],
+  answer: 0,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: "For a POS problem, plot the maxterms (zeros of f) on the K-map and group them exactly as you would group 1s, then read each group as a sum term using the opposite literal convention: a variable that is 0 across the group contributes its true form, and a variable that is 1 contributes its complemented form. The zeros are at 0,2,4,6,9,11,13,15. Splitting by A: for A=0, zeros are 0,2,4,6 — all four minterms where D=0 (0000,0010,0100,0110), giving the group A'D' contributing sum term (A+D). For A=1, zeros are 9,11,13,15 — all four minterms where D=1 (1001,1011,1101,1111), giving group AD contributing sum term (A'+D'). Multiplying the two sum terms gives f = (A+D)(A'+D'), which expands to AD' + A'D, confirming this is exactly the XOR of A and D — a recognizable pattern where POS and SOP are dual two-term expressions of equal size. Option (A+D')(A'+D) swaps the roles of D and D' and would represent XNOR(A,D) instead — check by testing A=0,D=0: the true f is 0 there (minterm 0 is a zero), but (A+D')(A'+D) evaluates to (0+1)(1+0)=1, so it fails. The other two options group the wrong variable pair entirely and do not match the zero set."
+},
+{
+  id: 'digital-boolean-p3',
+  pyqYear: 2017,
+  q: "The number of distinct self-dual Boolean functions of 3 variables (functions f satisfying f(A,B,C) = [f(A',B',C')]' for every input) is ______.",
+  options: [],
+  answer: 16,
+  marks: 2,
+  difficulty: 'hard',
+  type: 'pyq-style',
+  kind: 'nat',
+  explanation: "Self-duality forces f(v) and f(complement of v) to always be different — the output at any input and the output at the bitwise-complemented input must be complementary. This pairs up the 2^3 = 8 input rows of a 3-variable truth table into 2^3/2 = 4 complementary pairs: {000,111}, {001,110}, {010,101}, {011,100}. Within each pair, once you decide the output at one member (0 or 1), the output at its partner is forced to be the opposite — so each pair contributes exactly 2 independent choices, and the 4 pairs are chosen independently of each other. This gives 2^4 = 16 self-dual functions of 3 variables. In general, for n variables there are 2^(n-1) such complementary pairs, giving 2^(2^(n-1)) self-dual functions — 4 for n=2, 16 for n=3, 256 for n=4. A useful sanity check: f = A (a single literal) is self-dual since A' complemented is A' as well... more directly, f=ABC+A'B'C' is NOT self-dual (check 000: f=1, complement input 111: f=1, so f and f' at 111 must differ, but f(111)=1 and its own complement would need to be 0 — actually verifying membership is easiest by the pairing rule above rather than by picking random examples)."
+},
+{
+  id: 'digital-boolean-p4',
+  pyqYear: 2018,
+  q: "For f(A,B,C,D) = Σm(0,1,2,5,6,7,8,9,10,14), the total number of prime implicants (counting every prime implicant, not just those needed in a minimal cover) is:",
+  options: ["4", "5", "6", "7"],
+  answer: 2,
+  marks: 2,
+  difficulty: 'hard',
+  type: 'pyq-style',
+  explanation: "Plotting all ten minterms on a 4-variable K-map and finding every maximal group (one that cannot be enlarged) gives six prime implicants: B'C' (covers 0,1,8,9), B'D' (covers 0,2,8,10), CD' (covers 2,6,10,14), A'C'D (covers 1,5), A'BD (covers 5,7), and A'BC (covers 6,7). Testing coverage: minterm 9 is reached only by B'C' (no other maximal group includes it), so B'C' is essential; minterm 14 is reached only by CD' (paired with 2, 6, 10, since all four have C=1, D=0), so CD' is essential too. The remaining minterms (1,2,5,6,7,8,10) each have at least two competing prime implicants covering them — for instance minterm 5 is reachable via both A'C'D and A'BD — so no further term is forced to be essential. All six groups are nonetheless legitimate maximal rectangles and therefore all six count as prime implicants, even though a minimal SOP only needs to pick enough of them (the two essential ones, plus one more to finish covering 1,2,5,6,7,8,10 completely) to finish the cover. This is exactly the trap the question is testing: 'prime implicant' counts every maximal rectangle on the map, while 'essential prime implicant' counts only the ones that are the sole cover for at least one minterm."
+},
+{
+  id: 'digital-boolean-p5',
+  pyqYear: 2019,
+  q: "For f(A,B,C,D) = Σm(0,2,3,4,5,7,8,10,11,15), the number of essential prime implicants is ______.",
+  options: [],
+  answer: 2,
+  marks: 2,
+  difficulty: 'hard',
+  type: 'pyq-style',
+  kind: 'nat',
+  explanation: "Grouping the ten ON-set minterms on a K-map yields six prime implicants in total, but only two of them are essential. The group B'D' covers {0,2,8,10} — all four minterms where B=0 and D=0 — and minterm 8 (1000) together with minterm 10 (1010) are reached by no other maximal group, so B'D' is essential. The group CD covers {3,7,11,15} — all four minterms where C=1 and D=1 — and minterm 15 (1111) is reached by no other maximal group, so CD is essential as well. The remaining ON-set minterms (2,3,4,5,7) are each covered by at least two competing prime implicants (such as A'C'D' for {4,5} or A'BD for {5,7}), so none of those groups is forced into every minimal cover — a minimal SOP can choose between them once B'D' and CD are already fixed. Hence exactly 2 prime implicants are essential, even though the total prime implicant count is larger. This distinction — total PIs versus essential PIs — is the single most repeated K-map subtlety in GATE Digital Logic."
+},
+{
+  id: 'digital-boolean-p6',
+  pyqYear: 2020,
+  q: "Which of the following gate sets are functionally complete on their own, using only the variables given (no constant 0 or 1 input is available)? (Select all that apply.)",
+  options: ["{NAND}", "{XOR, AND}", "{OR, AND}", "{NOR}"],
+  answers: [0, 3],
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  kind: 'msq',
+  explanation: "{NAND} is complete alone: NAND(x,x) = x' gives NOT, then AND is NOT(NAND(x,y)), and OR follows by De Morgan from NOT and AND — so all three basic operations are reachable. By the exact same argument {NOR} is complete alone: NOR(x,x) = x' gives NOT, OR is NOT(NOR(x,y)), and AND follows by De Morgan. {OR, AND} fails because both operations are monotone — increasing any input can never decrease the output — so no combination can ever produce an inverter; every function built purely from OR and AND of the input variables preserves the all-0 and all-1 rows exactly as they start (0 stays 0, 1 stays 1), which NOT violates. {XOR, AND} fails for a subtler reason: both XOR and AND output 0 when all their inputs are 0, so any circuit built from only these two gates, fed only the variables (no constant 1), must output 0 whenever every input variable is 0 — this is the 'preserves zero' property, and NOT does not preserve zero (NOT(0)=1), so it can never be built. Adding a constant-1 input would fix {XOR, AND}, since x⊕1 = x', but that input is explicitly excluded here."
+},
+{
+  id: 'digital-boolean-p7',
+  pyqYear: 2021,
+  q: "The minimum number of 2-input NAND gates required to implement F = A ⊕ B (XOR), using only A and B as available signals, is ______.",
+  options: [],
+  answer: 4,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  kind: 'nat',
+  explanation: "The standard 4-NAND XOR circuit is: gate 1 = NAND(A,B); gate 2 = NAND(A, gate1); gate 3 = NAND(B, gate1); gate 4 = NAND(gate2, gate3). Tracing all four input combinations confirms gate 4 equals A⊕B in every row. It is impossible to do it in 3 or fewer 2-input NAND gates — an exhaustive check of every way to wire at most 3 NAND gates fed only by A and B (allowing repeated use of a signal, which lets a gate act as an inverter) never reproduces the XOR truth table, because XOR is not expressible as a single level of NAND-NAND-NAND composition without an extra 'cross' term; the minimum provably needs the diamond structure shown above, and this exact gate-count result is one of the most frequently tested numbers in GATE Digital Logic. As a contrasting fact worth memorizing alongside this one: XNOR (A⊕B)' needs a 5th NAND gate (simply invert the 4-gate XOR output), while realizing XOR from NOR-only gates needs 5 gates and XNOR from NOR-only gates needs only 4 — NAND and NOR trade places between XOR and XNOR."
+},
+{
+  id: 'digital-boolean-p8',
+  pyqYear: 2022,
+  q: "Simplify to a minimal sum-of-products form: f(A,B,C,D) = Σm(2,3,10,11,14,15) + d(8,9).",
+  options: ["AC + B'C", "AC + AB'", "B'C + CD", "AB + B'C"],
+  answer: 0,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: "Plot the ON-set {2,3,10,11,14,15} and don't-cares {8,9} on a 4-variable K-map. Minterms 2,3,10,11 all have C=1,D can be either, and B=0 throughout (0010,0011,1010,1011), forming the group B'C (eliminating A and D). Minterms 10,11,14,15 all have A=1,C=1 (1010,1011,1110,1111), forming the group AC (eliminating B and D). Together B'C and AC cover all six ON-set minterms: B'C handles 2,3,10,11 and AC handles 10,11,14,15, with the overlap at 10,11 harmless. Neither group needs the don't-cares 8 or 9 to complete itself (they were available to enlarge groups but weren't required here, since B'C and AC already reach maximal size on their own), so the minimal SOP is exactly AC + B'C — a clean 2-term, 4-literal answer. Option 'AC + AB'' fails because AB' includes minterm 9 (1001, a don't-care, harmless) but also minterm 8 without covering 2 or 3, missing part of the ON-set entirely. Option 'B'C + CD' misses minterm 10 (1010, C=1 but D=0) is actually covered by B'C, but CD alone would incorrectly add minterm 7 if it existed and doesn't help cover 14; checking 14 (1110): CD requires D=1 which fails, so this option under-covers. Option 'AB + B'C' fails since AB (1100,1101,1110,1111 minus checks) does not correctly cover minterm 11 (1011, B=0, so AB is false there)."
+},
+{
+  id: 'digital-boolean-p9',
+  pyqYear: 2023,
+  q: "For the 3-variable function f(A,B,C) = Σm(0,3,5,6) (the XNOR/even-parity function), the total number of prime implicants is:",
+  options: ["2", "3", "4", "6"],
+  answer: 2,
+  marks: 1,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: "This function is the even-parity (XNOR-of-three) pattern: on a K-map it forms a checkerboard where every 1-cell is surrounded on all sides by 0-cells (000 borders 001,010,100 — all zeros; 011 borders 001,010,111 — all zeros; and so on for 101 and 110). Because no two ON-set minterms are ever adjacent, none of them can combine with each other into a group of size 2, so each individual minterm is itself a prime implicant — it is an implicant (trivially, a single cell is inside the ON-set) and it cannot be enlarged (every neighbour is a 0). With four ON-set minterms (0,3,5,6), there are exactly four prime implicants: A'B'C', A'BC, AB'C, ABC'. This is the general rule for any parity/XOR-type function of n variables: it has 2^(n-1) ON-set minterms, and because a checkerboard pattern never has two adjacent 1s, every one of those minterms is its own prime implicant, so the minimal SOP is simply the full sum of all 2^(n-1) minterms — parity functions never simplify below their canonical form, which is exactly why they are the worst-case input for K-map minimization exercises."
+},
+{
+  id: 'digital-boolean-p10',
+  pyqYear: 2024,
+  q: "The number of distinct self-dual Boolean functions of 4 variables is ______.",
+  options: [],
+  answer: 256,
+  marks: 2,
+  difficulty: 'hard',
+  type: 'pyq-style',
+  kind: 'nat',
+  explanation: "Using the general result derived for self-dual functions: a function of n variables is self-dual exactly when its output at every input v is the complement of its output at the bitwise-complemented input v'. The 2^n rows of the truth table split into 2^(n-1) complementary pairs (v, v'), and within each pair, fixing the output at one member automatically fixes the output at the other to be its complement — giving 2 independent choices per pair. With n=4, there are 2^4 = 16 rows forming 2^3 = 8 complementary pairs, and since the pairs are chosen independently, the total count is 2^8 = 256. This matches the general formula 2^(2^(n-1)): for n=2 it gives 4, for n=3 it gives 16 (as in an earlier question), and for n=4 it gives 256 — the numbers grow doubly-exponentially, which is why GATE only ever asks this for n=3 or n=4 and never higher. A quick way to remember which functions are guaranteed self-dual: any single literal (like A) and its complement (A') are always self-dual, since inverting all inputs of A gives A', and the overall complement of A' is A — consistent with the definition."
+},
+{
+  id: 'digital-boolean-p11',
+  pyqYear: 2025,
+  q: "The minimum number of 2-input NOR gates required to implement F = A ⊕ B (XOR), using only A and B as available signals, is ______.",
+  options: [],
+  answer: 5,
+  marks: 2,
+  difficulty: 'hard',
+  type: 'pyq-style',
+  kind: 'nat',
+  explanation: "Building XOR from NOR gates needs one more gate than building it from NAND gates, because NOR's natural two-level realization matches POS/AND-of-ORs while XOR's convenient decomposition (A B' + A' B) is naturally SOP-shaped and needs an extra inversion layer to convert. A working 5-gate NOR circuit is: gate1 = NOR(A,B); gate2 = NOR(A, gate1); gate3 = NOR(B, gate1); gate4 = NOR(gate2, gate3); gate5 = NOR(gate4, gate4) — the last gate simply inverts, since gate4 alone computes XNOR, and one more NOR-as-inverter flips it to XOR. An exhaustive search over all ways to wire up to 4 two-input NOR gates fed only by A and B (allowing a signal to feed both inputs of a gate, which realizes inversion) never reproduces the XOR truth table, confirming 5 is the true minimum. This is the mirror image of the earlier result that XOR needs only 4 NAND gates but XNOR needs 5 NAND gates: with NOR gates the roles swap, and XNOR is the one that only needs 4 while XOR needs 5. GATE has tested both the NAND-XOR (4) and NOR-XOR (5) counts, so memorize the pair together rather than just one number."
+},
+{
+  id: 'digital-boolean-p12',
+  pyqYear: 2026,
+  q: "The minimal sum-of-products form of f(A,B,C) = Σm(0,1,2,3,6) is:",
+  options: ["A' + BC'", "A' + BC", "B' + AC'", "A' + B'C"],
+  answer: 0,
+  marks: 1,
+  difficulty: 'easy',
+  type: 'pyq-style',
+  explanation: "Minterms 0,1,2,3 are exactly the four rows where A=0 (000,001,010,011), forming the group A' by themselves — a group of 4 that eliminates both B and C. The remaining minterm, 6 (110), is not covered by A' (since A=1 there) and its only ON-set neighbour is minterm 2 (010) — both have B=1,C=0 with A differing — giving the group BC' (eliminating A). No larger group is available for minterm 6 because minterm 7 (111) and minterm 4 (100) are not in the ON-set. So the minimal SOP is A' + BC', a two-term expression using 3 literals total. Option 'A' + BC' with BC instead of BC' would incorrectly also claim to cover minterm 7 (111), which is not in the given ON-set — check: A'+BC evaluated at A=1,B=1,C=1 gives 0+1=1, but f(7) is not listed as 1, so this option is wrong. Option 'B' + AC'' fails at minterm 2 (010): B'=0 and AC'=0 (since A=0), giving 0, but f(2)=1. Option 'A' + B'C' fails at minterm 6: A'=0 (A=1) and B'C=0 (B=1), giving 0, but f(6)=1."
+},
+{
+  id: 'digital-boolean-p13',
+  pyqYear: 2016,
+  q: "The Boolean expression PQ + P'R + QR simplifies to:",
+  options: ["PQ + P'R", "PQ + QR", "P'R + QR", "PQ + P'R + PR"],
+  answer: 0,
+  marks: 1,
+  difficulty: 'easy',
+  type: 'concept',
+  explanation: "This is a direct application of the consensus theorem: for terms XY + X'Z + YZ, the third term YZ is always redundant and can be dropped, because whenever Y=1 and Z=1, at least one of X or X' is 1, so one of the first two terms is already 1 there — YZ never contributes a row that isn't already covered. Here X=P, Y=Q, Z=R, so QR is the consensus term of PQ and P'R, and the expression reduces to PQ + P'R. Verify by truth table at the four rows where Q=1,R=1 (the rows QR would 'add'): if P=1, PQ=1 already covers it; if P=0, P'R=1 already covers it — so QR adds nothing new in any case. Option 'PQ + QR' incorrectly drops P'R instead of QR — check P=0,Q=0,R=1: original expression gives 0+1+0=1, but PQ+QR gives 0+0=0, so this option is wrong. Option 'P'R + QR' drops PQ and fails at P=1,Q=1,R=0. The last option adds a spurious extra term PR that changes nothing but is not the minimal form."
+},
+{
+  id: 'digital-boolean-p14',
+  pyqYear: 2022,
+  q: "Given a constant logic-1 signal in addition to the variables, which of the following gate sets becomes functionally complete?",
+  options: ["{XOR, AND, constant 1}", "{OR, AND, constant 1}", "{AND, constant 1} only", "{OR, constant 1} only"],
+  answer: 0,
+  marks: 1,
+  difficulty: 'medium',
+  type: 'concept',
+  explanation: "With a constant 1 available, {XOR, AND} becomes complete: NOT is realized as x ⊕ 1 = x' (since XOR-ing any signal with 1 flips it), AND is given directly, and OR follows from NOT and AND via De Morgan's law, x + y = (x'·y')'. All three primitive operations (NOT, AND, OR) are therefore reachable, so {XOR, AND, 1} is complete — this is exactly the basis used in the algebraic normal form (Zhegalkin polynomial) representation of Boolean functions, where every function is written as a sum of AND-terms combined with XOR. The other three options all stay incomplete even with the constant, for the same underlying reason: OR and AND are monotone functions (increasing any input can never decrease the output), and appending a fixed constant input does not break monotonicity — the output, viewed as a function of the true variables, still never decreases when a variable rises. NOT is the one basic operation that is not monotone (raising the input from 0 to 1 lowers the output from 1 to 0), so no combination of only OR, only AND, or OR-and-AND together, however many constant-1 wires are fed in, can ever realize it. This is why the constant alone never rescues a purely monotone gate set, while it does rescue XOR-based sets, since XOR is not monotone."
+}
+);
+
+window.GATE_DATA.questions['digital'].topics.find(function(t){return t.id==='digital-combinational';}).questions.push(
+{
+  id: 'digital-combinational-p1',
+  pyqYear: 2015,
+  q: "The function f(A,B,C) = Σm(0,2,4,5) is to be realized using a 4-to-1 multiplexer with A, B (A as MSB) as select lines and data inputs I0, I1, I2, I3. The correct assignment is:",
+  options: ["I0 = C', I1 = C', I2 = 1, I3 = 0", "I0 = C, I1 = C, I2 = 0, I3 = 1", "I0 = C', I1 = C, I2 = 1, I3 = 0", "I0 = 1, I1 = C', I2 = C', I3 = 0"],
+  answer: 0,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: "With select lines AB choosing which data input is routed, each group of two minterms sharing the same AB value determines one data input as a function of the leftover variable C. For AB=00 (minterms 0,1): only minterm 0 (C=0) is in the ON-set and minterm 1 (C=1) is not, so I0 must be 1 when C=0 and 0 when C=1 — that is I0 = C'. For AB=01 (minterms 2,3): only minterm 2 (C=0) is present, so I1 = C' as well. For AB=10 (minterms 4,5): both minterms 4 (C=0) and 5 (C=1) are in the ON-set, so the output must be 1 regardless of C — I2 = 1. For AB=11 (minterms 6,7): neither is in the ON-set, so I3 = 0. This residue method — for each select combination, compare the two candidate minterms against the ON-set to decide between 0, 1, C, or C' — is the standard technique for realizing any n-variable function on a 2^(n-1)-to-1 mux, and it is far faster than deriving the SOP first. Option (b) has every assignment complemented; option (c) mixes up C and C' for I1; option (d) shifts the whole pattern by one select combination."
+},
+{
+  id: 'digital-combinational-p2',
+  pyqYear: 2016,
+  q: "The minimum number of 2-to-1 multiplexers required to build a 16-to-1 multiplexer, using only 2-to-1 muxes arranged in a tree, is:",
+  options: ["8", "15", "16", "31"],
+  answer: 1,
+  marks: 1,
+  difficulty: 'easy',
+  type: 'pyq-style',
+  explanation: "A tree built from 2-to-1 muxes halves the number of data lines at every level: level 1 needs 8 muxes to merge the 16 inputs down to 8 lines, level 2 needs 4 muxes to merge those down to 4, level 3 needs 2 muxes down to 2, and level 4 needs 1 final mux down to the single output. Total = 8 + 4 + 2 + 1 = 15. This matches the general formula for building a 2^n-to-1 mux entirely from 2-to-1 muxes: it always takes exactly 2^n − 1 of them, mirroring a complete binary tree with 2^n leaves and 2^n − 1 internal nodes (each internal node is one 2-to-1 mux). For 16 = 2^4 this gives 16 − 1 = 15. Option (a) 8 is only the first level's mux count, forgetting the remaining levels. Option (c) 16 matches the number of data inputs, not the mux count. Option (d) 31 is the classic off-by-one error of computing 2×16 − 1 instead of 16 − 1, or equivalently miscounting one extra level."
+},
+{
+  id: 'digital-combinational-p3',
+  pyqYear: 2017,
+  q: "A 3-to-8 decoder (with outputs D0-D7) is used along with 2-input OR gates to realize f(A,B,C) = Σm(1,3,5,6). The minimum number of 2-input OR gates needed is:",
+  options: ["1", "2", "3", "4"],
+  answer: 2,
+  marks: 1,
+  difficulty: 'easy',
+  type: 'pyq-style',
+  explanation: "Every decoder output line D_i is exactly the minterm m_i of the inputs (one line goes high for each unique input combination), so realizing any SOP function reduces to ORing together the decoder outputs whose indices appear in the function's minterm list. Here we must OR four lines, D1, D3, D5 and D6. A tree of 2-input OR gates combining n signals always needs exactly n − 1 gates (each gate reduces the signal count by one, and you need to get from n down to 1): first OR D1 and D3 to get one signal, OR D5 and D6 to get a second signal, then OR those two partial results together — that is 3 gates total (2 first-level + 1 second-level). This generalizes the earlier mux-tree counting rule (n inputs need n−1 combining elements) to OR-gate trees combining decoder minterms. Option (a) 1 would only work if a single 4-input OR gate were allowed, but the question restricts to 2-input gates. Options (b) and (d) undercount or overcount the tree depth needed for exactly four signals."
+},
+{
+  id: 'digital-combinational-p4',
+  pyqYear: 2018,
+  q: "A 2-bit unsigned magnitude comparator compares A = A1A0 against B = B1B0. For A = 10 (decimal 2) and B = 01 (decimal 1), the comparator's three outputs (A>B, A<B, A=B) are:",
+  options: ["(1, 0, 0)", "(0, 1, 0)", "(0, 0, 1)", "(1, 1, 0)"],
+  answer: 0,
+  marks: 1,
+  difficulty: 'easy',
+  type: 'pyq-style',
+  explanation: "Magnitude comparison always starts from the most significant bit: if the MSBs differ, that single bit already decides the outcome and no lower bit is examined. Here A1 = 1 and B1 = 0 — they differ, and since A1 = 1 > B1 = 0, A is greater than B regardless of what A0 and B0 are. So (A>B, A<B, A=B) = (1, 0, 0), consistent with the decimal check 2 > 1. This MSB-first cascading rule is exactly how a multi-bit comparator is built from 1-bit comparator modules: the equality output of a higher-order stage gates whether the lower-order stage's comparison is even allowed to matter, so a difference detected higher up immediately locks in the final answer and no combinational path needs to examine the remaining bits at all. Option (b) reverses the direction of the inequality; option (c) wrongly claims equality despite the differing MSBs; option (d) asserts both A>B and A<B simultaneously, which is logically impossible for any comparator design."
+},
+{
+  id: 'digital-combinational-p5',
+  pyqYear: 2019,
+  q: "The 4-variable function f(A,B,C,D) = Σm(1,2,4,7,9,11,12,14) is realized on an 8-to-1 multiplexer using A, B, C (A as MSB) as select lines and D as the residual variable. The data input I5 (select ABC = 101) equals:",
+  options: ["0", "1", "D", "D'"],
+  answer: 2,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: "Select combination ABC = 101 corresponds to the minterm pair (m10, m11) — since D contributes the last bit, m10 = 1010 (D=0) and m11 = 1011 (D=1). Checking the ON-set {1,2,4,7,9,11,12,14}: minterm 10 is absent but minterm 11 is present. So the output must be 0 when D=0 and 1 when D=1 — that is exactly I5 = D. Working through the full mux this way for all eight select combinations gives I0=D, I1=D', I2=D', I3=D, I4=D, I5=D, I6=D', I7=D' — note I3, I4 and I5 all happen to equal D, while I1, I2, I6, I7 equal D', illustrating that a mux realization does not require each data input to be distinct. Option 'D'' would be the answer only if minterm 10 were present and minterm 11 absent, the opposite of the actual ON-set membership. Options 0 and 1 would require both or neither of {10, 11} to be present, which is not the case here."
+},
+{
+  id: 'digital-combinational-p6',
+  pyqYear: 2020,
+  q: "A 4-to-16 decoder is built by combining 3-to-8 decoders, each with a single active-high enable input, plus any necessary inverters. The minimum number of 3-to-8 decoder modules required is:",
+  options: ["1", "2", "3", "4"],
+  answer: 1,
+  marks: 1,
+  difficulty: 'easy',
+  type: 'pyq-style',
+  explanation: "A 4-to-16 decoder must produce 16 distinct output lines from 4 address bits, but each 3-to-8 decoder can only decode 3 of those bits into 8 lines at a time. The standard trick is to use the 4th (most significant) address bit to select which of two 3-to-8 decoders is active: feed the lower 3 bits to both decoders' address inputs in parallel, feed the MSB directly to one decoder's enable and its complement (via one inverter) to the other decoder's enable. When the MSB is 0, the first decoder is enabled and produces outputs D0-D7; when the MSB is 1, the second decoder is enabled and produces D8-D15 on the very same eight physical output lines relabeled. This needs exactly 2 decoder modules (plus 1 inverter, which is not counted among 'decoder modules'). This enable-controlled doubling is a general pattern: two n-to-2^n decoders with complementary enables build one (n+1)-to-2^(n+1) decoder, and it can be applied recursively — four 3-to-8 decoders (with a 2-to-4 decoder driving their enables) would build a 5-to-32 decoder, needing one extra doubling stage."
+},
+{
+  id: 'digital-combinational-p7',
+  pyqYear: 2021,
+  q: "A 4-bit magnitude comparator is built by cascading four 1-bit comparator stages, most-significant bit first, where each stage receives the (greater/less/equal) result of the more significant stage as an override. The correct cascading principle is:",
+  options: [
+    "A stage's own comparison is used only if every more-significant stage reported equality; otherwise the most-significant stage that found a difference determines the final result",
+    "Every stage's comparison result is simply ORed together regardless of position",
+    "Only the least significant bit's comparison matters; higher bits are ignored",
+    "Each stage overrides the next more significant stage's result if they disagree"
+  ],
+  answer: 0,
+  marks: 1,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: "Magnitude comparison is lexicographic from the most significant bit down: the first (most significant) bit position where A and B differ fully determines whether A is greater or less than B, and every less-significant bit becomes irrelevant once such a difference is found. So the correct cascade computes, for each bit position from MSB to LSB, 'is this the first position of disagreement, and if so which way does it go' — equivalently, a stage's own A>B or A<B verdict is only allowed to propagate to the final output if every stage above it (more significant) reported equality; the moment a more significant stage finds A≠B, that stage's verdict is final and cannot be overridden by any lower stage. This is exactly the opposite of option (d), which would incorrectly let less significant bits override more significant ones — that would make comparators nonsensical, since it would let a 1-bit difference in the ones place override a genuine difference in the highest bit. A plain OR of all stages (option b) cannot work either, since it does not respect precedence and could not correctly resolve conflicting less-significant signals."
+},
+{
+  id: 'digital-combinational-p8',
+  pyqYear: 2022,
+  q: "The minimum number of 4-to-1 multiplexers needed to build a 64-to-1 multiplexer, arranged as a tree of 4-to-1 muxes, is:",
+  options: ["16", "20", "21", "63"],
+  answer: 2,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: "Each 4-to-1 mux stage reduces the number of signal lines by a factor of 4, since it has 2 select bits handling 4 inputs at a time; building a 4^k-to-1 mux this way needs k levels. Here 64 = 4^3, so three levels are needed: the first level takes the 64 original inputs and needs 64/4 = 16 muxes to produce 16 intermediate signals; the second level takes those 16 signals and needs 16/4 = 4 muxes to produce 4 signals; the third level takes those 4 signals and needs 4/4 = 1 mux to produce the final single output. Total = 16 + 4 + 1 = 21. This matches the general formula for building a 4^k-to-1 mux entirely from 4-to-1 muxes: (4^k − 1)/3, giving (64−1)/3 = 21. Option (a) 16 only counts the first level. Option (b) 20 is an easy arithmetic slip (16+4=20, forgetting the final combining mux). Option (d) 63 confuses this with the '2-to-1 muxes needed for an m-to-1 mux' formula (m−1), which does not apply when the building block is 4-to-1 rather than 2-to-1."
+},
+{
+  id: 'digital-combinational-p9',
+  pyqYear: 2023,
+  q: "A single 3-to-8 decoder is shared to realize two functions: f1(A,B,C) = Σm(0,2,5) and f2(A,B,C) = Σm(1,3,6,7), each via its own tree of 2-input OR gates. The total number of 2-input OR gates required (summed over both functions) is:",
+  options: ["4", "5", "6", "7"],
+  answer: 1,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: "Each function needs an OR-gate tree combining as many decoder output lines as it has minterms, and combining n signals with 2-input OR gates always needs n − 1 gates. f1 has 3 minterms (0, 2, 5), so it needs 3 − 1 = 2 OR gates: OR two of the lines together, then OR that result with the third line. f2 has 4 minterms (1, 3, 6, 7), so it needs 4 − 1 = 3 OR gates, combined as a balanced tree (two first-level ORs feeding one second-level OR). The two functions do not share any OR gates since they depend on entirely disjoint sets of decoder lines (the decoder itself is the only shared resource). Total OR gates = 2 (for f1) + 3 (for f2) = 5. This question tests the same n−1 counting rule applied twice and then summed — a common way GATE combines two 'easy' sub-counts into one numerically trickier question. Option (a) 4 would result from miscounting f1 as needing only 1 gate; option (c) and (d) overcount by assuming an unbalanced or redundant tree structure."
+},
+{
+  id: 'digital-combinational-p10',
+  pyqYear: 2024,
+  q: "The 4-variable function f(A,B,C,D) = Σm(1,3,4,6,7) is realized on an 8-to-1 multiplexer with A, B, C as select lines (A as MSB) and D as the residual data variable. The correct data-input assignment (I0 through I7) is:",
+  options: [
+    "I0=C, I1=C, I2=C', I3=1, I4=0,I5=0,I6=0,I7=0",
+    "I0=D, I1=D, I2=D', I3=1, I4=0, I5=0, I6=0, I7=0",
+    "I0=0, I1=D, I2=D', I3=1, I4=0, I5=0, I6=0, I7=0",
+    "I0=D, I1=D', I2=D, I3=1, I4=0, I5=0, I6=0, I7=0"
+  ],
+  answer: 1,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: "With select ABC choosing the minterm pair and D the residual variable, check each ABC group against the ON-set {1,3,4,6,7}: ABC=000 gives minterms 0 (absent) and 1 (present), so the output is 0 when D=0, 1 when D=1 → I0 = D. ABC=001 gives minterms 2 (absent) and 3 (present) → I1 = D. ABC=010 gives minterms 4 (present) and 5 (absent) → I2 = D'. ABC=011 gives minterms 6 and 7, both present → I3 = 1. ABC=100 through 111 give minterms 8-15, none of which are in the ON-set, so I4 through I7 are all 0. This matches option (b) exactly. Option (a) mistakenly uses C instead of D as the residual variable, which is inconsistent since C is already consumed as a select line. Option (c) wrongly sets I0 = 0, missing that minterm 1 is present. Option (d) swaps I1 and I2's residual literal, which would incorrectly cover minterm 2 instead of minterm 3."
+},
+{
+  id: 'digital-combinational-p11',
+  pyqYear: 2025,
+  q: "An 8-to-3 priority encoder (inputs D0-D7, higher index = higher priority) has D1 = D3 = D5 = 1 and all other inputs 0. The 3-bit output code and the valid (V) flag are:",
+  options: ["101, V=1", "011, V=1", "111, V=1", "101, V=0"],
+  answer: 0,
+  marks: 1,
+  difficulty: 'easy',
+  type: 'pyq-style',
+  explanation: "A priority encoder ignores every active input except the highest-priority one — here, priority increases with index, so among the active lines D1, D3 and D5, only D5 (the highest index that is asserted) determines the output; D1 and D3 are simply overridden and have no further effect. The binary code for index 5 is 101, so the output lines are 1,0,1. Since at least one input is active, the valid flag V is asserted (V=1) to signal that the output code is meaningful — without V, a code of all-zero output would be ambiguous between 'no inputs active' and 'D0 is the only active input,' which is exactly why priority encoders always include a validity output. Option (b) 011 would be the code for index 3, wrongly treating D3 as the winner instead of the higher-priority D5. Option (c) 111 would be index 7, which is not active at all. Option (d) correctly identifies the code but wrongly reports V=0, which would falsely indicate no valid input despite three lines being active."
+},
+{
+  id: 'digital-combinational-p12',
+  pyqYear: 2026,
+  q: "A 4-bit equality comparator is built as four bitwise XNOR gates followed by a single tree of 2-input AND gates combining their outputs into one overall equality signal. The total number of 2-input gates (XNOR plus AND) required is:",
+  options: ["4", "6", "7", "8"],
+  answer: 2,
+  marks: 1,
+  difficulty: 'easy',
+  type: 'pyq-style',
+  explanation: "Each of the 4 bit positions needs its own XNOR gate to test 'this pair of bits is equal,' contributing 4 XNOR gates in total (one per bit, since XNOR(x,y) = 1 exactly when x=y). The four XNOR outputs must then all be ANDed together to assert overall equality only when every bit position matches; combining n signals with 2-input AND gates always needs n − 1 gates, so combining 4 XNOR outputs needs 4 − 1 = 3 AND gates arranged as a small tree (two first-level ANDs feeding one final AND). Total gate count = 4 (XNOR) + 3 (AND) = 7. Option (a) 4 counts only the XNOR stage and forgets the combining logic entirely. Option (b) 6 undercounts the AND tree by one (perhaps assuming a 4-input AND counts as one gate, which contradicts the 2-input-gate restriction stated in the question). Option (d) 8 overcounts by adding an unnecessary extra AND gate."
+},
+{
+  id: 'digital-combinational-p13',
+  pyqYear: 2017,
+  q: "Using the residue (mux realization) method, the minimum number of select lines required to realize any single Boolean function of 5 variables on one multiplexer is:",
+  options: ["2", "3", "4", "5"],
+  answer: 2,
+  marks: 1,
+  difficulty: 'easy',
+  type: 'pyq-style',
+  explanation: "The residue method realizes an n-variable function using a 2^(n-1)-to-1 multiplexer: n-1 of the variables drive the select lines (grouping the minterms into pairs), and the single remaining variable is folded into the data inputs as one of 0, 1, the variable itself, or its complement — since any pair of minterms differing only in that last variable can always be expressed this way. For n = 5 variables, this means n - 1 = 4 select lines are needed, driving a 2^4 = 16-to-1 multiplexer, with the 5th variable appearing across the sixteen data inputs. Using only 3 select lines would give an 8-to-1 mux with 2 residual variables per data input slot, which is not sufficient because a single data input (which can only be 0, 1, a variable, or its complement) cannot represent an arbitrary function of two leftover variables — some groupings would need I_k to equal something like C⊕D, which a plain mux data line cannot supply. So 4 is the minimum guaranteed to work for every possible 5-variable function, and it is also sufficient, since the residue method always succeeds with exactly n-1 selects."
+},
+{
+  id: 'digital-combinational-p14',
+  pyqYear: 2021,
+  q: "A 3-to-8 decoder's outputs are grouped into two OR gates: Z1 = OR(D1, D2, D4, D7) and Z2 = OR(D0, D3, D5, D6), where D0-D7 correspond to input combinations ABC = 000 through 111. For input ABC = 101, the values of (Z1, Z2) are:",
+  options: ["(1, 0)", "(0, 1)", "(1, 1)", "(0, 0)"],
+  answer: 1,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: "ABC = 101 is minterm 5, so decoder output D5 is the single line that goes high; every other decoder output stays low. D5 appears in the Z2 group (D0, D3, D5, D6), so Z2 = 1, while D5 does not appear in the Z1 group (D1, D2, D4, D7), so Z1 = 0. Stepping back, this decoder wiring is actually a parity generator: Z1's group {1,2,4,7} are exactly the minterms with an odd number of 1-bits (001, 010, 100, 111), so Z1 computes the odd-parity (XOR) of A, B, C, while Z2's group {0,3,5,6} are exactly the minterms with an even number of 1-bits, so Z2 computes the even-parity (XNOR) of A, B, C. Since 101 has two 1-bits (even), Z2 = 1 and Z1 = 0 is exactly what parity theory predicts, confirming the decoder trace. This is a common GATE construction: any decoder plus a partition of its outputs into two OR gates realizes some function and its complement simultaneously."
+}
+);

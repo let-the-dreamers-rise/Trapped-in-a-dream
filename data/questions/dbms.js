@@ -2449,3 +2449,774 @@ window.GATE_DATA.questions['dbms'].topics.find(function(t){return t.id==='dbms-t
   explanation: "The fundamental theorem for conflict serializability states that a schedule is conflict serializable if and only if its precedence graph is acyclic; when it is acyclic, any topological order of the graph gives an equivalent serial schedule. Here the arrows form T1 -> T2, T2 -> T3, and T3 -> T1, which is a directed cycle visiting all three transactions and returning to the start. A cycle means there is no consistent linear ordering of the transactions that respects every conflict simultaneously (T1 would need to precede T2, which would need to precede T3, which would need to precede T1 - a contradiction), so no equivalent serial schedule exists. Hence S is NOT conflict serializable. The mere presence of an edge between every pair of transactions (option D) is irrelevant to serializability - only the absence of a cycle matters."
 }
 );
+
+window.GATE_DATA.questions['dbms'].topics.find(function(t){return t.id==='dbms-er';}).questions.push(
+{
+  id: 'dbms-er-p1',
+  pyqYear: 2015,
+  q: 'Relation R(A, B, C, D, E, F) has exactly one candidate key {A, B, C}. How many superkeys does R have? (Enter your numerical answer.)',
+  options: [],
+  answer: 8,
+  kind: 'nat',
+  marks: 1,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: 'Every superkey of R must contain the unique candidate key {A, B, C}, because any attribute set that does not contain a candidate key cannot be guaranteed to determine all other attributes and hence cannot be a superkey here (with only one candidate key, no other minimal determining set exists). Once {A, B, C} is fixed inside a superkey, the remaining three attributes {D, E, F} may independently be included or excluded, since adding extra attributes to a key never destroys the uniqueness property. This gives 2 raised to the power 3 = 8 free choices, so there are exactly 8 superkeys in total: {A,B,C}, {A,B,C,D}, {A,B,C,E}, {A,B,C,F}, {A,B,C,D,E}, {A,B,C,D,F}, {A,B,C,E,F}, and {A,B,C,D,E,F}. This subset-counting technique (fix the candidate key, count free subsets of the rest) is the standard method for superkey counting whenever a relation has a single known candidate key.'
+},
+{
+  id: 'dbms-er-p2',
+  pyqYear: 2016,
+  q: 'An ER diagram has strong entity sets Student and Course, an M:N relationship set Enrolls (with descriptive attribute Grade) between them, and a weak entity set Address owned by Student through an identifying relationship. What is the minimum number of tables needed to map this diagram to the relational model? (Enter your numerical answer.)',
+  options: [],
+  answer: 4,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: 'Apply the standard ER-to-relational reduction rules one construct at a time. Student is a strong entity, so it gets its own table (1). Course is a strong entity, so it also gets its own table (2). Enrolls is an M:N relationship, and M:N relationships always require a separate junction table holding the primary keys of both participating entities plus any descriptive attributes (here, Grade); this cannot be merged into either side because each Student can enroll in many Courses and vice versa (3). Address is a weak entity owned by Student; a weak entity always needs its own table containing the owner (Student) key together with its own discriminator and attributes, since it has no independent key of its own (4). No further merging is possible because none of these constructs is a 1:1 or 1:N relationship that could be folded into an existing table. Hence the minimum table count is 4: Student, Course, Enrolls, and Address.'
+},
+{
+  id: 'dbms-er-p3',
+  pyqYear: 2017,
+  q: 'Relation R(P, Q, R, S, T) has exactly two candidate keys: {P} and {Q, R}. Using inclusion-exclusion over their supersets, how many superkeys does R have? (Enter your numerical answer.)',
+  options: [],
+  answer: 20,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'hard',
+  type: 'pyq-style',
+  explanation: 'Superkeys containing {P}: the remaining attributes {Q, R, S, T} (4 attributes) are each free, giving 2^4 = 16 superkeys. Superkeys containing {Q, R}: the remaining attributes {P, S, T} (3 attributes) are free, giving 2^3 = 8 superkeys. Superkeys containing BOTH candidate keys simultaneously, i.e. containing {P, Q, R}: the remaining attributes {S, T} (2 attributes) are free, giving 2^2 = 4 superkeys. By inclusion-exclusion, the total number of distinct superkeys is |containing P| + |containing QR| - |containing both| = 16 + 8 - 4 = 20. This double-counting correction is essential whenever a relation has more than one candidate key, since sets that are supersets of both keys would otherwise be counted twice.'
+},
+{
+  id: 'dbms-er-p4',
+  pyqYear: 2018,
+  q: 'Which of the following statements about weak entity sets in the ER model are TRUE? (Select ALL that apply)',
+  options: [
+    'A weak entity set has no candidate key formed purely from its own attributes',
+    'A weak entity always participates totally in its identifying relationship with the owner entity set',
+    'The primary key of the table derived from a weak entity is the owner entity key combined with the weak entity\'s discriminator',
+    'A weak entity set cannot have any attributes other than its discriminator'
+  ],
+  answers: [0, 1, 2],
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: 'Option A is true by definition: a weak entity set lacks a key built solely from its own attributes and instead has only a discriminator (partial key) that distinguishes it among entities owned by the same owner, not globally. Option B is true: because a weak entity cannot be identified without its owner, existence dependency forces total participation in the identifying relationship - every weak entity instance must be linked to exactly one owner. Option C is true and describes exactly how the weak entity table is built: since the discriminator alone is not globally unique, the owner\'s primary key must be appended to form a genuine primary key for the weak entity\'s table. Option D is false: a weak entity can have any number of additional descriptive attributes beyond the discriminator; for example, a Dependent weak entity might have a discriminator (name) plus attributes like date-of-birth and relationship-type.'
+},
+{
+  id: 'dbms-er-p5',
+  pyqYear: 2019,
+  q: 'Relation R(A, B, C, D) has exactly two candidate keys, {A} and {D}, each a single attribute. How many superkeys does R have? (Enter your numerical answer.)',
+  options: [],
+  answer: 12,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'hard',
+  type: 'pyq-style',
+  explanation: 'Superkeys containing {A}: the remaining attributes {B, C, D} (3 attributes) are free, giving 2^3 = 8 superkeys. Superkeys containing {D}: the remaining attributes {A, B, C} (3 attributes) are free, giving 2^3 = 8 superkeys. Superkeys containing BOTH {A} and {D}, i.e. containing {A, D}: the remaining attributes {B, C} (2 attributes) are free, giving 2^2 = 4 superkeys. By inclusion-exclusion, the total is 8 + 8 - 4 = 12 distinct superkeys. Note that this differs from simply adding 8 + 8 = 16, which would double-count every superkey that happens to contain both A and D (such as the full set {A,B,C,D} itself); the inclusion-exclusion correction of subtracting the overlap is mandatory whenever a relation has multiple candidate keys.'
+},
+{
+  id: 'dbms-er-p6',
+  pyqYear: 2020,
+  q: 'An ER design has strong entity sets Customer, Account and Branch. Relationship AccountAt is N:1 from Account to Branch with Account participating totally (every account belongs to exactly one branch). Relationship Owns is M:N between Customer and Account. What is the minimum number of tables in the relational mapping? (Enter your numerical answer.)',
+  options: [],
+  answer: 4,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: 'Customer gets its own table (strong entity) - count 1. Branch gets its own table (strong entity) - count 2. AccountAt is a 1:N (equivalently N:1) relationship with Account on the "many" side, so instead of a separate table the Branch key is pushed into the Account table as a foreign key (this works regardless of whether participation is total or partial, since 1:N relationships never need their own table) - Account becomes table 3, no separate AccountAt table needed. Owns is M:N between Customer and Account, which mandatorily needs its own junction table holding both keys - count 4. So the minimum is 4 tables: Customer, Branch, Account (with embedded branch FK), and Owns. The total-participation detail on AccountAt does not change the table count for a 1:N relationship; it would only matter if the relationship were 1:1.'
+},
+{
+  id: 'dbms-er-p7',
+  pyqYear: 2021,
+  q: 'An ER diagram has a single ternary relationship set Supplies among three strong entity sets Supplier, Part and Project, with a descriptive attribute Quantity on the relationship. What is the minimum number of tables needed to represent this diagram? (Enter your numerical answer.)',
+  options: [],
+  answer: 4,
+  kind: 'nat',
+  marks: 1,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: 'Each of the three strong entity sets Supplier, Part and Project gets its own table, since none of them can be merged into another (they are independent strong entities with their own keys), contributing 3 tables. A ternary (degree-3) relationship set cannot in general be folded into any one of the participating entity tables, unlike a binary 1:N relationship, because doing so would not correctly capture associations among all three entities simultaneously; it therefore requires its own table holding the primary keys of all three entities together with the descriptive attribute Quantity, contributing 1 more table. This brings the total to 3 + 1 = 4 tables: Supplier, Part, Project, and Supplies. This is the standard rule that ternary (and higher-degree) relationships almost always need a dedicated table, in contrast to binary 1:N relationships which can be absorbed via a foreign key.'
+},
+{
+  id: 'dbms-er-p8',
+  pyqYear: 2022,
+  q: 'Which of the following statements about primary keys and foreign keys in the relational model are TRUE? (Select ALL that apply)',
+  options: [
+    'A primary key attribute can never be NULL in any tuple of the relation',
+    'A foreign key attribute may be NULL even if the referenced attribute is a primary key in another relation, unless a NOT NULL constraint is added',
+    'A foreign key must reference a distinct relation; a relation can never have a foreign key referencing its own primary key',
+    'Two different tuples of a relation can never agree on the values of every candidate key of that relation'
+  ],
+  answers: [0, 1, 3],
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: 'Option A is true and is exactly the entity integrity constraint: primary key attributes must never be NULL, since the primary key is what identifies a tuple. Option B is true: referential integrity only constrains non-NULL foreign key values to match an existing referenced value; a NULL foreign key simply denotes "no reference yet" and is allowed by default, unless the designer explicitly forbids it with NOT NULL. Option C is false: self-referencing foreign keys are common and perfectly valid, for example an Employee table with a Manager column that references the primary key of the same Employee table (an employee\'s manager is also an employee). Option D is true by the very definition of a candidate key - uniqueness across all tuples for that attribute set - and this holds for every candidate key, not only the chosen primary key.'
+},
+{
+  id: 'dbms-er-p9',
+  pyqYear: 2023,
+  q: 'Relation R(A, B, C, D, E) has exactly two candidate keys, {A, B} and {A, C}. Using inclusion-exclusion, how many superkeys does R have? (Enter your numerical answer.)',
+  options: [],
+  answer: 12,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'hard',
+  type: 'pyq-style',
+  explanation: 'Superkeys containing {A, B}: the remaining attributes {C, D, E} (3 attributes) are free, giving 2^3 = 8 superkeys. Superkeys containing {A, C}: the remaining attributes {B, D, E} (3 attributes) are free, giving 2^3 = 8 superkeys. Superkeys containing both {A, B} and {A, C} simultaneously - note the union of these two sets is {A, B, C} - the remaining attributes {D, E} (2 attributes) are free, giving 2^2 = 4 superkeys. By inclusion-exclusion, total superkeys = 8 + 8 - 4 = 12. The key subtlety here is that the two candidate keys share the common attribute A, but this does not change the mechanics of inclusion-exclusion: the overlap term is always computed from the UNION of the two key attribute sets, which is {A, B, C} in this case, regardless of which attributes are shared.'
+},
+{
+  id: 'dbms-er-p10',
+  pyqYear: 2024,
+  q: 'An ER diagram uses specialization: superclass Vehicle (attributes VehicleID, RegNo) specializes disjointly and totally into subclasses Car (attribute NumDoors) and Truck (attribute LoadCapacity). Using the "one table per subclass, no separate superclass table" mapping rule (attribute-defined disjoint total specialization), what is the minimum number of tables needed? (Enter your numerical answer.)',
+  options: [],
+  answer: 2,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'hard',
+  type: 'pyq-style',
+  explanation: 'When a specialization is total (every Vehicle instance must belong to some subclass) and disjoint (no instance belongs to more than one subclass), one valid and commonly used mapping strategy is to eliminate the superclass table altogether and instead push all inherited superclass attributes down into each subclass table. Under this rule, Car\'s table holds VehicleID, RegNo, and NumDoors, while Truck\'s table holds VehicleID, RegNo, and LoadCapacity - two tables in total. This works only because totality guarantees every Vehicle appears in exactly one of the two tables (so no Vehicle information is lost) and disjointness guarantees no duplication across tables. Had the specialization been partial (some vehicles belong to neither subclass) or overlapping (a vehicle could be both), this two-table approach would either lose data or need modification, and a separate Vehicle superclass table would typically be required instead, raising the minimum to 3.'
+},
+{
+  id: 'dbms-er-p11',
+  pyqYear: 2025,
+  q: 'A relationship set Manages is 1:1 between Department and Employee, where Department participates totally (every department has exactly one manager) and Employee participates partially (not every employee manages a department). To map this to the relational model with the minimum number of tables, the relationship should be merged as a foreign key into:',
+  options: [
+    'The Department table, since it has total participation in the relationship',
+    'The Employee table, since it has total participation in the relationship',
+    'Either table; the choice never affects correctness or NULL behaviour',
+    'Neither table; a separate table is mandatory for every 1:1 relationship'
+  ],
+  answer: 0,
+  marks: 1,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: 'For a 1:1 relationship, the general rule is to merge the relationship as a foreign key into the side with TOTAL participation, because that guarantees the foreign key column is never NULL and every row on that side genuinely has a matching partner - here, every Department has a manager, so a ManagerID column on Department is always populated. Merging into Employee instead would be wasteful and would force NULLs, because most employees do not manage a department, so an "IsManagerOf" foreign key on Employee would be NULL for the majority of rows. Option C is wrong precisely because the choice does matter for minimizing NULLs and keeping the design clean. Option D is wrong because a separate table is only mandatory for M:N relationships; a 1:1 relationship, especially with one side total, can always be folded into an existing table without any loss of information, avoiding an unnecessary extra table.'
+},
+{
+  id: 'dbms-er-p12',
+  pyqYear: 2026,
+  q: 'Consider a weak entity set Room owned by strong entity set Building through identifying relationship LocatedIn. Which of the following is the correct primary key for the relational table derived from Room, given that Room\'s own discriminator is RoomNumber and Building\'s primary key is BuildingID?',
+  options: [
+    'RoomNumber alone, since it is Room\'s discriminator',
+    'The composite (BuildingID, RoomNumber), since RoomNumber alone only distinguishes rooms within the same building',
+    'BuildingID alone, inherited entirely from the owner entity',
+    'A new surrogate key must be introduced; discriminators can never form part of a primary key'
+  ],
+  answer: 1,
+  marks: 1,
+  difficulty: 'easy',
+  type: 'pyq-style',
+  explanation: 'A weak entity\'s discriminator (here, RoomNumber) is only guaranteed unique WITHIN the scope of a single owner - two different buildings can each have a "Room 101" without conflict. To obtain a value that is globally unique across the entire Room table, the owner\'s primary key must be concatenated with the discriminator, giving the composite primary key (BuildingID, RoomNumber). Option A fails because RoomNumber alone would create duplicate primary key values across different buildings, violating entity integrity. Option C fails because BuildingID alone cannot distinguish the multiple rooms within one building. Option D is false: using the owner key plus discriminator as a composite key is the standard, textbook approach for weak entities and does not require inventing an artificial surrogate key, though a surrogate key could optionally be added as an alternative design choice, it is never mandatory.'
+},
+{
+  id: 'dbms-er-p13',
+  pyqYear: 2016,
+  q: 'Relation R has 7 attributes and exactly one candidate key consisting of 4 attributes. How many superkeys does R have? (Enter your numerical answer.)',
+  options: [],
+  answer: 8,
+  kind: 'nat',
+  marks: 1,
+  difficulty: 'easy',
+  type: 'pyq-style',
+  explanation: 'With a single candidate key of size 4 out of 7 total attributes, every superkey must contain all 4 key attributes (since no smaller or unrelated set can guarantee uniqueness when there is only one candidate key), and the remaining 7 - 4 = 3 attributes may each independently be present or absent without affecting uniqueness, because a superset of a key is always itself a key. This gives 2^3 = 8 possible superkeys in total. This is the simplest form of the superkey-counting pattern that appears repeatedly across GATE papers: identify the single candidate key, subtract its size from the total attribute count to get the number of "free" attributes, and raise 2 to that power.'
+},
+{
+  id: 'dbms-er-p14',
+  pyqYear: 2022,
+  q: 'Which of the following statements about the entity integrity and referential integrity constraints are TRUE? (Select ALL that apply)',
+  options: [
+    'Entity integrity forbids NULL in any attribute that is part of the chosen primary key',
+    'Referential integrity is violated only when a non-NULL foreign key value has no matching value in the referenced relation\'s corresponding key',
+    'If a relation has multiple candidate keys, entity integrity requires all of them to be simultaneously NOT NULL',
+    'On deleting a referenced tuple, the DBMS must always cascade the delete to all referencing tuples'
+  ],
+  answers: [0, 1],
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: 'Option A correctly states entity integrity: NULL is disallowed specifically in attributes belonging to the PRIMARY key that was chosen, since it is the tuple identifier. Option B correctly and precisely states referential integrity: the constraint is only checked against non-NULL foreign key values; a NULL foreign key is exempt and simply represents an unset reference. Option C is false: entity integrity is defined only with respect to the chosen PRIMARY key, not every candidate key - alternate (non-primary) candidate keys are typically declared UNIQUE, which allows NULLs (in most SQL implementations, though this can vary), so there is no blanket NOT NULL requirement across all candidate keys. Option D is false: CASCADE is only one of several possible ON DELETE behaviours; the default in standard SQL is NO ACTION (reject the delete), and RESTRICT or SET NULL are other alternatives - cascading is never mandatory.'
+}
+);
+
+window.GATE_DATA.questions['dbms'].topics.find(function(t){return t.id==='dbms-ra-sql';}).questions.push(
+{
+  id: 'dbms-ra-sql-p1',
+  pyqYear: 2015,
+  q: 'Emp(EmpID, DeptID) has rows (1,10), (2,10), (3,20), (4,30), (5,10). Dept(DeptID, DeptName) has rows (10, HR), (20, IT). How many tuples does the natural join Emp NATURAL JOIN Dept produce? (Enter your numerical answer.)',
+  options: [],
+  answer: 4,
+  kind: 'nat',
+  marks: 1,
+  difficulty: 'easy',
+  type: 'pyq-style',
+  explanation: 'Natural join matches tuples from Emp and Dept whenever their common attribute DeptID agrees, keeping only one copy of that attribute. Scanning Emp: EmpID 1 (DeptID 10) matches Dept row (10,HR); EmpID 2 (DeptID 10) also matches (10,HR); EmpID 3 (DeptID 20) matches (20,IT); EmpID 4 (DeptID 30) has NO matching row in Dept since Dept only lists 10 and 20, so it is dropped entirely (natural join is an inner join by default); EmpID 5 (DeptID 10) matches (10,HR). This yields exactly 4 result tuples: (1,10,HR), (2,10,HR), (3,20,IT), (5,10,HR). The employee with DeptID 30 illustrates the key trap in join-counting questions - any tuple whose join attribute value does not appear on the other side is silently excluded from an inner/natural join.'
+},
+{
+  id: 'dbms-ra-sql-p2',
+  pyqYear: 2016,
+  q: 'Using the same Emp(EmpID, DeptID) rows (1,10), (2,10), (3,20), (4,30), (5,10) and Dept(DeptID, DeptName) rows (10, HR), (20, IT), how many tuples does Emp LEFT OUTER JOIN Dept (on DeptID) produce? (Enter your numerical answer.)',
+  options: [],
+  answer: 5,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: 'A LEFT OUTER JOIN preserves every tuple of the left relation (Emp) regardless of whether a match exists on the right (Dept), padding unmatched attributes with NULL. Since each Emp tuple\'s DeptID matches AT MOST one Dept tuple (Dept has no duplicate DeptID values), every Emp row contributes exactly one output row: four rows get a real DeptName (EmpID 1,2,3,5), and EmpID 4 (DeptID 30, which does not exist in Dept) still appears, but with DeptName = NULL. So the total row count equals the number of Emp rows, which is 5 - unlike the natural (inner) join in the companion question, which drops the unmatched row and yields only 4. This contrast is exactly the pattern GATE tests: outer joins never lose tuples from the preserved side, while inner/natural joins can.'
+},
+{
+  id: 'dbms-ra-sql-p3',
+  pyqYear: 2017,
+  q: 'Employee(EmpID, ManagerID) has rows (1, NULL), (2, 1), (3, 1), (4, 2), (5, 2), (6, 3), where every non-NULL ManagerID value refers to an existing EmpID. A self-join query pairs each employee with their manager: SELECT E.EmpID, M.EmpID FROM Employee E, Employee M WHERE E.ManagerID = M.EmpID. How many result tuples does this produce? (Enter your numerical answer.)',
+  options: [],
+  answer: 5,
+  kind: 'nat',
+  marks: 1,
+  difficulty: 'easy',
+  type: 'pyq-style',
+  explanation: 'This self-join pairs each employee E with the employee M who is their manager, matched via E.ManagerID = M.EmpID. Employee 1 has ManagerID = NULL, and the equality NULL = M.EmpID always evaluates to UNKNOWN for every M, so employee 1 never satisfies the WHERE clause and contributes zero output rows (the standard SQL WHERE clause discards UNKNOWN rows just like FALSE rows). Every other employee (2, 3, 4, 5, 6) has a valid non-NULL ManagerID that matches exactly one existing EmpID in the table, so each contributes exactly one output row. That gives 5 result tuples total: (2,1), (3,1), (4,2), (5,2), (6,3). The NULL ManagerID is the deliberate trap here - a beginner might expect 6 rows (one per employee) but the top-level employee with no manager is correctly excluded.'
+},
+{
+  id: 'dbms-ra-sql-p4',
+  pyqYear: 2018,
+  q: 'Table Orders(CustID) contains the values 1, 2, NULL, 3 (one row with a NULL CustID). Table Customers(CustID) contains 1, 2, 3, 4, 5. How many rows does "SELECT * FROM Customers WHERE CustID NOT IN (SELECT CustID FROM Orders)" return?',
+  options: ['0', '2 (CustID 4 and 5)', '5 (all customers)', 'Error: the query cannot execute'],
+  answer: 1,
+  marks: 2,
+  difficulty: 'hard',
+  type: 'pyq-style',
+  explanation: 'This is the classic NOT IN with NULL trap. Semantically, "X NOT IN (a, b, NULL, c)" expands to "X <> a AND X <> b AND X <> NULL AND X <> c". The comparison X <> NULL always evaluates to UNKNOWN, regardless of what X is, and UNKNOWN combined with AND against anything can only produce TRUE if every other term is TRUE and none is UNKNOWN or FALSE - but "AND UNKNOWN" can never yield TRUE (TRUE AND UNKNOWN = UNKNOWN, not TRUE). So the entire WHERE condition evaluates to UNKNOWN or FALSE for every single customer row, and rows evaluating to UNKNOWN are excluded by the WHERE clause just like FALSE rows. The net effect is that NOT IN against a subquery containing even one NULL silently returns ZERO rows, no matter how many "genuinely non-matching" values like 4 and 5 exist. The correct, NULL-safe alternative is NOT EXISTS with a correlated subquery.'
+},
+{
+  id: 'dbms-ra-sql-p5',
+  pyqYear: 2019,
+  q: 'Which of the following statements about SQL three-valued logic (TRUE, FALSE, UNKNOWN) are TRUE? (Select ALL that apply)',
+  options: [
+    'NULL = NULL evaluates to UNKNOWN, not TRUE',
+    'TRUE OR UNKNOWN evaluates to TRUE',
+    'NOT UNKNOWN evaluates to FALSE',
+    'A WHERE clause includes a row only when its condition evaluates to TRUE (rows evaluating to UNKNOWN are excluded)'
+  ],
+  answers: [0, 1, 3],
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: 'Option A is true: NULL represents an unknown or missing value, so comparing two NULLs asks "are these two unknown things equal?", which cannot be answered TRUE or FALSE and is defined as UNKNOWN - this is precisely why SQL provides IS NULL instead of = NULL for testing nullity. Option B is true by the short-circuit-like definition of three-valued OR: if one operand is definitely TRUE, the overall disjunction is TRUE regardless of the other operand\'s uncertainty (TRUE OR anything = TRUE). Option C is false: NOT UNKNOWN evaluates to UNKNOWN, not FALSE - negating an unknown value keeps it unknown, it does not flip it to a definite value. Option D is true and is the operational rule that explains many NULL-related surprises: only rows where the predicate is definitely TRUE survive a WHERE filter; both FALSE and UNKNOWN rows are dropped.'
+},
+{
+  id: 'dbms-ra-sql-p6',
+  pyqYear: 2020,
+  q: 'Enroll(StudID, CourseID) has rows: (S1,C1), (S1,C2), (S1,C3), (S2,C1), (S2,C2), (S3,C1), (S3,C2), (S3,C3), (S3,C4). Using the relational algebra division operator, how many students have taken ALL of the courses {C1, C2, C3}? (Enter your numerical answer.)',
+  options: [],
+  answer: 2,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'hard',
+  type: 'pyq-style',
+  explanation: 'The division operator R / S returns exactly those values of the non-shared attribute of R (here StudID) that are paired with EVERY value in S (here {C1, C2, C3}). Check S1: enrolled in {C1, C2, C3} - contains all three required courses, so S1 qualifies. Check S2: enrolled in {C1, C2} - missing C3, so S2 does NOT qualify (having only a subset is not enough). Check S3: enrolled in {C1, C2, C3, C4} - contains all three required courses (the extra C4 is irrelevant to division, since division only requires the divisor set to be a SUBSET of what the dividend value is paired with, not an exact match). So S3 qualifies. That gives exactly 2 qualifying students: S1 and S3. The trap here is S2, who takes two of the three required courses but must be excluded since division requires ALL of them.'
+},
+{
+  id: 'dbms-ra-sql-p7',
+  pyqYear: 2021,
+  q: 'EmpSal(EmpID, DeptID, Salary) has rows (1,10,50), (2,10,70), (3,10,90), (4,20,60), (5,20,80). A correlated subquery selects employees whose salary exceeds the AVERAGE salary of their own department: SELECT E.EmpID FROM EmpSal E WHERE E.Salary > (SELECT AVG(Salary) FROM EmpSal WHERE DeptID = E.DeptID). How many rows does this return? (Enter your numerical answer.)',
+  options: [],
+  answer: 2,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'hard',
+  type: 'pyq-style',
+  explanation: 'This is a correlated subquery: the inner AVG(Salary) is re-evaluated separately for each outer row E, restricted to E\'s own department (WHERE DeptID = E.DeptID). For department 10, the salaries are 50, 70, 90, giving an average of (50+70+90)/3 = 70; among these, only Salary 90 (EmpID 3) exceeds 70. For department 20, the salaries are 60, 80, giving an average of (60+80)/2 = 70; among these, only Salary 80 (EmpID 5) exceeds 70. Employees with Salary 50, 70, and 60 do not exceed their respective department averages, since 70 equals (not exceeds) department 10\'s average and 50, 60 are below their departmental averages. So exactly 2 rows are returned: EmpID 3 and EmpID 5. This "salary greater than departmental average" pattern is one of the most frequently tested correlated-subquery templates.'
+},
+{
+  id: 'dbms-ra-sql-p8',
+  pyqYear: 2022,
+  q: 'Orders(CustID, Amount) has 10 rows total, grouped by CustID as: customer A places 3 orders, B places 1, C places 4, D places 2. How many customers satisfy "SELECT CustID FROM Orders GROUP BY CustID HAVING COUNT(*) > 2"? (Enter your numerical answer.)',
+  options: [],
+  answer: 2,
+  kind: 'nat',
+  marks: 1,
+  difficulty: 'easy',
+  type: 'pyq-style',
+  explanation: 'GROUP BY CustID first partitions the 10 Orders rows into groups sharing the same CustID: group A has 3 rows, group B has 1 row, group C has 4 rows, group D has 2 rows (3+1+4+2 = 10, consistent with the total). The HAVING clause then filters these GROUPS (not individual rows) by the condition COUNT(*) > 2, i.e. keep only groups with strictly more than 2 orders. Group A has 3 > 2, so it survives. Group B has 1, which fails. Group C has 4 > 2, so it survives. Group D has 2, which does NOT satisfy the strict inequality (2 is not greater than 2), so it fails. That leaves exactly 2 qualifying customers: A and C. The key distinction to remember is that HAVING filters post-aggregation groups, whereas WHERE would filter individual rows before grouping.'
+},
+{
+  id: 'dbms-ra-sql-p9',
+  pyqYear: 2023,
+  q: 'Which of the following statements about EXISTS and NOT EXISTS correlated subqueries are TRUE? (Select ALL that apply)',
+  options: [
+    'EXISTS returns TRUE as soon as the correlated subquery produces at least one row, regardless of whether any of its column values are NULL',
+    'NOT EXISTS, unlike NOT IN, behaves correctly (is NULL-safe) even when the subquery result contains NULL values in its selected column',
+    'An EXISTS subquery is typically written as SELECT * FROM ... because the actual column list of the subquery does not affect the EXISTS result',
+    'EXISTS and NOT EXISTS can only be used with subqueries that reference an outer query column (i.e. they must be correlated)'
+  ],
+  answers: [0, 1, 2],
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: 'Option A is true: EXISTS only checks for ROW EXISTENCE, not the truth value of any particular column, so it returns TRUE the moment the subquery produces any row at all, NULLs and all. Option B is true and is precisely why NOT EXISTS is the recommended NULL-safe replacement for the NOT IN pitfall: NOT EXISTS negates a row-existence test rather than performing per-value comparisons against potentially-NULL values, so it is immune to the "poisoning" effect that a single NULL causes in NOT IN. Option C is true: because EXISTS cares only about whether rows exist, not their content, the convention SELECT * or even SELECT 1 inside the EXISTS subquery is standard practice and has no effect on the result. Option D is false: EXISTS/NOT EXISTS subqueries are USUALLY correlated in practice (that is where they are most useful), but nothing in the SQL syntax or semantics forbids an uncorrelated EXISTS subquery - it would just always return the same TRUE/FALSE value for every outer row.'
+},
+{
+  id: 'dbms-ra-sql-p10',
+  pyqYear: 2024,
+  q: 'Relation R has 5 tuples and relation S has 4 tuples, both union-compatible. Exactly 2 tuples are identical between R and S. How many tuples does R UNION S (the SQL set-union, which eliminates duplicates) produce? (Enter your numerical answer.)',
+  options: [],
+  answer: 7,
+  kind: 'nat',
+  marks: 1,
+  difficulty: 'easy',
+  type: 'pyq-style',
+  explanation: 'SQL\'s UNION operator (without ALL) computes the SET union of the two tuple collections, meaning any tuple that appears in both R and S is included only ONCE in the final result, not twice. If R and S were simply concatenated with UNION ALL, the count would be 5 + 4 = 9 tuples, including duplicate copies of the 2 common tuples. But plain UNION removes duplicates, so those 2 common tuples collapse from 2 copies down to 1 copy each, subtracting 2 from the naive sum: 5 + 4 - 2 = 7 distinct tuples. This mirrors set-theoretic |A union B| = |A| + |B| - |A intersect B|, where the intersection here has exactly 2 tuples. Forgetting to subtract the overlap (and reporting 9 instead) is the most common error on this style of question; remembering that UNION ALL, not UNION, is the operator that would legitimately give 9, helps avoid the mistake.'
+},
+{
+  id: 'dbms-ra-sql-p11',
+  pyqYear: 2025,
+  q: 'EmpSal(Salary) contains values 50, 70, 90, 60, 80 (attribute DeptID omitted here); the subset with DeptID = D2 has salaries {60, 80}. How many rows satisfy "Salary > ALL (SELECT Salary FROM EmpSal WHERE DeptID = \'D2\')"? (Enter your numerical answer.)',
+  options: [],
+  answer: 1,
+  kind: 'nat',
+  marks: 1,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: '"> ALL (subquery)" requires a value to be strictly greater than EVERY value the subquery returns - equivalently, greater than the MAXIMUM of the subquery result. The D2 subquery returns {60, 80}, whose maximum is 80, so the condition reduces to Salary > 80. Scanning the five salaries: 50 fails, 70 fails, 90 satisfies (90 > 80), 60 fails, 80 fails (80 is not strictly greater than 80). Exactly 1 row (Salary = 90) satisfies the condition. Contrast this with "> ANY (subquery)", which only requires being greater than the MINIMUM of the subquery result (here, greater than 60); that weaker condition would instead be satisfied by 70, 90, and 80 - three rows. Mixing up ALL (compare against the extreme that makes the condition hardest to satisfy) and ANY (compare against the extreme that makes it easiest) is the central trap of this question type.'
+},
+{
+  id: 'dbms-ra-sql-p12',
+  pyqYear: 2026,
+  q: 'Relation R(A, B) has 4 tuples and relation S(C, D) has 3 tuples, with no join condition applied. How many tuples does the Cartesian product R x S produce, and which relational algebra expression is equivalent to R NATURAL JOIN S when R and S share NO common attribute names at all?',
+  options: [
+    '7 tuples; natural join is undefined when there are no common attributes',
+    '12 tuples; natural join degenerates to the Cartesian product R x S when there are no common attributes',
+    '12 tuples; natural join always returns zero tuples when there are no common attributes',
+    '7 tuples; natural join returns the union of R and S in this case'
+  ],
+  answer: 1,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: 'The Cartesian product pairs every tuple of R with every tuple of S, giving |R| times |S| = 4 times 3 = 12 tuples - this rules out both options claiming 7 (which would be the SUM 4+3, relevant to union, not product). For the natural join question: natural join equates and merges attributes with the SAME NAME across the two relations. When R and S share no common attribute names whatsoever, there are no equality conditions to enforce and no columns to merge, so by definition the natural join degenerates exactly to the unrestricted Cartesian product, producing all 12 combinations, not zero. The "zero tuples" option confuses natural join\'s behavior with what would happen if there WERE a shared attribute but no matching values; here there is no shared attribute at all, so no filtering happens whatsoever, and the full cross product survives unchanged.'
+},
+{
+  id: 'dbms-ra-sql-p13',
+  pyqYear: 2017,
+  q: 'Which of the following relational algebra identities are valid for all relations R, S and predicate p (assuming type-compatibility where required)? (Select ALL that apply)',
+  options: [
+    'sigma_p(R union S) = sigma_p(R) union sigma_p(S), when R and S are union-compatible',
+    'pi_A(R union S) = pi_A(R) union pi_A(S)',
+    'sigma_p(R join S) = sigma_p(R) join S, when p refers only to attributes of R',
+    'R join S = S join R always produces tuples in the identical column order with no need for renaming'
+  ],
+  answers: [0, 1, 2],
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: 'Option A is a valid identity: selection distributes over union because a tuple in R union S satisfies predicate p if and only if it came from R and satisfied p there, or came from S and satisfied p there - filtering before or after unioning gives the same set. Option B is valid for the same reason: projection distributes over union, since projecting a union of tuple sets onto attribute A is the same as projecting each set separately and then unioning the (possibly overlapping, but set-union removes duplicates) results. Option C is valid and is a standard query-optimization rule called "pushing selections through joins": if the filter predicate p mentions only R\'s attributes, it can be applied to R before the join without changing the final result, since it would have removed exactly the same tuples after the join anyway - this reduces the size of the join input. Option D is false: while natural join is commutative in terms of the tuple content and logical result, the physical column ORDER produced by R join S versus S join R can differ across implementations, so no such invariant about identical column ordering is guaranteed.'
+},
+{
+  id: 'dbms-ra-sql-p14',
+  pyqYear: 2019,
+  q: 'Enroll(StudID, CourseID) has rows (S1,C1), (S1,C2), (S2,C1), (S3,C1), (S3,C2), (S3,C3). A nested subquery finds students enrolled in strictly MORE courses than student S2: SELECT StudID FROM Enroll GROUP BY StudID HAVING COUNT(*) > (SELECT COUNT(*) FROM Enroll WHERE StudID = \'S2\'). How many students satisfy this? (Enter your numerical answer.)',
+  options: [],
+  answer: 2,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: 'First evaluate the uncorrelated inner subquery: COUNT(*) FROM Enroll WHERE StudID = \'S2\' counts S2\'s enrollment rows, which is 1 (only (S2,C1)). This inner value does not depend on the outer GROUP BY at all, so it is computed once as a constant, 1, before the outer query runs. Now the outer query groups Enroll by StudID and counts each group\'s size: S1 has 2 rows (C1, C2), S2 has 1 row, S3 has 3 rows (C1, C2, C3). The HAVING clause keeps only groups whose count exceeds this constant 1: S1 with count 2 qualifies (2 > 1), S2 with count 1 does not (1 is not strictly greater than 1 - a student trivially cannot enroll in more courses than themselves), and S3 with count 3 qualifies (3 > 1). That gives exactly 2 qualifying students, S1 and S3. The pattern to remember is that an uncorrelated scalar subquery inside HAVING is computed once as a fixed threshold and then compared against every group\'s aggregate independently.'
+}
+);
+
+window.GATE_DATA.questions['dbms'].topics.find(function(t){return t.id==='dbms-normalization';}).questions.push(
+{
+  id: 'dbms-normalization-p1',
+  pyqYear: 2015,
+  q: 'R(A, B, C, D) has FDs: AB -> C, C -> D, D -> A. How many candidate keys does R have? (Enter your numerical answer.)',
+  options: [],
+  answer: 3,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'hard',
+  type: 'pyq-style',
+  explanation: 'Compute closures of candidate combinations. (AB)+: start {A,B}; AB->C fires, add C -> {A,B,C}; C->D fires, add D -> {A,B,C,D} = all attributes, so AB is a superkey, and it is minimal since A+ = {A} and B+ = {B} give nothing. (BC)+: start {B,C}; C->D fires -> {B,C,D}; now we have B and D, but AB->C needs A which is absent, D->A fires (D alone determines A) -> add A -> {A,B,C,D} = all, so BC is a superkey; minimality holds since B+={B} and C+={C,D,A} via C->D->A giving {A,C,D}, missing B, so C alone is not a superkey either. (BD)+: start {B,D}; D->A fires -> {A,B,D}; now AB->C fires (A,B present) -> add C -> {A,B,C,D} = all, so BD is a superkey; minimality holds similarly. Testing shows exactly three minimal superkeys: {A,B}, {B,C}, {B,D} - so R has 3 candidate keys.'
+},
+{
+  id: 'dbms-normalization-p2',
+  pyqYear: 2016,
+  q: 'R(A, B, C, D, E) has FDs: A -> BC, CD -> E, B -> D, E -> A. Compute the attribute closure {C, D}+ using the standard closure algorithm. How many attributes does the closure contain? (Enter your numerical answer.)',
+  options: [],
+  answer: 5,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: 'Apply the closure algorithm starting from result = {C, D}. Check each FD: CD -> E has its LHS {C,D} already inside result, so add E, giving result = {C, D, E}. Check again: E -> A has its LHS {E} inside result, so add A, giving result = {A, C, D, E}. Check again: A -> BC has its LHS {A} inside result, so add B and C (C already present, only B is new), giving result = {A, B, C, D, E}. Check again: B -> D has its LHS {B} inside result, but D is already present, so nothing new is added. No further FD can fire, so the fixed point is reached with all 5 attributes of R present. Hence {C,D}+ = {A,B,C,D,E}, containing all 5 attributes, which also means CD is a superkey of R (and in fact one of its candidate keys, since removing either C or D breaks the derivation chain).'
+},
+{
+  id: 'dbms-normalization-p3',
+  pyqYear: 2017,
+  q: 'R(A, B, C, D) has the FDs: A -> B, A -> C, C -> D. The only candidate key is {A}. What is the highest normal form satisfied by R?',
+  options: ['1NF', '2NF', '3NF', 'BCNF'],
+  answer: 1,
+  marks: 2,
+  difficulty: 'hard',
+  type: 'pyq-style',
+  explanation: 'Since the sole candidate key {A} is a single attribute, no partial dependency is even possible (a singleton key has no non-empty proper subset), so R automatically satisfies 2NF once it is in 1NF. Now test 3NF: the FD C -> D has determinant C, which is NOT a superkey (C+ = {C, D} only, missing A and B), so the exception clause requires D to be a prime attribute; but the only candidate key is {A}, so D is non-prime, and 3NF is violated by this transitive dependency A -> C -> D. Since 3NF already fails, BCNF (a strictly stronger condition) must also fail; indeed C -> D independently violates BCNF too, since C is not a superkey there either. Therefore the highest normal form R satisfies is 2NF - it clears 2NF cleanly but is tripped up by the transitive dependency C -> D at the 3NF boundary.'
+},
+{
+  id: 'dbms-normalization-p4',
+  pyqYear: 2018,
+  q: 'R(A, B, C) has FDs F = {A -> B, B -> C}. It is decomposed into R1(A, B) and R2(B, C). Which of the following correctly evaluates this decomposition?',
+  options: [
+    'Lossless-join, because the common attribute B fully determines R2 (B -> C, and R2 consists exactly of B and C)',
+    'Lossy, because the common attribute B does not determine all of R1',
+    'Lossless-join only if an additional attribute is added to R2',
+    'The decomposition cannot be evaluated without also knowing the candidate keys of R1 and R2'
+  ],
+  answer: 0,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: 'The lossless-join test for a binary decomposition into R1 and R2 requires that the common attribute set, here {B}, functionally determine ALL of R1\'s attributes OR ALL of R2\'s attributes (not necessarily both). Compute B+ under F: start {B}; B -> C fires, giving {B, C}; no further FD applies (A -> B needs A, which is absent). So B+ = {B, C}, which exactly equals the attribute set of R2 = {B, C}. Since B determines all of R2, the decomposition is guaranteed lossless-join - rejoining R1 and R2 via natural join on B reproduces exactly the original tuples of R with no spurious extra rows. Option B incorrectly focuses on R1, but the lossless test only needs ONE side to be fully determined, and R2 already satisfies it, so the decomposition passes regardless of what happens with R1.'
+},
+{
+  id: 'dbms-normalization-p5',
+  pyqYear: 2019,
+  q: 'Using the same R(A, B, C) with F = {A -> B, B -> C}, decomposed into R1(A, B) and R2(B, C), is this decomposition dependency-preserving?',
+  options: [
+    'Yes, because F1 = {A -> B} (projected onto R1) and F2 = {B -> C} (projected onto R2) together imply every FD in F',
+    'No, because the transitive FD A -> C cannot be verified without joining R1 and R2',
+    'No, because B -> C cannot be derived from any FD projected onto R1 or R2',
+    'Dependency preservation cannot be determined without computing F+'
+  ],
+  answer: 0,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: 'Dependency preservation asks whether the union of the FDs that can be checked LOCALLY within each decomposed relation (the projections F1 and F2) together imply everything in the original FD set F, without ever needing to reconstruct R via a join. Projecting F onto R1 = {A, B} gives F1 = {A -> B} (directly present, checkable using only R1\'s rows). Projecting F onto R2 = {B, C} gives F2 = {B -> C} (directly present, checkable using only R2\'s rows). Now F1 union F2 = {A -> B, B -> C}, which is exactly equal to the original F - so every original FD is already captured by some single decomposed relation, and F is trivially "implied". The transitive FD A -> C, while true in F+, is not itself a member of the given F and does not need to be independently preserved beyond what A -> B and B -> C together already guarantee; hence option B\'s concern is a non-issue. So this decomposition IS dependency-preserving.'
+},
+{
+  id: 'dbms-normalization-p6',
+  pyqYear: 2020,
+  q: 'R(A, B, C, D, E) has FDs: AB -> CDE and C -> A. How many candidate keys does R have? (Enter your numerical answer.)',
+  options: [],
+  answer: 2,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'hard',
+  type: 'pyq-style',
+  explanation: 'Since B never appears on the right-hand side of any FD, B must belong to every candidate key (it can never be derived from other attributes). Test (AB)+: start {A,B}; AB -> CDE fires, adding C, D, E -> {A,B,C,D,E} = all attributes, so AB is a superkey; it is minimal since A alone gives A+ = {A} (nothing fires) and B alone gives B+ = {B}. Test (BC)+: start {B,C}; C -> A fires, adding A -> {A,B,C}; now AB -> CDE fires (A and B present), adding D, E -> {A,B,C,D,E} = all, so BC is also a superkey; minimality holds since B+ = {B} and C+ = {A,C} (via C->A), neither reaching all attributes alone. No other combination with B as a proper subset works without adding A or C first, so exactly 2 candidate keys exist: {A,B} and {B,C}.'
+},
+{
+  id: 'dbms-normalization-p7',
+  pyqYear: 2021,
+  q: 'R(A, B, C, D, E) has FDs: AB -> C, C -> D, D -> E, and the only candidate key is {A, B}. What is the highest normal form satisfied by R?',
+  options: ['1NF', '2NF', '3NF', 'BCNF'],
+  answer: 1,
+  marks: 2,
+  difficulty: 'hard',
+  type: 'pyq-style',
+  explanation: 'Check 2NF first: the sole candidate key is the composite {A, B}. A partial dependency would require a non-prime attribute to depend on a proper subset of this key, i.e. on {A} alone or {B} alone - but no FD in the given set has A alone or B alone as its determinant, so no partial dependency exists and 2NF is satisfied. Now check 3NF: the FD C -> D has determinant C, which is not a superkey (C+ = {C, D, E}, missing A and B), so the exception requires D to be prime; since the only candidate key is {A, B}, D is non-prime, so 3NF is violated by the transitive chain AB -> C -> D. Since 3NF fails, BCNF also fails automatically (C -> D likewise violates BCNF, as does D -> E). Hence the highest normal form satisfied is 2NF, tripped up at the very next level by the transitive dependencies chained off of C.'
+},
+{
+  id: 'dbms-normalization-p8',
+  pyqYear: 2022,
+  q: 'Which of the following statements about the attribute closure algorithm and Armstrong\'s axioms are TRUE? (Select ALL that apply)',
+  options: [
+    'An attribute that never appears on the right-hand side of any FD in F must belong to every candidate key of R',
+    'If X+ (computed under F) equals the full attribute set of R, then X is guaranteed to be a superkey, though not necessarily minimal',
+    'The union rule (if X -> Y and X -> Z then X -> YZ) is one of the three primitive Armstrong axioms, not a derived rule',
+    'Two different determinant sets can have the same closure only if they are functionally equivalent to each other'
+  ],
+  answers: [0, 1],
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: 'Option A is true: since an attribute that never occurs on any FD\'s right-hand side can never be produced/derived by applying any FD, the only way to include it in a determinant set that reaches every attribute is to add it directly - so it is mandatory in every candidate key. Option B is true by the very definition of a superkey: if closure(X) covers all of R\'s attributes, X determines everything, which is exactly what makes it a superkey; whether it is MINIMAL (a candidate key) requires a separate check of proper subsets. Option C is false: the three PRIMITIVE Armstrong axioms are reflexivity, augmentation, and transitivity; the union rule (along with decomposition and pseudotransitivity) is a DERIVED rule, provable from the three primitives but not itself primitive. Option D is a vague overreach: two sets can certainly share a closure without any formal "functional equivalence" framework being invoked here - the closure equality by itself is exactly what functional equivalence between the SETS of attributes would mean, but the statement as phrased conflates set-level and FD-set-level equivalence loosely, making it an unreliable statement to select as unconditionally true.'
+},
+{
+  id: 'dbms-normalization-p9',
+  pyqYear: 2023,
+  q: 'R(A, B, C) has FDs F = {A -> B} only (note: B -> C does NOT hold). It is decomposed into R1(A, B) and R2(B, C). Is this decomposition lossless-join?',
+  options: [
+    'Yes, because B is common to both R1 and R2',
+    'No, because B+ = {B} under F, which is neither a superkey of R1 nor of R2',
+    'Yes, because A -> B implies A -> C by transitivity',
+    'Cannot be determined without additional FDs on R2'
+  ],
+  answer: 1,
+  marks: 2,
+  difficulty: 'hard',
+  type: 'pyq-style',
+  explanation: 'The lossless-join test requires the common attribute set {B} to determine ALL of R1 = {A, B} or ALL of R2 = {B, C}. Compute B+ under the given F = {A -> B} only: starting from {B}, no FD has B (or a subset of {B}) as its left-hand side - the only FD present, A -> B, requires A to fire, which is not in our starting set - so B+ = {B}, with nothing added. This closure {B} does not contain A (so it is not a superkey of R1) and does not contain C (so it is not a superkey of R2 either). Since neither condition of the lossless-join test is satisfied, this decomposition is LOSSY: rejoining R1 and R2 via natural join on B can produce spurious tuples that were never in the original relation R, because a single B value could pair with multiple unrelated A values and multiple unrelated C values with no way to recover which A originally went with which C. Option C is a trap: transitivity requires both A->B AND B->C to hold, but B->C is explicitly stated NOT to hold here.'
+},
+{
+  id: 'dbms-normalization-p10',
+  pyqYear: 2024,
+  q: 'R(A, B, C) has FDs F = {AB -> C, C -> A}. It is decomposed into R1(B, C) and R2(A, C). Which of the following correctly describes this decomposition?',
+  options: [
+    'Lossless-join (via C -> A making C a key of R2), but NOT dependency-preserving, because AB -> C cannot be verified from either projected FD set alone',
+    'Lossless-join and dependency-preserving, since both R1 and R2 retain attribute C',
+    'Lossy, because C alone does not determine B',
+    'Neither lossless nor dependency-preserving'
+  ],
+  answer: 0,
+  marks: 2,
+  difficulty: 'hard',
+  type: 'pyq-style',
+  explanation: 'Lossless-join check: the common attribute is {C}. Compute C+ under full F: {C} then C -> A fires, giving {A, C}; no further FD fires since AB -> C needs B, which is absent. So C+ = {A, C}, which exactly equals R2\'s attribute set {A, C} - so C is a key of R2, and the decomposition IS lossless-join. Dependency-preservation check: project F onto R1 = {B, C}: no FD with LHS subset of {B,C} produces anything new within {B,C} (C+ restricted to R1 gives nothing since A is not in R1), so F1 is empty of non-trivial FDs. Project F onto R2 = {A, C}: C -> A holds directly, so F2 = {C -> A}. The union F1 union F2 = {C -> A} only - but the original FD AB -> C is nowhere derivable from just C -> A (C -> A does not let you conclude AB -> C), so the union fails to imply the full original F. This decomposition is therefore lossless but NOT dependency-preserving - a decomposition can satisfy one property without the other, and this is the canonical textbook example illustrating exactly that gap.'
+},
+{
+  id: 'dbms-normalization-p11',
+  pyqYear: 2025,
+  q: 'R(A, B, C, D) has FDs: A -> B, B -> C, A -> D, and the only candidate key is {A}. What is the highest normal form satisfied by R?',
+  options: ['1NF', '2NF', '3NF', 'BCNF'],
+  answer: 1,
+  marks: 1,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: 'Since the only candidate key {A} is a single attribute, no proper non-empty subset of the key exists, so partial dependency is structurally impossible and R is automatically in 2NF once it satisfies 1NF. Now check 3NF: the FD B -> C has determinant B, which is not a superkey (B+ = {B, C} only, missing A and D), so 3NF\'s exception requires C to be prime; but the sole candidate key is {A}, making C non-prime. This means B -> C is a transitive dependency (A -> B -> C) that violates 3NF. Since 3NF fails, BCNF fails too for the same reason (B is not a superkey either). So R clears 2NF but fails at the 3NF boundary due to the transitive chain through B, giving a highest normal form of 2NF - this is a very common GATE pattern: a single-attribute key plus one "extra" transitive hop is enough to cap the relation at 2NF.'
+},
+{
+  id: 'dbms-normalization-p12',
+  pyqYear: 2026,
+  q: 'R(A, B, C, D) has FDs: AB -> CD and C -> B, with candidate keys {A, B} and {A, C}. What is the highest normal form satisfied by R?',
+  options: ['1NF', '2NF', '3NF', 'BCNF'],
+  answer: 2,
+  marks: 2,
+  difficulty: 'hard',
+  type: 'pyq-style',
+  explanation: 'Prime attributes here are A, B and C, since each appears in at least one of the two candidate keys {A,B} or {A,C}; only D is non-prime. Check 2NF: for candidate key {A,B}, does A alone or B alone determine any non-prime attribute (only D matters)? A+ = {A} and B+ = {B} individually give nothing new, so no partial dependency on D exists from this key; symmetric check on {A,C} likewise shows A+ = {A} and C+ = {B,C} (via C->B) do not reach D alone, so 2NF holds. Check 3NF: the FD C -> B has determinant C, which is not a superkey (C+ = {B,C}, missing A and D), so the exception clause requires B to be prime - and B IS prime (member of key {A,B}), so this FD does not violate 3NF; the FD AB -> CD has superkey determinant, trivially fine. So 3NF holds. Check BCNF: C -> B still requires C to be a superkey for BCNF (no prime exception allowed), but C is not a superkey, so BCNF is violated. The highest normal form is therefore 3NF.'
+},
+{
+  id: 'dbms-normalization-p13',
+  pyqYear: 2016,
+  q: 'R(A, B) has FDs: A -> B and B -> A (a bijective, one-to-one relationship). Which of the following is TRUE?',
+  options: [
+    'R has two candidate keys, {A} and {B}, and R is in BCNF',
+    'R has only one candidate key, {A, B}, and R violates BCNF',
+    'R is not even in 1NF because of the circular dependency',
+    'R has two candidate keys, but is only in 2NF, not BCNF'
+  ],
+  answer: 0,
+  marks: 1,
+  difficulty: 'easy',
+  type: 'pyq-style',
+  explanation: 'Test A+: start {A}; A -> B fires, giving {A, B} = all attributes, so {A} is a superkey, and trivially minimal (a single attribute cannot have a smaller nonempty subset). Test B+: start {B}; B -> A fires, giving {A, B} = all attributes, so {B} is also a superkey and minimal. So R has exactly two candidate keys, {A} and {B}. Now check BCNF: the two non-trivial FDs are A -> B (determinant A is a superkey - fine) and B -> A (determinant B is also a superkey - fine). Since every non-trivial FD has a superkey as its determinant, BCNF is satisfied with no exceptions needed. This is a case where a seemingly "circular" pair of dependencies is completely benign from a normalization standpoint - it just means A and B are two independent keys for the same relation, similar to a person\'s SSN and passport number both individually identifying them and determining each other.'
+},
+{
+  id: 'dbms-normalization-p14',
+  pyqYear: 2017,
+  q: 'Which of the following statements about lossless-join and dependency-preserving decompositions are TRUE? (Select ALL that apply)',
+  options: [
+    'Every decomposition produced by the standard 3NF synthesis algorithm (using a minimal cover) is guaranteed to be both lossless-join and dependency-preserving',
+    'A decomposition into BCNF is always guaranteed lossless-join, but is not always guaranteed dependency-preserving',
+    'Lossless-join and dependency-preservation are independent properties; a decomposition can have either one without the other',
+    'If a decomposition is dependency-preserving, it must also be lossless-join'
+  ],
+  answers: [0, 1, 2],
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: 'Option A is true: the 3NF synthesis algorithm builds one relation per FD of a minimal cover (plus a relation containing a candidate key if none of the synthesized relations already contains one), and this construction is proven to always achieve both losslessness and dependency preservation simultaneously - it is the standard theorem justifying why 3NF is often preferred over BCNF in practice. Option B is true: the standard BCNF decomposition algorithm (repeatedly splitting on BCNF-violating FDs) always terminates in a lossless-join decomposition by construction, but it can sacrifice dependency preservation, since splitting to satisfy BCNF can separate an FD\'s determinant and dependent into different relations where that FD can no longer be checked locally, as the AB->C, C->A example demonstrates. Option C is true and is the key conceptual takeaway: these are two genuinely separate properties, and satisfying one gives no guarantee about the other. Option D is false: dependency preservation says nothing about whether attributes are lost or spurious tuples are introduced upon rejoining; a decomposition can preserve every original FD locally while still failing the lossless-join test (for example decomposing R(A,B,C) with A->B into R1(A,B) and R2(A,C) is dependency preserving but must be separately checked for losslessness via the common attribute A, which happens to work here, but the two properties are verified by entirely different, unrelated tests).'
+}
+);
+
+window.GATE_DATA.questions['dbms'].topics.find(function(t){return t.id==='dbms-indexing';}).questions.push(
+{
+  id: 'dbms-indexing-p1',
+  pyqYear: 2015,
+  q: 'A B+-tree leaf node can hold at most 50 key values (order 51, i.e. 51 pointers per internal node). If the tree stores 5000 records and every leaf is packed to maximum capacity, what is the minimum possible number of leaf nodes? (Enter your numerical answer.)',
+  options: [],
+  answer: 100,
+  kind: 'nat',
+  marks: 1,
+  difficulty: 'easy',
+  type: 'pyq-style',
+  explanation: 'The minimum number of leaf nodes is achieved when every leaf is packed as full as possible, since fuller leaves mean fewer leaves are needed to hold the same total number of records. Each leaf holds at most 50 keys, so the minimum leaf count is ceil(total records / max keys per leaf) = ceil(5000 / 50) = ceil(100) = 100 leaf nodes exactly (since 5000 divides evenly by 50, no partial leaf is needed at all). If instead the question asked for the MAXIMUM number of leaves (worst case, minimum occupancy), you would divide by the minimum guaranteed occupancy per leaf, which is typically ceil(50/2) = 25 for a B+-tree, giving ceil(5000/25) = 200 leaves - always identify which extreme (min or max) a B+-tree counting question is asking for, since maximum leaves uses the WORST-case (least full) occupancy bound, not the best case.'
+},
+{
+  id: 'dbms-indexing-p2',
+  pyqYear: 2016,
+  q: 'A B+-tree of order 101 (maximum 101 pointers and 100 keys per node, applying to both internal nodes and leaves) is used to index 1,000,000 records, with every node packed to maximum capacity. Counting the leaf level as one level and the root as the topmost level, how many levels does this fully-packed tree have? (Enter your numerical answer.)',
+  options: [],
+  answer: 3,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'hard',
+  type: 'pyq-style',
+  explanation: 'With maximum occupancy, each leaf holds 100 records, so the number of leaves is ceil(1,000,000 / 100) = 10,000 leaves - this is level 1 (the leaf level). Each internal node can point to at most 101 children, so the level directly above the leaves needs ceil(10,000 / 101) = ceil(99.0099) = 100 internal nodes - this is level 2. One more level up, a single node can point to at most 101 of these level-2 nodes, and since 100 is less than or equal to 101, ceil(100/101) = 1 node suffices - this single node is the root, forming level 3. Since the count at level 3 has reached exactly 1 (the root), the tree stops growing upward. So the fully-packed tree has exactly 3 levels total: the leaf level, one internal level, and the root. This is the standard "how many disk accesses in the best case" calculation for large B+-trees.'
+},
+{
+  id: 'dbms-indexing-p3',
+  pyqYear: 2017,
+  q: 'A B+-tree of order 4 has leaves that can hold up to 3 keys. A leaf currently holding the full 3 keys (10, 20, 30) receives a new insertion of key 25, causing it to temporarily hold 4 keys (10, 20, 25, 30) before splitting. Using the standard "split in half, copy first key of new right leaf up" rule, how many keys end up in the LEFT leaf after the split? (Enter your numerical answer.)',
+  options: [],
+  answer: 2,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: 'When a leaf holding n = 4 keys (after insertion causes temporary overflow, one more than the maximum of 3) must split, the standard convention distributes the first ceil(n/2) keys to the left leaf and the remaining floor(n/2) keys to the right leaf, keeping the leaf-level linked list in sorted order. Here n = 4, so ceil(4/2) = 2 keys go to the left leaf (10, 20) and floor(4/2) = 2 keys go to the right leaf (25, 30). So the left leaf ends up with exactly 2 keys. Crucially, for leaf splits, the first key of the new right leaf (here, 25) is COPIED (not moved/deleted) up into the parent as a separator/router key, because that value must still physically exist in a leaf for range-scan traversal via the leaf-level linked list to work correctly - this "copy up, don\'t remove" rule is unique to leaf splits and differs from internal node splits, where the middle key is pushed up and removed from the node.'
+},
+{
+  id: 'dbms-indexing-p4',
+  pyqYear: 2018,
+  q: 'When an internal (non-leaf) node of a B+-tree overflows and must split, which of the following correctly describes what happens to the middle key, in contrast to a leaf split?',
+  options: [
+    'The middle key is pushed up into the parent and REMOVED from the internal node, unlike a leaf split, where the first key of the new right leaf is COPIED up and remains in the leaf',
+    'The middle key is copied up into the parent and also remains in the internal node, identical to how a leaf split behaves',
+    'Internal node splits never propagate a key upward; only leaf splits do',
+    'The middle key is deleted permanently and never appears again at any level'
+  ],
+  answer: 0,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: 'This distinction is one of the most commonly tested B+-tree mechanics questions. For an INTERNAL node split, the middle key is PUSHED UP into the parent as a new separator and is REMOVED from the two resulting internal nodes, because internal nodes only store routing/separator keys, not actual data - the key\'s job as a router is fully satisfied by its presence in the parent, so keeping a duplicate in the child would be redundant. For a LEAF split, by contrast, the first key of the new right leaf is COPIED (duplicated) up into the parent as a separator, but it must ALSO remain physically in the leaf, because leaves hold the actual data-bearing entries (or record pointers) and the leaf-level linked list must remain a complete, traversable, sorted sequence of all keys for efficient range queries. Option C is false since both leaf and internal splits propagate a key upward; option D is false since the key is never permanently deleted, only relocated according to the appropriate rule for its node type.'
+},
+{
+  id: 'dbms-indexing-p5',
+  pyqYear: 2019,
+  q: 'When the root of a B+-tree splits during an insertion (because the root itself overflowed), what is the effect on the tree\'s height?',
+  options: [
+    'The height increases by exactly 1, since a brand-new root is created above the two nodes resulting from the old root\'s split',
+    'The height stays the same, since splitting only rearranges keys within the existing root level',
+    'The height decreases by 1, since the root is destroyed and replaced',
+    'The height increases by 1 only if the tree previously had an odd number of levels'
+  ],
+  answer: 0,
+  marks: 1,
+  difficulty: 'easy',
+  type: 'pyq-style',
+  explanation: 'A root split is the ONLY event that increases the height of a B+-tree. When the root overflows, it splits into two nodes exactly like any other node split, but since a root has no parent to receive the promoted middle key, a brand-new root node is created specifically to hold that one promoted key and point to the two resulting nodes as its two children. This new root becomes the sole node at a new topmost level, increasing the overall height by exactly 1. This is also why B+-trees are said to grow "upward from the root" rather than downward from the leaves - all insertion-driven growth in height originates from root splits, and the tree remains perfectly balanced (all leaves at the same depth) because every split, at any level, is triggered by and resolved through this same uniform mechanism.'
+},
+{
+  id: 'dbms-indexing-p6',
+  pyqYear: 2020,
+  q: 'A B+-tree has height 2, meaning the root directly points to leaf nodes (root is level 1, leaves are level 2). The root can have at most p pointers (order p), and each leaf can hold at most p - 1 records. What is the minimum order p such that this 2-level tree can index at least 500 records? (Enter your numerical answer.)',
+  options: [],
+  answer: 23,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'hard',
+  type: 'pyq-style',
+  explanation: 'With a 2-level tree, the root has at most p children, and each child leaf holds at most p - 1 records, so the maximum number of records this configuration can index is p multiplied by (p - 1). We need the smallest integer p satisfying p(p-1) >= 500. Testing p = 22: 22 x 21 = 462, which is less than 500, so order 22 is insufficient. Testing p = 23: 23 x 22 = 506, which is at least 500, so order 23 suffices. Since the function p(p-1) is strictly increasing for positive p, p = 23 is confirmed as the minimum order that works, and no smaller order can reach the required capacity. This kind of "minimum order for given capacity at a fixed height" question tests the same quadratic-growth intuition as basic B+-tree fan-out reasoning, just solved in reverse (given the target capacity, solve for the required order).'
+},
+{
+  id: 'dbms-indexing-p7',
+  pyqYear: 2021,
+  q: 'A data file has 1,000,000 records stored with a blocking factor of 100 records per block (so records are physically sorted by the index key). A sparse index has exactly one index entry per data block, and the index blocks themselves also hold 100 entries per block. How many blocks does the sparse index occupy? (Enter your numerical answer.)',
+  options: [],
+  answer: 100,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: 'First find the number of data blocks: with 1,000,000 records and 100 records per block, the data file occupies 1,000,000 / 100 = 10,000 blocks. A sparse index has exactly one index entry per data block (not per record), so the sparse index has exactly 10,000 entries in total - this is the key economy of a sparse index over a dense index, which would instead need one entry per RECORD (1,000,000 entries). Now, since the index itself is stored in blocks holding 100 entries each, the number of index blocks required is 10,000 / 100 = 100 blocks. This two-step calculation - first reduce record count to block count using the data blocking factor, then reduce entry count to index-block count using the index blocking factor - is the standard template for sparse-index sizing questions, and the resulting index (100 blocks) is dramatically smaller than both the 10,000-block data file and what a dense index (10,000 blocks, one entry per record group) would require.'
+},
+{
+  id: 'dbms-indexing-p8',
+  pyqYear: 2022,
+  q: 'Which of the following statements comparing B-trees and B+-trees are TRUE? (Select ALL that apply)',
+  options: [
+    'In a B+-tree, all actual data (or record pointers) reside only at the leaf level; internal nodes hold only routing keys',
+    'In a B-tree, data pointers can be attached to keys stored in internal (non-leaf) nodes, not just at the leaves',
+    'B+-trees support efficient sequential range scans via a linked list connecting leaf nodes, which classical B-trees do not provide',
+    'For the same order and same number of records, a B-tree is always shorter (fewer levels) than a B+-tree, because B-trees never duplicate keys'
+  ],
+  answers: [0, 1, 2],
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: 'Option A is true: this is the defining structural feature of B+-trees - internal nodes exist purely to guide the search (holding only separator keys and child pointers), while every actual record pointer (or the record itself) lives at the leaf level, often with leaf keys duplicated from what also appears in internal nodes as routers. Option B is true: in a classical B-tree, there is no such separation - a key can appear exactly once anywhere in the tree, at whatever level it was inserted, with its associated data pointer attached directly to it at that level, meaning a search can terminate successfully at an internal node without ever reaching a leaf. Option C is true: because B+-tree leaves are explicitly linked together in sorted order (a linked list), range queries and full sequential scans can be done efficiently by following leaf pointers, unlike a plain B-tree, which lacks this leaf-linking and would require more complex in-order traversal for range scans. Option D is false and reverses the actual trade-off: because B-tree internal nodes carry both keys and data pointers together, taking up more space per key, a B-tree of the same order and page size typically has LOWER fan-out and thus tends to be equal or TALLER (not shorter) than a B+-tree indexing the same number of records, where thin, pointer-only internal nodes achieve higher fan-out.'
+},
+{
+  id: 'dbms-indexing-p9',
+  pyqYear: 2023,
+  q: 'A B+-tree of order 101 (maximum 101 pointers and 100 keys per node) indexes 2,000,000 records with every node packed to maximum capacity. Counting the leaf level as level 1 up through the root as the topmost level, how many levels does this tree have? (Enter your numerical answer.)',
+  options: [],
+  answer: 4,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'hard',
+  type: 'pyq-style',
+  explanation: 'With full occupancy, each leaf holds 100 records, giving ceil(2,000,000 / 100) = 20,000 leaves - level 1. Each internal node holds at most 101 pointers, so the level above needs ceil(20,000 / 101) = ceil(198.02) = 199 nodes - level 2. One level higher needs ceil(199 / 101) = ceil(1.97) = 2 nodes - level 3. Since 2 nodes at level 3 is still more than 1, one more level is needed: ceil(2 / 101) = 1 node - the root, forming level 4. Since the count has reached 1, the tree stops growing. So this tree requires 4 levels total. Comparing to the earlier 1,000,000-record example (which needed only 3 levels), doubling the record count pushed the fan-out calculation just past the threshold where 2 nodes remained at what would have been the root level, forcing one additional level - a good illustration of how B+-tree height grows only logarithmically (very slowly) even as the record count grows substantially.'
+},
+{
+  id: 'dbms-indexing-p10',
+  pyqYear: 2024,
+  q: 'Which of the following statements about primary, clustering and secondary indexes are TRUE? (Select ALL that apply)',
+  options: [
+    'A primary index requires the data file to be physically sorted on a key that is also a unique (candidate/primary) key of the file',
+    'A clustering index is defined on a non-unique ordering field of a sorted data file, so multiple records can share one index entry',
+    'A secondary index can be built on a non-ordering field, and unlike a primary or clustering index, it must always be dense',
+    'There can be at most one primary or clustering index on a data file, but many secondary indexes'
+  ],
+  answers: [0, 1, 2, 3],
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: 'Option A is true: a primary index specifically requires the ordering field of a sequentially sorted data file to also be a key with unique values (usually the primary key), and this uniqueness is what allows the index to be sparse (one entry per BLOCK rather than per record) while still supporting exact-match lookup. Option B is true: a clustering index also requires the data file to be sorted by the indexing field, but that field need NOT be unique - multiple records can share the same value (e.g. clustering by department in an employee file), and the index typically holds one entry per DISTINCT value, pointing to the first record of that value\'s block of tuples. Option C is true: because a secondary index is built on a field that does NOT determine the physical ordering of the data file, there is no way to "skip ahead" to nearby records the way sorted-file traversal allows for primary/clustering indexes, so every indexed value (or every record, if the field is non-unique) needs its own explicit entry - a sparse secondary index is not possible. Option D is true: physical file ordering is a single, fixed property of the data file, so only one field can serve as the ordering key for a primary or clustering index at a time, but any number of additional secondary indexes on other fields can coexist independently.'
+},
+{
+  id: 'dbms-indexing-p11',
+  pyqYear: 2025,
+  q: 'A dense index has one entry per record of a data file containing 800,000 records, with each index block able to hold 200 index entries. A sparse index on the same file (which must be sorted on the index field) has one entry per data block, where each data block holds 40 records. How many FEWER blocks does the sparse index occupy compared to the dense index? (Enter your numerical answer.)',
+  options: [],
+  answer: 3900,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'hard',
+  type: 'pyq-style',
+  explanation: 'Dense index size: with 800,000 records, a dense index needs 800,000 entries (one per record), and at 200 entries per index block, this requires 800,000 / 200 = 4,000 blocks. Sparse index size: first find the number of data blocks, which is 800,000 records / 40 records per block = 20,000 data blocks; the sparse index needs one entry per data block, giving 20,000 entries, which at 200 entries per index block requires 20,000 / 200 = 100 blocks. The difference is 4,000 - 100 = 3,900 fewer blocks for the sparse index. This large gap (40x fewer entries, since the sparse index only needs one entry per 40 records instead of one per record) is exactly why sparse indexes are preferred whenever the data file can be kept physically sorted on the index field - the space savings scale directly with the file\'s blocking factor.'
+},
+{
+  id: 'dbms-indexing-p12',
+  pyqYear: 2026,
+  q: 'Which of the following statements about B+-tree deletion are TRUE? (Select ALL that apply)',
+  options: [
+    'If a leaf underflows (falls below the minimum occupancy) after a key is deleted, the B+-tree first tries to borrow (redistribute) a key from an adjacent sibling before resorting to merging',
+    'Merging two underflowing sibling nodes can cause the parent to lose a key, potentially causing the parent itself to underflow and requiring the fix-up to propagate upward',
+    'Deleting a key from a leaf never requires any change to a separator key stored in an internal node, even if the deleted key itself appears as a separator',
+    'If merging propagates all the way up and empties the root down to a single child, that child becomes the new root, decreasing the tree height by 1'
+  ],
+  answers: [0, 1, 3],
+  marks: 2,
+  difficulty: 'hard',
+  type: 'pyq-style',
+  explanation: 'Option A is true: redistribution (borrowing a key-pointer pair from a sibling that has more than the minimum) is always attempted first because it is cheaper (touches only 2-3 nodes and requires no structural changes above the immediate parent), and merging is used only when redistribution is not possible (both siblings are already at minimum occupancy). Option B is true: when two nodes merge into one, the separator key that used to distinguish them in the parent is removed, which can push the parent below its own minimum key count, triggering the same underflow-handling procedure recursively one level up - this is precisely how deletion fix-ups can cascade toward the root. Option C is false: if the deleted key also appears as a separator/router value in an internal (non-leaf) node, that separator generally does need to be replaced, commonly with the new smallest key of the affected subtree, to keep the routing information consistent with the tree\'s actual contents. Option D is true: this is the exact deletion-side mirror of a root split during insertion - when merging drains the root down to holding only a single child pointer and no keys, that redundant root is discarded and its one remaining child is promoted to be the new root, reducing the overall height of the tree by exactly 1.'
+},
+{
+  id: 'dbms-indexing-p13',
+  pyqYear: 2017,
+  q: 'A B+-tree of order 6 has internal nodes that can hold at most 5 keys and 6 pointers, with a minimum occupancy requirement of ceil(6/2) = 3 pointers (2 keys) for any non-root internal node. If a non-root internal node currently has exactly 3 pointers and loses one child due to a merge below it, what MUST happen to this node?',
+  options: [
+    'It now has only 2 pointers, violating the minimum of 3, so it must itself borrow from a sibling or merge with one',
+    'Nothing; 2 pointers is still an acceptable configuration for an internal node of order 6',
+    'It must immediately become a leaf node',
+    'The entire tree must be rebuilt from scratch'
+  ],
+  answer: 0,
+  marks: 1,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: 'For a B+-tree of order 6, every non-root internal node must maintain at least ceil(6/2) = 3 pointers (equivalently, at least 2 keys, since an internal node with k pointers has k - 1 keys) to guarantee the tree stays reasonably balanced and shallow. The node in question starts at exactly the minimum of 3 pointers; losing one more child pointer (because a merge one level below removed a subtree) drops it to 2 pointers, which is strictly below the required minimum of 3 - this is an underflow condition. Per standard B+-tree deletion handling, an underflowing internal node must first attempt to borrow (redistribute) a pointer-key pair from an adjacent sibling that has more than the minimum; if no sibling can spare one, this node must instead merge with a sibling, and that merge may in turn cause the current node\'s own parent to underflow, continuing the cascade upward exactly as far as necessary (potentially reaching and shrinking the root, as covered by the deletion propagation rules for this topic).'
+},
+{
+  id: 'dbms-indexing-p14',
+  pyqYear: 2021,
+  q: 'Which of the following statements about hashing-based indexing (as an alternative to tree-based indexing) are TRUE? (Select ALL that apply)',
+  options: [
+    'Static hashing suffers from performance degradation as the data file grows well beyond the originally chosen number of buckets, due to increasing collisions and overflow chains',
+    'Extendable (dynamic) hashing can grow the directory to accommodate more buckets without needing to rehash every existing record in the file',
+    'Hashing-based indexes generally support efficient RANGE queries (e.g. find all keys between 100 and 200), just as well as B+-trees do',
+    'A good hash function should distribute keys as uniformly as possible across the available buckets to minimize collisions and overflow chain length'
+  ],
+  answers: [0, 1, 3],
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: 'Option A is true: static hashing fixes the number of buckets in advance, so as the file grows beyond that planned capacity, buckets increasingly overflow, chains of overflow blocks lengthen, and average search performance degrades toward a linear scan of the chain - this is the fundamental weakness that motivated dynamic hashing schemes. Option B is true: extendable hashing uses an expandable directory of pointers to buckets, and when a bucket overflows, only that ONE bucket needs to split (and the directory may need to double in size), without ever touching or rehashing records in unrelated buckets, unlike static hashing\'s full-file reorganization. Option C is false: hashing scrambles key values into essentially unrelated bucket addresses by design, specifically to spread keys evenly - this destroys any notion of key ORDERING, so hashing is fundamentally unsuited for range queries; you would need to probe every bucket to find keys in a range, whereas B+-trees preserve sorted order at the leaf level specifically to make range scans efficient. Option D is true: uniform key distribution across buckets is the single most important property of a good hash function for indexing purposes, since it directly minimizes the frequency and length of overflow chains, keeping average-case lookup close to O(1).'
+}
+);

@@ -2131,3 +2131,329 @@ window.GATE_DATA.questions['toc'].topics.find(function(t){return t.id==='toc-tur
   explanation: "The single self-loop on q0 reads a, writes x in its place, and moves the head right, staying in q0; only when the head reads a blank B does it write B, stay put (S for stay), and move to qacc to halt. Trace step by step on tape a a a (cells 0,1,2) with head at cell 0: step 1 reads a at cell 0, writes x, moves right to cell 1, tape is now x a a; step 2 reads a at cell 1, writes x, moves right to cell 2, tape is now x x a; step 3 reads a at cell 2, writes x, moves right to cell 3 (the first blank cell), tape is now x x x. So after exactly 3 steps every one of the three original a symbols has been overwritten with x, giving tape content xxx, and the head is now sitting on the blank at cell 3 about to trigger the halting transition to qacc on the next (fourth) step. The correct answer is option A, xxx; the machine has not yet halted after 3 steps, but every a has already been converted."
 }
 );
+
+window.GATE_DATA.questions['toc'].topics.find(function(t){return t.id==='toc-regular';}).questions.push(
+{
+  id: 'toc-regular-p1',
+  pyqYear: 2015,
+  q: "What is the minimum number of states in a DFA over {0,1} that accepts exactly those strings whose THIRD symbol from the right end is a 1 (the string must have length at least 3)? Enter your numerical answer.",
+  options: [],
+  answer: 8,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'hard',
+  type: 'pyq-style',
+  explanation: "This is the classic exponential-blowup family: to know the symbol that is exactly k positions from the right end, a DFA must remember the last k symbols read, because any future input could end at any point and the decision depends on that whole trailing window. With k=3 there are 2^3 = 8 possible windows (000,001,010,...,111), so the state needs to encode which of the 8 windows is the current suffix; on reading a new symbol c the state shifts left and appends c, dropping the oldest bit, exactly like a shift register. All 8 states are reachable (any 3-bit pattern can be built by an appropriate 3-symbol prefix) and pairwise distinguishable (from window w1 != w2, appending the same 2 more symbols exposes their differing leading bit as the new third-from-end symbol, so some suffix accepts from one window and rejects from the other). Hence the minimal DFA needs exactly 8 states, matching the general 2^k pattern for 'kth symbol from the end' languages, one of GATE's favorite state-counting traps because it looks like it should need only k+1 states but actually needs 2^k."
+},
+{
+  id: 'toc-regular-p2',
+  pyqYear: 2016,
+  q: "Consider the NFA over {0,1} with states {q0,q1,q2,q3}, start state q0, and accepting state q3, recognizing strings that END with the pattern 101. Transitions: delta(q0,1)={q0,q1}, delta(q0,0)={q0}, delta(q1,0)={q2}, delta(q2,1)={q3}, and all other transitions empty (no state has any other move). Applying subset construction starting from {q0}, how many DISTINCT states does the resulting DFA have (count only states reachable from the start, and do not add a separate dead state unless the construction actually reaches the empty set)? Enter your numerical answer.",
+  options: [],
+  answer: 4,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: "Trace subset construction carefully. Start set S0={q0}. On 0: only q0 has a 0-move, to {q0}, so S0 stays S0. On 1: q0 moves to {q0,q1}, call this S1. From S1 on 0: q0->{q0}, q1->{q2}, union={q0,q2}=S2. From S1 on 1: q0->{q0,q1}, q1 has no 1-move, union={q0,q1}=S1 (no change). From S2 on 0: q0->{q0}, q2 has no 0-move, union={q0}=S0. From S2 on 1: q0->{q0,q1}, q2->{q3}, union={q0,q1,q3}=S3. From S3 on 0: q0->{q0}, q1->{q2}, q3 has no 0-move, union={q0,q2}=S2. From S3 on 1: q0->{q0,q1}, q1 and q3 have no 1-moves, union={q0,q1}=S1. Every transition lands in one of {S0,S1,S2,S3}, none ever produces the empty set, so exactly 4 distinct reachable DFA states result, with S3 (the only one containing q3) as the sole accepting state. This matches the general fact that a minimal DFA for strings ending in a fixed pattern of length m needs exactly m+1 states, here m=3."
+},
+{
+  id: 'toc-regular-p3',
+  pyqYear: 2017,
+  q: "Consider these four languages over {a,b}: (I) L1 = { a^i b^j : i,j >= 0 and (i+j) mod 4 = 0 }. (II) L2 = { a^n b^n : n >= 0 }. (III) L3 = { a^n : n is a perfect square }. (IV) L4 = { a^i b^j : i,j >= 0 and i <= 5 } (any number of a's from 0 to 5, followed by any number of b's). Which of these languages are REGULAR? (Select ALL that apply)",
+  options: ['L1', 'L2', 'L3', 'L4'],
+  answers: [0, 3],
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: "L1 is regular: counting (i+j) mod 4 needs only 4 states cycling on every a or every b, regardless of how a's and b's are ordered internally in this set-builder description, since it is only the total symbol count that matters -- a simple mod-4 counter DFA suffices, so L1 is regular. L4 is regular: since i is capped at a small constant (at most 5), a DFA can count a's up to 5 (going to a dead state if a 6th a arrives before any b), then freely accept any run of b's -- bounding one of the counters by a constant is exactly what keeps a language regular despite looking like a counting condition. L2 = a^n b^n is the textbook non-regular language: by the pumping lemma or the infinite Myhill-Nerode equivalence classes on a^n (each n needs a different number of subsequent b's to reach acceptance), it fails to be regular. L3 (a^n for n a perfect square) is also non-regular: pumping any string a^p with p >= pumping length by inserting extra a's produces lengths that skip out of the sparse perfect-square set for large enough pump counts, since consecutive perfect squares grow farther apart than the fixed pump amount, violating the pumping lemma. So only L1 and L4 are regular."
+},
+{
+  id: 'toc-regular-p4',
+  pyqYear: 2018,
+  q: "What is the minimum number of states in a DFA over {0,1} that accepts a string if and only if BOTH of the following hold: the number of 1's in the string is even, AND the string does NOT end with the substring 00? Enter your numerical answer.",
+  options: [],
+  answer: 6,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'hard',
+  type: 'pyq-style',
+  explanation: "The two conditions are tracked by independent finite trackers that must be combined via a product construction. Tracker 1 (parity of 1's) needs 2 states: Even, Odd, toggling on every 1 and self-looping on every 0. Tracker 2 (does the string currently end in 00) needs 3 states: S (does not end in 0 at all, or is empty), A (ends in exactly one 0), B (ends in 00 or more), where reading a 1 always resets to S, and reading a 0 advances S->A->B->B. Since these two trackers read completely disjoint information from the same symbol (parity only cares about 1's, the suffix-tracker only cares about the pattern of 0's and resets on 1's) but both must be evaluated on every symbol, the minimal combined DFA is their product: 2 x 3 = 6 states, one per (parity, suffix-state) pair. All 6 combinations are reachable from (Even,S) by mixing 0's and 1's freely, and no two are equivalent: differing parity is always eventually distinguished by an odd-length suffix of 1's, and differing suffix-state is distinguished by an immediate 0 or 00 (e.g. (Even,S) accepts the empty continuation while (Even,A) does not, since appending a single 0 sends (Even,S) to the still-accepting (Even,A) but sends (Even,A) to the rejecting (Even,B)). Accepting states are exactly (Even,S) and (Even,A). Minimum is 6."
+},
+{
+  id: 'toc-regular-p5',
+  pyqYear: 2019,
+  q: "Which of the following statements about regular languages are TRUE? (Select ALL that apply)",
+  options: ['The class of regular languages is closed under intersection', 'The class of regular languages is closed under the Kleene star operation', 'The class of regular languages is closed under arbitrary (possibly infinite) unions of regular languages', 'The class of regular languages is closed under reversal (reversing every string in the language)'],
+  answers: [0, 1, 3],
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: "Intersection (A true): build the product automaton of the two DFAs and accept where both components accept; this is a standard closure proof, so A holds. Kleene star (B true): standard NFA construction adds epsilon transitions from every accepting state back to a new start state, staying within regular languages, so B holds. Reversal (D true): reverse every transition of the DFA, swap start and accept roles (make old accept states the new start via epsilon transitions, old start state the new unique accept state); the resulting NFA still recognizes a regular language, so D holds. Arbitrary infinite union (C false) is the trap: regular languages are closed only under FINITE unions, not infinite ones. Concretely, each singleton set L_n = { a^n b^n } is trivially a finite, hence regular, language for every fixed n, but the infinite union of all L_n over n=0,1,2,... is exactly { a^n b^n : n >= 0 }, the textbook non-regular language. So an infinite union of regular languages can escape regularity, making C false; only finite unions are guaranteed to preserve regularity."
+},
+{
+  id: 'toc-regular-p6',
+  pyqYear: 2020,
+  q: "To prove L = { a^n b^n : n >= 0 } is not regular using the pumping lemma, we let p be the pumping length and pick w = a^p b^p, then consider any decomposition w = xyz satisfying |xy| <= p and |y| >= 1. What can we conclude about y itself under this constraint?",
+  options: ['y must consist only of a symbols (y = a^k for some k >= 1)', 'y must consist of a mix of a symbols followed by b symbols', 'y must consist only of b symbols', 'y must be the empty string'],
+  answer: 0,
+  marks: 1,
+  difficulty: 'easy',
+  type: 'pyq-style',
+  explanation: "Since w = a^p b^p has its first p symbols all equal to a (the entire a-block has length exactly p), the constraint |xy| <= p forces the substring xy to lie entirely within this leading a-block, because any position up to index p in w is still inside the a's. Consequently y, being a nonempty substring of xy, is also entirely within the a-block, so y cannot contain any b symbols at all -- it must be of the form a^k for some k with 1 <= k <= p (nonempty because the pumping lemma requires |y| >= 1). This is exactly why the pumping argument works: pumping y up (repeating it, i.e. taking i=2) produces a string with MORE a's than b's, namely a^(p+k) b^p, which is no longer of the form a^n b^n, contradicting the assumption that all pumped strings must remain in L. Since this contradiction arises for every possible valid decomposition, L cannot be regular. Options B and C are impossible given the length restriction, and D violates the pumping lemma's own requirement that |y| >= 1."
+},
+{
+  id: 'toc-regular-p7',
+  pyqYear: 2021,
+  q: "What is the minimum number of states in a DFA over {0,1} that accepts exactly those strings ENDING in the pattern 01? Enter your numerical answer.",
+  options: [],
+  answer: 3,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: "Build the string-matching automaton for pattern P=01 using the standard technique: state i (0<=i<=2) means the longest suffix of the input read so far that is also a prefix of P has length i, with state 2 being the accepting 'full match just occurred' state. From state 0 (no progress): reading 0 advances to state 1 (matches prefix '0'); reading 1 keeps it at state 0 (no prefix of '01' ends in 1). From state 1 (matched '0'): reading 0 stays at state 1 (the new suffix '00' still has longest P-prefix-suffix overlap equal to '0'); reading 1 completes the match, advancing to state 2. From state 2 (just matched '01', accepting): reading 0 falls back to state 1 (new suffix ends in '0', matching prefix '0' again); reading 1 falls back to state 0 (new suffix ends in '1', which is not a prefix of '01'). This gives exactly 3 states (0,1,2), all reachable and pairwise distinguishable since they represent genuinely different amounts of pattern progress. In general, the minimal DFA recognizing 'ends with a fixed pattern of length m' always has exactly m+1 states via this construction (closely related to the KMP failure-function automaton), regardless of whether the pattern has internal self-overlaps."
+},
+{
+  id: 'toc-regular-p8',
+  pyqYear: 2022,
+  q: "Consider the epsilon-NFA over {a,b} with states {p0,p1,p2}, start state p0 (accepting state p2), and moves: p0 has an epsilon-move to p1, p0 has a self-loop on a, p0 has a self-loop on b, p1 has a move to p2 on a (p1 has no move on b), and p2 has a self-loop on a (p2 has no move on b). Applying the standard epsilon-closure subset construction, how many DISTINCT reachable DFA states does the equivalent DFA have? Enter your numerical answer.",
+  options: [],
+  answer: 2,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: "Start state of the DFA is ECLOSE(p0) = {p0,p1} (following the epsilon-move), call it S1. From S1 on a: p0 self-loops to p0, and p1 moves to p2, giving the raw set {p0,p2}; taking epsilon-closure adds p1 (reachable from p0 via epsilon), giving {p0,p1,p2}, call it S2. From S1 on b: only p0 has a b-move, to p0 (p1 has no b-move), giving {p0}, whose epsilon-closure is {p0,p1} = S1 again. From S2 on a: p0->p0, p1->p2, p2->p2 (self-loop), raw union {p0,p2}, epsilon-closure adds p1, giving {p0,p1,p2} = S2 (no change). From S2 on b: only p0 has a b-move (to p0), p1 and p2 have none, giving {p0}, epsilon-closure {p0,p1} = S1. So every transition stays within {S1,S2} and the empty set is never produced -- exactly 2 distinct reachable DFA states, with S2 (the only one containing p2) being the sole accepting state."
+},
+{
+  id: 'toc-regular-p9',
+  pyqYear: 2023,
+  q: "Which of the following statements about regular languages are TRUE? (Select ALL that apply)",
+  options: ['If L1 and L2 are both regular, then L1 intersect L2 is regular', 'If L1 is regular and L2 is not regular, then L1 union L2 can never be regular', 'If L is regular, then { w w : w is in L } is always regular', 'The class of regular languages is closed under set difference (L1 minus L2 is regular whenever L1 and L2 are)'],
+  answers: [0, 3],
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: "A is a standard closure property (product automaton), true. D follows algebraically: L1 - L2 = L1 intersect complement(L2); since regular languages are closed under both complement (swap DFA accept/reject labels) and intersection, the difference is also regular, so D is true. B is a classic trap and is FALSE: a regular L1 unioned with a non-regular L2 need not stay non-regular -- take L1 = Sigma* (the whole alphabet's strings, trivially regular) and let L2 be any non-regular language over the same alphabet; then L1 union L2 = Sigma*, which is regular, directly contradicting the claim that the union 'can never be regular'. C is also FALSE in general: even when L is regular, doubling every string via { w w : w is in L } does not preserve regularity in general -- the extreme case L = Sigma* itself gives { w w : w is any string }, which is the well-known non-regular 'squaring' language (an infinite Myhill-Nerode argument, or pumping lemma on w=a^p b a^p b style strings, shows no DFA can verify that the second half exactly repeats the first for unboundedly long w). So only A and D are guaranteed true in general."
+},
+{
+  id: 'toc-regular-p10',
+  pyqYear: 2024,
+  q: "A DFA over {0,1} has states {A,B,C,D}, start state A, accepting states {C,D}, and transitions: A on 0 goes to B, A on 1 goes to C; B on 0 goes to B, B on 1 goes to D; C on 0 goes to D, C on 1 goes to C; D on 0 goes to C, D on 1 goes to D. Using the table-filling (Myhill-Nerode partition refinement) method to minimize this DFA, how many states does the MINIMAL equivalent DFA have? Enter your numerical answer.",
+  options: [],
+  answer: 2,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: "First separate by acceptance: {A,B} (non-accepting) versus {C,D} (accepting) -- this is round 0 of the partition. Check whether A and B stay together: on 0, A goes to B (in the non-accepting group) and B goes to B (also non-accepting group) -- same group; on 1, A goes to C (accepting group) and B goes to D (also accepting group) -- same group. So A and B always transition to the same partition-group on every symbol, meaning the current partition already distinguishes them from nothing new -- A and B are equivalent and can be merged into a single state, call it S0. Now check C and D: on 0, C goes to D (accepting group) and D goes to C (accepting group) -- same group; on 1, C goes to C (accepting group) and D goes to D (accepting group) -- same group. C and D also always land in the same group as each other, so they merge into a single accepting state S1. Refining further with these merged groups changes nothing (both S0 and S1's transitions stay consistently within {S0,S1} exactly as before), so the partition is stable at 2 classes: {A,B} and {C,D}. The minimized DFA therefore has exactly 2 states, essentially recognizing 'does this string end with the transitions leading to an accepting label', collapsing to the language of strings containing at least one 1 with valid odd/even-agnostic reach -- regardless of the exact language, the state count after minimization is 2."
+},
+{
+  id: 'toc-regular-p11',
+  pyqYear: 2025,
+  q: "For each n, there exists an n-state NFA over {0,1} such that every equivalent DFA needs at least 2^n states -- this is the standard witness family used to show the subset construction's exponential blowup is TIGHT (not just an upper bound). Which language family is this classic witness?",
+  options: ['The language of strings whose n-th symbol from the right end is a fixed value (e.g. 1)', 'The language a^n b^n', 'The language of strings of even length', 'The language of strings containing the substring aba'],
+  answer: 0,
+  marks: 1,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: "The 'n-th symbol from the end' family is the standard tight-bound witness for the NFA-to-DFA exponential blowup. An NFA can guess, upon reading each symbol, whether it might be the n-th-from-last one, spawning parallel guesses along the input using only n+1 states (one to stay in the 'not yet guessed' mode, plus a chain of n states counting down after a guess is made, accepting if the guessed symbol matches and exactly n more symbols follow) -- so only around n states suffice nondeterministically. But any DFA must deterministically track the entire trailing window of the last n symbols to answer correctly regardless of how the string might end, requiring one state per possible n-bit window, i.e. genuinely 2^n states, all reachable and pairwise distinguishable (as reasoned in the third-from-end example). This proves the 2^n subset-construction bound is not a loose artifact of the construction but is actually achieved, unlike languages such as a^n b^n (not even regular, so it does not illustrate a DFA/NFA size gap at all), even-length strings (only needs 2 states for both NFA and DFA), or substring-containment languages (blowup for those is typically only linear in pattern length, not exponential)."
+},
+{
+  id: 'toc-regular-p12',
+  pyqYear: 2026,
+  q: "What is the minimum number of states in a DFA over {0,1} recognizing the language described by the regular expression (0+1)* 11 (0+1)*, i.e. all strings containing 11 as a substring somewhere? Enter your numerical answer.",
+  options: [],
+  answer: 3,
+  kind: 'nat',
+  marks: 1,
+  difficulty: 'easy',
+  type: 'pyq-style',
+  explanation: "This is 'contains substring 11', matched by the string-matching automaton for pattern P=11 with states tracking longest matched prefix-suffix overlap: state 0 (no progress, e.g. just read a 0 or nothing yet), state 1 (just read a single 1, one symbol of progress toward '11'), and state 2 (accepting, '11' has been seen; it is a sink/absorbing accept state since once the substring has appeared anywhere, the string stays accepted forever). Transitions: state 0 on 1 goes to state 1, on 0 stays at state 0; state 1 on 1 goes to state 2 (match complete), on 0 falls back to state 0 (the run of 1's was broken); state 2 self-loops on both 0 and 1 (already accepted, additional symbols cannot un-accept it). All three states are reachable and pairwise distinguishable (state 0 versus state 1 are told apart by appending '1' -- one needs one more 1 to reach acceptance, the other needs zero more; state 2 is told apart from both by already being accepting on the empty suffix). So the minimal DFA needs exactly 3 states, matching the general rule that 'contains pattern of length m as substring' needs m+1 states (here m=2)."
+},
+{
+  id: 'toc-regular-p13',
+  pyqYear: 2016,
+  q: "What is the minimum number of states in a DFA over {a,b} that accepts a string if and only if the number of a's in it is congruent to 0 mod 4 (the b's may occur anywhere and do not affect acceptance)? Enter your numerical answer.",
+  options: [],
+  answer: 4,
+  kind: 'nat',
+  marks: 1,
+  difficulty: 'easy',
+  type: 'pyq-style',
+  explanation: "Since only the count of a's modulo 4 matters and b's are entirely irrelevant to acceptance, a standard mod-k counter suffices: one state per residue class 0,1,2,3 representing the current count of a's seen so far modulo 4, with state 0 being the unique accepting state (the initial state, since 0 a's satisfies 0 mod 4 = 0). Reading an a advances the residue by 1 (cycling 0->1->2->3->0), while reading a b self-loops on the current state (leaving the residue unchanged, since b's do not count). All 4 states are clearly reachable (feed 0,1,2, or 3 a's from the start) and pairwise distinguishable (from residue r1 != r2, appending (4 - r1) more a's reaches the accepting state 0 from r1 but reaches residue (r2 + 4 - r1) mod 4 != 0 from r2, since r1 != r2 implies this difference is nonzero mod 4), so no states can be merged. The minimum is exactly 4, matching the general mod-k counting rule of k states for a single independent counted symbol."
+},
+{
+  id: 'toc-regular-p14',
+  pyqYear: 2020,
+  q: "Which of the following statements about the pumping lemma for regular languages are TRUE? (Select ALL that apply)",
+  options: ['If a language satisfies the pumping lemma condition (some valid pumping length p exists with the usual decomposition property), the language must be regular', 'If a language FAILS the pumping lemma condition (no valid p works for every long-enough string), the language cannot be regular', 'The pumping lemma is used to PROVE that a language is regular, by exhibiting a valid pumping decomposition for every string in it', 'Every finite language automatically satisfies the pumping lemma condition, because a sufficiently large pumping length can be chosen so that no string in the language is long enough to require decomposition'],
+  answers: [1, 3],
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: "The pumping lemma states a NECESSARY (not sufficient) condition for regularity: every regular language satisfies it, but satisfying it does not guarantee regularity. So A is FALSE -- there exist famous non-regular languages that still happen to satisfy the pumping lemma's pumping property for some choice of decompositions (constructing such examples is a standard advanced exercise), meaning the pumping lemma alone can never be used to prove regularity, which also makes C FALSE for the same underlying reason (the lemma's proper use is strictly to prove NON-regularity by contradiction: assume regularity, invoke the lemma, then exhibit that no valid decomposition can satisfy the pumping requirement, contradicting the assumption). B is the lemma's actual valid use and is TRUE: the contrapositive of 'regular implies pumpable' is 'not pumpable implies not regular', which is exactly the logically sound direction. D is TRUE: for a finite language, choose the pumping length p to exceed the length of every string in the language; then the pumping lemma's requirement only concerns strings of length >= p, and since none exist in a finite language, the condition holds vacuously (true because there is nothing to check), which is why finite languages trivially and always satisfy the pumping lemma despite the lemma normally being used to rule languages OUT."
+}
+);
+
+window.GATE_DATA.questions['toc'].topics.find(function(t){return t.id==='toc-cfl';}).questions.push(
+{
+  id: 'toc-cfl-p1',
+  pyqYear: 2015,
+  q: "Consider L = { a^n b^n c^m : n,m >= 0 }, i.e. equal numbers of a's and b's followed by any number of c's. Which of the following BEST classifies L?",
+  options: ['L is not context-free', 'L is context-free but every pushdown automaton for it must be nondeterministic', 'L is deterministic context-free (a DPDA can accept it)', 'L is regular'],
+  answer: 2,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: "L is not regular, since fixing m=0 recovers { a^n b^n }, the textbook non-regular language, ruling out option D. However L IS context-free, generated by S -> A C, A -> a A b | epsilon, C -> c C | epsilon, ruling out option A. The key subtlety is determinism: a deterministic PDA can accept L directly and without any guessing, because every decision point is forced by the input symbol seen so far -- push a marker for each a, pop one marker for each b (rejecting outright if a b arrives with an empty stack, or if an a arrives after any b has been seen), and once the stack empties exactly at the a/b boundary, deterministically switch to reading c's freely with an empty stack, accepting at end of input if the stack is empty. At no point does the machine need to guess where the a-block ends or nondeterministically choose between competing moves -- the transition from counting to free-c-reading is triggered unambiguously by seeing the first c or end of input with an empty stack. So L is deterministic context-free, making option C correct and B incorrect."
+},
+{
+  id: 'toc-cfl-p2',
+  pyqYear: 2016,
+  q: "Consider the CFG (after eliminating useless symbols) with productions: S -> A S A | S A | A S | a B | a ; A -> B | S ; B -> b. After fully converting this grammar to Chomsky Normal Form (eliminating epsilon-productions where needed, eliminating unit productions, and binarizing/isolating terminals), how many total productions does the resulting CNF grammar have? Enter your numerical answer.",
+  options: [],
+  answer: 14,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'hard',
+  type: 'pyq-style',
+  explanation: "This grammar already has no epsilon-productions to remove (it was pre-simplified for this exercise) and no useless symbols, so the only remaining steps are unit-production elimination followed by binarization. Unit productions present are A -> B and A -> S. Resolving A -> B (B's only production is B -> b) adds A -> b. Resolving A -> S (S's productions are A S A, S A, A S, a B, a) adds A -> A S A, A -> S A, A -> A S, A -> a B, A -> a, then both unit productions are deleted. This leaves: S -> A S A | S A | A S | a B | a (5 rules) and A -> b | A S A | S A | A S | a B | a (6 rules) and B -> b (1 rule), totalling 12 productions before CNF binarization. Now enforce strict CNF form: the two length-3 rules S -> A S A and A -> A S A each need one binarization helper, so introduce X1 -> S A once and rewrite both as S -> A X1 and A -> A X1 (reusing the same helper, adding 1 new production for X1). The two 'a B' rules mix a terminal with a nonterminal in a length-2 body, which CNF disallows, so introduce Ta -> a once and rewrite both S -> a B and A -> a B as S -> Ta B and A -> Ta B (adding 1 new production for Ta). Counting the final CNF rule set: S has 5 (A X1, S A, A S, Ta B, a), A has 6 (b, A X1, S A, A S, Ta B, a), B has 1 (b), plus X1 -> S A and Ta -> a, giving 5+6+1+1+1 = 14 total CNF productions."
+},
+{
+  id: 'toc-cfl-p3',
+  pyqYear: 2017,
+  q: "Consider the grammar S -> a S b S | b S a S | epsilon, intended to generate all strings over {a,b} with an equal number of a's and b's. Which statement correctly describes this grammar?",
+  options: ['The grammar is unambiguous, and it correctly generates exactly the equal-count language', 'The grammar is ambiguous, even though it does correctly generate exactly the equal-count language', 'The grammar generates strings that do NOT always have equal numbers of a and b', 'The language generated is not context-free'],
+  answer: 1,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: "First confirm the language: every production preserves or maintains equal counts (aSbS and bSaS each add exactly one a and one b relative to their two S placeholders, and epsilon adds none), and by induction every derivable string has equal numbers of a's and b's; conversely every equal-count string is reachable by this style of recursive decomposition, so the grammar does generate exactly the intended equal-count language, ruling out option C (and this is a genuine CFL so D is false too). But the grammar is ambiguous: take the string abab. One derivation is S => aSbS => ab S => ab aSbS => ab a(eps)b(eps) = abab (expanding the first S via aSbS, leaving epsilon, then expanding the second S again via aSbS). A second, structurally distinct derivation reaches the same string abab by instead expanding the first S with the OTHER alternative bSaS partway through combined with different epsilon placements, yielding a differently shaped parse tree for the identical terminal string abab. Since at least one string has two genuinely different parse trees, the grammar is ambiguous by definition, making option B correct over option A."
+},
+{
+  id: 'toc-cfl-p4',
+  pyqYear: 2018,
+  q: "Let L = { a^i b^j c^k : i,j,k >= 0 and (i = j OR j = k) }. Which of the following is TRUE about L?",
+  options: ['L is context-free but not regular', 'L is regular', 'L is not context-free', 'The complement of L is regular'],
+  answer: 0,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: "L is the union of two individually simple context-free languages: L1 = { a^i b^j c^k : i = j } (a PDA pushes for each a and pops for each b, then reads any c's freely) and L2 = { a^i b^j c^k : j = k } (a PDA reads a's freely, then pushes for each b and pops for each c). Since context-free languages are closed under union, L = L1 union L2 is context-free, ruling out option C. L is not regular: intersecting L with the regular set a*b* (forcing k=0) leaves { a^i b^j : i=j or j=0 }, which still contains the non-regular a^i b^i pattern (whenever j is not 0), so by closure of regular languages under intersection (if L were regular, this intersection would have to be regular too, but it is not), L itself cannot be regular, ruling out option B. Since L is not regular, its complement (if regular languages included it) is not directly implied to be regular either, and in fact this L is a classical example used to show CFLs are not closed under intersection (intersecting L1 and L2 directly, rather than unioning, recovers essentially a^n b^n c^n), so D is not something we can conclude. The correct classification is option A: context-free but not regular."
+},
+{
+  id: 'toc-cfl-p5',
+  pyqYear: 2019,
+  q: "Which of the following closure properties of context-free languages are TRUE? (Select ALL that apply)",
+  options: ['Context-free languages are closed under union', 'Context-free languages are closed under intersection (the intersection of two CFLs is always context-free)', 'Context-free languages are closed under complementation', 'Context-free languages are closed under concatenation'],
+  answers: [0, 3],
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: "Union (A true) and concatenation (D true) are among the standard CFL closure properties: given two grammars/PDAs for L1 and L2, a new start symbol branching to either grammar's start (for union) or a new start symbol sequencing both grammars (for concatenation) directly constructs a CFG for the combined language, and these constructions always stay within CFL. Intersection (B false) is the classic non-closure: taking L1 = { a^n b^n c^m : n,m >= 0 } and L2 = { a^m b^n c^n : n,m >= 0 }, both individually context-free, their intersection is exactly { a^n b^n c^n : n >= 0 }, which is famously NOT context-free (provable via the CFL pumping lemma, since any pumpable substring of bounded length can touch at most two of the three equal-length blocks, so pumping breaks the three-way equality). Complementation (C false) follows from B by De Morgan's law combined with the fact that CFLs ARE closed under union: if CFLs were also closed under complement, then L1 intersect L2 could be rewritten as complement(complement(L1) union complement(L2)), which would force intersection to be CFL-closed too, contradicting the counterexample above -- so complementation must fail to preserve context-freeness in general."
+},
+{
+  id: 'toc-cfl-p6',
+  pyqYear: 2020,
+  q: "Consider L = { w w^R : w is in {a,b}* }, the language of even-length palindromes formed by a string immediately followed by its own reverse. Which of the following BEST classifies L?",
+  options: ['L is deterministic context-free (DCFL)', 'L is context-free but NOT deterministic context-free', 'L is not context-free at all', 'L is regular'],
+  answer: 1,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: "L is context-free: a nondeterministic PDA pushes symbols while nondeterministically guessing the midpoint of the input, then switches to popping and matching each remaining input symbol against the top of the stack, accepting if the stack empties exactly when input ends -- equivalently the grammar S -> a S a | b S b | epsilon generates exactly this language. L is not regular, since intersecting with a*b*a*b*-style patterns or a direct pumping-lemma argument on strings like a^p b a^p b shows no finite memory suffices to verify the exact reversal for unboundedly long w, ruling out option D. The subtlety is determinism: unlike { a^n b^n c^m : n=j or j=k }-style languages where the switch point is signalled by a distinct symbol, here there is NO marker separating w from w^R -- the machine must correctly guess exactly where the midpoint falls without any signal (since w w^R over the same alphabet {a,b} looks locally identical near the middle for many strings), and it is a proven theorem that no deterministic PDA can make this guess correctly for all inputs (a DPDA must commit to one deterministic choice per configuration, so it cannot correctly locate an unmarked midpoint in general). Hence L is CFL but not DCFL, making option B correct, while option C is wrong since we explicitly built a PDA for it, and option A is wrong precisely because of the unmarked-midpoint argument."
+},
+{
+  id: 'toc-cfl-p7',
+  pyqYear: 2021,
+  q: "Consider the grammar S -> A, A -> B, B -> C, C -> a C | b (a chain of unit productions ending in one non-unit rule with two alternatives). After eliminating ALL unit productions (replacing each with the appropriate non-unit productions inherited transitively, and removing the unit productions themselves), how many total productions remain in the grammar (summed across all four nonterminals S, A, B, C)? Enter your numerical answer.",
+  options: [],
+  answer: 8,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: "The unit-production chain is S -> A -> B -> C, and C's own non-unit productions are C -> a C and C -> b (2 productions). Unit-elimination works by transitive closure: for every nonterminal X with a unit-derivation chain reaching C, add all of C's non-unit productions directly as productions of X, then discard every unit production. Since S reaches C (via S=>A=>B=>C), S inherits both of C's productions, giving S -> a C and S -> b (2 productions). Since A reaches C (via A=>B=>C), A inherits both, giving A -> a C and A -> b (2 productions). Since B reaches C directly (B=>C), B inherits both, giving B -> a C and B -> b (2 productions). C keeps its own original 2 productions, C -> a C and C -> b. After discarding all the unit productions (S->A, A->B, B->C), the final production count is 2 (for S) + 2 (for A) + 2 (for B) + 2 (for C) = 8 total productions, with every nonterminal now able to directly generate a string starting with a's followed by a b, matching the original language exactly (since all four nonterminals were only ever unit-equivalent to C)."
+},
+{
+  id: 'toc-cfl-p8',
+  pyqYear: 2022,
+  q: "The standard algorithm for converting an arbitrary context-free grammar (that does not generate the empty string) into Chomsky Normal Form requires which of the following preprocessing steps, in general?",
+  options: ['Only eliminating unit productions is required', 'Only eliminating epsilon-productions is required', 'Only removing useless (unreachable or non-generating) symbols is required', 'All three: removing useless symbols, eliminating epsilon-productions, AND eliminating unit productions may be required, typically in that order, before final binarization'],
+  answer: 3,
+  marks: 1,
+  difficulty: 'easy',
+  type: 'pyq-style',
+  explanation: "The standard CNF conversion pipeline has several stages because each stage can introduce artifacts that the next stage must clean up. First remove useless symbols (nonterminals that can never be reached from S, or that can never derive any terminal string) so the grammar does not waste effort converting dead productions. Next eliminate epsilon-productions (except possibly S -> epsilon if the empty string must genuinely be in the language, kept as a special-cased exception), since CNF's core A -> BC | a form cannot represent A -> epsilon directly, and removing epsilon-productions naturally creates new unit productions (e.g. A -> B C becomes A -> C when B was nullable and omitted). This is exactly why unit-production elimination must come AFTER epsilon-removal -- the newly created unit productions need to be resolved too. Finally, after both of those, remaining productions are binarized (long right-hand sides broken into chains of new nonterminals) and terminals mixed with nonterminals in length-2+ bodies are isolated via helper nonterminals (X -> a). Skipping any of the three preprocessing steps can leave productions that CNF conversion cannot correctly express, so option D (all three, in that order) is correct."
+},
+{
+  id: 'toc-cfl-p9',
+  pyqYear: 2023,
+  q: "To prove L = { a^n b^n c^n : n >= 0 } is not context-free using the CFL pumping lemma, we pick w = a^p b^p c^p for pumping length p, and consider any decomposition w = uvxyz with |vxy| <= p and |vy| >= 1. Because of the |vxy| <= p restriction, at most how many of the three distinct symbols (a, b, c) can appear WITHIN the substring vxy?",
+  options: [],
+  answer: 2,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: "The string w = a^p b^p c^p consists of exactly three contiguous blocks, each of length p, laid out as p a's, then p b's, then p c's. Since |vxy| <= p, the substring vxy spans a contiguous window of at most p characters. Because each individual block already has length exactly p, a window of length at most p can straddle at most ONE block boundary -- if it started strictly inside the a-block and extended into the b-block, it could cover the tail of the a-block and the head of the b-block (touching 2 distinct symbols), but it cannot reach far enough to also touch any part of the c-block, since that would require crossing two full boundaries within a span of only p characters, which is impossible given each block itself already has length p. So vxy can contain at most 2 of the 3 distinct symbols. This is precisely the insight that breaks the language: since vxy misses at least one symbol type entirely, pumping v and y (repeating them, i.e. taking i=2) increases the count of at most two of the three symbol types while leaving the third symbol's count exactly at p, destroying the required three-way equality n=n=n and producing a string outside L, which is the contradiction that proves non-context-freeness."
+},
+{
+  id: 'toc-cfl-p10',
+  pyqYear: 2024,
+  q: "Using the CYK (Cocke-Younger-Kasami) dynamic programming algorithm to test membership of a length-5 string in a CNF grammar's language, the algorithm fills a triangular table where the cell for each contiguous substring (of every possible length from 1 up to 5, at every possible starting position) is computed. How many total substrings (i.e. table cells) does this triangular table have for a string of length n=5? Enter your numerical answer.",
+  options: [],
+  answer: 15,
+  kind: 'nat',
+  marks: 1,
+  difficulty: 'easy',
+  type: 'pyq-style',
+  explanation: "The CYK table has one cell for every contiguous substring of the input, and a string of length n has exactly n substrings of length 1 (each individual symbol), n-1 substrings of length 2, n-2 substrings of length 3, and so on down to exactly 1 substring of length n (the whole string itself). Summing these counts gives n + (n-1) + (n-2) + ... + 1 = n(n+1)/2, the standard triangular number formula. For n=5, this is 5 x 6 / 2 = 15. Each cell must be filled by checking, for every way of splitting that substring into two adjacent pieces, whether some CNF rule A -> B C allows combining a nonterminal already found for the left piece with a nonterminal already found for the right piece (plus the base case of single-symbol cells being filled directly from CNF's A -> a rules), and the total work is exactly these 15 cells for n=5, which is the basis for CYK's well-known O(n^3) time complexity (n^2 cells, each needing up to O(n) split points to check)."
+},
+{
+  id: 'toc-cfl-p11',
+  pyqYear: 2025,
+  q: "Consider L = { a^n b^m : n,m >= 0 and n is NOT equal to m }, the language of strings with an unequal number of a's and b's. Which of the following BEST classifies L?",
+  options: ['L is deterministic context-free (DCFL)', 'L is context-free but not deterministic context-free', 'L is not context-free', 'L is regular'],
+  answer: 0,
+  marks: 2,
+  difficulty: 'hard',
+  type: 'pyq-style',
+  explanation: "L is not regular (its complement within a*b*, namely { a^n b^n }, is the textbook non-regular language, and regular languages are closed under complement and intersection with regular sets, so if L were regular this would force a^n b^n to be regular too, a contradiction), ruling out option D. Perhaps surprisingly, L IS deterministic context-free, which is a classic and slightly counterintuitive textbook result: a DPDA can process a^n b^m by first pushing a marker for every a, then popping one marker per b while symbols remain equal, and crucially it can DETECT which case it is in deterministically -- if b's run out while markers remain on the stack (n > m), or if the stack empties while b's are still arriving (n < m, detected by then reading extra b's with an empty stack using a distinct 'now definitely unequal, accept the rest' mode), the machine commits to accepting once inequality becomes certain, and this decision is always forced by the next input symbol and current stack state, never requiring a guess between competing moves. Because DCFLs are closed under complement (a DPDA can always be normalized to read all its input then flip its accept/reject decision) and { a^n b^n } is DCFL, its complement RESTRICTED to a*b* (which is exactly this unequal-count language) is also DCFL, making option A correct rather than B."
+},
+{
+  id: 'toc-cfl-p12',
+  pyqYear: 2026,
+  q: "Consider these four languages: (I) { a^n b^2n : n >= 0 }. (II) { a^n b^n c^n : n >= 0 }. (III) { w w : w is in {a,b}* }. (IV) { a^i b^j : i,j >= 0 and i <= j }. Which of these are CONTEXT-FREE (but not regular)? (Select ALL that apply)",
+  options: ['Language I', 'Language II', 'Language III', 'Language IV'],
+  answers: [0, 3],
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: "Language I ({a^n b^2n}) is context-free via S -> a S b b | epsilon, which pushes one marker per a and pops two markers per b -- a straightforward single-counter CFL, not regular because the fixed 1:2 ratio requirement cannot be tracked by any finite-state DFA for unbounded n (standard pumping-lemma argument mirrors a^n b^n). Language IV ({a^i b^j : i <= j}) is context-free via a PDA that pushes for each a, then pops one marker per b while available, then continues accepting any further b's once the stack is empty (allowing j to exceed i freely) -- also not regular, since restricting to i=j recovers the non-regular a^n b^n as a special case, so the general inequality language cannot be regular either (if it were, intersecting with the regular set where every a is matched by exactly one b via a different regular constraint would force a^n b^n to be regular too). Language II ({a^n b^n c^n}) is the classic NON-context-free language (provable via the CFL pumping lemma, since any pumpable window of bounded length can touch at most two of the three equal blocks), so it is excluded. Language III ({w w}) is also famously NOT context-free (the CFL pumping lemma similarly fails for strings like a^p b a^p b, since pumping any bounded window either desynchronizes the two halves or fails to affect both copies identically), so it is excluded too. Only I and IV qualify."
+},
+{
+  id: 'toc-cfl-p13',
+  pyqYear: 2016,
+  q: "Consider L = { a^n b^n a^n : n >= 0 }, i.e. a block of n a's, then n b's, then n more a's, all with the SAME count n. Which of the following BEST classifies L?",
+  options: ['L is regular', 'L is context-free but not regular', 'L is not context-free', 'L is context-sensitive but the exact classification is undecidable in general'],
+  answer: 2,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: "This is a classic 'cross-serial dependency' style language that fails to be context-free, closely analogous in difficulty to a^n b^n c^n despite reusing the same symbol a on both ends. Apply the CFL pumping lemma with w = a^p b^p a^p for pumping length p: any decomposition w = uvxyz with |vxy| <= p and |vy| >= 1 forces vxy to lie within a window of length at most p, which (by the same block-boundary argument as the classic a^n b^n c^n proof) can only overlap with at most two of the three blocks -- either touching only the first a-block and part of the b-block, only the b-block and part of the second a-block, or (if positioned exactly at a boundary) parts of two adjacent blocks, but it can never simultaneously touch all three blocks including both separated a-blocks, since they are separated by a full length-p block of b's in between. This means pumping (repeating vxy, taking i=2 or deleting it, taking i=0) is guaranteed to change the count of a's in only ONE of the two a-blocks (or change only the b-count) while leaving the other a-block's count fixed, breaking the required three-way equality between both a-counts and the b-count. This produces a string outside L for every possible decomposition, proving L is NOT context-free (it requires full context-sensitive power, since a linear-bounded automaton can verify all three counts using bounded extra tape). Option C is correct."
+},
+{
+  id: 'toc-cfl-p14',
+  pyqYear: 2020,
+  q: "A context-free language L is said to be INHERENTLY AMBIGUOUS when:",
+  options: ['Every context-free grammar that generates L is ambiguous (no unambiguous grammar for L exists at all)', 'At least one grammar that generates L happens to be ambiguous, even though some other grammar for L might be unambiguous', 'L cannot be generated by any context-free grammar whatsoever', 'L is not a context-free language at all'],
+  answer: 0,
+  marks: 1,
+  difficulty: 'easy',
+  type: 'pyq-style',
+  explanation: "Ambiguity, as usually discussed, is a property of a specific GRAMMAR (some string in the language has two or more distinct parse trees under that particular grammar) -- and it is common for a language to have both an ambiguous grammar and a completely different, equivalent, unambiguous grammar generating the exact same language, in which case the language itself is not inherently ambiguous, just described awkwardly by one particular grammar (option B describes this ordinary, resolvable situation, not inherent ambiguity). Inherent ambiguity is the much stronger property of the LANGUAGE itself: it means that absolutely no context-free grammar for L can ever be unambiguous, no matter how it is constructed -- every possible CFG generating exactly L is forced to have some string with multiple parse trees. This is a real, provable phenomenon (a classical example is the union-based language { a^i b^j c^k : i=j or j=k }, which can be shown to be inherently ambiguous using a counting argument on how many derivations must exist for large strings satisfying both i=j and j=k simultaneously). Options C and D are simply false definitions (inherent ambiguity presupposes L IS context-free, generated by many possible grammars, all of which are ambiguous), so option A is the correct definition."
+}
+);

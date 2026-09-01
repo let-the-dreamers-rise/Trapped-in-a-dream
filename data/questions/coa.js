@@ -2174,3 +2174,496 @@ window.GATE_DATA.questions['coa'].topics.find(function(t){return t.id==='coa-dat
   explanation: 'The highlighted path shows the ALU computing a memory address (from a register value, typically added to an offset), that address being sent into Data Memory to be READ, and the value that comes back out of Data Memory being selected by the Mux (MemtoReg=1) to be written back into the Register File. This exact sequence -- compute address, read memory, write the loaded value into a register -- is precisely what a load word (lw) instruction does. It rules out sw (store word), since a store writes a register value INTO Data Memory and never routes anything back into the Register File, so there would be no active Mux-to-RegFile write path at all. It rules out add, since a register-register ALU instruction writes the ALU result directly back to the Register File, meaning the Mux would select the ALU output (the dashed path) rather than the Data Memory output. It rules out beq, since a branch does not write back to the Register File at all -- it only affects the PC via a separate branch-target adder and comparison, which is not shown as active here. Only lw matches every teal-highlighted segment in the diagram.'
 }
 );
+
+window.GATE_DATA.questions['coa'].topics.find(function(t){return t.id==='coa-instructions';}).questions.push(
+{
+  id: 'coa-instructions-p1',
+  pyqYear: 2015,
+  q: 'On a three-address machine (each instruction can name up to three operands directly from memory, e.g. ADD T,A,B), what is the minimum number of instructions needed to evaluate X = (A + B) * (C - D) / E?',
+  options: ['3', '4', '5', '6'],
+  answer: 1,
+  marks: 1,
+  difficulty: 'easy',
+  type: 'pyq-style',
+  explanation: 'A three-address instruction can compute one binary operation per instruction, writing its result to a fresh temporary while reading both operands directly from memory or from earlier temporaries. The expression has exactly four binary operators: +, -, *, and /. So: ADD T1,A,B computes A+B; SUB T2,C,D computes C-D; MUL T3,T1,T2 computes (A+B)*(C-D); DIV X,T3,E computes the final quotient into X. That is exactly 4 instructions, one per operator, because a three-address format never needs extra MOV or LOAD/STORE instructions to hold intermediate results — the destination field of each instruction already serves as the temporary. This is the general rule GATE tests here: on a true three-address machine, instruction count equals the number of operators in the expression.'
+},
+{
+  id: 'coa-instructions-p2',
+  pyqYear: 2016,
+  q: 'An instruction is 8 bits wide. Register operand fields are 3 bits each. Two-address (register-register) instructions use two such fields, leaving 2 bits for the opcode. If exactly 3 of the 4 opcode patterns are assigned to two-address instructions, what is the maximum number of one-address instructions obtainable from the unused pattern via expanding opcodes?',
+  options: ['4', '6', '8', '16'],
+  answer: 2,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: 'A 2-bit opcode field provides 2^2 = 4 distinct patterns. Two-address instructions consume 3 of these 4 patterns (each still followed by two 3-bit register fields). That leaves 4 - 3 = 1 opcode pattern unused. In the expanding opcode scheme, this single unused pattern can be extended: one of the two 3-bit fields that used to be a register operand is reinterpreted as additional opcode bits, while the other 3-bit field still supplies the single register operand needed by a one-address instruction. This gives 1 (leftover pattern) x 2^3 (bits of the freed field) = 8 distinct one-address opcodes. The governing rule, as always with expanding opcodes, is: number of leftover patterns at one level, multiplied by 2^(bits reclaimed), gives the instruction count achievable at the next level.'
+},
+{
+  id: 'coa-instructions-p3',
+  pyqYear: 2017,
+  q: 'An addressing mode computes the effective address as EA = Base register + (Index register x element size) + Displacement. Given Base = 2000, Index = 50, element size = 4 bytes, and Displacement = 100 (all in the same units), what effective address does the instruction access?',
+  options: ['2300', '2150', '2250', '2400'],
+  answer: 0,
+  marks: 1,
+  difficulty: 'easy',
+  type: 'pyq-style',
+  explanation: 'This is base-indexed addressing with scaling, common for array-of-structures access where the index register counts elements rather than bytes. Substituting the given values: EA = 2000 + (50 x 4) + 100. First scale the index by the element size: 50 x 4 = 200, converting an element count into a byte offset. Then add the displacement: 200 + 100 = 300. Finally add the base: 2000 + 300 = 2300. A common error is forgetting to scale the index (which would wrongly give 2000+50+100=2150) or scaling the displacement as well (which is never scaled, since it is already a byte-granular constant baked into the instruction). The correct effective address is 2300.'
+},
+{
+  id: 'coa-instructions-p4',
+  pyqYear: 2018,
+  q: 'A machine uses 12-bit instructions with 3-bit register fields. Two-address (register-register) instructions use two such fields, leaving 6 opcode bits (64 patterns). If 55 patterns are reserved for two-address instructions, what is the maximum number of one-address instructions (using a single 3-bit register field) obtainable from the remaining patterns via expanding opcodes?',
+  options: ['63', '72', '81', '90'],
+  answer: 1,
+  marks: 2,
+  difficulty: 'hard',
+  type: 'pyq-style',
+  explanation: 'The 6-bit opcode field allows 2^6 = 64 distinct patterns. Two-address instructions use 55 of them, each still followed by two 3-bit register fields. That leaves 64 - 55 = 9 unused patterns. Under expanding opcodes, each of these 9 patterns can absorb one of the two freed 3-bit register fields as extra opcode bits, while the remaining 3-bit field still supplies the one register operand a one-address instruction needs. So the maximum count is 9 (leftover patterns) x 2^3 (bits reclaimed from one freed field) = 9 x 8 = 72. This is the classic multi-level expanding-opcode calculation GATE has repeatedly tested: always compute leftover patterns at the current level first, then multiply by 2^(width of the field being folded into the opcode) to get the count achievable one level down.'
+},
+{
+  id: 'coa-instructions-p5',
+  pyqYear: 2019,
+  q: 'A branch instruction 4 bytes long is stored at address 3000. The processor uses PC-relative addressing where the signed offset is added to the PC after it has already been incremented past the current instruction. What signed offset must the instruction encode to branch backward to address 2960?',
+  options: ['-44', '-40', '-48', '-36'],
+  answer: 0,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: 'By the time the offset is added, the PC has already advanced past this 4-byte instruction, so the base for the addition is 3000 + 4 = 3004, not 3000. The offset needed is target - (updated PC) = 2960 - 3004 = -44. Because the branch target lies before the current instruction, the offset must be negative, and PC-relative addressing handles this naturally using a signed (two\'s-complement) offset field. A very common mistake is using the un-incremented PC (3000) as the base, which would give -40 instead — always remember the fetch stage increments the PC first, and PC-relative effective-address computation happens relative to that already-updated value, not the address the instruction itself was fetched from.'
+},
+{
+  id: 'coa-instructions-p6',
+  pyqYear: 2020,
+  q: 'Register R3 holds the memory address 500. The instruction MOV (R3)+, R1 uses auto-increment addressing: it first fetches the operand from the address in R3, then increments R3 by the operand size, 4 bytes. What is the value of R3 immediately after this instruction executes?',
+  options: ['500', '504', '496', '508'],
+  answer: 1,
+  marks: 1,
+  difficulty: 'easy',
+  type: 'pyq-style',
+  explanation: 'Auto-increment addressing performs the memory access using the register\'s current contents first, and only afterward updates the register by the size of the data item just accessed. Here R3 starts at 500, so the operand is fetched from address 500 for R1. Then, because the operand size is 4 bytes (a word), R3 is incremented by 4, giving 500 + 4 = 504. This mode is ideal for stepping sequentially through an array: a loop repeating MOV (R3)+, R1 automatically advances R3 to the next element\'s address after each access, without a separate increment instruction. The increment amount always equals the size of the operand actually transferred, not a fixed value of 1, which is the detail GATE most often tests here.'
+},
+{
+  id: 'coa-instructions-p7',
+  pyqYear: 2021,
+  q: 'An instruction ADD @X, R1 uses memory-indirect addressing for its source operand: location X in memory holds the address of the actual operand. Excluding the instruction fetch itself, how many memory read accesses are needed to obtain the source operand\'s value?',
+  options: ['1', '2', '3', '4'],
+  answer: 1,
+  marks: 1,
+  difficulty: 'easy',
+  type: 'pyq-style',
+  explanation: 'Memory-indirect addressing requires two separate memory accesses to reach the operand. First, the processor reads location X to obtain the pointer stored there (this is one memory access). Second, it uses that pointer as an address and reads memory again to obtain the actual operand value (a second memory access). This is what distinguishes memory-indirect from register-indirect or direct addressing: register-indirect needs only one memory access (the register itself supplies the address for free), and direct addressing also needs only one access (the instruction directly embeds the operand address). Memory-indirect is more flexible (the pointer can be updated by other code) but strictly slower, needing exactly one extra memory reference compared to direct or register-indirect addressing.'
+},
+{
+  id: 'coa-instructions-p8',
+  pyqYear: 2022,
+  q: 'On a one-address (accumulator-based) machine with LOAD, STORE, ADD, SUB and MUL instructions (each combining the accumulator with one memory operand), what is the minimum number of instructions needed to evaluate Y = (P + Q) * (R - S)?',
+  options: ['5', '6', '7', '8'],
+  answer: 2,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: 'A minimal accumulator-machine sequence is: LOAD P (AC=P); ADD Q (AC=P+Q); STORE T (T=P+Q, freeing the accumulator); LOAD R (AC=R); SUB S (AC=R-S); MUL T (AC=(R-S)*T=(R-S)*(P+Q), which equals the desired product since multiplication commutes); STORE Y (Y=AC). Counting these: LOAD, ADD, STORE, LOAD, SUB, MUL, STORE is exactly 7 instructions. The key saving compared to a naive count is that the second operand of the final MUL can be read directly from memory location T without a separate LOAD, since MUL is itself a one-address (accumulator, memory) instruction. Each binary operator still needs one arithmetic instruction, but only sub-expressions that must be preserved across another LOAD need an explicit STORE, which is why the total is 7 rather than a flat 3 instructions per operator.'
+},
+{
+  id: 'coa-instructions-p9',
+  pyqYear: 2023,
+  q: 'A CPU has 100 distinct opcodes and 16 general-purpose registers. A two-address register-register instruction format encodes the opcode plus two register operand fields, each field sized to just accommodate the register count. If the instruction must be a whole number of bytes, what is the minimum instruction length in bits?',
+  options: ['15', '16', '14', '20'],
+  answer: 1,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: 'The opcode field must distinguish 100 distinct opcodes, needing ceil(log2 100) = 7 bits, since 2^6=64 is too few but 2^7=128 suffices. Each register field must distinguish 16 registers, needing ceil(log2 16) = 4 bits exactly, since 2^4=16. With two register operands, the raw total is 7 + 4 + 4 = 15 bits. However, the instruction is required to occupy a whole number of bytes, so 15 bits must be rounded up to the next multiple of 8, which is 16 bits. This is a two-step calculation GATE frequently tests: first compute the true information-theoretic minimum from ceil(log2(.)) on each field, then apply whatever alignment or word-size constraint the question states, since the raw bit count is very often not the final answer.'
+},
+{
+  id: 'coa-instructions-p10',
+  pyqYear: 2024,
+  q: 'A zero-address (stack) machine evaluates the postfix expression A B + C D - * E / using PUSH, POP, ADD, SUB, MUL and DIV, where each arithmetic instruction pops its operands from the stack and pushes the result, and the final value must be popped into memory location X. What is the total number of instructions executed?',
+  options: ['8', '9', '10', '11'],
+  answer: 2,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: 'The postfix expression has 5 distinct operands (A, B, C, D, E) and 4 operators (+, -, *, /). Every operand needs exactly one PUSH instruction to place it on the stack (5 PUSH instructions). Every operator needs exactly one arithmetic instruction, since on a stack machine ADD/SUB/MUL/DIV implicitly pop their two operands and push the single result (4 instructions: ADD for A+B, SUB for C-D, MUL to multiply the two intermediate results, DIV to divide by E). Finally, the last value remaining on the stack must be explicitly popped into X with one POP instruction. Total = 5 (PUSH) + 4 (operators) + 1 (final POP) = 10 instructions. A common miscount is forgetting the terminal POP, which would wrongly give 9.'
+},
+{
+  id: 'coa-instructions-p11',
+  pyqYear: 2025,
+  q: 'An array of 8-byte double-precision elements begins at base address 1000 (encoded in the instruction). Indexed addressing computes EA = Base + (Index register x element size). If the index register holds 5, what effective address does the instruction access?',
+  options: ['1040', '1005', '1008', '1045'],
+  answer: 0,
+  marks: 1,
+  difficulty: 'easy',
+  type: 'pyq-style',
+  explanation: 'Indexed addressing is designed for array traversal: the base address (fixed, embedded in the instruction) marks the start of the array, and the index register (which the program increments across loop iterations) selects which element to access, automatically scaled by the element size so the programmer works in element counts rather than raw byte offsets. Here the index register holds 5, meaning "the 6th element" (0-indexed), and each element occupies 8 bytes, so the byte offset is 5 x 8 = 40. Adding this to the base gives EA = 1000 + 40 = 1040. Forgetting to scale by element size (giving 1005) is the most common error GATE targets with this pattern — the index register almost always counts elements, not bytes, unless a question explicitly says otherwise.'
+},
+{
+  id: 'coa-instructions-p12',
+  pyqYear: 2026,
+  q: 'A 10-bit instruction word has two 4-bit address fields for two-address instructions, leaving a 2-bit opcode (4 patterns). Three of the 4 patterns are used for two-address instructions, so the remaining pattern expands into one-address instructions using one freed 4-bit field (giving 16 one-address opcodes). If only 10 of those 16 one-address opcodes are actually used, how many zero-address instructions can the remaining opcodes support using the last 4-bit field?',
+  options: ['16', '32', '64', '96'],
+  answer: 3,
+  marks: 2,
+  difficulty: 'hard',
+  type: 'pyq-style',
+  explanation: 'Working top-down: the 2-bit opcode gives 4 patterns; 3 are used for two-address instructions, leaving 1 pattern, which expands across one freed 4-bit field to give 1 x 2^4 = 16 possible one-address opcodes (each still carrying one 4-bit address field). Of these 16, only 10 are assigned to actual one-address instructions, leaving 16 - 10 = 6 unused one-address-level patterns. Each of these 6 patterns can expand again by folding the last remaining 4-bit field into the opcode, since a zero-address instruction needs no address field at all. This gives 6 x 2^4 = 96 possible zero-address instructions. This three-level cascade — two-address to one-address to zero-address — is the fullest version of the expanding-opcode pattern GATE tests, and each level must be computed strictly in sequence using the previous level\'s leftover count.'
+},
+{
+  id: 'coa-instructions-p13',
+  pyqYear: 2017,
+  q: 'On a two-address machine (each arithmetic instruction destroys its first operand, e.g. ADD dst,src computes dst = dst + src), what is the minimum number of instructions to evaluate W = (A - B) / (C + D * E), assuming a MOV instruction is available to load a temporary from a memory operand?',
+  options: ['6', '7', '8', '9'],
+  answer: 2,
+  marks: 2,
+  difficulty: 'hard',
+  type: 'pyq-style',
+  explanation: 'A safe two-address sequence, always evaluating into a temporary before it is overwritten, is: MOV T1,D; MUL T1,E (T1=D*E); MOV T2,C; ADD T2,T1 (T2=C+D*E); MOV T3,A; SUB T3,B (T3=A-B); DIV T3,T2 (T3=(A-B)/(C+D*E), using the two-address convention that DIV dst,src computes dst=dst/src); MOV W,T3. Counting instructions: 3 MOV-load pairs before their operators (6 instructions: 3 MOV + 3 operator) plus one more DIV plus the final MOV, giving MOV,MUL,MOV,ADD,MOV,SUB,DIV,MOV = 8 instructions total. Two-address machines need one extra MOV per operand that would otherwise be destroyed prematurely, which is why they typically need more instructions than an equivalent three-address machine for the same expression, even though each instruction is shorter.'
+},
+{
+  id: 'coa-instructions-p14',
+  pyqYear: 2019,
+  q: 'A 16-bit instruction reserves 6 bits for the opcode and the remaining 10 bits for a signed (two\'s complement) immediate operand. What is the largest positive integer value that can be encoded in the immediate field?',
+  options: ['511', '512', '1023', '255'],
+  answer: 0,
+  marks: 1,
+  difficulty: 'easy',
+  type: 'pyq-style',
+  explanation: 'A 10-bit two\'s complement field can represent 2^10 = 1024 distinct values in total, split asymmetrically between negative and non-negative numbers: it covers the range from -2^9 = -512 up to +(2^9 - 1) = +511. The largest positive value is therefore 511, not 512, because value 0 is counted among the non-negative values, leaving only 511 positive slots above it (0 through 511 is 512 values, matching half of the 1024-value range, while -512 through -1 is the other 512 values). A frequent slip is to answer 512 by treating the field as unsigned, or 1023 by forgetting the sign bit consumes half the range entirely. This immediate-range calculation — 2^(n-1) - 1 for the positive extreme — recurs any time GATE asks about the reach of a signed literal or displacement field.'
+}
+);
+
+window.GATE_DATA.questions['coa'].topics.find(function(t){return t.id==='coa-datapath';}).questions.push(
+{
+  id: 'coa-datapath-p1',
+  pyqYear: 2015,
+  q: 'A single-cycle processor has functional delays: instruction fetch 220 ps, register read 90 ps, ALU 140 ps, data memory access 210 ps, register write-back 90 ps. Every instruction, regardless of type, completes in exactly one clock cycle. What is the minimum clock period the design can use?',
+  options: ['750 ps', '220 ps', '210 ps', '650 ps'],
+  answer: 0,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: 'In a single-cycle datapath, every instruction must complete within one clock period, so that period must be long enough for the slowest instruction to pass through every stage its execution needs. The worst case is a load, which visits all five stages: fetch (220), register read (90), ALU address computation (140), data memory access (210) and write-back (90). Summing these gives 220+90+140+210+90 = 750 ps. It is not correct to take only the maximum individual stage delay (210 ps), because unlike a pipeline, a single-cycle design does not overlap stages across instructions at all -- every stage of the current instruction must finish sequentially before the clock edge that starts the next instruction. The clock period is therefore the sum of delays along the longest path through the datapath, not the largest single stage.'
+},
+{
+  id: 'coa-datapath-p2',
+  pyqYear: 2015,
+  q: 'Two 8-bit two\'s complement numbers, 01110010 (114) and 00110101 (53), are added. What are the resulting overflow (V) and carry-out flags?',
+  options: ['V = 1, C = 0', 'V = 0, C = 1', 'V = 1, C = 1', 'V = 0, C = 0'],
+  answer: 0,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: 'Adding the two 8-bit values bit by bit gives the sum 10100111, with a carry of 1 entering the sign (bit 7) position but a carry of 0 leaving it (no carry out of the MSB). Overflow is detected exactly when these two carries differ: V = Cin(MSB) XOR Cout(MSB) = 1 XOR 0 = 1, so V = 1. Since the final carry out of the MSB is 0, C = 0. This matches the arithmetic check: 114 + 53 = 167 in true decimal, but the maximum representable positive value in 8-bit two\'s complement is 127, so the true sum cannot fit and must overflow -- and indeed the result bit pattern 10100111 decodes as a negative number (-89), confirming that two positive operands wrongly produced a negative result, the textbook signature of signed overflow.'
+},
+{
+  id: 'coa-datapath-p3',
+  pyqYear: 2016,
+  q: 'A control memory holds 1024 microinstructions. Each microinstruction has 20 control-signal bits, a 4-bit condition-select field, and a next-address field sized to address the entire control memory. What is the total size of the control memory in bits?',
+  options: ['34816', '30720', '24576', '35840'],
+  answer: 0,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: 'The next-address field must be able to select any one of the 1024 = 2^10 microinstructions, so it needs ceil(log2 1024) = 10 bits. The full microinstruction width is therefore 20 (control bits) + 4 (condition-select) + 10 (next-address) = 34 bits. Since the control memory holds 1024 such microinstructions, the total control memory size is 1024 x 34 = 34816 bits. A common error is to size the next-address field from the number of control bits or from an unrelated main-memory address width instead of the actual depth of the control store -- the sequencer only ever needs to address locations within the microprogram memory itself, so log2(depth of control memory) is always the right basis for that field.'
+},
+{
+  id: 'coa-datapath-p4',
+  pyqYear: 2016,
+  q: 'A CPU has 46 control signals divided into three mutually exclusive groups of 5, 9 and 20 signals; within a group at most one signal is active per cycle, and a group may also have no active signal that cycle. Using vertical microprogramming with one separately encoded field per group, how many total control bits does each microinstruction need?',
+  options: ['12', '10', '15', '46'],
+  answer: 0,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: 'In vertical microprogramming, each group of mutually exclusive signals is replaced by one encoded field wide enough to represent every signal in that group PLUS one extra pattern for "none active." A group of size k therefore needs ceil(log2(k+1)) bits. For the group of 5, ceil(log2 6) = 3 bits. For the group of 9, ceil(log2 10) = 4 bits. For the group of 20, ceil(log2 21) = 5 bits. Summing across the three independently encoded fields gives 3 + 4 + 5 = 12 bits total, far fewer than the 46 bits horizontal microprogramming would need (one bit per signal), at the cost of needing a decoder on each field before the signals can be used. This "+1 for none-active" detail is the step GATE most often catches students missing.'
+},
+{
+  id: 'coa-datapath-p5',
+  pyqYear: 2017,
+  q: 'A multi-cycle processor with a 250 ps clock executes instructions in these cycle counts: load 5, store 4, ALU 4, branch 3. The instruction mix is 20% loads, 15% stores, 50% ALU and 15% branches. What is the average execution time per instruction?',
+  options: ['1012.5 ps', '1000 ps', '900 ps', '1125 ps'],
+  answer: 0,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: 'Average CPI is the mix-weighted sum of each instruction type\'s cycle count: CPI = 0.20x5 + 0.15x4 + 0.50x4 + 0.15x3 = 1.00 + 0.60 + 2.00 + 0.45 = 4.05 cycles per instruction. Multiplying by the clock period gives the average execution time per instruction: 4.05 x 250 ps = 1012.5 ps. This is the standard multi-cycle performance calculation: unlike a single-cycle design (one fixed, long cycle for every instruction) or an ideal pipeline (one cycle throughput after fill), a multi-cycle machine lets each instruction use only the cycles it needs, but the fair way to compare its overall speed against another design is always through this weighted-average CPI multiplied by the (typically much shorter) multi-cycle clock period.'
+},
+{
+  id: 'coa-datapath-p6',
+  pyqYear: 2018,
+  q: 'A register file has 64 registers, three read ports and one write port. How many bits of control input are needed per cycle in total, to select the source/destination register on every port plus one write-enable bit?',
+  options: ['25', '24', '18', '19'],
+  answer: 0,
+  marks: 1,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: 'With 64 = 2^6 registers, selecting any one register requires n = 6 bits, and this same 6-bit select is needed independently on every port, since each port may access a different register in the same cycle. There are 3 read ports and 1 write port, i.e. 4 ports total, each needing its own 6-bit select field, giving 4 x 6 = 24 bits. In addition, the write port needs one write-enable bit to indicate whether the write should actually happen this cycle (reads are typically always "on" and simply return whatever is stored). Total control bits = 24 + 1 = 25. The general formula to remember is: (number of ports) x ceil(log2(number of registers)) + (number of write ports, for their enable bits).'
+},
+{
+  id: 'coa-datapath-p7',
+  pyqYear: 2019,
+  q: 'A hardwired control unit for a multi-cycle processor is implemented as a finite state machine with 35 distinct states, whose state register feeds combinational logic together with the opcode. What is the minimum number of flip-flops needed for the state register?',
+  options: ['6', '5', '7', '35'],
+  answer: 0,
+  marks: 1,
+  difficulty: 'easy',
+  type: 'pyq-style',
+  explanation: 'An n-bit state register can distinguish 2^n distinct states, so the minimum n must satisfy 2^n >= 35. Since 2^5 = 32 is not enough to give each of the 35 states a unique code, but 2^6 = 64 comfortably covers all 35 (with 29 unused codes to spare), the minimum number of flip-flops is 6. This is the same ceil(log2 .) calculation that recurs throughout digital design questions -- for register file addressing, opcode field sizing, and control-store addressing alike -- and it is worth memorizing that the answer is always the smallest n with 2^n at least as large as the count being encoded, not the closest power of two below it.'
+},
+{
+  id: 'coa-datapath-p8',
+  pyqYear: 2020,
+  q: 'Compared with horizontal microprogramming, vertical microprogramming:',
+  options: [
+    'uses narrower microinstruction words by encoding grouped signals, but needs a decoder and typically allows fewer signals to be activated per cycle',
+    'always executes machine instructions faster because its control memory is smaller',
+    'requires no decoding logic between the control-memory output and the datapath',
+    'is only usable in hardwired, not microprogrammed, control units'
+  ],
+  answer: 0,
+  marks: 1,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: 'Horizontal microprogramming dedicates one bit of the microinstruction to each control signal, so words are wide but every signal can be asserted independently and in full parallel with no decoding delay. Vertical microprogramming instead groups mutually exclusive signals and encodes each group into a compact field, shrinking the microinstruction width considerably -- but a decoder must now expand each field back into individual signal lines before they can drive the datapath, adding a small delay, and because signals within a group are mutually exclusive by construction, fewer signals can typically be active simultaneously than in the horizontal scheme. Vertical microprogramming does not inherently make the machine faster (control memory being smaller does not by itself reduce the number of microinstructions an instruction needs), and both horizontal and vertical styles apply specifically to microprogrammed control, not hardwired control, which has no control memory at all.'
+},
+{
+  id: 'coa-datapath-p9',
+  pyqYear: 2021,
+  q: 'In a microprogrammed CPU, each machine instruction is interpreted by an average of 8 microinstructions, and each control memory access (fetching one microinstruction) takes 25 ns. Ignoring all other delays, what is the average time to execute one machine instruction?',
+  options: ['200 ns', '160 ns', '225 ns', '175 ns'],
+  answer: 0,
+  marks: 1,
+  difficulty: 'easy',
+  type: 'pyq-style',
+  explanation: 'In a microprogrammed control unit, executing one machine instruction means stepping the microprogram sequencer through its associated microroutine one microinstruction at a time, and each step costs exactly one control-memory access. If a machine instruction needs, on average, 8 microinstructions, and each such access takes 25 ns, the average execution time is simply 8 x 25 ns = 200 ns. This directly illustrates why microprogrammed control units are inherently slower than hardwired ones for the same instruction: a hardwired unit generates its control signals combinationally within a single machine cycle, while a microprogrammed unit pays one control-memory access latency for every microinstruction in the routine, and more complex (CISC-style) instructions with longer microroutines take proportionally longer.'
+},
+{
+  id: 'coa-datapath-p10',
+  pyqYear: 2022,
+  q: 'Which of the following is a correct statement about a single-bus CPU organization, where one shared internal bus connects the ALU inputs/output and all registers?',
+  options: [
+    'Transferring a value from one register to another, or through the ALU, may require multiple clock cycles because the shared bus can carry only one value at a time',
+    'A single-bus organization always executes any given instruction faster than a multi-bus organization',
+    'A single-bus CPU cannot support register-to-register ALU operations at all',
+    'The ALU in a single-bus CPU never needs a temporary latch to hold one operand'
+  ],
+  answer: 0,
+  marks: 1,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: 'Because only one value can be present on the shared bus at any instant, an ALU operation needing two register operands cannot read both simultaneously the way a multi-bus datapath could. Instead, one operand is first moved onto the bus and latched into a temporary register feeding the ALU, and only then is the second operand placed on the bus for the ALU to combine with the latched value -- consuming an extra cycle compared to a design with multiple buses or dedicated ALU input latches. This is precisely why single-bus CPUs need at least one dedicated temporary register at an ALU input: without it, the single bus could never hold two different values at once for a binary operation. Register-to-register ALU operations are still fully supported, just spread across more cycles, and a single-bus design is simpler and cheaper in hardware but generally slower per instruction, not faster, than a multi-bus alternative.'
+},
+{
+  id: 'coa-datapath-p11',
+  pyqYear: 2023,
+  q: 'A control memory holds 5000 microinstructions. What is the minimum number of bits required for the next-address field so that it can address any microinstruction in this control memory?',
+  options: [],
+  answer: 13,
+  kind: 'nat',
+  marks: 1,
+  difficulty: 'easy',
+  type: 'pyq-style',
+  explanation: 'The next-address field of a microinstruction must be wide enough to name any one of the 5000 locations in the control memory. Since 2^12 = 4096 is not enough to give a unique address to each of the 5000 microinstructions, but 2^13 = 8192 is more than enough (leaving 3192 unused addresses), the minimum field width is 13 bits. As with all such addressing-field problems, the answer is the smallest n satisfying 2^n >= (number of distinct items to be addressed), computed with ceil(log2 .), and it is never rounded down to the nearest power of two that falls short of the actual count -- 12 bits would leave 904 microinstructions with no valid address at all.'
+},
+{
+  id: 'coa-datapath-p12',
+  pyqYear: 2024,
+  q: 'A single-cycle datapath needs a 750 ps clock period because every instruction, even the fastest, must budget for the load instruction\'s full critical path. A multi-cycle version of the same underlying hardware uses a 150 ps clock, with load taking 5 cycles, store 4, ALU 4, and branch 3, in a mix of 25% load, 15% store, 40% ALU and 20% branch. Which design executes a given program faster, and by roughly what factor?',
+  options: [
+    'Multi-cycle is faster, by roughly 750/(4.05 x 150) ≈ 1.235x',
+    'Single-cycle is faster, by roughly (4.05 x 150)/750 ≈ 0.81x',
+    'Both designs take exactly the same total time',
+    'Multi-cycle is faster by exactly 5x, matching the load instruction\'s cycle count'
+  ],
+  answer: 0,
+  marks: 2,
+  difficulty: 'hard',
+  type: 'pyq-style',
+  explanation: 'First compute the multi-cycle average CPI from the mix: 0.25x5 + 0.15x4 + 0.40x4 + 0.20x3 = 1.25 + 0.60 + 1.60 + 0.60 = 4.05 cycles per instruction. Its average time per instruction is then 4.05 x 150 ps = 607.5 ps. The single-cycle design, by contrast, spends a flat 750 ps on every instruction regardless of type, since its clock must always accommodate the worst-case (load) critical path. Comparing the two average-time-per-instruction figures, 750 ps (single-cycle) versus 607.5 ps (multi-cycle), the multi-cycle design is faster, by a factor of 750/607.5 ≈ 1.235x. The general lesson: single-cycle designs waste time on every instruction to accommodate the slowest one, while multi-cycle designs let simple instructions finish in fewer cycles, and the fair comparison is always total (or average) execution time, never cycle count or clock period alone.'
+},
+{
+  id: 'coa-datapath-p13',
+  pyqYear: 2025,
+  q: 'In a microprogrammed control unit, the microprogram sequencer\'s primary job is to:',
+  options: [
+    'determine the address of the next microinstruction to fetch from control memory, based on the current microinstruction\'s next-address field and, when needed, condition flags',
+    'perform the arithmetic and logic operations specified by the current machine instruction',
+    'decode the machine instruction\'s opcode directly into datapath control signals with no control memory access',
+    'store the operands of the currently executing machine instruction'
+  ],
+  answer: 0,
+  marks: 1,
+  difficulty: 'easy',
+  type: 'pyq-style',
+  explanation: 'The microprogram sequencer is the piece of hardware that decides which control-memory location to read next, on every micro-cycle. Typically it takes the next-address field embedded in the current microinstruction as its default choice, but for conditional microbranches it also consults selected condition flags (or the machine instruction\'s opcode, at the start of a new microroutine) to choose among several possible next addresses. It does not itself perform arithmetic (that is the ALU\'s job), nor does it decode opcodes directly into datapath signals without going through control memory (that would describe hardwired control, which has no sequencer or control memory at all), nor does it store operands (that is the register file or memory\'s job). The sequencer is purely about navigating the microprogram, one microinstruction fetch at a time.'
+},
+{
+  id: 'coa-datapath-p14',
+  pyqYear: 2026,
+  q: 'A CPU has 41 control signals split into three mutually exclusive groups of 6, 10 and 14 signals (each group may also have no signal active in a given cycle). Using vertical microprogramming with an independently encoded field per group, how many control bits does one microinstruction need in total?',
+  options: ['11', '10', '9', '41'],
+  answer: 0,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: 'Each group needs a field wide enough for its own signals plus one extra code for "none of this group\'s signals active." For the group of 6, ceil(log2(6+1)) = ceil(log2 7) = 3 bits. For the group of 10, ceil(log2(10+1)) = ceil(log2 11) = 4 bits. For the group of 14, ceil(log2(14+1)) = ceil(log2 15) = 4 bits. Adding the three independently encoded fields gives 3 + 4 + 4 = 11 bits total for the microinstruction\'s control portion -- a large reduction from the 41 bits that horizontal microprogramming would need if every signal got its own dedicated bit. The recurring trap is forgetting the "+1" for the inactive case within each group, which would undercount the required field width whenever a group need not always have exactly one signal firing.'
+}
+);
+
+window.GATE_DATA.questions['coa'].topics.find(function(t){return t.id==='coa-pipelining';}).questions.push(
+{
+  id: 'coa-pipelining-p1',
+  pyqYear: 2015,
+  q: 'A 5-stage pipeline has a clock cycle of 2.5 ns. With no stalls, how long does it take to execute a program of 200 instructions?',
+  options: ['510 ns', '500 ns', '512.5 ns', '502.5 ns'],
+  answer: 0,
+  marks: 1,
+  difficulty: 'easy',
+  type: 'pyq-style',
+  explanation: 'With no hazards, a k-stage pipeline executing n instructions takes (k + n - 1) clock cycles: k cycles for the first instruction to fill the pipeline, and then one additional instruction completes every subsequent cycle. Here k = 5 and n = 200, so the total cycle count is 5 + 200 - 1 = 204 cycles. Multiplying by the 2.5 ns cycle time gives 204 x 2.5 = 510 ns. A frequent slip is to compute n x k = 1000 cycles (treating the pipeline as if it never overlapped instructions, i.e. as a non-pipelined machine), which massively overstates the time; the whole benefit of pipelining is that only the first instruction pays the full k-cycle latency, not every instruction.'
+},
+{
+  id: 'coa-pipelining-p2',
+  pyqYear: 2016,
+  q: 'A 4-stage pipeline has stage delays of 180, 140, 190 and 150 ps, and each inter-stage latch adds 10 ps. What is the asymptotic (large n) speedup over a non-pipelined implementation of the same hardware, which needs no latches?',
+  options: ['3.3', '4', '2.75', '3.0'],
+  answer: 0,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: 'The non-pipelined machine executes each instruction by passing through all four stages sequentially with no latch overhead, taking 180+140+190+150 = 660 ps per instruction. The pipelined machine\'s cycle time is fixed by its slowest stage plus one latch delay: max(180,140,190,150) + 10 = 190 + 10 = 200 ps per cycle, and for a very large instruction count the pipeline completes essentially one instruction per cycle, so its per-instruction time approaches 200 ps. The asymptotic speedup is therefore 660 / 200 = 3.3. Note this falls short of the naive "speedup = number of stages = 4" because the stages are not perfectly balanced (190 ps dominates over the average) and the latch adds fixed overhead every cycle -- both of these are exactly what keep real pipelines below their ideal k-fold speedup.'
+},
+{
+  id: 'coa-pipelining-p3',
+  pyqYear: 2017,
+  q: 'A 5-stage pipeline executes I1: ADD R1,R2,R3; I2: SUB R4,R1,R5; I3: MUL R6,R4,R7; I4: DIV R8,R6,R9, where each instruction is a RAW dependency on the one immediately before it. Without forwarding (each adjacent RAW dependency costs a 2-cycle stall, per the usual split-phase WB/ID convention), compared with full ALU-to-ALU forwarding (which entirely removes stalls for back-to-back single-cycle-EX dependencies), how many fewer cycles does the sequence take with forwarding?',
+  options: ['6', '4', '8', '2'],
+  answer: 0,
+  marks: 2,
+  difficulty: 'hard',
+  type: 'pyq-style',
+  explanation: 'Without any stalls at all, the base time for 4 instructions on a 5-stage pipeline is k+n-1 = 5+4-1 = 8 cycles. Without forwarding, each of the three adjacent RAW dependencies (I1 to I2, I2 to I3, I3 to I4) forces a 2-cycle stall so that the dependent instruction\'s ID lines up with its producer\'s WB, adding 2+2+2 = 6 stall cycles, for a total of 8+6 = 14 cycles. With full operand forwarding, the ALU result computed at the end of a producer\'s EX stage (available in the EX/MEM latch) is routed directly into the very next instruction\'s EX stage input in the following cycle -- exactly when a back-to-back dependent instruction needs it -- so none of these three dependencies causes any stall at all, and the sequence completes in the base 8 cycles. The difference is 14 - 8 = 6 cycles saved by forwarding.'
+},
+{
+  id: 'coa-pipelining-p4',
+  pyqYear: 2018,
+  q: 'In a pipelined processor, conditional branches are resolved at the end of the 4th pipeline stage. Instructions after the branch are fetched sequentially and squashed if the branch turns out to be taken. What is the branch penalty (number of wasted cycles) for a taken branch?',
+  options: ['3', '4', '2', '1'],
+  answer: 0,
+  marks: 1,
+  difficulty: 'easy',
+  type: 'pyq-style',
+  explanation: 'While the branch instruction itself is moving through stages 1 through 4, the pipeline keeps fetching subsequent sequential instructions one per cycle behind it, since the outcome is not yet known. By the time the branch resolves at the end of stage 4, three younger instructions have already been fetched into the pipeline (one entering in each of the three cycles following the branch\'s own fetch). If the branch is taken, all three of these wrongly-fetched instructions must be squashed and the correct target fetched instead, wasting exactly 3 cycles. The general formula, confirmed here, is: if the branch outcome becomes known at the end of stage b, the taken-branch penalty is b - 1 cycles -- resolving branches earlier in the pipeline is precisely why architectures add a dedicated early comparator to shrink this penalty.'
+},
+{
+  id: 'coa-pipelining-p5',
+  pyqYear: 2019,
+  q: 'In a pipelined processor, 30% of instructions are branches. Half of all branches are taken, and each taken branch incurs a 2-cycle penalty; not-taken branches and all other instructions execute at CPI 1. What is the effective CPI?',
+  options: ['1.3', '1.6', '1.15', '1.5'],
+  answer: 0,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: 'Effective CPI = base CPI + (fraction of instructions that stall) x (stall cycles each). Here 30% of instructions are branches, and of those, half (i.e. 0.30 x 0.5 = 0.15, or 15% of all instructions) are taken and each such taken branch adds a 2-cycle penalty on top of its own 1 base cycle. So the extra CPI contributed is 0.15 x 2 = 0.30, and effective CPI = 1 + 0.30 = 1.3. The not-taken half of the branches, along with every non-branch instruction, execute at the baseline CPI of 1 and contribute nothing extra. This weighted-penalty pattern -- base CPI plus (hazard frequency x penalty per hazard) -- is the single most reused formula across GATE\'s pipeline-performance questions, whether the hazard is a branch, a stall, or a cache miss.'
+},
+{
+  id: 'coa-pipelining-p6',
+  pyqYear: 2020,
+  q: 'A 4-stage pipeline has stage delays 4, 5, 11 and 5 ns (ignore latch delays). The 11 ns stage is split into two balanced stages of 5.5 ns each, turning it into a 5-stage pipeline. For a very long instruction stream, what speedup does the new 5-stage design achieve over the original 4-stage pipeline?',
+  options: ['2', '2.2', '1.57', '4'],
+  answer: 0,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: 'The original 4-stage pipeline\'s cycle time is set by its slowest stage: max(4,5,11,5) = 11 ns. After splitting the 11 ns stage into two equal 5.5 ns halves, the stage delays become {4,5,5.5,5.5,5}, and the new slowest stage is 5.5 ns, so the new cycle time is 5.5 ns. For a very long instruction stream, throughput approaches one instruction completed per cycle in both designs, so the asymptotic speedup of the new design over the old one is the ratio of cycle times: 11 / 5.5 = 2. This is the clean case where splitting the single bottleneck stage in half does translate directly into a 2x speedup, precisely because every other stage (4, 5 and 5 ns) already comfortably fits under the new 5.5 ns cycle time and none of them becomes a new bottleneck. Whenever splitting the worst stage does NOT achieve the full proportional speedup, it is because some other, previously-hidden stage becomes the new maximum instead — always recompute the new max(.) explicitly rather than assuming a clean halving.'
+},
+{
+  id: 'coa-pipelining-p7',
+  pyqYear: 2021,
+  q: 'A processor uses branch prediction with 85% accuracy. Branches make up 20% of all instructions, and each misprediction costs a 4-cycle penalty. Non-branch instructions and correctly predicted branches execute at CPI 1. What is the effective CPI?',
+  options: ['1.12', '1.20', '1.68', '1.05'],
+  answer: 0,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: 'The misprediction rate is 100% - 85% = 15%. The fraction of all instructions that are mispredicted branches is 0.20 (branch fraction) x 0.15 (misprediction rate) = 0.03, i.e. 3% of all instructions. Each of these adds 4 extra cycles beyond the baseline CPI of 1, contributing 0.03 x 4 = 0.12 to the effective CPI. Every other instruction -- non-branches and correctly predicted branches, together 97% of the stream -- runs at the baseline CPI of 1 with no penalty. Effective CPI = 1 + 0.12 = 1.12. This confirms the general principle that even a fairly accurate predictor (85%) leaves a small but real performance tax whenever the branch frequency and misprediction penalty are both non-trivial.'
+},
+{
+  id: 'coa-pipelining-p8',
+  pyqYear: 2022,
+  q: 'A 4-stage pipeline has stage latencies 500, 300, 450 and 350 ps, and each pipeline register (latch) adds 50 ps. What is the maximum clock frequency at which the pipeline can operate?',
+  options: ['1.818 GHz', '2 GHz', '1.667 GHz', '1.538 GHz'],
+  answer: 0,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: 'The pipeline\'s clock period must be at least as long as its slowest stage plus the fixed latch overhead that every stage boundary incurs: cycle time = max(500,300,450,350) + 50 = 500 + 50 = 550 ps. The maximum clock frequency is the reciprocal of this cycle time: 1 / 550 ps = 1 / (550 x 10^-12 s) ≈ 1.818 x 10^9 Hz = 1.818 GHz. A common slip is to forget the latch delay entirely (giving 1/500ps = 2 GHz) or to add the latch delay to every stage and sum them rather than adding it once to only the bottleneck stage -- the clock period is set by the single slowest stage-plus-latch path, not by the sum of all stages, since stages execute concurrently once the pipeline is full.'
+},
+{
+  id: 'coa-pipelining-p9',
+  pyqYear: 2023,
+  q: 'A pipelined processor has full operand forwarding from the EX/MEM and MEM/WB latches into the EX stage. A load instruction is immediately followed by another instruction that needs the loaded value as an ALU input. What is the minimum number of stall cycles this "load-use" hazard still requires, even with forwarding enabled?',
+  options: ['1', '0', '2', '3'],
+  answer: 0,
+  marks: 1,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: 'Forwarding eliminates stalls for ALU-to-ALU dependencies because the producer\'s result is available at the end of its EX stage, exactly one cycle before the consumer needs it in its own EX stage. A load, however, does not produce its result until the end of the MEM stage, one stage later than an ALU operation. If the very next instruction needs that loaded value in its EX stage, the timing is one cycle too tight even with forwarding: the load\'s MEM output is not ready until after the dependent instruction\'s EX stage would otherwise need it. So exactly 1 bubble (stall cycle) must still be inserted to delay the dependent instruction by one cycle, letting the load\'s MEM/WB result be forwarded into the now-delayed EX stage. This unavoidable single-cycle load-use hazard is why compilers try to schedule at least one independent instruction between a load and its first use.'
+},
+{
+  id: 'coa-pipelining-p10',
+  pyqYear: 2024,
+  q: 'A 5-stage pipeline uses a single-port unified memory, so every load or store instruction (25% of a 40-instruction program) stalls the pipeline for 1 extra cycle whenever its memory access overlaps an instruction fetch. Assuming every load/store instruction causes exactly one such stall, how many total clock cycles does the program take?',
+  options: ['54', '50', '44', '49'],
+  answer: 0,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: 'With no hazards, a 5-stage pipeline running 40 instructions takes k+n-1 = 5+40-1 = 44 cycles. This particular structural hazard arises whenever a load or store\'s MEM-stage access collides with a younger instruction\'s IF-stage access to the same single-ported memory, forcing a 1-cycle stall. With 25% of the 40 instructions being loads/stores, that is 0.25 x 40 = 10 instructions, each contributing one stall cycle, for 10 extra cycles. Total execution time = 44 (base) + 10 (structural-hazard stalls) = 54 cycles. This is the standard fix-it-with-arithmetic version of the structural hazard question: first get the ideal (k+n-1) baseline, then add one stall per resource conflict, exactly as with data or control hazards.'
+},
+{
+  id: 'coa-pipelining-p11',
+  pyqYear: 2025,
+  q: 'A 500-instruction program has 15% branches, each of which previously incurred a 2-cycle penalty. The compiler now fills the branch delay slot with a useful, always-executed instruction in 80% of branches (fully absorbing 1 of the 2 penalty cycles for those branches), while the remaining 20% of branches still pay the full 2-cycle penalty. How many total penalty cycles does delayed branching save compared to never using a delay slot?',
+  options: ['60', '75', '100', '40'],
+  answer: 0,
+  marks: 2,
+  difficulty: 'hard',
+  type: 'pyq-style',
+  explanation: 'The number of branches in the program is 15% of 500 = 75. Without any delayed-branch technique, every one of these 75 branches would pay the full 2-cycle penalty, for a baseline total of 75 x 2 = 150 penalty cycles. With delayed branching, 80% of the 75 branches (= 60 branches) have their delay slot filled with useful work, and that filled instruction executes regardless of the branch outcome, absorbing exactly 1 of the 2 penalty cycles per such branch — saving 60 x 1 = 60 cycles. The remaining 20% of branches (15 branches) gain nothing and still cost the full 2 cycles each. So the total saving compared to never using delayed branching is 60 cycles (only the successfully-filled branches contribute any saving at all — the unfilled ones are exactly as expensive as before).'
+},
+{
+  id: 'coa-pipelining-p12',
+  pyqYear: 2026,
+  q: 'A processor has a balanced 6-stage pipeline (ideal speedup would be 6 with zero stalls) but stalls give it an effective CPI of 1.25. What is the actual speedup of this pipelined processor over an equivalent non-pipelined implementation?',
+  options: ['4.8', '6', '7.5', '4.25'],
+  answer: 0,
+  marks: 1,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: 'For a pipeline with perfectly balanced stages, the ideal (zero-stall) speedup over a non-pipelined machine equals the number of stages, k = 6, since the pipeline would then complete one instruction every single cycle instead of one every k cycles. Stalls reduce this ideal by inflating the effective CPI above 1: actual speedup = ideal speedup / effective CPI = k / CPI = 6 / 1.25 = 4.8. This captures the intuitive idea that a CPI of 1.25 means the pipeline is, on average, only 1/1.25 = 80% as efficient as the zero-stall ideal, so the realized speedup is 80% of the theoretical maximum: 0.8 x 6 = 4.8, matching the direct division. This k/CPI relationship is the fastest way to combine a pipeline\'s structural potential with its measured hazard overhead into one performance number.'
+},
+{
+  id: 'coa-pipelining-p13',
+  pyqYear: 2015,
+  q: 'A 5-stage pipeline has every stage taking exactly 2 ns (ignore latch delay). For a program of 10 instructions, what is the actual speedup of the pipelined execution over a non-pipelined implementation of the same datapath (where each instruction takes 5 x 2 = 10 ns, executed one at a time)?',
+  options: ['3.57', '5', '2.86', '4.5'],
+  answer: 0,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: 'The non-pipelined machine executes all 5 stages of every instruction sequentially, taking 5 x 2 = 10 ns per instruction, so 10 instructions take 10 x 10 = 100 ns in total. The pipelined machine, with no hazards, takes (k+n-1) cycles = (5+10-1) = 14 cycles, each 2 ns long, giving 14 x 2 = 28 ns in total. The actual speedup for this finite instruction count is 100/28 ≈ 3.57 — noticeably less than the ideal asymptotic speedup of k = 5, because with only n = 10 instructions the pipeline fill/drain overhead (4 extra cycles beyond the ideal one-per-cycle rate) is still a significant fraction of the total time. This finite-n calculation, as opposed to the "for very large n" asymptotic shortcut, is exactly the distinction GATE tests when it specifies a concrete, small instruction count rather than saying "a very long instruction stream."'
+},
+{
+  id: 'coa-pipelining-p14',
+  pyqYear: 2024,
+  q: 'A 6-stage pipeline has stage delays 3, 4, 9, 5, 6 and 4 ns, with each latch adding 1 ns. The 9 ns stage is split into three equal 3 ns sub-stages, making an 8-stage pipeline (still with 1 ns latches). What is the asymptotic speedup of the new 8-stage design over the original 6-stage design?',
+  options: ['1.43', '3', '2', '1.67'],
+  answer: 0,
+  marks: 2,
+  difficulty: 'hard',
+  type: 'pyq-style',
+  explanation: 'The original pipeline\'s cycle time is its slowest stage plus one latch: max(3,4,9,5,6,4) + 1 = 9 + 1 = 10 ns. After splitting the 9 ns stage into three 3 ns sub-stages, the stage delays become {3,4,3,3,3,5,6,4}; the new slowest stage is now the 6 ns one (previously hidden behind the larger 9 ns stage), giving a new cycle time of 6 + 1 = 7 ns. For a very long instruction stream, both pipelines approach one instruction completed per cycle, so the asymptotic speedup of the new design over the old one is simply the ratio of cycle times: 10 / 7 ≈ 1.43. This illustrates an important subtlety: splitting the single worst stage does not automatically deliver a proportional speedup, because as soon as that stage shrinks, a different, previously-hidden stage (here the 6 ns one) becomes the new bottleneck and caps the achievable improvement.'
+}
+);

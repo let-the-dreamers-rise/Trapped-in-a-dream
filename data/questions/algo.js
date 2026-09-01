@@ -2576,3 +2576,592 @@ window.GATE_DATA.questions['algo'].topics.find(function(t){return t.id==='algo-d
   explanation: 'Count every highlighted F(2) node in the tree. F(5) branches into F(4) and F(3). F(4) itself branches into F(3) and F(2) -- that F(2) is the first occurrence. The F(3) that is a child of F(4) branches into F(2) and F(1) -- that F(2) is the second occurrence. Separately, F(5)\'s other child F(3) (the right subtree) branches into F(2) and F(1) -- that F(2) is the third occurrence. So F(2) is recomputed 3 separate times from scratch, doing identical redundant work each time (each F(2) call itself re-expands into F(1) and F(0)). This exponential redundancy -- the same subproblem solved repeatedly -- is precisely the inefficiency that dynamic programming (via memoization or bottom-up tabulation) eliminates, computing each distinct F(k) exactly once and reducing the O(2^n) naive recursion to O(n) time.'
 }
 );
+window.GATE_DATA.questions['algo'].topics.find(function(t){return t.id==='algo-asymptotic';}).questions.push(
+{
+  id: 'algo-asymptotic-pyq1',
+  pyqYear: 2015,
+  q: 'Which one of the following statements is TRUE for all sufficiently large values of n?',
+  options: ['n^3 = O(n^2)', '2^n = O(n!)', 'n log n = O(n)', 'n! = O(2^n)'],
+  answer: 1,
+  marks: 1,
+  difficulty: 'easy',
+  type: 'pyq-style',
+  explanation: 'For each option, check whether the left side is bounded above by a constant multiple of the right side for large n. n^3 = O(n^2) is FALSE since n^3/n^2 = n grows without bound. n! = O(2^n) is FALSE since n!/2^n grows without bound for n>4 (factorial eventually beats exponential of fixed base). n log n = O(n) is FALSE since (n log n)/n = log n grows without bound. That leaves 2^n = O(n!): since n! = n(n-1)(n-2)...(3)(2)(1) has n-1 factors each at least 2 once n>=2, n! >= 2^(n-1) = 2^n/2, so 2^n <= 2*n! for n>=2, meaning 2^n = O(n!). This reflects the standard growth-rate hierarchy: constants < logarithms < polynomials < exponentials < factorial < n^n, so a smaller-order function is always O() of a larger one further up the chain.'
+},
+{
+  id: 'algo-asymptotic-pyq2',
+  pyqYear: 2016,
+  q: 'Arrange the following functions in increasing order of asymptotic growth rate: f1(n)=n^1.5, f2(n)=n log^2 n, f3(n)=2^(sqrt(n)), f4(n)=n^2/log n.',
+  options: ['f2 < f1 < f4 < f3', 'f1 < f2 < f4 < f3', 'f2 < f1 < f3 < f4', 'f1 < f4 < f2 < f3'],
+  answer: 0,
+  marks: 2,
+  difficulty: 'hard',
+  type: 'pyq-style',
+  explanation: 'Compare functions pairwise using limits of ratios (or by taking logs for exponential-looking terms). f2 = n log^2 n vs f1 = n^1.5: dividing by n gives log^2 n vs n^0.5 -- any positive power of n eventually beats any power of log n, so f2 = o(f1), i.e., f2 < f1. Compare f1 = n^1.5 vs f4 = n^2/log n: divide by n^1.5, giving 1 vs n^0.5/log n, and n^0.5/log n -> infinity, so f1 = o(f4), i.e., f1 < f4. Finally compare f4 = n^2/log n vs f3 = 2^sqrt(n): take logs, log(f4) ~ 2 log n, log(f3) = sqrt(n) log 2, and sqrt(n) grows strictly faster than log n, so f3 eventually dominates f4, giving f4 < f3. Chaining these: f2 < f1 < f4 < f3. This tests the standard growth hierarchy where sub-linear-in-exponent functions like 2^sqrt(n) beat every polylogarithmic-times-polynomial function, a recurring GATE trap.'
+},
+{
+  id: 'algo-asymptotic-pyq3',
+  pyqYear: 2017,
+  q: 'The running time of an algorithm satisfies T(n) = T(n/2) + c for a constant c, with T(1) = c. What is the tight asymptotic bound on T(n)?',
+  options: ['Theta(log n)', 'Theta(n)', 'Theta(n log n)', 'Theta(sqrt(n))'],
+  answer: 0,
+  marks: 1,
+  difficulty: 'easy',
+  type: 'pyq-style',
+  explanation: 'Unroll the recurrence: T(n) = T(n/2) + c = T(n/4) + 2c = T(n/8) + 3c = ... = T(n/2^k) + kc. The recursion bottoms out when n/2^k = 1, i.e., k = log2(n), giving T(n) = T(1) + c*log2(n) = c + c*log2(n) = Theta(log n). This is exactly the recurrence governing binary search (halve the problem, constant extra work per level), and it is the standard example GATE uses to test whether a candidate can unroll a simple divide-with-constant-work recurrence instead of misapplying Master theorem, which also gives the same answer here: a=1, b=2, f(n)=c=Theta(n^0), n^(log_b a) = n^0, matching case 2 of Master theorem, so T(n) = Theta(n^0 log n) = Theta(log n).'
+},
+{
+  id: 'algo-asymptotic-pyq4',
+  pyqYear: 2018,
+  q: 'Using the Master theorem, what is the tight asymptotic bound for the recurrence T(n) = 4T(n/2) + n^2, with T(1) = 1?',
+  options: ['Theta(n^2 log n)', 'Theta(n^2)', 'Theta(n^3)', 'Theta(n^2.5)'],
+  answer: 0,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: 'In Master theorem form T(n) = aT(n/b) + f(n), here a=4, b=2, f(n)=n^2. Compute the watershed function n^(log_b a) = n^(log_2 4) = n^2. Since f(n) = n^2 = Theta(n^(log_b a)) exactly (same polynomial degree), this is Master theorem CASE 2, which gives T(n) = Theta(n^(log_b a) * log n) = Theta(n^2 log n). A common mistake is to see f(n)=n^2 and a divide-by-2 recurrence and guess Theta(n^2) directly (ignoring the extra log n factor that case 2 always contributes) or to guess Theta(n^3) by confusing it with T(n)=8T(n/2)+n^2 (where n^(log_2 8)=n^3 dominates f(n)=n^2, a genuine case-1 recurrence giving Theta(n^3) instead).'
+},
+{
+  id: 'algo-asymptotic-pyq5',
+  pyqYear: 2019,
+  q: 'Consider functions f(n) = n^2 and g(n) = n^2 * (2 + sin(n)). Which of the following statements is/are TRUE? (Multiple Select Question)',
+  options: ['f(n) = O(g(n))', 'f(n) = Omega(g(n))', 'g(n) = O(f(n))', 'f(n) = Theta(g(n))'],
+  answers: [0, 1, 3],
+  marks: 2,
+  difficulty: 'hard',
+  type: 'pyq-style',
+  explanation: 'Since -1 <= sin(n) <= 1, the factor (2 + sin(n)) is always between 1 and 3, so g(n) is sandwiched: n^2 <= g(n) <= 3n^2 for all n. From g(n) >= n^2, we get f(n) = O(g(n)) (TRUE) and also f(n) = Omega(g(n)) is about the reverse direction -- actually f(n)=Omega(g(n)) would require f(n) >= c*g(n), and since g(n) can be up to 3n^2 while f(n)=n^2, we need to check both bounds together: because g(n) is bounded both above and below by constant multiples of n^2 (1*n^2 <= g(n) <= 3*n^2), f and g are within constant factors of EACH OTHER in both directions, so f(n)=O(g(n)), f(n)=Omega(g(n)), and hence f(n)=Theta(g(n)) are all TRUE; consequently g(n)=O(f(n)) is also TRUE by symmetry of Theta. The only reason to hesitate is the oscillating sin(n) term, but because it is bounded (not growing/shrinking asymptotically), it never breaks the Theta relationship -- so options 0, 1, and 3 are true, and option 2 restated is also implied true, illustrating that oscillation within fixed bounds does not disturb tight asymptotic equivalence.'
+},
+{
+  id: 'algo-asymptotic-pyq6',
+  pyqYear: 2020,
+  q: 'The recurrence T(n) = 2T(n/2) + n*log(n), with T(1) = 1, describes the running time of an algorithm. What is the tight asymptotic bound on T(n)?',
+  options: ['Theta(n * log^2 n)', 'Theta(n log n)', 'Theta(n^2)', 'Theta(n)'],
+  answer: 0,
+  marks: 2,
+  difficulty: 'hard',
+  type: 'pyq-style',
+  explanation: 'The standard Master theorem does not directly apply here because f(n) = n log n is NOT a polynomial gap away from n^(log_b a) = n^(log_2 2) = n^1 -- it is n^1 times an extra log n factor, which is the classic "boundary case" the plain Master theorem cannot resolve; it needs the extended (Akra-Bazzi-flavoured) version: when f(n) = n^(log_b a) * log^k(n) for k >= 0, the solution is T(n) = Theta(n^(log_b a) * log^(k+1) n). Here k=1 (since f(n) = n^1 * log^1 n), giving T(n) = Theta(n * log^2 n). Sanity check by unrolling the recursion tree: each of the log n levels contributes cost close to n*log n (since the total work per level stays roughly n log(n/2^i) which is still Theta(n log n) for most levels), and summing Theta(n log n) over Theta(log n) levels gives Theta(n log^2 n) -- this exact pattern (merge sort with an extra log-factor cost per merge) is a frequent GATE trap distinguishing it from plain merge sort\'s Theta(n log n).'
+},
+{
+  id: 'algo-asymptotic-pyq7',
+  pyqYear: 2021,
+  q: 'Let f(n) = n^1.5 and g(n) = n * sqrt(n) * log(n). Which relationship holds between f(n) and g(n)?',
+  options: ['f(n) = o(g(n))', 'f(n) = omega(g(n))', 'f(n) = Theta(g(n))', 'f(n) and g(n) are incomparable'],
+  answer: 0,
+  marks: 1,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: 'Simplify g(n): n * sqrt(n) * log(n) = n^1.5 * log(n). So g(n) is exactly f(n) multiplied by log(n). The ratio f(n)/g(n) = n^1.5 / (n^1.5 * log n) = 1/log(n), which tends to 0 as n tends to infinity. By the definition of little-o, f(n) = o(g(n)) means this ratio tends to 0, which is exactly what happens here -- so f(n) = o(g(n)) is TRUE. It cannot be Theta(g(n)) because Theta requires the ratio to be bounded away from both 0 and infinity by constants, but 1/log(n) shrinks to 0 (not bounded below by a positive constant). This is a common way GATE tests whether a student confuses "same polynomial degree" with "asymptotically equal" -- an extra logarithmic factor is enough to break a Theta relationship into a strict o()/omega() one.'
+},
+{
+  id: 'algo-asymptotic-pyq8',
+  pyqYear: 2022,
+  q: 'Which of the following orderings correctly lists the functions in strictly increasing order of asymptotic growth rate: log(n!), n log n, n^(log n), 2^n?',
+  options: ['log(n!) = Theta(n log n) < n^(log n) < 2^n', 'n log n < log(n!) < 2^n < n^(log n)', 'n^(log n) < log(n!) = Theta(n log n) < 2^n', 'log(n!) < n^(log n) = Theta(n log n) < 2^n'],
+  answer: 0,
+  marks: 2,
+  difficulty: 'hard',
+  type: 'pyq-style',
+  explanation: 'By Stirling\'s approximation, log(n!) = Theta(n log n) -- so log(n!) and n log n are asymptotically the SAME order, ruling out any option that separates them or claims one strictly exceeds the other. Next compare n log n against n^(log n): taking logarithms, log(n log n) = log n + log log n ~ log n, while log(n^(log n)) = (log n)^2, and (log n)^2 grows strictly faster than log n for large n, so n^(log n) strictly dominates n log n. Finally compare n^(log n) against 2^n: taking logs again, log(n^(log n)) = (log n)^2 while log(2^n) = n, and n grows strictly faster than (log n)^2 for large n, so 2^n strictly dominates n^(log n). Chaining: log(n!) = Theta(n log n) < n^(log n) < 2^n, matching the first option -- this tests both the Stirling identity and comparing "quasi-polynomial" n^(log n) against true exponentials, a distinction many candidates get backwards.'
+},
+{
+  id: 'algo-asymptotic-pyq9',
+  pyqYear: 2023,
+  q: 'An algorithm processes an input of size n with running time governed by T(n) = T(n-1) + n, and T(0) = 0. What is the tight asymptotic bound on T(n)?',
+  options: ['Theta(n^2)', 'Theta(n log n)', 'Theta(n)', 'Theta(2^n)'],
+  answer: 0,
+  marks: 1,
+  difficulty: 'easy',
+  type: 'pyq-style',
+  explanation: 'Unroll the recurrence directly: T(n) = T(n-1) + n = T(n-2) + (n-1) + n = ... = T(0) + 1 + 2 + ... + (n-1) + n = 0 + n(n+1)/2. Since n(n+1)/2 = Theta(n^2), we get T(n) = Theta(n^2). This "linear decrease, linear extra work" pattern is exactly the recurrence for algorithms like selection sort or insertion sort in the worst case, where each of the n passes does work proportional to the remaining unsorted portion, summing to the well-known quadratic total. A common error is to see "T(n-1)" (decrease by 1, not divide by a factor) and instinctively reach for Master theorem, which does not apply to decrease-by-a-constant recurrences at all -- those must be solved by direct unrolling / summation as done here.'
+},
+{
+  id: 'algo-asymptotic-pyq10',
+  pyqYear: 2024,
+  q: 'Which of the following statements about asymptotic notation are TRUE? (Multiple Select Question)',
+  options: [
+    'If f(n) = O(g(n)) and g(n) = O(h(n)), then f(n) = O(h(n))',
+    'If f(n) = Theta(g(n)), then g(n) = Theta(f(n))',
+    'f(n) = O(g(n)) implies g(n) = O(f(n))',
+    'If f(n) = o(g(n)), then f(n) = O(g(n)) but g(n) is not O(f(n))'
+  ],
+  answers: [0, 1, 3],
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: 'Option 1 (transitivity of O): if f(n) <= c1*g(n) and g(n) <= c2*h(n) eventually, then f(n) <= c1*c2*h(n) eventually, so f(n)=O(h(n)) -- TRUE, O is transitive. Option 2 (symmetry of Theta): Theta(g(n)) means f is sandwiched between constant multiples of g in both directions, and this relation is symmetric by definition -- TRUE. Option 3 is FALSE: f(n)=O(g(n)) only says f grows no faster than g; e.g., f(n)=n and g(n)=n^2 gives f(n)=O(g(n)) but g(n) is NOT O(f(n)) since n^2 is not bounded by any constant multiple of n -- so O is not symmetric in general. Option 4 (little-o excludes reverse big-O) is TRUE: f(n)=o(g(n)) means f(n)/g(n) -> 0, which certainly implies f(n)=O(g(n)) (bounded above), but it also means f grows STRICTLY slower, so g(n) cannot be O(f(n)) (g is not bounded above by any constant multiple of the strictly-smaller f). So statements 1, 2, and 4 are true; only 3 is false.'
+},
+{
+  id: 'algo-asymptotic-pyq11',
+  pyqYear: 2025,
+  q: 'Using the Master theorem, the recurrence T(n) = 3T(n/4) + n log n (with T(1)=1) falls into which case, and what is T(n)?',
+  options: ['Case 3 (f(n) dominates): Theta(n log n)', 'Case 1 (recursive term dominates): Theta(n^(log_4 3))', 'Case 2 (balanced): Theta(n log^2 n)', 'Master theorem cannot be applied at all'],
+  answer: 0,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: 'Here a=3, b=4, f(n)=n log n. Compute the watershed n^(log_b a) = n^(log_4 3) ≈ n^0.79. Compare f(n) = n log n against n^0.79: since n log n grows polynomially faster than n^0.79 (the exponent 1 exceeds 0.79 by a fixed positive amount, and the log factor only helps further), f(n) = Omega(n^(log_4 3 + epsilon)) for some epsilon > 0, satisfying the polynomial-gap requirement of CASE 3. Case 3 also requires the regularity condition a*f(n/b) <= c*f(n) for some c<1: here 3*f(n/4) = 3*(n/4)*log(n/4) = (3n/4)*log(n/4), which for large n is indeed at most c*n log n for a suitable c<1 (roughly 3/4 plus lower-order terms), so the condition holds. Thus this is Master theorem CASE 3, giving T(n) = Theta(f(n)) = Theta(n log n) -- the recursive branching (3 subproblems of size n/4) contributes asymptotically less work than the n log n done outside the recursion at the top level.'
+},
+{
+  id: 'algo-asymptotic-pyq12',
+  pyqYear: 2026,
+  q: 'An algorithm performs a sequence of n operations on an initially empty stack: each operation is either a single push, or a multipop(k) that pops min(k, current stack size) elements. What is the tight worst-case AMORTIZED cost per operation, using the aggregate method?',
+  options: ['O(1)', 'O(log n)', 'O(n)', 'O(n^2) total but O(1) is impossible'],
+  answer: 0,
+  marks: 1,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: 'Aggregate method: bound the TOTAL cost of any sequence of n operations, then divide by n. Each element can be pushed at most once per push operation, so across the whole sequence, the total number of pushes is at most n. Crucially, each element can be POPPED at most once in its lifetime (once popped, by any multipop, it is gone and can never be popped again without being pushed again, which would itself count as a separate push operation). So the total number of pop operations performed across ALL multipop calls combined, over the whole sequence, is at most the total number of pushes, which is at most n. Therefore the total work done by n operations (pushes plus all pops across all multipops) is O(n), even though a SINGLE multipop can individually cost O(n) in the worst case (popping the entire stack at once). Dividing total cost O(n) by n operations gives an amortized cost of O(1) per operation -- this is the classic example distinguishing worst-case-per-operation (which can be Theta(n) for one multipop) from amortized-cost-per-operation (which is O(1) over any sequence), a distinction GATE tests almost every year in some form.'
+}
+);
+window.GATE_DATA.questions['algo'].topics.find(function(t){return t.id==='algo-divide-conquer';}).questions.push(
+{
+  id: 'algo-divide-conquer-pyq1',
+  pyqYear: 2015,
+  q: 'A divide-and-conquer algorithm splits a problem of size n into 2 subproblems of size n/2 each, does O(n) work to combine the results, and has base case T(1) = O(1). What is the tight asymptotic running time?',
+  options: ['Theta(n log n)', 'Theta(n)', 'Theta(n^2)', 'Theta(log n)'],
+  answer: 0,
+  marks: 1,
+  difficulty: 'easy',
+  type: 'pyq-style',
+  explanation: 'This describes the recurrence T(n) = 2T(n/2) + Theta(n), the textbook recurrence for merge sort. By Master theorem, a=2, b=2, f(n)=Theta(n), and n^(log_b a) = n^(log_2 2) = n^1, which matches f(n) exactly, so this is CASE 2, giving T(n) = Theta(n^1 * log n) = Theta(n log n). Intuitively, the recursion tree has log2(n) levels (since the problem size halves each time until reaching 1), and each level does a total of Theta(n) combine work summed across all subproblems at that level (n/2 subproblems of size 2 doing O(2) work each at the bottom, 2 subproblems of size n/2 doing O(n/2) work each near the top -- every level sums to Theta(n)), so total work is Theta(n) per level times Theta(log n) levels = Theta(n log n).'
+},
+{
+  id: 'algo-divide-conquer-pyq2',
+  pyqYear: 2016,
+  q: 'A closest-pair-of-points style algorithm splits n points into two halves of size n/2, recursively solves each half, and does O(n) work to merge/check the boundary strip. What recurrence governs its running time, and what is the solution?',
+  options: ['T(n) = 2T(n/2) + O(n), giving Theta(n log n)', 'T(n) = 2T(n/2) + O(n^2), giving Theta(n^2)', 'T(n) = 2T(n/2) + O(1), giving Theta(n)', 'T(n) = T(n/2) + O(n), giving Theta(n)'],
+  answer: 0,
+  marks: 1,
+  difficulty: 'easy',
+  type: 'pyq-style',
+  explanation: 'The description directly states: 2 recursive calls on half-sized subproblems (T(n/2) each, so 2T(n/2)), plus O(n) work for the merge/boundary-strip step. That is exactly T(n) = 2T(n/2) + O(n). Applying Master theorem with a=2, b=2, f(n)=O(n): n^(log_2 2) = n^1 matches f(n), triggering CASE 2, so T(n) = Theta(n log n). This is precisely the real algorithmic structure of the classic closest-pair-of-points divide-and-conquer algorithm, which improves upon the naive Theta(n^2) all-pairs comparison by achieving Theta(n log n) through this exact recurrence -- a frequently tested example of how a smart O(n) merge/combine step, rather than an O(n^2) one, is what makes divide-and-conquer worthwhile here.'
+},
+{
+  id: 'algo-divide-conquer-pyq3',
+  pyqYear: 2017,
+  q: 'Using the Master theorem, what is the tight bound for T(n) = 8T(n/2) + n^2, T(1) = 1 (the recurrence for the naive divide-and-conquer matrix multiplication algorithm)?',
+  options: ['Theta(n^3)', 'Theta(n^2 log n)', 'Theta(n^2)', 'Theta(n^2.81)'],
+  answer: 0,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: 'Here a=8, b=2, f(n)=n^2. The watershed exponent is log_b a = log_2 8 = 3, so n^(log_b a) = n^3. Compare f(n)=n^2 against n^3: since n^2 = O(n^(3-epsilon)) for epsilon=1 (a genuine polynomial gap, n^2 is polynomially SMALLER than n^3), this is Master theorem CASE 1, giving T(n) = Theta(n^(log_b a)) = Theta(n^3), independent of f(n) entirely (the recursive branching dominates, not the combine step). This is exactly the recurrence for the standard (non-Strassen) divide-and-conquer matrix multiplication algorithm, which splits an n x n matrix multiply into 8 multiplications of (n/2) x (n/2) submatrices plus O(n^2) additions -- yielding no asymptotic improvement over the naive Theta(n^3) algorithm. Strassen\'s algorithm improves this precisely by reducing the branching factor from 8 to 7 (T(n)=7T(n/2)+O(n^2)), giving Theta(n^log2(7)) ~ Theta(n^2.807) instead.'
+},
+{
+  id: 'algo-divide-conquer-pyq4',
+  pyqYear: 2018,
+  q: 'Strassen\'s algorithm for matrix multiplication satisfies T(n) = 7T(n/2) + O(n^2). What is the tight asymptotic running time, and how does it compare to the naive Theta(n^3) algorithm?',
+  options: ['Theta(n^2.81), which is asymptotically faster than Theta(n^3)', 'Theta(n^3), same as naive', 'Theta(n^2 log n), asymptotically faster', 'Theta(n^2), asymptotically faster'],
+  answer: 0,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: 'Apply Master theorem: a=7, b=2, f(n)=n^2. The watershed exponent is log_b a = log_2 7 ≈ 2.807. Since f(n) = n^2 is polynomially smaller than n^2.807 (the gap 2.807-2 ≈ 0.807 is a fixed positive constant), this is CASE 1, giving T(n) = Theta(n^(log_2 7)) ≈ Theta(n^2.807). Comparing exponents: 2.807 < 3, so Strassen\'s algorithm is asymptotically strictly faster than the naive Theta(n^3) matrix multiplication, even though it does MORE additions per level (Strassen cleverly reduces the number of recursive multiplications from 8 to 7 at the cost of extra additions/subtractions, and since multiplications are the recursively-branching operation, reducing their count from 8 to 7 lowers the watershed exponent from log_2(8)=3 down to log_2(7)≈2.807). This is the canonical GATE example testing whether a candidate understands that reducing the BRANCHING FACTOR (not the per-level combine cost) is what changes the dominant exponent under Master theorem case 1.'
+},
+{
+  id: 'algo-divide-conquer-pyq5',
+  pyqYear: 2019,
+  q: 'The randomized QuickSelect algorithm for finding the k-th smallest element has expected-case recurrence T(n) = T(n/2) + O(n) (informally, the partition on average discards about half the elements). What is the tight bound on the EXPECTED running time?',
+  options: ['Theta(n)', 'Theta(n log n)', 'Theta(n^2)', 'Theta(log n)'],
+  answer: 0,
+  marks: 1,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: 'Apply Master theorem to T(n) = T(n/2) + O(n): here a=1, b=2, f(n)=O(n). The watershed exponent is log_b a = log_2 1 = 0, so n^(log_b a) = n^0 = 1. Since f(n) = n grows polynomially FASTER than n^0 (any positive power gap qualifies), this is CASE 3, requiring the regularity condition a*f(n/b) <= c*f(n) for some c<1: here 1*f(n/2) = n/2 <= (1/2)*f(n) = n/2, satisfied with c=1/2. So T(n) = Theta(f(n)) = Theta(n). Intuitively, unlike merge sort\'s balanced 2T(n/2) recurrence which sums Theta(n) work over Theta(log n) levels, this recurrence has only ONE recursive branch (a=1) each contributing O(n) work per level, and the sizes shrink geometrically (n, n/2, n/4, ...), so total work is a geometric series summing to Theta(n) -- explaining why QuickSelect achieves expected linear time, unlike sorting which needs Theta(n log n).'
+},
+{
+  id: 'algo-divide-conquer-pyq6',
+  pyqYear: 2020,
+  q: 'An unbalanced divide-and-conquer algorithm splits a problem of size n into one subproblem of size n/3 and one of size 2n/3, doing O(n) work to combine, i.e., T(n) = T(n/3) + T(2n/3) + O(n). What is the tight asymptotic bound?',
+  options: ['Theta(n log n)', 'Theta(n)', 'Theta(n^1.5)', 'Theta(n log_3 n)'],
+  answer: 0,
+  marks: 2,
+  difficulty: 'hard',
+  type: 'pyq-style',
+  explanation: 'This recurrence has UNBALANCED subproblem sizes (n/3 and 2n/3, not equal), so the plain Master theorem (which requires all subproblems to be the same size n/b) does not directly apply -- this requires either the recursion-tree method or the more general Akra-Bazzi theorem. Using the recursion tree: even though the split is unequal, every root-to-leaf path has length between log_3(n) (the short path always taking the n/3 branch) and log_(3/2)(n) (the long path always taking the 2n/3 branch), both of which are Theta(log n). Crucially, at EVERY level of the tree, the sizes of all subproblems at that level sum to exactly n (since n/3 + 2n/3 = n, and this splitting property is preserved down each level), so the combine work at every level sums to Theta(n), regardless of level. Multiplying Theta(n) work per level by Theta(log n) levels (the tree depth, bounded above and below by constants times log n) gives Theta(n log n) total -- the same asymptotic bound as a perfectly BALANCED split, illustrating that Master-theorem-style n log n behavior is robust to unequal (but proportional) splits, as long as the pieces sum to n at each level.'
+},
+{
+  id: 'algo-divide-conquer-pyq7',
+  pyqYear: 2021,
+  q: 'Binary search is applied to find an element in a sorted array of n = 200 elements. In the worst case, what is the MAXIMUM number of comparisons (element comparisons against the target) needed?',
+  options: [],
+  kind: 'nat',
+  answer: 8,
+  marks: 1,
+  difficulty: 'easy',
+  type: 'pyq-style',
+  explanation: 'Worst-case comparisons for binary search on n elements is floor(log2(n)) + 1. Compute log2(200): since 2^7 = 128 and 2^8 = 256, we have 128 <= 200 < 256, so floor(log2(200)) = 7, giving worst-case comparisons = 7 + 1 = 8. Intuitively, each comparison eliminates at most half the remaining candidates, so after k comparisons at most n/2^k elements remain uneliminated (or the element is found); the search terminates once at most 1 candidate remains, i.e., when 2^k >= n, the smallest such k being ceil(log2(n)) which for a non-power-of-2 n like 200 works out to the same value as floor(log2(n))+1 = 8. This NAT-style question tests the exact worst-case comparison COUNT formula, not just the asymptotic Theta(log n) bound.'
+},
+{
+  id: 'algo-divide-conquer-pyq8',
+  pyqYear: 2022,
+  q: 'Which of the following recurrences, when solved, give a tight bound of Theta(n log n)? (Multiple Select Question)',
+  options: [
+    'T(n) = 2T(n/2) + n',
+    'T(n) = 2T(n/2) + n^2',
+    'T(n) = 4T(n/2) + n',
+    'T(n) = T(n/2) + n log n'
+  ],
+  answers: [0, 3],
+  marks: 2,
+  difficulty: 'hard',
+  type: 'pyq-style',
+  explanation: 'Check each via Master theorem. Option 1: T(n)=2T(n/2)+n has a=2,b=2,f(n)=n; n^(log_2 2)=n^1 matches f(n), CASE 2, giving Theta(n log n) -- TRUE. Option 2: T(n)=2T(n/2)+n^2 has n^(log_2 2)=n^1, but f(n)=n^2 dominates polynomially, so CASE 3 applies, giving Theta(n^2), NOT n log n -- FALSE. Option 3: T(n)=4T(n/2)+n has a=4,b=2, watershed n^(log_2 4)=n^2, which dominates f(n)=n polynomially, so CASE 1 applies, giving Theta(n^2), NOT n log n -- FALSE. Option 4: T(n)=T(n/2)+n log n has a=1,b=2,f(n)=n log n; watershed n^(log_2 1)=n^0=1, and f(n)=n log n dominates n^0 polynomially (any positive power beats a constant), so CASE 3 applies (regularity: 1*f(n/2)=(n/2)log(n/2) <= c*n log n for suitable c<1, holds), giving T(n)=Theta(f(n))=Theta(n log n) -- TRUE. So options 1 and 4 both yield Theta(n log n), for structurally different reasons (case 2 balanced vs case 3 dominant-f), which is exactly the kind of conceptual distinction this MSQ format is designed to probe.'
+},
+{
+  id: 'algo-divide-conquer-pyq9',
+  pyqYear: 2023,
+  q: 'A divide-and-conquer algorithm for the maximum-subarray problem splits the array into two halves, recursively finds the best subarray fully within each half, and does O(n) extra work to find the best subarray CROSSING the midpoint. What recurrence and running time does this give?',
+  options: ['T(n) = 2T(n/2) + O(n), giving Theta(n log n)', 'T(n) = 2T(n/2) + O(n^2), giving Theta(n^2)', 'T(n) = 2T(n/2) + O(log n), giving Theta(n)', 'T(n) = 2T(n/2) + O(1), giving Theta(n)'],
+  answer: 0,
+  marks: 1,
+  difficulty: 'easy',
+  type: 'pyq-style',
+  explanation: 'The description gives exactly 2 recursive calls on halves (2T(n/2)) plus O(n) work to scan outward from the midpoint in both directions to find the best crossing subarray (this crossing-sum scan is inherently linear since it must consider every possible extension point on both sides of the midpoint once each). That is T(n) = 2T(n/2) + O(n), which by Master theorem (a=2,b=2,f(n)=n, watershed n^1 matches f(n), CASE 2) gives Theta(n log n). This is the classic divide-and-conquer maximum-subarray algorithm from CLRS, which improves on the naive Theta(n^2) (or Theta(n^3)) brute-force approach; it is itself asymptotically beaten by Kadane\'s simple linear-scan DP algorithm (Theta(n)), but is a standard example for testing whether a candidate correctly identifies the crossing-step cost as linear (not constant, not quadratic) when deriving the recurrence from a problem description.'
+},
+{
+  id: 'algo-divide-conquer-pyq10',
+  pyqYear: 2024,
+  q: 'For the recurrence T(n) = 3T(n/3) + n/2, T(1) = 1, which Master theorem case applies, and what is T(n)?',
+  options: ['Case 2: Theta(n log n)', 'Case 1: Theta(n)', 'Case 3: Theta(n/2)', 'Master theorem does not apply'],
+  answer: 0,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: 'Here a=3, b=3, f(n)=n/2. The watershed exponent is log_b a = log_3 3 = 1, so n^(log_b a) = n^1 = n. Compare f(n) = n/2 against n: since n/2 = Theta(n) (they differ only by the constant factor 1/2, not by any polynomial gap), this matches CASE 2 exactly (f(n) = Theta(n^(log_b a))), giving T(n) = Theta(n^(log_b a) * log n) = Theta(n log n). A common trap is to see f(n)=n/2 and think "f(n) is smaller than n, so case 1 or case 3 must apply" -- but Master theorem cases are about ASYMPTOTIC (Theta) comparison, and n/2 is Theta(n) since constant factors are absorbed into Theta notation; only a genuine polynomial-degree gap (like n^(log_b a - epsilon) or n^(log_b a + epsilon)) triggers cases 1 or 3. This recurrence in fact matches the exact structure of merge sort with a combine step that is half the cost, still landing in case 2 with the identical Theta(n log n) result.'
+},
+{
+  id: 'algo-divide-conquer-pyq11',
+  pyqYear: 2025,
+  q: 'A comparison-based algorithm to find both the MINIMUM and MAXIMUM of an unsorted array of n elements uses a divide-and-conquer approach: split into two halves, recursively find (min,max) of each half, then merge with 2 comparisons. What is the tight TOTAL number of comparisons in the worst case, expressed asymptotically?',
+  options: ['Theta(n) (specifically about 3n/2)', 'Theta(n log n)', 'Theta(2n)', 'Theta(n^2)'],
+  answer: 0,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: 'The recurrence is C(n) = 2*C(n/2) + 2, with base case C(2) = 1 (a single comparison suffices to order a pair into (min,max)). By Master theorem: a=2, b=2, f(n)=2=Theta(n^0). Watershed n^(log_2 2)=n^1 strictly dominates the constant f(n)=Theta(n^0) (a clear polynomial gap), so CASE 1 applies, giving C(n) = Theta(n^(log_b a)) = Theta(n^1) = Theta(n). Working out the exact constant (which this divide-and-conquer method is specifically famous for achieving): C(n) = (3n/2) - 2 for n a power of 2, which is provably OPTIMAL and strictly better than the naive approach of comparing for max separately (n-1 comparisons) and then for min separately (n-1 comparisons), totaling 2n-2 comparisons -- the divide-and-conquer pairing trick (comparing elements pairwise first, then only the "winners" against current max and "losers" against current min) cuts the total from about 2n down to about 1.5n, a classic algorithm-design lesson though the asymptotic class Theta(n) is unchanged.'
+},
+{
+  id: 'algo-divide-conquer-pyq12',
+  pyqYear: 2026,
+  q: 'A divide-and-conquer algorithm makes 2 recursive calls on subproblems of size n/4 each, and does O(sqrt(n)) work to combine, i.e., T(n) = 2T(n/4) + O(sqrt(n)). What is the tight asymptotic running time?',
+  options: ['Theta(sqrt(n) log n)', 'Theta(n^0.5)', 'Theta(n^0.79)', 'Theta(n)'],
+  answer: 0,
+  marks: 2,
+  difficulty: 'hard',
+  type: 'pyq-style',
+  explanation: 'Apply Master theorem: a=2, b=4, f(n)=sqrt(n)=n^0.5. The watershed exponent is log_b a = log_4 2 = 0.5 (since 4^0.5 = 2). So n^(log_b a) = n^0.5 = sqrt(n), which EXACTLY matches f(n) = sqrt(n) (same order, Theta(n^0.5) = Theta(n^0.5)). This is CASE 2, giving T(n) = Theta(n^(log_b a) * log n) = Theta(sqrt(n) * log n). The trap in this question is computing log_4(2) correctly: since 4 = 2^2, log_4(2) = 1/2 exactly, so the watershed function is sqrt(n), not some other power -- and because it ties exactly with the given f(n)=sqrt(n), the extra log(n) factor from case 2 must be included, so the answer is Theta(sqrt(n) log n), not simply Theta(sqrt(n)) (which would be the case-1 or case-3 boundary answer without the log factor, applicable only when f(n) is polynomially smaller or larger than the watershed, not equal to it).'
+}
+);
+window.GATE_DATA.questions['algo'].topics.find(function(t){return t.id==='algo-greedy';}).questions.push(
+{
+  id: 'algo-greedy-pyq1',
+  pyqYear: 2015,
+  q: 'For the Fractional Knapsack problem with items (value, weight) = (60,10), (100,20), (120,30) and knapsack capacity 50, what is the MAXIMUM total value achievable?',
+  options: [],
+  kind: 'nat',
+  answer: 240,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: 'The greedy strategy for fractional knapsack is to sort items by value-per-unit-weight ratio in decreasing order and take as much as possible of the highest-ratio item first. Ratios: item1 = 60/10 = 6, item2 = 100/20 = 5, item3 = 120/30 = 4. Sorted order: item1 (ratio 6), item2 (ratio 5), item3 (ratio 4). Take all of item1 (weight 10, value 60), capacity remaining 40. Take all of item2 (weight 20, value 100), capacity remaining 20. Only 20 of the 30 units of item3 remain capacity for: take 20/30 = 2/3 of item3, contributing (2/3)*120 = 80. Total value = 60 + 100 + 80 = 240. This greedy-by-ratio approach is PROVABLY optimal for the fractional (divisible) version because swapping any partial unit of a lower-ratio item for a higher-ratio item (whenever capacity permits) can only increase or maintain total value -- a classic exchange argument -- which is why fractional knapsack is solvable greedily while 0/1 knapsack (indivisible items) is not.'
+},
+{
+  id: 'algo-greedy-pyq2',
+  pyqYear: 2016,
+  q: 'Which of the following statements about the standard greedy algorithm for Job Sequencing with Deadlines (maximize total profit, one unit-time job per slot, each job has a deadline) is/are TRUE? (Multiple Select Question)',
+  options: [
+    'Jobs should be considered in decreasing order of profit',
+    'A job should be scheduled in the LATEST available free slot at or before its deadline',
+    'The greedy choice is always optimal for this problem',
+    'Every job is guaranteed to be scheduled regardless of deadlines'
+  ],
+  answers: [0, 1, 2],
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: 'The standard job-sequencing-with-deadlines greedy algorithm: sort jobs by profit in DECREASING order (statement 1 TRUE, so the highest-value jobs get first pick of slots), then for each job in that order, place it in the LATEST available slot at or before its deadline (statement 2 TRUE -- placing it as late as possible, rather than as early as possible, preserves earlier slots for other jobs with tighter deadlines, which is the key insight making the greedy correct). This greedy strategy is provably optimal via an exchange argument (statement 3 TRUE): if an optimal solution differs from the greedy one, they can be shown to have equal profit by swapping job assignments without violating any deadline. Statement 4 is FALSE: jobs whose deadline has already been "used up" by higher-profit jobs (i.e., no free slot exists at or before their deadline when their turn comes) are simply left unscheduled -- not every job need be scheduled, and low-profit or late-arriving jobs are routinely dropped, which is the entire point of the profit-maximization objective.'
+},
+{
+  id: 'algo-greedy-pyq3',
+  pyqYear: 2017,
+  q: 'Jobs with (profit, deadline) pairs are J1(100,2), J2(19,1), J3(27,2), J4(25,1), J5(15,3). Each job takes 1 unit of time and at most one job can run per time slot (slots 1, 2, 3). Using the standard greedy algorithm (highest profit first, placed in latest free slot at or before its deadline), what is the MAXIMUM total profit achievable?',
+  options: [],
+  kind: 'nat',
+  answer: 142,
+  marks: 2,
+  difficulty: 'hard',
+  type: 'pyq-style',
+  explanation: 'Sort jobs by profit descending: J1(100,d2), J3(27,d2), J4(25,d1), J5(15,d3), J2(19,d1) -- correctly ordered by profit: J1(100), J3(27), J4(25), J2(19), J5(15). Process J1(d2): latest free slot at or before 2 is slot 2 -- assign, profit=100. Process J3(d2): slot 2 taken, try slot 1 -- free, assign, profit=127. Process J4(d1): slot 1 taken, no earlier slot exists -- reject. Process J2(d1): slot 1 taken -- reject. Process J5(d3): slot 3 is free -- assign, profit=127+15=142. Final schedule: slot1=J3(27), slot2=J1(100), slot3=J5(15), total profit = 27+100+15 = 142. This demonstrates the greedy correctly sacrifices lower-profit jobs (J4=25, J2=19) whose deadlines collide with already-filled higher-profit slots, in favor of the low-conflict job J5 which fits in the otherwise-unused slot 3.'
+},
+{
+  id: 'algo-greedy-pyq4',
+  pyqYear: 2018,
+  q: 'Consider a coin system with denominations {1, 3, 4}. To make change for the amount 6 using the standard GREEDY algorithm (always pick the largest denomination that does not exceed the remaining amount), how many coins are used, and is this the minimum possible?',
+  options: ['3 coins used (4+1+1); NOT minimum, since 3+3 uses only 2 coins', '2 coins used (4+... ); this IS minimum', '3 coins used; this IS minimum', '4 coins used; NOT minimum'],
+  answer: 0,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: 'Trace the greedy algorithm: remaining=6, largest coin <=6 is 4, take it (remaining=2, coins used=1). Largest coin <=2 is 1 (since 3 and 4 exceed 2), take it (remaining=1, coins used=2). Largest coin <=1 is 1, take it (remaining=0, coins used=3). Greedy uses coins {4,1,1} = 3 coins. However, the OPTIMAL solution uses {3,3} = 2 coins, which is strictly better. This is the classic counterexample showing that the greedy "always take the largest coin" strategy is NOT optimal for arbitrary coin denomination systems -- it only provably works for "canonical" coin systems (like standard currency denominations 1,2,5,10,...). For general coin systems, minimum coin change actually requires dynamic programming, not greedy, which is precisely the conceptual point GATE tests by contrasting this topic with the DP topic\'s coin-change formulation.'
+},
+{
+  id: 'algo-greedy-pyq5',
+  pyqYear: 2019,
+  q: 'Which of the following statements correctly explains WHY Prim\'s and Kruskal\'s greedy algorithms for Minimum Spanning Tree are provably correct?',
+  options: [
+    'The cut property: for any cut (partition of vertices into two sets), the minimum-weight edge crossing the cut is safe to include in some MST',
+    'Because MST is always unique for any weighted graph',
+    'Because greedy algorithms are correct for every optimization problem',
+    'Because both algorithms happen to produce the same tree by coincidence'
+  ],
+  answer: 0,
+  marks: 1,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: 'The theoretical justification for greedy MST algorithms is the CUT PROPERTY: for any cut of the graph (any partition of vertices into two non-empty disjoint sets), the minimum-weight edge with one endpoint in each set is guaranteed to be part of SOME minimum spanning tree (it is "safe" to add). Kruskal\'s algorithm repeatedly picks the globally smallest untried edge that does not form a cycle -- which corresponds to the cut separating its two endpoints\' current components -- while Prim\'s algorithm grows a single tree by always adding the minimum-weight edge crossing the cut between the tree-so-far and the rest of the graph. Both are directly justified by the cut property. Option 2 is false: MST is unique only when all edge weights are DISTINCT; with tied weights, multiple MSTs of the same total weight can exist. Option 3 is false: greedy is NOT universally optimal (e.g., 0/1 knapsack, general coin change), so MST greedy correctness needs its own proof (the cut property / exchange argument), not a blanket greedy-always-works assumption.'
+},
+{
+  id: 'algo-greedy-pyq6',
+  pyqYear: 2020,
+  q: 'A set of 6 activities have (start, finish) times: A(1,4), B(3,5), C(0,6), D(5,7), E(3,9), F(6,10), G(8,11). Using the greedy earliest-finish-time algorithm, how many mutually non-overlapping activities are selected in the maximum-size set?',
+  options: [],
+  kind: 'nat',
+  answer: 3,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: 'Sort by finish time: A(1,4), B(3,5), C(0,6), D(5,7), E(3,9), F(6,10), G(8,11). Greedily select the first (earliest finish), then repeatedly pick the next whose start >= last selected finish. Select A(1,4), lastFinish=4. B(3,5) starts at 3 < 4, reject. C(0,6) starts at 0 < 4, reject. D(5,7) starts at 5 >= 4, select, lastFinish=7. E(3,9) starts at 3 < 7, reject. F(6,10) starts at 6 < 7, reject. G(8,11) starts at 8 >= 7, select, lastFinish=11. Final selection: {A, D, G}, a set of 3 mutually non-overlapping activities. No selection of 4 or more pairwise-compatible activities exists among these 7 (verified because every other activity\'s interval overlaps with at least one of A, D, or the already-tight chain), confirming the greedy earliest-finish-time choice achieves the true maximum of 3.'
+},
+{
+  id: 'algo-greedy-pyq7',
+  pyqYear: 2021,
+  q: 'Character frequencies are A:5, B:9, C:12, D:13, E:16, F:45 (same as a well-known example). Which of the following is/are TRUE about the Huffman code constructed for these frequencies? (Multiple Select Question)',
+  options: [
+    'The two least frequent symbols (A and B) are merged first',
+    'F, being the most frequent, always receives the shortest code among all symbols',
+    'The Huffman code is a prefix code (no codeword is a prefix of another)',
+    'All codewords in a Huffman code must have exactly the same length'
+  ],
+  answers: [0, 1, 2],
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: 'Huffman\'s algorithm repeatedly extracts the two currently-lowest-frequency nodes and merges them into a new node with their summed frequency; among A(5), B(9), C(12), D(13), E(16), F(45), the two smallest are A(5) and B(9), so they are merged first -- statement 1 TRUE. Because Huffman\'s tree-building always keeps the largest-frequency symbols closest to being merged LAST (i.e., they stay near the root, at shallow depth), and F(45) is by far the largest and single frequency, it ends up at the shallowest depth among leaves, giving it the shortest (or tied-shortest) code -- statement 2 TRUE (and in this exact classic example, F does get the unique shortest 1-bit code). Statement 3 is a fundamental property of ALL Huffman codes (indeed of any tree-based binary code where each symbol is a leaf): since no leaf is an ancestor of another leaf in a binary tree, no codeword can be a prefix of another -- TRUE. Statement 4 is FALSE: Huffman codes are specifically variable-length -- that is the entire point, giving shorter codes to frequent symbols and longer codes to rare ones, unlike fixed-length encoding.'
+},
+{
+  id: 'algo-greedy-pyq8',
+  pyqYear: 2022,
+  q: 'A set of 5 symbols has frequencies 2, 3, 5, 7, 11 (total 28). Using Huffman\'s algorithm, what is the total number of bits needed to encode one occurrence of each symbol (the total weighted path length)?',
+  options: [],
+  kind: 'nat',
+  answer: 60,
+  marks: 2,
+  difficulty: 'hard',
+  type: 'pyq-style',
+  explanation: 'Repeatedly merge the two smallest frequencies using a min-heap, adding the merge cost (sum of the two merged values) to a running total each time -- this running total exactly equals the final total weighted path length, because every symbol\'s frequency is counted once for every tree level (bit) it sits beneath the root, and summing per-merge costs telescopes to that same total. Starting heap {2,3,5,7,11}: pop 2 and 3, merge to 5, add cost 5 to total (total=5); heap becomes {5,5,7,11}. Pop 5 and 5, merge to 10, add cost 10 (total=15); heap becomes {7,10,11}. Pop 7 and 10, merge to 17, add cost 17 (total=32); heap becomes {11,17}. Pop 11 and 17, merge to 28, add cost 28 (total=60); heap becomes {28}, done. So the total weighted path length is 60 bits -- confirmed by direct min-heap simulation.'
+},
+{
+  id: 'algo-greedy-pyq9',
+  pyqYear: 2023,
+  q: 'Which of the following problems CANNOT be solved optimally by a simple greedy algorithm (i.e., requires dynamic programming or another technique for optimality)?',
+  options: ['0/1 Knapsack (items are indivisible, each item taken fully or not at all)', 'Minimum Spanning Tree', 'Activity Selection (maximize number of non-overlapping activities)', 'Huffman Coding (minimize total weighted code length)'],
+  answer: 0,
+  marks: 1,
+  difficulty: 'easy',
+  type: 'pyq-style',
+  explanation: '0/1 Knapsack, where each item must be taken entirely or not at all (no fractional pieces allowed), does NOT have the greedy-choice property in general: picking items by highest value-per-weight ratio first (the greedy strategy that works for the FRACTIONAL version) can produce a strictly suboptimal solution once items become indivisible, because a high-ratio item might not fit while a combination of lower-ratio items would fill the remaining capacity with higher total value. This is why 0/1 Knapsack is solved optimally via dynamic programming instead. In contrast, MST (via the cut property), Activity Selection (via an exchange argument on earliest finish time), and Huffman Coding (via the merge-the-two-smallest exchange argument) are all classic examples where a greedy strategy IS provably optimal, each with its own distinct correctness proof -- this question tests the ability to distinguish which problems have the greedy-choice + optimal-substructure properties needed for greedy correctness from those (like 0/1 knapsack) that only satisfy optimal substructure but not the greedy-choice property.'
+},
+{
+  id: 'algo-greedy-pyq10',
+  pyqYear: 2024,
+  q: 'In a min-heap-based implementation of Huffman\'s algorithm processing n symbols, what is the tight asymptotic time complexity of building the complete Huffman tree?',
+  options: ['Theta(n log n)', 'Theta(n)', 'Theta(n^2)', 'Theta(log n)'],
+  answer: 0,
+  marks: 1,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: 'Huffman\'s algorithm performs exactly n-1 merge operations to combine n symbols into a single tree (each merge reduces the symbol/node count by 1, starting from n and ending at 1). Each merge operation requires: two EXTRACT-MIN operations from the min-heap (each O(log n)) and one INSERT of the newly merged node back into the heap (also O(log n)). So each of the n-1 merges costs O(log n), giving total time Theta((n-1) * log n) = Theta(n log n). Building the initial min-heap from n frequencies takes only O(n) (via the standard bottom-up build-heap procedure), which is dominated by the Theta(n log n) merging phase. This Theta(n log n) bound is why Huffman coding, despite being conceptually a simple greedy algorithm, has the same asymptotic complexity class as comparison-based sorting -- both are fundamentally limited by needing repeated priority-queue operations (or equivalently, both are lower-bounded related to sorting-like operations on n elements).'
+},
+{
+  id: 'algo-greedy-pyq11',
+  pyqYear: 2025,
+  q: 'A greedy interval-point-covering algorithm is given n intervals on a line and must choose the minimum number of POINTS such that every interval contains at least one chosen point. The standard greedy strategy is:',
+  options: [
+    'Sort intervals by RIGHT endpoint; repeatedly pick the right endpoint of the earliest not-yet-covered interval as a point, then skip all intervals it covers',
+    'Sort intervals by LEFT endpoint; always pick the left endpoint of the first interval',
+    'Pick points at every integer coordinate that appears as any endpoint',
+    'This problem cannot be solved by any greedy algorithm'
+  ],
+  answer: 0,
+  marks: 1,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: 'This is the classic "minimum points to stab all intervals" (interval point cover) problem, structurally the dual of activity selection. The correct greedy strategy sorts intervals by their RIGHT endpoint (ascending), then processes intervals left to right: whenever an interval is not yet covered by any previously chosen point, it greedily places a NEW point exactly at that interval\'s right endpoint (the rightmost possible choice that still covers this interval), and this single point automatically covers every other interval that overlaps it going forward, which are then skipped. Choosing the RIGHTMOST feasible point (rather than the leftmost, as in option 2) is the key greedy insight: it maximizes the chance of also covering subsequent intervals that start before this point ends, minimizing the total point count -- this is provably optimal via an exchange argument nearly identical to activity selection\'s. Option 3 (picking every distinct endpoint) massively over-counts and is not optimal; option 4 is false since this problem is a textbook example of correct greedy design.'
+},
+{
+  id: 'algo-greedy-pyq12',
+  pyqYear: 2026,
+  q: 'Consider the greedy algorithm for MST using Prim\'s method starting from an arbitrary vertex, versus Kruskal\'s method. Which of the following statements is/are TRUE? (Multiple Select Question)',
+  options: [
+    'If all edge weights in the graph are distinct, the MST is unique, and both Prim\'s and Kruskal\'s algorithms will find the same MST',
+    'If two edges have equal weight and both are candidates at some step, choosing either can still lead to a valid MST (possibly a different one, but of the same total weight)',
+    'Prim\'s algorithm requires the graph to be connected for its output to be a single spanning tree',
+    'Kruskal\'s algorithm sorts edges by weight in INCREASING order and adds an edge only if it does NOT create a cycle with previously added edges'
+  ],
+  answers: [0, 1, 2, 3],
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: 'Statement 1 is TRUE: a standard theorem states that if all edge weights are pairwise distinct, the MST is unique, and since both Prim\'s and Kruskal\'s are correct greedy algorithms (justified by the cut property), they must both converge to that same unique tree. Statement 2 is TRUE: when weights tie, different valid tie-breaking choices can lead to different spanning trees, but all such trees are guaranteed to have the SAME total minimum weight (multiple MSTs can co-exist, all optimal). Statement 3 is TRUE: Prim\'s algorithm grows one connected tree by always attaching the minimum-weight edge leaving the current tree to a new vertex; if the graph is disconnected, Prim\'s algorithm (run from a single start vertex) can only ever reach vertices in that vertex\'s connected component, and will fail to produce a SPANNING tree covering all vertices -- connectivity is a precondition. Statement 4 correctly describes Kruskal\'s algorithm: sort all edges by weight ascending, then greedily add each edge unless it would close a cycle (checked via union-find), continuing until n-1 edges are added -- TRUE. All four statements are correct.'
+}
+);
+window.GATE_DATA.questions['algo'].topics.find(function(t){return t.id==='algo-dp';}).questions.push(
+{
+  id: 'algo-dp-pyq1',
+  pyqYear: 2015,
+  q: 'For the 0/1 Knapsack problem with items of (weight, value) = (1,1), (3,4), (4,5), (5,7) and knapsack capacity W = 7, what is the MAXIMUM total value achievable (each item taken at most once)?',
+  options: [],
+  kind: 'nat',
+  answer: 9,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: 'Build the DP table dp[i][w] = max value using the first i items with capacity w, using the recurrence dp[i][w] = dp[i-1][w] if weight[i] > w, else max(dp[i-1][w], dp[i-1][w-weight[i]] + value[i]). Filling the table for items (1,1),(3,4),(4,5),(5,7) up to capacity 7 gives dp[4][7] = 9, achieved by choosing items with weights {3,4} (values 4+5=9, total weight 3+4=7, exactly filling the capacity) -- this beats other combinations like {1,3} (weight 4, value 5), {1,3,... nothing else fits}, or taking the single item (5,7) alone (value 7). The 0/1 constraint (no fractional items) is why this needs the DP table rather than the simple greedy-by-ratio approach that works for fractional knapsack; greedy by ratio here would rank item (1,1) ratio=1, (3,4) ratio=1.33, (4,5) ratio=1.25, (5,7) ratio=1.4, and taking the top-ratio items greedily would not necessarily find this optimal combination.'
+},
+{
+  id: 'algo-dp-pyq2',
+  pyqYear: 2016,
+  q: 'What is the minimum EDIT DISTANCE (using insert, delete, and substitute, each cost 1) between the strings "SUNDAY" and "SATURDAY"?',
+  options: [],
+  kind: 'nat',
+  answer: 3,
+  marks: 2,
+  difficulty: 'hard',
+  type: 'pyq-style',
+  explanation: 'Using the standard DP recurrence dp[i][j] = dp[i-1][j-1] if the characters match, else 1 + min(dp[i-1][j] (delete), dp[i][j-1] (insert), dp[i-1][j-1] (substitute)), with dp[i][0]=i and dp[0][j]=j as base cases, filling the full 7x9 table (for "SUNDAY" of length 6 against "SATURDAY" of length 8) gives dp[6][8] = 3. One optimal alignment achieving cost 3: insert "A" after S (SAUNDAY), substitute "N" with "R"... more directly, one valid edit sequence is: insert \'A\' (S->SA), insert \'T\' before U appropriately, and one substitution -- the DP guarantees the MINIMUM regardless of which specific sequence of 3 edits is found, and no sequence of fewer than 3 edits can transform "SUNDAY" into "SATURDAY". This exact string pair is a well-known benchmark example for edit distance / Levenshtein distance computation.'
+},
+{
+  id: 'algo-dp-pyq3',
+  pyqYear: 2017,
+  q: 'What is the length of the Longest Common Subsequence (LCS) between "ABCBDAB" and "BDCABA"?',
+  options: [],
+  kind: 'nat',
+  answer: 4,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: 'Using the LCS recurrence dp[i][j] = dp[i-1][j-1]+1 if the i-th character of the first string equals the j-th character of the second, else dp[i][j] = max(dp[i-1][j], dp[i][j-1]), filling the DP table for "ABCBDAB" (length 7) against "BDCABA" (length 6) gives dp[7][6] = 4. Two subsequences achieving this length are "BCBA" and "BDAB", both of length 4, and both can be verified to appear (in order, not necessarily contiguous) within both original strings. No common subsequence of length 5 or more exists between these two strings. This is one of the most frequently reused GATE example string pairs for testing LCS table construction, precisely because it requires several genuine max() tie-breaks that expose whether a candidate correctly applies the recurrence rather than guessing.'
+},
+{
+  id: 'algo-dp-pyq4',
+  pyqYear: 2018,
+  q: 'For matrix chain multiplication with matrices of dimensions 5x10, 10x3, 3x12, 12x5, 5x50, 50x6 (i.e., p = [5,10,3,12,5,50,6]), what is the MINIMUM number of scalar multiplications needed to compute the full product using optimal parenthesization?',
+  options: [],
+  kind: 'nat',
+  answer: 2010,
+  marks: 2,
+  difficulty: 'hard',
+  type: 'pyq-style',
+  explanation: 'Using the matrix-chain DP recurrence dp[i][j] = min over all split points k (i<=k<j) of dp[i][k] + dp[k+1][j] + p[i-1]*p[k]*p[j], filling the table bottom-up by increasing chain length for 6 matrices (dimensions given by p=[5,10,3,12,5,50,6]) gives dp[1][6] = 2010 as the minimum total scalar multiplications. This demonstrates the huge cost difference correct parenthesization can make: multiplying strictly left-to-right (((((M1*M2)*M3)*M4)*M5)*M6) would cost far more multiplications than the DP-found optimal grouping, since the DP explores all O(2^n / n) possible parenthesizations implicitly via the O(n^3) table-filling recurrence rather than enumerating them all directly (which would itself be exponential).'
+},
+{
+  id: 'algo-dp-pyq5',
+  pyqYear: 2019,
+  q: 'What is the length of the Longest Increasing Subsequence (LIS) of the array [10, 9, 2, 5, 3, 7, 101, 18]?',
+  options: [],
+  kind: 'nat',
+  answer: 4,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: 'Using the O(n^2) LIS DP recurrence dp[i] = 1 + max(dp[j]) over all j<i with a[j]<a[i] (or dp[i]=1 if no such j exists), and taking the maximum over all dp[i]: for array [10,9,2,5,3,7,101,18], one longest increasing subsequence is [2,5,7,101] or equivalently [2,3,7,101] or [2,3,7,18], each of length 4. No increasing subsequence of length 5 exists in this array (verified by exhaustive DP table computation: dp values are [1,1,1,2,2,3,4,4], and the maximum is 4). This exact array is a standard textbook/interview example for LIS, and this question format tests whether a candidate can correctly trace the O(n^2) table-filling recurrence (as opposed to only knowing the existence of an O(n log n) patience-sorting-based algorithm without being able to hand-compute a small example).'
+},
+{
+  id: 'algo-dp-pyq6',
+  pyqYear: 2020,
+  q: 'Using the coin denominations {1, 2, 5}, what is the MINIMUM number of coins needed to make change for the amount 11 (using standard DP, not greedy)?',
+  options: [],
+  kind: 'nat',
+  answer: 3,
+  marks: 1,
+  difficulty: 'easy',
+  type: 'pyq-style',
+  explanation: 'Using the DP recurrence dp[a] = 1 + min(dp[a-c]) over all coin denominations c<=a, with dp[0]=0, filling the table from amount 0 up to 11 gives dp[11] = 3, achieved by the combination {5, 5, 1} (5+5+1=11, using 3 coins). No combination of 2 coins can sum to exactly 11 using denominations from {1,2,5} (checking all pairs: 5+5=10, 5+2=7, 5+1=6, 2+2=4, etc., none reach 11), confirming 3 is indeed minimal. This coin system {1,2,5} happens to be "canonical" (greedy also gives the correct answer here, taking 5+5+1=3 coins by picking largest-first), but the DP formulation is what generalizes correctly to ANY coin system, including non-canonical ones like {1,3,4} where greedy can fail.'
+},
+{
+  id: 'algo-dp-pyq7',
+  pyqYear: 2021,
+  q: 'Using coin denominations {1, 2, 5}, how many DISTINCT ways (order does not matter, i.e., counting combinations not permutations) are there to make change for the amount 5?',
+  options: [],
+  kind: 'nat',
+  answer: 4,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: 'Using the "counting combinations" DP recurrence (process coins one denomination at a time in the outer loop, amounts in the inner loop, dp[a] += dp[a-c]), with dp[0]=1 initially, the number of ways to make amount 5 using coins from {1,2,5} is dp[5] = 4. The 4 distinct combinations are: {5} (one 5-coin), {2,2,1} (two 2-coins and one 1-coin), {2,1,1,1} (one 2-coin and three 1-coins), and {1,1,1,1,1} (five 1-coins). Note that the ORDER of the outer (coin) and inner (amount) loops matters critically for this variant: iterating coins in the outer loop and amounts in the inner loop counts combinations (order-independent), while swapping the loop order would instead count PERMUTATIONS (order-dependent, treating {2,1,1,1} arranged differently as distinct), a subtle but frequently tested distinction in coin-change DP formulations.'
+},
+{
+  id: 'algo-dp-pyq8',
+  pyqYear: 2022,
+  q: 'The Rod Cutting problem has rod length 8 and price table (for lengths 1 through 8): [1, 5, 8, 9, 10, 17, 17, 20]. What is the MAXIMUM total revenue obtainable by optimally cutting the rod?',
+  options: [],
+  kind: 'nat',
+  answer: 22,
+  marks: 2,
+  difficulty: 'hard',
+  type: 'pyq-style',
+  explanation: 'Using the rod-cutting DP recurrence dp[n] = max over all first-cut lengths i (1<=i<=n) of price[i] + dp[n-i], with dp[0]=0, filling the table from length 0 up to 8 gives dp[8] = 22, achieved by cutting the rod into two pieces of length 2 and 6 (price[2]+price[6] = 5+17 = 22), which beats selling the rod whole at price[8]=20, or other cuts like length 1+7 (1+17=18) or 4+4 (9+9=18). This is the classic CLRS rod-cutting example, and the optimal cut here (2+6, giving revenue 22) is a frequently-tested "surprising" result since it is NOT simply the single best per-unit-price cut repeated (price[2]/2 = 2.5/unit is the best per-unit rate, but cutting the whole rod into four length-2 pieces would give 4*5=20, LESS than the 22 achieved by the 2+6 split), showing DP correctly balances marginal prices rather than naively maximizing a per-unit ratio.'
+},
+{
+  id: 'algo-dp-pyq9',
+  pyqYear: 2023,
+  q: 'A DP algorithm for the 0/1 Knapsack problem with n items and capacity W is implemented using the standard 2D table dp[i][w]. What are the TIGHT time and space complexities of this standard DP formulation?',
+  options: ['Time O(nW), Space O(nW)', 'Time O(n log W), Space O(n)', 'Time O(2^n), Space O(n)', 'Time O(nW), Space O(n) using a rolling array, but NEVER O(nW) time'],
+  answer: 0,
+  marks: 1,
+  difficulty: 'easy',
+  type: 'pyq-style',
+  explanation: 'The standard 0/1 knapsack DP fills a table of size (n+1) x (W+1), where n is the number of items and W is the knapsack capacity, and computing each cell dp[i][w] takes O(1) time given the previous row\'s values. So total time is O(n*W) and, using the full 2D table (needed if item-selection reconstruction via backtracking is required), space is also O(n*W). Note that this is PSEUDO-polynomial time -- it depends on the VALUE of W, not just the number of bits needed to represent W, meaning if W is exponentially large relative to n (e.g., W = 2^n), this algorithm becomes exponential in the input size; 0/1 Knapsack is NP-hard in general, and this pseudo-polynomial DP does not contradict that. A space optimization using a 1D rolling array (processing weights in decreasing order per item) can reduce space to O(W) while keeping time at O(n*W), but the question\'s stated 2D table formulation is O(nW) in both time and space as given.'
+},
+{
+  id: 'algo-dp-pyq10',
+  pyqYear: 2024,
+  q: 'Which of the following statements about Dynamic Programming are TRUE? (Multiple Select Question)',
+  options: [
+    'DP is applicable when a problem has both optimal substructure and overlapping subproblems',
+    'Memoization (top-down) and tabulation (bottom-up) both compute the same set of DP values but differ in evaluation order',
+    'If subproblems do NOT overlap, DP typically offers no benefit over plain divide-and-conquer recursion',
+    'Every problem with optimal substructure can be solved by DP in polynomial time'
+  ],
+  answers: [0, 1, 2],
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: 'Statement 1 is TRUE: DP requires BOTH optimal substructure (an optimal solution can be built from optimal solutions to subproblems) AND overlapping subproblems (the same subproblems recur multiple times) -- both are needed to justify caching. Statement 2 is TRUE: memoization computes values on-demand via recursion, caching results the first time each subproblem is seen (top-down), while tabulation computes values in a fixed order (typically smallest subproblems first) filling a table iteratively (bottom-up) -- both explore the exact same dependency DAG of subproblems and produce identical final values, just via different traversal orders and different overhead (tabulation avoids recursion-call overhead but must compute a valid topological order in advance). Statement 3 is TRUE: divide-and-conquer algorithms like merge sort have optimal substructure but NON-overlapping subproblems (each recursive call works on a disjoint portion of the array), so caching offers no speedup -- this is precisely why merge sort is "just" divide-and-conquer, not DP. Statement 4 is FALSE: optimal substructure alone is not sufficient for a polynomial-time DP -- the NUMBER of distinct subproblems must also be polynomial (bounded); problems like the general Traveling Salesman Problem have optimal substructure but an exponential number of distinct subproblems (subsets of cities), so their DP formulation (e.g., Held-Karp) is still exponential, just less so than brute force.'
+},
+{
+  id: 'algo-dp-pyq11',
+  pyqYear: 2025,
+  q: 'In the Longest Common Subsequence DP table for two strings of lengths m and n, if the two strings share NO characters in common at all, what value appears in every cell of the table (except the necessarily-zero base row/column, which are also zero)?',
+  options: ['0', '1', 'min(m,n)', 'It varies depending on string content even with no common characters'],
+  answer: 0,
+  marks: 1,
+  difficulty: 'easy',
+  type: 'pyq-style',
+  explanation: 'The LCS recurrence is dp[i][j] = dp[i-1][j-1]+1 if characters match, else dp[i][j] = max(dp[i-1][j], dp[i][j-1]). If the two strings share absolutely no character in common, the "characters match" branch (dp[i-1][j-1]+1) is NEVER taken anywhere in the table, so every cell falls back to max(dp[i-1][j], dp[i][j-1]). Since the base row (i=0) and base column (j=0) are initialized to 0 (an empty string has LCS length 0 with anything), and every subsequent cell only ever takes the max of already-zero neighbors (by induction, since the match branch never fires), EVERY cell in the entire table remains 0, including dp[m][n]. This makes intuitive sense: if the two strings have no character in common, their longest common SUBSEQUENCE must also be empty (length 0), since a subsequence is built entirely from characters that must appear in both strings.'
+},
+{
+  id: 'algo-dp-pyq12',
+  pyqYear: 2026,
+  q: 'The Fibonacci-like recurrence f(n) = f(n-1) + f(n-2) + f(n-3) (a "tribonacci" sequence) with f(0)=0, f(1)=0, f(2)=1 is computed using BOTTOM-UP dynamic programming (tabulation) storing only the last 3 values at any time (not a full array). What are the TIME and SPACE complexities to compute f(n)?',
+  options: ['Time O(n), Space O(1)', 'Time O(n), Space O(n)', 'Time O(2^n), Space O(1)', 'Time O(n^2), Space O(1)'],
+  answer: 0,
+  marks: 1,
+  difficulty: 'easy',
+  type: 'pyq-style',
+  explanation: 'Computing f(3), f(4), ..., f(n) bottom-up, each requiring O(1) work given the previous three values already computed, takes a total of O(n) time across n-2 iterations. Because the recurrence only ever needs the most recent 3 values (a sliding window, not the entire history), maintaining just 3 variables (rather than a full array of size n) suffices, achieving O(1) auxiliary space -- this is the standard space-optimization trick for any DP recurrence whose dependency only reaches back a CONSTANT number of previous states (as opposed to something like LCS or knapsack, whose recurrences need an entire previous row and thus cannot be reduced below O(row size) space, or in special row-elimination cases like knapsack, reduced to O(W) via careful iteration order but not O(1)). This distinction -- constant-lookback recurrences reducible to O(1) space versus row-dependent recurrences needing O(row) space -- is a common space-complexity trap in DP questions.'
+}
+);

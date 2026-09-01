@@ -2353,3 +2353,438 @@ window.GATE_DATA.questions['os'].topics.find(function(t){return t.id==='os-virtu
   explanation: 'Simulate FIFO with 3 empty frames, tracking insertion order (the front of the queue is evicted first). t1: reference 7 -> fault, frames={7}. t2: reference 0 -> fault, frames={7,0}. t3: reference 1 -> fault, frames={7,0,1} (now full). t4: reference 2 -> fault, evict oldest (7), frames={0,1,2}. t5: reference 0 -> HIT (0 is already present; FIFO does not reorder on a hit, so the queue order 0,1,2 is unchanged). t6: reference 3 -> fault, evict oldest (0), frames={1,2,3}. t7: reference 0 -> fault (0 was just evicted), evict oldest (1), frames={2,3,0}. t8: reference 4 -> fault, evict oldest (2), frames={3,0,4}. Counting: faults occur at t1,t2,t3,t4,t6,t7,t8 -- that is 7 faults out of 8 references, with the only hit at t5. This specific reference string with 3 frames is the classic example used to demonstrate Belady\'s Anomaly, since adding a 4th frame to the same string actually reduces the fault count rather than only ever helping monotonically as intuition might suggest for other algorithms like LRU.'
 }
 );
+
+window.GATE_DATA.questions['os'].topics.find(function(t){return t.id==='os-processes';}).questions.push(
+{
+  id: 'os-processes-p1',
+  pyqYear: 2015,
+  q: 'Consider the following C code fragment executed by a single process:\n\nfork();\nfork();\nfork();\n\n(three unconditional, sequential fork() calls, one after another). How many processes in total (including the original) exist after all three statements have executed? (Enter your numerical answer.)',
+  options: [],
+  answer: 8,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: 'Each unconditional fork() call doubles the number of currently-live processes, because every process that reaches the statement (the original and every process created by earlier forks) executes it and splits into two. Starting with 1 process: after the first fork() there are 2; after the second fork(), each of those 2 processes forks independently, giving 4; after the third fork(), each of those 4 forks again, giving 8. In general, n sequential unconditional fork() calls executed by every resulting process yield 2^n total processes, so 3 forks give 2^3 = 8. This doubling rule is the single most useful shortcut for this entire question family: count how many fork() statements lie on a straight-line (non-conditional) path that every process executes, and the total process count is simply 2 raised to that count.'
+},
+{
+  id: 'os-processes-p2',
+  pyqYear: 2016,
+  q: 'A program contains a loop: for (i = 0; i < 4; i++) { fork(); } with no other statements inside the loop body, executed by a single initial process. How many NEW child processes (i.e., not counting the original parent process) are created in total by the time the loop finishes in all processes? (Enter your numerical answer.)',
+  options: [],
+  answer: 15,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: 'A loop that calls fork() unconditionally n times, where every spawned process also executes the remaining loop iterations, behaves exactly like n sequential unconditional fork() calls: it doubles the live process count on every iteration. Starting from 1 process, after iteration 1 there are 2, after iteration 2 there are 4, after iteration 3 there are 8, and after iteration 4 there are 16 total processes. The question asks for the number of NEW processes created, not the total -- since we started with exactly 1 original process and ended with 16 processes overall, the number of children created is 16 - 1 = 15. This distinction (total processes vs. newly created children) is a common source of off-by-one errors in fork()-counting questions, so always re-read exactly what quantity is being asked for.'
+},
+{
+  id: 'os-processes-p3',
+  pyqYear: 2017,
+  q: 'Consider this C code executed by a single process:\n\nfork();\nif (fork() == 0) {\n    fork();\n}\n\nHow many processes in total exist after this code fragment finishes executing everywhere? (Enter your numerical answer.)',
+  options: [],
+  answer: 6,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'hard',
+  type: 'pyq-style',
+  explanation: 'Trace it as a tree. The first fork() is unconditional and executed by everyone, so it turns the 1 original process into 2 processes. Each of those 2 processes now executes "if (fork() == 0)": this second fork() also runs in both, creating 2 more processes, so we now have 4 processes total, of which exactly 2 are "children" of this second fork (the ones for which fork() returned 0, i.e., the newly created child on each branch) and 2 are "parents" (fork() returned the nonzero child PID). Only the 2 child processes (where the condition fork()==0 is true) enter the if-block and execute the third fork(), each producing one more process, adding 2 more processes. Final count: the 2 parent processes from the second fork (no further forking) + the 2 child processes from the second fork (each now further forked into 2, giving 4) = 2 + 4 = 6 total processes.'
+},
+{
+  id: 'os-processes-p4',
+  pyqYear: 2018,
+  q: 'Consider this C code executed by a single process:\n\nif (fork() == 0) {\n    if (fork() == 0) {\n        fork();\n    }\n} else {\n    fork();\n}\n\nHow many processes in total exist after this code finishes executing everywhere? (Enter your numerical answer.)',
+  options: [],
+  answer: 5,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'hard',
+  type: 'pyq-style',
+  explanation: 'The very first fork() splits the 1 original process into 2: a child (for which fork()==0 is true, entering the outer if-block) and a parent (entering the else-block). The parent branch runs "fork();" unconditionally once, turning that 1 parent into 2 processes with no further forking -- contributing 2 processes total from that branch. The child branch executes "if (fork()==0) { fork(); }": this second fork() splits that 1 process into 2 (a new child and a new parent); the new parent does nothing further (1 process), while the new child executes one more fork(), splitting into 2 processes. So the child branch contributes 1 (inner parent) + 2 (inner child, further forked) = 3 processes. Grand total = 2 (else branch) + 3 (if branch) = 5 processes.'
+},
+{
+  id: 'os-processes-p5',
+  pyqYear: 2019,
+  q: 'Consider this C code executed by a single process:\n\nfork();\nif (fork() == 0) {\n    fork();\n    fork();\n}\n\nHow many processes in total exist after this code finishes executing everywhere? (Enter your numerical answer.)',
+  options: [],
+  answer: 10,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'hard',
+  type: 'pyq-style',
+  explanation: 'The first fork() is unconditional, doubling the 1 original process into 2. Each of these 2 processes then executes the second fork(): this doubles them again into 4 total processes, of which exactly 2 are children (where fork()==0 held) and 2 are parents (non-zero return, condition false, they skip the if-block entirely). The 2 parent processes do nothing more, contributing 2 to the final total. Each of the 2 child processes now executes "fork(); fork();" -- two more unconditional, sequential forks -- which by the standard doubling rule turns each single child into 2^2 = 4 processes, so the 2 children together produce 2 x 4 = 8 processes. Grand total = 2 (parents, unaffected) + 8 (from the two child sub-trees) = 10 processes.'
+},
+{
+  id: 'os-processes-p6',
+  pyqYear: 2020,
+  q: 'Consider this C code executed by a single process:\n\nfork();\nfork();\nif (fork() > 0) {\n    fork();\n}\n\n(the condition fork() > 0 is true only in the PARENT of that third fork() call, i.e., the process that received a nonzero child PID). How many processes in total exist after this code finishes executing everywhere? (Enter your numerical answer.)',
+  options: [],
+  answer: 12,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'hard',
+  type: 'pyq-style',
+  explanation: 'The first two fork() calls are unconditional and executed by everyone, so by the doubling rule they turn 1 process into 2^2 = 4 processes. Each of these 4 processes now executes "if (fork() > 0)": this third fork() is also executed by all 4, producing 4 new child processes (fork()==0 for them, condition false, they skip the if-block) and leaving the original 4 as parents (fork()>0, condition true, they enter the if-block). So immediately after the third fork() there are 8 processes: 4 parents (about to fork again) and 4 children (done). Each of the 4 parent processes now executes one more unconditional fork(), doubling itself into 2, contributing 4*2 = 8 processes. Grand total = 4 (children, done) + 8 (from parents forking once more) = 12 processes.'
+},
+{
+  id: 'os-processes-p7',
+  pyqYear: 2021,
+  q: 'Consider this C code executed by a single process:\n\nif (fork() == 0) {\n    fork();\n} else {\n    fork();\n    fork();\n}\n\nHow many processes in total exist after this code finishes executing everywhere? (Enter your numerical answer.)',
+  options: [],
+  answer: 6,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: 'The single fork() in the condition splits the 1 original process into exactly 2: one child (fork()==0, takes the if-branch) and one parent (takes the else-branch). The child branch executes one further unconditional fork(), turning that 1 process into 2^1 = 2 processes total from that branch. The else (parent) branch executes two further unconditional, sequential fork() calls, turning that 1 process into 2^2 = 4 processes total from that branch. Grand total = 2 (if-branch) + 4 (else-branch) = 6 processes. Note that the answer would be different (and larger) if the branches were swapped, since the branch that executes MORE forks contributes exponentially more processes -- always match each fork() count to the correct branch when tracing.'
+},
+{
+  id: 'os-processes-p8',
+  pyqYear: 2022,
+  q: 'Consider this C code executed by a single process:\n\nfork();\nfork();\nprintf("done\\n");\n\n(the printf statement is unconditional and comes after both forks, so every live process executes it exactly once). How many times does the string "done" get printed in total, across all processes? (Enter your numerical answer.)',
+  options: [],
+  answer: 4,
+  kind: 'nat',
+  marks: 1,
+  difficulty: 'easy',
+  type: 'pyq-style',
+  explanation: 'The two unconditional, sequential fork() calls double the process count twice: 1 process becomes 2 after the first fork(), then 4 after the second fork(). Since the printf() statement is unconditional, placed after both forks, and every one of the resulting processes independently reaches and executes it exactly once (each process has its own copy of the program counter and executes every instruction after the fork point in its own code path), the number of times "done" is printed equals the total number of live processes at that point, which is 2^2 = 4. This is a common GATE variation on plain process-counting: instead of asking for the total process count, it asks how many times a given output statement executes, which for an unconditional printf placed after all the forks is simply equal to the final process count.'
+},
+{
+  id: 'os-processes-p9',
+  pyqYear: 2023,
+  q: 'Consider this C code executed by a single process:\n\nfork();\nprintf("hi\\n");\nfork();\n\n(the printf is placed BETWEEN the two fork() calls, so it executes once per process that exists at that point in the code, before the second fork happens). How many times does "hi" get printed in total? (Enter your numerical answer.)',
+  options: [],
+  answer: 2,
+  kind: 'nat',
+  marks: 1,
+  difficulty: 'easy',
+  type: 'pyq-style',
+  explanation: 'The key subtlety here is exactly WHEN the printf() executes relative to the forks. The first fork() splits the 1 original process into 2 processes. At this point, both of the 2 processes independently reach the printf() statement (which comes right after the first fork but before the second), so "hi" is printed exactly twice -- once by each of the 2 processes that exist at that moment. Only after printing does each of those 2 processes go on to execute the second fork(), which doubles the process count again to 4, but since printf() already executed before this second fork(), those newly created processes from the second fork never print "hi" a second time. So the total number of times "hi" is printed is exactly 2, matching the process count at the moment the printf statement is reached, not the final process count of 4.'
+},
+{
+  id: 'os-processes-p10',
+  pyqYear: 2024,
+  q: 'Consider this C code executed by a single process:\n\nfork();\nfork();\nfork();\nprintf("x\\n");\n\n(three unconditional, sequential forks, followed by an unconditional printf executed by every resulting process). How many times does "x" get printed in total? (Enter your numerical answer.)',
+  options: [],
+  answer: 8,
+  kind: 'nat',
+  marks: 1,
+  difficulty: 'easy',
+  type: 'pyq-style',
+  explanation: 'Three unconditional, sequential fork() calls double the process count three times: 1 process becomes 2, then 4, then 8, following the standard 2^n rule for n straight-line fork() calls. Since the printf() statement is placed after all three forks and is itself unconditional, every one of the 8 processes alive at that point independently executes it exactly once (each process runs the remainder of the program from where it was created, and printf() is simply the next instruction for all of them). Therefore "x" is printed exactly 8 times in total. This reinforces the general pattern: when a print statement sits after k unconditional sequential forks with no conditionals in between, the number of times it prints equals 2^k, the same as the total process count at that point in the code.'
+},
+{
+  id: 'os-processes-p11',
+  pyqYear: 2025,
+  q: 'Consider this C code executed by a single process:\n\nif (fork() == 0) {\n    exit(0);\n}\nfork();\n\n(the first fork()\'s child immediately exits without doing anything further; the first fork()\'s parent survives and goes on to execute the second, unconditional fork()). How many NEW child processes are ever created in total by this code (not counting the original process, and counting a child even though it exits immediately)? (Enter your numerical answer.)',
+  options: [],
+  answer: 2,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: 'The first fork() splits the 1 original process into 2: a child (fork()==0 is true), which immediately calls exit(0) and leaves the system without executing anything else -- crucially, it NEVER reaches the second fork() -- and a parent (fork()!=0), which survives and falls through to the unconditional second fork(). That surviving parent then executes the second fork(), which creates exactly 1 more new child. Counting every child process ever created: the first fork() created 1 child (which exited immediately) and the second fork() created 1 more child (which survives) -- a total of 1 + 1 = 2 new child processes created overall. Note that only 2 processes are alive at the very end (the parent-of-the-second-fork and its new child), since the very first child already exited, but the question asks how many children were CREATED in total, which counts the exited one too, giving 2.'
+},
+{
+  id: 'os-processes-p12',
+  pyqYear: 2026,
+  q: 'Consider this C code executed by a single process:\n\nfork();\nfork();\nif (fork() == 0) {\n    exit(0);\n}\n\n(the first two forks are unconditional and sequential; the third fork\'s child immediately exits, while the third fork\'s parent survives and does nothing further). How many processes are still ALIVE (i.e., have not exited) once every process has finished executing this fragment? (Enter your numerical answer.)',
+  options: [],
+  answer: 4,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'hard',
+  type: 'pyq-style',
+  explanation: 'The first two unconditional, sequential fork() calls double the process count twice, turning 1 original process into 2^2 = 4 processes -- call these the "generation-2" processes. Each of these 4 processes now independently executes the third fork(): this creates 4 brand-new child processes (for which fork()==0, so they immediately call exit(0) and die) while the original 4 generation-2 processes become the parents of this third fork (fork()!=0, so the if-condition is false and they skip the exit -- they simply fall off the end of the code fragment and remain alive, having done nothing more). So a total of 4 + 4 = 8 processes were created by the third fork\'s point, but the 4 newly created children all exit immediately, leaving only the original 4 generation-2 processes alive at the end. Hence exactly 4 processes are alive once the fragment finishes, even though 8 processes existed at some point during execution -- a useful reminder to distinguish "total ever created" from "alive at the end" in these traces.'
+}
+);
+
+window.GATE_DATA.questions['os'].topics.find(function(t){return t.id==='os-scheduling';}).questions.push(
+{
+  id: 'os-scheduling-p1',
+  pyqYear: 2015,
+  q: 'Four processes P1, P2, P3, P4 with burst times 6, 8, 7, 3 ms respectively all arrive at t = 0 and are scheduled using non-preemptive Shortest-Job-First (SJF). What is the AVERAGE WAITING TIME across all 4 processes, in ms? (Enter your numerical answer.)',
+  options: [],
+  answer: 7,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: 'Since all four processes arrive at t=0, non-preemptive SJF simply runs them in increasing order of burst time: P4 (3), then P1 (6), then P3 (7), then P2 (8). Tracing the timeline: P4 runs 0-3 (waiting 0), P1 runs 3-9 (waiting 3, the time P4 occupied the CPU), P3 runs 9-16 (waiting 9, the time P4+P1 occupied), and P2 runs 16-24 (waiting 16, the time P4+P1+P3 occupied). Summing the waiting times: 0 + 3 + 9 + 16 = 28. Dividing by 4 processes gives an average waiting time of 28/4 = 7 ms. This illustrates the key optimality property of SJF: among all non-preemptive schedules for a fixed set of processes arriving together, running shortest-burst-first minimizes the average waiting time, which is exactly why GATE repeatedly tests this computation.'
+},
+{
+  id: 'os-scheduling-p2',
+  pyqYear: 2016,
+  q: 'Four processes arrive as follows and are scheduled by Shortest-Remaining-Time-First (SRTF), a preemptive algorithm: P1 (arrival 0, burst 8), P2 (arrival 1, burst 4), P3 (arrival 2, burst 9), P4 (arrival 3, burst 5). What is the AVERAGE TURNAROUND TIME across all 4 processes, in ms? (Enter your numerical answer.)',
+  options: [],
+  answer: 13,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'hard',
+  type: 'pyq-style',
+  explanation: 'Simulating SRTF minute by minute: P1 (remaining 8) runs alone from t=0 until t=1, when P2 arrives with remaining time 4 -- since 4 is less than P1\'s remaining 7, P2 preempts and runs. P2 completes at t=5 (having run its full burst of 4 uninterrupted, since P3 which arrives at t=2 with remaining 9 and P4 arriving at t=3 with remaining 5 are both longer than P2\'s remaining time throughout). At t=5, comparing P1 (remaining 7), P3 (remaining 9), and P4 (remaining 5), P4 is shortest and runs 5-10, completing at t=10. Next, P1 (remaining 7) is shorter than P3 (remaining 9), so P1 runs 10-17, completing at t=17. Finally P3 runs 17-26, completing at t=26. Turnaround times: P1 = 17-0=17, P2 = 5-1=4, P3 = 26-2=24, P4 = 10-3=7. Sum = 17+4+24+7 = 52; average = 52/4 = 13 ms.'
+},
+{
+  id: 'os-scheduling-p3',
+  pyqYear: 2017,
+  q: 'Four processes are scheduled using Round Robin with time quantum = 2 ms: P1 (arrival 0, burst 5), P2 (arrival 1, burst 4), P3 (arrival 2, burst 2), P4 (arrival 4, burst 1). Ties in the ready queue are broken by earliest arrival, and a process that arrives at the exact instant another is preempted is placed in the queue before the preempted process re-enters it. What is the AVERAGE WAITING TIME across all 4 processes, in ms? (Enter your numerical answer, up to 2 decimal places.)',
+  options: [],
+  answer: 4.75,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'hard',
+  type: 'pyq-style',
+  explanation: 'Tracing Round Robin with quantum 2 (new arrivals join the back of the ready queue as soon as they arrive, before the just-preempted process re-enters it): t=0-2 P1 runs (rem 3), during which P2 arrives at t=1 and queues up; t=2-4 P2 runs (rem 2), during which P3 arrives at t=2 and queues up, so the queue is now [P1, P3]; t=4-6 P3 runs to completion (burst was only 2, finishing at t=6), and P4 arrived at t=4 so the queue becomes [P1, P4]; t=6-8 P1 runs (rem 1), queue becomes [P4, P2, P1]; t=8-9 P4 runs to completion (burst 1, finishing at t=9); t=9-11 P2 runs its remaining 2 units to completion (finishing at t=11); t=11-12 P1 runs its last 1 unit and finishes at t=12. Completion times: P1=12, P2=11, P3=6, P4=9. Turnaround (completion - arrival): P1=12, P2=10, P3=4, P4=5. Waiting (turnaround - burst): P1=12-5=7, P2=10-4=6, P3=4-2=2, P4=5-1=4. Sum = 7+6+2+4 = 19; average = 19/4 = 4.75 ms.'
+},
+{
+  id: 'os-scheduling-p4',
+  pyqYear: 2018,
+  q: 'Four processes arrive as follows and are scheduled using non-preemptive SJF: P1 (arrival 0, burst 7), P2 (arrival 2, burst 4), P3 (arrival 4, burst 1), P4 (arrival 5, burst 4). What is the AVERAGE WAITING TIME across all 4 processes, in ms? (Enter your numerical answer.)',
+  options: [],
+  answer: 4,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'hard',
+  type: 'pyq-style',
+  explanation: 'At t=0 only P1 has arrived, so it starts immediately and (being non-preemptive) runs to completion at t=7, even though P2 (arrival 2) and P3 (arrival 4) arrive with shorter bursts while P1 is running -- non-preemptive SJF never interrupts a running process. At t=7, the ready queue holds P2 (burst 4) and P3 (burst 1); P3 is shorter, so it runs 7-8. At t=8, only P2 (burst 4) and P4 (arrival 5, burst 4) remain, tied at burst 4, so the earlier-arriving P2 goes first, running 8-12. Finally P4 runs 12-16. Waiting times: P1 = 0 (started immediately), P2 = start(8) - arrival(2) = 6, P3 = start(7) - arrival(4) = 3, P4 = start(12) - arrival(5) = 7. Sum = 0+6+3+7 = 16; average = 16/4 = 4 ms.'
+},
+{
+  id: 'os-scheduling-p5',
+  pyqYear: 2019,
+  q: 'Three processes P1, P2, P3 with burst times 10, 5, 8 ms respectively all arrive at t = 0 and are scheduled using Round Robin with time quantum = 3 ms. What is the AVERAGE TURNAROUND TIME across all 3 processes, in ms? (Enter your numerical answer, up to 2 decimal places.)',
+  options: [],
+  answer: 19.67,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: 'With quantum 3 and all three processes ready at t=0 in order P1, P2, P3, the cycle proceeds: t0-3 P1 (rem 7), t3-6 P2 (rem 2), t6-9 P3 (rem 5), t9-12 P1 (rem 4), t12-14 P2 finishes (used its remaining 2, completing at t=14), t14-17 P3 (rem 2), t17-20 P1 (rem 1), t20-22 P3 finishes (completing at t=22), t22-23 P1 finishes its last unit (completing at t=23). Completion times: P1=23, P2=14, P3=22. Since all arrived at t=0, turnaround time equals completion time directly: 23, 14, 22. Sum = 23+14+22 = 59; average = 59/3 = 19.666... ms, which rounds to 19.67 ms. This demonstrates how Round Robin spreads completions out compared to SJF or FCFS, generally raising average turnaround for workloads with widely varying burst lengths while improving response time.'
+},
+{
+  id: 'os-scheduling-p6',
+  pyqYear: 2020,
+  q: 'Four processes P1, P2, P3, P4 with burst times 6, 2, 8, 3 ms respectively all arrive at t = 0 and are scheduled using Shortest-Remaining-Time-First (SRTF). Since all bursts are known and fixed and all processes arrive together, no preemption ever actually occurs beyond the initial ordering. What is the AVERAGE WAITING TIME across all 4 processes, in ms? (Enter your numerical answer.)',
+  options: [],
+  answer: 4.5,
+  kind: 'nat',
+  marks: 1,
+  difficulty: 'easy',
+  type: 'pyq-style',
+  explanation: 'When every process is already present in the ready queue at t=0, SRTF (preemptive) and non-preemptive SJF produce IDENTICAL schedules, because there is never a new, shorter-burst arrival partway through execution to trigger a preemption -- the algorithm simply always picks the currently-shortest-remaining-time process, and since no process is interrupted before another with a shorter remaining time appears, it runs each chosen process to completion. Ordering by burst: P2 (2), P4 (3), P1 (6), P3 (8). Timeline: P2 runs 0-2 (wait 0), P4 runs 2-5 (wait 2), P1 runs 5-11 (wait 5), P3 runs 11-19 (wait 11). Sum of waits = 0+2+5+11 = 18; average = 18/4 = 4.5 ms. This is an important conceptual point GATE tests: SRTF only differs from non-preemptive SJF when processes arrive at staggered times, not when they are all ready simultaneously.'
+},
+{
+  id: 'os-scheduling-p7',
+  pyqYear: 2021,
+  q: 'Four processes all arrive at t = 0 and are scheduled using non-preemptive PRIORITY scheduling (a smaller priority number means higher priority, so it runs first): P1 (burst 5, priority 3), P2 (burst 2, priority 1), P3 (burst 8, priority 4), P4 (burst 4, priority 2). What is the AVERAGE WAITING TIME across all 4 processes, in ms? (Enter your numerical answer.)',
+  options: [],
+  answer: 4.75,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: 'Sorting purely by priority number (lower runs first, since all arrive together at t=0): P2 (priority 1, burst 2) runs first, then P4 (priority 2, burst 4), then P1 (priority 3, burst 5), then P3 (priority 4, burst 8). Timeline: P2 runs 0-2 (waiting 0), P4 runs 2-6 (waiting 2, the time P2 occupied the CPU), P1 runs 6-11 (waiting 6, the time P2+P4 occupied), P3 runs 11-19 (waiting 11, the time P2+P4+P1 occupied). Sum of waiting times = 0+2+6+11 = 19; average = 19/4 = 4.75 ms. Note that priority scheduling completely ignores burst length in choosing the run order (unlike SJF), so a process with a long burst but high priority (like P3 here, actually the lowest priority in this case) can still cause significant waiting for others -- this is exactly the starvation risk priority scheduling is known for.'
+},
+{
+  id: 'os-scheduling-p8',
+  pyqYear: 2022,
+  q: 'Three processes P1, P2, P3 with burst times 5, 3, 8 ms respectively all arrive at t = 0 and are scheduled using Round Robin with a SMALL time quantum of 1 ms. What is the AVERAGE WAITING TIME across all 3 processes, in ms? (Enter your numerical answer, up to 2 decimal places.)',
+  options: [],
+  answer: 6.67,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: 'With quantum 1, Round Robin cycles through P1, P2, P3 one unit at a time in strict order, re-queuing each process behind the others after every single unit of execution. Since bursts are 5, 3, 8, process P2 (the shortest) is the first to exhaust its burst -- after 3 full cycles through all three processes it has received exactly 3 units and completes at t=8. P1 (burst 5) needs 5 units total; once P2 drops out of the rotation, P1 and P3 alternate, and P1 completes at t=12. P3 (burst 8) is last, using its remaining units as P1 finishes, completing at t=16 (the sum of all three bursts, since it is the final process standing). Turnaround times equal completion times here since all arrived at t=0: 12, 8, 16 for P1, P2, P3. Waiting times (turnaround - burst): P1 = 12-5=7, P2 = 8-3=5, P3 = 16-8=8. Sum = 7+5+8 = 20; average = 20/3 = 6.666... which rounds to 6.67 ms. This illustrates how a very small quantum approximates fair, processor-sharing scheduling where all active jobs progress almost simultaneously.'
+},
+{
+  id: 'os-scheduling-p9',
+  pyqYear: 2023,
+  q: 'Four processes arrive as follows and are scheduled using Shortest-Remaining-Time-First (SRTF): P1 (arrival 0, burst 8), P2 (arrival 1, burst 4), P3 (arrival 2, burst 9), P4 (arrival 3, burst 5). Counting the initial dispatch of P1 as the first context switch, how many total context switches (switches to a DIFFERENT process than the one that was just running) occur before all four processes complete? (Enter your numerical answer.)',
+  options: [],
+  answer: 5,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'hard',
+  type: 'pyq-style',
+  explanation: 'Using the same SRTF trace as the average-turnaround-time version of this scenario: switch 1 is the initial dispatch of P1 at t=0 (remaining 8). Switch 2 occurs at t=1 when P2 arrives with remaining time 4, which is less than P1\'s remaining 7, so P2 preempts P1. P2 then runs uninterrupted to completion at t=5 (no later arrival ever has a smaller remaining time than P2 while P2 is active), so no additional preemption happens during P2\'s run. Switch 3 happens at t=5 when P4 (remaining 5) is chosen over P1 (remaining 7) and P3 (remaining 9). Switch 4 happens at t=10 when P1 (remaining 7) is chosen over P3 (remaining 9). Switch 5 happens at t=17 when P1 finishes and P3 (the only process left, remaining 9) is dispatched. After that P3 runs uninterrupted to completion at t=26. Total context switches = 5.'
+},
+{
+  id: 'os-scheduling-p10',
+  pyqYear: 2024,
+  q: 'Four processes arrive as follows and are scheduled using non-preemptive SJF: P1 (arrival 0, burst 7), P2 (arrival 2, burst 4), P3 (arrival 4, burst 1), P4 (arrival 5, burst 4). What is the TURNAROUND TIME of process P2 specifically, in ms? (Enter your numerical answer.)',
+  options: [],
+  answer: 10,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: 'P1 arrives first (t=0) and, being non-preemptive SJF, runs to completion at t=7 regardless of who arrives during that time. At t=7 the ready queue contains P2 (arrived t=2, burst 4) and P3 (arrived t=4, burst 1); P3 is shorter, so it runs first, from t=7 to t=8. At t=8, the queue contains P2 (burst 4) and P4 (arrived t=5, burst 4) -- tied on burst length, so the earlier-arriving P2 is chosen (tie broken by arrival order), running from t=8 to t=12. P2 therefore completes at t=12. Its turnaround time is completion minus arrival: 12 - 2 = 10 ms. (For reference, P4 then runs last, from t=12 to t=16.) This question specifically tests whether a student can correctly track WHEN a process actually gets picked in a staggered-arrival SJF queue, rather than just computing an overall average.'
+},
+{
+  id: 'os-scheduling-p11',
+  pyqYear: 2025,
+  q: 'Three processes P1, P2, P3 with burst times 5, 3, 6 ms respectively all arrive at t = 0 and are scheduled using Round Robin with time quantum = 2 ms. What is the AVERAGE TURNAROUND TIME across all 3 processes, in ms? (Enter your numerical answer, up to 2 decimal places.)',
+  options: [],
+  answer: 11.67,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: 'With quantum 2 and ready order P1, P2, P3 at t=0: t0-2 P1 (rem 3), t2-4 P2 (rem 1), t4-6 P3 (rem 4), t6-8 P1 (rem 1), t8-9 P2 finishes (its last 1 unit, completing at t=9), t9-11 P3 (rem 2), t11-12 P1 finishes (its last 1 unit, completing at t=12), t12-14 P3 finishes (its last 2 units, completing at t=14). Completion times: P1=12, P2=9, P3=14. Since all processes arrived at t=0, turnaround time equals completion time directly. Sum = 12+9+14 = 35; average = 35/3 = 11.666... which rounds to 11.67 ms. Notice that P3, despite having the longest burst, does not necessarily finish last in every Round Robin trace order -- here it does finish last, but the exact finishing order depends sensitively on how the remaining bursts happen to align with the fixed quantum, which is precisely why careful step-by-step tracing (rather than a shortcut formula) is required for Round Robin.'
+},
+{
+  id: 'os-scheduling-p12',
+  pyqYear: 2026,
+  q: 'Four processes P1, P2, P3, P4 with burst times 8, 2, 5, 1 ms respectively all arrive at t = 0. By how much does the AVERAGE WAITING TIME decrease when switching from FCFS scheduling (in the order P1, P2, P3, P4) to non-preemptive SJF scheduling, for this exact workload? (Enter your numerical answer, in ms.)',
+  options: [],
+  answer: 5.25,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: 'Under FCFS in the given order, waiting times are: P1=0, P2=8 (time P1 ran), P3=10 (time P1+P2 ran), P4=15 (time P1+P2+P3 ran). Sum = 0+8+10+15 = 33; average = 33/4 = 8.25 ms. Under non-preemptive SJF, the run order becomes P4 (1), P2 (2), P3 (5), P1 (8): waiting times are P4=0, P2=1 (time P4 ran), P3=3 (time P4+P2 ran), P1=8 (time P4+P2+P3 ran). Sum = 0+1+3+8 = 12; average = 12/4 = 3 ms. The decrease in average waiting time from switching FCFS to SJF is therefore 8.25 - 3 = 5.25 ms. This numerically confirms the general theorem that, for any fixed set of burst times released together, SJF minimizes average waiting time among all non-preemptive orderings, and the gap can be substantial when burst times vary widely, exactly as in this workload (bursts ranging from 1 to 8).'
+}
+);
+
+window.GATE_DATA.questions['os'].topics.find(function(t){return t.id==='os-sync';}).questions.push(
+{
+  id: 'os-sync-p1',
+  pyqYear: 2015,
+  q: 'A counting semaphore S is initialized to the value 4. Five processes each execute wait(S) exactly once, one after another, with NO signal(S) call happening in between (assume the semaphore\'s value is allowed to go negative, where a negative value represents the number of processes currently blocked and waiting). What is the value of S immediately after all five wait(S) calls have been issued? (Enter your numerical answer.)',
+  options: [],
+  answer: -1,
+  kind: 'nat',
+  marks: 1,
+  difficulty: 'easy',
+  type: 'pyq-style',
+  explanation: 'Under the standard counting-semaphore definition where the value can go negative, every wait(S) operation unconditionally decrements S by 1 regardless of whether the calling process is allowed to proceed immediately or must block; the sign and magnitude of a negative value simply record how many processes are currently queued waiting for a signal(S). Starting from S=4, the first four wait(S) calls succeed without blocking (decrementing S to 3, 2, 1, and then 0 respectively) since each still finds a "permit" available. The fifth wait(S) call further decrements S from 0 to -1; that fifth process now blocks because the value is negative, but the decrement itself still happens as the very first action of wait(). So after all five wait(S) calls, S = 4 - 5 = -1, with the magnitude 1 correctly indicating that exactly one process is currently blocked waiting for a future signal(S).'
+},
+{
+  id: 'os-sync-p2',
+  pyqYear: 2016,
+  q: 'A bounded-buffer producer-consumer system uses a buffer of capacity 6, synchronized with counting semaphores empty (initially 6, counts free slots) and full (initially 0, counts filled slots), plus a binary mutex semaphore for the buffer index. Starting from an empty buffer, the producer successfully inserts 4 items, then the consumer successfully removes 1 item. What is the value of the semaphore "full" at this point? (Enter your numerical answer.)',
+  options: [],
+  answer: 3,
+  kind: 'nat',
+  marks: 1,
+  difficulty: 'easy',
+  type: 'pyq-style',
+  explanation: 'The semaphore "full" always tracks the current number of occupied buffer slots (equivalently, the number of items available for the consumer to remove): it starts at 0 (buffer empty), and every successful producer insertion increments it via signal(full), while every successful consumer removal decrements it via wait(full). Here the producer inserts 4 items, so full goes from 0 up to 0+4=4 (each insertion calling signal(full) once). Then the consumer removes 1 item, calling wait(full) once, which decrements full from 4 down to 4-1=3. So the final value of full is 3, correctly reflecting that the buffer currently holds 3 items (4 produced minus 1 consumed). As a cross-check, the "empty" semaphore would simultaneously read 6 - 4 + 1 = 3 as well, since empty + full must always equal the buffer capacity (6) at any point where no process is mid-operation.'
+},
+{
+  id: 'os-sync-p3',
+  pyqYear: 2017,
+  q: 'A critical section is guarded by a counting semaphore S initialized to 3 (allowing up to 3 processes to be inside the critical section simultaneously, unlike a binary mutex which would allow only 1). If 7 processes call wait(S) one after another with no process yet calling signal(S), how many of these 7 processes are able to enter the critical section immediately (i.e., are NOT blocked)? (Enter your numerical answer.)',
+  options: [],
+  answer: 3,
+  kind: 'nat',
+  marks: 1,
+  difficulty: 'easy',
+  type: 'pyq-style',
+  explanation: 'A counting semaphore initialized to k acts as a pool of k available "permits": the first k processes that call wait(S) each successfully decrement S and proceed without blocking, since S remains non-negative for each of them (going k, k-1, ..., 1). The moment S would need to go below 0, the calling process instead blocks. Here S starts at 3, so the 1st, 2nd, and 3rd processes to call wait(S) each succeed (S goes 3->2->1->0), entering the critical section and running concurrently -- exactly matching the "up to 3 concurrent processes" semantics of this semaphore. The 4th through 7th processes (4 processes) each call wait(S) when S is already 0 or negative, so they get blocked and must wait for a future signal(S) from one of the 3 currently-executing processes. So exactly 3 of the 7 processes enter immediately, and 4 are blocked.'
+},
+{
+  id: 'os-sync-p4',
+  pyqYear: 2018,
+  q: 'Two processes P1 and P2 share two semaphores S1 and S2, both initialized to 1. P1 executes wait(S1) followed by wait(S2), while P2 executes wait(S2) followed by wait(S1) -- each process then does its critical work and eventually releases both semaphores. If the scheduler happens to run P1\'s wait(S1) and P2\'s wait(S2) (in either order) before either process attempts its second wait, what is guaranteed to happen next?',
+  options: ['Both processes proceed into their critical sections without any problem', 'P1 successfully acquires S2 and P2 successfully acquires S1, so both complete', 'Both P1 and P2 become permanently blocked, waiting for a semaphore the other process holds -- a deadlock', 'Only P1 blocks; P2 completes normally and eventually signals S1 to release P1'],
+  answer: 2,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: 'This is the classic circular-wait setup for deadlock via inconsistent lock ordering. After the described interleaving, P1 holds S1 (having decremented it from 1 to 0) and is about to request S2, while P2 holds S2 (having decremented it from 1 to 0) and is about to request S1. When P1 calls wait(S2), S2 is already 0 (held by P2), so P1 blocks. When P2 calls wait(S1), S1 is already 0 (held by P1), so P2 blocks. Neither process can ever call the signal() that would release the semaphore the other needs, because each is blocked waiting precisely for that release -- this satisfies all four Coffman conditions (mutual exclusion, hold-and-wait, no preemption, circular wait) and results in a permanent deadlock. This exact scenario -- two processes acquiring two shared locks in opposite orders -- is the textbook reason lock-ordering discipline (always acquire in the same global order) is taught as a deadlock-prevention technique.'
+},
+{
+  id: 'os-sync-p5',
+  pyqYear: 2019,
+  q: 'A bounded buffer of capacity 10 is synchronized with counting semaphores empty (initially 10) and full (initially 0). Starting empty, the following sequence of operations happens: the producer inserts 7 items, the consumer removes 3 items, the producer inserts 4 more items, and the consumer removes 2 items. What is the value of the semaphore "empty" after all these operations? (Enter your numerical answer.)',
+  options: [],
+  answer: 4,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: 'The semaphore "empty" tracks the number of currently free buffer slots: every producer insertion calls wait(empty), decrementing it by 1, and every consumer removal calls signal(empty), incrementing it by 1 (since removing an item frees up a slot). Tracing the sequence starting from empty=10: producer inserts 7 items -> empty = 10 - 7 = 3. Consumer removes 3 items -> empty = 3 + 3 = 6. Producer inserts 4 more items -> empty = 6 - 4 = 2. Consumer removes 2 items -> empty = 2 + 2 = 4. So the final value of empty is 4. As a sanity check, the number of items actually in the buffer at the end is (7-3+4-2) = 6, and empty + (items in buffer) should equal the capacity: 4 + 6 = 10, which matches the buffer capacity, confirming the trace is consistent.'
+},
+{
+  id: 'os-sync-p6',
+  pyqYear: 2020,
+  q: 'A binary semaphore mutex is initialized to 1 and used to protect a critical section shared by several processes, each executing wait(mutex); critical_section(); signal(mutex);. Suppose a programmer makes a bug: one particular process\'s code accidentally calls signal(mutex) TWICE at the end instead of once (but still calls wait(mutex) only once, correctly, at the start). Assuming no other process is currently inside or waiting for the critical section when this happens, what problem does this bug cause?',
+  options: ['No problem at all; the extra signal(mutex) is simply ignored by the semaphore', 'mutex ends up with value 2, which means TWO processes could now enter the critical section simultaneously, breaking mutual exclusion', 'The process itself gets blocked and never terminates', 'The operating system automatically detects and corrects the mismatched wait/signal count'],
+  answer: 1,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: 'A semaphore has no built-in memory of how many times wait() versus signal() "should" have been called for correctness -- it is simply a counter that any signal() call increments and any wait() call decrements, with no automatic pairing or validation. Starting at mutex=1: the buggy process calls wait(mutex) once (mutex becomes 0, and it enters the critical section normally), then, due to the bug, calls signal(mutex) twice at the end (mutex becomes 1, then 2). Now, with mutex sitting at 2, TWO subsequent processes can each call wait(mutex) and both succeed (decrementing to 1, then 0) without blocking, meaning both could be inside the critical section at the same time -- a direct violation of mutual exclusion, which can lead to data races and corrupted shared state. This is precisely why an unbalanced signal() call is one of the most dangerous and hard-to-detect classes of concurrency bugs: the system gives no error, but the safety guarantee is silently broken.'
+},
+{
+  id: 'os-sync-p7',
+  pyqYear: 2021,
+  q: 'A bounded buffer of capacity 5 uses counting semaphores empty (initially 5) and full (initially 0), correctly guarded by a mutex for the buffer index. A student incorrectly reorders the producer\'s code to call wait(mutex) BEFORE wait(empty) (instead of the correct order: wait(empty) first, then wait(mutex)), while the consumer\'s code correctly calls wait(mutex) before wait(full) is unaffected... Actually, re-stating precisely: producer does wait(mutex); wait(empty); ... ; signal(mutex); signal(full);  and consumer does the standard correct wait(full); wait(mutex); ...; signal(mutex); signal(empty);. If the buffer becomes completely full (all 5 slots occupied) and the producer then tries to insert one more item while the consumer is simultaneously trying to remove an item, what happens?',
+  options: ['The producer waits briefly and then successfully inserts the item once the consumer removes one', 'Both the producer and the consumer become permanently deadlocked: the producer holds mutex and blocks on wait(empty) since the buffer is full, while the consumer can never acquire mutex to remove an item and signal(empty)', 'Only the producer blocks; the consumer proceeds normally, removes an item, and eventually unblocks the producer', 'No deadlock occurs because mutex and empty are independent semaphores with no interaction'],
+  answer: 1,
+  marks: 2,
+  difficulty: 'hard',
+  type: 'pyq-style',
+  explanation: 'This is the classic "wrong order of semaphore acquisition" deadlock in the producer-consumer problem. The correct discipline requires acquiring the counting semaphore that can BLOCK (empty for the producer, full for the consumer) BEFORE acquiring the mutex that protects the shared buffer index, precisely so that a blocked producer or consumer does not hold the mutex while waiting. Here, because the producer acquires mutex first, when the buffer is full and the producer calls wait(empty), it blocks WHILE STILL HOLDING mutex. The consumer, needing to remove an item to eventually call signal(empty) and unblock the producer, first needs to acquire mutex itself -- but mutex is held by the blocked producer and will never be released, since the producer cannot proceed past wait(empty) to reach signal(mutex). This is a genuine and permanent deadlock: the producer waits for empty (which only the consumer can signal) while holding the mutex the consumer needs, and the consumer can never signal empty without first getting the mutex. This exact ordering bug is one of the most commonly tested producer-consumer traps.'
+},
+{
+  id: 'os-sync-p8',
+  pyqYear: 2022,
+  q: 'A counting semaphore S is initialized to 2. The following sequence of operations is issued strictly in this order by different processes: wait(S), wait(S), wait(S), signal(S), wait(S), signal(S), signal(S). Assuming the semaphore\'s value is allowed to go negative to represent blocked processes waiting, what is the FINAL value of S after this entire sequence? (Enter your numerical answer.)',
+  options: [],
+  answer: 1,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: 'Since every wait() unconditionally decrements S by 1 and every signal() unconditionally increments S by 1 (regardless of whether the caller ends up blocking), the final value can be found either by a full step trace or by simply counting net operations. Step by step from S=2: wait -> 1, wait -> 0, wait -> -1 (this third process blocks), signal -> 0 (the blocked process is woken and its wait() completes, so the value reflects it now holding a permit), wait -> -1 (this next process blocks), signal -> 0 (wakes the waiting process), signal -> 1. The sequence has 4 wait() calls and 3 signal() calls in total, so the net change from the initial value is -4 + 3 = -1, giving a final value of S = 2 - 1 = 1. This matches the step-by-step trace exactly: the final value of S is 1.'
+},
+{
+  id: 'os-sync-p9',
+  pyqYear: 2023,
+  q: 'A bounded buffer of capacity 8 uses counting semaphores empty (initially 8) and full (initially 0). Starting from an empty buffer, the producer inserts 6 items, then the consumer removes 5 items, and then the producer inserts 3 more items. What is the value of "full" at this point, and does this represent a valid state (i.e., does it respect the buffer capacity of 8)?',
+  options: ['full = 4, and this is a valid state within capacity', 'full = 4, but this VIOLATES the buffer capacity of 8, meaning the last producer insertion should have blocked before completing all 3 insertions', 'full = 14, and this is a valid state since full simply counts total items ever produced', 'full = 8, and this is a valid state exactly at capacity'],
+  answer: 0,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: 'The semaphore full tracks the CURRENT number of occupied slots, incremented by signal(full) on every successful insertion and decremented by wait(full) on every successful removal (not the total items ever produced). Tracing from full=0: producer inserts 6 items -> full = 0+6 = 6. Consumer removes 5 items -> full = 6-5 = 1. Producer inserts 3 more items -> full = 1+3 = 4. Since the buffer capacity is 8 and full=4 <= 8 throughout this trace (it never exceeded 8 at any intermediate step: it reached at most 6, which is safely within capacity), this is a fully valid state and no blocking would have been needed. The correctness of a producer-consumer trace should always be checked against the invariant 0 <= full <= capacity (equivalently, empty = capacity - full must also stay within [0, capacity]) at every single point in the sequence, not just at the final tally.'
+},
+{
+  id: 'os-sync-p10',
+  pyqYear: 2024,
+  q: 'A semaphore S is used purely as a signaling mechanism (not mutual exclusion) between two processes: process A must finish some initialization work before process B is allowed to proceed. S is initialized to 0. Process A executes signal(S) once it finishes initializing, and process B executes wait(S) before it starts its own work. If process B happens to call wait(S) BEFORE process A calls signal(S), what happens?',
+  options: ['Process B proceeds immediately anyway, since S was going to be signaled eventually', 'Process B blocks until process A calls signal(S), after which B is unblocked and proceeds -- this is the correct behavior for this kind of rendezvous/ordering synchronization', 'This causes a deadlock, since S is initialized to 0 and B calling wait(S) first is not allowed', 'Process A is forced to call signal(S) immediately, out of its intended order, to prevent B from being stuck'],
+  answer: 1,
+  marks: 1,
+  difficulty: 'easy',
+  type: 'pyq-style',
+  explanation: 'A semaphore initialized to 0 is the standard idiom for enforcing an ordering constraint ("B must not proceed until A has reached a certain point") regardless of which process happens to reach its semaphore call first -- this is exactly the intended, correct use case, not an error. If B calls wait(S) first, S decrements from 0 to -1 and B simply blocks (goes to sleep), waiting for a future signal. When A later completes its initialization and calls signal(S), S increments back to 0 and the operating system wakes up the blocked process B, which then proceeds. If instead A happened to call signal(S) first (before B calls wait), S would go from 0 to 1, and B\'s subsequent wait(S) would immediately succeed (decrementing back to 0) without blocking at all. Either interleaving works correctly precisely because a 0-initialized semaphore handles both orderings safely -- this is the core reason semaphores (not just mutex locks) are used for producer-style ordering, not merely exclusion.'
+},
+{
+  id: 'os-sync-p11',
+  pyqYear: 2025,
+  q: 'A counting semaphore S, initialized to 5, is shared among worker processes that repeatedly call wait(S) to acquire one of 5 identical database connections from a pool, use the connection, and then call signal(S) to return it. At some instant, ALL 5 connections are currently checked out (in use) by 5 different processes, and 2 more processes are currently blocked waiting for a connection to free up. What is the CURRENT value of S at this instant (using the convention that a negative value indicates the number of blocked processes)? (Enter your numerical answer.)',
+  options: [],
+  answer: -2,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: 'The value of a counting semaphore at any instant equals (initial value) - (total number of wait() calls issued so far), since every wait() call decrements it exactly once whether or not the caller ends up blocking. Here, 5 processes successfully completed wait(S) and are currently holding all 5 connections (bringing S down from 5 to 5-5=0 after just those), and 2 additional processes have also called wait(S) but find S already at 0, so each of their calls further decrements S below zero and causes them to block: S goes from 0 to -1 (first blocked process) and then to -2 (second blocked process). So the total number of wait() calls issued so far is 5 (successful) + 2 (blocked) = 7, and S = 5 - 7 = -2. The magnitude of the negative value (2) directly and conveniently tells us exactly how many processes are currently blocked waiting for a connection, which is the whole point of allowing the semaphore\'s internal counter to go negative in this representation.'
+},
+{
+  id: 'os-sync-p12',
+  pyqYear: 2026,
+  q: 'A bounded buffer of capacity 4 uses counting semaphores empty (initially 4) and full (initially 0), correctly guarded. Starting from empty buffer: the producer inserts 4 items (filling it completely), then a 5th producer attempt calls wait(empty) and BLOCKS (since empty is now 0). While this 5th producer is blocked, the consumer removes 2 items. What is the value of "empty" immediately after the consumer\'s 2 removals, and does the blocked 5th producer get to proceed as a result?',
+  options: ['empty becomes 2, and the blocked producer remains blocked forever regardless', 'empty becomes 2, and the blocked producer is woken up and successfully completes its wait(empty), immediately consuming one of those 2 freed slots (leaving empty effectively back down to 1 once its insertion completes)', 'empty stays at 0, since the producer is permanently stuck and its block cannot be reversed', 'empty becomes 6, since removing items should increase empty beyond the buffer capacity'],
+  answer: 1,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: 'Each consumer removal calls signal(empty), which increments empty by 1 and, crucially, if any process is currently blocked on wait(empty), the semaphore\'s wake-up mechanism unblocks exactly one such process per signal(). Starting from empty=0 (buffer full, 5th producer blocked): the consumer\'s first removal calls signal(empty), incrementing empty to 1 -- but since the 5th producer is blocked waiting exactly for this, it is immediately woken up and allowed to complete its wait(empty), which re-decrements empty back to 0 as it proceeds to insert its item. The consumer\'s second removal then calls signal(empty) again, incrementing empty to 1 (no one is blocked now, since the producer already got unblocked and completed). So after both removals and accounting for the woken producer completing its insertion, empty settles at 1, and yes, the previously blocked producer does get to proceed as a direct result of the first signal(empty) -- this is exactly the point of using a semaphore rather than a simple counter for empty: blocked processes are automatically and correctly woken up as slots become available, without needing to be manually polled or restarted.'
+}
+);

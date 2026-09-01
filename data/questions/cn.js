@@ -2099,3 +2099,482 @@ window.GATE_DATA.questions['cn'].topics.find(function(t){return t.id==='cn-trans
   explanation: "During slow start, cwnd doubles every RTT: starting at 1, it goes 1 (RTT1), 2 (RTT2), 4 (RTT3), 8 (RTT4) - at RTT4 it reaches ssthresh=8, so slow start ends there. From RTT4 onward the connection switches to congestion avoidance, where cwnd grows by only 1 segment per RTT (additive increase) instead of doubling. So at RTT5, cwnd = 8 + 1 = 9, and the connection is in congestion avoidance, not slow start. The marked point in the figure sits just past the dashed ssthresh=8 line, consistent with the curve's slope visibly flattening from exponential (doubling) to linear (+1 per RTT) right after RTT4 - the classic slow-start-to-congestion-avoidance transition tested in GATE CN."
 }
 );
+
+window.GATE_DATA.questions['cn'].topics.find(function(t){return t.id==='cn-network';}).questions.push(
+  {
+    id: "cn-network-p1",
+    pyqYear: 2015,
+    q: "A network administrator has the block 172.16.0.0/16 and must carve out one subnet large enough for 500 hosts, using Variable Length Subnet Masking (VLSM) so that the subnet wastes as few addresses as possible. What is the longest prefix length that still supports at least 500 usable host addresses?",
+    options: ["/21", "/22", "/23", "/24"],
+    answer: 2,
+    marks: 2,
+    difficulty: "medium",
+    type: "pyq-style",
+    explanation: "With h host bits, a subnet gives 2^h - 2 usable addresses (subtracting the network and broadcast addresses). We need 2^h - 2 >= 500, i.e. 2^h >= 502. Since 2^8 = 256 is too small and 2^9 = 512 satisfies 512 - 2 = 510 >= 500, the minimum number of host bits required is h = 9. The prefix length is then 32 - 9 = 23, so the subnet mask is /23. This is the standard VLSM technique GATE tests repeatedly: find the smallest power-of-two block (in host bits) that can still hold the required number of usable hosts, then convert that into the longest (most address-efficient) prefix, since making the prefix any longer (like /24, giving only 254 usable hosts) would fail to fit 500 hosts."
+  },
+  {
+    id: "cn-network-p2",
+    pyqYear: 2016,
+    q: "An organization owns eight contiguous /24 blocks: 10.20.32.0/24 through 10.20.39.0/24. What is the single CIDR block that exactly summarizes all eight, with no extra addresses included?",
+    options: ["10.20.32.0/20", "10.20.32.0/21", "10.20.32.0/22", "10.20.32.0/23"],
+    answer: 1,
+    marks: 2,
+    difficulty: "medium",
+    type: "pyq-style",
+    explanation: "Write the third octet of each block in binary: 32-39 are 00100000 through 00100111. All eight share the same top 5 bits (00100), while the bottom 3 bits vary across all 8 possible combinations (000 through 111), exactly matching 32 through 39 with nothing left over. Since 5 bits of the third octet are now fixed and shared, the aggregate prefix extends 5 bits into that octet beyond the first two full octets, giving a prefix length of 16 + 5 = 21. So the correct route summarizing exactly 10.20.32.0-10.20.39.255 is 10.20.32.0/21. A /20 would be too broad (16 blocks), and /22 or /23 would each cover fewer than all 8 required blocks."
+  },
+  {
+    id: "cn-network-p3",
+    pyqYear: 2017,
+    q: "A router's forwarding table has three entries: 172.20.0.0/16 via next-hop A, 172.20.16.0/20 via next-hop B, and 172.20.16.0/22 via next-hop C. Using longest-prefix matching, which next hop is chosen for a packet destined to 172.20.18.10?",
+    options: ["A", "B", "C", "The packet cannot be forwarded; no entry matches"],
+    answer: 2,
+    marks: 2,
+    difficulty: "medium",
+    type: "pyq-style",
+    explanation: "Check each entry: the /16 route covers all of 172.20.0.0-172.20.255.255, which includes 172.20.18.10. The /20 route covers 172.20.16.0-172.20.31.255, which also includes 172.20.18.10. The /22 route covers only 172.20.16.0-172.20.19.255, a narrower range that still includes 172.20.18.10. All three entries match, but IP forwarding always applies longest-prefix matching, selecting the entry with the greatest number of matching prefix bits, since it represents the most specific known route. Here /22 is the longest of the three matching prefixes, so the packet is forwarded via next-hop C, even though the broader /16 and /20 entries technically also matched."
+  },
+  {
+    id: "cn-network-p4",
+    pyqYear: 2018,
+    q: "An IP datagram has a total length of 3200 bytes, including its 20-byte header, giving a 3180-byte payload. It must cross a network with an MTU of 620 bytes (including a 20-byte IP header per fragment, so each fragment can carry at most 600 bytes of payload, already a multiple of 8). Into how many fragments must this datagram be split?",
+    options: ["4", "5", "6", "7"],
+    answer: 2,
+    marks: 2,
+    difficulty: "hard",
+    type: "pyq-style",
+    explanation: "Each fragment can carry at most 600 bytes of the 3180-byte payload. The number of fragments needed is ceil(3180 / 600) = ceil(5.3) = 6. Concretely, the first five fragments each carry a full 600 bytes (covering 3000 bytes total), and the sixth and final fragment carries the remaining 3180 - 3000 = 180 bytes. Since 600 is already a multiple of 8 (as fragment offsets, measured in 8-byte units, require every fragment's payload except possibly the last to be a multiple of 8), no further adjustment is needed. So the datagram is split into 6 fragments, and the destination host reassembles them using the shared Identification field along with each fragment's Offset and More Fragments flag."
+  },
+  {
+    id: "cn-network-p5",
+    pyqYear: 2019,
+    q: "Continuing the same fragmentation scenario (3180-byte payload, 600-byte maximum fragment payload, 6 fragments total), what Fragmentation Offset value (in 8-byte units) does the last fragment carry, and what is the More Fragments (MF) flag set to in that last fragment?",
+    options: ["Offset = 300, MF = 1", "Offset = 375, MF = 0", "Offset = 600, MF = 0", "Offset = 375, MF = 1"],
+    answer: 1,
+    marks: 2,
+    difficulty: "hard",
+    type: "pyq-style",
+    explanation: "The first five fragments each carry 600 bytes, so together they cover payload bytes 0 through 2999, a total of 3000 bytes. The sixth (final) fragment therefore starts at byte 3000 within the original payload, and the Offset field records this position in units of 8 bytes: 3000 / 8 = 375. Since this is the last fragment, no more fragments follow it, so the More Fragments flag is cleared to MF = 0 — every other fragment before it (fragments 1 through 5) would carry MF = 1. Together, the shared Identification field, this Offset value, and the MF = 0 marker let the receiving host correctly detect it has all the pieces and reassemble the original 3180-byte payload."
+  },
+  {
+    id: "cn-network-p6",
+    pyqYear: 2020,
+    q: "Router M runs a distance-vector protocol and has three neighbours A, B, and C for reaching destination Z, with direct link costs M-A = 3, M-B = 2, and M-C = 5. The neighbours currently advertise their own best distances to Z as: A advertises 4, B advertises 6, and C advertises 1. What is router M's new best cost to Z after this update, and via which neighbour?",
+    options: ["Cost 6, via C", "Cost 6, via A", "Cost 7, via A", "Cost 8, via B"],
+    answer: 0,
+    marks: 2,
+    difficulty: "hard",
+    type: "pyq-style",
+    explanation: "The distance-vector (Bellman-Ford) update rule computes, for each neighbour, the direct link cost to that neighbour plus the neighbour's own advertised distance to the destination, then keeps the minimum. Via A: 3 + 4 = 7. Via B: 2 + 6 = 8. Via C: 5 + 1 = 6. The smallest total is 6, achieved via C, so router M updates its routing table entry for Z to cost 6 with next hop C, replacing whatever it previously had if that was larger. This is exactly the per-neighbour minimization RIP-style protocols perform on every received distance-vector update, always preferring whichever combination of link cost plus advertised remaining distance is smallest."
+  },
+  {
+    id: "cn-network-p7",
+    pyqYear: 2021,
+    q: "A NAT (Network Address Translation) router has exactly one public IPv4 address and dedicates the port range 1024 to 5119 (inclusive) for translating outbound TCP connections. Assuming each simultaneous connection to any external server needs its own distinct translated port number, what is the maximum number of simultaneous outbound TCP connections this NAT router can support?",
+    options: [],
+    kind: "nat",
+    answer: 4096,
+    marks: 2,
+    difficulty: "medium",
+    type: "pyq-style",
+    explanation: "NAT with port translation (NAPT/PAT) maps each simultaneous outbound connection to a unique (public IP, port) pair, and since there is only one public IP here, each connection needs a distinct port drawn from the dedicated range. The number of available ports is simply the count of integers from 1024 to 5119 inclusive, which is 5119 - 1024 + 1 = 4096. So this NAT router can support up to 4096 simultaneous outbound TCP connections before it runs out of translatable ports and must reject or queue further connection attempts. This directly tests the fencepost (inclusive-range counting) arithmetic that GATE frequently hides inside NAT and port-multiplexing questions."
+  },
+  {
+    id: "cn-network-p8",
+    pyqYear: 2022,
+    q: "An organization is allocated a single /20 block and wants to split it into the maximum possible number of equal-sized /26 subnets. How many /26 subnets can be created from this /20 block?",
+    options: [],
+    kind: "nat",
+    answer: 64,
+    marks: 1,
+    difficulty: "easy",
+    type: "pyq-style",
+    explanation: "Splitting a /20 block into /26 subnets means extending the prefix length by 26 - 20 = 6 bits. Each additional bit of prefix doubles the number of subnets, so 6 extra bits give 2^6 = 64 equal-sized subnets. This is the standard subnetting-count formula tested repeatedly in GATE: the number of subnets obtainable equals 2 raised to the power of (new prefix length - original prefix length), regardless of the specific network address involved. Each of these 64 /26 subnets would then have 2^(32-26) - 2 = 62 usable host addresses, since /26 leaves 6 host bits, two of which (all-0s and all-1s) are reserved for the network and broadcast addresses respectively."
+  },
+  {
+    id: "cn-network-p9",
+    pyqYear: 2023,
+    q: "In distance-vector routing, split horizon with poison reverse is used to help mitigate the count-to-infinity problem. Which statement correctly describes what it does, and what it does NOT guarantee?",
+    options: ["It advertises an infinite-cost route back to the neighbour a route was learned from, which prevents count-to-infinity in every possible topology including three-or-more-router loops", "It advertises an infinite-cost route back to the neighbour a route was learned from (rather than staying silent), which helps in simple two-router loops but does not eliminate count-to-infinity in all topologies, such as loops through three or more routers", "It physically disconnects the link to the neighbour whenever a route becomes unreachable", "It replaces distance-vector routing entirely with link-state routing whenever a failure is detected"],
+    answer: 1,
+    marks: 2,
+    difficulty: "medium",
+    type: "concept",
+    explanation: "Split horizon with poison reverse improves on plain split horizon by actively advertising a route back toward the neighbour it was learned from, but with an infinite (unreachable) cost, rather than simply omitting the advertisement. This makes the two-router case immediately clear: if a route becomes unreachable, the neighbour is explicitly told 'infinity' rather than being left to guess. However, this technique is only a partial mitigation, not a complete cure — in more complex topologies involving three or more routers forming a loop, routers can still slowly count up toward infinity because poison reverse only addresses direct back-and-forth pairs, not longer indirect cycles. This distinction between full prevention and partial mitigation is exactly what GATE tests on this topic."
+  },
+  {
+    id: "cn-network-p10",
+    pyqYear: 2024,
+    q: "A host is configured with IP address 192.168.5.130 and subnet mask 255.255.255.224 (a /27 prefix). What are the network address and the broadcast address of the subnet this host belongs to?",
+    options: ["Network 192.168.5.128, Broadcast 192.168.5.159", "Network 192.168.5.96, Broadcast 192.168.5.127", "Network 192.168.5.128, Broadcast 192.168.5.191", "Network 192.168.5.130, Broadcast 192.168.5.255"],
+    answer: 0,
+    marks: 2,
+    difficulty: "medium",
+    type: "pyq-style",
+    explanation: "A /27 mask leaves 5 host bits, giving a subnet block size of 2^5 = 32 addresses. Dividing the last octet 130 by 32 gives 4 remainder 2, so this address falls in the 5th block, which starts at 4 x 32 = 128 and spans 128 through 159. The network address is therefore the first address of that block, 192.168.5.128, and the broadcast address is the last address of that block, 192.168.5.159. The usable host range within this subnet runs from 192.168.5.129 to 192.168.5.158 (30 usable addresses), with the host's own address 192.168.5.130 correctly falling inside that usable range, confirming the block boundaries are right."
+  },
+  {
+    id: "cn-network-p11",
+    pyqYear: 2025,
+    q: "An IP datagram has a total length of 5000 bytes, including its 20-byte header, giving a 4980-byte payload. It must cross a link with an MTU of 1000 bytes (including a 20-byte header per fragment, so the maximum usable payload per fragment must be rounded down to the nearest multiple of 8, giving 976 bytes). How many fragments are produced, and what is the Fragmentation Offset (in 8-byte units) of the last fragment?",
+    options: ["5 fragments, offset 488", "6 fragments, offset 488", "6 fragments, offset 610", "7 fragments, offset 610"],
+    answer: 2,
+    marks: 2,
+    difficulty: "hard",
+    type: "pyq-style",
+    explanation: "The raw available payload space per fragment is 1000 - 20 = 980 bytes, but since offsets are measured in 8-byte units, each fragment's payload (except the last) must be a multiple of 8, so it is rounded down to floor(980/8) x 8 = 976 bytes. The number of fragments needed is ceil(4980 / 976) = ceil(5.10) = 6. The first five fragments each carry 976 bytes, covering 5 x 976 = 4880 bytes total, so the sixth and final fragment carries the remaining 4980 - 4880 = 100 bytes, starting at byte 4880 of the original payload. Its Offset field is therefore 4880 / 8 = 610, with More Fragments cleared to 0 since it is the last piece."
+  },
+  {
+    id: "cn-network-p12",
+    pyqYear: 2026,
+    q: "A router's forwarding table has a default route 0.0.0.0/0 via G, along with 198.51.100.0/24 via H and 198.51.100.64/26 via I. Using longest-prefix matching, which next hop handles a packet destined to 198.51.100.70?",
+    options: ["G, since the default route always takes priority when other routes also match", "H, because /24 is a more commonly used prefix length for this address range", "I, because /26 is the longest matching prefix among all three entries", "The packet is dropped since three entries match ambiguously"],
+    answer: 2,
+    marks: 1,
+    difficulty: "easy",
+    type: "pyq-style",
+    explanation: "All three entries technically match 198.51.100.70: the default route 0.0.0.0/0 matches every address by definition; the /24 route covers 198.51.100.0-198.51.100.255; and the /26 route covers 198.51.100.64-198.51.100.127, all of which include .70. Longest-prefix matching always picks the entry with the most specific (longest) prefix among all matches, regardless of how commonly that prefix length is used or whether a default route also happens to match — the default route is deliberately the least specific (/0) and is only ever chosen when nothing more specific matches at all. Here /26 is the longest matching prefix, so next hop I is selected, with H and G only serving as fallbacks for addresses outside 198.51.100.64/26."
+  },
+  {
+    id: "cn-network-p13",
+    pyqYear: 2015,
+    q: "An IPv4 header's checksum field is set to all zeros before computing the checksum. The remaining header, split into 16-bit words, is: 0x4500, 0x003C, 0x1234, 0x0000. Using the standard IPv4 ones-complement checksum algorithm (sum all words with end-around carry, then take the ones complement), what value is inserted into the checksum field?",
+    options: ["0x5770", "0xA88F", "0xB88F", "0x5771"],
+    answer: 1,
+    marks: 2,
+    difficulty: "medium",
+    type: "pyq-style",
+    explanation: "First add all four 16-bit words in ordinary binary: 0x4500 + 0x003C + 0x1234 + 0x0000 = 0x5770 (this particular sum happens to stay within 16 bits, so there is no end-around carry to fold back in — a case that does arise with other word choices and must not be forgotten there). The checksum is then the ones complement of this sum: bitwise-inverting 0x5770 gives 0xA88F. This value 0xA88F is what gets written into the checksum field before transmission. At the receiver (or any router along the path), summing all header words including this checksum field should yield exactly 0xFFFF (all ones) if no bit errors occurred, which is the standard verification step of the IPv4 checksum scheme."
+  },
+  {
+    id: "cn-network-p14",
+    pyqYear: 2017,
+    q: "The class C network 200.10.10.0/24 must be divided into exactly 4 equal-sized subnets. What subnet mask should be used, and how many usable host addresses does each resulting subnet have?",
+    options: ["Mask 255.255.255.192 (/26), 62 usable hosts per subnet", "Mask 255.255.255.224 (/27), 30 usable hosts per subnet", "Mask 255.255.255.128 (/25), 126 usable hosts per subnet", "Mask 255.255.255.240 (/28), 14 usable hosts per subnet"],
+    answer: 0,
+    marks: 1,
+    difficulty: "easy",
+    type: "pyq-style",
+    explanation: "Creating exactly 4 equal subnets from one block requires borrowing enough bits so that 2^(borrowed bits) = 4, which means borrowing 2 bits. The original /24 prefix then extends to /24 + 2 = /26, corresponding to subnet mask 255.255.255.192. Each /26 subnet leaves 32 - 26 = 6 host bits, giving 2^6 = 64 total addresses per subnet, of which 2 are reserved (the all-0s network address and the all-1s broadcast address), leaving 64 - 2 = 62 usable host addresses per subnet. This borrow-bits-to-get-N-subnets-then-compute-remaining-host-bits chain is one of the most frequently repeated subnetting question patterns across GATE CN papers."
+  }
+);
+
+window.GATE_DATA.questions['cn'].topics.find(function(t){return t.id==='cn-datalink';}).questions.push(
+  {
+    id: "cn-datalink-p1",
+    pyqYear: 2015,
+    q: "Two stations are 1000 km apart, connected by a 100 Mbps link with signal propagation speed 2 x 10^8 m/s. Station A sends 8000-bit frames to B using the stop-and-wait ARQ protocol, waiting for each frame's acknowledgement (of negligible size and transmission time) before sending the next. What is the link utilization (efficiency)?",
+    options: ["0.794%", "1.59%", "7.94%", "50%"],
+    answer: 0,
+    marks: 2,
+    difficulty: "hard",
+    type: "pyq-style",
+    explanation: "Transmission time per frame is tf = 8000 bits / 100,000,000 bps = 80 microseconds. One-way propagation delay is tp = 1,000,000 m / (2x10^8 m/s) = 5,000 microseconds = 5 ms. Since stop-and-wait sends one frame, then waits a full round trip (2 x tp) before the next frame can go out, the ratio a = tp/tf = 5000/80 = 62.5. Utilization for stop-and-wait is U = tf / (tf + 2tp) = 1 / (1 + 2a) = 1 / (1 + 125) = 1/126 = 0.00794, i.e. about 0.794%. This tiny efficiency is the classic motivation for sliding-window protocols: on long, fast links, stop-and-wait wastes over 99% of the available bandwidth idling for acknowledgements, which is exactly the numeric intuition GATE wants students to internalize here."
+  },
+  {
+    id: "cn-datalink-p2",
+    pyqYear: 2016,
+    q: "For the same link (100 Mbps, 1000 km, propagation speed 2 x 10^8 m/s, 8000-bit frames, giving a = tp/tf = 62.5), what is the minimum sliding-window size W needed so the sender can transmit continuously with 100% link utilization (never idling waiting for an ACK)?",
+    options: [],
+    kind: "nat",
+    answer: 126,
+    marks: 2,
+    difficulty: "hard",
+    type: "pyq-style",
+    explanation: "In a sliding-window protocol, the sender can keep transmitting without stalling as long as it has not exhausted its window before the first ACK returns. The number of frames that can be sent in one full round-trip time is 1 + 2a, where a = tp/tf = 62.5, giving 1 + 2(62.5) = 126. So the sender needs a window of at least 126 frames outstanding at once to keep the link continuously busy: by the time it has sent frame 126, the ACK for frame 1 has just arrived, letting it slide the window forward without ever pausing. Any smaller window would force the sender to stop and wait partway through, dropping utilization below 100%, exactly the deficiency stop-and-wait (W = 1) suffers from in the extreme."
+  },
+  {
+    id: "cn-datalink-p3",
+    pyqYear: 2017,
+    q: "Continuing the same scenario (minimum window size 126 needed for 100% utilization), if Go-Back-N (GBN) is used, what is the minimum number of bits required in the frame sequence number field?",
+    options: ["5", "6", "7", "8"],
+    answer: 2,
+    marks: 2,
+    difficulty: "medium",
+    type: "pyq-style",
+    explanation: "Go-Back-N requires the sender's window size W to satisfy W <= 2^n - 1, where n is the number of sequence-number bits, because the receiver must be able to unambiguously distinguish new frames from old duplicates using cumulative acknowledgements. Here W = 126, so we need 2^n - 1 >= 126, i.e. 2^n >= 127. Testing n = 6 gives 2^6 = 64, which is too small; testing n = 7 gives 2^7 = 128 >= 127, which works. So the minimum sequence-number field width for GBN is 7 bits, allowing sequence numbers 0 through 127 (128 total) to cycle safely without a new frame's sequence number colliding with an old, still-outstanding one within the window."
+  },
+  {
+    id: "cn-datalink-p4",
+    pyqYear: 2018,
+    q: "Continuing the same scenario (minimum window size 126), if Selective Repeat (SR) is used instead of GBN, what is the minimum number of bits required in the frame sequence number field?",
+    options: ["6", "7", "8", "9"],
+    answer: 2,
+    marks: 2,
+    difficulty: "medium",
+    type: "pyq-style",
+    explanation: "Selective Repeat requires the stricter constraint W <= 2^(n-1), where n is the number of sequence-number bits, because both the sender's window and the receiver's buffering window must fit within half the sequence-number space to avoid ambiguity between a genuinely new frame and a retransmitted old one that the receiver already buffered. Here W = 126, so we need 2^(n-1) >= 126. Testing n = 7 gives 2^6 = 64, too small; testing n = 8 gives 2^7 = 128 >= 126, which works. So SR needs a minimum of 8 sequence-number bits — one more bit than GBN required for the identical window size, reflecting SR's extra ambiguity-avoidance overhead in exchange for its more selective, bandwidth-efficient retransmission behaviour."
+  },
+  {
+    id: "cn-datalink-p5",
+    pyqYear: 2019,
+    q: "Two stations using CSMA/CD are separated by 8 km on a 10 Mbps bus, with signal propagation speed 2 x 10^8 m/s. What is the minimum frame size (in bits) required so that a transmitting station is guaranteed to still be transmitting when a collision signal could arrive back from the far end?",
+    options: ["400 bits", "800 bits", "1000 bits", "1600 bits"],
+    answer: 1,
+    marks: 2,
+    difficulty: "hard",
+    type: "pyq-style",
+    explanation: "For CSMA/CD's collision detection to work reliably, a station must still be transmitting when it could possibly hear about a collision, so the frame transmission time must be at least the full round-trip propagation delay. One-way propagation delay is tp = 8000 m / (2x10^8 m/s) = 40 microseconds, so the round-trip time is 2tp = 80 microseconds. The minimum frame size in bits is then bandwidth x round-trip time = 10,000,000 bps x 80x10^-6 s = 800 bits. If frames were shorter than this, a station could finish transmitting before a collision occurring near the far end propagates back, meaning it would falsely believe its frame was sent successfully — exactly the scenario this minimum-frame-size rule (mirrored by real Ethernet's 512-bit / 64-byte minimum) is designed to prevent."
+  },
+  {
+    id: "cn-datalink-p6",
+    pyqYear: 2020,
+    q: "A sender wants to protect the 9-bit dataword 110101001 using a CRC with the 4-bit generator polynomial represented as 1011 (i.e. x^3 + x + 1). After appending 3 zero bits and performing modulo-2 division by 1011, what is the 3-bit CRC remainder that gets appended to form the transmitted codeword?",
+    options: ["000", "001", "011", "101"],
+    answer: 1,
+    marks: 2,
+    difficulty: "hard",
+    type: "pyq-style",
+    explanation: "CRC computation appends (n-1) zero bits, where n = 4 is the generator's bit length, to the 9-bit dataword, giving the 12-bit sequence 110101001000, then performs modulo-2 (XOR-based, no-borrow) binary long division by the generator 1011. Carrying out this division step by step yields a final remainder of 001. This remainder replaces the appended zero bits to form the transmitted codeword 110101001001. As a check, dividing this full codeword 110101001001 by the same generator 1011 using modulo-2 division yields a remainder of exactly 000, confirming the codeword is valid — this all-zero-remainder check is precisely what the receiver performs to detect whether any bit errors occurred in transit."
+  },
+  {
+    id: "cn-datalink-p7",
+    pyqYear: 2021,
+    q: "A sliding-window protocol operates on a 2 Mbps link where each frame is 2000 bits (so transmission time tf = 1 ms) and the one-way propagation delay is 9.5 ms. If the sender's window size is fixed at W = 5 frames, what is the resulting link utilization?",
+    options: ["12.5%", "20%", "25%", "50%"],
+    answer: 2,
+    marks: 2,
+    difficulty: "medium",
+    type: "pyq-style",
+    explanation: "Here a = tp/tf = 9.5ms / 1ms = 9.5, so the number of frames that could be sent in one full round trip (the window needed for 100% utilization) is 1 + 2a = 1 + 19 = 20. Since the actual window W = 5 is smaller than this required value of 20, the sender exhausts its window and stalls waiting for ACKs well before the link would otherwise become idle on its own, so utilization is simply U = W / (1 + 2a) = 5/20 = 0.25, i.e. 25%. Only once W reaches or exceeds 20 would the link achieve 100% utilization; below that threshold, utilization scales linearly with window size, exactly the relationship this question tests."
+  },
+  {
+    id: "cn-datalink-p8",
+    pyqYear: 2022,
+    q: "For the same link (a = tp/tf = 9.5), what is the minimum window size needed to achieve 100% link utilization?",
+    options: [],
+    kind: "nat",
+    answer: 20,
+    marks: 1,
+    difficulty: "medium",
+    type: "pyq-style",
+    explanation: "The number of frames that fit within one full round-trip time (transmission time plus the two-way propagation delay) is 1 + 2a. With a = tp/tf = 9.5, this is 1 + 2(9.5) = 1 + 19 = 20. Once the sender's window size reaches 20, it can keep transmitting frame after frame continuously: by the time it finishes sending its 20th frame, the acknowledgement for its very first frame has just arrived, letting the window slide forward with no idle gap. Any window smaller than 20 forces at least some idle waiting each cycle, which is exactly why the previous question with W = 5 achieved only 25% utilization (5 out of the needed 20)."
+  },
+  {
+    id: "cn-datalink-p9",
+    pyqYear: 2023,
+    q: "For that same link requiring a minimum window of 20 frames for full utilization, what is the minimum number of sequence-number bits needed if Go-Back-N (GBN) is used?",
+    options: ["4", "5", "6", "20"],
+    answer: 1,
+    marks: 1,
+    difficulty: "medium",
+    type: "pyq-style",
+    explanation: "GBN's constraint is W <= 2^n - 1. With the required window W = 20, we need 2^n - 1 >= 20, i.e. 2^n >= 21. Testing n = 4 gives 2^4 = 16, too small. Testing n = 5 gives 2^5 = 32 >= 21, which works. So the minimum number of sequence-number bits for GBN here is 5, allowing sequence numbers 0 through 31 to cycle. Note that the answer is not simply the window size itself (20) — GBN's cumulative-ACK design only needs enough distinct sequence numbers to avoid ambiguity across one window's worth of outstanding frames, which is comfortably fewer bits than the window size would naively suggest."
+  },
+  {
+    id: "cn-datalink-p10",
+    pyqYear: 2024,
+    q: "For that same link requiring a minimum window of 20 frames for full utilization, what is the minimum number of sequence-number bits needed if Selective Repeat (SR) is used instead?",
+    options: ["5", "6", "7", "10"],
+    answer: 1,
+    marks: 1,
+    difficulty: "medium",
+    type: "pyq-style",
+    explanation: "Selective Repeat's stricter constraint is W <= 2^(n-1). With the required window W = 20, we need 2^(n-1) >= 20. Testing n = 5 gives 2^4 = 16, too small. Testing n = 6 gives 2^5 = 32 >= 20, which works. So SR needs a minimum of 6 sequence-number bits here — one more than GBN's 5 bits for the same window size — because SR's individually-acknowledged, out-of-order-buffering design requires the sequence-number space to be at least twice the window size to prevent a retransmitted old frame from being mistaken for a new one by the receiver's buffer."
+  },
+  {
+    id: "cn-datalink-p11",
+    pyqYear: 2025,
+    q: "A data-link protocol uses bit stuffing with the standard HDLC rule: after any five consecutive 1-bits in the data, a 0 is inserted before transmission (and removed by the receiver), so that the true 6-consecutive-1s flag pattern never appears inside the data. Given the 22-bit data payload 0111111011111101111110, how many extra 0-bits does the stuffing process insert in total?",
+    options: [],
+    kind: "nat",
+    answer: 3,
+    marks: 2,
+    difficulty: "medium",
+    type: "pyq-style",
+    explanation: "Scanning left to right and counting consecutive 1-bits, the 22-bit payload contains exactly three separate runs of six consecutive 1s (each followed by a single naturally-occurring 0 that is part of the original data, not stuffing). Every time a run of 1s reaches exactly five consecutive 1-bits, the stuffing rule inserts a single extra 0 immediately after that fifth one, then resumes counting from zero for whatever 1-bits follow (so a six-long run gets exactly one stuffed bit, not two, since the sixth 1 only reaches a fresh count of 1 after the reset). With three such six-long runs in this payload, stuffing inserts exactly 3 extra 0-bits in total, expanding the 22-bit payload to 25 bits on the wire — the receiver then strips out precisely these 3 bits during destuffing to recover the original data."
+  },
+  {
+    id: "cn-datalink-p12",
+    pyqYear: 2026,
+    q: "In CSMA/CD with binary exponential backoff, a station experiences its 4th consecutive collision on a given frame. From how many distinct integer values can it now randomly choose its backoff count k (in units of slot time), and what is the maximum possible number of slot times it might have to wait?",
+    options: ["8 values (0 to 7); maximum wait 7 slot times", "16 values (0 to 15); maximum wait 15 slot times", "4 values (0 to 3); maximum wait 3 slot times", "32 values (0 to 31); maximum wait 31 slot times"],
+    answer: 1,
+    marks: 2,
+    difficulty: "medium",
+    type: "pyq-style",
+    explanation: "Binary exponential backoff picks a random integer k uniformly from the range 0 to 2^m - 1, where m is the number of collisions experienced so far (capped at 10 in real Ethernet, but that cap is irrelevant this early). After the 4th collision, m = 4, so k is chosen from 0 to 2^4 - 1 = 15, giving 2^4 = 16 distinct possible values overall. The station then waits k slot times before attempting retransmission, so the maximum possible wait is 15 slot times (if k happens to be chosen as 15). This doubling of the contention window after each successive collision is exactly the 'exponential' part of the algorithm, spreading out retransmission attempts to reduce the chance of repeated collisions among the same contending stations."
+  },
+  {
+    id: "cn-datalink-p13",
+    pyqYear: 2016,
+    q: "A block error-correcting code is designed with a minimum Hamming distance of 6 between any two valid codewords. What is the maximum number of bit errors this code is guaranteed to detect, and the maximum number it is guaranteed to correct?",
+    options: ["Detect 6, correct 3", "Detect 5, correct 2", "Detect 5, correct 3", "Detect 6, correct 2"],
+    answer: 1,
+    marks: 2,
+    difficulty: "medium",
+    type: "pyq-style",
+    explanation: "For a code with minimum Hamming distance d_min, the guaranteed error-detection capability is d_min - 1 bits, and the guaranteed error-correction capability is floor((d_min - 1) / 2) bits. With d_min = 6, detection capability is 6 - 1 = 5 bit errors: any pattern of up to 5 bit flips cannot turn one valid codeword into another valid codeword, so it is always detectable. Correction capability is floor(5/2) = floor(2.5) = 2 bit errors: the receiver can always correctly identify and fix up to 2 bit errors by finding the nearest valid codeword, but a 3-bit error pattern could potentially land exactly as close to a different valid codeword, making correction unreliable beyond 2 bits."
+  },
+  {
+    id: "cn-datalink-p14",
+    pyqYear: 2019,
+    q: "In the basic stop-and-wait ARQ protocol (assuming reliable, though possibly delayed or duplicated, delivery over the link), what is the minimum number of distinct sequence numbers that must be used to correctly distinguish a new frame from a delayed duplicate of the previous frame?",
+    options: ["1", "2", "4", "As many as the number of frames sent in the entire session"],
+    answer: 1,
+    marks: 1,
+    difficulty: "easy",
+    type: "concept",
+    explanation: "Because stop-and-wait only ever has one frame outstanding at a time (the sender waits for each frame's ACK before sending the next), the receiver only ever needs to distinguish 'this is the next new frame' from 'this is a delayed duplicate retransmission of the frame I already have.' Two sequence numbers, alternating 0 and 1, are sufficient for this: if the receiver just accepted sequence number 0, any further frame arriving still labelled 0 must be a duplicate (from a lost ACK causing retransmission) and is discarded (though re-acknowledged), while a frame labelled 1 is the genuinely new one. This is why stop-and-wait needs only a single sequence-number bit, in sharp contrast to sliding-window protocols like GBN and SR, which need many more bits to cover an entire window's worth of frames."
+  }
+);
+
+window.GATE_DATA.questions['cn'].topics.find(function(t){return t.id==='cn-transport';}).questions.push(
+  {
+    id: "cn-transport-p1",
+    pyqYear: 2015,
+    q: "Host A sends a TCP segment to host B with sequence number 100, carrying 200 bytes of data. Host B then sends a reply segment with sequence number 500 and acknowledgement number 300 (acknowledging A's data), carrying 100 bytes of its own data back to A. What sequence number and acknowledgement number does A's next segment to B carry?",
+    options: ["Sequence 300, Acknowledgement 500", "Sequence 300, Acknowledgement 600", "Sequence 200, Acknowledgement 600", "Sequence 300, Acknowledgement 300"],
+    answer: 1,
+    marks: 2,
+    difficulty: "medium",
+    type: "pyq-style",
+    explanation: "A's first segment carried bytes numbered 100 through 299 (100 + 200 - 1), so A's next byte to send starts at sequence number 100 + 200 = 300. B's reply carried sequence number 500 and 100 bytes of data, covering bytes 500 through 599, so B's next expected byte to receive is 600; this means A must acknowledge up through byte 599 by sending acknowledgement number 600 (TCP acknowledgement numbers are cumulative and specify the next byte expected, not the last byte received). So A's next segment carries sequence number 300 (continuing its own byte stream) and acknowledgement number 600 (piggybacked acknowledgement of B's data) — sequence and acknowledgement numbers are tracked completely independently in each direction of a full-duplex TCP connection."
+  },
+  {
+    id: "cn-transport-p2",
+    pyqYear: 2016,
+    q: "A TCP connection begins with ssthresh = 16 (in segments) and cwnd = 1. Using standard slow start (cwnd doubles each RTT until reaching ssthresh) followed by congestion avoidance (cwnd increases by 1 each RTT), what is cwnd at the start of round 9, immediately before a timeout is detected?",
+    options: [],
+    kind: "nat",
+    answer: 20,
+    marks: 2,
+    difficulty: "hard",
+    type: "pyq-style",
+    explanation: "Slow start doubles cwnd each round: round 1 -> 1, round 2 -> 2, round 3 -> 4, round 4 -> 8, round 5 -> 16 (cwnd now equals ssthresh, so the connection switches to congestion avoidance). From round 5 onward, cwnd increases by exactly 1 per round instead of doubling: round 6 -> 17, round 7 -> 18, round 8 -> 19, round 9 -> 20. So immediately before the timeout is detected (which is discovered at round 9, after cwnd has grown to 20 through this round-by-round process), cwnd = 20. This is the classic slow-start-then-linear-growth sawtooth pattern GATE repeatedly draws as a cwnd-vs-round-number graph and asks students to read values off or reconstruct numerically."
+  },
+  {
+    id: "cn-transport-p3",
+    pyqYear: 2017,
+    q: "Continuing the same TCP connection (timeout detected with cwnd = 20 at round 9), the standard timeout response sets ssthresh = cwnd/2 and resets cwnd = 1, restarting slow start. After this reset, at which round number does cwnd first reach the new ssthresh value (i.e., when does the connection switch back to congestion avoidance)?",
+    options: ["Round 12", "Round 13", "Round 14", "Round 15"],
+    answer: 2,
+    marks: 2,
+    difficulty: "hard",
+    type: "pyq-style",
+    explanation: "After the timeout, the new ssthresh = 20/2 = 10, and cwnd resets to 1 at round 10. Slow start then doubles cwnd each round: round 10 -> 1, round 11 -> 2, round 12 -> 4, round 13 -> 8, and round 14 -> would double to 16, but since that exceeds the new ssthresh of 10, cwnd is instead capped at ssthresh = 10 for round 14. This is the round at which cwnd first reaches ssthresh, so the connection switches from slow start to congestion avoidance at round 14, after which cwnd increases by only 1 per round (round 15 -> 11, and so on). Capping growth exactly at ssthresh, rather than overshooting past it, is a detail GATE frequently tests."
+  },
+  {
+    id: "cn-transport-p4",
+    pyqYear: 2018,
+    q: "A TCP sender detects packet loss in two different ways: via a retransmission timeout (RTO expiry) versus via receiving three duplicate ACKs (triggering fast retransmit). According to the standard TCP congestion-control model taught for GATE, how does the sender's response to these two events differ?",
+    options: ["Both events cause identical behaviour: ssthresh is halved and cwnd resets to 1, restarting slow start", "On a timeout, ssthresh is halved and cwnd resets to 1 (restarting slow start); on triple duplicate ACKs, ssthresh is halved and cwnd is also set to that same halved value, remaining in (or entering) congestion avoidance without dropping to 1", "On a timeout, cwnd is left completely unchanged; only triple duplicate ACKs reduce cwnd", "Triple duplicate ACKs are ignored entirely by TCP; only timeouts trigger any congestion response"],
+    answer: 1,
+    marks: 2,
+    difficulty: "medium",
+    type: "concept",
+    explanation: "A timeout is treated as a strong signal of serious congestion (since it typically means no ACKs are getting through at all), so TCP reacts drastically: ssthresh is set to half the current cwnd, and cwnd itself drops all the way back to 1, forcing the connection to restart from slow start. Triple duplicate ACKs, by contrast, indicate that most segments are still getting through (since ACKs are arriving, just not the one that would advance the cumulative acknowledgement), so this is treated as a milder congestion signal: ssthresh is still halved, but cwnd is set directly to that new (halved) ssthresh value rather than collapsing to 1, letting the connection continue in congestion avoidance's gentler linear-increase mode instead of re-entering the aggressive slow-start phase."
+  },
+  {
+    id: "cn-transport-p5",
+    pyqYear: 2019,
+    q: "A TCP sender's cwnd is 20 segments when it receives three duplicate ACKs, triggering fast retransmit. Following the standard model (ssthresh = cwnd/2, then cwnd = ssthresh, remaining in congestion avoidance), what is cwnd one round-trip time after this event?",
+    options: ["10", "11", "15", "20"],
+    answer: 1,
+    marks: 2,
+    difficulty: "medium",
+    type: "pyq-style",
+    explanation: "On the triple duplicate ACK event, ssthresh is set to half the current cwnd: 20/2 = 10, and cwnd is immediately set to this same new ssthresh value of 10 (not reset to 1, since triple duplicate ACKs are a milder signal than a full timeout). Since cwnd now equals ssthresh, the connection is already in (or re-enters) congestion avoidance mode, where cwnd grows by exactly 1 segment per round-trip time rather than doubling. So one RTT after the event, cwnd = 10 + 1 = 11. This linear, additive growth immediately following a halving is exactly the 'AIMD' (Additive Increase, Multiplicative Decrease) sawtooth behaviour that gives TCP Reno's congestion window its characteristic sawtooth-shaped graph over time."
+  },
+  {
+    id: "cn-transport-p6",
+    pyqYear: 2020,
+    q: "A TCP connection has a fixed send window of 64 KB (65536 bytes) and the round-trip time to the receiver is 100 ms. Ignoring all other delays and assuming the sender always has data ready to send, what is the maximum achievable throughput of this connection?",
+    options: ["3.2 Mbps", "5.24 Mbps", "6.4 Mbps", "10.48 Mbps"],
+    answer: 1,
+    marks: 2,
+    difficulty: "medium",
+    type: "pyq-style",
+    explanation: "With a fixed window W, TCP can have at most W bytes of unacknowledged data in flight at once, so once the pipe is full, throughput is capped at Throughput = W / RTT. Here W = 65536 bytes and RTT = 0.1 s, giving 65536 / 0.1 = 655360 bytes/second. Converting to bits per second: 655360 x 8 = 5,242,880 bps = 5.24 Mbps (approximately). No matter how much raw bandwidth the underlying link provides, a TCP connection can never exceed this window-over-RTT ceiling, which is exactly why applications needing higher throughput over high-RTT paths need a correspondingly larger TCP window (this is the basis of the 'bandwidth-delay product' sizing rule for TCP window scaling)."
+  },
+  {
+    id: "cn-transport-p7",
+    pyqYear: 2021,
+    q: "A path has available bandwidth 10 Mbps and round-trip time 50 ms. What is the bandwidth-delay product of this path, in bytes — i.e., the minimum TCP window size (in bytes) needed to keep the pipe fully utilized?",
+    options: [],
+    kind: "nat",
+    answer: 62500,
+    marks: 2,
+    difficulty: "medium",
+    type: "pyq-style",
+    explanation: "The bandwidth-delay product represents the maximum amount of data that can be 'in flight' on the path at any instant, and is computed as Bandwidth x RTT. In bits, this is 10,000,000 bps x 0.05 s = 500,000 bits. Converting to bytes: 500,000 / 8 = 62,500 bytes. This means the sender's TCP window must be at least 62,500 bytes (about 61 KB) for the connection to keep the link continuously saturated with data; any smaller window forces the sender to pause and wait for acknowledgements before the pipe is full, just as with the sliding-window utilization formulas seen at the data-link layer, only here applied end-to-end across an entire network path rather than a single hop."
+  },
+  {
+    id: "cn-transport-p8",
+    pyqYear: 2022,
+    q: "A server machine simultaneously handles two independent TCP connections from two different client processes, both connecting to the exact same server IP address and the exact same server port number 80. What allows the server's operating system to correctly distinguish and demultiplex data belonging to these two separate connections?",
+    options: ["It is impossible; a server can only handle one connection per port at a time", "The full 4-tuple (source IP, source port, destination IP, destination port) uniquely identifies each connection, so differing client IPs or client ports make the two connections distinct even though the server IP and port match", "The server assigns each connection a different destination port internally, even though the client believes it connected to port 80", "TCP uses only the destination port for demultiplexing, so this scenario is not actually possible"],
+    answer: 1,
+    marks: 1,
+    difficulty: "easy",
+    type: "concept",
+    explanation: "A TCP connection (a 'socket pair') is uniquely identified by the 4-tuple: (source IP address, source port, destination IP address, destination port). Two connections can share the same destination IP and destination port (both being the server's address and the well-known port 80) and still be entirely distinct, as long as they differ in source IP, source port, or both — which is virtually always the case for connections from different client processes, since each client typically uses a different IP address or, even from the same host, a different ephemeral source port per connection. The operating system's TCP stack uses this full 4-tuple as the demultiplexing key to route each arriving segment's data to the correct socket buffer and application process."
+  },
+  {
+    id: "cn-transport-p9",
+    pyqYear: 2023,
+    q: "In TCP flow control (as opposed to congestion control), the receiver advertises a window size in every ACK segment it sends back to the sender. If host B's TCP receive buffer is nearly full and it advertises a window size of 0, what must the sender do?",
+    options: ["Immediately close the connection, since a zero window means the receiver has failed", "Stop sending new data (except small probe segments sent periodically to check if the window has reopened) until B advertises a nonzero window again", "Ignore the advertised window and continue sending at the same rate, since flow control is only advisory", "Switch the connection from TCP to UDP to avoid the flow-control restriction"],
+    answer: 1,
+    marks: 1,
+    difficulty: "easy",
+    type: "concept",
+    explanation: "TCP flow control exists to prevent a fast sender from overwhelming a slow receiver's buffer space, and the receiver communicates its available buffer capacity via the advertised (receive) window field in every ACK. A window size of 0 explicitly tells the sender 'do not send any more data right now, my buffer is full' — the sender must pause regular data transmission. To avoid a deadlock where the receiver's later window update is itself lost and never noticed, TCP senders periodically send small 'window probe' segments (typically carrying 1 byte of data) to elicit a fresh ACK carrying the receiver's current window size, resuming full-speed transmission once that advertised window becomes nonzero again."
+  },
+  {
+    id: "cn-transport-p10",
+    pyqYear: 2024,
+    q: "A TCP sender uses a Maximum Segment Size (MSS) of 1460 bytes of application data per segment, with a combined TCP + IP header overhead of 40 bytes per segment (20 bytes each). Over a 10 Mbps link running at full capacity, what is the effective application-level throughput (goodput), accounting for this header overhead?",
+    options: ["8.90 Mbps", "9.33 Mbps", "9.73 Mbps", "10.00 Mbps"],
+    answer: 2,
+    marks: 2,
+    difficulty: "medium",
+    type: "pyq-style",
+    explanation: "Every segment sent on the wire actually occupies 1460 + 40 = 1500 bytes total (data plus headers), but only the 1460 bytes of data is useful application-level goodput; the remaining 40 bytes is protocol overhead. So the fraction of the link's raw bandwidth that translates into actual goodput is 1460/1500 = 0.9733, or 97.33%. Applying this fraction to the full 10 Mbps link capacity: 10 Mbps x 0.9733 = 9.733 Mbps (approximately 9.73 Mbps). This overhead fraction shrinks (goodput efficiency improves) as MSS increases relative to the fixed 40-byte header cost, which is exactly why protocols try to use as large an MSS as the path's MTU safely allows, to minimize this fixed per-segment overhead tax."
+  },
+  {
+    id: "cn-transport-p11",
+    pyqYear: 2025,
+    q: "TCP's congestion avoidance phase uses an Additive-Increase, Multiplicative-Decrease (AIMD) strategy. Which statement correctly describes why AIMD, rather than, say, Multiplicative-Increase Multiplicative-Decrease (MIMD), is used for TCP's congestion window adjustment?",
+    options: ["AIMD converges towards fair, stable bandwidth-sharing among competing connections, since additive increase probes gently for spare capacity while multiplicative decrease backs off sharply and quickly upon detecting congestion; MIMD's aggressive multiplicative growth can instead amplify unfairness and oscillate wildly", "AIMD was chosen purely for historical, arbitrary reasons with no mathematical justification for fairness or stability", "MIMD actually provides strictly better throughput and fairness than AIMD in every scenario, but is harder to implement", "AIMD only affects the receiver's advertised window, never the sender's actual congestion window"],
+    answer: 0,
+    marks: 2,
+    difficulty: "medium",
+    type: "concept",
+    explanation: "A classical result in congestion-control theory (the Chiu-Jain analysis) shows that additive increase paired with multiplicative decrease is what drives multiple competing connections sharing a bottleneck link towards an equal, fair allocation of bandwidth over time, while remaining responsive enough to quickly back off when congestion is detected. Additive increase (growing cwnd by a fixed small amount, +1 MSS per RTT) is a cautious, gentle probe for any spare capacity that appears; multiplicative decrease (halving cwnd) is a fast, proportionally scaled retreat exactly when congestion signals appear, regardless of how large cwnd had grown. Multiplicative-increase alternatives grow far too aggressively and do not have the same fairness-converging mathematical property, risking oscillation and unfairness between competing flows instead of settling towards balance."
+  },
+  {
+    id: "cn-transport-p12",
+    pyqYear: 2026,
+    q: "TCP estimates its retransmission timeout using Jacobson's exponentially weighted moving average: EstimatedRTT_new = (1 - alpha) x EstimatedRTT_old + alpha x SampleRTT, with the standard alpha = 0.125. If the current EstimatedRTT is 100 ms and a fresh SampleRTT measurement of 120 ms is observed, what is the updated EstimatedRTT?",
+    options: [],
+    kind: "nat",
+    answer: 102.5,
+    marks: 2,
+    difficulty: "medium",
+    type: "pyq-style",
+    explanation: "Substituting directly into the formula: EstimatedRTT_new = (1 - 0.125) x 100 + 0.125 x 120 = 0.875 x 100 + 0.125 x 120 = 87.5 + 15 = 102.5 ms. This exponentially weighted moving average deliberately gives most weight (87.5%) to the prior smoothed estimate and only a small weight (12.5%) to any single fresh sample, which smooths out noisy round-trip-time fluctuations from one measurement to the next while still gradually tracking real changes in network conditions over many samples. This EstimatedRTT (combined with a similarly smoothed deviation term) feeds into computing the actual retransmission timeout value TCP uses to decide when to declare a segment lost and retransmit it."
+  },
+  {
+    id: "cn-transport-p13",
+    pyqYear: 2016,
+    q: "During TCP's three-way handshake, host A sends a SYN segment with an Initial Sequence Number (ISN) of 3000. Host B replies with SYN+ACK, using its own ISN of 8000. What sequence number and acknowledgement number does B's SYN+ACK segment carry?",
+    options: ["Sequence 8000, Acknowledgement 3000", "Sequence 8000, Acknowledgement 3001", "Sequence 8001, Acknowledgement 3000", "Sequence 3001, Acknowledgement 8000"],
+    answer: 1,
+    marks: 1,
+    difficulty: "easy",
+    type: "concept",
+    explanation: "Each side's SYN segment, though it carries no actual application data, is treated as consuming exactly one sequence number, so host A's SYN with ISN 3000 means the next byte A will send (or the byte number the connection logically continues from) is 3001; consequently, B must acknowledge A's SYN using acknowledgement number 3001 (not 3000), following TCP's rule that the acknowledgement number always names the next byte expected, one past the last byte (or SYN/FIN control bit) actually received. B's own segment carries its own chosen Initial Sequence Number, 8000, in the sequence number field, since it is starting its own independent byte stream in the other direction. So B's SYN+ACK carries sequence number 8000 and acknowledgement number 3001."
+  },
+  {
+    id: "cn-transport-p14",
+    pyqYear: 2019,
+    q: "The TCP checksum is computed over a pseudo-header (containing the source IP, destination IP, protocol number, and TCP segment length) in addition to the TCP header and data. Why does TCP deliberately include this network-layer information from the IP header in its own checksum computation, even though IP has its own separate header checksum?",
+    options: ["It is redundant and serves no purpose; TCP could safely skip it since IP already checks its own header", "It lets TCP detect certain misdelivered segments, such as ones that arrived at the wrong destination IP address or were incorrectly attributed to the wrong upper-layer protocol, which IP's own header checksum (covering only the IP header, not these end-to-end associations) would not catch", "It allows TCP to encrypt the segment using the IP addresses as a key", "It is required so that NAT routers can rewrite the checksum without needing to touch the TCP header at all"],
+    answer: 1,
+    marks: 2,
+    difficulty: "medium",
+    type: "concept",
+    explanation: "IP's own header checksum only verifies that the IP header itself was not corrupted in transit; it says nothing about whether the packet ended up correctly associated with the right upper-layer protocol or the right source/destination IP pairing further down the stack, especially since the IP header is technically outside of what TCP itself receives as its payload. By folding the source IP, destination IP, protocol field, and segment length into its own checksum computation via the pseudo-header, TCP can additionally catch scenarios like a segment being misrouted to the wrong destination address or misidentified as belonging to a different protocol, providing an extra end-to-end sanity check that complements, rather than duplicates, IP's more narrowly scoped header-only checksum."
+  }
+);
