@@ -1965,3 +1965,737 @@ window.GATE_DATA.questions['apti'].topics.find(function(t){return t.id==='apti-l
     explanation: 'The statement gives a necessary condition for membership (winning at least one tournament), not a sufficient one, so winning tournaments does not automatically make someone a member; Aman winning three tournaments does not force him into the club, especially since he never applied. Concluding "Aman must be a member" reverses the direction of the conditional, a classic logical trap. The only conclusion that is definitely and directly supported is that satisfying the tournament requirement alone does not guarantee membership. Fast route: whenever a rule is phrased as "all members satisfy X," treat X as necessary-not-sufficient, and reject any conclusion that assumes satisfying X is enough to grant the status.'
   }
 );
+
+window.GATE_DATA.questions['apti'].topics.find(function(t){return t.id==='apti-quant';}).questions.push(
+  {
+    id: 'apti-quant-pyq2015a',
+    pyqYear: 2015,
+    q: 'A sum of Rs. 6300 is divided among P, Q and R in the ratio 2:3:4. Find R\'s share.',
+    options: ['Rs. 2100', 'Rs. 2800', 'Rs. 3200', 'Rs. 1800'],
+    answer: 1,
+    marks: 1,
+    difficulty: 'easy',
+    type: 'pyq-style',
+    explanation: 'The ratio 2:3:4 has 2 + 3 + 4 = 9 total parts, so one part is 6300/9 = 700. R\'s share corresponds to 4 parts: 4 x 700 = Rs. 2800. Fast route: compute R\'s fraction of the whole directly as 4/9 and multiply once: 6300 x 4/9 = 700 x 4 = 2800, skipping the need to find P\'s and Q\'s shares first. A quick check: P = 2 x 700 = 1400 and Q = 3 x 700 = 2100, and 1400 + 2100 + 2800 = 6300, confirming the split. GATE frequently asks for one specific share rather than all three, so isolate that share\'s fraction immediately instead of solving the whole partition.'
+  },
+  {
+    id: 'apti-quant-pyq2016a',
+    pyqYear: 2016,
+    q: 'The population of a town increases by 10% in the first year and decreases by 10% in the second year. What is the net percentage change in population over the two years?',
+    options: ['5% increase', 'No net change', '1% decrease', '1% increase'],
+    answer: 2,
+    marks: 1,
+    difficulty: 'easy',
+    type: 'pyq-style',
+    explanation: 'Successive percentage changes multiply as factors rather than adding: the net factor is 1.10 x 0.90 = 0.99, a 1% decrease overall, not zero. Using the shortcut net% = p + q + pq/100 with p = +10 and q = -10: 10 - 10 + (10)(-10)/100 = 0 - 1 = -1%. Concretely, a population of 100 becomes 110 after the increase, and a 10% decrease on 110 removes 11, leaving 99, which is indeed 1% below the original 100. The trap answer "no net change" assumes equal-and-opposite percentages cancel exactly, which only happens when both changes act on the same fixed base, not sequentially. Fast route: always multiply the two factors first; never assume equal-magnitude opposite percentages return you to the start.'
+  },
+  {
+    id: 'apti-quant-pyq2017a',
+    pyqYear: 2017,
+    q: 'A shopkeeper marks an article at Rs. 1200 and allows a discount of 25%. He still makes a profit of 20% on the cost price. Find the cost price of the article.',
+    options: ['Rs. 750', 'Rs. 800', 'Rs. 720', 'Rs. 700'],
+    answer: 0,
+    marks: 1,
+    difficulty: 'medium',
+    type: 'pyq-style',
+    explanation: 'The actual selling price after discount is SP = 1200 x (1 - 0.25) = 1200 x 0.75 = Rs. 900. Since this SP represents a 20% profit over cost price, SP = CP x 1.20, so CP = 900/1.20 = Rs. 750. Fast route: compute the real selling price from the marked price and discount factor first, then divide by the profit factor exactly once to isolate CP, instead of setting up CP as an unknown from the start and solving an equation. Verification: 750 x 1.20 = 900, and 900 matches the discounted selling price, confirming consistency. The most common slip is applying the profit percentage to the marked price instead of the cost price.'
+  },
+  {
+    id: 'apti-quant-pyq2018a',
+    pyqYear: 2018,
+    q: 'Two trains of lengths 120 m and 180 m are running on parallel tracks in opposite directions at speeds of 54 km/h and 36 km/h respectively. Find the time taken by the trains to completely cross each other.',
+    options: ['12 seconds', '10 seconds', '15 seconds', '9 seconds'],
+    answer: 0,
+    marks: 2,
+    difficulty: 'medium',
+    type: 'pyq-style',
+    explanation: 'When two trains move in opposite directions, their speeds add: relative speed = 54 + 36 = 90 km/h. Converting to m/s using the standard factor 5/18: 90 x 5/18 = 25 m/s. To cross each other completely, the trains must together cover the sum of their lengths: 120 + 180 = 300 m. Time = distance/speed = 300/25 = 12 seconds. Fast route: always add speeds for opposite-direction crossing and subtract for same-direction crossing, add the two lengths (never just one), then convert once to m/s using x5/18 before dividing. The frequent error is forgetting to add both train lengths and using just one length instead.'
+  },
+  {
+    id: 'apti-quant-pyq2019a',
+    pyqYear: 2019,
+    q: 'Pipe A can fill a tank in 12 hours and pipe B can fill it in 15 hours, while an outlet pipe C can empty the full tank in 20 hours. If all three pipes are opened together, in how many hours will the tank be filled?',
+    options: ['10 hours', '12 hours', '15 hours', '9 hours'],
+    answer: 0,
+    marks: 2,
+    difficulty: 'medium',
+    type: 'pyq-style',
+    explanation: 'Convert every pipe to a rate per hour: A fills 1/12 per hour, B fills 1/15 per hour, and outlet C empties 1/20 per hour, so C\'s rate is subtracted. Using the LCM of 12, 15, 20 which is 60: A = 5/60, B = 4/60, C = -3/60 per hour. Combined rate = (5 + 4 - 3)/60 = 6/60 = 1/10 per hour, so the tank fills in 10 hours. Fast route: convert every pipe (filling or emptying) into a rate over a common LCM denominator immediately, add filling rates and subtract emptying rates, then invert the final combined fraction once. The common mistake is adding all three rates without flipping the sign on the outlet pipe.'
+  },
+  {
+    id: 'apti-quant-pyq2020a',
+    pyqYear: 2020,
+    q: 'Solution A contains 40% acid and solution B contains 60% acid. How many litres of solution A must be mixed with 5 litres of solution B to obtain a mixture that is 50% acid?',
+    options: ['5 litres', '4 litres', '6 litres', '10 litres'],
+    answer: 0,
+    marks: 1,
+    difficulty: 'medium',
+    type: 'pyq-style',
+    explanation: 'Using the alligation rule, the required ratio of quantities is inversely proportional to the distance of each concentration from the target mean: distance of A from mean = |50 - 40| = 10, distance of B from mean = |60 - 50| = 10, so the ratio A:B = 10:10 = 1:1. Since 5 litres of B is used, an equal 5 litres of A is needed to keep the ratio 1:1. Fast route: write the alligation cross with the mean in the centre, take the two absolute differences as the mixing ratio (swapped diagonally), and read the answer directly without setting up an acid-balance equation. Verification: total acid = 0.40(5) + 0.60(5) = 2 + 3 = 5, total volume = 10, giving 5/10 = 50%, exactly the target.'
+  },
+  {
+    id: 'apti-quant-pyq2020b',
+    pyqYear: 2020,
+    q: 'Find the difference between the compound interest and the simple interest on a principal of Rs. 8000 for 2 years at 5% per annum.',
+    options: ['Rs. 20', 'Rs. 40', 'Rs. 16', 'Rs. 25'],
+    answer: 0,
+    marks: 1,
+    difficulty: 'medium',
+    type: 'pyq-style',
+    explanation: 'For exactly 2 years, the difference between compound and simple interest has a direct formula: CI - SI = P x (r/100)^2, independent of computing CI and SI separately. Here P = 8000 and r = 5, so CI - SI = 8000 x (0.05)^2 = 8000 x 0.0025 = Rs. 20. Fast route: memorize this 2-year identity and apply it in one step, since deriving CI and SI individually (SI = 800, CI = 8000 x 1.05^2 - 8000 = 820, difference 20) wastes time computing two full quantities to reach the same answer. This shortcut generalizes: for 3 years, CI - SI = P(r/100)^2(3 + r/100), useful whenever a "difference between CI and SI" question appears.'
+  },
+  {
+    id: 'apti-quant-pyq2021a',
+    pyqYear: 2021,
+    q: 'A committee of 5 members is to be formed from 6 men and 4 women such that the committee has at least 3 women. In how many ways can this committee be formed? (Enter your numerical answer.)',
+    options: [],
+    answer: 66,
+    kind: 'nat',
+    marks: 2,
+    difficulty: 'hard',
+    type: 'pyq-style',
+    explanation: '"At least 3 women" out of 5 seats splits into two mutually exclusive cases: exactly 3 women and 2 men, or exactly 4 women and 1 man (there are only 4 women available, so 5 women is impossible). Case 1: C(4,3) x C(6,2) = 4 x 15 = 60. Case 2: C(4,4) x C(6,1) = 1 x 6 = 6. Total = 60 + 6 = 66. Fast route: whenever a constraint says "at least k," partition into the individually clean cases (exactly k, exactly k+1, ...) up to the maximum available, compute each case as an independent combination product, and add across cases rather than trying to subtract from the complement, which is more error-prone here since "at most 2 women" would still need multiple sub-cases.'
+  },
+  {
+    id: 'apti-quant-pyq2022a',
+    pyqYear: 2022,
+    q: 'A bag contains 5 red, 4 blue and 3 green balls. Two balls are drawn at random without replacement. What is the probability that both balls drawn are red?',
+    options: ['5/33', '1/6', '5/22', '2/11'],
+    answer: 0,
+    marks: 2,
+    difficulty: 'medium',
+    type: 'pyq-style',
+    explanation: 'Total balls = 5 + 4 + 3 = 12, so the total number of ways to choose 2 balls is C(12,2) = 66. The number of favourable ways to choose 2 red balls out of 5 is C(5,2) = 10. Probability = 10/66, which simplifies by dividing both by 2 to 5/33. Fast route: for "without replacement, both same colour" questions, always compute C(favourable, 2)/C(total, 2) directly rather than multiplying two shrinking fractions (5/12 x 4/11 = 20/132 = 5/33, same answer but combinations are quicker to set up and simplify). The trap answer 5/22 comes from an incorrect denominator, and 1/6 comes from ignoring that the balls are drawn without replacement.'
+  },
+  {
+    id: 'apti-quant-pyq2022b',
+    pyqYear: 2022,
+    q: 'The radius of a cylinder is increased by 20% and its height is decreased by 20%. Find the percentage change in its volume.',
+    options: ['15.2% increase', '4% decrease', '20% increase', 'No change'],
+    answer: 0,
+    marks: 2,
+    difficulty: 'hard',
+    type: 'pyq-style',
+    explanation: 'Cylinder volume V = pi r^2 h depends on the radius squared but on height only linearly, so the two percentage changes are not symmetric. The new volume factor is (1.20)^2 x (0.80) = 1.44 x 0.80 = 1.152, a 15.2% increase. Fast route: apply each percentage change as its own multiplying factor, squaring the factor for any dimension that appears squared in the formula, then multiply all factors together and subtract 1 to get the net percentage change; never assume that a matching percentage increase and decrease on different dimensions cancel out, since the exponents differ. The trap answer "no change" assumes r and h changes offset because the percentages look equal in magnitude, which ignores that radius contributes quadratically.'
+  },
+  {
+    id: 'apti-quant-pyq2023a',
+    pyqYear: 2023,
+    q: 'Find the remainder when 2^100 is divided by 7. (Enter your numerical answer.)',
+    options: [],
+    answer: 2,
+    kind: 'nat',
+    marks: 1,
+    difficulty: 'medium',
+    type: 'pyq-style',
+    explanation: 'Powers of 2 modulo 7 cycle with a short period: 2^1 = 2, 2^2 = 4, 2^3 = 1 (mod 7), and then the pattern 2, 4, 1 repeats every 3 powers. Since the cycle length is 3, reduce the exponent 100 modulo 3: 100 = 3 x 33 + 1, so 2^100 has the same remainder as 2^1, which is 2. Fast route: for "remainder of a^n mod m" questions, compute successive powers of a mod m only until the remainder repeats (rarely more than a handful of steps), note the cycle length, then reduce the exponent modulo that cycle length instead of computing the full power directly.'
+  },
+  {
+    id: 'apti-quant-pyq2023b',
+    pyqYear: 2023,
+    q: 'A can complete a piece of work in 18 days. B is twice as efficient as A. If A and B work together, in how many days will the work be completed? (Enter your numerical answer.)',
+    options: [],
+    answer: 6,
+    kind: 'nat',
+    marks: 1,
+    difficulty: 'easy',
+    type: 'pyq-style',
+    explanation: 'A\'s rate of work is 1/18 per day. Since B is twice as efficient as A, B\'s rate is twice A\'s rate: 2/18 = 1/9 per day. Working together, the combined rate is 1/18 + 2/18 = 3/18 = 1/6 per day, so the work is completed in 6 days. Fast route: convert an "efficiency multiple" statement directly into a rate multiple (twice as efficient means twice the rate, not half the time relative to a wrong reference), add the two rates over a common denominator, then invert once. A common slip is halving A\'s time instead of doubling A\'s rate relative to A itself, which gives the same answer here but breaks down when the multiple is not a simple doubling.'
+  },
+  {
+    id: 'apti-quant-pyq2024a',
+    pyqYear: 2024,
+    q: 'The speed of a boat in still water is 15 km/h and the speed of the stream is 5 km/h. Find the total time taken by the boat to travel 60 km downstream and then return 60 km upstream to the starting point.',
+    options: ['9 hours', '8 hours', '10 hours', '7.5 hours'],
+    answer: 0,
+    marks: 2,
+    difficulty: 'medium',
+    type: 'pyq-style',
+    explanation: 'Downstream speed = boat speed + stream speed = 15 + 5 = 20 km/h, and upstream speed = boat speed - stream speed = 15 - 5 = 10 km/h. Time downstream = 60/20 = 3 hours, and time upstream = 60/10 = 6 hours. Total time = 3 + 6 = 9 hours. Fast route: compute the two effective speeds first by adding and subtracting the stream speed from the boat speed, then find each leg\'s time separately and add them; never average the two speeds and divide the total distance by that average, since downstream and upstream take unequal times for the same distance. A quick sanity check: the upstream leg naturally takes longer than the downstream leg since the boat fights the current, and 6 hours upstream versus 3 hours downstream reflects exactly that.'
+  },
+  {
+    id: 'apti-quant-pyq2024b',
+    pyqYear: 2024,
+    q: 'How many distinct arrangements can be made using all the letters of the word "STATISTICS"? (Enter your numerical answer.)',
+    options: [],
+    answer: 50400,
+    kind: 'nat',
+    marks: 2,
+    difficulty: 'hard',
+    type: 'pyq-style',
+    explanation: 'STATISTICS has 10 letters with repetitions: S appears 3 times, T appears 3 times, I appears 2 times, A appears once, and C appears once (3 + 3 + 2 + 1 + 1 = 10). The number of distinct arrangements of a multiset is n! divided by the factorial of each repeated letter\'s count: 10!/(3! x 3! x 2!) = 3628800/(6 x 6 x 2) = 3628800/72 = 50400. Fast route: always write out the letter-frequency count first before touching factorials, since misidentifying even one repeated letter (for example, missing that both S and T repeat three times each) changes the denominator and gives a wrong final count. Cross-check that all the frequency counts sum to the total letter count as a safeguard before finalizing the division.'
+  },
+  {
+    id: 'apti-quant-pyq2025a',
+    pyqYear: 2025,
+    q: 'Two fair dice are thrown together. What is the probability that the sum of the numbers appearing on them is a multiple of 4? (Enter your numerical answer as a decimal.)',
+    options: [],
+    answer: 0.25,
+    kind: 'nat',
+    marks: 1,
+    difficulty: 'medium',
+    type: 'pyq-style',
+    explanation: 'The total number of equally likely outcomes when two dice are thrown is 6 x 6 = 36. The sums that are multiples of 4 within the possible range 2 to 12 are 4, 8 and 12. Sum = 4 arises from (1,3),(2,2),(3,1): 3 ways. Sum = 8 arises from (2,6),(3,5),(4,4),(5,3),(6,2): 5 ways. Sum = 12 arises from (6,6) only: 1 way. Total favourable outcomes = 3 + 5 + 1 = 9. Probability = 9/36 = 0.25. Fast route: list only the sums that satisfy the target condition within the valid range, count each sum\'s outcome combinations using the standard triangular pattern for two-dice sums (sums closer to 7 have more combinations), and add before dividing by 36, rather than enumerating all 36 outcomes individually.'
+  },
+  {
+    id: 'apti-quant-pyq2026a',
+    pyqYear: 2026,
+    q: 'A shopkeeper marks his goods 40% above the cost price and then offers two successive discounts of 10% and 5%. Find his overall profit percentage.',
+    options: ['19.7% profit', '20% profit', '15% profit', '25% profit'],
+    answer: 0,
+    marks: 2,
+    difficulty: 'hard',
+    type: 'pyq-style',
+    explanation: 'Starting from cost price, the marked price factor is 1.40. Applying two successive discounts of 10% and 5% multiplies by 0.90 and then 0.95. The overall factor from cost price to final selling price is 1.40 x 0.90 x 0.95 = 1.40 x 0.855 = 1.197, which is a 19.7% profit. Fast route: chain every markup and every successive discount as its own multiplying factor in one continuous product, evaluate the full product once, and read the profit or loss percentage directly from how far the final factor is from 1; never add or subtract the individual percentages (40 - 10 - 5 = 25% is the trap answer here), since only multiplication of factors correctly captures compounding percentage changes.'
+  }
+);
+
+window.GATE_DATA.questions['apti'].topics.find(function(t){return t.id==='apti-logical';}).questions.push(
+  {
+    id: 'apti-logical-pyq2015a',
+    pyqYear: 2015,
+    q: 'Find the next term in the series: 3, 8, 15, 24, 35, ? (Enter your numerical answer.)',
+    options: [],
+    answer: 48,
+    kind: 'nat',
+    marks: 1,
+    difficulty: 'medium',
+    type: 'pyq-style',
+    explanation: 'The differences between consecutive terms are 8-3=5, 15-8=7, 24-15=9, 35-24=11, which form their own arithmetic series increasing by 2 each time (5, 7, 9, 11). The next difference must therefore be 13, so the next term is 35 + 13 = 48. Fast route: whenever a series does not have a constant common difference, compute the sequence of first differences and check if that sequence itself is arithmetic (constant second difference); here the second difference is a steady +2, confirming the pattern and letting you extend it in one extra step without guessing.'
+  },
+  {
+    id: 'apti-logical-pyq2016a',
+    pyqYear: 2016,
+    q: 'Choose the word that best completes the analogy: Book is to Author as Painting is to ?',
+    options: ['Canvas', 'Painter', 'Frame', 'Gallery'],
+    answer: 1,
+    marks: 1,
+    difficulty: 'easy',
+    type: 'pyq-style',
+    explanation: 'The relationship in "Book is to Author" is creator-to-creation: an Author creates a Book. Applying the same creator-to-creation relationship to a Painting, the creator is the Painter. Canvas is only the physical material the painting is made on (analogous to paper, not the author), Frame is a decorative accessory, and Gallery is merely a place of display, none of which parallel the "creator" role that Author holds for Book. Fast route: state the abstract relationship in the given pair first in words ("X creates Y" here), then apply that exact same abstract relationship to the second pair rather than looking for any loosely associated word.'
+  },
+  {
+    id: 'apti-logical-pyq2017a',
+    pyqYear: 2017,
+    q: 'Pointing to a man, a woman said, "His mother is the only daughter of my mother." How is the woman related to the man?',
+    options: ['Mother', 'Sister', 'Aunt', 'Daughter'],
+    answer: 0,
+    marks: 1,
+    difficulty: 'medium',
+    type: 'pyq-style',
+    explanation: '"The only daughter of my mother" describes the woman herself, since she is the only daughter of her own mother. So the statement reduces to "his mother is [the woman]," meaning the woman is directly the man\'s mother. Fast route: whenever a relation is phrased as "the only [relation] of my [relation]," first check whether it collapses to describe the speaker themself (as "only daughter of my mother" always does for a female speaker), which usually shortens a seemingly multi-step puzzle into a single direct relation.'
+  },
+  {
+    id: 'apti-logical-pyq2018a',
+    pyqYear: 2018,
+    q: 'A man starts walking from a point and goes 5 km North. He then turns right and walks 3 km, and turns right again and walks 5 km. How far is he from his starting point, and in which direction?',
+    options: ['3 km, East', '5 km, North', '8 km, East', '3 km, West'],
+    answer: 0,
+    marks: 2,
+    difficulty: 'medium',
+    type: 'pyq-style',
+    explanation: 'Track the position using coordinates with East as positive x and North as positive y, starting at (0,0). Walking 5 km North gives (0,5). Facing North and turning right means now facing East; walking 3 km gives (3,5). Facing East and turning right again means now facing South; walking 5 km gives (3,0). The final position (3,0) is exactly 3 km East of the origin (0,0), since the North and South legs of 5 km each cancel out. Fast route: convert each leg of the walk into a coordinate shift immediately using a fixed East-North axis convention, and notice when two legs are equal and opposite (the 5 km North and 5 km South here) so they can be cancelled by inspection before computing the final distance.'
+  },
+  {
+    id: 'apti-logical-pyq2019a',
+    pyqYear: 2019,
+    q: 'Five friends A, B, C, D and E are sitting in a row facing North. B is immediately to the right of A. D is immediately to the left of C. E is sitting at one of the two ends. C is second from the left end. Who is sitting at the left end?',
+    options: ['D', 'A', 'E', 'C'],
+    answer: 0,
+    marks: 2,
+    difficulty: 'hard',
+    type: 'pyq-style',
+    explanation: 'Number the seats 1 to 5 from the left. C is second from the left end, so C occupies seat 2. D is immediately to the left of C, so D occupies seat 1. Since seat 1 is already taken by D, and E must sit at one of the two ends, E must occupy the other end, seat 5. The remaining people A and B fill seats 3 and 4, and since B is immediately to the right of A, A occupies seat 3 and B occupies seat 4. The final row is D, C, A, B, E, so the left end (seat 1) is occupied by D. Fast route: fix the most specific clue first (C is second from left, an exact position) before applying relative clues (immediately left of, immediately right of), since exact-position clues anchor the whole row and let relative clues snap into place with no trial and error.'
+  },
+  {
+    id: 'apti-logical-pyq2020a',
+    pyqYear: 2020,
+    q: 'Statements: Some doctors are engineers. All engineers are teachers.\nConclusions:\nI. Some doctors are teachers.\nII. All teachers are engineers.\nWhich of the conclusions logically follow from the statements?',
+    options: ['Only I follows', 'Only II follows', 'Both I and II follow', 'Neither I nor II follows'],
+    answer: 0,
+    marks: 1,
+    difficulty: 'medium',
+    type: 'pyq-style',
+    explanation: 'From "Some doctors are engineers" and "All engineers are teachers," the doctors who are engineers must also be teachers (since every engineer is a teacher), so "Some doctors are teachers" follows validly. This is the standard "Some A are B, All B are C, therefore Some A are C" syllogism form. Conclusion II reverses the universal statement: "All engineers are teachers" does not imply "All teachers are engineers," since there could be teachers who are not engineers at all; this is the classic converse error. Fast route: chain a "Some...All" pair directly into a "Some...are" conclusion about the outer categories, and always reject any conclusion that reverses the direction of a given "All A are B" statement into "All B are A."'
+  },
+  {
+    id: 'apti-logical-pyq2021a',
+    pyqYear: 2021,
+    q: 'A cube is painted red on all its faces and then cut into 64 smaller cubes of equal size (a 4 x 4 x 4 arrangement). How many of the smaller cubes have exactly two faces painted red? (Enter your numerical answer.)',
+    options: [],
+    answer: 24,
+    kind: 'nat',
+    marks: 2,
+    difficulty: 'hard',
+    type: 'pyq-style',
+    explanation: 'For an n x n x n painted cube cut into unit cubes, the cubes with exactly two painted faces lie along the edges of the big cube, excluding the corners, and their count is 12(n-2), where 12 is the number of edges of a cube and each edge contributes (n-2) such cubes after removing the two corner cubes at its ends. Here n = 4, so the count is 12 x (4-2) = 12 x 2 = 24. Fast route: memorize the fixed census for a painted n-cube (corners = 8 always, edges = 12(n-2), faces = 6(n-2)^2, interior = (n-2)^3) and simply substitute n, rather than trying to visualize or count the 4x4x4 cube face by face; as a check, the four counts should sum to n^3 = 64, and indeed 8 + 24 + 24 + 8 = 64.'
+  },
+  {
+    id: 'apti-logical-pyq2022a',
+    pyqYear: 2022,
+    q: 'At what time between 3 o\'clock and 4 o\'clock (other than exactly 3:00) will the minute hand and hour hand of a clock first be at right angles (90 degrees apart)?',
+    options: ['3:32 and 8/11 minutes', '3:27', '3:16 and 4/11 minutes', '3:00'],
+    answer: 0,
+    marks: 2,
+    difficulty: 'hard',
+    type: 'pyq-style',
+    explanation: 'The angle between the hour and minute hands is given by |30H - 5.5M| degrees, where H is the hour and M is minutes past the hour. At exactly 3:00, the angle is |90 - 0| = 90 degrees, which is already a right angle, but the question asks for the next such instance after 3:00. Setting |90 - 5.5M| = 90 for M > 0 gives 5.5M - 90 = 90 (the other branch, since 90 - 5.5M = 90 only gives M = 0), so 5.5M = 180 and M = 180/5.5 = 32 and 8/11 minutes. Fast route: recognize that "on the hour" positions like 3:00 often already satisfy angle conditions trivially, so explicitly solve for the next non-trivial root of the absolute-value equation rather than accepting the hour mark itself as the answer.'
+  },
+  {
+    id: 'apti-logical-pyq2023a',
+    pyqYear: 2023,
+    q: '1st January 2023 was a Sunday. What day of the week was 1st January 2024? (2023 is not a leap year.)',
+    options: ['Monday', 'Tuesday', 'Sunday', 'Wednesday'],
+    answer: 0,
+    marks: 1,
+    difficulty: 'medium',
+    type: 'pyq-style',
+    explanation: 'Since 2023 is not a leap year, it has exactly 365 days. Dividing 365 by 7 gives a remainder of 1 (365 = 7 x 52 + 1), so the day of the week advances by exactly 1 day over a non-leap year. Starting from Sunday on 1st January 2023, adding 1 day gives Monday for 1st January 2024. Fast route: for consecutive-year day-of-week questions, skip counting actual dates and instead use the fixed odd-days rule: a non-leap year always shifts the weekday by 1 day, and a leap year (when the intervening 29th February is crossed) always shifts it by 2 days.'
+  },
+  {
+    id: 'apti-logical-pyq2023b',
+    pyqYear: 2023,
+    q: 'Find the missing term in the series: B, D, G, K, P, ?',
+    options: ['V', 'U', 'W', 'T'],
+    answer: 0,
+    marks: 1,
+    difficulty: 'medium',
+    type: 'pyq-style',
+    explanation: 'Converting each letter to its position in the alphabet: B=2, D=4, G=7, K=11, P=16. The differences between consecutive positions are 2, 3, 4, 5, increasing by 1 each time, so the next difference should be 6, giving the next position as 16 + 6 = 22, which corresponds to the letter V. Fast route: convert a letter series into its numeric alphabet positions first, then look for the same kind of arithmetic or increasing-difference pattern used in pure number series, since letter series on GATE almost always reduce to a disguised number series once converted.'
+  },
+  {
+    id: 'apti-logical-pyq2024a',
+    pyqYear: 2024,
+    q: 'Pointing to a boy, a girl said, "He is the son of the only son of my grandfather." How is the boy related to the girl?',
+    options: ['Brother', 'Cousin', 'Nephew', 'Son'],
+    answer: 0,
+    marks: 1,
+    difficulty: 'medium',
+    type: 'pyq-style',
+    explanation: 'The "only son of my grandfather" is the girl\'s own father, since he is the single son of her grandfather and she is his child. The boy is described as the son of this only son, meaning the boy is the son of the girl\'s father, which makes the boy the girl\'s brother. Fast route: resolve the innermost nested relation first ("only son of my grandfather" reduces to "my father"), substitute that resolved relation back into the full sentence, and then take just the final remaining step, rather than trying to hold the entire nested chain in mind simultaneously.'
+  },
+  {
+    id: 'apti-logical-pyq2024b',
+    pyqYear: 2024,
+    q: 'A person walks 8 m towards South, then turns left and walks 6 m, then turns left again and walks 8 m. What is the distance, in metres, between his final position and his starting point? (Enter your numerical answer.)',
+    options: [],
+    answer: 6,
+    kind: 'nat',
+    marks: 1,
+    difficulty: 'medium',
+    type: 'pyq-style',
+    explanation: 'Track the walk on coordinates starting at (0,0), with East as positive x and North as positive y. Facing South and walking 8 m gives (0,-8). Facing South and turning left means now facing East; walking 6 m gives (6,-8). Facing East and turning left again means now facing North; walking 8 m gives (6,-8+8) = (6,0). The final position (6,0) is exactly 6 m from the origin (0,0) along the East direction, since the 8 m South and 8 m North legs are equal and opposite and cancel exactly. Fast route: convert each leg into a coordinate shift as it happens, and whenever two legs in the same axis are numerically equal and opposite in direction, cancel them immediately by inspection instead of carrying both through to a final Pythagorean calculation.'
+  },
+  {
+    id: 'apti-logical-pyq2025a',
+    pyqYear: 2025,
+    q: 'Statements: All fruits are sweet. No sweet thing is bitter.\nConclusion: No fruit is bitter.\nIs this conclusion logically valid?',
+    options: ['Valid, it follows directly', 'Invalid, it needs an additional premise', 'Valid only if at least one fruit exists', 'Invalid, this is a converse error'],
+    answer: 0,
+    marks: 1,
+    difficulty: 'medium',
+    type: 'pyq-style',
+    explanation: 'This is the standard "All A are B, No B are C, therefore No A are C" syllogism form. Since all fruits (A) are sweet (B), and no sweet thing (B) is bitter (C), every fruit is automatically excluded from being bitter, because fruits fall entirely inside the sweet category, which has no overlap with bitter at all. The conclusion "No fruit is bitter" follows directly and validly, with no additional premise or existential assumption required, since a universal "All A are B" statement combined with a universal "No B are C" statement produces a universal "No A are C" without needing to assume any A actually exists. Fast route: memorize this specific AEE-1 syllogism pattern (All...No...therefore No) as automatically valid, so it can be recognized instantly rather than re-derived with a truth diagram each time.'
+  },
+  {
+    id: 'apti-logical-pyq2025b',
+    pyqYear: 2025,
+    q: 'Three distinct dice, each numbered 1 to 6, are thrown together. In how many ways can the numbers shown add up to a total of 10? (Enter your numerical answer.)',
+    options: [],
+    answer: 27,
+    kind: 'nat',
+    marks: 2,
+    difficulty: 'hard',
+    type: 'pyq-style',
+    explanation: 'We need the number of ordered triples (x, y, z), each between 1 and 6 inclusive, with x + y + z = 10. Listing by the smallest value or using inclusion-exclusion on the stars-and-bars count for three dice, the total comes out to 27 ordered triples; this matches the well-known symmetric peak of the three-dice sum distribution, where sums of 10 and 11 are tied for the most frequent outcomes out of the 216 total equally likely triples. Fast route: for three-dice sum-count questions, recall or quickly rebuild the standard 3-dice frequency table (sums 3 and 18 have 1 way each, rising smoothly to a peak of 27 ways at both sums 10 and 11, then falling symmetrically), rather than manually enumerating every ordered triple from scratch.'
+  },
+  {
+    id: 'apti-logical-pyq2026a',
+    pyqYear: 2026,
+    q: 'Which of the following numbers does not belong with the others: 8, 27, 64, 100, 125?',
+    options: ['100', '64', '125', '27'],
+    answer: 0,
+    marks: 1,
+    difficulty: 'easy',
+    type: 'pyq-style',
+    explanation: 'The numbers 8, 27, 64 and 125 are all perfect cubes: 8 = 2^3, 27 = 3^3, 64 = 4^3, and 125 = 5^3. The number 100 is not a perfect cube (it is a perfect square, 10^2, and the nearest cubes to it are 64 = 4^3 and 125 = 5^3), so it is the one number that breaks the pattern shared by all the others. Fast route: for "odd one out" number sets, first test whether all the numbers share a common property such as being perfect squares, perfect cubes, primes, or members of a specific series, by quickly checking a few candidates against small known powers, rather than searching for a relationship among all five numbers simultaneously.'
+  },
+  {
+    id: 'apti-logical-pyq2026b',
+    pyqYear: 2026,
+    q: 'A man walks 10 m East, then turns and walks 10 m North, then turns and walks 10 m West. How far, in metres, is he from his starting point? (Enter your numerical answer.)',
+    options: [],
+    answer: 10,
+    kind: 'nat',
+    marks: 1,
+    difficulty: 'easy',
+    type: 'pyq-style',
+    explanation: 'Track the walk on coordinates starting at (0,0), East as positive x and North as positive y. Walking 10 m East gives (10,0). Walking 10 m North gives (10,10). Walking 10 m West gives (0,10). The final position (0,10) is exactly 10 m from the origin (0,0), directly to the North, since the 10 m East and 10 m West legs are equal and opposite and cancel exactly, leaving only the North leg as the net displacement. Fast route: track coordinates leg by leg, and whenever an East leg and a West leg (or a North leg and a South leg) are numerically equal, cross them out immediately rather than computing a full Pythagorean distance that is not actually needed here.'
+  }
+);
+
+window.GATE_DATA.questions['apti'].topics.find(function(t){return t.id==='apti-verbal';}).questions.push(
+  {
+    id: 'apti-verbal-pyq2015a',
+    pyqYear: 2015,
+    q: 'Choose the most appropriate word to fill the blank: Despite his ______ efforts, he could not complete the project on time.',
+    options: ['diligent', 'diligence', 'diligently', 'dilated'],
+    answer: 0,
+    marks: 1,
+    difficulty: 'easy',
+    type: 'pyq-style',
+    explanation: 'The blank sits directly before the noun "efforts," so it must be filled by an adjective that modifies that noun. "Diligent" is the adjective form (meaning careful and persistent), correctly describing the noun "efforts." "Diligence" is a noun and cannot modify another noun in this slot, "diligently" is an adverb and would need to modify a verb rather than a noun, and "dilated" is an unrelated word (meaning widened) that does not fit the meaning at all. Fast route: identify the part of speech required by the surrounding grammar first (adjective before a noun, adverb before a verb) and eliminate every option that is the wrong part of speech before even considering meaning.'
+  },
+  {
+    id: 'apti-verbal-pyq2016a',
+    pyqYear: 2016,
+    q: 'Identify the part of the sentence that contains a grammatical error: "Neither the manager nor the employees (A) / was informed (B) / about the sudden change (C) / in the schedule (D)."',
+    options: ['A', 'B', 'C', 'D'],
+    answer: 1,
+    marks: 2,
+    difficulty: 'hard',
+    type: 'pyq-style',
+    explanation: 'With "neither...nor" joining a singular subject (the manager) and a plural subject (the employees), the verb must agree with whichever subject is closer to it, which here is "the employees" (plural). The verb should therefore be "were informed," not "was informed," making part B the error. Parts A, C and D are grammatically fine as written. Fast route: for "neither...nor" or "either...or" subject pairs, always check agreement against the second (nearer) subject only, ignoring the first subject\'s number entirely when deciding singular versus plural verb form.'
+  },
+  {
+    id: 'apti-verbal-pyq2017a',
+    pyqYear: 2017,
+    q: 'What does the idiom "to let the cat out of the bag" mean?',
+    options: ['To reveal a secret unintentionally', 'To adopt a pet', 'To escape from danger', 'To create confusion deliberately'],
+    answer: 0,
+    marks: 1,
+    difficulty: 'easy',
+    type: 'pyq-style',
+    explanation: 'The idiom "to let the cat out of the bag" means to accidentally reveal a secret or piece of information that was supposed to remain hidden. It has nothing to do with literal cats or pets; the phrase originates from old market trickery involving sacks and animals but has become fixed as an idiom purely about unintended disclosure. Fast route: idiom-meaning questions cannot be solved by literal word analysis, so if an idiom is recognized as a standard fixed phrase, recall its conventional dictionary meaning directly rather than trying to reason from the individual words like "cat" or "bag."'
+  },
+  {
+    id: 'apti-verbal-pyq2018a',
+    pyqYear: 2018,
+    q: 'Arrange the following sentences (P, Q, R, S) in a logical order to form a coherent paragraph:\nP. Then, gradually, industries began adopting automation.\nQ. Automation initially faced resistance from workers who feared job losses.\nR. In the early twentieth century, manual labour dominated most industries.\nS. Today, automation is central to almost every manufacturing process.',
+    options: ['RPQS', 'RQPS', 'PRQS', 'SRPQ'],
+    answer: 0,
+    marks: 2,
+    difficulty: 'medium',
+    type: 'pyq-style',
+    explanation: 'The paragraph follows a clear chronological progression. R sets the historical starting point (manual labour dominating industries in the early twentieth century). P then introduces the shift as industries began adopting automation. Q describes the resistance that this automation initially faced from workers. S concludes with the present-day state, where automation has become central. This gives the order R, P, Q, S. Fast route: scan the sentences for time markers and connecting words first ("then," "initially," "today") since these words almost always signal the intended chronological or logical sequence, letting you place the sentence with "today" last and the one establishing historical background first without testing every permutation.'
+  },
+  {
+    id: 'apti-verbal-pyq2019a',
+    pyqYear: 2019,
+    q: 'The government has announced free Wi-Fi in all public parks to encourage outdoor activity among youth. Which of the following is an assumption implicit in this statement?',
+    options: ['Youth do not currently use public parks much due to lack of internet access there', 'Free Wi-Fi will improve government revenue', 'Parks lack proper seating arrangements', 'Youth prefer indoor activities over outdoor ones'],
+    answer: 0,
+    marks: 2,
+    difficulty: 'hard',
+    type: 'pyq-style',
+    explanation: 'An assumption is an unstated belief that must be true for the stated action to make sense as a solution. The government\'s plan (adding Wi-Fi to parks to boost outdoor activity) only makes logical sense if it assumes that the current lack of internet access in parks is at least part of why youth avoid parks or outdoor activity; otherwise adding Wi-Fi would not plausibly increase outdoor activity at all. The other options either introduce unrelated goals (revenue), unrelated deficiencies (seating), or an assumption that would actually work against the plan\'s logic (option D would suggest Wi-Fi in parks does not help since youth prefer being indoors anyway). Fast route: to test if a statement is a valid assumption, negate it and check whether the original argument or plan would then fall apart; negating option A ("youth already have full internet access in parks") makes the free-Wi-Fi plan pointless, confirming it is the necessary assumption.'
+  },
+  {
+    id: 'apti-verbal-pyq2020a',
+    pyqYear: 2020,
+    q: 'Choose the most appropriate word to fill the blank: The scientist\'s theory was so ______ that even experts in the field struggled to understand it.',
+    options: ['esoteric', 'elementary', 'extroverted', 'eloquent'],
+    answer: 0,
+    marks: 1,
+    difficulty: 'medium',
+    type: 'pyq-style',
+    explanation: '"Esoteric" means intended for or understood by only a small, specialized group, which fits perfectly with a theory so difficult that even experts struggled with it. "Elementary" means simple or basic, which directly contradicts the idea of experts struggling to understand it. "Extroverted" describes a personality trait unrelated to the difficulty of a theory, and "eloquent" describes fluent, persuasive expression rather than conceptual difficulty. Fast route: for vocabulary-in-context blanks, first identify the logical direction implied by the sentence (here, a signal of difficulty and specialization from "even experts...struggled"), then pick the option whose core meaning matches that direction, discarding words that are merely thematically related but point the wrong way (like "elementary," which is the opposite direction).'
+  },
+  {
+    id: 'apti-verbal-pyq2020b',
+    pyqYear: 2020,
+    q: 'Choose the grammatically correct sentence.',
+    options: ['Each of the students has submitted his or her assignment.', 'Each of the students have submitted his assignment.', 'Each of the student have submit their assignment.', 'Each of the students has submit their assignment.'],
+    answer: 0,
+    marks: 1,
+    difficulty: 'medium',
+    type: 'pyq-style',
+    explanation: '"Each" is a singular indefinite pronoun and always takes a singular verb, regardless of the plural noun phrase that follows it ("of the students"). The correct verb form is therefore "has," not "have." The subject-verb pair must also agree in tense and form: "has submitted" (present perfect, singular) is fully correct, and pairing it with the gender-neutral "his or her" correctly matches the singular subject "each." The other options either use the plural verb "have" incorrectly, use the wrong noun form "student" instead of "students," or use incorrect verb forms like "submit" instead of "submitted." Fast route: treat "each," "every," "either," and "neither" as always singular for verb agreement purposes, no matter what plural phrase follows them, and check the rest of the sentence only after this agreement rule is satisfied.'
+  },
+  {
+    id: 'apti-verbal-pyq2021a',
+    pyqYear: 2021,
+    q: 'What does the idiom "once in a blue moon" mean?',
+    options: ['Very rarely', 'Every month', 'Very frequently', 'During the night'],
+    answer: 0,
+    marks: 1,
+    difficulty: 'easy',
+    type: 'pyq-style',
+    explanation: 'The idiom "once in a blue moon" refers to an event that happens very rarely or almost never, drawing on the rare astronomical occurrence of a second full moon within a single calendar month, which is uncommon and irregular. It has no literal connection to actual moon color or monthly frequency in everyday usage. Fast route: recognize idioms as fixed units of meaning learned as vocabulary rather than analyzed compositionally; "blue moon" specifically is a well-known idiom for rarity and should be recalled directly rather than reasoned out from its individual words.'
+  },
+  {
+    id: 'apti-verbal-pyq2022a',
+    pyqYear: 2022,
+    q: 'All members of the cycling club own bicycles. Rohit owns a bicycle. Which of the following can be validly inferred from these two statements?',
+    options: ['Rohit may or may not be a member of the cycling club', 'Rohit is definitely a member of the cycling club', 'Rohit owns more than one bicycle', 'All bicycle owners are club members'],
+    answer: 0,
+    marks: 2,
+    difficulty: 'hard',
+    type: 'pyq-style',
+    explanation: 'The first statement establishes that club membership implies bicycle ownership (all club members own bicycles), but it does not establish the reverse: that owning a bicycle implies club membership. Rohit owning a bicycle is consistent with being a club member, but it is equally consistent with him owning a bicycle for reasons entirely unrelated to any club. Since the statements never assert that only club members own bicycles, no definite conclusion about Rohit\'s membership can be drawn either way. Fast route: when a statement is phrased as "all A are B," never treat "X is B" as proof that "X is A," since that reverses the direction of a one-way implication; the only valid inference from "X is B" alone is that X\'s status regarding A remains genuinely undetermined.'
+  },
+  {
+    id: 'apti-verbal-pyq2022b',
+    pyqYear: 2022,
+    q: 'Arrange the following sentences (P, Q, R, S) in a logical order:\nP. As a result, several nations have set ambitious targets for solar and wind capacity.\nQ. Fossil fuel reserves are finite and their combustion contributes heavily to global warming.\nR. Renewable energy sources, in contrast, offer a sustainable alternative.\nS. These targets, if met, could significantly reduce global carbon emissions.',
+    options: ['QRPS', 'RQPS', 'QPRS', 'PQRS'],
+    answer: 0,
+    marks: 2,
+    difficulty: 'medium',
+    type: 'pyq-style',
+    explanation: 'Q opens by stating the core problem with fossil fuels (finite reserves, global warming). R then contrasts this problem with renewable energy as a sustainable alternative, using the explicit contrast marker "in contrast." P follows with the consequence of that shift, that nations have set targets for solar and wind. S closes by describing what those targets could achieve if met. This gives the order Q, R, P, S. Fast route: look for explicit connector words such as "as a result," "in contrast," and "these targets" (which refers back to something named earlier), since these connectors reveal which sentence must directly follow which, letting you chain the paragraph together without brute-force testing every ordering.'
+  },
+  {
+    id: 'apti-verbal-pyq2023a',
+    pyqYear: 2023,
+    q: 'Choose the most appropriate word to fill the blank: The committee members could not reach a consensus, as their opinions were entirely ______.',
+    options: ['divergent', 'convergent', 'congruent', 'identical'],
+    answer: 0,
+    marks: 1,
+    difficulty: 'medium',
+    type: 'pyq-style',
+    explanation: '"Divergent" means differing or moving apart, which logically explains why the committee could not reach a consensus: their opinions were too different from one another. "Convergent," "congruent," and "identical" all describe opinions that agree or are the same, which would make reaching a consensus easy rather than impossible, directly contradicting the sentence\'s stated outcome. Fast route: identify the logical relationship the sentence sets up (here, "could not reach a consensus" signals a cause of disagreement or difference) and eliminate every option whose meaning implies agreement or similarity before considering only words meaning difference or opposition.'
+  },
+  {
+    id: 'apti-verbal-pyq2023b',
+    pyqYear: 2023,
+    q: 'Identify the part of the sentence that contains a grammatical error: "The number of accidents on this highway (A) / have increased dramatically (B) / over the past few years (C) / due to reckless driving (D)."',
+    options: ['A', 'B', 'C', 'D'],
+    answer: 1,
+    marks: 2,
+    difficulty: 'hard',
+    type: 'pyq-style',
+    explanation: 'The subject of the sentence is "the number," which is a singular noun phrase, even though it is followed by the plural "of accidents." Since "the number of X" always takes a singular verb (unlike "a number of X," which takes a plural verb), the verb should be "has increased," not "have increased," making part B the error. Parts A, C, and D contain no grammatical faults. Fast route: distinguish "the number of" (always singular verb) from "a number of" (always plural verb) as a fixed rule, and apply it immediately whenever either phrase appears as a sentence\'s subject, without needing to analyze the rest of the sentence\'s grammar.'
+  },
+  {
+    id: 'apti-verbal-pyq2024a',
+    pyqYear: 2024,
+    q: 'All the participants who scored above 90% in the mock test were selected for the advanced batch. Priya was not selected for the advanced batch. What can be validly concluded?',
+    options: ['Priya did not score above 90% in the mock test', 'Priya scored above 90% in the mock test', 'Priya did not take the mock test', 'The mock test had no cutoff score'],
+    answer: 0,
+    marks: 2,
+    difficulty: 'hard',
+    type: 'pyq-style',
+    explanation: 'The first statement is a conditional: scoring above 90% guarantees selection. Priya\'s non-selection is the logical contrapositive situation: if she had scored above 90%, she would have been selected, but she was not selected, so she cannot have scored above 90%. This is a valid application of the contrapositive of "if P then Q" being "if not Q then not P." The other options either assert the opposite of what is logically forced (option B), introduce information not given at all (option C), or contradict the premise itself (option D, since a cutoff of 90% is explicitly implied). Fast route: whenever a statement gives "if condition then outcome" and you are told the outcome did not happen, apply the contrapositive directly to conclude the condition did not happen either, rather than treating the missing outcome as inconclusive.'
+  },
+  {
+    id: 'apti-verbal-pyq2024b',
+    pyqYear: 2024,
+    q: 'What does the idiom "to burn the midnight oil" mean?',
+    options: ['To work late into the night', 'To waste resources carelessly', 'To start a fire accidentally', 'To finish work well ahead of time'],
+    answer: 0,
+    marks: 1,
+    difficulty: 'easy',
+    type: 'pyq-style',
+    explanation: 'The idiom "to burn the midnight oil" means to work or study late into the night, originating from the historical practice of using oil lamps to work after dark before electric lighting existed. It carries a positive connotation of diligence and hard work, not carelessness, accidents, or early completion. Fast route: idioms involving old-fashioned everyday objects (oil lamps, candles) frequently trace back to a literal historical practice; recalling that origin story ("working by lamp oil at night") makes the idiomatic meaning immediately obvious and memorable rather than needing rote memorization alone.'
+  },
+  {
+    id: 'apti-verbal-pyq2025a',
+    pyqYear: 2025,
+    q: 'Choose the most appropriate pair of words to fill the blanks: The new policy, though ______ in intention, proved ______ in execution due to poor planning.',
+    options: ['noble ... disastrous', 'noble ... successful', 'flawed ... perfect', 'vague ... clear'],
+    answer: 0,
+    marks: 2,
+    difficulty: 'hard',
+    type: 'pyq-style',
+    explanation: 'The word "though" signals a contrast between the two blanks, and "due to poor planning" tells us the execution outcome must be negative. "Noble" (having good, well-meaning intentions) contrasts appropriately with "disastrous" (a clearly negative outcome caused by poor planning). "Noble...successful" fails the contrast signaled by "though" and also contradicts "due to poor planning," which demands a negative result. "Flawed...perfect" and "vague...clear" both misassign the sentence\'s required positive-to-negative direction across the two blanks. Fast route: for two-blank sentences with a contrast word like "though," "but," or "however," first decide the required positive/negative polarity of each blank from the surrounding clues, then test only option pairs matching that exact polarity pattern.'
+  },
+  {
+    id: 'apti-verbal-pyq2026a',
+    pyqYear: 2026,
+    q: 'Sales of a company\'s flagship product increased by 30% after it reduced the price by 10%. The company concluded that lowering prices further would continue to boost sales. Which of the following, if true, would most weaken this conclusion?',
+    options: ['A rival company launched an aggressive marketing campaign for a competing product at the same time, which likely drove the increased customer interest', 'The company\'s profit margins improved despite the price cut', 'The product remains popular among younger customers', 'The price reduction was well publicized in the media'],
+    answer: 0,
+    marks: 2,
+    difficulty: 'hard',
+    type: 'pyq-style',
+    explanation: 'The company\'s conclusion assumes that the price cut caused the sales increase, but this is only one possible explanation, and the argument is weakened if an alternative cause for the sales change is identified. A rival\'s aggressive marketing campaign occurring at the same time offers exactly such an alternative explanation: the increased customer interest (and thus sales) may have come from market disruption caused by the competitor, not from the company\'s own price reduction, undermining the causal link the company assumes. The other options either support the company\'s pricing strategy (options B and D) or are irrelevant to the causal claim about price and sales (option C). Fast route: for "weaken the conclusion" questions built on a causal claim (X caused Y), the strongest weakening option is always one that introduces a plausible alternative cause for Y, rather than one that merely provides supporting or tangential information.'
+  }
+);
+
+window.GATE_DATA.questions['apti'].topics.find(function(t){return t.id==='apti-data-spatial';}).questions.push(
+  {
+    id: 'apti-data-spatial-pyq2015a',
+    pyqYear: 2015,
+    q: 'A company\'s total annual budget is Rs. 72 lakh, shown as a pie chart. The "Marketing" sector occupies 120 degrees of the chart. What amount is allocated to Marketing?',
+    options: ['Rs. 24 lakh', 'Rs. 20 lakh', 'Rs. 18 lakh', 'Rs. 30 lakh'],
+    answer: 0,
+    marks: 1,
+    difficulty: 'easy',
+    type: 'pyq-style',
+    explanation: 'A pie chart\'s full circle of 360 degrees represents the entire total, so a sector\'s value is (its angle/360) x total. Here, Marketing\'s angle is 120 degrees, which is 120/360 = 1/3 of the circle. Marketing amount = 72 lakh x 1/3 = Rs. 24 lakh. Fast route: reduce the sector\'s angle-to-360 fraction to its simplest form first (120/360 = 1/3 here) and multiply that clean fraction by the total, rather than computing the decimal 120/360 = 0.333... and multiplying by that, since the exact fraction avoids any rounding risk.'
+  },
+  {
+    id: 'apti-data-spatial-pyq2016a',
+    pyqYear: 2016,
+    q: 'A company\'s annual sales (in Rs crore) were: 2018: 200, 2019: 250, 2020: 300, 2021: 330. In which year was the percentage growth over the previous year the highest?',
+    options: ['2019', '2020', '2021', '2018'],
+    answer: 0,
+    marks: 2,
+    difficulty: 'medium',
+    type: 'pyq-style',
+    explanation: 'Percentage growth for each year must be measured against that year\'s own previous-year base, not compared using absolute increases. 2019 over 2018: (250-200)/200 x 100 = 50/200 x 100 = 25%. 2020 over 2019: (300-250)/250 x 100 = 50/250 x 100 = 20%. 2021 over 2020: (330-300)/300 x 100 = 30/300 x 100 = 10%. Even though the absolute increase is the same (50 crore) for 2019 and 2020, 2019 shows a higher percentage growth because it grew from a smaller base. So 2019 has the highest percentage growth at 25%. Fast route: never rank years by absolute increase alone in a "highest percentage growth" question; always divide each year\'s increase by that specific year\'s own starting value, since an identical absolute rise from a smaller base always yields a larger percentage.'
+  },
+  {
+    id: 'apti-data-spatial-pyq2017a',
+    pyqYear: 2017,
+    q: 'A table shows monthly rainfall (in mm) as: January: 40, February: 60, March: 80, April: 100. What is the average rainfall over these four months?',
+    options: ['70 mm', '75 mm', '65 mm', '80 mm'],
+    answer: 0,
+    marks: 1,
+    difficulty: 'easy',
+    type: 'pyq-style',
+    explanation: 'The average is the sum of all values divided by the count of values: (40 + 60 + 80 + 100)/4 = 280/4 = 70 mm. Fast route: since the four values form an evenly spaced arithmetic sequence (40, 60, 80, 100, each step of +20), the average of an evenly spaced set equals the average of its first and last terms: (40 + 100)/2 = 70, skipping the need to add all four numbers individually. This shortcut works for any set of evenly spaced (arithmetic) data.'
+  },
+  {
+    id: 'apti-data-spatial-pyq2018a',
+    pyqYear: 2018,
+    q: 'A vertical mirror is placed to the right of a letter. Which of the following letters would appear unchanged in its mirror image?',
+    options: ['H', 'P', 'J', 'R'],
+    answer: 0,
+    marks: 1,
+    difficulty: 'easy',
+    type: 'pyq-style',
+    explanation: 'A vertical mirror flips a figure left-right, so only letters that are symmetric about a vertical axis running through their centre will look unchanged. Letters with this vertical symmetry include A, H, I, M, O, T, U, V, W, X and Y. Among the given options, H has a clear vertical line of symmetry (its left half mirrors its right half exactly), so it remains unchanged. P, J and R are all asymmetric about a vertical axis and would visibly change shape (and effectively reverse) in a vertical mirror. Fast route: memorize the fixed list of vertically-symmetric capital letters and simply check option letters against that list, rather than mentally visualizing each letter\'s reflection from scratch.'
+  },
+  {
+    id: 'apti-data-spatial-pyq2018b',
+    pyqYear: 2018,
+    q: 'A water image is formed by reflecting a figure in a horizontal surface below it. Which of the following letters would appear unchanged in its water image?',
+    options: ['K', 'A', 'P', 'J'],
+    answer: 0,
+    marks: 1,
+    difficulty: 'easy',
+    type: 'pyq-style',
+    explanation: 'A water image flips a figure top-to-bottom (vertically), so only letters symmetric about a horizontal axis running through their centre will look unchanged. Letters with this horizontal symmetry include B, C, D, E, H, I, K, O and X. Among the options, K has its top half mirroring its bottom half around a horizontal midline, so it remains unchanged in a water image. A, P and J are all asymmetric about a horizontal axis and would look different when flipped vertically. Fast route: never confuse the water-image rule (flips top-bottom, so check horizontal symmetry) with the mirror-image rule (flips left-right, so check vertical symmetry); the two symmetric-letter lists barely overlap (only H, I, O, X, and the always-symmetric shapes appear in both), making this mix-up a common and costly error.'
+  },
+  {
+    id: 'apti-data-spatial-pyq2019a',
+    pyqYear: 2019,
+    q: 'A square sheet of paper is folded in half, then folded in half again (two folds in total). A single hole is then punched through the folded paper at the centre. How many holes will appear when the paper is fully unfolded? (Enter your numerical answer.)',
+    options: [],
+    answer: 4,
+    kind: 'nat',
+    marks: 1,
+    difficulty: 'medium',
+    type: 'pyq-style',
+    explanation: 'Each fold doubles the number of paper layers stacked on top of each other. After 2 folds, the number of layers is 2^2 = 4. A single punch through all the stacked layers creates one hole in each layer, so unfolding reveals 4 holes total, arranged symmetrically about both fold lines. Fast route: for "n folds, one punch" questions, the number of resulting holes is always 2^n (as long as the punch does not land exactly on a fold line, which would merge holes), so simply raise 2 to the power of the number of folds rather than trying to trace the hole through each unfolding step visually.'
+  },
+  {
+    id: 'apti-data-spatial-pyq2020a',
+    pyqYear: 2020,
+    q: 'In a class of 60 students, 35 play cricket, 30 play football, and 15 play both cricket and football. How many students play neither sport? (Enter your numerical answer.)',
+    options: [],
+    answer: 10,
+    kind: 'nat',
+    marks: 2,
+    difficulty: 'medium',
+    type: 'pyq-style',
+    explanation: 'Using the inclusion-exclusion principle for two overlapping sets, the number playing at least one sport = (cricket) + (football) - (both) = 35 + 30 - 15 = 50. Since the total class size is 60, the number playing neither sport is 60 - 50 = 10. Fast route: always subtract the "both" overlap exactly once from the sum of the two individual totals before subtracting from the grand total, since simply adding 35 + 30 = 65 and subtracting from 60 would wrongly double-count the 15 students who play both sports, producing a nonsensical negative answer as a warning sign of the error.'
+  },
+  {
+    id: 'apti-data-spatial-pyq2020b',
+    pyqYear: 2020,
+    q: 'Class A has 30 students with an average score of 60 marks, and Class B has 20 students with an average score of 75 marks. What is the combined average score of both classes together? (Enter your numerical answer.)',
+    options: [],
+    answer: 66,
+    kind: 'nat',
+    marks: 2,
+    difficulty: 'medium',
+    type: 'pyq-style',
+    explanation: 'Combining two group averages requires weighting by group size, never a simple midpoint of the two averages. Total marks in Class A = 30 x 60 = 1800, and total marks in Class B = 20 x 75 = 1500. Combined total marks = 1800 + 1500 = 3300, and combined total students = 30 + 20 = 50. Combined average = 3300/50 = 66. Fast route: convert each group\'s average back into a total (average x count), add the totals and the counts separately, then divide once at the end; never average the two averages directly (which would wrongly give (60+75)/2 = 67.5 here), since that ignores the unequal group sizes.'
+  },
+  {
+    id: 'apti-data-spatial-pyq2021a',
+    pyqYear: 2021,
+    q: 'A bar chart shows the sales (in units) of four products: P = 150, Q = 200, R = 250, S = 180. What is the ratio of R\'s sales to the total sales of all four products (in lowest terms)?',
+    options: ['25:78', '25:76', '1:3', '5:16'],
+    answer: 0,
+    marks: 2,
+    difficulty: 'medium',
+    type: 'pyq-style',
+    explanation: 'Total sales across all four products = 150 + 200 + 250 + 180 = 780. The ratio of R\'s sales to the total is 250:780. Dividing both terms by their greatest common divisor, 10, gives 25:78, which cannot be simplified further since 25 (5x5) and 78 (2x3x13) share no common factors. Fast route: always sum all category values first to get the correct denominator for a "share of total" ratio question, then find the greatest common divisor of the numerator and that total to reduce the ratio in one step, rather than trying to guess a "nice" fraction like 1:3 that does not actually match the exact numbers given.'
+  },
+  {
+    id: 'apti-data-spatial-pyq2022a',
+    pyqYear: 2022,
+    q: 'A cube of side 5 units is painted on all its outer faces and then cut into 125 unit cubes. How many of these unit cubes have no face painted at all (fully interior cubes)? (Enter your numerical answer.)',
+    options: [],
+    answer: 27,
+    kind: 'nat',
+    marks: 2,
+    difficulty: 'medium',
+    type: 'pyq-style',
+    explanation: 'For an n x n x n painted cube, the fully interior unit cubes (no painted face at all) form a smaller (n-2) x (n-2) x (n-2) cube tucked entirely inside, away from every outer surface, giving a count of (n-2)^3. Here n = 5, so the interior count is (5-2)^3 = 3^3 = 27. Fast route: apply the fixed interior-cube formula (n-2)^3 directly by substituting n, and cross-check using the full census (corners 8, edges 12(n-2) = 36, faces 6(n-2)^2 = 54, interior 27) summing to 8+36+54+27 = 125, which matches n^3 = 125 exactly, confirming no arithmetic slip.'
+  },
+  {
+    id: 'apti-data-spatial-pyq2022b',
+    pyqYear: 2022,
+    q: 'A clock shows the time as 3:40. What time will its mirror image show?',
+    options: ['8:20', '8:40', '7:20', '9:20'],
+    answer: 0,
+    marks: 1,
+    difficulty: 'medium',
+    type: 'pyq-style',
+    explanation: 'For a standard analog clock face, the mirror image time and the actual time always add up to 11:60 (equivalently, 12:00 read as 11 hours and 60 minutes for easy subtraction). Converting 3:40 to minutes past 3: 3 hours 40 minutes. Subtracting from 11:60: 11:60 - 3:40 = 8:20. Fast route: memorize the fixed rule "actual time + mirror time = 11:60" and perform a single subtraction (borrowing from hours when the minutes of the actual time exceed 0, since 60 minutes are being subtracted from), rather than trying to visualize the reflected clock face directly, which is much more error-prone under time pressure.'
+  },
+  {
+    id: 'apti-data-spatial-pyq2023a',
+    pyqYear: 2023,
+    q: 'A table shows a company\'s regional revenue (in Rs lakh): North = 120, South = 180, East = 90, West = 110. What percentage of the total revenue comes from the South region? (Enter your numerical answer, rounded to the nearest whole number.)',
+    options: [],
+    answer: 36,
+    kind: 'nat',
+    marks: 1,
+    difficulty: 'easy',
+    type: 'pyq-style',
+    explanation: 'Total revenue across all regions = 120 + 180 + 90 + 110 = 500 lakh. South\'s share of the total = (180/500) x 100 = 36%. Fast route: since the total here is a round number (500), convert the fraction 180/500 to a percentage by first simplifying to 18/50 = 36/100 = 36%, or equivalently multiply 180 by 100/500 = 0.2 directly (180 x 0.2 = 36), both of which avoid a long division by 500.'
+  },
+  {
+    id: 'apti-data-spatial-pyq2023b',
+    pyqYear: 2023,
+    q: 'In a survey of 100 people: 50 read newspaper A, 40 read newspaper B, 30 read newspaper C, 20 read both A and B, 15 read both B and C, 10 read both A and C, and 5 read all three newspapers. How many people read at least one of the three newspapers? (Enter your numerical answer.)',
+    options: [],
+    answer: 80,
+    kind: 'nat',
+    marks: 2,
+    difficulty: 'hard',
+    type: 'pyq-style',
+    explanation: 'The inclusion-exclusion principle for three overlapping sets states: |A union B union C| = |A| + |B| + |C| - |A and B| - |B and C| - |A and C| + |A and B and C|. Substituting the given values: 50 + 40 + 30 - 20 - 15 - 10 + 5 = 120 - 45 + 5 = 80. Fast route: write the inclusion-exclusion formula out explicitly with all six terms (three singles added, three pairwise overlaps subtracted, one triple overlap added back) before substituting numbers, since skipping the final "+ triple overlap" term (a very common mistake, since it was already subtracted three times in the pairwise terms and needs to be added back exactly once) is the single most frequent source of error in three-set counting.'
+  },
+  {
+    id: 'apti-data-spatial-pyq2024a',
+    pyqYear: 2024,
+    q: 'A square sheet of paper is folded diagonally in half, then folded diagonally in half again. Two holes are then punched near the folded corner, all the way through the folded stack. How many holes will appear when the paper is fully unfolded? (Enter your numerical answer.)',
+    options: [],
+    answer: 8,
+    kind: 'nat',
+    marks: 2,
+    difficulty: 'hard',
+    type: 'pyq-style',
+    explanation: 'Each fold doubles the number of layers, so after 2 folds there are 2^2 = 4 layers stacked together. Each of the 2 punches goes through all 4 layers, creating one hole per layer per punch location, so each punch produces 4 holes, and with 2 separate punch locations the total is 2 x 4 = 8 holes when unfolded. Fast route: generalize the single-punch rule (holes = 2^n for n folds) by multiplying by the number of distinct punch locations when more than one hole is punched per fold, since each punch location independently multiplies by the same layer count.'
+  },
+  {
+    id: 'apti-data-spatial-pyq2025a',
+    pyqYear: 2025,
+    q: 'A pie chart divides a company\'s total expenditure into five categories: Education 20%, Health 15%, Infrastructure 30%, Defense 25%, and Others 10%. What is the angle, in degrees, representing the Infrastructure sector? (Enter your numerical answer.)',
+    options: [],
+    answer: 108,
+    kind: 'nat',
+    marks: 1,
+    difficulty: 'easy',
+    type: 'pyq-style',
+    explanation: 'A pie chart\'s full circle of 360 degrees corresponds to 100% of the total, so each percentage point equals 360/100 = 3.6 degrees. The Infrastructure sector is 30% of the total, so its angle = 30 x 3.6 = 108 degrees. Fast route: memorize common angle-to-percent anchors (10% = 36 degrees, 20% = 72 degrees, 25% = 90 degrees, 30% = 108 degrees, 40% = 144 degrees, 50% = 180 degrees) and read the answer off directly for round percentages like 30%, instead of multiplying by 3.6 from scratch each time.'
+  },
+  {
+    id: 'apti-data-spatial-pyq2026a',
+    pyqYear: 2026,
+    q: 'The word "CODE" is viewed in a vertical mirror placed to its right. Ignoring the reversal of letter order, which individual letters within the word would appear unchanged in shape?',
+    options: ['Only O', 'O and D', 'C and O', 'All four letters'],
+    answer: 0,
+    marks: 1,
+    difficulty: 'medium',
+    type: 'pyq-style',
+    explanation: 'A vertical mirror flips each letter left-right, so only letters with a vertical line of symmetry (such as A, H, I, M, O, T, U, V, W, X, Y) look unchanged in shape. Checking each letter of "CODE" individually: C is symmetric about a horizontal axis but not a vertical one, so it changes in a vertical mirror; O is symmetric about both axes, so it remains unchanged; D has its flat edge on one side and curved edge on the other, so it is not vertically symmetric and changes shape; E has no vertical symmetry either and also changes. Only O remains visually unchanged as an individual letter shape. Fast route: check each letter of a word independently against the fixed list of vertically-symmetric letters, treating the "letter order reversal" (a separate, always-true effect of any mirror) as irrelevant to the question of which individual letter shapes stay visually the same.'
+  }
+);
