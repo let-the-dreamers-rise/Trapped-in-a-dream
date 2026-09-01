@@ -2916,3 +2916,148 @@ window.GATE_DATA.questions['os'].topics.find(function(t){return t.id==='os-deadl
   explanation: 'Needs (Max - Allocation) are: P0 needs 7-3=4, P1 needs 5-2=3, P2 needs 4-1=3, P3 needs 3-1=2. With only 1 instance available, NONE of the four processes\' needs (4, 3, 3, and 2) can be satisfied -- every one of them needs at least 2 more instances than are currently available. Since no process can acquire enough to finish and release its held resources, the Banker\'s safety algorithm cannot mark even a single process as completable, so no safe sequence exists and this state is genuinely UNSAFE. However, "unsafe" is a strictly weaker and more cautious condition than "deadlocked": a state being unsafe means the Banker\'s Algorithm cannot GUARANTEE all processes will finish under every possible future request pattern -- it is a conservative, worst-case declaration made in advance. It does NOT mean deadlock has already occurred right now, nor that deadlock is strictly inevitable; in practice, some process might request less than its stated maximum, or another resource-holder might release resources voluntarily before requesting more, allowing the system to muddle through successfully anyway. Genuine deadlock is a stronger, already-realized condition (an actual cycle of processes each permanently waiting on one another with zero possible progress), and every deadlocked state is unsafe, but not every unsafe state is (yet) deadlocked -- this distinction is one of the most frequently tested conceptual points in this topic.'
 }
 );
+
+window.GATE_DATA.questions['os'].topics.find(function(t){return t.id==='os-memory';}).questions.push(
+{
+  id: 'os-memory-p1',
+  pyqYear: 2015,
+  q: 'A system uses 32-bit virtual addresses with a page size of 8 KB. How many bits are needed for the PAGE NUMBER field of the virtual address? (Enter your numerical answer.)',
+  options: [],
+  answer: 19,
+  kind: 'nat',
+  marks: 1,
+  difficulty: 'easy',
+  type: 'pyq-style',
+  explanation: 'The virtual address splits into a page-number field and an offset field, and the offset field\'s width is determined entirely by the page size: since the page size is 8 KB = 2^13 bytes, exactly 13 bits are needed to address every byte within a single page. The remaining bits of the 32-bit address form the page number, which selects which page is being referenced. Since the total address width is 32 bits and the offset consumes 13 of them, the page number field takes the remaining 32 - 13 = 19 bits. This also implies the process\'s virtual address space contains up to 2^19 = 524,288 distinct pages, and a single-level page table for this process would need up to 2^19 entries.'
+},
+{
+  id: 'os-memory-p2',
+  pyqYear: 2016,
+  q: 'A system has a 22-bit physical address space and uses a frame (page) size of 4 KB. How many physical frames does the system have in total? (Enter your numerical answer.)',
+  options: [],
+  answer: 1024,
+  kind: 'nat',
+  marks: 1,
+  difficulty: 'easy',
+  type: 'pyq-style',
+  explanation: 'The physical address is split into a frame-number field and an offset field. Since the frame size is 4 KB = 2^12 bytes, the offset field needs 12 bits to address every byte within a frame. Since the total physical address width is 22 bits, the frame-number field takes the remaining 22 - 12 = 10 bits. The number of distinct frame numbers representable in 10 bits is 2^10 = 1024, and since every valid frame number must correspond to an actual physical frame, this is exactly the total number of physical frames available in the system. As a cross-check: total physical memory = 2^22 bytes = 4 MB, and dividing by the frame size gives 4 MB / 4 KB = 1024 frames, confirming the answer.'
+},
+{
+  id: 'os-memory-p3',
+  pyqYear: 2017,
+  q: 'A process has a 32-bit virtual address space with a page size of 4 KB (so the page number field is 20 bits). If each page table entry is 4 bytes, what is the TOTAL SIZE of this process\'s single-level page table?',
+  options: ['1 MB', '2 MB', '4 MB', '8 MB'],
+  answer: 2,
+  marks: 1,
+  difficulty: 'easy',
+  type: 'pyq-style',
+  explanation: 'A single-level page table needs exactly one entry per possible page number, so the number of entries equals 2^(page number bits) = 2^20 = 1,048,576 entries. Since each entry is 4 bytes, the total size of the page table is 2^20 entries x 4 bytes/entry = 2^20 x 2^2 bytes = 2^22 bytes = 4,194,304 bytes = 4 MB. This large size (4 MB just for one process\'s page table, when the process itself might use far less than its full 4 GB virtual address space) is precisely the motivation for multi-level and inverted page tables, which avoid allocating page table space for unused regions of the virtual address space.'
+},
+{
+  id: 'os-memory-p4',
+  pyqYear: 2018,
+  q: 'A process uses a page size of 1024 bytes (1 KB). Its page table maps page number 2 to physical frame number 6. What is the PHYSICAL ADDRESS corresponding to the virtual (logical) address 2560 (decimal)? (Enter your numerical answer.)',
+  options: [],
+  answer: 6656,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: 'To translate a logical address into (page number, offset), divide by the page size: page number = floor(2560 / 1024) = 2, and offset = 2560 mod 1024 = 2560 - 2*1024 = 2560 - 2048 = 512. Looking up page number 2 in the page table gives frame number 6. The physical address is then reconstructed as (frame number x page size) + offset = (6 x 1024) + 512 = 6144 + 512 = 6656. This two-step process -- split the logical address into page number and offset using the page size, replace the page number with its mapped frame number via the page table, then recombine with the SAME offset (since offsets within a page never change during translation) -- is the fundamental mechanism of paging-based address translation.'
+},
+{
+  id: 'os-memory-p5',
+  pyqYear: 2019,
+  q: 'A process requires 41 KB of memory, and the system uses a page size of 8 KB. How much INTERNAL FRAGMENTATION (in KB) results from allocating this process the number of whole pages it needs? (Enter your numerical answer.)',
+  options: [],
+  answer: 7,
+  kind: 'nat',
+  marks: 1,
+  difficulty: 'easy',
+  type: 'pyq-style',
+  explanation: 'Since memory can only be allocated to a process in whole-page units, the process needs ceil(41 KB / 8 KB) = ceil(5.125) = 6 pages, because 5 pages would provide only 40 KB, which is not enough to hold the full 41 KB. Allocating 6 pages gives the process 6 x 8 KB = 48 KB of actual physical memory, but the process only uses 41 KB of it. The unused space within the last allocated page -- memory that is reserved for the process but never used by it -- is called internal fragmentation, and it equals 48 KB - 41 KB = 7 KB here. Internal fragmentation is an inherent cost of fixed-size paging (it never occurs in pure segmentation, which instead suffers from external fragmentation), and on average, across many processes with essentially random final page usage, it amounts to roughly half the page size per process.'
+},
+{
+  id: 'os-memory-p6',
+  pyqYear: 2020,
+  q: 'A paging system uses a page size of 4 KB. Averaged across a very large number of processes with random memory requirement sizes, what is the expected (average) INTERNAL FRAGMENTATION per process, approximately?',
+  options: ['0 KB (paging causes no internal fragmentation on average)', 'Approximately 2 KB (about half the page size)', 'Exactly 4 KB (the full page size) for every process', 'It depends only on the total number of processes, not the page size'],
+  answer: 1,
+  marks: 1,
+  difficulty: 'easy',
+  type: 'pyq-style',
+  explanation: 'For a process whose true memory requirement is not an exact multiple of the page size, the operating system must still round up and allocate an integer number of pages, wasting the unused portion of the final, partially-used page as internal fragmentation. If a process\'s size modulo the page size is uniformly distributed between 0 and (page size - 1) across many processes -- which is a reasonable simplifying assumption for random workloads -- then the wasted space in the last page averages out to (page size - 1)/2, which for practical purposes is approximated as half the page size. With a 4 KB page size, this gives an average internal fragmentation of roughly 4 KB / 2 = 2 KB per process. This is the standard justification GATE uses for the trade-off in choosing page size: larger pages reduce page table size and overhead but increase average internal fragmentation, and vice versa for smaller pages.'
+},
+{
+  id: 'os-memory-p7',
+  pyqYear: 2021,
+  q: 'Each of 50 concurrently running processes has an identical single-level page table of size 4 MB (because each has a 32-bit virtual address space with a 4 KB page size, needing 2^20 entries of 4 bytes each). What is the TOTAL memory (in MB) consumed just by the page tables of all 50 processes combined? (Enter your numerical answer.)',
+  options: [],
+  answer: 200,
+  kind: 'nat',
+  marks: 1,
+  difficulty: 'easy',
+  type: 'pyq-style',
+  explanation: 'Since every one of the 50 processes maintains its own separate, independent page table of size 4 MB (page tables are per-process structures, as each process has a different virtual-to-physical mapping), the total memory consumed by all their page tables combined is simply 50 x 4 MB = 200 MB. This large, purely-overhead memory cost -- 200 MB spent on bookkeeping alone, without storing a single byte of actual process data -- is exactly why real operating systems use multi-level page tables or inverted page tables rather than giant flat single-level tables: a multi-level scheme allocates page-table space only for the portions of the virtual address space a process actually uses, which is typically a tiny fraction of the full 4 GB range that a flat 32-bit table must otherwise account for.'
+},
+{
+  id: 'os-memory-p8',
+  pyqYear: 2022,
+  q: 'A process uses a page size of 1 KB (1024 bytes). For the logical (virtual) address 5000 (decimal), what is the OFFSET within its page? (Enter your numerical answer.)',
+  options: [],
+  answer: 904,
+  kind: 'nat',
+  marks: 1,
+  difficulty: 'easy',
+  type: 'pyq-style',
+  explanation: 'To find the offset within a page for a given logical address, compute the address modulo the page size: offset = 5000 mod 1024. Dividing, 1024 x 4 = 4096, and 5000 - 4096 = 904, with 904 being less than 1024 (confirming 4 is the correct page number, since 1024 x 5 = 5120 would exceed 5000). So the page number is 4 (floor(5000/1024) = 4) and the offset is 904. The offset is the part of the address that is NEVER translated during paging -- it stays numerically identical in both the logical and the resulting physical address, since it just identifies a specific byte position within whichever page (or frame) is being referenced; only the page number changes into a (usually numerically unrelated) frame number.'
+},
+{
+  id: 'os-memory-p9',
+  pyqYear: 2023,
+  q: 'A system has 128 MB of physical memory and uses a frame size of 2 KB. What is the total width, in bits, of a PHYSICAL address in this system? (Enter your numerical answer.)',
+  options: [],
+  answer: 27,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: 'The offset field width is determined by the frame size: since the frame size is 2 KB = 2^11 bytes, 11 bits are needed for the offset. The frame-number field width is determined by the total number of physical frames: total physical memory / frame size = 128 MB / 2 KB = (2^27 bytes) / (2^11 bytes) = 2^16 frames, so 16 bits are needed to number every frame uniquely. The total physical address width is the sum of these two independent fields: 16 (frame number) + 11 (offset) = 27 bits. As a direct cross-check, 128 MB itself equals 2^27 bytes, and a byte-addressable memory of size 2^27 bytes requires exactly 27 address bits to reference every byte -- which matches, confirming the frame-number-plus-offset decomposition is consistent with the total memory size.'
+},
+{
+  id: 'os-memory-p10',
+  pyqYear: 2024,
+  q: 'A system has 2^15 physical frames. Each page table entry must store the frame number PLUS exactly 1 additional valid/invalid status bit (and no other fields). What is the MINIMUM size of a single page table entry, in BYTES (rounding up to the nearest whole byte, since entries must be byte-aligned)? (Enter your numerical answer.)',
+  options: [],
+  answer: 2,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: 'Storing a frame number that can range over 2^15 distinct values requires exactly 15 bits (since 15 bits can represent values 0 through 2^15 - 1). Adding 1 more bit for the valid/invalid status flag gives a minimum requirement of 15 + 1 = 16 bits per entry. Since page table entries must be stored at byte-aligned boundaries in memory (partial bytes cannot be individually addressed), 16 bits rounds up to exactly 16/8 = 2 bytes -- conveniently an exact whole number of bytes with no wasted padding in this case. In practice, real page table entries also carry additional bits (dirty bit, referenced/accessed bit, protection bits, cache-control bits), so this minimal 2-field version is a simplified textbook lower bound; a real x86-style entry is typically 4 or 8 bytes to accommodate these extra fields plus room for future physical memory growth.'
+},
+{
+  id: 'os-memory-p11',
+  pyqYear: 2025,
+  q: 'A process requires 1 MB of virtual memory, and the system uses a page size of 4 KB. How many page table entries are needed to map this process\'s entire address space (i.e., how many pages does the process consist of)? (Enter your numerical answer.)',
+  options: [],
+  answer: 256,
+  kind: 'nat',
+  marks: 1,
+  difficulty: 'easy',
+  type: 'pyq-style',
+  explanation: 'The number of pages (and hence the number of page table entries needed) is simply the process\'s address space size divided by the page size, since paging carves the address space into equal fixed-size chunks: 1 MB / 4 KB = (2^20 bytes) / (2^12 bytes) = 2^8 = 256 pages. Each of these 256 pages needs exactly one entry in the process\'s page table recording which physical frame it currently occupies (or that it is not currently resident, in a demand-paged system). If the 1 MB requirement had not divided evenly into the 4 KB page size, the count would need to be rounded UP to the next whole page (as in the internal-fragmentation question), but here 1 MB / 4 KB is already an exact integer, so no rounding is needed.'
+},
+{
+  id: 'os-memory-p12',
+  pyqYear: 2026,
+  q: 'A process\'s single-level page table has exactly 2^10 entries, and the system uses a page size of 4 KB. What is the MAXIMUM total virtual address space size this process can address, in MB? (Enter your numerical answer.)',
+  options: [],
+  answer: 4,
+  kind: 'nat',
+  marks: 1,
+  difficulty: 'easy',
+  type: 'pyq-style',
+  explanation: 'Since each page table entry corresponds to exactly one page of the virtual address space, having 2^10 = 1024 entries means the process can address at most 1024 distinct pages. The total addressable space is then the number of pages multiplied by the size of each page: 1024 pages x 4 KB/page = 4096 KB = 4 MB. This is exactly the reverse computation of finding "how many entries are needed for a given address space size" (as in a related question): here, the page table SIZE (number of entries) is given, and we compute the maximum address space it can support, which is a common way GATE frames this same underlying relationship -- (address space size) = (number of page table entries) x (page size) -- from the opposite direction.'
+}
+);
