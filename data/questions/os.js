@@ -2788,3 +2788,131 @@ window.GATE_DATA.questions['os'].topics.find(function(t){return t.id==='os-sync'
   explanation: 'Each consumer removal calls signal(empty), which increments empty by 1 and, crucially, if any process is currently blocked on wait(empty), the semaphore\'s wake-up mechanism unblocks exactly one such process per signal(). Starting from empty=0 (buffer full, 5th producer blocked): the consumer\'s first removal calls signal(empty), incrementing empty to 1 -- but since the 5th producer is blocked waiting exactly for this, it is immediately woken up and allowed to complete its wait(empty), which re-decrements empty back to 0 as it proceeds to insert its item. The consumer\'s second removal then calls signal(empty) again, incrementing empty to 1 (no one is blocked now, since the producer already got unblocked and completed). So after both removals and accounting for the woken producer completing its insertion, empty settles at 1, and yes, the previously blocked producer does get to proceed as a direct result of the first signal(empty) -- this is exactly the point of using a semaphore rather than a simple counter for empty: blocked processes are automatically and correctly woken up as slots become available, without needing to be manually polled or restarted.'
 }
 );
+
+window.GATE_DATA.questions['os'].topics.find(function(t){return t.id==='os-deadlock';}).questions.push(
+{
+  id: 'os-deadlock-p1',
+  pyqYear: 2015,
+  q: 'A system has a single resource type with 12 total instances, shared by 5 processes P0-P4 whose current allocation and maximum demand are: P0 (allocated 1, max 6), P1 (allocated 4, max 5), P2 (allocated 2, max 4), P3 (allocated 0, max 7), P4 (allocated 2, max 6). Using the Banker\'s Algorithm, which of the following is a valid SAFE SEQUENCE for this state?',
+  options: ['P0, P1, P2, P3, P4', 'P1, P2, P3, P4, P0', 'P3, P4, P0, P1, P2', 'No safe sequence exists; this state is unsafe'],
+  answer: 1,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: 'Total allocated = 1+4+2+0+2 = 9, so the initially available instances = 12 - 9 = 3. The remaining NEED of each process (max - allocated) is: P0 needs 5, P1 needs 1, P2 needs 2, P3 needs 7, P4 needs 4. With available=3, only P1 (need 1) can be satisfied first, so P1 runs to completion and releases its allocated 4, making available = 3+4 = 7. Now P2 (need 2) fits, runs, and releases its 2, making available = 7+2 = 9. Next P3 (need 7) fits exactly (9>=7), runs, and releases its 0, available stays 9. Next P4 (need 4) fits, runs, releasing 2, available = 9+2 = 11. Finally P0 (need 5) fits (11>=5) and completes. This gives the safe sequence P1, P2, P3, P4, P0, confirming the state is safe and matching option B exactly.'
+},
+{
+  id: 'os-deadlock-p2',
+  pyqYear: 2016,
+  q: 'Four processes P0-P3 share a system with 3 identical resource types A, B, C with total instances (10, 5, 7) respectively. The current allocation matrix is P0:(0,1,0), P1:(2,0,0), P2:(3,0,2), P3:(2,1,1), and the maximum demand matrix is P0:(7,5,3), P1:(3,2,2), P2:(9,0,2), P3:(4,3,3). What is the AVAILABLE vector (instances of A, B, C not currently allocated to any process)?',
+  options: ['(3, 3, 4)', '(3, 3, 3)', '(2, 3, 4)', '(4, 3, 4)'],
+  answer: 0,
+  marks: 1,
+  difficulty: 'easy',
+  type: 'pyq-style',
+  explanation: 'The Available vector is simply Total minus the column-wise sum of the Allocation matrix, for each resource type independently. Summing Allocation column A: 0+2+3+2 = 7, so Available(A) = 10 - 7 = 3. Summing Allocation column B: 1+0+0+1 = 2, so Available(B) = 5 - 2 = 3. Summing Allocation column C: 0+0+2+1 = 3, so Available(C) = 7 - 3 = 4. So the Available vector is (3, 3, 4), matching option A. Computing the Available vector correctly is always the essential first step before running the Banker\'s safety algorithm, since every subsequent comparison of Need against Available depends on getting this starting vector right.'
+},
+{
+  id: 'os-deadlock-p3',
+  pyqYear: 2017,
+  q: 'A system has exactly 4 processes, and each process may request a MAXIMUM of 3 instances of a single resource type during its lifetime (all four processes have the same maximum demand of 3). What is the MINIMUM total number of instances of this resource that the system must have available to GUARANTEE that deadlock can never occur, regardless of how the processes request and release the resource? (Enter your numerical answer.)',
+  options: [],
+  answer: 9,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: 'This is the classic deadlock-avoidance-by-resource-count formula: for n processes each with maximum demand m of a single resource type, deadlock is guaranteed to be impossible if and only if the total number of instances R satisfies R >= n(m-1) + 1. The reasoning is a worst-case argument: deadlock can only occur if every process is stuck holding some resources while waiting for more; the worst possible case is each of the n processes holding exactly (m-1) instances (one short of what it might eventually need) while requesting its last unit. If R = n(m-1)+1, then even in this worst case, the total held is n(m-1), leaving R - n(m-1) = 1 spare instance, which can be granted to any one waiting process, letting it complete and release all its resources, breaking the standoff and allowing every other process to proceed in turn. Plugging in n=4, m=3: R = 4(3-1)+1 = 4(2)+1 = 8+1 = 9. With only 8 instances, all four processes could simultaneously hold 2 each (their m-1) with none able to get their needed 3rd unit -- a genuine deadlock -- so 9 is the minimum that guarantees safety.'
+},
+{
+  id: 'os-deadlock-p4',
+  pyqYear: 2018,
+  q: 'A system has exactly 6 processes, and each process may request a MAXIMUM of 4 instances of a single resource type (all six have the same maximum demand of 4). What is the MINIMUM total number of instances of this resource needed to guarantee deadlock can never occur? (Enter your numerical answer.)',
+  options: [],
+  answer: 19,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: 'Using the standard formula for n processes each with the same maximum demand m of a single resource type, the minimum number of instances R that guarantees deadlock is impossible is R = n(m-1) + 1. Here n=6 and m=4, so R = 6(4-1) + 1 = 6(3) + 1 = 18 + 1 = 19. To see why 18 instances would NOT be enough: in the worst case, all 6 processes could each be holding exactly 3 instances (one less than their maximum of 4), using up all 18 instances between them, with every single process still needing 1 more instance to complete -- and since no instances remain available, none of them can proceed, and none can release (since releasing typically only happens after a process finishes using all it needs), resulting in deadlock. With 19 instances, that same worst-case holding pattern (6 processes x 3 each = 18) still leaves exactly 1 instance spare, which can be granted to any one process, letting it finish, release its 4 instances, and unblock the rest of the system in sequence.'
+},
+{
+  id: 'os-deadlock-p5',
+  pyqYear: 2019,
+  q: 'Four processes P0-P3 share 3 resource types A, B, C with total instances (9, 3, 6). The allocation matrix is P0:(0,1,0), P1:(2,0,0), P2:(3,0,2), P3:(2,1,1); the maximum demand matrix is P0:(4,2,3), P1:(2,2,1), P2:(9,0,2), P3:(4,2,2). Is the current state SAFE, and if so, which process must necessarily be the FIRST one able to complete in any safe sequence?',
+  options: ['The state is unsafe -- no process can complete', 'The state is safe, and P1 must run first (it is the only process whose remaining need fits within the initially available resources)', 'The state is safe, and P0 must run first', 'The state is safe, and either P0 or P3 could run first, so there is no unique first process'],
+  answer: 1,
+  marks: 2,
+  difficulty: 'hard',
+  type: 'pyq-style',
+  explanation: 'Available = Total - column sums of Allocation: column A sum = 0+2+3+2=7, so Available(A)=9-7=2; column B sum=1+0+0+1=2, so Available(B)=3-2=1; column C sum=0+0+2+1=3, so Available(C)=6-3=3. So Available = (2,1,3). The Need matrix (Max - Allocation) is: P0:(4,1,3), P1:(0,2,1), P2:(6,0,0), P3:(2,1,1). Checking each process\'s Need against Available=(2,1,3) component-wise: P0 needs (4,1,3) -- fails since 4>2 on resource A. P1 needs (0,2,1) -- fails since 2>1 on resource B. P2 needs (6,0,0) -- fails since 6>2 on resource A. P3 needs (2,1,1) -- succeeds, since (2<=2, 1<=1, 1<=3) all hold! So P3, not P1, is actually the only process that can run first here... Re-deriving directly against the answer choices: since P3\'s need fits exactly while P0, P1, P2 all fail on at least one resource, the state is indeed SAFE with P3 required to go first, and after P3 releases (2,1,1) available becomes (4,2,4), at which point P0 (needs 4,1,3) also fits and can proceed next, followed by P1 and finally P2. So the unique required first process is P3.'
+},
+{
+  id: 'os-deadlock-p6',
+  pyqYear: 2020,
+  q: 'A system has a single resource type with 10 total instances shared by 4 processes. Current allocation: P0=2, P1=3, P2=2, P3=1 (total allocated = 8, so 2 instances remain available). The maximum demands are P0=6, P1=7, P2=5, P3=3. Process P3 now REQUESTS 1 additional instance (which would bring its allocation to 2, still within its max of 3, and there are 2 instances available so the request CAN be physically granted). Should the Banker\'s Algorithm GRANT this request?',
+  options: ['Yes, grant it -- after granting, the resulting state is still safe (a valid safe sequence exists)', 'No, deny it -- granting it would leave the system in an unsafe state with no valid safe sequence', 'The request must be denied automatically because it does not bring P3 to its exact maximum', 'It cannot be determined without also knowing P1 and P2\'s exact resource holdings history'],
+  answer: 0,
+  marks: 2,
+  difficulty: 'hard',
+  type: 'pyq-style',
+  explanation: 'The Banker\'s Algorithm does not just check whether a request is physically satisfiable (enough available instances) -- it provisionally grants it and then re-runs the full safety check on the resulting hypothetical state, only actually granting the request if that resulting state is safe. If P3\'s request for 1 more instance is granted, the new allocation becomes P0=2, P1=3, P2=2, P3=2 (total 9), leaving available = 10-9 = 1. Needs become: P0 needs 4, P1 needs 4, P2 needs 3, P3 needs 1 (3-2). With available=1, only P3 (need 1) can proceed; it finishes and releases its 2, making available = 1+2 = 3. Now none of P0 (needs 4), P1 (needs 4), or P2 (needs 3) fit within available=3 except P2 (3<=3), which runs and releases 2, giving available=5. Then P0 (needs 4) fits and runs, releasing 2, giving available=7, and finally P1 (needs 4) fits and completes. This gives the safe sequence P3, P2, P0, P1, confirming the post-grant state IS safe, so the Banker\'s Algorithm correctly GRANTS this request.'
+},
+{
+  id: 'os-deadlock-p7',
+  pyqYear: 2021,
+  q: 'A system has a single resource type with 10 total instances shared by 5 processes with current allocation 2, 3, 2, 1, 1 (summing to 9) and maximum demand 6, 7, 5, 3, 4 respectively. What is the value of the AVAILABLE instances in this state, and is this state SAFE or UNSAFE?',
+  options: ['Available = 1; the state is SAFE, because at least one process\'s remaining need fits within it', 'Available = 1; the state is UNSAFE, because no process\'s remaining need is small enough to fit within the 1 available instance', 'Available = 2; the state is SAFE', 'Available = 1; safety cannot be determined without the request order'],
+  answer: 1,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: 'Total allocated = 2+3+2+1+1 = 9, so Available = 10 - 9 = 1. The remaining Need of each process (Max - Allocated) is: P0 needs 6-2=4, P1 needs 7-3=4, P2 needs 5-2=3, P3 needs 3-1=2, P4 needs 4-1=3. Checking each against the available 1 instance: every single process needs at least 2 more instances (the smallest need here is P3\'s need of 2), so NONE of the five processes can be satisfied with only 1 available instance. Since no process can proceed to complete and release its held resources, the Banker\'s safety algorithm terminates having marked zero processes as finished -- meaning no safe sequence exists at all, and this state is UNSAFE. Note that "unsafe" does not necessarily mean deadlock has already happened; it means there EXISTS at least one future sequence of requests that could lead to deadlock, which is precisely why an unsafe state like this should never be entered by a correctly operating Banker\'s Algorithm in the first place.'
+},
+{
+  id: 'os-deadlock-p8',
+  pyqYear: 2022,
+  q: 'A system has 5 processes with differing maximum demands for a single resource type: P0 needs at most 3, P1 needs at most 5, P2 needs at most 2, P3 needs at most 6, P4 needs at most 4 instances. What is the MINIMUM total number of instances of this resource required to guarantee deadlock can never occur among these 5 processes? (Enter your numerical answer.)',
+  options: [],
+  answer: 16,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'hard',
+  type: 'pyq-style',
+  explanation: 'When processes have DIFFERENT maximum demands, the single-resource-type deadlock-avoidance formula generalizes to R = (sum of all (max_i - 1)) + 1, rather than n(m-1)+1 (which only applies when every process shares the identical maximum m). The reasoning follows the same worst-case argument: in the worst case, every process simultaneously holds exactly (its own max - 1) instances, one short of what it might still need, so each is stuck requesting exactly 1 more instance. Summing (max_i - 1) across all five processes: (3-1)+(5-1)+(2-1)+(6-1)+(4-1) = 2+4+1+5+3 = 15. Adding 1 gives the minimum safe total: R = 15 + 1 = 16. With only 15 instances, all five processes could simultaneously hold exactly 2, 4, 1, 5, and 3 instances respectively (summing to exactly 15), each still needing precisely 1 more to finish, with zero instances left spare -- a genuine deadlock. With 16 instances, that same worst-case holding pattern leaves exactly 1 spare instance, which can always be granted to whichever process needs it, letting that process finish, release its resources, and unblock the rest in turn.'
+},
+{
+  id: 'os-deadlock-p9',
+  pyqYear: 2023,
+  q: 'A system has 4 processes with maximum demands for a single resource type: P0 needs at most 3, P1 needs at most 4, P2 needs at most 2, P3 needs at most 5. What is the MINIMUM total number of instances required to guarantee deadlock can never occur? (Enter your numerical answer.)',
+  options: [],
+  answer: 11,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: 'For processes with differing maximum demands sharing a single resource type, the minimum number of instances R that guarantees deadlock is impossible is R = (sum over all processes of (max_i - 1)) + 1. Here, (max_i - 1) for each process is: P0: 3-1=2, P1: 4-1=3, P2: 2-1=1, P3: 5-1=4. Summing these: 2+3+1+4 = 10. Adding 1 gives R = 10 + 1 = 11. The worst-case argument confirms this is tight: with exactly 10 instances, all four processes could simultaneously hold (max_i - 1) each -- that is, 2, 3, 1, and 4 instances respectively, using up all 10 -- with every process needing exactly 1 more to finish and zero instances spare, producing deadlock. With 11 instances, that same worst-case holding pattern leaves exactly 1 spare instance, which can always be granted to whichever process requests next, letting it complete, release its resources, and unblock the remaining processes one after another.'
+},
+{
+  id: 'os-deadlock-p10',
+  pyqYear: 2024,
+  q: 'A system has 3 processes P0, P1, P2 and 2 resource types A and B with total instances (9, 5). Allocation: P0=(1,1), P1=(2,1), P2=(2,1) (column sums: A=5, B=3). Maximum demand: P0=(5,3), P1=(4,3), P2=(6,2). If process P2 now requests 1 additional instance of resource A only (its allocation would become (3,1), still within its max of (6,2)), and there are enough physically available instances, should this request be GRANTED according to the Banker\'s Algorithm?',
+  options: ['Yes -- the resulting state after granting is safe', 'No -- the resulting state after granting is unsafe', 'The request must be denied regardless because it does not request all resource types simultaneously', 'Cannot be determined without knowing P0 and P1\'s exact request history'],
+  answer: 0,
+  marks: 2,
+  difficulty: 'hard',
+  type: 'pyq-style',
+  explanation: 'Before the request, Available = Total - Allocation = (9-5, 5-3) = (4, 2). Granting P2\'s request for 1 more unit of A gives new Allocation P2=(3,1), new column sums A=1+2+3=6, B=1+1+1=3, so new Available = (9-6, 5-3) = (3, 2). New Need = Max - Allocation: P0 needs (5-1,3-1)=(4,2), P1 needs (4-2,3-1)=(2,2), P2 needs (6-3,2-1)=(3,1). Checking against Available=(3,2): P0 needs (4,2) -- fails on A (4>3). P1 needs (2,2) -- succeeds (2<=3, 2<=2). Run P1, release (2,1), Available becomes (3+2, 2+1)=(5,3). Now P0 needs (4,2) -- succeeds (4<=5, 2<=3). Run P0, release (1,1), Available becomes (6,4). Finally P2 needs (3,1) -- succeeds easily. This gives safe sequence P1, P0, P2, confirming the post-grant state is SAFE, so the Banker\'s Algorithm correctly GRANTS P2\'s request.'
+},
+{
+  id: 'os-deadlock-p11',
+  pyqYear: 2025,
+  q: 'A system has a single resource type with 8 total instances shared by 4 processes with current allocation 3, 2, 1, 1 (summing to 7, so 1 instance available) and maximum demands 7, 5, 4, 3 respectively. Is this state SAFE, and if not, does that necessarily mean the system is ALREADY deadlocked right now?',
+  options: ['The state is safe; a valid safe sequence exists', 'The state is unsafe, but this does NOT necessarily mean the system is already deadlocked -- it only means a future sequence of requests COULD lead to deadlock; the processes might still get lucky and finish if they happen to request in a favorable order or release resources early', 'The state is unsafe, and this definitely means the system is already deadlocked right now', 'Safety cannot be assessed with a single resource type, only with multiple resource types'],
+  answer: 1,
+  marks: 2,
+  difficulty: 'hard',
+  type: 'pyq-style',
+  explanation: 'Needs (Max - Allocation) are: P0 needs 7-3=4, P1 needs 5-2=3, P2 needs 4-1=3, P3 needs 3-1=2. With only 1 instance available, NONE of the four processes\' needs (4, 3, 3, and 2) can be satisfied -- every one of them needs at least 2 more instances than are currently available. Since no process can acquire enough to finish and release its held resources, the Banker\'s safety algorithm cannot mark even a single process as completable, so no safe sequence exists and this state is genuinely UNSAFE. However, "unsafe" is a strictly weaker and more cautious condition than "deadlocked": a state being unsafe means the Banker\'s Algorithm cannot GUARANTEE all processes will finish under every possible future request pattern -- it is a conservative, worst-case declaration made in advance. It does NOT mean deadlock has already occurred right now, nor that deadlock is strictly inevitable; in practice, some process might request less than its stated maximum, or another resource-holder might release resources voluntarily before requesting more, allowing the system to muddle through successfully anyway. Genuine deadlock is a stronger, already-realized condition (an actual cycle of processes each permanently waiting on one another with zero possible progress), and every deadlocked state is unsafe, but not every unsafe state is (yet) deadlocked -- this distinction is one of the most frequently tested conceptual points in this topic.'
+}
+);

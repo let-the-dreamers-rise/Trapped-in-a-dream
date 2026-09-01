@@ -2738,3 +2738,160 @@ window.GATE_DATA.questions['cn'].topics.find(function(t){return t.id==='cn-appli
     explanation: "DNS typically uses UDP for its usual short query/response exchanges (falling back to TCP only for larger responses like zone transfers or responses exceeding UDP's size limits), since the simplicity and low overhead of UDP suits DNS's typically small, single-round-trip request/response pattern well. DHCP also uses UDP (ports 67/68), since a client obtaining an IP address has no existing IP/TCP connection to use yet, and broadcast-based UDP messaging fits the discovery process needed. SNMP similarly uses UDP for its typically small, periodic management queries and traps, prioritizing low overhead over guaranteed delivery. HTTP, by contrast, is built on TCP (both HTTP/1.1 and HTTP/2 use TCP; only the newer HTTP/3 uses UDP-based QUIC), since reliable, ordered, in-sequence delivery of potentially large web content is essential to HTTP's design, making it the one protocol in this list that is NOT UDP-based."
   }
 );
+
+window.GATE_DATA.questions['cn'].topics.find(function(t){return t.id==='cn-basics';}).questions.push(
+  {
+    id: "cn-basics-p1",
+    pyqYear: 2015,
+    q: "A noiseless channel has a bandwidth of 4 kHz. Using a signal with 8 distinct levels, what is the maximum achievable bit rate according to the Nyquist formula?",
+    options: ["8 kbps", "12 kbps", "16 kbps", "24 kbps"],
+    answer: 3,
+    marks: 1,
+    difficulty: "easy",
+    type: "pyq-style",
+    explanation: "The Nyquist formula for a noiseless channel gives the maximum bit rate as C = 2 x B x log2(L), where B is the bandwidth and L is the number of discrete signal levels used. Here B = 4000 Hz and L = 8, so log2(8) = 3. Substituting: C = 2 x 4000 x 3 = 24,000 bits per second, i.e. 24 kbps. This formula assumes a completely noiseless channel, where the only fundamental limit on data rate is the sampling requirement (twice the bandwidth) combined with how many distinct amplitude/phase levels each sample can distinguish between — more levels per symbol packs more bits per sample, at the cost of requiring the receiver to reliably distinguish finer differences, which is precisely why real noisy channels (governed instead by the Shannon formula) cannot push L arbitrarily high without errors."
+  },
+  {
+    id: "cn-basics-p2",
+    pyqYear: 2016,
+    q: "A noisy telephone-line channel has a bandwidth of 3 kHz and a signal-to-noise ratio of 30 dB. Using Shannon's capacity formula, what is the approximate maximum channel capacity?",
+    options: ["Approximately 9 kbps", "Approximately 20 kbps", "Approximately 30 kbps", "Approximately 60 kbps"],
+    answer: 2,
+    marks: 2,
+    difficulty: "medium",
+    type: "pyq-style",
+    explanation: "First convert the SNR from decibels to a plain ratio: SNR(dB) = 10 x log10(SNR), so 30 = 10 x log10(SNR) gives SNR = 10^3 = 1000. Shannon's capacity formula is C = B x log2(1 + SNR). Substituting B = 3000 Hz and SNR = 1000: C = 3000 x log2(1001). Since log2(1001) is very close to log2(1024) = 10, but slightly less (approximately 9.97), C is approximately 3000 x 9.97 = 29,900 bps, i.e. approximately 30 kbps. This is the classic textbook result explaining why a standard analog telephone line, despite its modest 3 kHz bandwidth, was historically capable of supporting dial-up modem speeds in the vicinity of 30 kbps under good line conditions — any additional bandwidth-vs-noise tradeoff beyond this is fundamentally impossible, per Shannon's theorem, regardless of how clever the modulation scheme is."
+  },
+  {
+    id: "cn-basics-p3",
+    pyqYear: 2017,
+    q: "A 1 Mbps link connects two hosts 2000 km apart, with a signal propagation speed of 2 x 10^8 m/s. A single packet of 8000 bits is sent from one host to the other. What is the total one-way delay (transmission delay plus propagation delay) experienced by this packet, ignoring processing and queuing delay?",
+    options: ["8 ms", "10 ms", "18 ms", "26 ms"],
+    answer: 2,
+    marks: 2,
+    difficulty: "medium",
+    type: "pyq-style",
+    explanation: "Transmission delay is the time to push all the packet's bits onto the link: 8000 bits / 1,000,000 bps = 0.008 s = 8 ms. Propagation delay is the time for a signal to physically travel the distance: 2,000,000 m / (2 x 10^8 m/s) = 0.010 s = 10 ms. These two delays are independent and additive for a single point-to-point hop (transmission delay depends only on packet size and bandwidth; propagation delay depends only on distance and signal speed), so the total one-way delay is 8 ms + 10 ms = 18 ms. Confusing these two delays, or assuming one dominates without computing both, is exactly the kind of error GATE numerical questions on this topic are designed to catch."
+  },
+  {
+    id: "cn-basics-p4",
+    pyqYear: 2018,
+    q: "A message is sent as a single 5000-bit packet from a source to a destination across a path with 2 intermediate routers (so 3 links total), each link having a bandwidth of 10 Mbps. Assuming pure store-and-forward switching (each router fully receives the entire packet before starting to forward it) and negligible propagation and processing delay, what is the total end-to-end delay?",
+    options: ["0.5 ms", "1.0 ms", "1.5 ms", "2.0 ms"],
+    answer: 2,
+    marks: 2,
+    difficulty: "medium",
+    type: "pyq-style",
+    explanation: "In store-and-forward switching, each link along the path independently needs its own full transmission time for the packet, since a router must completely receive the packet before it can begin re-transmitting it onward. The transmission time per link is 5000 bits / 10,000,000 bps = 0.0005 s = 0.5 ms. With 3 links total (source-to-router1, router1-to-router2, router2-to-destination) and negligible propagation/processing delay, the total end-to-end delay is simply the sum across all 3 links: 3 x 0.5 ms = 1.5 ms. This linear scaling of store-and-forward delay with the number of hops is why reducing hop count (or fragmenting large messages into smaller packets that can pipeline across hops) both directly reduce end-to-end latency in packet-switched networks."
+  },
+  {
+    id: "cn-basics-p5",
+    pyqYear: 2019,
+    q: "An analog voice signal has a maximum frequency component of 4 kHz. It is sampled at the Nyquist rate and each sample is quantized into 256 distinct levels (using Pulse Code Modulation). What is the resulting digital bit rate?",
+    options: ["32 kbps", "64 kbps", "128 kbps", "256 kbps"],
+    answer: 1,
+    marks: 2,
+    difficulty: "medium",
+    type: "pyq-style",
+    explanation: "The Nyquist sampling theorem requires sampling at a rate at least twice the highest frequency component present, to allow perfect reconstruction of the original analog signal. With a maximum frequency of 4 kHz, the Nyquist sampling rate is 2 x 4000 = 8000 samples per second. Each sample is then quantized into one of 256 levels; since 256 = 2^8, representing each sample requires exactly 8 bits. The resulting digital bit rate is therefore 8000 samples/second x 8 bits/sample = 64,000 bits per second, i.e. 64 kbps. This is precisely the standard PCM (Pulse Code Modulation) bit rate used for a single digitized voice channel in traditional telephone systems (the well-known '64 kbps DS0 channel'), making this one of the most frequently recurring numeric patterns in GATE's physical-layer questions."
+  },
+  {
+    id: "cn-basics-p6",
+    pyqYear: 2020,
+    q: "A modem uses QPSK (Quadrature Phase Shift Keying) modulation, which encodes 2 bits per transmitted symbol, at a symbol (baud) rate of 1200 symbols per second. What is the resulting bit rate?",
+    options: ["600 bps", "1200 bps", "2400 bps", "4800 bps"],
+    answer: 2,
+    marks: 1,
+    difficulty: "easy",
+    type: "pyq-style",
+    explanation: "Bit rate and baud (symbol) rate are related by Bit rate = Baud rate x (bits encoded per symbol). QPSK uses 4 distinct phase states to represent 2^2 = 4 possible symbol values, so each transmitted symbol carries log2(4) = 2 bits of information. With a baud rate of 1200 symbols/second, the resulting bit rate is 1200 x 2 = 2400 bits per second. This bit-rate-vs-baud-rate distinction (baud measures how many distinct signal changes occur per second on the physical medium, while bit rate measures actual information throughput) is a classic GATE trap when higher-order modulation schemes like QPSK, 8-PSK, or various QAM constellations pack multiple bits into each transmitted symbol, making bit rate a multiple, not necessarily equal to, the baud rate."
+  },
+  {
+    id: "cn-basics-p7",
+    pyqYear: 2021,
+    q: "Manchester encoding represents each data bit using a transition in the middle of the bit interval (low-to-high for one binary value, high-to-low for the other), making it self-clocking but requiring more raw signal bandwidth than the underlying data rate. If a link uses Manchester encoding to send data at 10 Mbps, what minimum signal transition (baud) rate is required on the physical medium?",
+    options: ["5 million transitions/second", "10 million transitions/second", "20 million transitions/second", "40 million transitions/second"],
+    answer: 2,
+    marks: 1,
+    difficulty: "easy",
+    type: "concept",
+    explanation: "Manchester encoding guarantees exactly one signal transition in the middle of every bit period (used to encode the bit value itself, and incidentally providing built-in clock recovery for the receiver), which means the underlying physical signal must be able to change twice as fast as the actual data bit rate. For a 10 Mbps data rate, this means the physical layer must support 2 x 10,000,000 = 20,000,000 transitions per second, i.e. 20 million baud. This 2x bandwidth overhead is the well-known cost Manchester encoding pays in exchange for its self-clocking property (no separate clock signal or complex clock-recovery circuitry needed) and its resistance to baseline wander from long runs of identical bits — exactly the tradeoff that led classic 10 Mbps Ethernet (10BASE-T) to require 20 MHz-class analog bandwidth on its cabling."
+  },
+  {
+    id: "cn-basics-p8",
+    pyqYear: 2022,
+    q: "Which of the following correctly matches a networking device to the OSI layer at which it primarily operates, and briefly why?",
+    options: ["A hub operates at the network layer because it forwards IP packets", "A switch (bridge) operates at the data link layer because it forwards frames using MAC address tables it learns by observing traffic", "A router operates at the physical layer because it only regenerates electrical signals", "A repeater operates at the transport layer because it manages end-to-end segment delivery"],
+    answer: 1,
+    marks: 1,
+    difficulty: "easy",
+    type: "concept",
+    explanation: "A switch (also called a learning bridge) inspects the data-link-layer header of each incoming frame to read its destination MAC address, and forwards that frame only out the specific port associated with that MAC address in a table the switch builds by observing source addresses on incoming traffic — this MAC-address-based forwarding decision is exactly what defines data-link-layer (Layer 2) operation. A hub, by contrast, is a purely physical-layer device that simply repeats/broadcasts incoming electrical signals out every other port with no awareness of addresses or frames at all. A router is a network-layer (Layer 3) device that forwards based on IP addresses using routing tables. A repeater is also a physical-layer device, regenerating and re-timing a weakened signal with no knowledge of frames, packets, or segments — describing any of these three the way the incorrect options do reverses their actual layer assignments."
+  },
+  {
+    id: "cn-basics-p9",
+    pyqYear: 2023,
+    q: "A network path has a bandwidth of 2 Mbps and a round-trip time (RTT) of 40 ms. What is the bandwidth-delay product of this path, in bits, and what does it physically represent?",
+    options: ["40,000 bits; the amount of data the receiver can buffer", "80,000 bits; the maximum amount of data that can be 'in flight' (transmitted but not yet acknowledged) on the path at any instant", "2,000,000 bits; the total data the link can carry in one second", "800 bits; the size of a single optimal packet for this path"],
+    answer: 1,
+    marks: 2,
+    difficulty: "medium",
+    type: "pyq-style",
+    explanation: "The bandwidth-delay product is computed as Bandwidth x RTT (using round-trip time, since it represents the 'pipe' the sender must fill before receiving any acknowledgement back): 2,000,000 bps x 0.040 s = 80,000 bits. This value represents the maximum volume of data that can be transmitted onto the link and still be somewhere 'in flight' — either still travelling toward the receiver, or having arrived but with its acknowledgement not yet back at the sender — at any single instant in time, essentially the physical capacity of the link-plus-propagation-delay 'pipe' itself. A sender wishing to keep this pipe continuously full (achieving maximum possible throughput) must therefore have at least this many bits' worth of unacknowledged data outstanding at once, which is exactly the reasoning behind sizing sliding-window and TCP window parameters to match or exceed the bandwidth-delay product."
+  },
+  {
+    id: "cn-basics-p10",
+    pyqYear: 2024,
+    q: "An 80-megabit (8 x 10^7 bit) file is transferred over a link with bandwidth 1 Mbps and one-way propagation delay 50 ms. Comparing the effect of (a) doubling the bandwidth to 2 Mbps versus (b) halving the propagation delay to 25 ms, which change reduces the total one-way transfer time more, and roughly by how much?",
+    options: ["Halving propagation delay helps far more, cutting total time roughly in half", "Doubling bandwidth helps far more, cutting total time roughly in half, while halving propagation delay barely changes it", "Both changes produce an identical, negligible reduction in total time", "Neither change has any effect since total time is fixed by file size alone"],
+    answer: 1,
+    marks: 2,
+    difficulty: "medium",
+    type: "concept",
+    explanation: "Total one-way transfer time is transmission delay plus propagation delay. Originally: transmission delay = 8x10^7 bits / 1,000,000 bps = 80 s, and propagation delay = 0.05 s, giving a total of 80.05 s — transmission delay overwhelmingly dominates since the file is large relative to the link's bandwidth. Doubling bandwidth to 2 Mbps halves the transmission delay to 40 s, giving a new total of 40.05 s — very close to half the original time. Halving the propagation delay to 25 ms instead only reduces the total to 80.025 s, a negligible 0.025 s improvement. This numerically illustrates a general principle: for large transfers where transmission delay dominates, increasing bandwidth yields far greater practical benefit than reducing propagation delay, which mainly matters for small messages or interactive/real-time traffic where transmission delay is already tiny."
+  },
+  {
+    id: "cn-basics-p11",
+    pyqYear: 2025,
+    q: "Four data sources, each producing data at exactly 2 kbps, are combined using synchronous Time Division Multiplexing (TDM) onto a single shared link. Each TDM frame carries exactly 1 bit from each of the 4 sources, plus 1 additional framing/synchronization bit, giving 5 bits per frame. What is the resulting total bit rate required on the shared multiplexed link?",
+    options: ["8 kbps", "9 kbps", "10 kbps", "12 kbps"],
+    answer: 2,
+    marks: 2,
+    difficulty: "medium",
+    type: "pyq-style",
+    explanation: "Since each TDM frame carries exactly 1 bit from each source, and each source must supply 2000 bits every second to sustain its own 2 kbps data rate, the multiplexer must produce exactly 2000 frames per second (one frame per bit-slot needed by each source, all synchronized together). Each frame is 5 bits wide (4 data bits, one per source, plus 1 framing bit), so the total bit rate on the shared link is 2000 frames/second x 5 bits/frame = 10,000 bits per second, i.e. 10 kbps. Note this exceeds the simple sum of the four sources' raw data rates (4 x 2 kbps = 8 kbps) by exactly the overhead contributed by the framing bits (2000 bps here) — a recurring theme in multiplexing questions, where synchronization/framing overhead must always be added on top of the aggregated payload rate."
+  },
+  {
+    id: "cn-basics-p12",
+    pyqYear: 2026,
+    q: "A 1,000,000-bit (1 Mb) message is sent along a path with 4 links (3 intermediate routers), each link having bandwidth 1 Mbps and one-way propagation delay 5 ms. Compare: (a) circuit switching, where a 10 ms setup delay reserves a dedicated end-to-end circuit and the message then flows continuously (transmission delay counted once, all 4 links' propagation delays summed once, experienced as one continuous stream), versus (b) pure packet (store-and-forward) switching sending the ENTIRE message as one single packet, where each of the 4 links independently needs its own full transmission time before forwarding onward. Which technique finishes faster here, and what is the approximate total delay for each?",
+    options: ["Circuit switching finishes faster: about 1030 ms, versus about 4020 ms for store-and-forward of the single large packet", "Store-and-forward finishes faster: about 1030 ms, versus about 4020 ms for circuit switching", "Both techniques take exactly the same total time, about 2000 ms each", "Circuit switching cannot be compared numerically to packet switching under any circumstances"],
+    answer: 0,
+    marks: 2,
+    difficulty: "hard",
+    type: "pyq-style",
+    explanation: "Circuit switching: total = setup delay + one transmission of the whole message + total end-to-end propagation (summed across all 4 links but experienced once, since the circuit is a continuous dedicated path) = 10 ms + (1,000,000 bits / 1,000,000 bps = 1000 ms) + (4 x 5 ms = 20 ms) = 1030 ms. Store-and-forward packet switching, when the ENTIRE message is sent as a single unfragmented packet, forces EVERY one of the 4 links to independently pay the full transmission time (1000 ms each) before that link can forward the (fully-received) packet onward, plus its own propagation delay: total = 4 x (1000 ms + 5 ms) = 4020 ms. So circuit switching is dramatically faster here, precisely because store-and-forward without any fragmentation into smaller packets forfeits all pipelining benefit — this specific 'one giant packet' worst case is exactly why real packet-switched networks always fragment large messages into many smaller packets, which can then be pipelined across links instead of being fully re-transmitted at every hop."
+  },
+  {
+    id: "cn-basics-p13",
+    pyqYear: 2016,
+    q: "A channel with bandwidth 1 MHz needs to support a required data rate of at least 8 Mbps using Shannon's capacity formula (C = B x log2(1 + SNR)). What is the minimum signal-to-noise ratio (as a plain ratio, not dB) required to achieve this?",
+    options: ["7", "15", "255", "256"],
+    answer: 2,
+    marks: 2,
+    difficulty: "medium",
+    type: "pyq-style",
+    explanation: "Setting Shannon's formula equal to the required capacity: 8,000,000 = 1,000,000 x log2(1 + SNR). Dividing both sides by 1,000,000 gives log2(1 + SNR) = 8. Solving for SNR: 1 + SNR = 2^8 = 256, so SNR = 256 - 1 = 255. This means the channel needs a signal-to-noise ratio of at least 255 (equivalent to roughly 24 dB, since 10 x log10(255) is approximately 24.07) to theoretically sustain 8 Mbps over a 1 MHz channel — this is the maximum possible rate under Shannon's limit; no error-correction coding or modulation scheme cleverness can exceed it at a lower SNR, only approach it. This 'invert the Shannon formula to find required SNR' variant is a common alternate framing GATE uses instead of directly computing capacity from a given SNR."
+  },
+  {
+    id: "cn-basics-p14",
+    pyqYear: 2019,
+    q: "Match the correct Protocol Data Unit (PDU) name used at each layer of the TCP/IP stack: at the transport layer, network layer, data link layer, and physical layer respectively.",
+    options: ["Segment (or datagram for UDP), Packet (or datagram), Frame, Bit(s)", "Packet, Segment, Bit(s), Frame", "Frame, Packet, Segment, Bit(s)", "Bit(s), Frame, Packet, Segment"],
+    answer: 0,
+    marks: 1,
+    difficulty: "easy",
+    type: "concept",
+    explanation: "Each layer of the networking stack wraps the layer above's data with its own header (and sometimes trailer), and conventionally gives the resulting unit a distinct name. At the transport layer, TCP's PDU is called a segment (UDP's equivalent is often just called a datagram or message). At the network layer, the PDU is called a packet (or, especially for IP specifically, a datagram). At the data link layer, the PDU is called a frame, since it adds framing (delimiting) information plus a MAC header/trailer for hop-to-hop delivery. At the physical layer, data is transmitted as a raw stream of bits (or symbols), with no further structured PDU name. Getting this naming sequence backwards or scrambled, as the incorrect options do, is a common careless mistake on layer-terminology questions."
+  }
+);

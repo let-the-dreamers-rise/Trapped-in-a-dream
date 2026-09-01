@@ -3220,3 +3220,222 @@ window.GATE_DATA.questions['dbms'].topics.find(function(t){return t.id==='dbms-i
   explanation: 'Option A is true: static hashing fixes the number of buckets in advance, so as the file grows beyond that planned capacity, buckets increasingly overflow, chains of overflow blocks lengthen, and average search performance degrades toward a linear scan of the chain - this is the fundamental weakness that motivated dynamic hashing schemes. Option B is true: extendable hashing uses an expandable directory of pointers to buckets, and when a bucket overflows, only that ONE bucket needs to split (and the directory may need to double in size), without ever touching or rehashing records in unrelated buckets, unlike static hashing\'s full-file reorganization. Option C is false: hashing scrambles key values into essentially unrelated bucket addresses by design, specifically to spread keys evenly - this destroys any notion of key ORDERING, so hashing is fundamentally unsuited for range queries; you would need to probe every bucket to find keys in a range, whereas B+-trees preserve sorted order at the leaf level specifically to make range scans efficient. Option D is true: uniform key distribution across buckets is the single most important property of a good hash function for indexing purposes, since it directly minimizes the frequency and length of overflow chains, keeping average-case lookup close to O(1).'
 }
 );
+
+window.GATE_DATA.questions['dbms'].topics.find(function(t){return t.id==='dbms-transactions';}).questions.push(
+{
+  id: 'dbms-transactions-p1',
+  pyqYear: 2015,
+  q: 'Schedule S1 = r1(A); w2(A); r2(B); w1(B), where ri/wi denote read/write by transaction Ti. Is S1 conflict serializable?',
+  options: [
+    'Yes, equivalent to the serial order T1, T2',
+    'Yes, equivalent to the serial order T2, T1',
+    'No, the precedence graph has a cycle T1 -> T2 -> T1',
+    'Cannot be determined without knowing the actual data values read and written'
+  ],
+  answer: 2,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: 'Build the precedence graph by finding every pair of conflicting operations (same data item, different transactions, at least one is a write) and drawing an edge from the earlier transaction to the later one. r1(A) precedes w2(A) on item A, both from different transactions with a write involved, giving edge T1 -> T2. Later, r2(B) precedes w1(B) on item B, giving edge T2 -> T1. These two edges together form a cycle: T1 -> T2 -> T1. By the fundamental theorem of conflict serializability, a schedule is conflict serializable if and only if its precedence graph is acyclic; since this graph has a 2-node cycle, S1 is NOT conflict serializable - there is no serial order of T1 and T2 that could produce equivalent results, because the schedule effectively requires T1 to happen "before" T2 (due to the A conflict) while simultaneously requiring T2 to happen "before" T1 (due to the B conflict), a direct contradiction.'
+},
+{
+  id: 'dbms-transactions-p2',
+  pyqYear: 2016,
+  q: 'Schedule S4 = w1(X); w2(X); w2(Y); w1(Y). Which pair of conflicting operations, if reordered, would make this schedule conflict serializable (equivalent to a serial order)?',
+  options: [
+    'Swapping w2(X) and w2(Y) has no effect; the schedule is already serializable as written',
+    'The write-write conflicts on X and Y create a cycle T1 -> T2 -> T1; moving w1(Y) to occur before w2(Y) (making the schedule w1(X); w2(X); w1(Y); w2(Y)) removes the cycle',
+    'This schedule can never be made serializable regardless of reordering',
+    'The schedule is already conflict serializable as given, equivalent to the serial order T1, T2'
+  ],
+  answer: 1,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: 'Precedence graph for S4: w1(X) precedes w2(X) (both writes to X, different transactions) giving edge T1 -> T2; w2(Y) precedes w1(Y) (both writes to Y) giving edge T2 -> T1. These two edges form a cycle T1 -> T2 -> T1, so S4 as given is NOT conflict serializable - this is the classic "lost update"-style non-serializable schedule pattern with two writers touching two shared items in opposite orders. If instead the schedule had been w1(X); w2(X); w1(Y); w2(Y) (i.e. T1 finishes writing Y before T2 writes Y, matching the same order T1-then-T2 already established by the X conflict), then BOTH conflicts would agree on the order T1 before T2, the precedence graph would have only the single edge T1 -> T2 with no cycle, and the schedule would be conflict serializable, equivalent to the serial execution T1 followed by T2.'
+},
+{
+  id: 'dbms-transactions-p3',
+  pyqYear: 2017,
+  q: 'Schedule S5 = r1(X); w1(X); r2(X); w2(X); r1(Y); w1(Y); r2(Y); w2(Y). Which serial schedule is S5 conflict-equivalent to?',
+  options: [
+    'T1 followed by T2',
+    'T2 followed by T1',
+    'S5 is not conflict serializable',
+    'Both T1-then-T2 and T2-then-T1 are equally valid equivalents'
+  ],
+  answer: 0,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: 'Build the precedence graph: on item X, w1(X) precedes r2(X) and w2(X) (T1\'s write comes before T2\'s read and write of the same item), giving edge T1 -> T2. On item Y, symmetrically, w1(Y) precedes r2(Y) and w2(Y), again giving edge T1 -> T2 (no new or conflicting direction). No edge in the reverse direction T2 -> T1 exists anywhere, since T1 always accesses both X and Y strictly before T2 does. The precedence graph therefore has only the single edge T1 -> T2, which is trivially acyclic, so S5 IS conflict serializable. A topological sort of this graph gives exactly one valid order: T1 before T2. Executing T1 completely followed by T2 completely would produce results equivalent to this interleaved schedule, confirming S5 is conflict-equivalent to the serial schedule T1, T2 (and NOT to T2, T1, since that would violate the established T1 -> T2 ordering requirement).'
+},
+{
+  id: 'dbms-transactions-p4',
+  pyqYear: 2018,
+  q: 'Schedule S3 involves three transactions on item A: r1(A); r2(A); w1(A); r3(A); w2(A); w3(A). How many edges does the resulting precedence graph have, and is S3 conflict serializable? (Enter the number of edges as your numerical answer; the schedule is NOT conflict serializable.)',
+  options: [],
+  answer: 5,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'hard',
+  type: 'pyq-style',
+  explanation: 'List every conflicting pair (same item A, different transactions, at least one write) in the order they occur and record a directed edge from earlier to later: r1(A) before w2(A) gives T1->T2; r1(A) before w3(A) gives T1->T3; r2(A) before w1(A) gives T2->T1; r2(A) before w3(A) gives T2->T3; r3(A) before w1(A)? No, w1(A) occurs BEFORE r3(A) in the schedule, so instead w1(A) before r3(A) gives an edge T1->T3, already counted... carefully redo: r3(A) is preceded by w1(A) (conflict, edge T1->T3, already listed) and preceded by nothing else new; w2(A) is preceded by w3(A)? No, w2(A) occurs before w3(A), giving edge T2->T3 (already counted). Final distinct edge set: T1->T2, T1->T3, T2->T1, T2->T3, T3->T2 - exactly 5 edges. Since both T1->T2 and T2->T1 appear, there is an immediate 2-cycle between T1 and T2 alone, so the graph is cyclic and S3 is definitively NOT conflict serializable, regardless of the other edges.'
+},
+{
+  id: 'dbms-transactions-p5',
+  pyqYear: 2019,
+  q: 'Schedule S = r1(A); w1(A); r2(A); w2(A); commit(T2); commit(T1), where T2 reads the value of A written by T1 (which has not yet committed) and T2 commits BEFORE T1. Is this schedule recoverable?',
+  options: [
+    'Yes, because T1 eventually commits after T2',
+    'No, because T2 committed before T1 (the transaction it read uncommitted data from), so if T1 later aborted, T2\'s commit could not be undone',
+    'Yes, recoverability only concerns write-write conflicts, not read-write',
+    'Cannot be determined without knowing whether T1 or T2 actually aborts'
+  ],
+  answer: 1,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: 'A schedule is recoverable if, whenever a transaction Tj reads data written by another transaction Ti, Ti\'s commit must occur before Tj\'s commit. Here, T2 reads A after T1 has written it but before T1 has committed (a "dirty read" of uncommitted data), and then T2 COMMITS before T1 commits. This violates the recoverability condition directly: if T1 were to subsequently abort (rather than commit) for any reason, its write to A would need to be undone, but T2 has already committed based on that now-invalid value of A - and a committed transaction\'s effects cannot be undone (commits are permanent by the durability property of ACID). This creates an unrecoverable inconsistency. The correct answer is therefore "no" and does not depend on whether T1 ACTUALLY aborts later - a schedule is classified as (non-)recoverable based on whether such a violation is STRUCTURALLY POSSIBLE given the commit ordering, regardless of the specific outcome.'
+},
+{
+  id: 'dbms-transactions-p6',
+  pyqYear: 2020,
+  q: 'Schedule S = r1(A); w1(A); r2(A); w2(A); commit(T1); commit(T2), where T2 reads A (written by uncommitted T1) before T1 commits, but T1 does commit before T2 commits. Which classification best fits S?',
+  options: [
+    'Recoverable, and also cascadeless, since T1 committed before T2 read A',
+    'Recoverable, but NOT cascadeless, because T2 read A while T1 was still uncommitted, even though T1 committed before T2 did',
+    'Neither recoverable nor cascadeless',
+    'Cascadeless, but not recoverable'
+  ],
+  answer: 1,
+  marks: 2,
+  difficulty: 'hard',
+  type: 'pyq-style',
+  explanation: 'Recoverability only requires that the WRITER commits before the READER commits: here T1 commits before T2 commits, so if T1 were to abort, it could only do so before its own commit point, which is before T2 has committed - meaning T2 never gets to commit based on data from a transaction that ultimately aborts. This satisfies recoverability. However, cascadelessness is a STRICTER condition: it requires that a transaction may only read a value AFTER the writer has COMMITTED (not merely before the reader itself commits). Here, T2\'s read of A happens immediately after T1\'s write, while T1 is still active and uncommitted - T1 does not commit until later in the schedule. If T1 had aborted at that point (before its actual commit), T2 would already have read a dirty, soon-to-be-invalid value, potentially requiring T2 itself to be cascaded-aborted. So S is recoverable (correct commit ORDER) but violates cascadelessness (wrong READ timing relative to commit) - illustrating that recoverable is a strictly weaker guarantee than cascadeless.'
+},
+{
+  id: 'dbms-transactions-p7',
+  pyqYear: 2021,
+  q: 'Schedule S = w1(A); w2(A); commit(T1); commit(T2), where T2 overwrites A (written by uncommitted T1) before T1 commits, but T1 commits before T2 commits, and neither transaction ever reads A. Which classification best fits S?',
+  options: [
+    'Cascadeless, but NOT strict, because T2 wrote over T1\'s uncommitted value of A before T1 committed',
+    'Strict, and therefore also cascadeless and recoverable',
+    'Not recoverable, since T2 overwrote uncommitted data',
+    'Not cascadeless, since cascadelessness also restricts write-write conflicts'
+  ],
+  answer: 0,
+  marks: 2,
+  difficulty: 'hard',
+  type: 'pyq-style',
+  explanation: 'Cascadelessness is defined purely in terms of READS: a transaction must not read a value written by another transaction until that writer has committed. Since neither T1 nor T2 ever performs a READ of A here (only writes), there is no reads-from relationship at all, so the cascadelessness condition is vacuously satisfied - there is nothing to violate. It is also trivially recoverable for the same reason (recoverability, like cascadelessness, is defined via reads-from dependencies, which are absent here) - and separately, T1 commits before T2 commits, so even if a reads-from relationship existed via some other item, the commit order is fine. However, STRICTNESS is a stronger property that also restricts WRITE-WRITE conflicts: it requires that no transaction may write OR read an item that was written by another uncommitted transaction. Here, T2 writes A while T1 (which also wrote A) is still uncommitted, directly violating strictness. This demonstrates that a schedule can be cascadeless yet fail to be strict when only write-write conflicts (with no reads) are involved.'
+},
+{
+  id: 'dbms-transactions-p8',
+  pyqYear: 2022,
+  q: 'Schedule S = r1(A); w1(A); commit(T1); r2(A); w2(A); commit(T2). Which is the STRONGEST classification that correctly applies to S among recoverable, cascadeless, and strict?',
+  options: [
+    'Recoverable only',
+    'Cascadeless only (implying recoverable, but not strict)',
+    'Strict (which automatically implies both cascadeless and recoverable)',
+    'None of these classifications apply since only one item is involved'
+  ],
+  answer: 2,
+  marks: 1,
+  difficulty: 'easy',
+  type: 'pyq-style',
+  explanation: 'In this schedule, T1 completely finishes and COMMITS before T2 ever touches item A at all - T2\'s read and write of A both occur strictly after commit(T1). This means every access (read or write) that T2 makes to data previously written by T1 happens only after T1\'s commit, which is exactly the definition of a STRICT schedule: no transaction may read or write an item until any previous transaction that wrote that item has committed (or aborted). Since strictness is the strongest of the three properties in the hierarchy strict implies cascadeless implies recoverable, establishing strictness automatically certifies the schedule as cascadeless and recoverable as well, without needing to check those conditions separately. This schedule represents the safest and simplest pattern in practice: transactions accessing a shared item execute in a completely non-overlapping, commit-then-proceed fashion, which is exactly what strict two-phase locking (holding all locks until commit/abort) naturally enforces in real database systems.'
+},
+{
+  id: 'dbms-transactions-p9',
+  pyqYear: 2023,
+  q: 'Which of the following statements about the Two-Phase Locking (2PL) protocol are TRUE? (Select ALL that apply)',
+  options: [
+    'In the growing phase, a transaction may only acquire locks, never release any; in the shrinking phase, it may only release locks, never acquire any',
+    'Basic 2PL guarantees conflict serializability of all schedules it permits, but does not by itself prevent deadlock',
+    'The "lock point" of a transaction is the moment it holds its maximum number of locks, marking the boundary between the growing and shrinking phases',
+    'Basic (non-strict) 2PL automatically guarantees that all its schedules are cascadeless'
+  ],
+  answers: [0, 1, 2],
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: 'Option A is true and is the literal definition of the two phases that give the protocol its name: once a transaction releases even a single lock, it has entered the shrinking phase and is forbidden from acquiring any new locks afterward, strictly separating the two phases. Option B is true: 2PL is proven to guarantee that every schedule it allows is conflict serializable, but the protocol says nothing about preventing transactions from waiting on each other in a circular fashion, so basic 2PL is fully compatible with deadlock occurring, requiring a separate deadlock detection or prevention scheme. Option C is true: the lock point is exactly the transaction\'s peak lock-holding moment, after which it begins releasing locks and can never acquire more, cleanly demarcating growing from shrinking. Option D is false: BASIC 2PL only controls the ORDER of lock acquisition and release relative to OTHER locks of the SAME transaction, but it permits releasing a lock (e.g. after finishing with an item) well before the transaction commits, allowing another transaction to read that possibly-uncommitted data - it is specifically STRICT 2PL (holding all locks until commit/abort) that additionally guarantees cascadelessness, not basic 2PL.'
+},
+{
+  id: 'dbms-transactions-p10',
+  pyqYear: 2024,
+  q: 'Which of the following statements about deadlock under Two-Phase Locking (2PL) are TRUE? (Select ALL that apply)',
+  options: [
+    'A deadlock can be represented as a cycle in a wait-for graph, where an edge Ti -> Tj means Ti is waiting for a lock currently held by Tj',
+    'Deadlock detection periodically checks the wait-for graph for cycles and, upon finding one, aborts (as a victim) one or more transactions in the cycle to break it',
+    'Deadlock prevention schemes such as wait-die and wound-wait use transaction timestamps to decide whether a requesting transaction should wait or be aborted, avoiding cycles from ever forming',
+    'Under Strict 2PL specifically (as opposed to basic 2PL), deadlock becomes structurally impossible because all locks are held until commit'
+  ],
+  answers: [0, 1, 2],
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: 'Option A is true and is the standard model for reasoning about deadlocks: an edge Ti -> Tj in the wait-for graph precisely captures "Ti is blocked, waiting to acquire a lock that Tj currently holds," and a cycle in this graph means a set of transactions are all mutually waiting on each other with no way to proceed. Option B is true: deadlock DETECTION is a reactive approach - the system periodically (or on each new wait) scans for cycles in the wait-for graph, and when one is found, it selects a victim transaction from the cycle to abort and roll back, releasing its locks and breaking the cycle so the remaining transactions can proceed. Option C is true: wait-die and wound-wait are classic timestamp-based deadlock PREVENTION schemes - they compare the requesting and holding transactions\' timestamps at every lock request and either force the requester to wait or force an abort, specifically engineered so that a cyclic wait can never be established in the first place. Option D is false: Strict 2PL only changes WHEN locks are released (at commit/abort instead of potentially earlier), which affects cascading aborts and recoverability, but transactions under Strict 2PL can still block each other while waiting for locks during their growing phase, so circular waiting - and hence deadlock - remains entirely possible; strict 2PL guarantees serializability and strictness, not deadlock-freedom.'
+},
+{
+  id: 'dbms-transactions-p11',
+  pyqYear: 2025,
+  q: 'Under the basic Timestamp Ordering (TO) protocol, transaction Ti (with timestamp TS(Ti)) attempts to WRITE data item Q. Let R-TS(Q) and W-TS(Q) denote the largest timestamps of any transaction that has successfully read and written Q so far, respectively. Under which condition(s) must Ti\'s write be REJECTED and Ti rolled back? (Select ALL that apply)',
+  options: [
+    'TS(Ti) < R-TS(Q), because a transaction with a larger timestamp already read Q, expecting to see writes only from transactions ordered before it',
+    'TS(Ti) < W-TS(Q), because a transaction with a larger timestamp already wrote a version of Q that logically should come after Ti\'s write',
+    'TS(Ti) equals both R-TS(Q) and W-TS(Q) simultaneously, which is always disallowed by definition',
+    'TS(Ti) > R-TS(Q) and TS(Ti) > W-TS(Q), since this is the standard successful case, not a rejection case'
+  ],
+  answers: [0, 1],
+  marks: 2,
+  difficulty: 'hard',
+  type: 'pyq-style',
+  explanation: 'The basic TO write rule rejects Ti\'s write to Q under two distinct conditions. First, if TS(Ti) < R-TS(Q): some transaction with a LARGER timestamp than Ti has already read Q, meaning that reader was serialized to logically occur AFTER Ti in timestamp order but has already seen a version of Q that did not yet include Ti\'s (now too-late) write - allowing the write would silently make that earlier read incorrect/stale, so Ti must be rolled back and restarted with a new, larger timestamp. Second, if TS(Ti) < W-TS(Q): a transaction with a larger timestamp has already written a NEWER version of Q; if Ti\'s (older, out-of-order) write were applied now, it would overwrite that newer value with stale data - this specific scenario is exactly what the Thomas Write Rule optimizes by simply IGNORING (not rejecting) such an obsolete write when no one has read the affected value in between, but under the plain basic TO protocol without that optimization, this write is also rejected and Ti is rolled back. Option D describes the accept case, and option C describes an impossible/non-issue condition, not a rejection rule.'
+},
+{
+  id: 'dbms-transactions-p12',
+  pyqYear: 2026,
+  q: 'Which of the following statements about the Thomas Write Rule (a modification of basic Timestamp Ordering) are TRUE? (Select ALL that apply)',
+  options: [
+    'When TS(Ti) < W-TS(Q), instead of rejecting Ti\'s write and rolling it back, the Thomas Write Rule simply IGNORES (skips) that write and lets Ti continue',
+    'The Thomas Write Rule can accept some schedules that are view-serializable but not conflict-serializable, by ignoring writes that would otherwise be flagged as out-of-order',
+    'The Thomas Write Rule changes the rejection condition for the case TS(Ti) < R-TS(Q) as well, allowing that write to also be ignored rather than rolled back',
+    'The Thomas Write Rule can only be applied to read operations, not write operations'
+  ],
+  answers: [0, 1],
+  marks: 2,
+  difficulty: 'hard',
+  type: 'pyq-style',
+  explanation: 'Option A is true and is precisely the optimization the Thomas Write Rule introduces: when Ti attempts to write Q but a later-timestamped transaction has already written a newer version (TS(Ti) < W-TS(Q)), instead of the costly rollback-and-restart that basic TO would enforce, the rule recognizes that Ti\'s write would immediately be "dead" (overwritten and never observed by anyone, since no read has occurred with a value between these timestamps), so it simply skips/ignores that particular write operation and lets Ti proceed with the rest of its operations. Option B is true: because this ignored write means the final database state and effective operation order deviate from what a strict conflict-based analysis would allow, the Thomas Write Rule permits certain schedules to be accepted that are view-serializable (produce results equivalent to some serial execution) even though they are not conflict-serializable by the standard precedence-graph test - it is a rare, textbook-cited protocol that achieves view-serializability directly rather than only conflict-serializability. Option C is false: the READ rejection condition TS(Ti) < R-TS(Q) is unaffected by the Thomas Write Rule, which only modifies the WRITE-WRITE rejection case; reads that are too old relative to a later reader are still rejected and Ti still rolled back as in basic TO. Option D is false: the rule is specifically and only about handling WRITE operations that would otherwise be rejected; it says nothing about modifying read handling.'
+},
+{
+  id: 'dbms-transactions-p13',
+  pyqYear: 2018,
+  q: 'Schedule S6 has three transactions each accessing entirely disjoint sets of data items: r1(A); r2(B); w1(A); r3(C); w2(B); w3(C). How many edges does the precedence graph of S6 contain, and is S6 conflict serializable? (Enter the number of edges as your numerical answer; note the schedule IS conflict serializable regardless of the count.)',
+  options: [],
+  answer: 0,
+  kind: 'nat',
+  marks: 1,
+  difficulty: 'easy',
+  type: 'pyq-style',
+  explanation: 'A precedence graph edge is only drawn between two operations from DIFFERENT transactions that access the SAME data item with at least one of them being a write. In S6, T1 only ever touches item A, T2 only ever touches item B, and T3 only ever touches item C - there is no data item accessed by more than one transaction anywhere in the schedule, so there are zero conflicting operation pairs and consequently zero edges in the precedence graph. A graph with no edges at all is trivially acyclic (there is nothing that could form a cycle), so S6 is conflict serializable - in fact it is equivalent to EVERY possible serial ordering of T1, T2 and T3, since none of them has any conflict-based ordering constraint relative to the others. This illustrates that when transactions operate on entirely disjoint data, interleaving them in any pattern can never introduce a serializability violation.'
+},
+{
+  id: 'dbms-transactions-p14',
+  pyqYear: 2020,
+  q: 'Schedule S7 = r1(A); w2(A); r3(A); w1(B); r2(B); w3(B). Compute the precedence graph and determine: is S7 conflict serializable, and if so, what is the unique equivalent serial order?',
+  options: [
+    'Conflict serializable, equivalent to T1, T2, T3',
+    'Conflict serializable, equivalent to T3, T2, T1',
+    'Not conflict serializable; the graph contains a 3-cycle',
+    'Conflict serializable, but with two equally valid equivalent serial orders'
+  ],
+  answer: 0,
+  marks: 2,
+  difficulty: 'hard',
+  type: 'pyq-style',
+  explanation: 'On item A: r1(A) precedes w2(A), giving edge T1->T2 (a read-write conflict); w2(A) precedes r3(A), giving edge T2->T3. On item B: w1(B) precedes r2(B), giving edge T1->T2 (already present, reinforcing it); r2(B) precedes w3(B), giving edge T2->T3 (already present, reinforcing it). So the complete edge set is exactly {T1->T2, T2->T3}, plus the transitively implied T1->T3 relationship is consistent with (though not separately drawn as) these two edges - there is no edge in the reverse direction anywhere. This graph is a simple directed chain T1 -> T2 -> T3 with no cycle, so S7 IS conflict serializable. Performing a topological sort of this chain yields exactly one valid linear order: T1, then T2, then T3 - and since the chain has no branching or alternative paths, this is the UNIQUE equivalent serial order (unlike graphs with independent, unconnected components, which could admit multiple valid topological orderings).'
+}
+);

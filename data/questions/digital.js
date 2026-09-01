@@ -2298,3 +2298,170 @@ window.GATE_DATA.questions['digital'].topics.find(function(t){return t.id==='dig
   explanation: "ABC = 101 is minterm 5, so decoder output D5 is the single line that goes high; every other decoder output stays low. D5 appears in the Z2 group (D0, D3, D5, D6), so Z2 = 1, while D5 does not appear in the Z1 group (D1, D2, D4, D7), so Z1 = 0. Stepping back, this decoder wiring is actually a parity generator: Z1's group {1,2,4,7} are exactly the minterms with an odd number of 1-bits (001, 010, 100, 111), so Z1 computes the odd-parity (XOR) of A, B, C, while Z2's group {0,3,5,6} are exactly the minterms with an even number of 1-bits, so Z2 computes the even-parity (XNOR) of A, B, C. Since 101 has two 1-bits (even), Z2 = 1 and Z1 = 0 is exactly what parity theory predicts, confirming the decoder trace. This is a common GATE construction: any decoder plus a partition of its outputs into two OR gates realizes some function and its complement simultaneously."
 }
 );
+
+window.GATE_DATA.questions['digital'].topics.find(function(t){return t.id==='digital-sequential';}).questions.push(
+{
+  id: 'digital-sequential-p1',
+  pyqYear: 2015,
+  q: "A JK flip-flop currently holds Q = 1 and must transition to Q = 0 on the next clock edge. The required (J, K) input combination is:",
+  options: ["J = 1, K = 0", "J = 0, K = 1", "J = X, K = 1", "J = 1, K = X"],
+  answer: 2,
+  marks: 1,
+  difficulty: 'easy',
+  type: 'pyq-style',
+  explanation: "Recall the JK characteristic equation Q+ = JQ' + K'Q. With current Q = 1, this simplifies to Q+ = J·0 + K'·1 = K'. We need Q+ = 0, so K' = 0, meaning K = 1 is required, and J can be anything since the J·Q' term is already forced to 0 by Q' = 0 regardless of J's value — hence J = X (don't care). This is the standard JK excitation table entry for a 1→0 transition. Checking directly: with K = 1, J = 0, the flip-flop resets to 0 as required; with K = 1, J = 1, it is the toggle condition but since Q is already 1, toggling also produces 0 — both choices of J are consistent, confirming J is indeed a don't-care. Option (a) J=1,K=0 keeps Q+=JQ'+K'Q=0+1=1, wrongly holding Q at 1. Option (b) J=0,K=1 is one valid specific case but wrongly excludes the equally valid J=1 case, so it understates the don't-care. Option (d) fixes K at don't-care instead of J, which is backwards — K must specifically be 1."
+},
+{
+  id: 'digital-sequential-p2',
+  pyqYear: 2016,
+  q: "A T flip-flop is to be realized using a JK flip-flop (with T as the only external input, connected identically to both J and K inputs). Verify that this conversion is correct by checking the resulting characteristic equation. Which expression correctly describes the resulting flip-flop's behavior?",
+  options: ["Q+ = T", "Q+ = T ⊕ Q (toggles when T = 1)", "Q+ = T'Q", "Q+ = TQ (holds only when T=1 and Q=1)"],
+  answer: 1,
+  marks: 1,
+  difficulty: 'easy',
+  type: 'pyq-style',
+  explanation: "Substituting J = K = T into the JK characteristic equation Q+ = JQ' + K'Q gives Q+ = TQ' + T'Q, which is precisely the XOR expression T ⊕ Q. This confirms the conversion is correct: when T = 0, Q+ = 0·Q' + 1·Q = Q (hold, since both terms reduce so that only Q survives), and when T = 1, Q+ = Q' (toggle). This is exactly the defining behavior of a T flip-flop, so tying J and K together and driving them both with T is a valid and standard way to build a T flip-flop from a JK flip-flop — no other logic is needed. Option (a) Q+ = T would describe a D flip-flop's behavior, not a toggle. Option (c) and (d) do not match the derived expression T⊕Q at all — checking option (d) at T=1,Q=0: TQ = 0, but the true Q+ should be 1 (toggle from 0), so option (d) is wrong."
+},
+{
+  id: 'digital-sequential-p3',
+  pyqYear: 2017,
+  q: "A counter built from 3 T flip-flops counts up in binary (000, 001, 010, ...) but has asynchronous reset logic that forces the counter back to 000 the instant it reaches state 110 (decimal 6). Starting from 000, the modulus of this counter (the number of distinct stable states in its repeating cycle) is:",
+  options: ["4", "5", "6", "7"],
+  answer: 2,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: "The counter counts normally through 000, 001, 010, 011, 100, 101 (decimal 0 through 5) — six stable states — and the instant it would advance to 110 (decimal 6), the reset logic detects that state and asynchronously forces it back to 000 before 110 can be observed as a stable output; 110 exists only as a transient glitch, not a state the counter settles into. So the counter cycles through exactly 6 stable states (0 through 5) before repeating, giving modulus 6, even though 3 flip-flops could in principle support up to 2^3 = 8 states. This is the standard technique for building a mod-N counter for any N that is not a power of 2: use enough flip-flops to cover at least N states (here ceil(log2 6) = 3), let it count normally, and add reset/preset logic that intercepts the counter at the unwanted state N and forces it back to 0. Option (d) 7 would be the modulus if the reset only triggered at 111 instead of 110. Options (a) and (b) undercount the number of states actually visited before the reset fires."
+},
+{
+  id: 'digital-sequential-p4',
+  pyqYear: 2018,
+  q: "A 4-bit ripple (asynchronous) counter uses flip-flops each with propagation delay 25 ns, and its outputs are not fed into any decoder. The maximum clock frequency at which this counter can operate reliably is:",
+  options: ["40 MHz", "25 MHz", "10 MHz", "4 MHz"],
+  answer: 2,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: "In a ripple counter, each flip-flop is clocked by the output of the previous stage, so a change at the input clock must propagate through all 4 stages before the counter's output is valid — the worst case is when every stage must toggle (such as the transition from 0111 to 1000), and the total settling time is the sum of all 4 individual propagation delays: 4 × 25 ns = 100 ns. The clock period must be at least this long to guarantee the ripple has fully settled before the next clock edge arrives, so the minimum period is 100 ns, giving a maximum frequency of 1/100 ns = 10 MHz. This linear growth of delay with the number of stages (n × tpd) is the fundamental weakness of ripple counters compared to synchronous counters, whose maximum frequency does not depend on the number of stages at all. Option (a) 40 MHz would result from mistakenly using only 1 stage's delay (1/25ns = 40MHz). Option (b) 25 MHz halves the correct delay sum by mistake. Option (d) 4 MHz would result from an arithmetic slip treating the total delay as 250 ns instead of 100 ns."
+},
+{
+  id: 'digital-sequential-p5',
+  pyqYear: 2019,
+  q: "A synchronous counter's flip-flops have clock-to-Q delay tcq = 5 ns, and the combinational next-state logic has worst-case delay tcomb = 10 ns; each flip-flop's setup time is tsu = 5 ns. The maximum operating frequency of this counter, regardless of how many flip-flop stages it has, is:",
+  options: ["100 MHz", "66.7 MHz", "50 MHz", "20 MHz"],
+  answer: 2,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: "In a synchronous counter, every flip-flop is clocked simultaneously, and the timing constraint is a single register-to-register path: the clock period must be at least tcq + tcomb + tsu, because a flip-flop's output must propagate through the combinational next-state logic and arrive at the next flip-flop's D (or J/K) input with enough margin (setup time) before the next active clock edge. Here that sum is 5 + 10 + 5 = 20 ns, giving a minimum period of 20 ns and a maximum frequency of 1/20 ns = 50 MHz. Crucially, this bound does not depend on the number of flip-flop stages in the counter — whether it has 4 bits or 16 bits, the same 20 ns period suffices, because all flip-flops update in one clock edge based on logic computed from the previous state, unlike a ripple counter where delays accumulate stage by stage. Option (a) 100 MHz would result from omitting tsu from the sum. Option (b) 66.7 MHz corresponds to a 15 ns period, an arithmetic slip. Option (d) 20 MHz corresponds to a 50 ns period, roughly 2.5× too large."
+},
+{
+  id: 'digital-sequential-p6',
+  pyqYear: 2020,
+  q: "A Johnson (twisted-ring) counter is built using 4 D flip-flops, with the complement of the last stage's output fed back to the first stage's input. Starting from state 0000, the number of distinct states visited before the sequence repeats is:",
+  options: ["4", "6", "8", "16"],
+  answer: 2,
+  marks: 1,
+  difficulty: 'easy',
+  type: 'pyq-style',
+  explanation: "Simulating the shift: starting at 0000, each clock shifts all bits over by one position and inserts the complement of the last (rightmost) bit at the front. The sequence is 0000 → 1000 → 1100 → 1110 → 1111 → 0111 → 0011 → 0001 → back to 0000, visiting 8 distinct states before repeating. This matches the general rule for a Johnson counter built from n flip-flops: it always cycles through exactly 2n states, in contrast to a plain ring counter with n flip-flops, which cycles through only n states (one bit set at a time, circulating). The Johnson counter trades a slightly more complex feedback (complement instead of direct feedback) for double the state count from the same number of flip-flops, and its states can all be decoded using only 2-input gates (since consecutive states differ by exactly one bit, much like Gray code), which is a major advantage over binary counters of the same modulus. Option (a) 4 would be the modulus of a plain ring counter with 4 stages, not a Johnson counter. Option (d) 16 would be the full 2^4 state space of 4 unconstrained flip-flops, which the twisted-ring feedback never realizes."
+},
+{
+  id: 'digital-sequential-p7',
+  pyqYear: 2021,
+  q: "A 5-stage ring counter (5 D flip-flops in a circular shift register, direct — not complemented — feedback) starts in state Q4Q3Q2Q1Q0 = 10000. After 3 clock pulses (shifting right, with the last bit wrapping to the front), the state is:",
+  options: ["01000", "00100", "00010", "00001"],
+  answer: 2,
+  marks: 1,
+  difficulty: 'easy',
+  type: 'pyq-style',
+  explanation: "A ring counter simply circulates its single active bit one position per clock pulse, with no inversion. Starting at 10000: after clock 1, the single 1 moves one position to give 01000; after clock 2, it moves again to give 00100; after clock 3, it moves once more to give 00010. Each of the 5 states in the cycle has exactly one flip-flop output high, so a ring counter is inherently self-decoding — no extra gates are needed to identify which state the counter is in, since each state corresponds one-to-one with a distinct flip-flop being high. This comes at the cost of needing n flip-flops for only n states (much less efficient than an n-flip-flop binary counter's 2^n states, or even a Johnson counter's 2n states from n flip-flops), which is why ring counters are used mainly when self-decoding matters more than flip-flop economy, such as in simple sequencers and traffic-light-style controllers. Option (a) 01000 is the state after only 1 clock, not 3. Option (d) 00001 would be the state after 4 clocks."
+},
+{
+  id: 'digital-sequential-p8',
+  pyqYear: 2022,
+  q: "A 4-bit serial-in serial-out (SISO) shift register, shifting right and starting with contents Q3Q2Q1Q0 = 0000, has the serial bit stream 1, 0, 1, 1 applied to its serial input (Q3), one bit per clock, in that order. After the 4th clock pulse, the register contents Q3Q2Q1Q0 are:",
+  options: ["1011", "1101", "0111", "1110"],
+  answer: 1,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: "On each clock, the register shifts right (Q2 → Q1, Q1 → Q0, Q0's old value is lost out the far end) and the new serial bit enters at Q3. Tracing all four clocks: after clock 1 (bit 1 enters), Q3Q2Q1Q0 = 1000. After clock 2 (bit 0 enters), the previous 1 shifts right and the new 0 enters at Q3: Q3Q2Q1Q0 = 0100. After clock 3 (bit 1 enters): Q3Q2Q1Q0 = 1010. After clock 4 (bit 1 enters): Q3Q2Q1Q0 = 1101. So the final contents are 1101 — reading right to left, Q0 holds the first bit that entered (1), Q1 holds the second (0), Q2 holds the third (1), and Q3 holds the most recently entered fourth bit (1), i.e. Q0Q1Q2Q3 = 1011 which is the input sequence read left to right, and Q3Q2Q1Q0 (the conventional MSB-first reading) reverses that to 1101. Option (a) 1011 is exactly this same content but read in the opposite (Q0Q1Q2Q3) bit order — a classic labeling trap. Options (c) and (d) result from shifting left instead of right, or misordering which bit entered first."
+},
+{
+  id: 'digital-sequential-p9',
+  pyqYear: 2023,
+  q: "A D flip-flop is to be realized using a JK flip-flop plus external combinational logic driving its J and K inputs from the D input. The correct logic is:",
+  options: ["J = D, K = D'", "J = D, K = D", "J = D', K = D", "J = 1, K = D"],
+  answer: 0,
+  marks: 1,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: "Substitute J = D and K = D' into the JK characteristic equation Q+ = JQ' + K'Q: this gives Q+ = D·Q' + (D')'·Q = DQ' + DQ = D(Q' + Q) = D, since Q' + Q = 1 for any Q. The next state equals D regardless of the current state Q, which is exactly the defining behavior of a D flip-flop — it simply copies its input to the output on every clock edge. Checking directly with the JK excitation table also confirms this: for a 0→0 or 1→1 transition (D holds its value, no change), we need J=0,K=X for 0→0 and J=X,K=0 for 1→1 — setting J=D=0,K=D'=1 satisfies the first (K=1 is a valid don't-care choice), and J=D=1,K=D'=0 satisfies the second. For a 0→1 transition, D=1 requires J=1,K=0 (a firm set), matching J=D=1,K=D'=0. Option (b) J=K=D would instead build a T flip-flop when D is renamed T (toggle behavior), not a D flip-flop. Options (c) and (d) do not reduce to Q+=D under substitution."
+},
+{
+  id: 'digital-sequential-p10',
+  pyqYear: 2024,
+  q: "A mod-5 counter is built with 3 JK flip-flops Q2Q1Q0, counting 000, 001, 010, 011, 100, then back to 000. For the transition of the most significant flip-flop Q2 from state 4 (100) to state 0 (000) — i.e. Q2 goes from 1 to 0 — the required (J2, K2) inputs are:",
+  options: ["J2 = 1, K2 = 0", "J2 = 0, K2 = 1", "J2 = X, K2 = 1", "J2 = 1, K2 = X"],
+  answer: 2,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: "This is the same 1→0 excitation rule applied to the specific flip-flop Q2 in this counter design: since Q2 must go from 1 (in state 100) to 0 (in state 000), the JK characteristic equation Q+ = JQ' + K'Q with Q=1 reduces to Q+ = K', so we need K' = 0, i.e. K2 = 1, while J2 is unconstrained (don't-care) because the JQ' term is already zero when Q=1... more precisely, since Q=1 makes Q'=0, the J-controlled term vanishes regardless of J's value, so J2 = X. This is exactly the JK excitation table's 1→0 row applied here. Designing the full mod-5 counter requires deriving similar excitation equations for Q1 and Q0 across all five state transitions (000→001, 001→010, 010→011, 011→100, 100→000) and then minimizing each of J0,K0,J1,K1,J2,K2 as a function of the present state — but this single transition in isolation only needs the basic excitation table lookup, independent of the rest of the design. Options (a) and (b) wrongly fix J2 to a specific value instead of leaving it don't-care; option (d) incorrectly leaves K2, not J2, as the don't-care."
+},
+{
+  id: 'digital-sequential-p11',
+  pyqYear: 2025,
+  q: "Which of the following correctly distinguishes the maximum operating frequency of a synchronous counter from that of a ripple counter with the same number of flip-flop stages?",
+  options: [
+    "A synchronous counter's maximum frequency is independent of the number of stages, while a ripple counter's maximum frequency decreases as more stages are added",
+    "A ripple counter's maximum frequency is independent of the number of stages, while a synchronous counter's decreases as more stages are added",
+    "Both counters' maximum frequencies decrease identically with the number of stages",
+    "Neither counter's maximum frequency depends on the number of stages"
+  ],
+  answer: 0,
+  marks: 1,
+  difficulty: 'easy',
+  type: 'pyq-style',
+  explanation: "A ripple counter's stages are triggered one after another (each flip-flop's clock comes from the previous stage's output), so a full ripple settling time grows linearly with the stage count: n × tpd. Adding more bits directly increases the worst-case settling delay and therefore directly lowers the maximum reliable clock frequency, fmax = 1/(n·tpd) (plus any decoding delay). A synchronous counter, in contrast, clocks every flip-flop from the same source simultaneously, and the timing constraint is a single register-to-register path of fixed depth: tcq + tcomb(max) + tsu. While tcomb can grow slightly with very wide counters (more inputs to the next-state logic can mean a few extra gate delays for carry propagation in the combinational logic), the dominant, textbook-level GATE answer treats this as constant, independent of the number of stages, which is the whole point of building synchronous rather than ripple counters for high-speed applications. Option (b) reverses the two counter types' actual scaling behavior. Options (c) and (d) both ignore the well-established asymmetry between the two architectures that this question is specifically testing."
+},
+{
+  id: 'digital-sequential-p12',
+  pyqYear: 2026,
+  q: "A synchronous binary up-counter is built from 2 T flip-flops Q1Q0 with T0 = 1 and T1 = Q0 (the standard mod-4 counter wiring). Starting from state Q1Q0 = 00, the sequence of states over the next 4 clock pulses is:",
+  options: ["00, 01, 10, 11", "00, 10, 01, 11", "01, 10, 11, 00", "00, 11, 01, 10"],
+  answer: 0,
+  marks: 1,
+  difficulty: 'easy',
+  type: 'pyq-style',
+  explanation: "Apply the T flip-flop characteristic equation Q+ = T ⊕ Q to both bits at each step. Starting at Q1Q0 = 00: T0 = 1 always, so Q0 toggles every clock; T1 = Q0, so Q1 toggles only when Q0 was 1 before the clock (this is exactly how a ripple-style carry works even in this synchronous design, since T1 depends combinationally on the current Q0). Clock 1: Q0 was 0, so T1=0, Q1 stays 0; Q0 toggles to 1. New state 01. Clock 2: Q0 was 1, so T1=1, Q1 toggles to 1; Q0 toggles to 0. New state 10. Clock 3: Q0 was 0, so T1=0, Q1 stays 1; Q0 toggles to 1. New state 11. Clock 4: Q0 was 1, so T1=1, Q1 toggles to 0; Q0 toggles to 0. New state 00. So the sequence is 00, 01, 10, 11, back to 00 — the standard binary count-up sequence, confirming T0=1, T1=Q0 is indeed the correct synchronous mod-4 up-counter design (the general rule being T_i = AND of all lower-order bits, which for a single lower bit Q0 is simply Q0 itself). Option (b) and (d) scramble the natural binary order; option (c) merely starts the same correct cycle from a different point, but the question specifies starting from 00."
+},
+{
+  id: 'digital-sequential-p13',
+  pyqYear: 2017,
+  q: "For a NOR-based SR flip-flop, the transition from Q = 0 to Q = 1 requires which (S, R) input combination at the clock edge?",
+  options: ["S = 1, R = 0", "S = 0, R = 1", "S = 0, R = 0", "S = 1, R = 1"],
+  answer: 0,
+  marks: 1,
+  difficulty: 'easy',
+  type: 'concept',
+  explanation: "The SR flip-flop's defining behavior is: S = 1, R = 0 sets Q to 1; S = 0, R = 1 resets Q to 0; S = R = 0 holds the previous value; and S = R = 1 is forbidden (both outputs would be forced to the same invalid combination, and releasing both inputs together causes a race to an unpredictable state). For Q to transition specifically from 0 to 1, the flip-flop must be actively set, which by definition requires S = 1 and R = 0 — there is no don't-care flexibility here as there is in the JK excitation table, since S = 1, R = 1 is forbidden outright and cannot be substituted as a don't-care option the way it can for J = K = 1 in a JK flip-flop (where it safely means toggle). This lack of a safe forbidden-state fallback is exactly why JK flip-flops evolved from SR flip-flops: JK removes the forbidden S=R=1 combination by redefining it as a toggle, giving one more usable degree of freedom in the excitation table. Option (b) would instead force Q to 0, the opposite of what's required. Option (c) holds Q at its previous value (0), never reaching 1. Option (d) is the forbidden state and must never be applied."
+},
+{
+  id: 'digital-sequential-p14',
+  pyqYear: 2021,
+  q: "For a fixed number of flip-flops n, how do the number of distinct states in a ring counter and a Johnson (twisted-ring) counter compare?",
+  options: [
+    "Ring counter gives n states; Johnson counter gives 2n states",
+    "Ring counter gives 2n states; Johnson counter gives n states",
+    "Both give exactly n states",
+    "Both give exactly 2^n states"
+  ],
+  answer: 0,
+  marks: 1,
+  difficulty: 'easy',
+  type: 'concept',
+  explanation: "A ring counter circulates a single active bit through n flip-flops with direct (uninverted) feedback from the last stage to the first, so the single 1 simply visits each of the n flip-flop positions once before returning to the start, giving exactly n distinct states. A Johnson counter instead feeds back the COMPLEMENT of the last stage, which means the register fills up with 1s one bit at a time over n clocks, then empties back to all 0s one bit at a time over another n clocks, giving 2n distinct states from the same n flip-flops before the cycle repeats — double the ring counter's state count for the same hardware cost. Both designs share the major practical advantage of being easy to decode: ring counter states are already self-decoded (one flip-flop per state), and Johnson counter states, though not self-decoded, differ from their neighbors by only one bit (like Gray code) and so can be decoded from just two flip-flop outputs per state using simple 2-input gates. Neither achieves the full 2^n states of an unconstrained n-bit binary counter (option d), since the shift-register feedback structure heavily restricts which state sequences are reachable."
+}
+);

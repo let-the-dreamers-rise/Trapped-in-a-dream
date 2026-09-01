@@ -2614,3 +2614,160 @@ window.GATE_DATA.questions['toc'].topics.find(function(t){return t.id==='toc-tur
   explanation: "Option B is the only DECIDABLE one here: bounding the number of steps to a specific finite k turns this into a direct, terminating simulation -- just run M on the empty string for at most k steps and observe whether it halts within that budget, which always finishes (this bounded-simulation trick is a recurring theme distinguishing decidable from undecidable TM questions). Option A ('halts on the empty input', a specific instance of the general Halting Problem restricted to one particular input) is UNDECIDABLE, provable by reduction from A_TM (given any <M,w>, construct M' that ignores its own input, hardcodes w, and simulates M on w; then M' halts on the empty string exactly when M halts on w). Option C (Totality, halting on ALL inputs) is UNDECIDABLE, also provable by reduction from A_TM using a similar hardcoding trick (M' ignores its real input and simulates M on a fixed w; M' is total, i.e. halts on every input, exactly when M halts on that one w, reducing A_TM to totality). Option D ('loops forever on at least one input') is the logical negation of totality -- since totality is undecidable and this is essentially its complement-flavored restatement (a nontrivial nonempty proper subset of the semantic behavior of M), it is also UNDECIDABLE by the same underlying reduction, just phrased as the existential negation rather than the universal statement."
 }
 );
+
+window.GATE_DATA.questions['toc'].topics.find(function(t){return t.id==='toc-decidability';}).questions.push(
+{
+  id: 'toc-decidability-p1',
+  pyqYear: 2015,
+  q: "Which of the following FINITENESS-related questions are DECIDABLE? (Select ALL that apply)",
+  options: ['Given a DFA M, is L(M) finite?', 'Given a CFG G, is L(G) finite?', 'Given a Turing machine M, is L(M) finite?', 'Given a CFG G, is L(G) infinite (i.e. NOT finite)?'],
+  answers: [0, 1, 3],
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: "DFA finiteness (A) is decidable: L(M) is infinite exactly when the state graph, restricted to states reachable from the start and able to reach an accepting state, contains a cycle -- a simple graph check. CFG finiteness (B) is decidable: L(G) is infinite exactly when the grammar's nonterminal dependency graph (restricted to useful, reachable-and-generating nonterminals) contains a cycle through a nonempty terminal-producing path (a 'self-embedding' nonterminal that can derive a string containing itself again) -- also a checkable graph property on the finite grammar. Option D (CFG infiniteness) is simply the logical negation of option B, and since finiteness is already established as decidable for CFGs, its negation, infiniteness, is trivially decidable too (a decider for one gives a decider for the other by flipping the answer), so D is correctly decidable. Option C (TM finiteness) is UNDECIDABLE by Rice's theorem: 'is L(M) finite' is a nontrivial semantic property of the recognized language (some RE languages are finite, some are not), so Rice's theorem directly applies and rules this one undecidable, in sharp contrast to the DFA and CFG cases where finiteness has direct combinatorial algorithms available."
+},
+{
+  id: 'toc-decidability-p2',
+  pyqYear: 2016,
+  q: "For an arbitrary Turing machine M, which of the following questions about M are UNDECIDABLE? (Select ALL that apply)",
+  options: ['Is L(M) a regular language?', 'Does M have an even number of states, as listed in its formal description?', 'Is L(M) equal to the empty set OR equal to Sigma* (i.e. is L(M) one of these two extreme, trivial-looking languages)?', 'Does M move its tape head to the left at some point during the first 5 steps of its run on the empty input?'],
+  answers: [0, 2],
+  marks: 2,
+  difficulty: 'hard',
+  type: 'pyq-style',
+  explanation: "Option A ('is L(M) regular') is a classic Rice's theorem application: it is a semantic property of the language (not the machine's code), and it is nontrivial (some RE languages are regular, e.g. any DFA-recognizable language trivially embedded into a TM, and some RE languages, like A_TM, are not regular), so Rice's theorem declares it undecidable. Option C is more subtle but still undecidable: the property 'L(M) is empty OR L(M) is all of Sigma*' is a semantic property of the language, and crucially it IS nontrivial despite sounding like it covers 'extreme' cases -- some RE languages satisfy it (the empty language, or a machine accepting everything) while many RE languages do not (any language properly between empty and Sigma*, like a language containing exactly the strings of even length), so nontriviality holds and Rice's theorem applies, making it undecidable. Options B and D are DECIDABLE: B is purely syntactic (count states directly from M's description, no simulation needed), and D is a bounded, directly simulatable question (just run M for 5 steps on the empty string and observe whether a left-move occurs), both falling outside Rice's theorem's scope entirely since neither is a property of the language recognized."
+},
+{
+  id: 'toc-decidability-p3',
+  pyqYear: 2017,
+  q: "Which of the following statements about REC (decidable) and RE (recursively enumerable) languages are TRUE? (Select ALL that apply)",
+  options: ['The class REC (decidable languages) is closed under complementation', 'The class RE is closed under complementation', 'The class RE is closed under union and under intersection', 'The class REC is closed under union and under intersection'],
+  answers: [0, 2, 3],
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: "REC is closed under complement (A true): given a decider for L that halts on all inputs, simply flip its accept/reject output to decide the complement, which also halts on all inputs. RE is closed under union and intersection (C true): given two recognizers M1 (for L1) and M2 (for L2), simulate both on the input in parallel for union (accept as soon as either one accepts), or run both to completion and accept only if both eventually accept for intersection (this may take longer but still correctly recognizes the intersection, accepting exactly when the input is in both languages, and looping if either fails to accept). REC is closed under union and intersection (D true): given deciders for L1 and L2, run both to completion (both are guaranteed to halt), then combine their answers with OR (for union) or AND (for intersection) -- this always halts and is correct. RE is NOT closed under complementation (B false): this is the crucial asymmetry that distinguishes RE from REC -- if RE were closed under complement, then for any RE language L, complement(L) would also be RE, and by the theorem that 'L and complement(L) both RE implies L decidable', every RE language would become decidable, collapsing RE into REC, which is false (A_TM is the standard counterexample, RE but with a complement that is not RE)."
+},
+{
+  id: 'toc-decidability-p4',
+  pyqYear: 2018,
+  q: "Suppose it is known that both a language L and its complement (over the same alphabet) are recursively enumerable (RE). What can we conclude about L?",
+  options: ['L must be decidable (in REC)', 'L must be undecidable', 'L cannot be RE itself (contradiction)', 'L must be a regular language'],
+  answer: 0,
+  marks: 1,
+  difficulty: 'easy',
+  type: 'pyq-style',
+  explanation: "This is one of the most important and frequently tested theorems in computability theory: if both L and its complement have Turing machines that recognize them (i.e. halt and accept exactly on their respective languages, though possibly looping forever on the other language's strings), then L is guaranteed to be decidable. The construction is direct: run the recognizer for L and the recognizer for complement(L) simultaneously, interleaving their execution steps one at a time; since every string is in exactly one of L or complement(L), exactly one of the two parallel simulations is mathematically guaranteed to eventually halt and accept, and whichever one does so first tells you definitively whether the input was in L or not, giving a machine that halts on every input, i.e. a decider. This directly rules out option B (undecidable directly contradicts the theorem) and option C (there is no contradiction; RE and co-RE overlapping exactly IS what forces decidability, this is not a paradox). Option D is unwarranted: the theorem gives decidability, a strictly weaker and more general property than regularity, so L could be decidable yet still context-free-but-not-regular, or even decidable but not context-free, without contradicting anything."
+},
+{
+  id: 'toc-decidability-p5',
+  pyqYear: 2019,
+  q: "Which of the following properties of an arbitrary Turing machine M is DECIDABLE (Rice's theorem does NOT apply)?",
+  options: ['Is L(M) empty?', 'Does M have a transition defined on the input symbol a from its designated start state, as written in its formal transition table?', 'Is L(M) finite?', 'Is L(M) equal to Sigma* (does M accept every string)?'],
+  answer: 1,
+  marks: 1,
+  difficulty: 'easy',
+  type: 'pyq-style',
+  explanation: "Options A, C, and D are all classic Rice's-theorem applications: each asks about a semantic property of the language L(M) that the machine recognizes (emptiness, finiteness, and universality respectively), and each is nontrivial (some RE languages are empty and some are not; some are finite and some are not; some equal Sigma* and some do not), so Rice's theorem correctly and immediately declares all three undecidable, with no need for a custom reduction argument once the semantic-and-nontrivial checklist is confirmed. Option B, however, asks something entirely different in character: whether the machine's OWN transition table, as literally written down in its formal description, happens to contain a specific entry (a transition defined on symbol a from the start state). This is a purely SYNTACTIC question about the machine's code/structure, not about the language it recognizes -- two machines that look completely different in their transition tables (one having this specific transition, one not) can still recognize the exact same language, or conversely the same transition table structure could theoretically appear across machines recognizing very different languages, showing this property is not even a function of L(M) alone. Since Rice's theorem only restricts SEMANTIC properties, it says nothing about B, and B is trivially decidable by directly inspecting the machine's description, making option B the correct answer here."
+},
+{
+  id: 'toc-decidability-p6',
+  pyqYear: 2020,
+  q: "To prove EQ_TM = { <M1,M2> : L(M1) = L(M2) } is undecidable, a standard technique reduces from E_TM = { <M> : L(M) = empty set }. Given an instance <M1> of E_TM, which construction correctly reduces it to an instance of EQ_TM?",
+  options: ['Fix M2 to be a specific machine that rejects every input (so L(M2) is the empty language), and output <M1,M2>; then M1 is in E_TM if and only if <M1,M2> is in EQ_TM', 'Fix M2 to be a machine that simulates M1 on every possible input simultaneously', 'Fix M2 to be a machine that always accepts every input immediately', 'Fix M2 to be M1 itself, unmodified, and output <M1,M1>'],
+  answer: 0,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: "The reduction must produce, from any E_TM-instance <M1>, a computable EQ_TM-instance whose membership exactly mirrors whether L(M1) is empty. Fixing M2 as a trivial machine that immediately rejects every input it is given (never entering an accept state, regardless of the input) guarantees L(M2) = the empty set, a fixed, easily-constructed reference language. Then <M1,M2> is in EQ_TM (meaning L(M1) = L(M2)) if and only if L(M1) also equals the empty set, which is exactly the condition <M1> is in E_TM. This transformation (writing down the description of this fixed always-rejecting M2 alongside M1's own unchanged description) is clearly computable in a simple, mechanical way. If a decider for EQ_TM existed, running it on <M1,M2> would then decide E_TM, contradicting E_TM's known undecidability (E_TM is itself undecidable by a similar reduction from A_TM), so no decider for EQ_TM can exist either. Option D reduces to a trivially-always-true statement (M1 always equals itself) and proves nothing; options B and C use constructions that do not correspond to a fixed, known reference language matching the empty-language condition being tested."
+},
+{
+  id: 'toc-decidability-p7',
+  pyqYear: 2021,
+  q: "Which of the following decidability questions, involving combinations of DFAs and context-free grammars, are DECIDABLE? (Select ALL that apply)",
+  options: ['Given two DFAs M1 and M2, is L(M1) a subset of L(M2)?', 'Given a DFA M, is L(M) equal to Sigma* (universality)?', 'Given a CFG G and a DFA M, is L(G) a subset of L(M) (i.e. does the DFA accept every string the grammar generates)?', 'Given a CFG G and a DFA M, is L(M) a subset of L(G) (i.e. does the grammar generate every string the DFA accepts)?'],
+  answers: [0, 1, 2],
+  marks: 2,
+  difficulty: 'hard',
+  type: 'pyq-style',
+  explanation: "A is decidable: L(M1) subset of L(M2) iff L(M1) intersect complement(L(M2)) is empty; DFAs are closed under complement and intersection, and DFA emptiness is a decidable reachability check, so the whole test is decidable. B is decidable similarly: complement M (DFA closure under complement), then test emptiness of the complement. C is the subtle but DECIDABLE direction: L(G) subset of L(M) iff L(G) intersect complement(L(M)) is empty; complement(L(M)) is still regular (DFA complement), and CFL intersected with a regular language is always still a CFL (a standard closure property, built via a product-style construction combining the PDA and the DFA), and CFL emptiness is decidable (generating-nonterminal computation), so this composed check is fully decidable. D is the DECEPTIVE one and is actually UNDECIDABLE in general: checking L(M) subset of L(G) is equivalent to asking whether complement(L(G)) intersect L(M) is empty, but complement(L(G)) is generally NOT context-free (CFLs are not closed under complement), so this construction breaks down; in fact, choosing M to accept Sigma* reduces this exact question to the CFG universality problem (is L(G) = Sigma*?), which is a landmark UNDECIDABLE problem, so D cannot be decidable in general."
+},
+{
+  id: 'toc-decidability-p8',
+  pyqYear: 2022,
+  q: "Suppose L is a language that is known to be RE (recursively enumerable) but UNDECIDABLE. What can we conclude about the complement of L?",
+  options: ['The complement of L must always be RE', 'The complement of L can never be RE (it is guaranteed to NOT be RE)', 'The complement of L might be RE or might not be RE, depending on the specific language, and there is no way to determine which without more information', 'The complement of L must be a regular language'],
+  answer: 1,
+  marks: 1,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: "This follows directly and necessarily from the RE-plus-co-RE-implies-decidable theorem: if the complement of L WERE also RE, then both L and its complement would be RE simultaneously, which by that theorem would force L to be decidable -- but L is explicitly given as undecidable, a direct contradiction. Therefore, whenever L is RE but undecidable, its complement is logically guaranteed to NOT be RE, with no exceptions and no case-by-case uncertainty; this is a hard mathematical necessity, not merely a common pattern, ruling out both option A (the opposite conclusion) and option C (falsely suggesting ambiguity or case-dependence where none exists). This exact relationship is precisely what makes A_TM such an important example: A_TM is RE but undecidable, and consequently its complement (the set of pairs <M,w> where M does NOT accept w, including cases where M rejects or loops forever) is provably NOT RE, illustrating that not being RE is a real and reachable classification, not just a theoretical possibility. Option D is unwarranted, since nothing in this reasoning implies regularity; the complement is simply 'not RE', which is a much weaker classification than being irregular specifically."
+},
+{
+  id: 'toc-decidability-p9',
+  pyqYear: 2023,
+  q: "Is the problem 'given a Turing machine M, is L(M) NON-empty?' (i.e. NE_TM, the logical negation of the standard emptiness problem E_TM) decidable?",
+  options: ['Yes, it is decidable, since it is just the negation of a well-understood problem', 'No, it is undecidable, since nonemptiness is also a nontrivial semantic property of L(M), and Rice’s theorem applies to it exactly as it does to emptiness', 'It is decidable only when M is known in advance to be a decider', 'The nonemptiness question is always trivially true, so it requires no algorithm at all'],
+  answer: 1,
+  marks: 1,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: "A common misconception is that negating an undecidable problem should somehow make it decidable, but this reasoning is invalid: decidability requires a machine that HALTS on all inputs and gives the correct answer, and simply relabeling 'accept' as 'reject' and vice versa on an existing UNDECIDABLE problem's hypothetical decider does not create new decidability out of nothing -- if E_TM (emptiness) were decidable, then flipping its verdict WOULD decide NE_TM too, and vice versa, meaning E_TM and NE_TM are decidable exactly together or undecidable exactly together, they cannot differ in decidability status. Since E_TM is a well-established undecidable problem (a canonical Rice's theorem application, as 'L(M) is empty' is a nontrivial semantic property), NE_TM ('L(M) is nonempty') must also be undecidable, which is independently confirmed by Rice's theorem directly: nonemptiness is itself a nontrivial semantic property too (some RE languages are nonempty, some are empty), so Rice's theorem applies to it on its own terms as well, without even needing the negation argument. Note that NE_TM, while undecidable, IS still RE (simulate M on every string in some fair, dovetailed order, accepting as soon as any simulation halts-and-accepts), just not decidable."
+},
+{
+  id: 'toc-decidability-p10',
+  pyqYear: 2024,
+  q: "Given the formal transition function of a Pushdown Automaton P, is it decidable to check whether P satisfies the definition of a DETERMINISTIC PDA (no state has both an applicable epsilon-move and an applicable input-symbol move simultaneously, and for every state, input symbol, and stack-top symbol combination, at most one transition applies)?",
+  options: ['Yes, this is decidable, because determinism is a purely syntactic/structural property directly inspectable from the transition function itself, requiring no simulation or Rice’s-theorem-style reasoning at all', 'No, this is undecidable, since it is a semantic property of the language P accepts and Rice’s theorem applies', 'This is decidable only for PDAs equivalent to some DFA', 'This is undecidable because it reduces to the CFG-ambiguity problem'],
+  answer: 0,
+  marks: 1,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: "Determinism, as defined for PDAs, is entirely a property of the machine's own transition function written down in its formal description -- for every combination of current state, next input symbol (or epsilon), and stack-top symbol, one simply checks the listed transitions and confirms there is never more than one applicable move, and never a simultaneous epsilon-move alongside an input-consuming move from the same configuration. This check requires no execution, no simulation of the machine on any input, and no reasoning whatsoever about the LANGUAGE the PDA ends up accepting -- it is a finite, mechanical inspection of a finite transition table, exactly analogous to checking B in an earlier question (does M have a specific transition listed). This is precisely the contrast Rice's theorem is meant to highlight: Rice's theorem restricts only SEMANTIC properties (properties of L(M) itself, invariant across all equivalent machines), while purely SYNTACTIC/structural properties of a machine's own description, like determinism here, always remain decidable by direct inspection, regardless of how complex or undecidable questions about the accepted language might be. Options B, C, and D all incorrectly try to force this syntactic check into a semantic-property or reduction framework where it does not belong."
+},
+{
+  id: 'toc-decidability-p11',
+  pyqYear: 2025,
+  q: "A problem X is proven undecidable by exhibiting a computable reduction from A_TM to X (i.e. A_TM reduces to X). What does this reduction actually demonstrate?",
+  options: ['If X were decidable, then A_TM would also be decidable, which is a contradiction, so X must be undecidable', 'If A_TM were decidable, then X would also be decidable', 'X and A_TM are logically unrelated problems, and no conclusion about X follows', 'X must be recursively enumerable (RE), simply because A_TM happens to be RE'],
+  answer: 0,
+  marks: 1,
+  difficulty: 'easy',
+  type: 'pyq-style',
+  explanation: "The entire logical force of a reduction A_TM reduces to X comes from the contrapositive argument: the reduction provides a computable transformation turning any A_TM-instance into a corresponding X-instance such that the A_TM-instance is a 'yes' exactly when the X-instance is a 'yes'. If we assume, for the sake of contradiction, that a decider D_X for X exists, we could feed every A_TM-instance through the transformation and then through D_X, producing a working decider for A_TM -- but A_TM is already firmly established as undecidable, so this is impossible, meaning our assumption that D_X exists must be false. Therefore X has no decider, i.e. X is undecidable. Option B states the logically backwards and useless direction (assuming the PREMISE, A_TM decidable, is already known false, so this conditional statement, while technically not incorrect as a vacuous implication, is not what the reduction is actually used to conclude or demonstrate about X's own decidability status). Option C is wrong since the reduction explicitly establishes a precise, deliberate relationship between the two problems. Option D is a non sequitur -- being built from A_TM via reduction says nothing automatically about whether X itself is RE; that would need to be established separately, if true at all, from X's own definition."
+},
+{
+  id: 'toc-decidability-p12',
+  pyqYear: 2026,
+  q: "Which of the following correctly orders these language classes by strict inclusion (using SUBSET-OF, where each class is a proper/strict subset of the next)?",
+  options: ['REGULAR is a strict subset of CFL, which is a strict subset of CSL, which is a strict subset of REC (decidable languages), which is a strict subset of RE', 'REGULAR is a strict subset of CSL, which is a strict subset of CFL, which is a strict subset of REC, which is a strict subset of RE', 'CFL is a strict subset of REGULAR, which is a strict subset of CSL, which is a strict subset of RE, which is a strict subset of REC', 'RE is a strict subset of REC, which is a strict subset of CSL, which is a strict subset of CFL, which is a strict subset of REGULAR'],
+  answer: 0,
+  marks: 1,
+  difficulty: 'easy',
+  type: 'pyq-style',
+  explanation: "The correct and standard containment chain, from least to most expressive, is REGULAR strictly inside CFL (witnessed by a^n b^n, which is context-free but not regular), CFL strictly inside CSL (witnessed by a^n b^n c^n, which is context-sensitive but not context-free), CSL strictly inside REC (every context-sensitive language is decidable, since a Linear Bounded Automaton's finite configuration space guarantees a halting simulation via configuration-repetition detection, but there exist decidable languages that cannot be generated by any context-sensitive grammar, keeping the containment strict), and finally REC strictly inside RE (the Halting Problem and A_TM are standard witnesses of RE-but-undecidable languages, showing decidable languages are a genuine proper subset of recognizable ones). This REC layer is easy to forget when reciting the classical four Chomsky types, but it is an essential and frequently tested intermediate class sitting strictly between CSL and RE. Option B swaps CFL and CSL's order incorrectly, and options C and D either misorder the classes or reverse the entire direction of containment, none of which match the correct, verified chain in option A."
+},
+{
+  id: 'toc-decidability-p13',
+  pyqYear: 2016,
+  q: "For each of the following, decide whether the described question is DECIDABLE. Which of them are DECIDABLE? (Select ALL that apply)",
+  options: ['Given a Turing machine M, is L(M) itself a decidable (REC) language?', 'Given a DFA M, is L(M) a decidable (REC) language?', 'Given a CFG G, is L(G) a decidable (REC) language?', 'Given a Turing machine M, is L(M) a context-free language?'],
+  answers: [1, 2],
+  marks: 2,
+  difficulty: 'hard',
+  type: 'pyq-style',
+  explanation: "Options B and C are DECIDABLE, but for a subtle reason unrelated to Rice's theorem: since EVERY regular language is automatically decidable (REGULAR is a strict subset of REC, as any DFA can be simulated to completion on any input, always halting), the answer to 'is L(M) decidable' for a DFA M is ALWAYS simply 'yes', with no exceptions -- making this a TRIVIAL question whose answer never depends on the specific M at all, hence trivially decidable (a machine that always outputs 'yes' regardless of input is a valid, if unhelpful-looking, decider). The exact same reasoning applies to option C: since every context-free language is also decidable (CFL is a strict subset of REC), 'is L(G) decidable' for a CFG G is likewise ALWAYS 'yes', trivially decidable. Options A and D, however, are genuinely UNDECIDABLE Rice's-theorem applications: for an arbitrary Turing machine M, 'is L(M) decidable' and 'is L(M) context-free' are both authentically NONTRIVIAL semantic properties (some RE languages recognized by TMs are decidable and some are not; some are context-free and some are not), so Rice's theorem correctly applies and declares both undecidable, in sharp contrast to the trivially-always-true DFA and CFG versions of essentially the same-sounding question."
+},
+{
+  id: 'toc-decidability-p14',
+  pyqYear: 2020,
+  q: "A language L is said to be recursively enumerable but NOT recursive (i.e. RE but not REC). What does this precisely mean?",
+  options: ['There exists a Turing machine that halts and accepts on every string in L (but may reject or loop forever on strings not in L), yet no Turing machine can be built that halts on EVERY input and correctly decides membership in L for all strings', 'There exists a Turing machine that halts on every possible input string and correctly decides membership in L', 'L must be a finite language', 'L must be a regular language, since regular languages are the simplest kind of recursively enumerable language'],
+  answer: 0,
+  marks: 1,
+  difficulty: 'easy',
+  type: 'pyq-style',
+  explanation: "This precisely captures the defining gap between the RE and REC classes. Being RE means a recognizer exists that correctly halts and accepts every string genuinely in L, giving positive confirmation whenever the answer is 'yes', but such a recognizer is explicitly permitted to behave unhelpfully on strings NOT in L, either by halting and rejecting, or (crucially, and this is the source of the asymmetry) by looping forever and never producing any answer at all. Being additionally NOT recursive (not REC) means that no matter how cleverly one tries to build a machine, it is provably impossible to also guarantee a halt on every input across the board, meaning there is no way to reliably detect and confirm the 'no' case in finite time for at least some non-member strings. Option B describes full decidability (REC), the opposite of what is being asked about (a language failing to be REC explicitly lacks this property). Options C and D are false generalizations: RE-but-not-REC languages, like A_TM, are typically infinite and are never regular, since every regular language is automatically decidable, making 'RE but not REC' and 'regular' mutually exclusive descriptions rather than compatible ones."
+}
+);
