@@ -2408,7 +2408,7 @@ window.GATE_DATA.questions['engmath'].topics.find(function(t){return t.id==='eng
 window.GATE_DATA.questions['engmath'].topics.find(function(t){return t.id==='engmath-discrete-logic';}).questions.push(
 {
   id: 'engmath-discrete-logic-pyq1',
-  pyqYear: 2019,
+  pyqStyle: true,
   q: 'Which of the following formulas is NOT a tautology?',
   options: ['((p -> q) AND (q -> r)) -> (p -> r)', '(p AND (p -> q)) -> q', '(p -> q) OR (q -> p)', '(p AND q) -> p OR r'],
   answer: 3,
@@ -2419,7 +2419,7 @@ window.GATE_DATA.questions['engmath'].topics.find(function(t){return t.id==='eng
 },
 {
   id: 'engmath-discrete-logic-pyq2',
-  pyqYear: 2015,
+  pyqStyle: true,
   q: 'Consider the statement: "If the compiler reports no errors, then the program will run correctly." Which of the following is the CONVERSE of this statement?',
   options: ['If the program runs correctly, then the compiler reported no errors.', 'If the compiler reports errors, then the program will not run correctly.', 'If the program does not run correctly, then the compiler reported errors.', 'The program runs correctly only if the compiler reports errors.'],
   answer: 0,
@@ -2430,7 +2430,7 @@ window.GATE_DATA.questions['engmath'].topics.find(function(t){return t.id==='eng
 },
 {
   id: 'engmath-discrete-logic-pyq3',
-  pyqYear: 2016,
+  pyqStyle: true,
   q: 'Which of the following sets of connectives is functionally complete (can express every Boolean function)? (Select ALL that apply)',
   options: ['{NAND}', '{AND, OR}', '{OR, NOT}', '{NOR}'],
   answers: [0, 2, 3],
@@ -2441,7 +2441,7 @@ window.GATE_DATA.questions['engmath'].topics.find(function(t){return t.id==='eng
 },
 {
   id: 'engmath-discrete-logic-pyq4',
-  pyqYear: 2017,
+  pyqStyle: true,
   q: 'How many of the 8 possible truth assignments to p, q, r satisfy the formula (p -> q) AND (~q OR r)? (Enter your numerical answer.)',
   options: [],
   answer: 4,
@@ -2453,7 +2453,7 @@ window.GATE_DATA.questions['engmath'].topics.find(function(t){return t.id==='eng
 },
 {
   id: 'engmath-discrete-logic-pyq5',
-  pyqYear: 2020,
+  pyqStyle: true,
   q: 'The negation of the statement "exists x forall y (Loves(x,y))" is logically equivalent to:',
   options: ['forall x exists y (~Loves(x,y))', 'exists x forall y (~Loves(x,y))', 'forall x forall y (~Loves(x,y))', 'exists x exists y (Loves(x,y))'],
   answer: 0,
@@ -2464,7 +2464,7 @@ window.GATE_DATA.questions['engmath'].topics.find(function(t){return t.id==='eng
 },
 {
   id: 'engmath-discrete-logic-pyq6',
-  pyqYear: 2021,
+  pyqStyle: true,
   q: 'Let the domain be the set of all integers and P(x,y) mean "x < y". Which of the following is TRUE?',
   options: ['exists y forall x P(x,y) is true', 'forall x exists y P(x,y) is true, and it does NOT imply exists y forall x P(x,y)', 'forall x exists y P(x,y) is equivalent to exists y forall x P(x,y)', 'forall x forall y P(x,y) is true'],
   answer: 1,
@@ -2475,7 +2475,7 @@ window.GATE_DATA.questions['engmath'].topics.find(function(t){return t.id==='eng
 },
 {
   id: 'engmath-discrete-logic-pyq7',
-  pyqYear: 2018,
+  pyqStyle: true,
   q: 'An argument has premises "If the server is down, users cannot log in" and "Users can log in." Which conclusion follows validly, and by which rule?',
   options: ['The server is not down; by modus tollens', 'The server is down; by modus ponens', 'The server is not down; by denying the antecedent', 'No valid conclusion follows'],
   answer: 0,
@@ -2486,7 +2486,7 @@ window.GATE_DATA.questions['engmath'].topics.find(function(t){return t.id==='eng
 },
 {
   id: 'engmath-discrete-logic-pyq8',
-  pyqYear: 2022,
+  pyqStyle: true,
   q: 'Which of the following English-to-FOL translations are CORRECT, given Student(x) and Passes(x)? (Select ALL that apply)',
   options: ['"Every student passes" translates to forall x (Student(x) -> Passes(x))', '"Some student passes" translates to exists x (Student(x) AND Passes(x))', '"Every student passes" translates to forall x (Student(x) AND Passes(x))', '"Some student passes" translates to exists x (Student(x) -> Passes(x))'],
   answers: [0, 1],
@@ -2497,7 +2497,7 @@ window.GATE_DATA.questions['engmath'].topics.find(function(t){return t.id==='eng
 },
 {
   id: 'engmath-discrete-logic-pyq9',
-  pyqYear: 2023,
+  pyqStyle: true,
   q: 'Which of the following logical equivalences are valid? (Select ALL that apply)',
   options: ['~(p -> q) == p AND ~q', 'p -> (q -> r) == (p AND q) -> r', '~(p <-> q) == (p AND ~q) OR (~p AND q)', 'p OR (q AND r) == (p OR q) AND r'],
   answers: [0, 1, 2],
@@ -2508,7 +2508,7 @@ window.GATE_DATA.questions['engmath'].topics.find(function(t){return t.id==='eng
 },
 {
   id: 'engmath-discrete-logic-pyq10',
-  pyqYear: 2024,
+  pyqStyle: true,
   q: 'How many of the 8 possible truth assignments to p, q, r satisfy the formula (p XOR q) OR (q AND r)? (Enter your numerical answer.)',
   options: [],
   answer: 5,
@@ -2520,7 +2520,7 @@ window.GATE_DATA.questions['engmath'].topics.find(function(t){return t.id==='eng
 },
 {
   id: 'engmath-discrete-logic-pyq11',
-  pyqYear: 2026,
+  pyqStyle: true,
   q: 'Consider the FOL sentence exists x (P(x) -> forall y P(y)), known as the "drinker principle". Over any non-empty domain, this sentence is:',
   options: ['A contradiction (false in every interpretation)', 'A tautology-like validity (true in every interpretation, for any non-empty domain)', 'True only when P is true for all elements', 'True only when P is false for all elements'],
   answer: 1,
@@ -2531,7 +2531,7 @@ window.GATE_DATA.questions['engmath'].topics.find(function(t){return t.id==='eng
 },
 {
   id: 'engmath-discrete-logic-pyq12',
-  pyqYear: 2025,
+  pyqStyle: true,
   q: 'The statement "A number is divisible by 6 if and only if it is divisible by 2 and by 3" is best formalized (with D6(x), D2(x), D3(x) as the respective divisibility predicates over integers x) as:',
   options: ['forall x (D6(x) <-> (D2(x) AND D3(x)))', 'forall x (D6(x) -> (D2(x) OR D3(x)))', 'exists x (D6(x) <-> (D2(x) AND D3(x)))', 'forall x ((D6(x) AND D2(x)) -> D3(x))'],
   answer: 0,
@@ -2544,7 +2544,7 @@ window.GATE_DATA.questions['engmath'].topics.find(function(t){return t.id==='eng
 window.GATE_DATA.questions['engmath'].topics.find(function(t){return t.id==='engmath-sets-relations';}).questions.push(
 {
   id: 'engmath-sets-relations-pyq1',
-  pyqYear: 2015,
+  pyqStyle: true,
   q: 'A set A has 3 elements. How many distinct REFLEXIVE relations can be defined on A? (Enter your numerical answer.)',
   options: [],
   answer: 64,
@@ -2556,7 +2556,7 @@ window.GATE_DATA.questions['engmath'].topics.find(function(t){return t.id==='eng
 },
 {
   id: 'engmath-sets-relations-pyq2',
-  pyqYear: 2016,
+  pyqStyle: true,
   q: 'Let R be a relation on the set of integers defined by aRb if and only if a - b is even. Which of the following properties does R satisfy?',
   options: ['Reflexive, symmetric, and transitive (an equivalence relation)', 'Reflexive and symmetric but not transitive', 'Symmetric and transitive but not reflexive', 'Reflexive and transitive but not symmetric'],
   answer: 0,
@@ -2567,7 +2567,7 @@ window.GATE_DATA.questions['engmath'].topics.find(function(t){return t.id==='eng
 },
 {
   id: 'engmath-sets-relations-pyq3',
-  pyqYear: 2017,
+  pyqStyle: true,
   q: 'A poset (partially ordered set) is drawn as a Hasse diagram below, where edges go upward. Which element is the MAXIMUM element of the poset (an element greater than every other element)?',
   figure: '<svg viewBox="0 0 200 220" width="100%" style="max-width:320px;height:auto" xmlns="http://www.w3.org/2000/svg"><g stroke="currentColor"><line x1="100" y1="180" x2="60" y2="120"/><line x1="100" y1="180" x2="140" y2="120"/><line x1="60" y1="120" x2="100" y2="60"/><line x1="140" y1="120" x2="100" y2="60"/></g><g fill="none" stroke="currentColor"><circle cx="100" cy="180" r="14"/><circle cx="60" cy="120" r="14"/><circle cx="140" cy="120" r="14"/><circle cx="100" cy="60" r="14"/></g><g font-size="13" fill="currentColor" text-anchor="middle"><text x="100" y="184">d</text><text x="60" y="124">b</text><text x="140" y="124">c</text><text x="100" y="64">a</text></g></svg>',
   options: ['a', 'b', 'c', 'd'],
@@ -2579,7 +2579,7 @@ window.GATE_DATA.questions['engmath'].topics.find(function(t){return t.id==='eng
 },
 {
   id: 'engmath-sets-relations-pyq4',
-  pyqYear: 2018,
+  pyqStyle: true,
   q: 'How many distinct equivalence relations can be defined on a set of 4 elements? (Enter your numerical answer.)',
   options: [],
   answer: 15,
@@ -2591,7 +2591,7 @@ window.GATE_DATA.questions['engmath'].topics.find(function(t){return t.id==='eng
 },
 {
   id: 'engmath-sets-relations-pyq5',
-  pyqYear: 2019,
+  pyqStyle: true,
   q: 'Let R be a relation on {1, 2, 3} given by R = {(1,1), (2,2), (3,3), (1,2), (2,1), (2,3)}. Which property does R fail to satisfy?',
   options: ['Reflexivity', 'Symmetry', 'Transitivity', 'R fails none of these; it is an equivalence relation'],
   answer: 2,
@@ -2602,7 +2602,7 @@ window.GATE_DATA.questions['engmath'].topics.find(function(t){return t.id==='eng
 },
 {
   id: 'engmath-sets-relations-pyq6',
-  pyqYear: 2020,
+  pyqStyle: true,
   q: 'Let A and B be sets each with exactly 4 elements. How many bijective (one-to-one and onto) functions exist from A to B? (Enter your numerical answer.)',
   options: [],
   answer: 24,
@@ -2614,7 +2614,7 @@ window.GATE_DATA.questions['engmath'].topics.find(function(t){return t.id==='eng
 },
 {
   id: 'engmath-sets-relations-pyq7',
-  pyqYear: 2021,
+  pyqStyle: true,
   q: 'How many functions from a 4-element set A to a 2-element set B = {0, 1} are ONTO (surjective, i.e. both elements of B are used)? (Enter your numerical answer.)',
   options: [],
   answer: 14,
@@ -2626,7 +2626,7 @@ window.GATE_DATA.questions['engmath'].topics.find(function(t){return t.id==='eng
 },
 {
   id: 'engmath-sets-relations-pyq8',
-  pyqYear: 2022,
+  pyqStyle: true,
   q: 'Let R and S be relations on the same set A, where R = {(1,2), (2,3)} and S = {(2,1), (3,4)}. What is R composed with S, i.e. S o R (apply R first, then S), as a set of ordered pairs? (Using the convention: (a,c) is in S o R if there exists b with (a,b) in R and (b,c) in S.)',
   options: ['{(1,1), (2,4)}', '{(1,2), (2,3)}', '{(2,1), (3,4)}', '{(1,4), (2,1)}'],
   answer: 0,
@@ -2637,7 +2637,7 @@ window.GATE_DATA.questions['engmath'].topics.find(function(t){return t.id==='eng
 },
 {
   id: 'engmath-sets-relations-pyq9',
-  pyqYear: 2023,
+  pyqStyle: true,
   q: 'Let R be the "divides" relation on the set {1, 2, 3, 4, 6, 12} (aRb iff a divides b). Which of the following properties does R have? (Select ALL that apply)',
   options: ['Reflexive', 'Antisymmetric', 'Transitive', 'A total order (every two elements are comparable)'],
   answers: [0, 1, 2],
@@ -2648,7 +2648,7 @@ window.GATE_DATA.questions['engmath'].topics.find(function(t){return t.id==='eng
 },
 {
   id: 'engmath-sets-relations-pyq10',
-  pyqYear: 2024,
+  pyqStyle: true,
   q: 'Let R = {(1,2), (2,3), (3,1)} be a relation on the set {1, 2, 3}. What is the total number of ordered pairs in the TRANSITIVE CLOSURE of R? (Enter your numerical answer.)',
   options: [],
   answer: 9,
@@ -2660,7 +2660,7 @@ window.GATE_DATA.questions['engmath'].topics.find(function(t){return t.id==='eng
 },
 {
   id: 'engmath-sets-relations-pyq11',
-  pyqYear: 2026,
+  pyqStyle: true,
   q: 'A set A has 5 elements. What is the cardinality of the power set of A, i.e. |P(A)|? (Enter your numerical answer.)',
   options: [],
   answer: 32,
@@ -2672,7 +2672,7 @@ window.GATE_DATA.questions['engmath'].topics.find(function(t){return t.id==='eng
 },
 {
   id: 'engmath-sets-relations-pyq12',
-  pyqYear: 2025,
+  pyqStyle: true,
   q: 'In a lattice (a poset in which every pair of elements has both a least upper bound and a greatest lower bound), which of the following statements is always TRUE?',
   options: ['Every pair of elements in the lattice is comparable (the lattice must be a total order)', 'The join (least upper bound) of two elements a and b is unique whenever it exists', 'A lattice can have more than one minimum element', 'The meet of an element with itself is always undefined'],
   answer: 1,
@@ -2685,7 +2685,7 @@ window.GATE_DATA.questions['engmath'].topics.find(function(t){return t.id==='eng
 window.GATE_DATA.questions['engmath'].topics.find(function(t){return t.id==='engmath-groups';}).questions.push(
 {
   id: 'engmath-groups-pyq1',
-  pyqYear: 2015,
+  pyqStyle: true,
   q: 'Let * be a binary operation on the set S = {1, -1, i, -i} (the fourth roots of unity) defined as ordinary multiplication. Which structure does (S, *) form?',
   options: ['A cyclic group of order 4', 'A monoid but not a group', 'A group that is not abelian', 'Not even closed under *'],
   answer: 0,
@@ -2696,7 +2696,7 @@ window.GATE_DATA.questions['engmath'].topics.find(function(t){return t.id==='eng
 },
 {
   id: 'engmath-groups-pyq2',
-  pyqYear: 2016,
+  pyqStyle: true,
   q: 'In the group (Z18, +) (integers mod 18 under addition), what is the order of the element 12 (the smallest positive k such that 12*k is congruent to 0 mod 18)? (Enter your numerical answer.)',
   options: [],
   answer: 3,
@@ -2708,7 +2708,7 @@ window.GATE_DATA.questions['engmath'].topics.find(function(t){return t.id==='eng
 },
 {
   id: 'engmath-groups-pyq3',
-  pyqYear: 2017,
+  pyqStyle: true,
   q: 'How many distinct generators does the cyclic group (Z20, +) have? (Enter your numerical answer.)',
   options: [],
   answer: 8,
@@ -2720,7 +2720,7 @@ window.GATE_DATA.questions['engmath'].topics.find(function(t){return t.id==='eng
 },
 {
   id: 'engmath-groups-pyq4',
-  pyqYear: 2018,
+  pyqStyle: true,
   q: 'What is the order of the smallest non-abelian group, and what is that group commonly called?',
   options: ['Order 6, the symmetric group S3', 'Order 4, the Klein four-group', 'Order 2, the cyclic group Z2', 'Order 8, the quaternion group'],
   answer: 0,
@@ -2731,7 +2731,7 @@ window.GATE_DATA.questions['engmath'].topics.find(function(t){return t.id==='eng
 },
 {
   id: 'engmath-groups-pyq5',
-  pyqYear: 2019,
+  pyqStyle: true,
   q: 'A group G has order 12. According to Lagrange\\u2019s theorem, which of the following CANNOT be the order of a subgroup of G? (Select ALL that apply)',
   options: ['5', '7', '4', '8'],
   answers: [0, 1, 3],
@@ -2742,7 +2742,7 @@ window.GATE_DATA.questions['engmath'].topics.find(function(t){return t.id==='eng
 },
 {
   id: 'engmath-groups-pyq6',
-  pyqYear: 2020,
+  pyqStyle: true,
   q: 'Consider the set of natural numbers N = {0, 1, 2, ...} under ordinary addition, (N, +). Which of the following best describes this algebraic structure?',
   options: ['A monoid, but not a group (no inverses)', 'A group, since addition is associative and 0 is an identity', 'Not even a monoid, since it lacks an identity element', 'An abelian group with identity 0'],
   answer: 0,
@@ -2753,7 +2753,7 @@ window.GATE_DATA.questions['engmath'].topics.find(function(t){return t.id==='eng
 },
 {
   id: 'engmath-groups-pyq7',
-  pyqYear: 2021,
+  pyqStyle: true,
   q: 'Let (G, *) be a group and let a be an element of G such that a * a = a (a is idempotent). Which of the following must be TRUE?',
   options: ['a must be the identity element of G', 'a must have order exactly 2', 'a cannot exist unless G is abelian', 'No such element can exist in any group'],
   answer: 0,
@@ -2764,7 +2764,7 @@ window.GATE_DATA.questions['engmath'].topics.find(function(t){return t.id==='eng
 },
 {
   id: 'engmath-groups-pyq8',
-  pyqYear: 2022,
+  pyqStyle: true,
   q: 'In the group (Z16, +), how many elements have order exactly 2? (Enter your numerical answer.)',
   options: [],
   answer: 1,
@@ -2776,7 +2776,7 @@ window.GATE_DATA.questions['engmath'].topics.find(function(t){return t.id==='eng
 },
 {
   id: 'engmath-groups-pyq9',
-  pyqYear: 2023,
+  pyqStyle: true,
   q: 'The converse of Lagrange\\u2019s theorem states that if d divides |G|, then G must have a subgroup of order d. Regarding this converse, which statement is correct?',
   options: ['The converse is FALSE in general (a counterexample exists, e.g. A4 of order 12 has no subgroup of order 6)', 'The converse is TRUE for every finite group', 'The converse is TRUE only for groups of prime order', 'The converse is equivalent to Lagrange\\u2019s theorem itself'],
   answer: 0,
@@ -2787,7 +2787,7 @@ window.GATE_DATA.questions['engmath'].topics.find(function(t){return t.id==='eng
 },
 {
   id: 'engmath-groups-pyq10',
-  pyqYear: 2024,
+  pyqStyle: true,
   q: 'Regarding subgroups of the cyclic group (Z12, +), which of the following statements are TRUE? (Select ALL that apply)',
   options: ['Z12 has exactly one subgroup of each order dividing 12', 'Every subgroup of Z12 is itself cyclic', 'Z12 has a subgroup of order 5', 'The subgroup of order 4 is generated by the element 3'],
   answers: [0, 1, 3],
@@ -2798,7 +2798,7 @@ window.GATE_DATA.questions['engmath'].topics.find(function(t){return t.id==='eng
 },
 {
   id: 'engmath-groups-pyq11',
-  pyqYear: 2026,
+  pyqStyle: true,
   q: 'Define a binary operation on the set of real numbers by a * b = a + b + ab. For which set is (S, *) a group, and what is the identity element?',
   options: ['S = R - {-1}, identity element 0', 'S = R, identity element 1', 'S = R - {0}, identity element 0', 'S = R - {-1}, identity element -1'],
   answer: 0,
@@ -2809,7 +2809,7 @@ window.GATE_DATA.questions['engmath'].topics.find(function(t){return t.id==='eng
 },
 {
   id: 'engmath-groups-pyq12',
-  pyqYear: 2025,
+  pyqStyle: true,
   q: 'In a group (G, *), if a, b are elements with inverses a^(-1) and b^(-1) respectively, what is the inverse of the product a * b, expressed correctly using the "shoe-sock rule"?',
   options: ['b^(-1) * a^(-1)', 'a^(-1) * b^(-1)', '(a * b)^(-1) = a * b (self-inverse in general)', 'a^(-1) + b^(-1) (using group addition notation always)'],
   answer: 0,
@@ -2822,7 +2822,7 @@ window.GATE_DATA.questions['engmath'].topics.find(function(t){return t.id==='eng
 window.GATE_DATA.questions['engmath'].topics.find(function(t){return t.id==='engmath-graph-theory';}).questions.push(
 {
   id: 'engmath-graph-theory-pyq1',
-  pyqYear: 2015,
+  pyqStyle: true,
   q: 'A simple undirected graph has 6 vertices with degrees 3, 3, 3, 3, 2, 2. How many edges does the graph have? (Enter your numerical answer.)',
   options: [],
   answer: 8,
@@ -2834,7 +2834,7 @@ window.GATE_DATA.questions['engmath'].topics.find(function(t){return t.id==='eng
 },
 {
   id: 'engmath-graph-theory-pyq2',
-  pyqYear: 2016,
+  pyqStyle: true,
   q: 'For a simple, connected planar graph with V = 10 vertices, what is the MAXIMUM possible number of edges, using the planarity edge bound E <= 3V - 6 (valid for V >= 3)?',
   options: [],
   answer: 24,
@@ -2846,7 +2846,7 @@ window.GATE_DATA.questions['engmath'].topics.find(function(t){return t.id==='eng
 },
 {
   id: 'engmath-graph-theory-pyq3',
-  pyqYear: 2017,
+  pyqStyle: true,
   q: 'What is the chromatic number of a cycle graph C5 (5 vertices arranged in a single cycle)?',
   figure: '<svg viewBox="0 0 200 200" width="100%" style="max-width:280px;height:auto" xmlns="http://www.w3.org/2000/svg"><g stroke="currentColor" fill="none"><line x1="100" y1="20" x2="180" y2="80"/><line x1="180" y1="80" x2="150" y2="175"/><line x1="150" y1="175" x2="50" y2="175"/><line x1="50" y1="175" x2="20" y2="80"/><line x1="20" y1="80" x2="100" y2="20"/></g><g fill="none" stroke="currentColor"><circle cx="100" cy="20" r="13"/><circle cx="180" cy="80" r="13"/><circle cx="150" cy="175" r="13"/><circle cx="50" cy="175" r="13"/><circle cx="20" cy="80" r="13"/></g></svg>',
   options: [],
@@ -2859,7 +2859,7 @@ window.GATE_DATA.questions['engmath'].topics.find(function(t){return t.id==='eng
 },
 {
   id: 'engmath-graph-theory-pyq4',
-  pyqYear: 2018,
+  pyqStyle: true,
   q: 'A connected undirected graph G has an Euler circuit (a closed walk using every edge exactly once) if and only if:',
   options: ['Every vertex of G has even degree', 'G has exactly two vertices of odd degree', 'G is a tree', 'G is bipartite'],
   answer: 0,
@@ -2870,7 +2870,7 @@ window.GATE_DATA.questions['engmath'].topics.find(function(t){return t.id==='eng
 },
 {
   id: 'engmath-graph-theory-pyq5',
-  pyqYear: 2019,
+  pyqStyle: true,
   q: 'Which of the following graphs is definitely NOT bipartite?',
   options: ['A tree with 7 vertices', 'A cycle graph C6 (6 vertices in a single cycle)', 'A cycle graph C7 (7 vertices in a single cycle)', 'The complete bipartite graph K3,4'],
   answer: 2,
@@ -2881,7 +2881,7 @@ window.GATE_DATA.questions['engmath'].topics.find(function(t){return t.id==='eng
 },
 {
   id: 'engmath-graph-theory-pyq6',
-  pyqYear: 2020,
+  pyqStyle: true,
   q: 'A connected undirected graph (a tree) has 15 vertices. How many edges does it have? (Enter your numerical answer.)',
   options: [],
   answer: 14,
@@ -2893,7 +2893,7 @@ window.GATE_DATA.questions['engmath'].topics.find(function(t){return t.id==='eng
 },
 {
   id: 'engmath-graph-theory-pyq7',
-  pyqYear: 2021,
+  pyqStyle: true,
   q: 'Using Cayley\\u2019s formula, the number of distinct labeled spanning trees on a complete graph K_n is n^(n-2). How many distinct labeled trees exist on 4 labeled vertices? (Enter your numerical answer.)',
   options: [],
   answer: 16,
@@ -2905,7 +2905,7 @@ window.GATE_DATA.questions['engmath'].topics.find(function(t){return t.id==='eng
 },
 {
   id: 'engmath-graph-theory-pyq8',
-  pyqYear: 2022,
+  pyqStyle: true,
   q: 'Which of the following statements correctly distinguishes Eulerian and Hamiltonian graph properties?',
   options: ['An Eulerian circuit visits every EDGE exactly once; a Hamiltonian circuit visits every VERTEX exactly once (except returning to start)', 'An Eulerian circuit visits every VERTEX exactly once; a Hamiltonian circuit visits every EDGE exactly once', 'Both Eulerian and Hamiltonian circuits require every vertex to have even degree', 'A graph having an Eulerian circuit always also has a Hamiltonian circuit'],
   answer: 0,
@@ -2916,7 +2916,7 @@ window.GATE_DATA.questions['engmath'].topics.find(function(t){return t.id==='eng
 },
 {
   id: 'engmath-graph-theory-pyq9',
-  pyqYear: 2023,
+  pyqStyle: true,
   q: 'Which of the following degree sequences CANNOT belong to any simple undirected graph? (Select ALL that apply, using the necessary condition that the degree sum must be even)',
   options: ['(3, 3, 3, 3)', '(1, 2, 3, 4)', '(2, 2, 2, 2, 2)', '(1, 1, 1)'],
   answers: [1, 3],
@@ -2927,7 +2927,7 @@ window.GATE_DATA.questions['engmath'].topics.find(function(t){return t.id==='eng
 },
 {
   id: 'engmath-graph-theory-pyq10',
-  pyqYear: 2024,
+  pyqStyle: true,
   q: 'In a connected graph G, a vertex v is called a CUT VERTEX (articulation point) if removing v (and its incident edges) disconnects the graph. Which statement about cut vertices is TRUE?',
   options: ['Every leaf (degree-1 vertex) of a tree is NOT a cut vertex, but every internal (non-leaf) vertex of a tree IS a cut vertex', 'A cut vertex can only exist in a disconnected graph', 'Removing any cut vertex always splits the graph into exactly two components', 'A complete graph Kn (n >= 3) always has at least one cut vertex'],
   answer: 0,
@@ -2938,7 +2938,7 @@ window.GATE_DATA.questions['engmath'].topics.find(function(t){return t.id==='eng
 },
 {
   id: 'engmath-graph-theory-pyq11',
-  pyqYear: 2026,
+  pyqStyle: true,
   q: 'What is the maximum number of edges in a simple bipartite graph with one part having 3 vertices and the other part having 5 vertices (i.e. the complete bipartite graph K3,5)? (Enter your numerical answer.)',
   options: [],
   answer: 15,
@@ -2950,7 +2950,7 @@ window.GATE_DATA.questions['engmath'].topics.find(function(t){return t.id==='eng
 },
 {
   id: 'engmath-graph-theory-pyq12',
-  pyqYear: 2025,
+  pyqStyle: true,
   q: 'The complete graph K4 (4 vertices, every pair connected) is shown below. What is its chromatic number?',
   figure: '<svg viewBox="0 0 200 200" width="100%" style="max-width:280px;height:auto" xmlns="http://www.w3.org/2000/svg"><g stroke="currentColor" fill="none"><line x1="50" y1="40" x2="150" y2="40"/><line x1="50" y1="40" x2="50" y2="160"/><line x1="50" y1="40" x2="150" y2="160"/><line x1="150" y1="40" x2="50" y2="160"/><line x1="150" y1="40" x2="150" y2="160"/><line x1="50" y1="160" x2="150" y2="160"/></g><g fill="none" stroke="currentColor"><circle cx="50" cy="40" r="12"/><circle cx="150" cy="40" r="12"/><circle cx="50" cy="160" r="12"/><circle cx="150" cy="160" r="12"/></g></svg>',
   options: [],
@@ -2965,7 +2965,7 @@ window.GATE_DATA.questions['engmath'].topics.find(function(t){return t.id==='eng
 window.GATE_DATA.questions['engmath'].topics.find(function(t){return t.id==='engmath-combinatorics';}).questions.push(
 {
   id: 'engmath-combinatorics-pyq1',
-  pyqYear: 2015,
+  pyqStyle: true,
   q: 'In how many ways can 3 boys and 2 girls be seated in a row of 5 chairs such that no two girls sit next to each other? (Enter your numerical answer.)',
   options: [],
   answer: 72,
@@ -2977,7 +2977,7 @@ window.GATE_DATA.questions['engmath'].topics.find(function(t){return t.id==='eng
 },
 {
   id: 'engmath-combinatorics-pyq2',
-  pyqYear: 2016,
+  pyqStyle: true,
   q: 'In how many distinct ways can 6 distinct people be seated around a circular table, if rotations of the same arrangement are considered identical (but reflections are considered different)? (Enter your numerical answer.)',
   options: [],
   answer: 120,
@@ -2989,7 +2989,7 @@ window.GATE_DATA.questions['engmath'].topics.find(function(t){return t.id==='eng
 },
 {
   id: 'engmath-combinatorics-pyq3',
-  pyqYear: 2017,
+  pyqStyle: true,
   q: 'A drawer contains socks of 4 different colors, with many socks of each color. What is the MINIMUM number of socks that must be drawn (without looking) to GUARANTEE that at least 3 socks of the same color are drawn?',
   options: ['7', '9', '8', '12'],
   answer: 1,
@@ -3000,7 +3000,7 @@ window.GATE_DATA.questions['engmath'].topics.find(function(t){return t.id==='eng
 },
 {
   id: 'engmath-combinatorics-pyq4',
-  pyqYear: 2018,
+  pyqStyle: true,
   q: 'Using the Inclusion-Exclusion Principle, how many integers from 1 to 100 (inclusive) are divisible by 2 or by 3 (or both)? (Enter your numerical answer.)',
   options: [],
   answer: 67,
@@ -3012,7 +3012,7 @@ window.GATE_DATA.questions['engmath'].topics.find(function(t){return t.id==='eng
 },
 {
   id: 'engmath-combinatorics-pyq5',
-  pyqYear: 2019,
+  pyqStyle: true,
   q: 'A sequence satisfies the linear recurrence a(n) = 3*a(n-1) - 2*a(n-2), with initial conditions a(0) = 1 and a(1) = 2. What is a(4)? (Enter your numerical answer.)',
   options: [],
   answer: 16,
@@ -3024,7 +3024,7 @@ window.GATE_DATA.questions['engmath'].topics.find(function(t){return t.id==='eng
 },
 {
   id: 'engmath-combinatorics-pyq6',
-  pyqYear: 2020,
+  pyqStyle: true,
   q: 'A derangement of n objects is a permutation in which no object appears in its original position. How many derangements exist for 4 distinct objects (i.e. D(4))? (Enter your numerical answer.)',
   options: [],
   answer: 9,
@@ -3036,7 +3036,7 @@ window.GATE_DATA.questions['engmath'].topics.find(function(t){return t.id==='eng
 },
 {
   id: 'engmath-combinatorics-pyq7',
-  pyqYear: 2021,
+  pyqStyle: true,
   q: 'Using the "stars and bars" technique, how many non-negative integer solutions exist to the equation x1 + x2 + x3 = 10? (Enter your numerical answer.)',
   options: [],
   answer: 66,
@@ -3048,7 +3048,7 @@ window.GATE_DATA.questions['engmath'].topics.find(function(t){return t.id==='eng
 },
 {
   id: 'engmath-combinatorics-pyq8',
-  pyqYear: 2022,
+  pyqStyle: true,
   q: 'Which of the following identities involving binomial coefficients C(n, k) = n! / (k! (n-k)!) are TRUE for all valid n, k? (Select ALL that apply)',
   options: ['C(n, k) = C(n, n-k)', 'C(n, k) = C(n-1, k-1) + C(n-1, k) (Pascal\\u2019s rule)', 'Sum from k=0 to n of C(n, k) = 2^n', 'C(n, k) = C(n, k-1) for all k'],
   answers: [0, 1, 2],
@@ -3059,7 +3059,7 @@ window.GATE_DATA.questions['engmath'].topics.find(function(t){return t.id==='eng
 },
 {
   id: 'engmath-combinatorics-pyq9',
-  pyqYear: 2023,
+  pyqStyle: true,
   q: 'The n-th Catalan number Cn = C(2n, n) / (n+1) counts, among other things, the number of ways to fully parenthesize a product of n+1 factors (equivalently, the number of distinct binary trees with n internal nodes). What is C4 (the 4th Catalan number)? (Enter your numerical answer.)',
   options: [],
   answer: 14,
@@ -3071,7 +3071,7 @@ window.GATE_DATA.questions['engmath'].topics.find(function(t){return t.id==='eng
 },
 {
   id: 'engmath-combinatorics-pyq10',
-  pyqYear: 2024,
+  pyqStyle: true,
   q: 'A committee of 5 people is to be formed from a pool of 5 men and 4 women, consisting of exactly 3 men and 2 women. In how many ways can this committee be chosen? (Enter your numerical answer.)',
   options: [],
   answer: 60,
@@ -3083,7 +3083,7 @@ window.GATE_DATA.questions['engmath'].topics.find(function(t){return t.id==='eng
 },
 {
   id: 'engmath-combinatorics-pyq11',
-  pyqYear: 2026,
+  pyqStyle: true,
   q: 'A sequence is defined by the recurrence a(n) = a(n-1) + a(n-2) (the Fibonacci recurrence) with a(1) = 1 and a(2) = 1. What is a(7)? (Enter your numerical answer.)',
   options: [],
   answer: 13,
@@ -3095,7 +3095,7 @@ window.GATE_DATA.questions['engmath'].topics.find(function(t){return t.id==='eng
 },
 {
   id: 'engmath-combinatorics-pyq12',
-  pyqYear: 2025,
+  pyqStyle: true,
   q: 'What is the minimum number of people that must be in a room to GUARANTEE that at least two of them were born in the same calendar month (assuming 12 possible birth months)? (Enter your numerical answer.)',
   options: [],
   answer: 13,
@@ -3109,7 +3109,7 @@ window.GATE_DATA.questions['engmath'].topics.find(function(t){return t.id==='eng
 window.GATE_DATA.questions['engmath'].topics.find(function(t){return t.id==='engmath-linear-algebra';}).questions.push(
 {
   id: 'engmath-linear-algebra-pyq1',
-  pyqYear: 2015,
+  pyqStyle: true,
   q: 'Matrix A = [[4, 1], [2, 3]] has two eigenvalues. What is the SUM of its eigenvalues? (Enter your numerical answer.)',
   options: [],
   answer: 7,
@@ -3121,7 +3121,7 @@ window.GATE_DATA.questions['engmath'].topics.find(function(t){return t.id==='eng
 },
 {
   id: 'engmath-linear-algebra-pyq2',
-  pyqYear: 2016,
+  pyqStyle: true,
   q: 'What is the rank of the matrix [[1, 2, 3], [2, 4, 6], [1, 1, 1]]? (Enter your numerical answer.)',
   options: [],
   answer: 2,
@@ -3133,7 +3133,7 @@ window.GATE_DATA.questions['engmath'].topics.find(function(t){return t.id==='eng
 },
 {
   id: 'engmath-linear-algebra-pyq3',
-  pyqYear: 2017,
+  pyqStyle: true,
   q: 'What is the determinant of the matrix [[1, 2, 3], [0, 1, 4], [5, 6, 0]]? (Enter your numerical answer.)',
   options: [],
   answer: 1,
@@ -3145,7 +3145,7 @@ window.GATE_DATA.questions['engmath'].topics.find(function(t){return t.id==='eng
 },
 {
   id: 'engmath-linear-algebra-pyq4',
-  pyqYear: 2018,
+  pyqStyle: true,
   q: 'For a system of linear equations Ax = b, let r = rank(A) (the coefficient matrix) and r\\u2019 = rank([A|b]) (the augmented matrix), with n unknowns. Which condition correctly identifies when the system has NO solution?',
   options: ['r < r\\u2019 (ranks differ)', 'r = r\\u2019 = n (ranks equal, and equal to the number of unknowns)', 'r = r\\u2019 < n (ranks equal, but less than the number of unknowns)', 'r > r\\u2019 (coefficient rank exceeds augmented rank)'],
   answer: 0,
@@ -3156,7 +3156,7 @@ window.GATE_DATA.questions['engmath'].topics.find(function(t){return t.id==='eng
 },
 {
   id: 'engmath-linear-algebra-pyq5',
-  pyqYear: 2019,
+  pyqStyle: true,
   q: 'An upper triangular matrix has diagonal entries 2, 3, and 5 (all other structure is irrelevant to this question). What is the PRODUCT of its eigenvalues? (Enter your numerical answer.)',
   options: [],
   answer: 30,
@@ -3168,7 +3168,7 @@ window.GATE_DATA.questions['engmath'].topics.find(function(t){return t.id==='eng
 },
 {
   id: 'engmath-linear-algebra-pyq6',
-  pyqYear: 2020,
+  pyqStyle: true,
   q: 'A square matrix Q is called ORTHOGONAL if Q^T * Q = I (the transpose equals the inverse). Which of the following statements about orthogonal matrices are TRUE? (Select ALL that apply)',
   options: ['det(Q) = +1 or -1', 'The columns of Q form an orthonormal set (unit length, mutually perpendicular)', 'Every orthogonal matrix is also symmetric', 'Q^(-1) = Q^T'],
   answers: [0, 1, 3],
@@ -3179,7 +3179,7 @@ window.GATE_DATA.questions['engmath'].topics.find(function(t){return t.id==='eng
 },
 {
   id: 'engmath-linear-algebra-pyq7',
-  pyqYear: 2021,
+  pyqStyle: true,
   q: 'For the matrix A = [[2, 1], [1, 2]], the Cayley-Hamilton theorem gives A^2 - 4A + 3I = 0, so A^(-1) = (4I - A) / 3. What is the (1,1) entry of A^(-1)? (Enter your numerical answer, as a decimal.)',
   options: [],
   answer: 0.6667,
@@ -3192,7 +3192,7 @@ window.GATE_DATA.questions['engmath'].topics.find(function(t){return t.id==='eng
 },
 {
   id: 'engmath-linear-algebra-pyq8',
-  pyqYear: 2022,
+  pyqStyle: true,
   q: 'Which of the following statements about a REAL SYMMETRIC matrix A (where A = A^T) are always TRUE? (Select ALL that apply)',
   options: ['All eigenvalues of A are real numbers', 'Eigenvectors corresponding to distinct eigenvalues are orthogonal to each other', 'A is always invertible', 'A can always be diagonalized by an orthogonal matrix'],
   answers: [0, 1, 3],
@@ -3203,7 +3203,7 @@ window.GATE_DATA.questions['engmath'].topics.find(function(t){return t.id==='eng
 },
 {
   id: 'engmath-linear-algebra-pyq9',
-  pyqYear: 2023,
+  pyqStyle: true,
   q: 'Let A and B be square n x n matrices, and let k be a scalar. Which of the following determinant properties are TRUE? (Select ALL that apply)',
   options: ['det(A * B) = det(A) * det(B)', 'det(A^T) = det(A)', 'det(k * A) = k^n * det(A)', 'det(A + B) = det(A) + det(B)'],
   answers: [0, 1, 2],
@@ -3214,7 +3214,7 @@ window.GATE_DATA.questions['engmath'].topics.find(function(t){return t.id==='eng
 },
 {
   id: 'engmath-linear-algebra-pyq10',
-  pyqYear: 2024,
+  pyqStyle: true,
   q: 'The system of equations x + y + z = 6, x + 2y + 3z = 10, x + 2y + kz = 10 has INFINITELY MANY solutions for exactly one value of k (making the coefficient matrix singular AND keeping the system consistent). What is that value of k? (Enter your numerical answer.)',
   options: [],
   answer: 3,
@@ -3226,7 +3226,7 @@ window.GATE_DATA.questions['engmath'].topics.find(function(t){return t.id==='eng
 },
 {
   id: 'engmath-linear-algebra-pyq11',
-  pyqYear: 2026,
+  pyqStyle: true,
   q: 'A linear transformation is represented by a 4 x 6 matrix A with rank(A) = 3. By the Rank-Nullity theorem, what is the nullity of A (the dimension of the null space, i.e. the solution space of Ax = 0)? (Enter your numerical answer.)',
   options: [],
   answer: 3,
@@ -3238,7 +3238,7 @@ window.GATE_DATA.questions['engmath'].topics.find(function(t){return t.id==='eng
 },
 {
   id: 'engmath-linear-algebra-pyq12',
-  pyqYear: 2025,
+  pyqStyle: true,
   q: 'A square matrix A is DIAGONALIZABLE (can be written as A = P*D*P^(-1) for diagonal D) if and only if:',
   options: ['A has n linearly independent eigenvectors (where A is n x n) - equivalently, the geometric multiplicity equals the algebraic multiplicity for every eigenvalue', 'A has n DISTINCT eigenvalues (this is both necessary and sufficient)', 'A is invertible (det(A) is nonzero)', 'A is symmetric'],
   answer: 0,
@@ -3251,7 +3251,7 @@ window.GATE_DATA.questions['engmath'].topics.find(function(t){return t.id==='eng
 window.GATE_DATA.questions['engmath'].topics.find(function(t){return t.id==='engmath-calculus';}).questions.push(
 {
   id: 'engmath-calculus-pyq1',
-  pyqYear: 2015,
+  pyqStyle: true,
   q: 'Evaluate: lim (x -> 0) of sin(3x) / sin(5x). (Enter your numerical answer, as a decimal.)',
   options: [],
   answer: 0.6,
@@ -3264,7 +3264,7 @@ window.GATE_DATA.questions['engmath'].topics.find(function(t){return t.id==='eng
 },
 {
   id: 'engmath-calculus-pyq2',
-  pyqYear: 2016,
+  pyqStyle: true,
   q: 'Evaluate: lim (n -> infinity) of (1 + 3/n)^n. (Enter your numerical answer, as a decimal, rounded to 2 decimal places.)',
   options: [],
   answer: 20.09,
@@ -3277,7 +3277,7 @@ window.GATE_DATA.questions['engmath'].topics.find(function(t){return t.id==='eng
 },
 {
   id: 'engmath-calculus-pyq3',
-  pyqYear: 2017,
+  pyqStyle: true,
   q: 'A function is defined piecewise as f(x) = 3x + 1 for x < 2, and f(x) = kx - 1 for x >= 2. For what value of k is f continuous at x = 2? (Enter your numerical answer.)',
   options: [],
   answer: 4,
@@ -3289,7 +3289,7 @@ window.GATE_DATA.questions['engmath'].topics.find(function(t){return t.id==='eng
 },
 {
   id: 'engmath-calculus-pyq4',
-  pyqYear: 2018,
+  pyqStyle: true,
   q: 'Consider f(x) = |x - 2| on the real line. Which statement about f at x = 2 is correct?',
   options: ['f is continuous at x=2 but NOT differentiable at x=2', 'f is differentiable at x=2, with f\\u2019(2) = 0', 'f is not even continuous at x=2', 'f is differentiable everywhere except it is discontinuous at x=2'],
   answer: 0,
@@ -3300,7 +3300,7 @@ window.GATE_DATA.questions['engmath'].topics.find(function(t){return t.id==='eng
 },
 {
   id: 'engmath-calculus-pyq5',
-  pyqYear: 2019,
+  pyqStyle: true,
   q: 'Rolle\\u2019s theorem requires continuity on [a,b], differentiability on (a,b), and f(a) = f(b). For the function f(x) = |x| on the interval [-1, 1] (where f(-1) = f(1) = 1), which hypothesis of Rolle\\u2019s theorem FAILS, correctly explaining why no c in (-1,1) with f\\u2019(c)=0 need exist (and indeed none does)?',
   options: ['Differentiability on the open interval (-1,1) fails, since f is not differentiable at x=0', 'Continuity on [-1,1] fails at the endpoints', 'f(a) = f(b) fails, since f(-1) != f(1)', 'All hypotheses hold, so Rolle\\u2019s theorem should have found a c, contradicting the theorem'],
   answer: 0,
@@ -3311,7 +3311,7 @@ window.GATE_DATA.questions['engmath'].topics.find(function(t){return t.id==='eng
 },
 {
   id: 'engmath-calculus-pyq6',
-  pyqYear: 2020,
+  pyqStyle: true,
   q: 'Using the Mean Value Theorem for f(x) = x^2 on the interval [1, 3], find the value of c in (1,3) that satisfies f\\u2019(c) = (f(3) - f(1)) / (3 - 1). (Enter your numerical answer.)',
   options: [],
   answer: 2,
@@ -3323,7 +3323,7 @@ window.GATE_DATA.questions['engmath'].topics.find(function(t){return t.id==='eng
 },
 {
   id: 'engmath-calculus-pyq7',
-  pyqYear: 2021,
+  pyqStyle: true,
   q: 'Find the MAXIMUM value of the function f(x) = -x^2 + 4x + 1 over all real numbers x. (Enter your numerical answer.)',
   options: [],
   answer: 5,
@@ -3335,7 +3335,7 @@ window.GATE_DATA.questions['engmath'].topics.find(function(t){return t.id==='eng
 },
 {
   id: 'engmath-calculus-pyq8',
-  pyqYear: 2022,
+  pyqStyle: true,
   q: 'Evaluate the definite integral: integral from x = -2 to x = 2 of (x^3 + 3x) dx, using the symmetry of the integrand. (Enter your numerical answer.)',
   options: [],
   answer: 0,
@@ -3347,7 +3347,7 @@ window.GATE_DATA.questions['engmath'].topics.find(function(t){return t.id==='eng
 },
 {
   id: 'engmath-calculus-pyq9',
-  pyqYear: 2023,
+  pyqStyle: true,
   q: 'Using integration by parts, evaluate: integral from x = 0 to x = 1 of x * e^x dx. (Enter your numerical answer.)',
   options: [],
   answer: 1,
@@ -3359,7 +3359,7 @@ window.GATE_DATA.questions['engmath'].topics.find(function(t){return t.id==='eng
 },
 {
   id: 'engmath-calculus-pyq10',
-  pyqYear: 2024,
+  pyqStyle: true,
   q: 'Find the area of the region enclosed between the curves y = x and y = x^2 for 0 <= x <= 1 (the region where y = x lies above y = x^2). (Enter your numerical answer, as a decimal.)',
   options: [],
   answer: 0.1667,
@@ -3372,7 +3372,7 @@ window.GATE_DATA.questions['engmath'].topics.find(function(t){return t.id==='eng
 },
 {
   id: 'engmath-calculus-pyq11',
-  pyqYear: 2026,
+  pyqStyle: true,
   q: 'Evaluate: lim (x -> 0) of (e^(2x) - 1) / x. (Enter your numerical answer.)',
   options: [],
   answer: 2,
@@ -3384,7 +3384,7 @@ window.GATE_DATA.questions['engmath'].topics.find(function(t){return t.id==='eng
 },
 {
   id: 'engmath-calculus-pyq12',
-  pyqYear: 2025,
+  pyqStyle: true,
   q: 'For the function f(x) = x^3 - 3x, the critical point at x = 1 (where f\\u2019(1) = 0) is classified using the second derivative test. What does this classification give?',
   options: ['A local minimum, since f\\u2019\\u2019(1) > 0', 'A local maximum, since f\\u2019\\u2019(1) < 0', 'An inflection point, since f\\u2019\\u2019(1) = 0', 'The test is inconclusive at x = 1'],
   answer: 0,
@@ -3397,7 +3397,7 @@ window.GATE_DATA.questions['engmath'].topics.find(function(t){return t.id==='eng
 window.GATE_DATA.questions['engmath'].topics.find(function(t){return t.id==='engmath-probability';}).questions.push(
 {
   id: 'engmath-probability-pyq1',
-  pyqYear: 2015,
+  pyqStyle: true,
   q: 'A disease affects 1% of a population. A diagnostic test has a 99% true positive rate (sensitivity) and a 2% false positive rate (i.e. 98% specificity). If a randomly chosen person tests POSITIVE, what is the probability they actually have the disease? (Give your answer as a decimal.)',
   options: [],
   answer: 0.3333,
@@ -3410,7 +3410,7 @@ window.GATE_DATA.questions['engmath'].topics.find(function(t){return t.id==='eng
 },
 {
   id: 'engmath-probability-pyq2',
-  pyqYear: 2016,
+  pyqStyle: true,
   q: 'A fair six-sided die is rolled once. Given that the outcome is an EVEN number, what is the probability that the outcome is also GREATER than 4?',
   options: ['1/3', '1/2', '2/3', '1/6'],
   answer: 0,
@@ -3421,7 +3421,7 @@ window.GATE_DATA.questions['engmath'].topics.find(function(t){return t.id==='eng
 },
 {
   id: 'engmath-probability-pyq3',
-  pyqYear: 2017,
+  pyqStyle: true,
   q: 'A random variable X has E[X] = 4. What is E[3X + 2]? (Enter your numerical answer.)',
   options: [],
   answer: 14,
@@ -3433,7 +3433,7 @@ window.GATE_DATA.questions['engmath'].topics.find(function(t){return t.id==='eng
 },
 {
   id: 'engmath-probability-pyq4',
-  pyqYear: 2018,
+  pyqStyle: true,
   q: 'A random variable X has Var(X) = 5. What is Var(2X + 3)? (Enter your numerical answer.)',
   options: [],
   answer: 20,
@@ -3445,7 +3445,7 @@ window.GATE_DATA.questions['engmath'].topics.find(function(t){return t.id==='eng
 },
 {
   id: 'engmath-probability-pyq5',
-  pyqYear: 2019,
+  pyqStyle: true,
   q: 'Two random variables X and Y each take values in {0, 1}, with the joint probability mass function: P(X=0,Y=0)=0.3, P(X=0,Y=1)=0.2, P(X=1,Y=0)=0.1, P(X=1,Y=1)=0.4. What is the MARGINAL probability P(X=1)?',
   options: [],
   answer: 0.5,
@@ -3457,7 +3457,7 @@ window.GATE_DATA.questions['engmath'].topics.find(function(t){return t.id==='eng
 },
 {
   id: 'engmath-probability-pyq6',
-  pyqYear: 2020,
+  pyqStyle: true,
   q: 'The number of typos on a page follows a Poisson distribution with mean (rate parameter) lambda = 4 typos per page. What is the probability that a randomly selected page has EXACTLY 2 typos? (Give your answer as a decimal, rounded to 4 places.)',
   options: [],
   answer: 0.1465,
@@ -3470,7 +3470,7 @@ window.GATE_DATA.questions['engmath'].topics.find(function(t){return t.id==='eng
 },
 {
   id: 'engmath-probability-pyq7',
-  pyqYear: 2021,
+  pyqStyle: true,
   q: 'A random variable X follows a Uniform distribution on the interval [2, 10]. What is P(3 < X < 7)? (Enter your numerical answer.)',
   options: [],
   answer: 0.5,
@@ -3482,7 +3482,7 @@ window.GATE_DATA.questions['engmath'].topics.find(function(t){return t.id==='eng
 },
 {
   id: 'engmath-probability-pyq8',
-  pyqYear: 2022,
+  pyqStyle: true,
   q: 'Which of the following statements about Covariance and Correlation are TRUE? (Select ALL that apply)',
   options: ['Cov(X, X) = Var(X)', 'If X and Y are independent, then Cov(X, Y) = 0', 'If Cov(X, Y) = 0, then X and Y must be independent', 'The correlation coefficient rho(X, Y) always lies in the range [-1, 1]'],
   answers: [0, 1, 3],
@@ -3493,7 +3493,7 @@ window.GATE_DATA.questions['engmath'].topics.find(function(t){return t.id==='eng
 },
 {
   id: 'engmath-probability-pyq9',
-  pyqYear: 2023,
+  pyqStyle: true,
   q: 'A factory has two machines, A and B. Machine A produces 60% of all items and has a 5% defect rate; Machine B produces 40% of all items and has a 10% defect rate. Using the Law of Total Probability, what is the overall probability that a randomly selected item is defective? (Give your answer as a decimal.)',
   options: [],
   answer: 0.07,
@@ -3506,7 +3506,7 @@ window.GATE_DATA.questions['engmath'].topics.find(function(t){return t.id==='eng
 },
 {
   id: 'engmath-probability-pyq10',
-  pyqYear: 2024,
+  pyqStyle: true,
   q: 'Two cards are drawn WITHOUT replacement from a standard well-shuffled deck of 52 playing cards (which contains exactly 4 aces). What is the probability that BOTH cards drawn are aces? (Give your answer as a decimal, rounded to 4 places.)',
   options: [],
   answer: 0.0045,
@@ -3519,7 +3519,7 @@ window.GATE_DATA.questions['engmath'].topics.find(function(t){return t.id==='eng
 },
 {
   id: 'engmath-probability-pyq11',
-  pyqYear: 2026,
+  pyqStyle: true,
   q: 'A random variable X follows a standard Normal distribution N(0,1). Using the property that the standard Normal is symmetric about 0, and given that P(0 < Z < 1) ≈ 0.3413, what is P(-1 < Z < 1)? (Give your answer as a decimal.)',
   options: [],
   answer: 0.6826,
@@ -3532,7 +3532,7 @@ window.GATE_DATA.questions['engmath'].topics.find(function(t){return t.id==='eng
 },
 {
   id: 'engmath-probability-pyq12',
-  pyqYear: 2025,
+  pyqStyle: true,
   q: 'The Exponential distribution is known for its MEMORYLESS property: P(X > s+t | X > s) = P(X > t) for all s, t >= 0. If a component\\u2019s lifetime X is Exponential and it has already survived 5 years, what is the probability it survives at least 3 MORE years, in terms of the unconditional survival function?',
   options: ['It equals P(X > 3), exactly the same as a brand-new component surviving 3 years, regardless of the 5 years already survived', 'It equals P(X > 8), since the total elapsed time must be counted from the original start', 'It equals P(X > 3) * P(X > 5), by independence of past and future', 'It is always smaller than P(X > 3), since the component has already aged 5 years'],
   answer: 0,

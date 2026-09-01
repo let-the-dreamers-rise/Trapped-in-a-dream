@@ -2135,7 +2135,7 @@ window.GATE_DATA.questions['toc'].topics.find(function(t){return t.id==='toc-tur
 window.GATE_DATA.questions['toc'].topics.find(function(t){return t.id==='toc-regular';}).questions.push(
 {
   id: 'toc-regular-p1',
-  pyqYear: 2015,
+  pyqStyle: true,
   q: "What is the minimum number of states in a DFA over {0,1} that accepts exactly those strings whose THIRD symbol from the right end is a 1 (the string must have length at least 3)? Enter your numerical answer.",
   options: [],
   answer: 8,
@@ -2147,7 +2147,7 @@ window.GATE_DATA.questions['toc'].topics.find(function(t){return t.id==='toc-reg
 },
 {
   id: 'toc-regular-p2',
-  pyqYear: 2016,
+  pyqStyle: true,
   q: "Consider the NFA over {0,1} with states {q0,q1,q2,q3}, start state q0, and accepting state q3, recognizing strings that END with the pattern 101. Transitions: delta(q0,1)={q0,q1}, delta(q0,0)={q0}, delta(q1,0)={q2}, delta(q2,1)={q3}, and all other transitions empty (no state has any other move). Applying subset construction starting from {q0}, how many DISTINCT states does the resulting DFA have (count only states reachable from the start, and do not add a separate dead state unless the construction actually reaches the empty set)? Enter your numerical answer.",
   options: [],
   answer: 4,
@@ -2159,7 +2159,7 @@ window.GATE_DATA.questions['toc'].topics.find(function(t){return t.id==='toc-reg
 },
 {
   id: 'toc-regular-p3',
-  pyqYear: 2017,
+  pyqStyle: true,
   q: "Consider these four languages over {a,b}: (I) L1 = { a^i b^j : i,j >= 0 and (i+j) mod 4 = 0 }. (II) L2 = { a^n b^n : n >= 0 }. (III) L3 = { a^n : n is a perfect square }. (IV) L4 = { a^i b^j : i,j >= 0 and i <= 5 } (any number of a's from 0 to 5, followed by any number of b's). Which of these languages are REGULAR? (Select ALL that apply)",
   options: ['L1', 'L2', 'L3', 'L4'],
   answers: [0, 3],
@@ -2170,7 +2170,7 @@ window.GATE_DATA.questions['toc'].topics.find(function(t){return t.id==='toc-reg
 },
 {
   id: 'toc-regular-p4',
-  pyqYear: 2018,
+  pyqStyle: true,
   q: "What is the minimum number of states in a DFA over {0,1} that accepts a string if and only if BOTH of the following hold: the number of 1's in the string is even, AND the string does NOT end with the substring 00? Enter your numerical answer.",
   options: [],
   answer: 6,
@@ -2182,7 +2182,7 @@ window.GATE_DATA.questions['toc'].topics.find(function(t){return t.id==='toc-reg
 },
 {
   id: 'toc-regular-p5',
-  pyqYear: 2019,
+  pyqStyle: true,
   q: "Which of the following statements about regular languages are TRUE? (Select ALL that apply)",
   options: ['The class of regular languages is closed under intersection', 'The class of regular languages is closed under the Kleene star operation', 'The class of regular languages is closed under arbitrary (possibly infinite) unions of regular languages', 'The class of regular languages is closed under reversal (reversing every string in the language)'],
   answers: [0, 1, 3],
@@ -2193,7 +2193,7 @@ window.GATE_DATA.questions['toc'].topics.find(function(t){return t.id==='toc-reg
 },
 {
   id: 'toc-regular-p6',
-  pyqYear: 2020,
+  pyqStyle: true,
   q: "To prove L = { a^n b^n : n >= 0 } is not regular using the pumping lemma, we let p be the pumping length and pick w = a^p b^p, then consider any decomposition w = xyz satisfying |xy| <= p and |y| >= 1. What can we conclude about y itself under this constraint?",
   options: ['y must consist only of a symbols (y = a^k for some k >= 1)', 'y must consist of a mix of a symbols followed by b symbols', 'y must consist only of b symbols', 'y must be the empty string'],
   answer: 0,
@@ -2204,7 +2204,7 @@ window.GATE_DATA.questions['toc'].topics.find(function(t){return t.id==='toc-reg
 },
 {
   id: 'toc-regular-p7',
-  pyqYear: 2021,
+  pyqStyle: true,
   q: "What is the minimum number of states in a DFA over {0,1} that accepts exactly those strings ENDING in the pattern 01? Enter your numerical answer.",
   options: [],
   answer: 3,
@@ -2216,7 +2216,7 @@ window.GATE_DATA.questions['toc'].topics.find(function(t){return t.id==='toc-reg
 },
 {
   id: 'toc-regular-p8',
-  pyqYear: 2022,
+  pyqStyle: true,
   q: "Consider the epsilon-NFA over {a,b} with states {p0,p1,p2}, start state p0 (accepting state p2), and moves: p0 has an epsilon-move to p1, p0 has a self-loop on a, p0 has a self-loop on b, p1 has a move to p2 on a (p1 has no move on b), and p2 has a self-loop on a (p2 has no move on b). Applying the standard epsilon-closure subset construction, how many DISTINCT reachable DFA states does the equivalent DFA have? Enter your numerical answer.",
   options: [],
   answer: 2,
@@ -2228,7 +2228,7 @@ window.GATE_DATA.questions['toc'].topics.find(function(t){return t.id==='toc-reg
 },
 {
   id: 'toc-regular-p9',
-  pyqYear: 2023,
+  pyqStyle: true,
   q: "Which of the following statements about regular languages are TRUE? (Select ALL that apply)",
   options: ['If L1 and L2 are both regular, then L1 intersect L2 is regular', 'If L1 is regular and L2 is not regular, then L1 union L2 can never be regular', 'If L is regular, then { w w : w is in L } is always regular', 'The class of regular languages is closed under set difference (L1 minus L2 is regular whenever L1 and L2 are)'],
   answers: [0, 3],
@@ -2239,7 +2239,7 @@ window.GATE_DATA.questions['toc'].topics.find(function(t){return t.id==='toc-reg
 },
 {
   id: 'toc-regular-p10',
-  pyqYear: 2024,
+  pyqStyle: true,
   q: "A DFA over {0,1} has states {A,B,C,D}, start state A, accepting states {C,D}, and transitions: A on 0 goes to B, A on 1 goes to C; B on 0 goes to B, B on 1 goes to D; C on 0 goes to D, C on 1 goes to C; D on 0 goes to C, D on 1 goes to D. Using the table-filling (Myhill-Nerode partition refinement) method to minimize this DFA, how many states does the MINIMAL equivalent DFA have? Enter your numerical answer.",
   options: [],
   answer: 2,
@@ -2251,7 +2251,7 @@ window.GATE_DATA.questions['toc'].topics.find(function(t){return t.id==='toc-reg
 },
 {
   id: 'toc-regular-p11',
-  pyqYear: 2025,
+  pyqStyle: true,
   q: "For each n, there exists an n-state NFA over {0,1} such that every equivalent DFA needs at least 2^n states -- this is the standard witness family used to show the subset construction's exponential blowup is TIGHT (not just an upper bound). Which language family is this classic witness?",
   options: ['The language of strings whose n-th symbol from the right end is a fixed value (e.g. 1)', 'The language a^n b^n', 'The language of strings of even length', 'The language of strings containing the substring aba'],
   answer: 0,
@@ -2262,7 +2262,7 @@ window.GATE_DATA.questions['toc'].topics.find(function(t){return t.id==='toc-reg
 },
 {
   id: 'toc-regular-p12',
-  pyqYear: 2026,
+  pyqStyle: true,
   q: "What is the minimum number of states in a DFA over {0,1} recognizing the language described by the regular expression (0+1)* 11 (0+1)*, i.e. all strings containing 11 as a substring somewhere? Enter your numerical answer.",
   options: [],
   answer: 3,
@@ -2274,7 +2274,7 @@ window.GATE_DATA.questions['toc'].topics.find(function(t){return t.id==='toc-reg
 },
 {
   id: 'toc-regular-p13',
-  pyqYear: 2016,
+  pyqStyle: true,
   q: "What is the minimum number of states in a DFA over {a,b} that accepts a string if and only if the number of a's in it is congruent to 0 mod 4 (the b's may occur anywhere and do not affect acceptance)? Enter your numerical answer.",
   options: [],
   answer: 4,
@@ -2286,7 +2286,7 @@ window.GATE_DATA.questions['toc'].topics.find(function(t){return t.id==='toc-reg
 },
 {
   id: 'toc-regular-p14',
-  pyqYear: 2020,
+  pyqStyle: true,
   q: "Which of the following statements about the pumping lemma for regular languages are TRUE? (Select ALL that apply)",
   options: ['If a language satisfies the pumping lemma condition (some valid pumping length p exists with the usual decomposition property), the language must be regular', 'If a language FAILS the pumping lemma condition (no valid p works for every long-enough string), the language cannot be regular', 'The pumping lemma is used to PROVE that a language is regular, by exhibiting a valid pumping decomposition for every string in it', 'Every finite language automatically satisfies the pumping lemma condition, because a sufficiently large pumping length can be chosen so that no string in the language is long enough to require decomposition'],
   answers: [1, 3],
@@ -2300,7 +2300,7 @@ window.GATE_DATA.questions['toc'].topics.find(function(t){return t.id==='toc-reg
 window.GATE_DATA.questions['toc'].topics.find(function(t){return t.id==='toc-cfl';}).questions.push(
 {
   id: 'toc-cfl-p1',
-  pyqYear: 2015,
+  pyqStyle: true,
   q: "Consider L = { a^n b^n c^m : n,m >= 0 }, i.e. equal numbers of a's and b's followed by any number of c's. Which of the following BEST classifies L?",
   options: ['L is not context-free', 'L is context-free but every pushdown automaton for it must be nondeterministic', 'L is deterministic context-free (a DPDA can accept it)', 'L is regular'],
   answer: 2,
@@ -2311,7 +2311,7 @@ window.GATE_DATA.questions['toc'].topics.find(function(t){return t.id==='toc-cfl
 },
 {
   id: 'toc-cfl-p2',
-  pyqYear: 2016,
+  pyqStyle: true,
   q: "Consider the CFG (after eliminating useless symbols) with productions: S -> A S A | S A | A S | a B | a ; A -> B | S ; B -> b. After fully converting this grammar to Chomsky Normal Form (eliminating epsilon-productions where needed, eliminating unit productions, and binarizing/isolating terminals), how many total productions does the resulting CNF grammar have? Enter your numerical answer.",
   options: [],
   answer: 14,
@@ -2323,7 +2323,7 @@ window.GATE_DATA.questions['toc'].topics.find(function(t){return t.id==='toc-cfl
 },
 {
   id: 'toc-cfl-p3',
-  pyqYear: 2017,
+  pyqStyle: true,
   q: "Consider the grammar S -> a S b S | b S a S | epsilon, intended to generate all strings over {a,b} with an equal number of a's and b's. Which statement correctly describes this grammar?",
   options: ['The grammar is unambiguous, and it correctly generates exactly the equal-count language', 'The grammar is ambiguous, even though it does correctly generate exactly the equal-count language', 'The grammar generates strings that do NOT always have equal numbers of a and b', 'The language generated is not context-free'],
   answer: 1,
@@ -2334,7 +2334,7 @@ window.GATE_DATA.questions['toc'].topics.find(function(t){return t.id==='toc-cfl
 },
 {
   id: 'toc-cfl-p4',
-  pyqYear: 2018,
+  pyqStyle: true,
   q: "Let L = { a^i b^j c^k : i,j,k >= 0 and (i = j OR j = k) }. Which of the following is TRUE about L?",
   options: ['L is context-free but not regular', 'L is regular', 'L is not context-free', 'The complement of L is regular'],
   answer: 0,
@@ -2345,7 +2345,7 @@ window.GATE_DATA.questions['toc'].topics.find(function(t){return t.id==='toc-cfl
 },
 {
   id: 'toc-cfl-p5',
-  pyqYear: 2019,
+  pyqStyle: true,
   q: "Which of the following closure properties of context-free languages are TRUE? (Select ALL that apply)",
   options: ['Context-free languages are closed under union', 'Context-free languages are closed under intersection (the intersection of two CFLs is always context-free)', 'Context-free languages are closed under complementation', 'Context-free languages are closed under concatenation'],
   answers: [0, 3],
@@ -2356,7 +2356,7 @@ window.GATE_DATA.questions['toc'].topics.find(function(t){return t.id==='toc-cfl
 },
 {
   id: 'toc-cfl-p6',
-  pyqYear: 2020,
+  pyqStyle: true,
   q: "Consider L = { w w^R : w is in {a,b}* }, the language of even-length palindromes formed by a string immediately followed by its own reverse. Which of the following BEST classifies L?",
   options: ['L is deterministic context-free (DCFL)', 'L is context-free but NOT deterministic context-free', 'L is not context-free at all', 'L is regular'],
   answer: 1,
@@ -2367,7 +2367,7 @@ window.GATE_DATA.questions['toc'].topics.find(function(t){return t.id==='toc-cfl
 },
 {
   id: 'toc-cfl-p7',
-  pyqYear: 2021,
+  pyqStyle: true,
   q: "Consider the grammar S -> A, A -> B, B -> C, C -> a C | b (a chain of unit productions ending in one non-unit rule with two alternatives). After eliminating ALL unit productions (replacing each with the appropriate non-unit productions inherited transitively, and removing the unit productions themselves), how many total productions remain in the grammar (summed across all four nonterminals S, A, B, C)? Enter your numerical answer.",
   options: [],
   answer: 8,
@@ -2379,7 +2379,7 @@ window.GATE_DATA.questions['toc'].topics.find(function(t){return t.id==='toc-cfl
 },
 {
   id: 'toc-cfl-p8',
-  pyqYear: 2022,
+  pyqStyle: true,
   q: "The standard algorithm for converting an arbitrary context-free grammar (that does not generate the empty string) into Chomsky Normal Form requires which of the following preprocessing steps, in general?",
   options: ['Only eliminating unit productions is required', 'Only eliminating epsilon-productions is required', 'Only removing useless (unreachable or non-generating) symbols is required', 'All three: removing useless symbols, eliminating epsilon-productions, AND eliminating unit productions may be required, typically in that order, before final binarization'],
   answer: 3,
@@ -2390,7 +2390,7 @@ window.GATE_DATA.questions['toc'].topics.find(function(t){return t.id==='toc-cfl
 },
 {
   id: 'toc-cfl-p9',
-  pyqYear: 2023,
+  pyqStyle: true,
   q: "To prove L = { a^n b^n c^n : n >= 0 } is not context-free using the CFL pumping lemma, we pick w = a^p b^p c^p for pumping length p, and consider any decomposition w = uvxyz with |vxy| <= p and |vy| >= 1. Because of the |vxy| <= p restriction, at most how many of the three distinct symbols (a, b, c) can appear WITHIN the substring vxy?",
   options: [],
   answer: 2,
@@ -2402,7 +2402,7 @@ window.GATE_DATA.questions['toc'].topics.find(function(t){return t.id==='toc-cfl
 },
 {
   id: 'toc-cfl-p10',
-  pyqYear: 2024,
+  pyqStyle: true,
   q: "Using the CYK (Cocke-Younger-Kasami) dynamic programming algorithm to test membership of a length-5 string in a CNF grammar's language, the algorithm fills a triangular table where the cell for each contiguous substring (of every possible length from 1 up to 5, at every possible starting position) is computed. How many total substrings (i.e. table cells) does this triangular table have for a string of length n=5? Enter your numerical answer.",
   options: [],
   answer: 15,
@@ -2414,7 +2414,7 @@ window.GATE_DATA.questions['toc'].topics.find(function(t){return t.id==='toc-cfl
 },
 {
   id: 'toc-cfl-p11',
-  pyqYear: 2025,
+  pyqStyle: true,
   q: "Consider L = { a^n b^m : n,m >= 0 and n is NOT equal to m }, the language of strings with an unequal number of a's and b's. Which of the following BEST classifies L?",
   options: ['L is deterministic context-free (DCFL)', 'L is context-free but not deterministic context-free', 'L is not context-free', 'L is regular'],
   answer: 0,
@@ -2425,7 +2425,7 @@ window.GATE_DATA.questions['toc'].topics.find(function(t){return t.id==='toc-cfl
 },
 {
   id: 'toc-cfl-p12',
-  pyqYear: 2026,
+  pyqStyle: true,
   q: "Consider these four languages: (I) { a^n b^2n : n >= 0 }. (II) { a^n b^n c^n : n >= 0 }. (III) { w w : w is in {a,b}* }. (IV) { a^i b^j : i,j >= 0 and i <= j }. Which of these are CONTEXT-FREE (but not regular)? (Select ALL that apply)",
   options: ['Language I', 'Language II', 'Language III', 'Language IV'],
   answers: [0, 3],
@@ -2436,7 +2436,7 @@ window.GATE_DATA.questions['toc'].topics.find(function(t){return t.id==='toc-cfl
 },
 {
   id: 'toc-cfl-p13',
-  pyqYear: 2016,
+  pyqStyle: true,
   q: "Consider L = { a^n b^n a^n : n >= 0 }, i.e. a block of n a's, then n b's, then n more a's, all with the SAME count n. Which of the following BEST classifies L?",
   options: ['L is regular', 'L is context-free but not regular', 'L is not context-free', 'L is context-sensitive but the exact classification is undecidable in general'],
   answer: 2,
@@ -2447,7 +2447,7 @@ window.GATE_DATA.questions['toc'].topics.find(function(t){return t.id==='toc-cfl
 },
 {
   id: 'toc-cfl-p14',
-  pyqYear: 2020,
+  pyqStyle: true,
   q: "A context-free language L is said to be INHERENTLY AMBIGUOUS when:",
   options: ['Every context-free grammar that generates L is ambiguous (no unambiguous grammar for L exists at all)', 'At least one grammar that generates L happens to be ambiguous, even though some other grammar for L might be unambiguous', 'L cannot be generated by any context-free grammar whatsoever', 'L is not a context-free language at all'],
   answer: 0,
@@ -2461,7 +2461,7 @@ window.GATE_DATA.questions['toc'].topics.find(function(t){return t.id==='toc-cfl
 window.GATE_DATA.questions['toc'].topics.find(function(t){return t.id==='toc-turing';}).questions.push(
 {
   id: 'toc-turing-p1',
-  pyqYear: 2015,
+  pyqStyle: true,
   q: "A Turing machine is said to DECIDE a language L (as opposed to merely RECOGNIZE/ACCEPT it). What additional requirement does 'decide' impose that plain 'accept' does not?",
   options: ['The machine must halt on EVERY input, entering an accept state for strings in L and a reject state (or otherwise halting without accepting) for strings not in L', 'The machine only needs to halt and accept on inputs that are in L, and may behave arbitrarily (including looping forever) on inputs not in L', 'The machine must halt only on inputs not in L', 'There is no difference between deciding and accepting a language'],
   answer: 0,
@@ -2472,7 +2472,7 @@ window.GATE_DATA.questions['toc'].topics.find(function(t){return t.id==='toc-tur
 },
 {
   id: 'toc-turing-p2',
-  pyqYear: 2016,
+  pyqStyle: true,
   q: "Which of the following statements relating RE (recursively enumerable) and REC (recursive/decidable) languages are TRUE? (Select ALL that apply)",
   options: ['If L is decidable (in REC), then the complement of L is also decidable', 'If L is RE, then the complement of L is always also RE', 'If both L and the complement of L are RE, then L must be decidable (in REC)', 'Every RE language is automatically decidable'],
   answers: [0, 2],
@@ -2483,7 +2483,7 @@ window.GATE_DATA.questions['toc'].topics.find(function(t){return t.id==='toc-tur
 },
 {
   id: 'toc-turing-p3',
-  pyqYear: 2017,
+  pyqStyle: true,
   q: "Consider the Halting Problem H = { <M,w> : Turing machine M halts on input w (regardless of whether it accepts or rejects) }. Which of the following correctly classifies H?",
   options: ['H is decidable', 'H is recursively enumerable (RE) but not decidable', 'H is co-RE (its complement is RE) but H itself is not RE', 'H is neither RE nor co-RE'],
   answer: 1,
@@ -2494,7 +2494,7 @@ window.GATE_DATA.questions['toc'].topics.find(function(t){return t.id==='toc-tur
 },
 {
   id: 'toc-turing-p4',
-  pyqYear: 2018,
+  pyqStyle: true,
   q: "For each of the following properties of an arbitrary Turing machine M, decide whether determining that property (given M's description) is DECIDABLE or UNDECIDABLE. Select the properties that are UNDECIDABLE. (Select ALL that apply)",
   options: ['Does M have at least 10 states (counting from its formal description)?', 'Does L(M) contain at least one string of length exactly 10?', 'Does M halt within 100 steps when run on the empty input string?', 'Is L(M) the empty language?'],
   answers: [1, 3],
@@ -2505,7 +2505,7 @@ window.GATE_DATA.questions['toc'].topics.find(function(t){return t.id==='toc-tur
 },
 {
   id: 'toc-turing-p5',
-  pyqYear: 2019,
+  pyqStyle: true,
   q: "To prove that the problem 'given a Turing machine M and input w, does M ever write a non-blank symbol on the tape while running on w' is undecidable, the standard proof technique is to construct a computable reduction FROM which known undecidable problem?",
   options: ['The Acceptance Problem A_TM = { <M,w> : M accepts w }', 'The Emptiness Problem for DFAs', 'Post’s Correspondence Problem, applied directly without any TM construction', 'No reduction is needed, since the property is actually decidable by direct simulation'],
   answer: 0,
@@ -2516,7 +2516,7 @@ window.GATE_DATA.questions['toc'].topics.find(function(t){return t.id==='toc-tur
 },
 {
   id: 'toc-turing-p6',
-  pyqYear: 2020,
+  pyqStyle: true,
   q: "The Post Correspondence Problem (PCP) is a fundamental undecidable problem primarily used as the starting point for proving undecidability results about which class of formalisms?",
   options: ['Properties of DFAs and regular expressions', 'Properties of context-free grammars, such as CFG ambiguity, CFG equivalence, and CFG universality', 'Only the Halting Problem for Turing machines directly, with no other applications', 'None of the above; PCP has no standard applications in formal language theory'],
   answer: 1,
@@ -2527,7 +2527,7 @@ window.GATE_DATA.questions['toc'].topics.find(function(t){return t.id==='toc-tur
 },
 {
   id: 'toc-turing-p7',
-  pyqYear: 2021,
+  pyqStyle: true,
   q: "For a Linear Bounded Automaton (LBA) M and input string w, is the membership problem (does M accept w?) decidable?",
   options: ['Yes, it is always decidable, because an LBA has only finitely many possible configurations (bounded by input length), so a simulation can detect and halt on configuration-repetition instead of looping forever', 'No, it is always undecidable, exactly like the analogous problem for unrestricted Turing machines', 'It is decidable only when M happens to be deterministic, but undecidable for nondeterministic LBAs', 'It is undecidable in general but is at least recursively enumerable (RE)'],
   answer: 0,
@@ -2538,7 +2538,7 @@ window.GATE_DATA.questions['toc'].topics.find(function(t){return t.id==='toc-tur
 },
 {
   id: 'toc-turing-p8',
-  pyqYear: 2022,
+  pyqStyle: true,
   q: "Which of the following is a language that is UNDECIDABLE but IS recursively enumerable (RE)?",
   options: ['A_TM = { <M,w> : Turing machine M accepts input w }', 'EQ_TM = { <M1,M2> : L(M1) = L(M2) }, which is known to be neither RE nor co-RE', 'The complement of A_TM, which is known to not be RE at all', 'The empty language over any alphabet, which is trivially decidable'],
   answer: 0,
@@ -2549,7 +2549,7 @@ window.GATE_DATA.questions['toc'].topics.find(function(t){return t.id==='toc-tur
 },
 {
   id: 'toc-turing-p9',
-  pyqYear: 2023,
+  pyqStyle: true,
   q: "To prove that a newly encountered problem X is undecidable by reduction from a known undecidable problem A, which direction of reduction is required?",
   options: ['Construct a computable transformation converting any instance of A into a corresponding instance of X (written A reduces to X), so that a decider for X would yield a decider for A', 'Construct a computable transformation converting any instance of X into a corresponding instance of A (written X reduces to A)', 'Either direction of reduction proves the same thing about X, so it does not matter which way it is done', 'No formal reduction is required; showing that X merely resembles A informally is sufficient to conclude X is undecidable'],
   answer: 0,
@@ -2560,7 +2560,7 @@ window.GATE_DATA.questions['toc'].topics.find(function(t){return t.id==='toc-tur
 },
 {
   id: 'toc-turing-p10',
-  pyqYear: 2024,
+  pyqStyle: true,
   q: "Consider the following four decision problems. Which of them are DECIDABLE? (Select ALL that apply)",
   options: ['Given a context-free grammar G, is L(G) equal to Sigma* (i.e. is G universal)?', 'Given two DFAs M1 and M2, do they accept the same language?', 'Given a context-free grammar G, is L(G) empty?', 'Given a Turing machine M, is L(M) equal to Sigma*?'],
   answers: [1, 2],
@@ -2571,7 +2571,7 @@ window.GATE_DATA.questions['toc'].topics.find(function(t){return t.id==='toc-tur
 },
 {
   id: 'toc-turing-p11',
-  pyqYear: 2025,
+  pyqStyle: true,
   q: "Consider the following four decision problems. Which of them are DECIDABLE? (Select ALL that apply)",
   options: ['Given a CFG G and a string w, does G generate w? (the CFG membership problem)', 'Given two CFGs G1 and G2, do they generate the same language?', 'Given a Turing machine M, does M halt on every possible input (the Totality Problem)?', 'Given a DFA M, is L(M) an infinite language?'],
   answers: [0, 3],
@@ -2582,7 +2582,7 @@ window.GATE_DATA.questions['toc'].topics.find(function(t){return t.id==='toc-tur
 },
 {
   id: 'toc-turing-p12',
-  pyqYear: 2026,
+  pyqStyle: true,
   q: "Which of the following properties of an arbitrary Turing machine's language L(M) is TRIVIAL (true for every possible RE language, or false for every possible RE language), meaning Rice's theorem does NOT apply and the property is trivially decidable regardless?",
   options: ['L(M) is the empty set', 'L(M) contains an even number of strings', 'L(M) is recursively enumerable', 'L(M) is a finite language'],
   answer: 2,
@@ -2593,7 +2593,7 @@ window.GATE_DATA.questions['toc'].topics.find(function(t){return t.id==='toc-tur
 },
 {
   id: 'toc-turing-p13',
-  pyqYear: 2016,
+  pyqStyle: true,
   q: "A Universal Turing Machine U is designed to take as input an encoding <M,w> of some other Turing machine M together with a string w. What does U do when run on this input?",
   options: ['U simulates M running on w step by step, and behaves exactly as M would (accepting if M accepts, rejecting if M rejects, and looping forever if M loops forever on w)', 'U always halts within a fixed number of steps regardless of what M and w are', 'U only works correctly when M happens to be a decider (halts on all inputs); for other M it always crashes with an error', 'A Universal Turing Machine cannot be constructed for an arbitrary M, only for specific restricted classes of machines'],
   answer: 0,
@@ -2604,7 +2604,7 @@ window.GATE_DATA.questions['toc'].topics.find(function(t){return t.id==='toc-tur
 },
 {
   id: 'toc-turing-p14',
-  pyqYear: 2020,
+  pyqStyle: true,
   q: "Consider the following four decision problems about an arbitrary Turing machine M. Which of them are UNDECIDABLE? (Select ALL that apply)",
   options: ['Given M, does M halt when run on the empty input string?', 'Given M and a specific number k, does M halt on the empty input string within k steps?', 'Given M, does M halt on EVERY possible input string (the Totality Problem)?', 'Given M, does M fail to halt (i.e. loop forever) on AT LEAST ONE input string?'],
   answers: [0, 2, 3],
@@ -2618,7 +2618,7 @@ window.GATE_DATA.questions['toc'].topics.find(function(t){return t.id==='toc-tur
 window.GATE_DATA.questions['toc'].topics.find(function(t){return t.id==='toc-decidability';}).questions.push(
 {
   id: 'toc-decidability-p1',
-  pyqYear: 2015,
+  pyqStyle: true,
   q: "Which of the following FINITENESS-related questions are DECIDABLE? (Select ALL that apply)",
   options: ['Given a DFA M, is L(M) finite?', 'Given a CFG G, is L(G) finite?', 'Given a Turing machine M, is L(M) finite?', 'Given a CFG G, is L(G) infinite (i.e. NOT finite)?'],
   answers: [0, 1, 3],
@@ -2629,7 +2629,7 @@ window.GATE_DATA.questions['toc'].topics.find(function(t){return t.id==='toc-dec
 },
 {
   id: 'toc-decidability-p2',
-  pyqYear: 2016,
+  pyqStyle: true,
   q: "For an arbitrary Turing machine M, which of the following questions about M are UNDECIDABLE? (Select ALL that apply)",
   options: ['Is L(M) a regular language?', 'Does M have an even number of states, as listed in its formal description?', 'Is L(M) equal to the empty set OR equal to Sigma* (i.e. is L(M) one of these two extreme, trivial-looking languages)?', 'Does M move its tape head to the left at some point during the first 5 steps of its run on the empty input?'],
   answers: [0, 2],
@@ -2640,7 +2640,7 @@ window.GATE_DATA.questions['toc'].topics.find(function(t){return t.id==='toc-dec
 },
 {
   id: 'toc-decidability-p3',
-  pyqYear: 2017,
+  pyqStyle: true,
   q: "Which of the following statements about REC (decidable) and RE (recursively enumerable) languages are TRUE? (Select ALL that apply)",
   options: ['The class REC (decidable languages) is closed under complementation', 'The class RE is closed under complementation', 'The class RE is closed under union and under intersection', 'The class REC is closed under union and under intersection'],
   answers: [0, 2, 3],
@@ -2651,7 +2651,7 @@ window.GATE_DATA.questions['toc'].topics.find(function(t){return t.id==='toc-dec
 },
 {
   id: 'toc-decidability-p4',
-  pyqYear: 2018,
+  pyqStyle: true,
   q: "Suppose it is known that both a language L and its complement (over the same alphabet) are recursively enumerable (RE). What can we conclude about L?",
   options: ['L must be decidable (in REC)', 'L must be undecidable', 'L cannot be RE itself (contradiction)', 'L must be a regular language'],
   answer: 0,
@@ -2662,7 +2662,7 @@ window.GATE_DATA.questions['toc'].topics.find(function(t){return t.id==='toc-dec
 },
 {
   id: 'toc-decidability-p5',
-  pyqYear: 2019,
+  pyqStyle: true,
   q: "Which of the following properties of an arbitrary Turing machine M is DECIDABLE (Rice's theorem does NOT apply)?",
   options: ['Is L(M) empty?', 'Does M have a transition defined on the input symbol a from its designated start state, as written in its formal transition table?', 'Is L(M) finite?', 'Is L(M) equal to Sigma* (does M accept every string)?'],
   answer: 1,
@@ -2673,7 +2673,7 @@ window.GATE_DATA.questions['toc'].topics.find(function(t){return t.id==='toc-dec
 },
 {
   id: 'toc-decidability-p6',
-  pyqYear: 2020,
+  pyqStyle: true,
   q: "To prove EQ_TM = { <M1,M2> : L(M1) = L(M2) } is undecidable, a standard technique reduces from E_TM = { <M> : L(M) = empty set }. Given an instance <M1> of E_TM, which construction correctly reduces it to an instance of EQ_TM?",
   options: ['Fix M2 to be a specific machine that rejects every input (so L(M2) is the empty language), and output <M1,M2>; then M1 is in E_TM if and only if <M1,M2> is in EQ_TM', 'Fix M2 to be a machine that simulates M1 on every possible input simultaneously', 'Fix M2 to be a machine that always accepts every input immediately', 'Fix M2 to be M1 itself, unmodified, and output <M1,M1>'],
   answer: 0,
@@ -2684,7 +2684,7 @@ window.GATE_DATA.questions['toc'].topics.find(function(t){return t.id==='toc-dec
 },
 {
   id: 'toc-decidability-p7',
-  pyqYear: 2021,
+  pyqStyle: true,
   q: "Which of the following decidability questions, involving combinations of DFAs and context-free grammars, are DECIDABLE? (Select ALL that apply)",
   options: ['Given two DFAs M1 and M2, is L(M1) a subset of L(M2)?', 'Given a DFA M, is L(M) equal to Sigma* (universality)?', 'Given a CFG G and a DFA M, is L(G) a subset of L(M) (i.e. does the DFA accept every string the grammar generates)?', 'Given a CFG G and a DFA M, is L(M) a subset of L(G) (i.e. does the grammar generate every string the DFA accepts)?'],
   answers: [0, 1, 2],
@@ -2695,7 +2695,7 @@ window.GATE_DATA.questions['toc'].topics.find(function(t){return t.id==='toc-dec
 },
 {
   id: 'toc-decidability-p8',
-  pyqYear: 2022,
+  pyqStyle: true,
   q: "Suppose L is a language that is known to be RE (recursively enumerable) but UNDECIDABLE. What can we conclude about the complement of L?",
   options: ['The complement of L must always be RE', 'The complement of L can never be RE (it is guaranteed to NOT be RE)', 'The complement of L might be RE or might not be RE, depending on the specific language, and there is no way to determine which without more information', 'The complement of L must be a regular language'],
   answer: 1,
@@ -2706,7 +2706,7 @@ window.GATE_DATA.questions['toc'].topics.find(function(t){return t.id==='toc-dec
 },
 {
   id: 'toc-decidability-p9',
-  pyqYear: 2023,
+  pyqStyle: true,
   q: "Is the problem 'given a Turing machine M, is L(M) NON-empty?' (i.e. NE_TM, the logical negation of the standard emptiness problem E_TM) decidable?",
   options: ['Yes, it is decidable, since it is just the negation of a well-understood problem', 'No, it is undecidable, since nonemptiness is also a nontrivial semantic property of L(M), and Rice’s theorem applies to it exactly as it does to emptiness', 'It is decidable only when M is known in advance to be a decider', 'The nonemptiness question is always trivially true, so it requires no algorithm at all'],
   answer: 1,
@@ -2717,7 +2717,7 @@ window.GATE_DATA.questions['toc'].topics.find(function(t){return t.id==='toc-dec
 },
 {
   id: 'toc-decidability-p10',
-  pyqYear: 2024,
+  pyqStyle: true,
   q: "Given the formal transition function of a Pushdown Automaton P, is it decidable to check whether P satisfies the definition of a DETERMINISTIC PDA (no state has both an applicable epsilon-move and an applicable input-symbol move simultaneously, and for every state, input symbol, and stack-top symbol combination, at most one transition applies)?",
   options: ['Yes, this is decidable, because determinism is a purely syntactic/structural property directly inspectable from the transition function itself, requiring no simulation or Rice’s-theorem-style reasoning at all', 'No, this is undecidable, since it is a semantic property of the language P accepts and Rice’s theorem applies', 'This is decidable only for PDAs equivalent to some DFA', 'This is undecidable because it reduces to the CFG-ambiguity problem'],
   answer: 0,
@@ -2728,7 +2728,7 @@ window.GATE_DATA.questions['toc'].topics.find(function(t){return t.id==='toc-dec
 },
 {
   id: 'toc-decidability-p11',
-  pyqYear: 2025,
+  pyqStyle: true,
   q: "A problem X is proven undecidable by exhibiting a computable reduction from A_TM to X (i.e. A_TM reduces to X). What does this reduction actually demonstrate?",
   options: ['If X were decidable, then A_TM would also be decidable, which is a contradiction, so X must be undecidable', 'If A_TM were decidable, then X would also be decidable', 'X and A_TM are logically unrelated problems, and no conclusion about X follows', 'X must be recursively enumerable (RE), simply because A_TM happens to be RE'],
   answer: 0,
@@ -2739,7 +2739,7 @@ window.GATE_DATA.questions['toc'].topics.find(function(t){return t.id==='toc-dec
 },
 {
   id: 'toc-decidability-p12',
-  pyqYear: 2026,
+  pyqStyle: true,
   q: "Which of the following correctly orders these language classes by strict inclusion (using SUBSET-OF, where each class is a proper/strict subset of the next)?",
   options: ['REGULAR is a strict subset of CFL, which is a strict subset of CSL, which is a strict subset of REC (decidable languages), which is a strict subset of RE', 'REGULAR is a strict subset of CSL, which is a strict subset of CFL, which is a strict subset of REC, which is a strict subset of RE', 'CFL is a strict subset of REGULAR, which is a strict subset of CSL, which is a strict subset of RE, which is a strict subset of REC', 'RE is a strict subset of REC, which is a strict subset of CSL, which is a strict subset of CFL, which is a strict subset of REGULAR'],
   answer: 0,
@@ -2750,7 +2750,7 @@ window.GATE_DATA.questions['toc'].topics.find(function(t){return t.id==='toc-dec
 },
 {
   id: 'toc-decidability-p13',
-  pyqYear: 2016,
+  pyqStyle: true,
   q: "For each of the following, decide whether the described question is DECIDABLE. Which of them are DECIDABLE? (Select ALL that apply)",
   options: ['Given a Turing machine M, is L(M) itself a decidable (REC) language?', 'Given a DFA M, is L(M) a decidable (REC) language?', 'Given a CFG G, is L(G) a decidable (REC) language?', 'Given a Turing machine M, is L(M) a context-free language?'],
   answers: [1, 2],
@@ -2761,7 +2761,7 @@ window.GATE_DATA.questions['toc'].topics.find(function(t){return t.id==='toc-dec
 },
 {
   id: 'toc-decidability-p14',
-  pyqYear: 2020,
+  pyqStyle: true,
   q: "A language L is said to be recursively enumerable but NOT recursive (i.e. RE but not REC). What does this precisely mean?",
   options: ['There exists a Turing machine that halts and accepts on every string in L (but may reject or loop forever on strings not in L), yet no Turing machine can be built that halts on EVERY input and correctly decides membership in L for all strings', 'There exists a Turing machine that halts on every possible input string and correctly decides membership in L', 'L must be a finite language', 'L must be a regular language, since regular languages are the simplest kind of recursively enumerable language'],
   answer: 0,
@@ -2775,7 +2775,7 @@ window.GATE_DATA.questions['toc'].topics.find(function(t){return t.id==='toc-dec
 window.GATE_DATA.questions['toc'].topics.find(function(t){return t.id==='toc-hierarchy';}).questions.push(
 {
   id: 'toc-hierarchy-p1',
-  pyqYear: 2015,
+  pyqStyle: true,
   q: "Consider L = { a^n b^n c^n d^n : n >= 0 }, a language requiring four blocks of equal length. What is the tightest correct classification of L in the Chomsky hierarchy?",
   options: ['L is regular', 'L is context-free but not regular', 'L is context-sensitive but not context-free', 'L cannot be recognized by any Turing machine'],
   answer: 2,
@@ -2786,7 +2786,7 @@ window.GATE_DATA.questions['toc'].topics.find(function(t){return t.id==='toc-hie
 },
 {
   id: 'toc-hierarchy-p2',
-  pyqYear: 2016,
+  pyqStyle: true,
   q: "Consider L = { a^i b^j c^k : i,j,k >= 0 and i < j < k }, requiring three counts in strictly increasing order. Is L context-free?",
   options: ['Yes, L is context-free (though not regular)', 'No, L is not context-free (it requires context-sensitive or greater power)', 'Yes, L is even regular', 'The context-freeness of L is undecidable in general'],
   answer: 1,
@@ -2797,7 +2797,7 @@ window.GATE_DATA.questions['toc'].topics.find(function(t){return t.id==='toc-hie
 },
 {
   id: 'toc-hierarchy-p3',
-  pyqYear: 2017,
+  pyqStyle: true,
   q: "Consider L = { a^n b^m : n,m >= 0 and (n = 2m OR m = 2n) }, the union of two proportional-count conditions. What is the tightest correct classification of L?",
   options: ['L is regular', 'L is context-free but not regular', 'L is not context-free', 'L is finite'],
   answer: 1,
@@ -2808,7 +2808,7 @@ window.GATE_DATA.questions['toc'].topics.find(function(t){return t.id==='toc-hie
 },
 {
   id: 'toc-hierarchy-p4',
-  pyqYear: 2018,
+  pyqStyle: true,
   q: "A grammar has every production restricted to the forms A -> a B or A -> a (where A, B are nonterminals and a is a terminal symbol, with the nonterminal always immediately preceding, if present, on the right). What Chomsky hierarchy TYPE does this grammar belong to?",
   options: ['Type 3 (regular grammar)', 'Type 2 (context-free grammar) but not Type 3', 'Type 1 (context-sensitive grammar) but not Type 2', 'Type 0 (unrestricted grammar) but not Type 1'],
   answer: 0,
@@ -2819,7 +2819,7 @@ window.GATE_DATA.questions['toc'].topics.find(function(t){return t.id==='toc-hie
 },
 {
   id: 'toc-hierarchy-p5',
-  pyqYear: 2019,
+  pyqStyle: true,
   q: "Which class of machines exactly characterizes the context-sensitive languages (Type 1 in the Chomsky hierarchy)?",
   options: ['Pushdown Automata (PDA)', 'Linear Bounded Automata (LBA)', 'Finite Automata (DFA/NFA)', 'Unrestricted Turing Machines with no tape bound'],
   answer: 1,
@@ -2830,7 +2830,7 @@ window.GATE_DATA.questions['toc'].topics.find(function(t){return t.id==='toc-hie
 },
 {
   id: 'toc-hierarchy-p6',
-  pyqYear: 2020,
+  pyqStyle: true,
   q: "Which language is the standard textbook WITNESS used to prove that CFL is a STRICT (proper) subset of CSL, i.e. a language that is context-sensitive but demonstrably NOT context-free?",
   options: ['L = { a^n b^n : n >= 0 }', 'L = { a^n b^n c^n : n >= 0 }', 'L = { w w : w is in {a,b}* }', 'L = { a^n : n is a prime number }'],
   answer: 1,
@@ -2841,7 +2841,7 @@ window.GATE_DATA.questions['toc'].topics.find(function(t){return t.id==='toc-hie
 },
 {
   id: 'toc-hierarchy-p7',
-  pyqYear: 2021,
+  pyqStyle: true,
   q: "Which statement about the relative power of deterministic and nondeterministic pushdown automata is TRUE?",
   options: ['DPDA and NPDA are equally powerful, exactly as DFA and NFA are equally powerful for regular languages', 'NPDA is STRICTLY more powerful than DPDA: the class of languages accepted by NPDAs (CFL) is a proper superset of the class accepted by DPDAs (DCFL)', 'DPDA is strictly more powerful than NPDA', 'Neither DPDA nor NPDA can be meaningfully compared, since they accept incomparable classes of languages'],
   answer: 1,
@@ -2852,7 +2852,7 @@ window.GATE_DATA.questions['toc'].topics.find(function(t){return t.id==='toc-hie
 },
 {
   id: 'toc-hierarchy-p8',
-  pyqYear: 2022,
+  pyqStyle: true,
   q: "A grammar has all of its productions restricted to the general form alpha A beta -> alpha gamma beta (where alpha, beta are arbitrary strings of terminals and nonterminals, A is a single nonterminal, and gamma is a NONEMPTY string), so that overall the right-hand side of every production is never shorter than the left-hand side. What Chomsky hierarchy TYPE does this restriction correspond to?",
   options: ['Type 0 (unrestricted)', 'Type 1 (context-sensitive)', 'Type 2 (context-free)', 'Type 3 (regular)'],
   answer: 1,
@@ -2863,7 +2863,7 @@ window.GATE_DATA.questions['toc'].topics.find(function(t){return t.id==='toc-hie
 },
 {
   id: 'toc-hierarchy-p9',
-  pyqYear: 2023,
+  pyqStyle: true,
   q: "Where does the class REC (recursive, i.e. decidable languages) sit relative to CSL (context-sensitive languages) and RE (recursively enumerable languages) in the language-class hierarchy?",
   options: ['REC is exactly equal to CSL (they are the same class)', 'REC sits strictly between CSL and RE: CSL is a proper subset of REC, which is itself a proper subset of RE', 'REC sits strictly between REGULAR and CFL', 'REC is exactly equal to RE (they are the same class)'],
   answer: 1,
@@ -2874,7 +2874,7 @@ window.GATE_DATA.questions['toc'].topics.find(function(t){return t.id==='toc-hie
 },
 {
   id: 'toc-hierarchy-p10',
-  pyqYear: 2024,
+  pyqStyle: true,
   q: "Which of the following statements about the Chomsky hierarchy are TRUE? (Select ALL that apply)",
   options: ['L = { a^n b^n : n >= 0 } is a regular language', 'L = { a^n b^n c^n : n >= 0 } is context-sensitive', 'L = { a^n b^n c^n : n >= 0 } is context-free', 'Every context-free language is also context-sensitive (modulo the standard epsilon-production technicality)'],
   answers: [1, 3],
@@ -2885,7 +2885,7 @@ window.GATE_DATA.questions['toc'].topics.find(function(t){return t.id==='toc-hie
 },
 {
   id: 'toc-hierarchy-p11',
-  pyqYear: 2025,
+  pyqStyle: true,
   q: "A grammar contains a mixture of both right-linear productions (of the form A -> aB or A -> a) AND left-linear productions (of the form A -> Ba or A -> a) within the SAME grammar (for example, some rules are right-linear while other, different rules in the same grammar are left-linear). What can we correctly conclude about the language generated by such a mixed grammar?",
   options: ['It is still always guaranteed to be regular, since both individual forms (right-linear and left-linear) are each regular on their own', 'It may FAIL to be regular; mixing right-linear and left-linear productions within one grammar is not guaranteed to preserve regularity, so the language must be checked/derived independently rather than assumed regular by default', 'It is always context-free but is guaranteed to never be regular in this mixed case', 'The language generated becomes automatically undecidable'],
   answer: 1,
@@ -2896,7 +2896,7 @@ window.GATE_DATA.questions['toc'].topics.find(function(t){return t.id==='toc-hie
 },
 {
   id: 'toc-hierarchy-p12',
-  pyqYear: 2026,
+  pyqStyle: true,
   q: "Which of the following languages requires the full generative power of an unrestricted (Type 0) grammar in the sense that it is recursively enumerable (RE) but NOT decidable, and hence cannot be generated by any context-sensitive (Type 1) grammar?",
   options: ['A_TM = { <M,w> : Turing machine M accepts input w }', 'L = { a^n b^n c^n : n >= 0 }', 'L = { w w : w is in {a,b}* }', 'Any finite language over a fixed alphabet'],
   answer: 0,
@@ -2907,7 +2907,7 @@ window.GATE_DATA.questions['toc'].topics.find(function(t){return t.id==='toc-hie
 },
 {
   id: 'toc-hierarchy-p13',
-  pyqYear: 2016,
+  pyqStyle: true,
   q: "Consider L = { a^n b^n : n >= 0 } UNION { a^n c^n : n >= 0 }, i.e. either an equal block of a's and b's, or an equal block of a's and c's (but not both patterns mixed in the same string). What is the tightest correct classification of L?",
   options: ['L is regular', 'L is context-free but not regular', 'L is not context-free', 'L is undecidable'],
   answer: 1,
@@ -2918,7 +2918,7 @@ window.GATE_DATA.questions['toc'].topics.find(function(t){return t.id==='toc-hie
 },
 {
   id: 'toc-hierarchy-p14',
-  pyqYear: 2020,
+  pyqStyle: true,
   q: "Which type of automaton exactly corresponds to (is equivalent in power to) Type 1 (context-sensitive) grammars in the classical Chomsky hierarchy?",
   options: ['Pushdown Automaton (PDA)', 'Pushdown Automaton with two independent stacks', 'Linear Bounded Automaton (LBA)', 'Unrestricted Turing Machine with unbounded tape'],
   answer: 2,

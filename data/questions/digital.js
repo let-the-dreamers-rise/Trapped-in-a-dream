@@ -1972,7 +1972,7 @@ window.GATE_DATA.questions['digital'].topics.find(function(t){return t.id==='dig
 window.GATE_DATA.questions['digital'].topics.find(function(t){return t.id==='digital-boolean';}).questions.push(
 {
   id: 'digital-boolean-p1',
-  pyqYear: 2015,
+  pyqStyle: true,
   q: "Simplify to a minimal sum-of-products form: f(A,B,C,D) = Σm(1,5,6,7,11,13,15) + d(3,9), where d denotes don't-care minterms.",
   options: ["D + A'BC", "D + BC", "A'D + BC", "D + AB'C"],
   answer: 0,
@@ -1983,7 +1983,7 @@ window.GATE_DATA.questions['digital'].topics.find(function(t){return t.id==='dig
 },
 {
   id: 'digital-boolean-p2',
-  pyqYear: 2016,
+  pyqStyle: true,
   q: "The minimal product-of-sums (POS) form of f(A,B,C,D) = ΠM(0,2,4,6,9,11,13,15) is:",
   options: ["(A+D)(A'+D')", "(A+D')(A'+D)", "(A+B)(C+D)", "(B+D)(B'+D')"],
   answer: 0,
@@ -1994,7 +1994,7 @@ window.GATE_DATA.questions['digital'].topics.find(function(t){return t.id==='dig
 },
 {
   id: 'digital-boolean-p3',
-  pyqYear: 2017,
+  pyqStyle: true,
   q: "The number of distinct self-dual Boolean functions of 3 variables (functions f satisfying f(A,B,C) = [f(A',B',C')]' for every input) is ______.",
   options: [],
   answer: 16,
@@ -2006,7 +2006,7 @@ window.GATE_DATA.questions['digital'].topics.find(function(t){return t.id==='dig
 },
 {
   id: 'digital-boolean-p4',
-  pyqYear: 2018,
+  pyqStyle: true,
   q: "For f(A,B,C,D) = Σm(0,1,2,5,6,7,8,9,10,14), the total number of prime implicants (counting every prime implicant, not just those needed in a minimal cover) is:",
   options: ["4", "5", "6", "7"],
   answer: 2,
@@ -2017,7 +2017,7 @@ window.GATE_DATA.questions['digital'].topics.find(function(t){return t.id==='dig
 },
 {
   id: 'digital-boolean-p5',
-  pyqYear: 2019,
+  pyqStyle: true,
   q: "For f(A,B,C,D) = Σm(0,2,3,4,5,7,8,10,11,15), the number of essential prime implicants is ______.",
   options: [],
   answer: 2,
@@ -2029,7 +2029,7 @@ window.GATE_DATA.questions['digital'].topics.find(function(t){return t.id==='dig
 },
 {
   id: 'digital-boolean-p6',
-  pyqYear: 2020,
+  pyqStyle: true,
   q: "Which of the following gate sets are functionally complete on their own, using only the variables given (no constant 0 or 1 input is available)? (Select all that apply.)",
   options: ["{NAND}", "{XOR, AND}", "{OR, AND}", "{NOR}"],
   answers: [0, 3],
@@ -2041,7 +2041,7 @@ window.GATE_DATA.questions['digital'].topics.find(function(t){return t.id==='dig
 },
 {
   id: 'digital-boolean-p7',
-  pyqYear: 2021,
+  pyqStyle: true,
   q: "The minimum number of 2-input NAND gates required to implement F = A ⊕ B (XOR), using only A and B as available signals, is ______.",
   options: [],
   answer: 4,
@@ -2053,7 +2053,7 @@ window.GATE_DATA.questions['digital'].topics.find(function(t){return t.id==='dig
 },
 {
   id: 'digital-boolean-p8',
-  pyqYear: 2022,
+  pyqStyle: true,
   q: "Simplify to a minimal sum-of-products form: f(A,B,C,D) = Σm(2,3,10,11,14,15) + d(8,9).",
   options: ["AC + B'C", "AC + AB'", "B'C + CD", "AB + B'C"],
   answer: 0,
@@ -2064,7 +2064,7 @@ window.GATE_DATA.questions['digital'].topics.find(function(t){return t.id==='dig
 },
 {
   id: 'digital-boolean-p9',
-  pyqYear: 2023,
+  pyqStyle: true,
   q: "For the 3-variable function f(A,B,C) = Σm(0,3,5,6) (the XNOR/even-parity function), the total number of prime implicants is:",
   options: ["2", "3", "4", "6"],
   answer: 2,
@@ -2075,7 +2075,7 @@ window.GATE_DATA.questions['digital'].topics.find(function(t){return t.id==='dig
 },
 {
   id: 'digital-boolean-p10',
-  pyqYear: 2024,
+  pyqStyle: true,
   q: "The number of distinct self-dual Boolean functions of 4 variables is ______.",
   options: [],
   answer: 256,
@@ -2087,7 +2087,7 @@ window.GATE_DATA.questions['digital'].topics.find(function(t){return t.id==='dig
 },
 {
   id: 'digital-boolean-p11',
-  pyqYear: 2025,
+  pyqStyle: true,
   q: "The minimum number of 2-input NOR gates required to implement F = A ⊕ B (XOR), using only A and B as available signals, is ______.",
   options: [],
   answer: 5,
@@ -2099,7 +2099,7 @@ window.GATE_DATA.questions['digital'].topics.find(function(t){return t.id==='dig
 },
 {
   id: 'digital-boolean-p12',
-  pyqYear: 2026,
+  pyqStyle: true,
   q: "The minimal sum-of-products form of f(A,B,C) = Σm(0,1,2,3,6) is:",
   options: ["A' + BC'", "A' + BC", "B' + AC'", "A' + B'C"],
   answer: 0,
@@ -2110,7 +2110,7 @@ window.GATE_DATA.questions['digital'].topics.find(function(t){return t.id==='dig
 },
 {
   id: 'digital-boolean-p13',
-  pyqYear: 2016,
+  pyqStyle: true,
   q: "The Boolean expression PQ + P'R + QR simplifies to:",
   options: ["PQ + P'R", "PQ + QR", "P'R + QR", "PQ + P'R + PR"],
   answer: 0,
@@ -2121,7 +2121,7 @@ window.GATE_DATA.questions['digital'].topics.find(function(t){return t.id==='dig
 },
 {
   id: 'digital-boolean-p14',
-  pyqYear: 2022,
+  pyqStyle: true,
   q: "Given a constant logic-1 signal in addition to the variables, which of the following gate sets becomes functionally complete?",
   options: ["{XOR, AND, constant 1}", "{OR, AND, constant 1}", "{AND, constant 1} only", "{OR, constant 1} only"],
   answer: 0,
@@ -2135,7 +2135,7 @@ window.GATE_DATA.questions['digital'].topics.find(function(t){return t.id==='dig
 window.GATE_DATA.questions['digital'].topics.find(function(t){return t.id==='digital-combinational';}).questions.push(
 {
   id: 'digital-combinational-p1',
-  pyqYear: 2015,
+  pyqStyle: true,
   q: "The function f(A,B,C) = Σm(0,2,4,5) is to be realized using a 4-to-1 multiplexer with A, B (A as MSB) as select lines and data inputs I0, I1, I2, I3. The correct assignment is:",
   options: ["I0 = C', I1 = C', I2 = 1, I3 = 0", "I0 = C, I1 = C, I2 = 0, I3 = 1", "I0 = C', I1 = C, I2 = 1, I3 = 0", "I0 = 1, I1 = C', I2 = C', I3 = 0"],
   answer: 0,
@@ -2146,7 +2146,7 @@ window.GATE_DATA.questions['digital'].topics.find(function(t){return t.id==='dig
 },
 {
   id: 'digital-combinational-p2',
-  pyqYear: 2016,
+  pyqStyle: true,
   q: "The minimum number of 2-to-1 multiplexers required to build a 16-to-1 multiplexer, using only 2-to-1 muxes arranged in a tree, is:",
   options: ["8", "15", "16", "31"],
   answer: 1,
@@ -2157,7 +2157,7 @@ window.GATE_DATA.questions['digital'].topics.find(function(t){return t.id==='dig
 },
 {
   id: 'digital-combinational-p3',
-  pyqYear: 2017,
+  pyqStyle: true,
   q: "A 3-to-8 decoder (with outputs D0-D7) is used along with 2-input OR gates to realize f(A,B,C) = Σm(1,3,5,6). The minimum number of 2-input OR gates needed is:",
   options: ["1", "2", "3", "4"],
   answer: 2,
@@ -2168,7 +2168,7 @@ window.GATE_DATA.questions['digital'].topics.find(function(t){return t.id==='dig
 },
 {
   id: 'digital-combinational-p4',
-  pyqYear: 2018,
+  pyqStyle: true,
   q: "A 2-bit unsigned magnitude comparator compares A = A1A0 against B = B1B0. For A = 10 (decimal 2) and B = 01 (decimal 1), the comparator's three outputs (A>B, A<B, A=B) are:",
   options: ["(1, 0, 0)", "(0, 1, 0)", "(0, 0, 1)", "(1, 1, 0)"],
   answer: 0,
@@ -2179,7 +2179,7 @@ window.GATE_DATA.questions['digital'].topics.find(function(t){return t.id==='dig
 },
 {
   id: 'digital-combinational-p5',
-  pyqYear: 2019,
+  pyqStyle: true,
   q: "The 4-variable function f(A,B,C,D) = Σm(1,2,4,7,9,11,12,14) is realized on an 8-to-1 multiplexer using A, B, C (A as MSB) as select lines and D as the residual variable. The data input I5 (select ABC = 101) equals:",
   options: ["0", "1", "D", "D'"],
   answer: 2,
@@ -2190,7 +2190,7 @@ window.GATE_DATA.questions['digital'].topics.find(function(t){return t.id==='dig
 },
 {
   id: 'digital-combinational-p6',
-  pyqYear: 2020,
+  pyqStyle: true,
   q: "A 4-to-16 decoder is built by combining 3-to-8 decoders, each with a single active-high enable input, plus any necessary inverters. The minimum number of 3-to-8 decoder modules required is:",
   options: ["1", "2", "3", "4"],
   answer: 1,
@@ -2201,7 +2201,7 @@ window.GATE_DATA.questions['digital'].topics.find(function(t){return t.id==='dig
 },
 {
   id: 'digital-combinational-p7',
-  pyqYear: 2021,
+  pyqStyle: true,
   q: "A 4-bit magnitude comparator is built by cascading four 1-bit comparator stages, most-significant bit first, where each stage receives the (greater/less/equal) result of the more significant stage as an override. The correct cascading principle is:",
   options: [
     "A stage's own comparison is used only if every more-significant stage reported equality; otherwise the most-significant stage that found a difference determines the final result",
@@ -2217,7 +2217,7 @@ window.GATE_DATA.questions['digital'].topics.find(function(t){return t.id==='dig
 },
 {
   id: 'digital-combinational-p8',
-  pyqYear: 2022,
+  pyqStyle: true,
   q: "The minimum number of 4-to-1 multiplexers needed to build a 64-to-1 multiplexer, arranged as a tree of 4-to-1 muxes, is:",
   options: ["16", "20", "21", "63"],
   answer: 2,
@@ -2228,7 +2228,7 @@ window.GATE_DATA.questions['digital'].topics.find(function(t){return t.id==='dig
 },
 {
   id: 'digital-combinational-p9',
-  pyqYear: 2023,
+  pyqStyle: true,
   q: "A single 3-to-8 decoder is shared to realize two functions: f1(A,B,C) = Σm(0,2,5) and f2(A,B,C) = Σm(1,3,6,7), each via its own tree of 2-input OR gates. The total number of 2-input OR gates required (summed over both functions) is:",
   options: ["4", "5", "6", "7"],
   answer: 1,
@@ -2239,7 +2239,7 @@ window.GATE_DATA.questions['digital'].topics.find(function(t){return t.id==='dig
 },
 {
   id: 'digital-combinational-p10',
-  pyqYear: 2024,
+  pyqStyle: true,
   q: "The 4-variable function f(A,B,C,D) = Σm(1,3,4,6,7) is realized on an 8-to-1 multiplexer with A, B, C as select lines (A as MSB) and D as the residual data variable. The correct data-input assignment (I0 through I7) is:",
   options: [
     "I0=C, I1=C, I2=C', I3=1, I4=0,I5=0,I6=0,I7=0",
@@ -2255,7 +2255,7 @@ window.GATE_DATA.questions['digital'].topics.find(function(t){return t.id==='dig
 },
 {
   id: 'digital-combinational-p11',
-  pyqYear: 2025,
+  pyqStyle: true,
   q: "An 8-to-3 priority encoder (inputs D0-D7, higher index = higher priority) has D1 = D3 = D5 = 1 and all other inputs 0. The 3-bit output code and the valid (V) flag are:",
   options: ["101, V=1", "011, V=1", "111, V=1", "101, V=0"],
   answer: 0,
@@ -2266,7 +2266,7 @@ window.GATE_DATA.questions['digital'].topics.find(function(t){return t.id==='dig
 },
 {
   id: 'digital-combinational-p12',
-  pyqYear: 2026,
+  pyqStyle: true,
   q: "A 4-bit equality comparator is built as four bitwise XNOR gates followed by a single tree of 2-input AND gates combining their outputs into one overall equality signal. The total number of 2-input gates (XNOR plus AND) required is:",
   options: ["4", "6", "7", "8"],
   answer: 2,
@@ -2277,7 +2277,7 @@ window.GATE_DATA.questions['digital'].topics.find(function(t){return t.id==='dig
 },
 {
   id: 'digital-combinational-p13',
-  pyqYear: 2017,
+  pyqStyle: true,
   q: "Using the residue (mux realization) method, the minimum number of select lines required to realize any single Boolean function of 5 variables on one multiplexer is:",
   options: ["2", "3", "4", "5"],
   answer: 2,
@@ -2288,7 +2288,7 @@ window.GATE_DATA.questions['digital'].topics.find(function(t){return t.id==='dig
 },
 {
   id: 'digital-combinational-p14',
-  pyqYear: 2021,
+  pyqStyle: true,
   q: "A 3-to-8 decoder's outputs are grouped into two OR gates: Z1 = OR(D1, D2, D4, D7) and Z2 = OR(D0, D3, D5, D6), where D0-D7 correspond to input combinations ABC = 000 through 111. For input ABC = 101, the values of (Z1, Z2) are:",
   options: ["(1, 0)", "(0, 1)", "(1, 1)", "(0, 0)"],
   answer: 1,
@@ -2302,7 +2302,7 @@ window.GATE_DATA.questions['digital'].topics.find(function(t){return t.id==='dig
 window.GATE_DATA.questions['digital'].topics.find(function(t){return t.id==='digital-sequential';}).questions.push(
 {
   id: 'digital-sequential-p1',
-  pyqYear: 2015,
+  pyqStyle: true,
   q: "A JK flip-flop currently holds Q = 1 and must transition to Q = 0 on the next clock edge. The required (J, K) input combination is:",
   options: ["J = 1, K = 0", "J = 0, K = 1", "J = X, K = 1", "J = 1, K = X"],
   answer: 2,
@@ -2313,7 +2313,7 @@ window.GATE_DATA.questions['digital'].topics.find(function(t){return t.id==='dig
 },
 {
   id: 'digital-sequential-p2',
-  pyqYear: 2016,
+  pyqStyle: true,
   q: "A T flip-flop is to be realized using a JK flip-flop (with T as the only external input, connected identically to both J and K inputs). Verify that this conversion is correct by checking the resulting characteristic equation. Which expression correctly describes the resulting flip-flop's behavior?",
   options: ["Q+ = T", "Q+ = T ⊕ Q (toggles when T = 1)", "Q+ = T'Q", "Q+ = TQ (holds only when T=1 and Q=1)"],
   answer: 1,
@@ -2324,7 +2324,7 @@ window.GATE_DATA.questions['digital'].topics.find(function(t){return t.id==='dig
 },
 {
   id: 'digital-sequential-p3',
-  pyqYear: 2017,
+  pyqStyle: true,
   q: "A counter built from 3 T flip-flops counts up in binary (000, 001, 010, ...) but has asynchronous reset logic that forces the counter back to 000 the instant it reaches state 110 (decimal 6). Starting from 000, the modulus of this counter (the number of distinct stable states in its repeating cycle) is:",
   options: ["4", "5", "6", "7"],
   answer: 2,
@@ -2335,7 +2335,7 @@ window.GATE_DATA.questions['digital'].topics.find(function(t){return t.id==='dig
 },
 {
   id: 'digital-sequential-p4',
-  pyqYear: 2018,
+  pyqStyle: true,
   q: "A 4-bit ripple (asynchronous) counter uses flip-flops each with propagation delay 25 ns, and its outputs are not fed into any decoder. The maximum clock frequency at which this counter can operate reliably is:",
   options: ["40 MHz", "25 MHz", "10 MHz", "4 MHz"],
   answer: 2,
@@ -2346,7 +2346,7 @@ window.GATE_DATA.questions['digital'].topics.find(function(t){return t.id==='dig
 },
 {
   id: 'digital-sequential-p5',
-  pyqYear: 2019,
+  pyqStyle: true,
   q: "A synchronous counter's flip-flops have clock-to-Q delay tcq = 5 ns, and the combinational next-state logic has worst-case delay tcomb = 10 ns; each flip-flop's setup time is tsu = 5 ns. The maximum operating frequency of this counter, regardless of how many flip-flop stages it has, is:",
   options: ["100 MHz", "66.7 MHz", "50 MHz", "20 MHz"],
   answer: 2,
@@ -2357,7 +2357,7 @@ window.GATE_DATA.questions['digital'].topics.find(function(t){return t.id==='dig
 },
 {
   id: 'digital-sequential-p6',
-  pyqYear: 2020,
+  pyqStyle: true,
   q: "A Johnson (twisted-ring) counter is built using 4 D flip-flops, with the complement of the last stage's output fed back to the first stage's input. Starting from state 0000, the number of distinct states visited before the sequence repeats is:",
   options: ["4", "6", "8", "16"],
   answer: 2,
@@ -2368,7 +2368,7 @@ window.GATE_DATA.questions['digital'].topics.find(function(t){return t.id==='dig
 },
 {
   id: 'digital-sequential-p7',
-  pyqYear: 2021,
+  pyqStyle: true,
   q: "A 5-stage ring counter (5 D flip-flops in a circular shift register, direct — not complemented — feedback) starts in state Q4Q3Q2Q1Q0 = 10000. After 3 clock pulses (shifting right, with the last bit wrapping to the front), the state is:",
   options: ["01000", "00100", "00010", "00001"],
   answer: 2,
@@ -2379,7 +2379,7 @@ window.GATE_DATA.questions['digital'].topics.find(function(t){return t.id==='dig
 },
 {
   id: 'digital-sequential-p8',
-  pyqYear: 2022,
+  pyqStyle: true,
   q: "A 4-bit serial-in serial-out (SISO) shift register, shifting right and starting with contents Q3Q2Q1Q0 = 0000, has the serial bit stream 1, 0, 1, 1 applied to its serial input (Q3), one bit per clock, in that order. After the 4th clock pulse, the register contents Q3Q2Q1Q0 are:",
   options: ["1011", "1101", "0111", "1110"],
   answer: 1,
@@ -2390,7 +2390,7 @@ window.GATE_DATA.questions['digital'].topics.find(function(t){return t.id==='dig
 },
 {
   id: 'digital-sequential-p9',
-  pyqYear: 2023,
+  pyqStyle: true,
   q: "A D flip-flop is to be realized using a JK flip-flop plus external combinational logic driving its J and K inputs from the D input. The correct logic is:",
   options: ["J = D, K = D'", "J = D, K = D", "J = D', K = D", "J = 1, K = D"],
   answer: 0,
@@ -2401,7 +2401,7 @@ window.GATE_DATA.questions['digital'].topics.find(function(t){return t.id==='dig
 },
 {
   id: 'digital-sequential-p10',
-  pyqYear: 2024,
+  pyqStyle: true,
   q: "A mod-5 counter is built with 3 JK flip-flops Q2Q1Q0, counting 000, 001, 010, 011, 100, then back to 000. For the transition of the most significant flip-flop Q2 from state 4 (100) to state 0 (000) — i.e. Q2 goes from 1 to 0 — the required (J2, K2) inputs are:",
   options: ["J2 = 1, K2 = 0", "J2 = 0, K2 = 1", "J2 = X, K2 = 1", "J2 = 1, K2 = X"],
   answer: 2,
@@ -2412,7 +2412,7 @@ window.GATE_DATA.questions['digital'].topics.find(function(t){return t.id==='dig
 },
 {
   id: 'digital-sequential-p11',
-  pyqYear: 2025,
+  pyqStyle: true,
   q: "Which of the following correctly distinguishes the maximum operating frequency of a synchronous counter from that of a ripple counter with the same number of flip-flop stages?",
   options: [
     "A synchronous counter's maximum frequency is independent of the number of stages, while a ripple counter's maximum frequency decreases as more stages are added",
@@ -2428,7 +2428,7 @@ window.GATE_DATA.questions['digital'].topics.find(function(t){return t.id==='dig
 },
 {
   id: 'digital-sequential-p12',
-  pyqYear: 2026,
+  pyqStyle: true,
   q: "A synchronous binary up-counter is built from 2 T flip-flops Q1Q0 with T0 = 1 and T1 = Q0 (the standard mod-4 counter wiring). Starting from state Q1Q0 = 00, the sequence of states over the next 4 clock pulses is:",
   options: ["00, 01, 10, 11", "00, 10, 01, 11", "01, 10, 11, 00", "00, 11, 01, 10"],
   answer: 0,
@@ -2439,7 +2439,7 @@ window.GATE_DATA.questions['digital'].topics.find(function(t){return t.id==='dig
 },
 {
   id: 'digital-sequential-p13',
-  pyqYear: 2017,
+  pyqStyle: true,
   q: "For a NOR-based SR flip-flop, the transition from Q = 0 to Q = 1 requires which (S, R) input combination at the clock edge?",
   options: ["S = 1, R = 0", "S = 0, R = 1", "S = 0, R = 0", "S = 1, R = 1"],
   answer: 0,
@@ -2450,7 +2450,7 @@ window.GATE_DATA.questions['digital'].topics.find(function(t){return t.id==='dig
 },
 {
   id: 'digital-sequential-p14',
-  pyqYear: 2021,
+  pyqStyle: true,
   q: "For a fixed number of flip-flops n, how do the number of distinct states in a ring counter and a Johnson (twisted-ring) counter compare?",
   options: [
     "Ring counter gives n states; Johnson counter gives 2n states",
@@ -2469,7 +2469,7 @@ window.GATE_DATA.questions['digital'].topics.find(function(t){return t.id==='dig
 window.GATE_DATA.questions['digital'].topics.find(function(t){return t.id==='digital-number-systems';}).questions.push(
 {
   id: 'digital-number-systems-p1',
-  pyqYear: 2015,
+  pyqStyle: true,
   q: "If the equation 44 + 33 = 121 holds in some radix r (all numerals written in base r), the value of r is:",
   options: ["5", "6", "7", "8"],
   answer: 1,
@@ -2480,7 +2480,7 @@ window.GATE_DATA.questions['digital'].topics.find(function(t){return t.id==='dig
 },
 {
   id: 'digital-number-systems-p2',
-  pyqYear: 2016,
+  pyqStyle: true,
   q: "The range of values representable by a 6-bit 2's complement number is:",
   options: ["-31 to +31", "-32 to +31", "-32 to +32", "-63 to +63"],
   answer: 1,
@@ -2491,7 +2491,7 @@ window.GATE_DATA.questions['digital'].topics.find(function(t){return t.id==='dig
 },
 {
   id: 'digital-number-systems-p3',
-  pyqYear: 2017,
+  pyqStyle: true,
   q: "Adding the 6-bit 2's complement numbers 011111 (31) and 000011 (3), the sum obtained is 100010. Regarding this addition:",
   options: [
     "The binary sum is correct and equals 34 in decimal, no overflow",
@@ -2507,7 +2507,7 @@ window.GATE_DATA.questions['digital'].topics.find(function(t){return t.id==='dig
 },
 {
   id: 'digital-number-systems-p4',
-  pyqYear: 2018,
+  pyqStyle: true,
   q: "The 4-bit Gray code corresponding to the binary number 1011 is:",
   options: ["1101", "1110", "1010", "0110"],
   answer: 1,
@@ -2518,7 +2518,7 @@ window.GATE_DATA.questions['digital'].topics.find(function(t){return t.id==='dig
 },
 {
   id: 'digital-number-systems-p5',
-  pyqYear: 2019,
+  pyqStyle: true,
   q: "The Excess-3 code for the decimal digit 6 is:",
   options: ["0110", "1001", "0011", "1100"],
   answer: 1,
@@ -2529,7 +2529,7 @@ window.GATE_DATA.questions['digital'].topics.find(function(t){return t.id==='dig
 },
 {
   id: 'digital-number-systems-p6',
-  pyqYear: 2020,
+  pyqStyle: true,
   q: "Adding the BCD digits 8 (1000) and 7 (0111) using a 4-bit binary adder followed by BCD correction logic, the final corrected BCD result (including the decimal carry-out bit) is:",
   options: ["0 1111 (no correction needed)", "1 0101 (decimal carry = 1, digit = 5)", "0 0101 (digit = 5, no carry)", "1 1111 (decimal carry = 1, digit = 15)"],
   answer: 1,
@@ -2540,7 +2540,7 @@ window.GATE_DATA.questions['digital'].topics.find(function(t){return t.id==='dig
 },
 {
   id: 'digital-number-systems-p7',
-  pyqYear: 2021,
+  pyqStyle: true,
   q: "The total number of distinct values representable by a 5-bit 1's complement number is:",
   options: ["32", "31", "16", "30"],
   answer: 1,
@@ -2551,7 +2551,7 @@ window.GATE_DATA.questions['digital'].topics.find(function(t){return t.id==='dig
 },
 {
   id: 'digital-number-systems-p8',
-  pyqYear: 2022,
+  pyqStyle: true,
   q: "If the equation 51 - 26 = 23 holds in some radix r (all numerals in base r), the value of r is:",
   options: ["7", "8", "9", "10"],
   answer: 1,
@@ -2562,7 +2562,7 @@ window.GATE_DATA.questions['digital'].topics.find(function(t){return t.id==='dig
 },
 {
   id: 'digital-number-systems-p9',
-  pyqYear: 2023,
+  pyqStyle: true,
   q: "A 4-bit Gray code value 1101 is to be converted back to its corresponding binary value. The correct binary value is:",
   options: ["1001", "1011", "1101", "0110"],
   answer: 0,
@@ -2573,7 +2573,7 @@ window.GATE_DATA.questions['digital'].topics.find(function(t){return t.id==='dig
 },
 {
   id: 'digital-number-systems-p10',
-  pyqYear: 2024,
+  pyqStyle: true,
   q: "Adding the 5-bit 2's complement numbers 10011 (-13) and 10101 (-11), the raw binary sum is 01000, with a carry of 0 produced into the sign bit position and a carry of 1 produced out of the sign bit position. What can be concluded?",
   options: [
     "No overflow occurred; the result 01000 (+8) is correct",
@@ -2589,7 +2589,7 @@ window.GATE_DATA.questions['digital'].topics.find(function(t){return t.id==='dig
 },
 {
   id: 'digital-number-systems-p11',
-  pyqYear: 2025,
+  pyqStyle: true,
   q: "In standard 8-4-2-1 BCD encoding, the number of 4-bit binary codes that are unused (invalid, not assigned to any decimal digit) is:",
   options: ["4", "5", "6", "7"],
   answer: 2,
@@ -2600,7 +2600,7 @@ window.GATE_DATA.questions['digital'].topics.find(function(t){return t.id==='dig
 },
 {
   id: 'digital-number-systems-p12',
-  pyqYear: 2026,
+  pyqStyle: true,
   q: "For an n-bit representation, how does the count of distinct representable values in 2's complement compare to the count in 1's complement?",
   options: [
     "2's complement always has exactly one more distinct representable value than 1's complement, for any n",
@@ -2616,7 +2616,7 @@ window.GATE_DATA.questions['digital'].topics.find(function(t){return t.id==='dig
 },
 {
   id: 'digital-number-systems-p13',
-  pyqYear: 2016,
+  pyqStyle: true,
   q: "Excess-3 code is called 'self-complementing' because:",
   options: [
     "The Excess-3 code of a digit d and the Excess-3 code of its 9's complement (9-d) are bitwise complements of each other",
@@ -2632,7 +2632,7 @@ window.GATE_DATA.questions['digital'].topics.find(function(t){return t.id==='dig
 },
 {
   id: 'digital-number-systems-p14',
-  pyqYear: 2019,
+  pyqStyle: true,
   q: "Which of the following decimal fractions has a terminating (finite) binary representation?",
   options: ["0.3", "0.6", "0.125", "0.9"],
   answer: 2,

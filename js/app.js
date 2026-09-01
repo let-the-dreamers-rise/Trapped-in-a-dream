@@ -73,7 +73,7 @@
   function nextQuestion(topicId, sessionSeen, diffFilter) {
     var entry = topicById(topicId);
     var qs = entry ? entry.topic.questions : [];
-    if (diffFilter === 'pyq') qs = qs.filter(function (qq) { return !!qq.pyqYear; });
+    if (diffFilter === 'pattern') qs = qs.filter(function (qq) { return !!qq.pyqStyle; });
     else if (diffFilter && diffFilter !== 'all') qs = qs.filter(function (qq) { return qq.difficulty === diffFilter; });
     var due = [], unseen = [], rest = [];
     qs.forEach(function (qq) {
@@ -273,7 +273,7 @@
   }
 
   function pyqCount(t) {
-    return (t.questions || []).filter(function (q) { return !!q.pyqYear; }).length;
+    return (t.questions || []).filter(function (q) { return !!q.pyqStyle; }).length;
   }
 
   // ---------- TOPIC (theory) ----------
@@ -289,7 +289,7 @@
       '<button data-tt="strategy">Exam strategy</button></div>' +
       '<div class="card"><div class="theory-body" id="tbody"></div></div>' +
       '<button class="btn block good" id="practice">Practice &mdash; infinite quiz</button>' +
-      (pyqCount(t) ? '<button class="btn block ghost" id="pyq-set" style="margin-top:8px">Past-year set &mdash; ' + pyqCount(t) + ' questions</button>' : '');
+      (pyqCount(t) ? '<button class="btn block ghost" id="pyq-set" style="margin-top:8px">Exam-pattern set &mdash; ' + pyqCount(t) + ' questions</button>' : '');
     $view.innerHTML = html;
     var body = document.getElementById('tbody');
     function show(k) {
@@ -303,7 +303,7 @@
     document.getElementById('back').addEventListener('click', function () { nav('subject', e.subject); });
     document.getElementById('practice').addEventListener('click', function () { nav('quiz', tid); });
     var pb = document.getElementById('pyq-set');
-    if (pb) pb.addEventListener('click', function () { nav('quiz', tid, 'pyq'); });
+    if (pb) pb.addEventListener('click', function () { nav('quiz', tid, 'pattern'); });
   }
 
   // Figures: questions may carry an inline SVG diagram (automata, circuits, graphs, Gantt...).
@@ -331,8 +331,11 @@
     var got = (selArr || []).slice().sort().join(',');
     return want === got && got !== '';
   }
+  // Exam-pattern practice questions. These are written to match GATE question
+  // patterns; they are not transcriptions of any specific year's paper, so the
+  // label never claims a year.
   function pyqPill(qq) {
-    return qq.pyqYear ? '<span class="pill pyq">GATE ' + qq.pyqYear + '</span>' : '';
+    return qq.pyqStyle ? '<span class="pill pyq">Exam pattern</span>' : '';
   }
   function kindPill(qq) {
     var k = qKind(qq);
@@ -352,7 +355,7 @@
     var e = topicById(tid); if (!e) return viewSubjects();
     var sessionSeen = {}; var num = 0; var right = 0; var diffFilter = startFilter || 'all'; var qStart = 0;
     function filterBar() {
-      return '<div class="theory-tabs" style="margin-top:8px">' + ['all', 'pyq', 'easy', 'medium', 'hard'].map(function (d) {
+      return '<div class="theory-tabs" style="margin-top:8px">' + ['all', 'pattern', 'easy', 'medium', 'hard'].map(function (d) {
         return '<button data-df="' + d + '" class="' + (diffFilter === d ? 'active' : '') + '">' + d + '</button>';
       }).join('') + '</div>';
     }

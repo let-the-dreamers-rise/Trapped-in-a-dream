@@ -2357,7 +2357,7 @@ window.GATE_DATA.questions['os'].topics.find(function(t){return t.id==='os-virtu
 window.GATE_DATA.questions['os'].topics.find(function(t){return t.id==='os-processes';}).questions.push(
 {
   id: 'os-processes-p1',
-  pyqYear: 2015,
+  pyqStyle: true,
   q: 'Consider the following C code fragment executed by a single process:\n\nfork();\nfork();\nfork();\n\n(three unconditional, sequential fork() calls, one after another). How many processes in total (including the original) exist after all three statements have executed? (Enter your numerical answer.)',
   options: [],
   answer: 8,
@@ -2369,7 +2369,7 @@ window.GATE_DATA.questions['os'].topics.find(function(t){return t.id==='os-proce
 },
 {
   id: 'os-processes-p2',
-  pyqYear: 2016,
+  pyqStyle: true,
   q: 'A program contains a loop: for (i = 0; i < 4; i++) { fork(); } with no other statements inside the loop body, executed by a single initial process. How many NEW child processes (i.e., not counting the original parent process) are created in total by the time the loop finishes in all processes? (Enter your numerical answer.)',
   options: [],
   answer: 15,
@@ -2381,7 +2381,7 @@ window.GATE_DATA.questions['os'].topics.find(function(t){return t.id==='os-proce
 },
 {
   id: 'os-processes-p3',
-  pyqYear: 2017,
+  pyqStyle: true,
   q: 'Consider this C code executed by a single process:\n\nfork();\nif (fork() == 0) {\n    fork();\n}\n\nHow many processes in total exist after this code fragment finishes executing everywhere? (Enter your numerical answer.)',
   options: [],
   answer: 6,
@@ -2393,7 +2393,7 @@ window.GATE_DATA.questions['os'].topics.find(function(t){return t.id==='os-proce
 },
 {
   id: 'os-processes-p4',
-  pyqYear: 2018,
+  pyqStyle: true,
   q: 'Consider this C code executed by a single process:\n\nif (fork() == 0) {\n    if (fork() == 0) {\n        fork();\n    }\n} else {\n    fork();\n}\n\nHow many processes in total exist after this code finishes executing everywhere? (Enter your numerical answer.)',
   options: [],
   answer: 5,
@@ -2405,7 +2405,7 @@ window.GATE_DATA.questions['os'].topics.find(function(t){return t.id==='os-proce
 },
 {
   id: 'os-processes-p5',
-  pyqYear: 2019,
+  pyqStyle: true,
   q: 'Consider this C code executed by a single process:\n\nfork();\nif (fork() == 0) {\n    fork();\n    fork();\n}\n\nHow many processes in total exist after this code finishes executing everywhere? (Enter your numerical answer.)',
   options: [],
   answer: 10,
@@ -2417,7 +2417,7 @@ window.GATE_DATA.questions['os'].topics.find(function(t){return t.id==='os-proce
 },
 {
   id: 'os-processes-p6',
-  pyqYear: 2020,
+  pyqStyle: true,
   q: 'Consider this C code executed by a single process:\n\nfork();\nfork();\nif (fork() > 0) {\n    fork();\n}\n\n(the condition fork() > 0 is true only in the PARENT of that third fork() call, i.e., the process that received a nonzero child PID). How many processes in total exist after this code finishes executing everywhere? (Enter your numerical answer.)',
   options: [],
   answer: 12,
@@ -2429,7 +2429,7 @@ window.GATE_DATA.questions['os'].topics.find(function(t){return t.id==='os-proce
 },
 {
   id: 'os-processes-p7',
-  pyqYear: 2021,
+  pyqStyle: true,
   q: 'Consider this C code executed by a single process:\n\nif (fork() == 0) {\n    fork();\n} else {\n    fork();\n    fork();\n}\n\nHow many processes in total exist after this code finishes executing everywhere? (Enter your numerical answer.)',
   options: [],
   answer: 6,
@@ -2441,7 +2441,7 @@ window.GATE_DATA.questions['os'].topics.find(function(t){return t.id==='os-proce
 },
 {
   id: 'os-processes-p8',
-  pyqYear: 2022,
+  pyqStyle: true,
   q: 'Consider this C code executed by a single process:\n\nfork();\nfork();\nprintf("done\\n");\n\n(the printf statement is unconditional and comes after both forks, so every live process executes it exactly once). How many times does the string "done" get printed in total, across all processes? (Enter your numerical answer.)',
   options: [],
   answer: 4,
@@ -2453,7 +2453,7 @@ window.GATE_DATA.questions['os'].topics.find(function(t){return t.id==='os-proce
 },
 {
   id: 'os-processes-p9',
-  pyqYear: 2023,
+  pyqStyle: true,
   q: 'Consider this C code executed by a single process:\n\nfork();\nprintf("hi\\n");\nfork();\n\n(the printf is placed BETWEEN the two fork() calls, so it executes once per process that exists at that point in the code, before the second fork happens). How many times does "hi" get printed in total? (Enter your numerical answer.)',
   options: [],
   answer: 2,
@@ -2465,7 +2465,7 @@ window.GATE_DATA.questions['os'].topics.find(function(t){return t.id==='os-proce
 },
 {
   id: 'os-processes-p10',
-  pyqYear: 2024,
+  pyqStyle: true,
   q: 'Consider this C code executed by a single process:\n\nfork();\nfork();\nfork();\nprintf("x\\n");\n\n(three unconditional, sequential forks, followed by an unconditional printf executed by every resulting process). How many times does "x" get printed in total? (Enter your numerical answer.)',
   options: [],
   answer: 8,
@@ -2477,7 +2477,7 @@ window.GATE_DATA.questions['os'].topics.find(function(t){return t.id==='os-proce
 },
 {
   id: 'os-processes-p11',
-  pyqYear: 2025,
+  pyqStyle: true,
   q: 'Consider this C code executed by a single process:\n\nif (fork() == 0) {\n    exit(0);\n}\nfork();\n\n(the first fork()\'s child immediately exits without doing anything further; the first fork()\'s parent survives and goes on to execute the second, unconditional fork()). How many NEW child processes are ever created in total by this code (not counting the original process, and counting a child even though it exits immediately)? (Enter your numerical answer.)',
   options: [],
   answer: 2,
@@ -2489,7 +2489,7 @@ window.GATE_DATA.questions['os'].topics.find(function(t){return t.id==='os-proce
 },
 {
   id: 'os-processes-p12',
-  pyqYear: 2026,
+  pyqStyle: true,
   q: 'Consider this C code executed by a single process:\n\nfork();\nfork();\nif (fork() == 0) {\n    exit(0);\n}\n\n(the first two forks are unconditional and sequential; the third fork\'s child immediately exits, while the third fork\'s parent survives and does nothing further). How many processes are still ALIVE (i.e., have not exited) once every process has finished executing this fragment? (Enter your numerical answer.)',
   options: [],
   answer: 4,
@@ -2504,7 +2504,7 @@ window.GATE_DATA.questions['os'].topics.find(function(t){return t.id==='os-proce
 window.GATE_DATA.questions['os'].topics.find(function(t){return t.id==='os-scheduling';}).questions.push(
 {
   id: 'os-scheduling-p1',
-  pyqYear: 2015,
+  pyqStyle: true,
   q: 'Four processes P1, P2, P3, P4 with burst times 6, 8, 7, 3 ms respectively all arrive at t = 0 and are scheduled using non-preemptive Shortest-Job-First (SJF). What is the AVERAGE WAITING TIME across all 4 processes, in ms? (Enter your numerical answer.)',
   options: [],
   answer: 7,
@@ -2516,7 +2516,7 @@ window.GATE_DATA.questions['os'].topics.find(function(t){return t.id==='os-sched
 },
 {
   id: 'os-scheduling-p2',
-  pyqYear: 2016,
+  pyqStyle: true,
   q: 'Four processes arrive as follows and are scheduled by Shortest-Remaining-Time-First (SRTF), a preemptive algorithm: P1 (arrival 0, burst 8), P2 (arrival 1, burst 4), P3 (arrival 2, burst 9), P4 (arrival 3, burst 5). What is the AVERAGE TURNAROUND TIME across all 4 processes, in ms? (Enter your numerical answer.)',
   options: [],
   answer: 13,
@@ -2528,7 +2528,7 @@ window.GATE_DATA.questions['os'].topics.find(function(t){return t.id==='os-sched
 },
 {
   id: 'os-scheduling-p3',
-  pyqYear: 2017,
+  pyqStyle: true,
   q: 'Four processes are scheduled using Round Robin with time quantum = 2 ms: P1 (arrival 0, burst 5), P2 (arrival 1, burst 4), P3 (arrival 2, burst 2), P4 (arrival 4, burst 1). Ties in the ready queue are broken by earliest arrival, and a process that arrives at the exact instant another is preempted is placed in the queue before the preempted process re-enters it. What is the AVERAGE WAITING TIME across all 4 processes, in ms? (Enter your numerical answer, up to 2 decimal places.)',
   options: [],
   answer: 4.75,
@@ -2540,7 +2540,7 @@ window.GATE_DATA.questions['os'].topics.find(function(t){return t.id==='os-sched
 },
 {
   id: 'os-scheduling-p4',
-  pyqYear: 2018,
+  pyqStyle: true,
   q: 'Four processes arrive as follows and are scheduled using non-preemptive SJF: P1 (arrival 0, burst 7), P2 (arrival 2, burst 4), P3 (arrival 4, burst 1), P4 (arrival 5, burst 4). What is the AVERAGE WAITING TIME across all 4 processes, in ms? (Enter your numerical answer.)',
   options: [],
   answer: 4,
@@ -2552,7 +2552,7 @@ window.GATE_DATA.questions['os'].topics.find(function(t){return t.id==='os-sched
 },
 {
   id: 'os-scheduling-p5',
-  pyqYear: 2019,
+  pyqStyle: true,
   q: 'Three processes P1, P2, P3 with burst times 10, 5, 8 ms respectively all arrive at t = 0 and are scheduled using Round Robin with time quantum = 3 ms. What is the AVERAGE TURNAROUND TIME across all 3 processes, in ms? (Enter your numerical answer, up to 2 decimal places.)',
   options: [],
   answer: 19.67,
@@ -2564,7 +2564,7 @@ window.GATE_DATA.questions['os'].topics.find(function(t){return t.id==='os-sched
 },
 {
   id: 'os-scheduling-p6',
-  pyqYear: 2020,
+  pyqStyle: true,
   q: 'Four processes P1, P2, P3, P4 with burst times 6, 2, 8, 3 ms respectively all arrive at t = 0 and are scheduled using Shortest-Remaining-Time-First (SRTF). Since all bursts are known and fixed and all processes arrive together, no preemption ever actually occurs beyond the initial ordering. What is the AVERAGE WAITING TIME across all 4 processes, in ms? (Enter your numerical answer.)',
   options: [],
   answer: 4.5,
@@ -2576,7 +2576,7 @@ window.GATE_DATA.questions['os'].topics.find(function(t){return t.id==='os-sched
 },
 {
   id: 'os-scheduling-p7',
-  pyqYear: 2021,
+  pyqStyle: true,
   q: 'Four processes all arrive at t = 0 and are scheduled using non-preemptive PRIORITY scheduling (a smaller priority number means higher priority, so it runs first): P1 (burst 5, priority 3), P2 (burst 2, priority 1), P3 (burst 8, priority 4), P4 (burst 4, priority 2). What is the AVERAGE WAITING TIME across all 4 processes, in ms? (Enter your numerical answer.)',
   options: [],
   answer: 4.75,
@@ -2588,7 +2588,7 @@ window.GATE_DATA.questions['os'].topics.find(function(t){return t.id==='os-sched
 },
 {
   id: 'os-scheduling-p8',
-  pyqYear: 2022,
+  pyqStyle: true,
   q: 'Three processes P1, P2, P3 with burst times 5, 3, 8 ms respectively all arrive at t = 0 and are scheduled using Round Robin with a SMALL time quantum of 1 ms. What is the AVERAGE WAITING TIME across all 3 processes, in ms? (Enter your numerical answer, up to 2 decimal places.)',
   options: [],
   answer: 6.67,
@@ -2600,7 +2600,7 @@ window.GATE_DATA.questions['os'].topics.find(function(t){return t.id==='os-sched
 },
 {
   id: 'os-scheduling-p9',
-  pyqYear: 2023,
+  pyqStyle: true,
   q: 'Four processes arrive as follows and are scheduled using Shortest-Remaining-Time-First (SRTF): P1 (arrival 0, burst 8), P2 (arrival 1, burst 4), P3 (arrival 2, burst 9), P4 (arrival 3, burst 5). Counting the initial dispatch of P1 as the first context switch, how many total context switches (switches to a DIFFERENT process than the one that was just running) occur before all four processes complete? (Enter your numerical answer.)',
   options: [],
   answer: 5,
@@ -2612,7 +2612,7 @@ window.GATE_DATA.questions['os'].topics.find(function(t){return t.id==='os-sched
 },
 {
   id: 'os-scheduling-p10',
-  pyqYear: 2024,
+  pyqStyle: true,
   q: 'Four processes arrive as follows and are scheduled using non-preemptive SJF: P1 (arrival 0, burst 7), P2 (arrival 2, burst 4), P3 (arrival 4, burst 1), P4 (arrival 5, burst 4). What is the TURNAROUND TIME of process P2 specifically, in ms? (Enter your numerical answer.)',
   options: [],
   answer: 10,
@@ -2624,7 +2624,7 @@ window.GATE_DATA.questions['os'].topics.find(function(t){return t.id==='os-sched
 },
 {
   id: 'os-scheduling-p11',
-  pyqYear: 2025,
+  pyqStyle: true,
   q: 'Three processes P1, P2, P3 with burst times 5, 3, 6 ms respectively all arrive at t = 0 and are scheduled using Round Robin with time quantum = 2 ms. What is the AVERAGE TURNAROUND TIME across all 3 processes, in ms? (Enter your numerical answer, up to 2 decimal places.)',
   options: [],
   answer: 11.67,
@@ -2636,7 +2636,7 @@ window.GATE_DATA.questions['os'].topics.find(function(t){return t.id==='os-sched
 },
 {
   id: 'os-scheduling-p12',
-  pyqYear: 2026,
+  pyqStyle: true,
   q: 'Four processes P1, P2, P3, P4 with burst times 8, 2, 5, 1 ms respectively all arrive at t = 0. By how much does the AVERAGE WAITING TIME decrease when switching from FCFS scheduling (in the order P1, P2, P3, P4) to non-preemptive SJF scheduling, for this exact workload? (Enter your numerical answer, in ms.)',
   options: [],
   answer: 5.25,
@@ -2651,7 +2651,7 @@ window.GATE_DATA.questions['os'].topics.find(function(t){return t.id==='os-sched
 window.GATE_DATA.questions['os'].topics.find(function(t){return t.id==='os-sync';}).questions.push(
 {
   id: 'os-sync-p1',
-  pyqYear: 2015,
+  pyqStyle: true,
   q: 'A counting semaphore S is initialized to the value 4. Five processes each execute wait(S) exactly once, one after another, with NO signal(S) call happening in between (assume the semaphore\'s value is allowed to go negative, where a negative value represents the number of processes currently blocked and waiting). What is the value of S immediately after all five wait(S) calls have been issued? (Enter your numerical answer.)',
   options: [],
   answer: -1,
@@ -2663,7 +2663,7 @@ window.GATE_DATA.questions['os'].topics.find(function(t){return t.id==='os-sync'
 },
 {
   id: 'os-sync-p2',
-  pyqYear: 2016,
+  pyqStyle: true,
   q: 'A bounded-buffer producer-consumer system uses a buffer of capacity 6, synchronized with counting semaphores empty (initially 6, counts free slots) and full (initially 0, counts filled slots), plus a binary mutex semaphore for the buffer index. Starting from an empty buffer, the producer successfully inserts 4 items, then the consumer successfully removes 1 item. What is the value of the semaphore "full" at this point? (Enter your numerical answer.)',
   options: [],
   answer: 3,
@@ -2675,7 +2675,7 @@ window.GATE_DATA.questions['os'].topics.find(function(t){return t.id==='os-sync'
 },
 {
   id: 'os-sync-p3',
-  pyqYear: 2017,
+  pyqStyle: true,
   q: 'A critical section is guarded by a counting semaphore S initialized to 3 (allowing up to 3 processes to be inside the critical section simultaneously, unlike a binary mutex which would allow only 1). If 7 processes call wait(S) one after another with no process yet calling signal(S), how many of these 7 processes are able to enter the critical section immediately (i.e., are NOT blocked)? (Enter your numerical answer.)',
   options: [],
   answer: 3,
@@ -2687,7 +2687,7 @@ window.GATE_DATA.questions['os'].topics.find(function(t){return t.id==='os-sync'
 },
 {
   id: 'os-sync-p4',
-  pyqYear: 2018,
+  pyqStyle: true,
   q: 'Two processes P1 and P2 share two semaphores S1 and S2, both initialized to 1. P1 executes wait(S1) followed by wait(S2), while P2 executes wait(S2) followed by wait(S1) -- each process then does its critical work and eventually releases both semaphores. If the scheduler happens to run P1\'s wait(S1) and P2\'s wait(S2) (in either order) before either process attempts its second wait, what is guaranteed to happen next?',
   options: ['Both processes proceed into their critical sections without any problem', 'P1 successfully acquires S2 and P2 successfully acquires S1, so both complete', 'Both P1 and P2 become permanently blocked, waiting for a semaphore the other process holds -- a deadlock', 'Only P1 blocks; P2 completes normally and eventually signals S1 to release P1'],
   answer: 2,
@@ -2698,7 +2698,7 @@ window.GATE_DATA.questions['os'].topics.find(function(t){return t.id==='os-sync'
 },
 {
   id: 'os-sync-p5',
-  pyqYear: 2019,
+  pyqStyle: true,
   q: 'A bounded buffer of capacity 10 is synchronized with counting semaphores empty (initially 10) and full (initially 0). Starting empty, the following sequence of operations happens: the producer inserts 7 items, the consumer removes 3 items, the producer inserts 4 more items, and the consumer removes 2 items. What is the value of the semaphore "empty" after all these operations? (Enter your numerical answer.)',
   options: [],
   answer: 4,
@@ -2710,7 +2710,7 @@ window.GATE_DATA.questions['os'].topics.find(function(t){return t.id==='os-sync'
 },
 {
   id: 'os-sync-p6',
-  pyqYear: 2020,
+  pyqStyle: true,
   q: 'A binary semaphore mutex is initialized to 1 and used to protect a critical section shared by several processes, each executing wait(mutex); critical_section(); signal(mutex);. Suppose a programmer makes a bug: one particular process\'s code accidentally calls signal(mutex) TWICE at the end instead of once (but still calls wait(mutex) only once, correctly, at the start). Assuming no other process is currently inside or waiting for the critical section when this happens, what problem does this bug cause?',
   options: ['No problem at all; the extra signal(mutex) is simply ignored by the semaphore', 'mutex ends up with value 2, which means TWO processes could now enter the critical section simultaneously, breaking mutual exclusion', 'The process itself gets blocked and never terminates', 'The operating system automatically detects and corrects the mismatched wait/signal count'],
   answer: 1,
@@ -2721,7 +2721,7 @@ window.GATE_DATA.questions['os'].topics.find(function(t){return t.id==='os-sync'
 },
 {
   id: 'os-sync-p7',
-  pyqYear: 2021,
+  pyqStyle: true,
   q: 'A bounded buffer of capacity 5 uses counting semaphores empty (initially 5) and full (initially 0), correctly guarded by a mutex for the buffer index. A student incorrectly reorders the producer\'s code to call wait(mutex) BEFORE wait(empty) (instead of the correct order: wait(empty) first, then wait(mutex)), while the consumer\'s code correctly calls wait(mutex) before wait(full) is unaffected... Actually, re-stating precisely: producer does wait(mutex); wait(empty); ... ; signal(mutex); signal(full);  and consumer does the standard correct wait(full); wait(mutex); ...; signal(mutex); signal(empty);. If the buffer becomes completely full (all 5 slots occupied) and the producer then tries to insert one more item while the consumer is simultaneously trying to remove an item, what happens?',
   options: ['The producer waits briefly and then successfully inserts the item once the consumer removes one', 'Both the producer and the consumer become permanently deadlocked: the producer holds mutex and blocks on wait(empty) since the buffer is full, while the consumer can never acquire mutex to remove an item and signal(empty)', 'Only the producer blocks; the consumer proceeds normally, removes an item, and eventually unblocks the producer', 'No deadlock occurs because mutex and empty are independent semaphores with no interaction'],
   answer: 1,
@@ -2732,7 +2732,7 @@ window.GATE_DATA.questions['os'].topics.find(function(t){return t.id==='os-sync'
 },
 {
   id: 'os-sync-p8',
-  pyqYear: 2022,
+  pyqStyle: true,
   q: 'A counting semaphore S is initialized to 2. The following sequence of operations is issued strictly in this order by different processes: wait(S), wait(S), wait(S), signal(S), wait(S), signal(S), signal(S). Assuming the semaphore\'s value is allowed to go negative to represent blocked processes waiting, what is the FINAL value of S after this entire sequence? (Enter your numerical answer.)',
   options: [],
   answer: 1,
@@ -2744,7 +2744,7 @@ window.GATE_DATA.questions['os'].topics.find(function(t){return t.id==='os-sync'
 },
 {
   id: 'os-sync-p9',
-  pyqYear: 2023,
+  pyqStyle: true,
   q: 'A bounded buffer of capacity 8 uses counting semaphores empty (initially 8) and full (initially 0). Starting from an empty buffer, the producer inserts 6 items, then the consumer removes 5 items, and then the producer inserts 3 more items. What is the value of "full" at this point, and does this represent a valid state (i.e., does it respect the buffer capacity of 8)?',
   options: ['full = 4, and this is a valid state within capacity', 'full = 4, but this VIOLATES the buffer capacity of 8, meaning the last producer insertion should have blocked before completing all 3 insertions', 'full = 14, and this is a valid state since full simply counts total items ever produced', 'full = 8, and this is a valid state exactly at capacity'],
   answer: 0,
@@ -2755,7 +2755,7 @@ window.GATE_DATA.questions['os'].topics.find(function(t){return t.id==='os-sync'
 },
 {
   id: 'os-sync-p10',
-  pyqYear: 2024,
+  pyqStyle: true,
   q: 'A semaphore S is used purely as a signaling mechanism (not mutual exclusion) between two processes: process A must finish some initialization work before process B is allowed to proceed. S is initialized to 0. Process A executes signal(S) once it finishes initializing, and process B executes wait(S) before it starts its own work. If process B happens to call wait(S) BEFORE process A calls signal(S), what happens?',
   options: ['Process B proceeds immediately anyway, since S was going to be signaled eventually', 'Process B blocks until process A calls signal(S), after which B is unblocked and proceeds -- this is the correct behavior for this kind of rendezvous/ordering synchronization', 'This causes a deadlock, since S is initialized to 0 and B calling wait(S) first is not allowed', 'Process A is forced to call signal(S) immediately, out of its intended order, to prevent B from being stuck'],
   answer: 1,
@@ -2766,7 +2766,7 @@ window.GATE_DATA.questions['os'].topics.find(function(t){return t.id==='os-sync'
 },
 {
   id: 'os-sync-p11',
-  pyqYear: 2025,
+  pyqStyle: true,
   q: 'A counting semaphore S, initialized to 5, is shared among worker processes that repeatedly call wait(S) to acquire one of 5 identical database connections from a pool, use the connection, and then call signal(S) to return it. At some instant, ALL 5 connections are currently checked out (in use) by 5 different processes, and 2 more processes are currently blocked waiting for a connection to free up. What is the CURRENT value of S at this instant (using the convention that a negative value indicates the number of blocked processes)? (Enter your numerical answer.)',
   options: [],
   answer: -2,
@@ -2778,7 +2778,7 @@ window.GATE_DATA.questions['os'].topics.find(function(t){return t.id==='os-sync'
 },
 {
   id: 'os-sync-p12',
-  pyqYear: 2026,
+  pyqStyle: true,
   q: 'A bounded buffer of capacity 4 uses counting semaphores empty (initially 4) and full (initially 0), correctly guarded. Starting from empty buffer: the producer inserts 4 items (filling it completely), then a 5th producer attempt calls wait(empty) and BLOCKS (since empty is now 0). While this 5th producer is blocked, the consumer removes 2 items. What is the value of "empty" immediately after the consumer\'s 2 removals, and does the blocked 5th producer get to proceed as a result?',
   options: ['empty becomes 2, and the blocked producer remains blocked forever regardless', 'empty becomes 2, and the blocked producer is woken up and successfully completes its wait(empty), immediately consuming one of those 2 freed slots (leaving empty effectively back down to 1 once its insertion completes)', 'empty stays at 0, since the producer is permanently stuck and its block cannot be reversed', 'empty becomes 6, since removing items should increase empty beyond the buffer capacity'],
   answer: 1,
@@ -2792,7 +2792,7 @@ window.GATE_DATA.questions['os'].topics.find(function(t){return t.id==='os-sync'
 window.GATE_DATA.questions['os'].topics.find(function(t){return t.id==='os-deadlock';}).questions.push(
 {
   id: 'os-deadlock-p1',
-  pyqYear: 2015,
+  pyqStyle: true,
   q: 'A system has a single resource type with 12 total instances, shared by 5 processes P0-P4 whose current allocation and maximum demand are: P0 (allocated 1, max 6), P1 (allocated 4, max 5), P2 (allocated 2, max 4), P3 (allocated 0, max 7), P4 (allocated 2, max 6). Using the Banker\'s Algorithm, which of the following is a valid SAFE SEQUENCE for this state?',
   options: ['P0, P1, P2, P3, P4', 'P1, P2, P3, P4, P0', 'P3, P4, P0, P1, P2', 'No safe sequence exists; this state is unsafe'],
   answer: 1,
@@ -2803,7 +2803,7 @@ window.GATE_DATA.questions['os'].topics.find(function(t){return t.id==='os-deadl
 },
 {
   id: 'os-deadlock-p2',
-  pyqYear: 2016,
+  pyqStyle: true,
   q: 'Four processes P0-P3 share a system with 3 identical resource types A, B, C with total instances (10, 5, 7) respectively. The current allocation matrix is P0:(0,1,0), P1:(2,0,0), P2:(3,0,2), P3:(2,1,1), and the maximum demand matrix is P0:(7,5,3), P1:(3,2,2), P2:(9,0,2), P3:(4,3,3). What is the AVAILABLE vector (instances of A, B, C not currently allocated to any process)?',
   options: ['(3, 3, 4)', '(3, 3, 3)', '(2, 3, 4)', '(4, 3, 4)'],
   answer: 0,
@@ -2814,7 +2814,7 @@ window.GATE_DATA.questions['os'].topics.find(function(t){return t.id==='os-deadl
 },
 {
   id: 'os-deadlock-p3',
-  pyqYear: 2017,
+  pyqStyle: true,
   q: 'A system has exactly 4 processes, and each process may request a MAXIMUM of 3 instances of a single resource type during its lifetime (all four processes have the same maximum demand of 3). What is the MINIMUM total number of instances of this resource that the system must have available to GUARANTEE that deadlock can never occur, regardless of how the processes request and release the resource? (Enter your numerical answer.)',
   options: [],
   answer: 9,
@@ -2826,7 +2826,7 @@ window.GATE_DATA.questions['os'].topics.find(function(t){return t.id==='os-deadl
 },
 {
   id: 'os-deadlock-p4',
-  pyqYear: 2018,
+  pyqStyle: true,
   q: 'A system has exactly 6 processes, and each process may request a MAXIMUM of 4 instances of a single resource type (all six have the same maximum demand of 4). What is the MINIMUM total number of instances of this resource needed to guarantee deadlock can never occur? (Enter your numerical answer.)',
   options: [],
   answer: 19,
@@ -2838,7 +2838,7 @@ window.GATE_DATA.questions['os'].topics.find(function(t){return t.id==='os-deadl
 },
 {
   id: 'os-deadlock-p5',
-  pyqYear: 2019,
+  pyqStyle: true,
   q: 'Four processes P0-P3 share 3 resource types A, B, C with total instances (9, 3, 6). The allocation matrix is P0:(0,1,0), P1:(2,0,0), P2:(3,0,2), P3:(2,1,1); the maximum demand matrix is P0:(4,2,3), P1:(2,2,1), P2:(9,0,2), P3:(4,2,2). Is the current state SAFE, and if so, which process must necessarily be the FIRST one able to complete in any safe sequence?',
   options: ['The state is unsafe -- no process can complete', 'The state is safe, and P1 must run first (it is the only process whose remaining need fits within the initially available resources)', 'The state is safe, and P0 must run first', 'The state is safe, and either P0 or P3 could run first, so there is no unique first process'],
   answer: 1,
@@ -2849,7 +2849,7 @@ window.GATE_DATA.questions['os'].topics.find(function(t){return t.id==='os-deadl
 },
 {
   id: 'os-deadlock-p6',
-  pyqYear: 2020,
+  pyqStyle: true,
   q: 'A system has a single resource type with 10 total instances shared by 4 processes. Current allocation: P0=2, P1=3, P2=2, P3=1 (total allocated = 8, so 2 instances remain available). The maximum demands are P0=6, P1=7, P2=5, P3=3. Process P3 now REQUESTS 1 additional instance (which would bring its allocation to 2, still within its max of 3, and there are 2 instances available so the request CAN be physically granted). Should the Banker\'s Algorithm GRANT this request?',
   options: ['Yes, grant it -- after granting, the resulting state is still safe (a valid safe sequence exists)', 'No, deny it -- granting it would leave the system in an unsafe state with no valid safe sequence', 'The request must be denied automatically because it does not bring P3 to its exact maximum', 'It cannot be determined without also knowing P1 and P2\'s exact resource holdings history'],
   answer: 0,
@@ -2860,7 +2860,7 @@ window.GATE_DATA.questions['os'].topics.find(function(t){return t.id==='os-deadl
 },
 {
   id: 'os-deadlock-p7',
-  pyqYear: 2021,
+  pyqStyle: true,
   q: 'A system has a single resource type with 10 total instances shared by 5 processes with current allocation 2, 3, 2, 1, 1 (summing to 9) and maximum demand 6, 7, 5, 3, 4 respectively. What is the value of the AVAILABLE instances in this state, and is this state SAFE or UNSAFE?',
   options: ['Available = 1; the state is SAFE, because at least one process\'s remaining need fits within it', 'Available = 1; the state is UNSAFE, because no process\'s remaining need is small enough to fit within the 1 available instance', 'Available = 2; the state is SAFE', 'Available = 1; safety cannot be determined without the request order'],
   answer: 1,
@@ -2871,7 +2871,7 @@ window.GATE_DATA.questions['os'].topics.find(function(t){return t.id==='os-deadl
 },
 {
   id: 'os-deadlock-p8',
-  pyqYear: 2022,
+  pyqStyle: true,
   q: 'A system has 5 processes with differing maximum demands for a single resource type: P0 needs at most 3, P1 needs at most 5, P2 needs at most 2, P3 needs at most 6, P4 needs at most 4 instances. What is the MINIMUM total number of instances of this resource required to guarantee deadlock can never occur among these 5 processes? (Enter your numerical answer.)',
   options: [],
   answer: 16,
@@ -2883,7 +2883,7 @@ window.GATE_DATA.questions['os'].topics.find(function(t){return t.id==='os-deadl
 },
 {
   id: 'os-deadlock-p9',
-  pyqYear: 2023,
+  pyqStyle: true,
   q: 'A system has 4 processes with maximum demands for a single resource type: P0 needs at most 3, P1 needs at most 4, P2 needs at most 2, P3 needs at most 5. What is the MINIMUM total number of instances required to guarantee deadlock can never occur? (Enter your numerical answer.)',
   options: [],
   answer: 11,
@@ -2895,7 +2895,7 @@ window.GATE_DATA.questions['os'].topics.find(function(t){return t.id==='os-deadl
 },
 {
   id: 'os-deadlock-p10',
-  pyqYear: 2024,
+  pyqStyle: true,
   q: 'A system has 3 processes P0, P1, P2 and 2 resource types A and B with total instances (9, 5). Allocation: P0=(1,1), P1=(2,1), P2=(2,1) (column sums: A=5, B=3). Maximum demand: P0=(5,3), P1=(4,3), P2=(6,2). If process P2 now requests 1 additional instance of resource A only (its allocation would become (3,1), still within its max of (6,2)), and there are enough physically available instances, should this request be GRANTED according to the Banker\'s Algorithm?',
   options: ['Yes -- the resulting state after granting is safe', 'No -- the resulting state after granting is unsafe', 'The request must be denied regardless because it does not request all resource types simultaneously', 'Cannot be determined without knowing P0 and P1\'s exact request history'],
   answer: 0,
@@ -2906,7 +2906,7 @@ window.GATE_DATA.questions['os'].topics.find(function(t){return t.id==='os-deadl
 },
 {
   id: 'os-deadlock-p11',
-  pyqYear: 2025,
+  pyqStyle: true,
   q: 'A system has a single resource type with 8 total instances shared by 4 processes with current allocation 3, 2, 1, 1 (summing to 7, so 1 instance available) and maximum demands 7, 5, 4, 3 respectively. Is this state SAFE, and if not, does that necessarily mean the system is ALREADY deadlocked right now?',
   options: ['The state is safe; a valid safe sequence exists', 'The state is unsafe, but this does NOT necessarily mean the system is already deadlocked -- it only means a future sequence of requests COULD lead to deadlock; the processes might still get lucky and finish if they happen to request in a favorable order or release resources early', 'The state is unsafe, and this definitely means the system is already deadlocked right now', 'Safety cannot be assessed with a single resource type, only with multiple resource types'],
   answer: 1,
@@ -2920,7 +2920,7 @@ window.GATE_DATA.questions['os'].topics.find(function(t){return t.id==='os-deadl
 window.GATE_DATA.questions['os'].topics.find(function(t){return t.id==='os-memory';}).questions.push(
 {
   id: 'os-memory-p1',
-  pyqYear: 2015,
+  pyqStyle: true,
   q: 'A system uses 32-bit virtual addresses with a page size of 8 KB. How many bits are needed for the PAGE NUMBER field of the virtual address? (Enter your numerical answer.)',
   options: [],
   answer: 19,
@@ -2932,7 +2932,7 @@ window.GATE_DATA.questions['os'].topics.find(function(t){return t.id==='os-memor
 },
 {
   id: 'os-memory-p2',
-  pyqYear: 2016,
+  pyqStyle: true,
   q: 'A system has a 22-bit physical address space and uses a frame (page) size of 4 KB. How many physical frames does the system have in total? (Enter your numerical answer.)',
   options: [],
   answer: 1024,
@@ -2944,7 +2944,7 @@ window.GATE_DATA.questions['os'].topics.find(function(t){return t.id==='os-memor
 },
 {
   id: 'os-memory-p3',
-  pyqYear: 2017,
+  pyqStyle: true,
   q: 'A process has a 32-bit virtual address space with a page size of 4 KB (so the page number field is 20 bits). If each page table entry is 4 bytes, what is the TOTAL SIZE of this process\'s single-level page table?',
   options: ['1 MB', '2 MB', '4 MB', '8 MB'],
   answer: 2,
@@ -2955,7 +2955,7 @@ window.GATE_DATA.questions['os'].topics.find(function(t){return t.id==='os-memor
 },
 {
   id: 'os-memory-p4',
-  pyqYear: 2018,
+  pyqStyle: true,
   q: 'A process uses a page size of 1024 bytes (1 KB). Its page table maps page number 2 to physical frame number 6. What is the PHYSICAL ADDRESS corresponding to the virtual (logical) address 2560 (decimal)? (Enter your numerical answer.)',
   options: [],
   answer: 6656,
@@ -2967,7 +2967,7 @@ window.GATE_DATA.questions['os'].topics.find(function(t){return t.id==='os-memor
 },
 {
   id: 'os-memory-p5',
-  pyqYear: 2019,
+  pyqStyle: true,
   q: 'A process requires 41 KB of memory, and the system uses a page size of 8 KB. How much INTERNAL FRAGMENTATION (in KB) results from allocating this process the number of whole pages it needs? (Enter your numerical answer.)',
   options: [],
   answer: 7,
@@ -2979,7 +2979,7 @@ window.GATE_DATA.questions['os'].topics.find(function(t){return t.id==='os-memor
 },
 {
   id: 'os-memory-p6',
-  pyqYear: 2020,
+  pyqStyle: true,
   q: 'A paging system uses a page size of 4 KB. Averaged across a very large number of processes with random memory requirement sizes, what is the expected (average) INTERNAL FRAGMENTATION per process, approximately?',
   options: ['0 KB (paging causes no internal fragmentation on average)', 'Approximately 2 KB (about half the page size)', 'Exactly 4 KB (the full page size) for every process', 'It depends only on the total number of processes, not the page size'],
   answer: 1,
@@ -2990,7 +2990,7 @@ window.GATE_DATA.questions['os'].topics.find(function(t){return t.id==='os-memor
 },
 {
   id: 'os-memory-p7',
-  pyqYear: 2021,
+  pyqStyle: true,
   q: 'Each of 50 concurrently running processes has an identical single-level page table of size 4 MB (because each has a 32-bit virtual address space with a 4 KB page size, needing 2^20 entries of 4 bytes each). What is the TOTAL memory (in MB) consumed just by the page tables of all 50 processes combined? (Enter your numerical answer.)',
   options: [],
   answer: 200,
@@ -3002,7 +3002,7 @@ window.GATE_DATA.questions['os'].topics.find(function(t){return t.id==='os-memor
 },
 {
   id: 'os-memory-p8',
-  pyqYear: 2022,
+  pyqStyle: true,
   q: 'A process uses a page size of 1 KB (1024 bytes). For the logical (virtual) address 5000 (decimal), what is the OFFSET within its page? (Enter your numerical answer.)',
   options: [],
   answer: 904,
@@ -3014,7 +3014,7 @@ window.GATE_DATA.questions['os'].topics.find(function(t){return t.id==='os-memor
 },
 {
   id: 'os-memory-p9',
-  pyqYear: 2023,
+  pyqStyle: true,
   q: 'A system has 128 MB of physical memory and uses a frame size of 2 KB. What is the total width, in bits, of a PHYSICAL address in this system? (Enter your numerical answer.)',
   options: [],
   answer: 27,
@@ -3026,7 +3026,7 @@ window.GATE_DATA.questions['os'].topics.find(function(t){return t.id==='os-memor
 },
 {
   id: 'os-memory-p10',
-  pyqYear: 2024,
+  pyqStyle: true,
   q: 'A system has 2^15 physical frames. Each page table entry must store the frame number PLUS exactly 1 additional valid/invalid status bit (and no other fields). What is the MINIMUM size of a single page table entry, in BYTES (rounding up to the nearest whole byte, since entries must be byte-aligned)? (Enter your numerical answer.)',
   options: [],
   answer: 2,
@@ -3038,7 +3038,7 @@ window.GATE_DATA.questions['os'].topics.find(function(t){return t.id==='os-memor
 },
 {
   id: 'os-memory-p11',
-  pyqYear: 2025,
+  pyqStyle: true,
   q: 'A process requires 1 MB of virtual memory, and the system uses a page size of 4 KB. How many page table entries are needed to map this process\'s entire address space (i.e., how many pages does the process consist of)? (Enter your numerical answer.)',
   options: [],
   answer: 256,
@@ -3050,7 +3050,7 @@ window.GATE_DATA.questions['os'].topics.find(function(t){return t.id==='os-memor
 },
 {
   id: 'os-memory-p12',
-  pyqYear: 2026,
+  pyqStyle: true,
   q: 'A process\'s single-level page table has exactly 2^10 entries, and the system uses a page size of 4 KB. What is the MAXIMUM total virtual address space size this process can address, in MB? (Enter your numerical answer.)',
   options: [],
   answer: 4,
@@ -3065,7 +3065,7 @@ window.GATE_DATA.questions['os'].topics.find(function(t){return t.id==='os-memor
 window.GATE_DATA.questions['os'].topics.find(function(t){return t.id==='os-virtual-memory';}).questions.push(
 {
   id: 'os-virtual-memory-p1',
-  pyqYear: 2015,
+  pyqStyle: true,
   q: 'A process references pages in the order: 1, 2, 3, 4, 1, 2, 5, 1, 2, 3, 4, 5. The system has exactly 3 page frames, all initially empty, and uses the FIFO page replacement algorithm. How many page faults occur in total? (Enter your numerical answer.)',
   options: [],
   answer: 9,
@@ -3077,7 +3077,7 @@ window.GATE_DATA.questions['os'].topics.find(function(t){return t.id==='os-virtu
 },
 {
   id: 'os-virtual-memory-p2',
-  pyqYear: 2016,
+  pyqStyle: true,
   q: 'Using the SAME reference string as before -- 1, 2, 3, 4, 1, 2, 5, 1, 2, 3, 4, 5 -- and the SAME FIFO algorithm, but now with 4 page frames instead of 3, the number of page faults is found to be 10 (MORE than the 9 faults with only 3 frames). What OS concept does this surprising result illustrate?',
   options: ['A simulation error -- more frames can never cause more page faults under any algorithm', 'Belady\'s Anomaly: for FIFO specifically, increasing the number of available frames can, for certain reference strings, counter-intuitively INCREASE rather than decrease the number of page faults', 'This proves FIFO is actually a stack algorithm like LRU and Optimal', 'This only happens when the reference string contains no repeated page numbers'],
   answer: 1,
@@ -3088,7 +3088,7 @@ window.GATE_DATA.questions['os'].topics.find(function(t){return t.id==='os-virtu
 },
 {
   id: 'os-virtual-memory-p3',
-  pyqYear: 2017,
+  pyqStyle: true,
   q: 'A process references pages in the order: 7, 0, 1, 2, 0, 3, 0, 4, 2, 3, 0, 3, 2. The system has 3 page frames, all initially empty, and uses the LRU (Least Recently Used) page replacement algorithm. How many page faults occur in total? (Enter your numerical answer.)',
   options: [],
   answer: 9,
@@ -3100,7 +3100,7 @@ window.GATE_DATA.questions['os'].topics.find(function(t){return t.id==='os-virtu
 },
 {
   id: 'os-virtual-memory-p4',
-  pyqYear: 2018,
+  pyqStyle: true,
   q: 'Using the SAME reference string -- 7, 0, 1, 2, 0, 3, 0, 4, 2, 3, 0, 3, 2 -- and the SAME LRU algorithm, but now with 4 page frames instead of 3, how many page faults occur? (Enter your numerical answer.)',
   options: [],
   answer: 6,
@@ -3112,7 +3112,7 @@ window.GATE_DATA.questions['os'].topics.find(function(t){return t.id==='os-virtu
 },
 {
   id: 'os-virtual-memory-p5',
-  pyqYear: 2019,
+  pyqStyle: true,
   q: 'A process references pages in the order: 1, 2, 3, 4, 1, 2, 5, 1, 2, 3, 4, 5. The system has 3 page frames, all initially empty, and uses the OPTIMAL (Belady\'s optimal, OPT) page replacement algorithm, which always evicts the page that will not be used for the longest time in the future. How many page faults occur in total? (Enter your numerical answer.)',
   options: [],
   answer: 7,
@@ -3124,7 +3124,7 @@ window.GATE_DATA.questions['os'].topics.find(function(t){return t.id==='os-virtu
 },
 {
   id: 'os-virtual-memory-p6',
-  pyqYear: 2020,
+  pyqStyle: true,
   q: 'For ANY given reference string and ANY fixed number of frames, which of the following relationships among the number of page faults produced by FIFO, LRU, and Optimal (OPT) is GUARANTEED to always hold?',
   options: ['OPT\'s fault count is always less than or equal to both LRU\'s and FIFO\'s fault count, since OPT is provably optimal, but no fixed ordering between LRU and FIFO is guaranteed in general', 'LRU always produces strictly fewer faults than FIFO for every possible reference string', 'FIFO always produces strictly fewer faults than LRU for every possible reference string', 'All three algorithms always produce exactly the same number of faults for any given reference string and frame count'],
   answer: 0,
@@ -3135,7 +3135,7 @@ window.GATE_DATA.questions['os'].topics.find(function(t){return t.id==='os-virtu
 },
 {
   id: 'os-virtual-memory-p7',
-  pyqYear: 2021,
+  pyqStyle: true,
   q: 'Belady\'s Anomaly -- where increasing the number of page frames can increase the number of page faults -- is a well-known property of the FIFO page replacement algorithm. Can this same anomaly ever occur with the LRU (Least Recently Used) or Optimal (OPT) algorithms?',
   options: ['No -- LRU and OPT are both classified as "stack algorithms" (the set of pages held with k frames is always a subset of the pages held with k+1 frames), and it is a proven mathematical theorem that stack algorithms can never exhibit Belady\'s Anomaly', 'Yes -- Belady\'s Anomaly can occur with any page replacement algorithm, including LRU and OPT, for sufficiently adversarial reference strings', 'Only LRU is immune to Belady\'s Anomaly; OPT can still exhibit it in rare cases', 'Only OPT is immune to Belady\'s Anomaly; LRU can still exhibit it in rare cases'],
   answer: 0,
@@ -3146,7 +3146,7 @@ window.GATE_DATA.questions['os'].topics.find(function(t){return t.id==='os-virtu
 },
 {
   id: 'os-virtual-memory-p8',
-  pyqYear: 2022,
+  pyqStyle: true,
   q: 'A system uses a TLB (Translation Lookaside Buffer) with a hit ratio of 80%, a TLB access time of 20 ns, and a main memory access time of 100 ns. On a TLB hit, the effective access requires one TLB lookup plus one memory access (for the actual data); on a TLB miss, it requires one TLB lookup, one memory access (to read the page table entry), plus one more memory access (for the actual data). What is the Effective Memory Access Time (EMAT), in ns? (Enter your numerical answer.)',
   options: [],
   answer: 140,
@@ -3158,7 +3158,7 @@ window.GATE_DATA.questions['os'].topics.find(function(t){return t.id==='os-virtu
 },
 {
   id: 'os-virtual-memory-p9',
-  pyqYear: 2023,
+  pyqStyle: true,
   q: 'A system uses 2-level paging for a 32-bit virtual address space with a 4 KB page size (12 bits of offset). The remaining 20 bits are split EVENLY between the outer (first-level) page table index and the inner (second-level) page table index, so that each page table itself exactly fits within a single page. How many bits are used for the OUTER page table index? (Enter your numerical answer.)',
   options: [],
   answer: 10,
@@ -3170,7 +3170,7 @@ window.GATE_DATA.questions['os'].topics.find(function(t){return t.id==='os-virtu
 },
 {
   id: 'os-virtual-memory-p10',
-  pyqYear: 2024,
+  pyqStyle: true,
   q: 'A system uses 2-level paging (so translating an address requires accessing 2 levels of page tables before the actual data) together with a TLB. The TLB hit ratio is 90%, TLB access time is 10 ns, and main memory access time is 80 ns. On a TLB hit, the total time is TLB access + 1 memory access (for data). On a TLB miss, the total time is TLB access + 2 memory accesses (one per page table level) + 1 memory access (for the actual data). What is the Effective Memory Access Time (EMAT), in ns? (Enter your numerical answer.)',
   options: [],
   answer: 106,
@@ -3182,7 +3182,7 @@ window.GATE_DATA.questions['os'].topics.find(function(t){return t.id==='os-virtu
 },
 {
   id: 'os-virtual-memory-p11',
-  pyqYear: 2025,
+  pyqStyle: true,
   q: 'A system uses 3-level paging (a page table hierarchy with 3 levels) and has NO TLB at all. Every single memory reference by the CPU must therefore walk all 3 page table levels (one memory access per level) before finally accessing the actual data (one more memory access). If main memory access time is 100 ns, what is the Effective Memory Access Time (EMAT) for this system, in ns? (Enter your numerical answer.)',
   options: [],
   answer: 400,
@@ -3194,7 +3194,7 @@ window.GATE_DATA.questions['os'].topics.find(function(t){return t.id==='os-virtu
 },
 {
   id: 'os-virtual-memory-p12',
-  pyqYear: 2026,
+  pyqStyle: true,
   q: 'A process uses 2-level paging where each second-level (inner) page table has 2^10 = 1024 entries, and each entry is 4 bytes. If the process\'s memory usage pattern is sparse enough that only 3 distinct second-level page tables have actually been allocated (i.e., only 3 outer-table entries point to real inner tables; the rest are marked invalid and consume no inner-table memory), what is the TOTAL memory (in KB) consumed by just these allocated inner-level page tables (ignore the outer table\'s own size)? (Enter your numerical answer.)',
   options: [],
   answer: 12,
@@ -3206,7 +3206,7 @@ window.GATE_DATA.questions['os'].topics.find(function(t){return t.id==='os-virtu
 },
 {
   id: 'os-virtual-memory-p13',
-  pyqYear: 2018,
+  pyqStyle: true,
   q: 'For the reference string 1, 2, 3, 4, 1, 2, 5, 1, 2, 3, 4, 5 with exactly 3 page frames, how many FEWER page faults does the OPTIMAL (OPT) algorithm produce compared to FIFO? (Enter your numerical answer.)',
   options: [],
   answer: 2,

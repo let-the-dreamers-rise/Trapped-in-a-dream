@@ -1969,7 +1969,7 @@ window.GATE_DATA.questions['apti'].topics.find(function(t){return t.id==='apti-l
 window.GATE_DATA.questions['apti'].topics.find(function(t){return t.id==='apti-quant';}).questions.push(
   {
     id: 'apti-quant-pyq2015a',
-    pyqYear: 2015,
+    pyqStyle: true,
     q: 'A sum of Rs. 6300 is divided among P, Q and R in the ratio 2:3:4. Find R\'s share.',
     options: ['Rs. 2100', 'Rs. 2800', 'Rs. 3200', 'Rs. 1800'],
     answer: 1,
@@ -1980,7 +1980,7 @@ window.GATE_DATA.questions['apti'].topics.find(function(t){return t.id==='apti-q
   },
   {
     id: 'apti-quant-pyq2016a',
-    pyqYear: 2016,
+    pyqStyle: true,
     q: 'The population of a town increases by 10% in the first year and decreases by 10% in the second year. What is the net percentage change in population over the two years?',
     options: ['5% increase', 'No net change', '1% decrease', '1% increase'],
     answer: 2,
@@ -1991,7 +1991,7 @@ window.GATE_DATA.questions['apti'].topics.find(function(t){return t.id==='apti-q
   },
   {
     id: 'apti-quant-pyq2017a',
-    pyqYear: 2017,
+    pyqStyle: true,
     q: 'A shopkeeper marks an article at Rs. 1200 and allows a discount of 25%. He still makes a profit of 20% on the cost price. Find the cost price of the article.',
     options: ['Rs. 750', 'Rs. 800', 'Rs. 720', 'Rs. 700'],
     answer: 0,
@@ -2002,7 +2002,7 @@ window.GATE_DATA.questions['apti'].topics.find(function(t){return t.id==='apti-q
   },
   {
     id: 'apti-quant-pyq2018a',
-    pyqYear: 2018,
+    pyqStyle: true,
     q: 'Two trains of lengths 120 m and 180 m are running on parallel tracks in opposite directions at speeds of 54 km/h and 36 km/h respectively. Find the time taken by the trains to completely cross each other.',
     options: ['12 seconds', '10 seconds', '15 seconds', '9 seconds'],
     answer: 0,
@@ -2013,7 +2013,7 @@ window.GATE_DATA.questions['apti'].topics.find(function(t){return t.id==='apti-q
   },
   {
     id: 'apti-quant-pyq2019a',
-    pyqYear: 2019,
+    pyqStyle: true,
     q: 'Pipe A can fill a tank in 12 hours and pipe B can fill it in 15 hours, while an outlet pipe C can empty the full tank in 20 hours. If all three pipes are opened together, in how many hours will the tank be filled?',
     options: ['10 hours', '12 hours', '15 hours', '9 hours'],
     answer: 0,
@@ -2024,7 +2024,7 @@ window.GATE_DATA.questions['apti'].topics.find(function(t){return t.id==='apti-q
   },
   {
     id: 'apti-quant-pyq2020a',
-    pyqYear: 2020,
+    pyqStyle: true,
     q: 'Solution A contains 40% acid and solution B contains 60% acid. How many litres of solution A must be mixed with 5 litres of solution B to obtain a mixture that is 50% acid?',
     options: ['5 litres', '4 litres', '6 litres', '10 litres'],
     answer: 0,
@@ -2035,7 +2035,7 @@ window.GATE_DATA.questions['apti'].topics.find(function(t){return t.id==='apti-q
   },
   {
     id: 'apti-quant-pyq2020b',
-    pyqYear: 2020,
+    pyqStyle: true,
     q: 'Find the difference between the compound interest and the simple interest on a principal of Rs. 8000 for 2 years at 5% per annum.',
     options: ['Rs. 20', 'Rs. 40', 'Rs. 16', 'Rs. 25'],
     answer: 0,
@@ -2046,7 +2046,7 @@ window.GATE_DATA.questions['apti'].topics.find(function(t){return t.id==='apti-q
   },
   {
     id: 'apti-quant-pyq2021a',
-    pyqYear: 2021,
+    pyqStyle: true,
     q: 'A committee of 5 members is to be formed from 6 men and 4 women such that the committee has at least 3 women. In how many ways can this committee be formed? (Enter your numerical answer.)',
     options: [],
     answer: 66,
@@ -2058,7 +2058,7 @@ window.GATE_DATA.questions['apti'].topics.find(function(t){return t.id==='apti-q
   },
   {
     id: 'apti-quant-pyq2022a',
-    pyqYear: 2022,
+    pyqStyle: true,
     q: 'A bag contains 5 red, 4 blue and 3 green balls. Two balls are drawn at random without replacement. What is the probability that both balls drawn are red?',
     options: ['5/33', '1/6', '5/22', '2/11'],
     answer: 0,
@@ -2069,7 +2069,7 @@ window.GATE_DATA.questions['apti'].topics.find(function(t){return t.id==='apti-q
   },
   {
     id: 'apti-quant-pyq2022b',
-    pyqYear: 2022,
+    pyqStyle: true,
     q: 'The radius of a cylinder is increased by 20% and its height is decreased by 20%. Find the percentage change in its volume.',
     options: ['15.2% increase', '4% decrease', '20% increase', 'No change'],
     answer: 0,
@@ -2080,7 +2080,7 @@ window.GATE_DATA.questions['apti'].topics.find(function(t){return t.id==='apti-q
   },
   {
     id: 'apti-quant-pyq2023a',
-    pyqYear: 2023,
+    pyqStyle: true,
     q: 'Find the remainder when 2^100 is divided by 7. (Enter your numerical answer.)',
     options: [],
     answer: 2,
@@ -2092,7 +2092,7 @@ window.GATE_DATA.questions['apti'].topics.find(function(t){return t.id==='apti-q
   },
   {
     id: 'apti-quant-pyq2023b',
-    pyqYear: 2023,
+    pyqStyle: true,
     q: 'A can complete a piece of work in 18 days. B is twice as efficient as A. If A and B work together, in how many days will the work be completed? (Enter your numerical answer.)',
     options: [],
     answer: 6,
@@ -2104,7 +2104,7 @@ window.GATE_DATA.questions['apti'].topics.find(function(t){return t.id==='apti-q
   },
   {
     id: 'apti-quant-pyq2024a',
-    pyqYear: 2024,
+    pyqStyle: true,
     q: 'The speed of a boat in still water is 15 km/h and the speed of the stream is 5 km/h. Find the total time taken by the boat to travel 60 km downstream and then return 60 km upstream to the starting point.',
     options: ['9 hours', '8 hours', '10 hours', '7.5 hours'],
     answer: 0,
@@ -2115,7 +2115,7 @@ window.GATE_DATA.questions['apti'].topics.find(function(t){return t.id==='apti-q
   },
   {
     id: 'apti-quant-pyq2024b',
-    pyqYear: 2024,
+    pyqStyle: true,
     q: 'How many distinct arrangements can be made using all the letters of the word "STATISTICS"? (Enter your numerical answer.)',
     options: [],
     answer: 50400,
@@ -2127,7 +2127,7 @@ window.GATE_DATA.questions['apti'].topics.find(function(t){return t.id==='apti-q
   },
   {
     id: 'apti-quant-pyq2025a',
-    pyqYear: 2025,
+    pyqStyle: true,
     q: 'Two fair dice are thrown together. What is the probability that the sum of the numbers appearing on them is a multiple of 4? (Enter your numerical answer as a decimal.)',
     options: [],
     answer: 0.25,
@@ -2139,7 +2139,7 @@ window.GATE_DATA.questions['apti'].topics.find(function(t){return t.id==='apti-q
   },
   {
     id: 'apti-quant-pyq2026a',
-    pyqYear: 2026,
+    pyqStyle: true,
     q: 'A shopkeeper marks his goods 40% above the cost price and then offers two successive discounts of 10% and 5%. Find his overall profit percentage.',
     options: ['19.7% profit', '20% profit', '15% profit', '25% profit'],
     answer: 0,
@@ -2153,7 +2153,7 @@ window.GATE_DATA.questions['apti'].topics.find(function(t){return t.id==='apti-q
 window.GATE_DATA.questions['apti'].topics.find(function(t){return t.id==='apti-logical';}).questions.push(
   {
     id: 'apti-logical-pyq2015a',
-    pyqYear: 2015,
+    pyqStyle: true,
     q: 'Find the next term in the series: 3, 8, 15, 24, 35, ? (Enter your numerical answer.)',
     options: [],
     answer: 48,
@@ -2165,7 +2165,7 @@ window.GATE_DATA.questions['apti'].topics.find(function(t){return t.id==='apti-l
   },
   {
     id: 'apti-logical-pyq2016a',
-    pyqYear: 2016,
+    pyqStyle: true,
     q: 'Choose the word that best completes the analogy: Book is to Author as Painting is to ?',
     options: ['Canvas', 'Painter', 'Frame', 'Gallery'],
     answer: 1,
@@ -2176,7 +2176,7 @@ window.GATE_DATA.questions['apti'].topics.find(function(t){return t.id==='apti-l
   },
   {
     id: 'apti-logical-pyq2017a',
-    pyqYear: 2017,
+    pyqStyle: true,
     q: 'Pointing to a man, a woman said, "His mother is the only daughter of my mother." How is the woman related to the man?',
     options: ['Mother', 'Sister', 'Aunt', 'Daughter'],
     answer: 0,
@@ -2187,7 +2187,7 @@ window.GATE_DATA.questions['apti'].topics.find(function(t){return t.id==='apti-l
   },
   {
     id: 'apti-logical-pyq2018a',
-    pyqYear: 2018,
+    pyqStyle: true,
     q: 'A man starts walking from a point and goes 5 km North. He then turns right and walks 3 km, and turns right again and walks 5 km. How far is he from his starting point, and in which direction?',
     options: ['3 km, East', '5 km, North', '8 km, East', '3 km, West'],
     answer: 0,
@@ -2198,7 +2198,7 @@ window.GATE_DATA.questions['apti'].topics.find(function(t){return t.id==='apti-l
   },
   {
     id: 'apti-logical-pyq2019a',
-    pyqYear: 2019,
+    pyqStyle: true,
     q: 'Five friends A, B, C, D and E are sitting in a row facing North. B is immediately to the right of A. D is immediately to the left of C. E is sitting at one of the two ends. C is second from the left end. Who is sitting at the left end?',
     options: ['D', 'A', 'E', 'C'],
     answer: 0,
@@ -2209,7 +2209,7 @@ window.GATE_DATA.questions['apti'].topics.find(function(t){return t.id==='apti-l
   },
   {
     id: 'apti-logical-pyq2020a',
-    pyqYear: 2020,
+    pyqStyle: true,
     q: 'Statements: Some doctors are engineers. All engineers are teachers.\nConclusions:\nI. Some doctors are teachers.\nII. All teachers are engineers.\nWhich of the conclusions logically follow from the statements?',
     options: ['Only I follows', 'Only II follows', 'Both I and II follow', 'Neither I nor II follows'],
     answer: 0,
@@ -2220,7 +2220,7 @@ window.GATE_DATA.questions['apti'].topics.find(function(t){return t.id==='apti-l
   },
   {
     id: 'apti-logical-pyq2021a',
-    pyqYear: 2021,
+    pyqStyle: true,
     q: 'A cube is painted red on all its faces and then cut into 64 smaller cubes of equal size (a 4 x 4 x 4 arrangement). How many of the smaller cubes have exactly two faces painted red? (Enter your numerical answer.)',
     options: [],
     answer: 24,
@@ -2232,7 +2232,7 @@ window.GATE_DATA.questions['apti'].topics.find(function(t){return t.id==='apti-l
   },
   {
     id: 'apti-logical-pyq2022a',
-    pyqYear: 2022,
+    pyqStyle: true,
     q: 'At what time between 3 o\'clock and 4 o\'clock (other than exactly 3:00) will the minute hand and hour hand of a clock first be at right angles (90 degrees apart)?',
     options: ['3:32 and 8/11 minutes', '3:27', '3:16 and 4/11 minutes', '3:00'],
     answer: 0,
@@ -2243,7 +2243,7 @@ window.GATE_DATA.questions['apti'].topics.find(function(t){return t.id==='apti-l
   },
   {
     id: 'apti-logical-pyq2023a',
-    pyqYear: 2023,
+    pyqStyle: true,
     q: '1st January 2023 was a Sunday. What day of the week was 1st January 2024? (2023 is not a leap year.)',
     options: ['Monday', 'Tuesday', 'Sunday', 'Wednesday'],
     answer: 0,
@@ -2254,7 +2254,7 @@ window.GATE_DATA.questions['apti'].topics.find(function(t){return t.id==='apti-l
   },
   {
     id: 'apti-logical-pyq2023b',
-    pyqYear: 2023,
+    pyqStyle: true,
     q: 'Find the missing term in the series: B, D, G, K, P, ?',
     options: ['V', 'U', 'W', 'T'],
     answer: 0,
@@ -2265,7 +2265,7 @@ window.GATE_DATA.questions['apti'].topics.find(function(t){return t.id==='apti-l
   },
   {
     id: 'apti-logical-pyq2024a',
-    pyqYear: 2024,
+    pyqStyle: true,
     q: 'Pointing to a boy, a girl said, "He is the son of the only son of my grandfather." How is the boy related to the girl?',
     options: ['Brother', 'Cousin', 'Nephew', 'Son'],
     answer: 0,
@@ -2276,7 +2276,7 @@ window.GATE_DATA.questions['apti'].topics.find(function(t){return t.id==='apti-l
   },
   {
     id: 'apti-logical-pyq2024b',
-    pyqYear: 2024,
+    pyqStyle: true,
     q: 'A person walks 8 m towards South, then turns left and walks 6 m, then turns left again and walks 8 m. What is the distance, in metres, between his final position and his starting point? (Enter your numerical answer.)',
     options: [],
     answer: 6,
@@ -2288,7 +2288,7 @@ window.GATE_DATA.questions['apti'].topics.find(function(t){return t.id==='apti-l
   },
   {
     id: 'apti-logical-pyq2025a',
-    pyqYear: 2025,
+    pyqStyle: true,
     q: 'Statements: All fruits are sweet. No sweet thing is bitter.\nConclusion: No fruit is bitter.\nIs this conclusion logically valid?',
     options: ['Valid, it follows directly', 'Invalid, it needs an additional premise', 'Valid only if at least one fruit exists', 'Invalid, this is a converse error'],
     answer: 0,
@@ -2299,7 +2299,7 @@ window.GATE_DATA.questions['apti'].topics.find(function(t){return t.id==='apti-l
   },
   {
     id: 'apti-logical-pyq2025b',
-    pyqYear: 2025,
+    pyqStyle: true,
     q: 'Three distinct dice, each numbered 1 to 6, are thrown together. In how many ways can the numbers shown add up to a total of 10? (Enter your numerical answer.)',
     options: [],
     answer: 27,
@@ -2311,7 +2311,7 @@ window.GATE_DATA.questions['apti'].topics.find(function(t){return t.id==='apti-l
   },
   {
     id: 'apti-logical-pyq2026a',
-    pyqYear: 2026,
+    pyqStyle: true,
     q: 'Which of the following numbers does not belong with the others: 8, 27, 64, 100, 125?',
     options: ['100', '64', '125', '27'],
     answer: 0,
@@ -2322,7 +2322,7 @@ window.GATE_DATA.questions['apti'].topics.find(function(t){return t.id==='apti-l
   },
   {
     id: 'apti-logical-pyq2026b',
-    pyqYear: 2026,
+    pyqStyle: true,
     q: 'A man walks 10 m East, then turns and walks 10 m North, then turns and walks 10 m West. How far, in metres, is he from his starting point? (Enter your numerical answer.)',
     options: [],
     answer: 10,
@@ -2337,7 +2337,7 @@ window.GATE_DATA.questions['apti'].topics.find(function(t){return t.id==='apti-l
 window.GATE_DATA.questions['apti'].topics.find(function(t){return t.id==='apti-verbal';}).questions.push(
   {
     id: 'apti-verbal-pyq2015a',
-    pyqYear: 2015,
+    pyqStyle: true,
     q: 'Choose the most appropriate word to fill the blank: Despite his ______ efforts, he could not complete the project on time.',
     options: ['diligent', 'diligence', 'diligently', 'dilated'],
     answer: 0,
@@ -2348,7 +2348,7 @@ window.GATE_DATA.questions['apti'].topics.find(function(t){return t.id==='apti-v
   },
   {
     id: 'apti-verbal-pyq2016a',
-    pyqYear: 2016,
+    pyqStyle: true,
     q: 'Identify the part of the sentence that contains a grammatical error: "Neither the manager nor the employees (A) / was informed (B) / about the sudden change (C) / in the schedule (D)."',
     options: ['A', 'B', 'C', 'D'],
     answer: 1,
@@ -2359,7 +2359,7 @@ window.GATE_DATA.questions['apti'].topics.find(function(t){return t.id==='apti-v
   },
   {
     id: 'apti-verbal-pyq2017a',
-    pyqYear: 2017,
+    pyqStyle: true,
     q: 'What does the idiom "to let the cat out of the bag" mean?',
     options: ['To reveal a secret unintentionally', 'To adopt a pet', 'To escape from danger', 'To create confusion deliberately'],
     answer: 0,
@@ -2370,7 +2370,7 @@ window.GATE_DATA.questions['apti'].topics.find(function(t){return t.id==='apti-v
   },
   {
     id: 'apti-verbal-pyq2018a',
-    pyqYear: 2018,
+    pyqStyle: true,
     q: 'Arrange the following sentences (P, Q, R, S) in a logical order to form a coherent paragraph:\nP. Then, gradually, industries began adopting automation.\nQ. Automation initially faced resistance from workers who feared job losses.\nR. In the early twentieth century, manual labour dominated most industries.\nS. Today, automation is central to almost every manufacturing process.',
     options: ['RPQS', 'RQPS', 'PRQS', 'SRPQ'],
     answer: 0,
@@ -2381,7 +2381,7 @@ window.GATE_DATA.questions['apti'].topics.find(function(t){return t.id==='apti-v
   },
   {
     id: 'apti-verbal-pyq2019a',
-    pyqYear: 2019,
+    pyqStyle: true,
     q: 'The government has announced free Wi-Fi in all public parks to encourage outdoor activity among youth. Which of the following is an assumption implicit in this statement?',
     options: ['Youth do not currently use public parks much due to lack of internet access there', 'Free Wi-Fi will improve government revenue', 'Parks lack proper seating arrangements', 'Youth prefer indoor activities over outdoor ones'],
     answer: 0,
@@ -2392,7 +2392,7 @@ window.GATE_DATA.questions['apti'].topics.find(function(t){return t.id==='apti-v
   },
   {
     id: 'apti-verbal-pyq2020a',
-    pyqYear: 2020,
+    pyqStyle: true,
     q: 'Choose the most appropriate word to fill the blank: The scientist\'s theory was so ______ that even experts in the field struggled to understand it.',
     options: ['esoteric', 'elementary', 'extroverted', 'eloquent'],
     answer: 0,
@@ -2403,7 +2403,7 @@ window.GATE_DATA.questions['apti'].topics.find(function(t){return t.id==='apti-v
   },
   {
     id: 'apti-verbal-pyq2020b',
-    pyqYear: 2020,
+    pyqStyle: true,
     q: 'Choose the grammatically correct sentence.',
     options: ['Each of the students has submitted his or her assignment.', 'Each of the students have submitted his assignment.', 'Each of the student have submit their assignment.', 'Each of the students has submit their assignment.'],
     answer: 0,
@@ -2414,7 +2414,7 @@ window.GATE_DATA.questions['apti'].topics.find(function(t){return t.id==='apti-v
   },
   {
     id: 'apti-verbal-pyq2021a',
-    pyqYear: 2021,
+    pyqStyle: true,
     q: 'What does the idiom "once in a blue moon" mean?',
     options: ['Very rarely', 'Every month', 'Very frequently', 'During the night'],
     answer: 0,
@@ -2425,7 +2425,7 @@ window.GATE_DATA.questions['apti'].topics.find(function(t){return t.id==='apti-v
   },
   {
     id: 'apti-verbal-pyq2022a',
-    pyqYear: 2022,
+    pyqStyle: true,
     q: 'All members of the cycling club own bicycles. Rohit owns a bicycle. Which of the following can be validly inferred from these two statements?',
     options: ['Rohit may or may not be a member of the cycling club', 'Rohit is definitely a member of the cycling club', 'Rohit owns more than one bicycle', 'All bicycle owners are club members'],
     answer: 0,
@@ -2436,7 +2436,7 @@ window.GATE_DATA.questions['apti'].topics.find(function(t){return t.id==='apti-v
   },
   {
     id: 'apti-verbal-pyq2022b',
-    pyqYear: 2022,
+    pyqStyle: true,
     q: 'Arrange the following sentences (P, Q, R, S) in a logical order:\nP. As a result, several nations have set ambitious targets for solar and wind capacity.\nQ. Fossil fuel reserves are finite and their combustion contributes heavily to global warming.\nR. Renewable energy sources, in contrast, offer a sustainable alternative.\nS. These targets, if met, could significantly reduce global carbon emissions.',
     options: ['QRPS', 'RQPS', 'QPRS', 'PQRS'],
     answer: 0,
@@ -2447,7 +2447,7 @@ window.GATE_DATA.questions['apti'].topics.find(function(t){return t.id==='apti-v
   },
   {
     id: 'apti-verbal-pyq2023a',
-    pyqYear: 2023,
+    pyqStyle: true,
     q: 'Choose the most appropriate word to fill the blank: The committee members could not reach a consensus, as their opinions were entirely ______.',
     options: ['divergent', 'convergent', 'congruent', 'identical'],
     answer: 0,
@@ -2458,7 +2458,7 @@ window.GATE_DATA.questions['apti'].topics.find(function(t){return t.id==='apti-v
   },
   {
     id: 'apti-verbal-pyq2023b',
-    pyqYear: 2023,
+    pyqStyle: true,
     q: 'Identify the part of the sentence that contains a grammatical error: "The number of accidents on this highway (A) / have increased dramatically (B) / over the past few years (C) / due to reckless driving (D)."',
     options: ['A', 'B', 'C', 'D'],
     answer: 1,
@@ -2469,7 +2469,7 @@ window.GATE_DATA.questions['apti'].topics.find(function(t){return t.id==='apti-v
   },
   {
     id: 'apti-verbal-pyq2024a',
-    pyqYear: 2024,
+    pyqStyle: true,
     q: 'All the participants who scored above 90% in the mock test were selected for the advanced batch. Priya was not selected for the advanced batch. What can be validly concluded?',
     options: ['Priya did not score above 90% in the mock test', 'Priya scored above 90% in the mock test', 'Priya did not take the mock test', 'The mock test had no cutoff score'],
     answer: 0,
@@ -2480,7 +2480,7 @@ window.GATE_DATA.questions['apti'].topics.find(function(t){return t.id==='apti-v
   },
   {
     id: 'apti-verbal-pyq2024b',
-    pyqYear: 2024,
+    pyqStyle: true,
     q: 'What does the idiom "to burn the midnight oil" mean?',
     options: ['To work late into the night', 'To waste resources carelessly', 'To start a fire accidentally', 'To finish work well ahead of time'],
     answer: 0,
@@ -2491,7 +2491,7 @@ window.GATE_DATA.questions['apti'].topics.find(function(t){return t.id==='apti-v
   },
   {
     id: 'apti-verbal-pyq2025a',
-    pyqYear: 2025,
+    pyqStyle: true,
     q: 'Choose the most appropriate pair of words to fill the blanks: The new policy, though ______ in intention, proved ______ in execution due to poor planning.',
     options: ['noble ... disastrous', 'noble ... successful', 'flawed ... perfect', 'vague ... clear'],
     answer: 0,
@@ -2502,7 +2502,7 @@ window.GATE_DATA.questions['apti'].topics.find(function(t){return t.id==='apti-v
   },
   {
     id: 'apti-verbal-pyq2026a',
-    pyqYear: 2026,
+    pyqStyle: true,
     q: 'Sales of a company\'s flagship product increased by 30% after it reduced the price by 10%. The company concluded that lowering prices further would continue to boost sales. Which of the following, if true, would most weaken this conclusion?',
     options: ['A rival company launched an aggressive marketing campaign for a competing product at the same time, which likely drove the increased customer interest', 'The company\'s profit margins improved despite the price cut', 'The product remains popular among younger customers', 'The price reduction was well publicized in the media'],
     answer: 0,
@@ -2516,7 +2516,7 @@ window.GATE_DATA.questions['apti'].topics.find(function(t){return t.id==='apti-v
 window.GATE_DATA.questions['apti'].topics.find(function(t){return t.id==='apti-data-spatial';}).questions.push(
   {
     id: 'apti-data-spatial-pyq2015a',
-    pyqYear: 2015,
+    pyqStyle: true,
     q: 'A company\'s total annual budget is Rs. 72 lakh, shown as a pie chart. The "Marketing" sector occupies 120 degrees of the chart. What amount is allocated to Marketing?',
     options: ['Rs. 24 lakh', 'Rs. 20 lakh', 'Rs. 18 lakh', 'Rs. 30 lakh'],
     answer: 0,
@@ -2527,7 +2527,7 @@ window.GATE_DATA.questions['apti'].topics.find(function(t){return t.id==='apti-d
   },
   {
     id: 'apti-data-spatial-pyq2016a',
-    pyqYear: 2016,
+    pyqStyle: true,
     q: 'A company\'s annual sales (in Rs crore) were: 2018: 200, 2019: 250, 2020: 300, 2021: 330. In which year was the percentage growth over the previous year the highest?',
     options: ['2019', '2020', '2021', '2018'],
     answer: 0,
@@ -2538,7 +2538,7 @@ window.GATE_DATA.questions['apti'].topics.find(function(t){return t.id==='apti-d
   },
   {
     id: 'apti-data-spatial-pyq2017a',
-    pyqYear: 2017,
+    pyqStyle: true,
     q: 'A table shows monthly rainfall (in mm) as: January: 40, February: 60, March: 80, April: 100. What is the average rainfall over these four months?',
     options: ['70 mm', '75 mm', '65 mm', '80 mm'],
     answer: 0,
@@ -2549,7 +2549,7 @@ window.GATE_DATA.questions['apti'].topics.find(function(t){return t.id==='apti-d
   },
   {
     id: 'apti-data-spatial-pyq2018a',
-    pyqYear: 2018,
+    pyqStyle: true,
     q: 'A vertical mirror is placed to the right of a letter. Which of the following letters would appear unchanged in its mirror image?',
     options: ['H', 'P', 'J', 'R'],
     answer: 0,
@@ -2560,7 +2560,7 @@ window.GATE_DATA.questions['apti'].topics.find(function(t){return t.id==='apti-d
   },
   {
     id: 'apti-data-spatial-pyq2018b',
-    pyqYear: 2018,
+    pyqStyle: true,
     q: 'A water image is formed by reflecting a figure in a horizontal surface below it. Which of the following letters would appear unchanged in its water image?',
     options: ['K', 'A', 'P', 'J'],
     answer: 0,
@@ -2571,7 +2571,7 @@ window.GATE_DATA.questions['apti'].topics.find(function(t){return t.id==='apti-d
   },
   {
     id: 'apti-data-spatial-pyq2019a',
-    pyqYear: 2019,
+    pyqStyle: true,
     q: 'A square sheet of paper is folded in half, then folded in half again (two folds in total). A single hole is then punched through the folded paper at the centre. How many holes will appear when the paper is fully unfolded? (Enter your numerical answer.)',
     options: [],
     answer: 4,
@@ -2583,7 +2583,7 @@ window.GATE_DATA.questions['apti'].topics.find(function(t){return t.id==='apti-d
   },
   {
     id: 'apti-data-spatial-pyq2020a',
-    pyqYear: 2020,
+    pyqStyle: true,
     q: 'In a class of 60 students, 35 play cricket, 30 play football, and 15 play both cricket and football. How many students play neither sport? (Enter your numerical answer.)',
     options: [],
     answer: 10,
@@ -2595,7 +2595,7 @@ window.GATE_DATA.questions['apti'].topics.find(function(t){return t.id==='apti-d
   },
   {
     id: 'apti-data-spatial-pyq2020b',
-    pyqYear: 2020,
+    pyqStyle: true,
     q: 'Class A has 30 students with an average score of 60 marks, and Class B has 20 students with an average score of 75 marks. What is the combined average score of both classes together? (Enter your numerical answer.)',
     options: [],
     answer: 66,
@@ -2607,7 +2607,7 @@ window.GATE_DATA.questions['apti'].topics.find(function(t){return t.id==='apti-d
   },
   {
     id: 'apti-data-spatial-pyq2021a',
-    pyqYear: 2021,
+    pyqStyle: true,
     q: 'A bar chart shows the sales (in units) of four products: P = 150, Q = 200, R = 250, S = 180. What is the ratio of R\'s sales to the total sales of all four products (in lowest terms)?',
     options: ['25:78', '25:76', '1:3', '5:16'],
     answer: 0,
@@ -2618,7 +2618,7 @@ window.GATE_DATA.questions['apti'].topics.find(function(t){return t.id==='apti-d
   },
   {
     id: 'apti-data-spatial-pyq2022a',
-    pyqYear: 2022,
+    pyqStyle: true,
     q: 'A cube of side 5 units is painted on all its outer faces and then cut into 125 unit cubes. How many of these unit cubes have no face painted at all (fully interior cubes)? (Enter your numerical answer.)',
     options: [],
     answer: 27,
@@ -2630,7 +2630,7 @@ window.GATE_DATA.questions['apti'].topics.find(function(t){return t.id==='apti-d
   },
   {
     id: 'apti-data-spatial-pyq2022b',
-    pyqYear: 2022,
+    pyqStyle: true,
     q: 'A clock shows the time as 3:40. What time will its mirror image show?',
     options: ['8:20', '8:40', '7:20', '9:20'],
     answer: 0,
@@ -2641,7 +2641,7 @@ window.GATE_DATA.questions['apti'].topics.find(function(t){return t.id==='apti-d
   },
   {
     id: 'apti-data-spatial-pyq2023a',
-    pyqYear: 2023,
+    pyqStyle: true,
     q: 'A table shows a company\'s regional revenue (in Rs lakh): North = 120, South = 180, East = 90, West = 110. What percentage of the total revenue comes from the South region? (Enter your numerical answer, rounded to the nearest whole number.)',
     options: [],
     answer: 36,
@@ -2653,7 +2653,7 @@ window.GATE_DATA.questions['apti'].topics.find(function(t){return t.id==='apti-d
   },
   {
     id: 'apti-data-spatial-pyq2023b',
-    pyqYear: 2023,
+    pyqStyle: true,
     q: 'In a survey of 100 people: 50 read newspaper A, 40 read newspaper B, 30 read newspaper C, 20 read both A and B, 15 read both B and C, 10 read both A and C, and 5 read all three newspapers. How many people read at least one of the three newspapers? (Enter your numerical answer.)',
     options: [],
     answer: 80,
@@ -2665,7 +2665,7 @@ window.GATE_DATA.questions['apti'].topics.find(function(t){return t.id==='apti-d
   },
   {
     id: 'apti-data-spatial-pyq2024a',
-    pyqYear: 2024,
+    pyqStyle: true,
     q: 'A square sheet of paper is folded diagonally in half, then folded diagonally in half again. Two holes are then punched near the folded corner, all the way through the folded stack. How many holes will appear when the paper is fully unfolded? (Enter your numerical answer.)',
     options: [],
     answer: 8,
@@ -2677,7 +2677,7 @@ window.GATE_DATA.questions['apti'].topics.find(function(t){return t.id==='apti-d
   },
   {
     id: 'apti-data-spatial-pyq2025a',
-    pyqYear: 2025,
+    pyqStyle: true,
     q: 'A pie chart divides a company\'s total expenditure into five categories: Education 20%, Health 15%, Infrastructure 30%, Defense 25%, and Others 10%. What is the angle, in degrees, representing the Infrastructure sector? (Enter your numerical answer.)',
     options: [],
     answer: 108,
@@ -2689,7 +2689,7 @@ window.GATE_DATA.questions['apti'].topics.find(function(t){return t.id==='apti-d
   },
   {
     id: 'apti-data-spatial-pyq2026a',
-    pyqYear: 2026,
+    pyqStyle: true,
     q: 'The word "CODE" is viewed in a vertical mirror placed to its right. Ignoring the reversal of letter order, which individual letters within the word would appear unchanged in shape?',
     options: ['Only O', 'O and D', 'C and O', 'All four letters'],
     answer: 0,

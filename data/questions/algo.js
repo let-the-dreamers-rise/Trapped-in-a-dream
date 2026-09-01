@@ -2579,7 +2579,7 @@ window.GATE_DATA.questions['algo'].topics.find(function(t){return t.id==='algo-d
 window.GATE_DATA.questions['algo'].topics.find(function(t){return t.id==='algo-asymptotic';}).questions.push(
 {
   id: 'algo-asymptotic-pyq1',
-  pyqYear: 2015,
+  pyqStyle: true,
   q: 'Which one of the following statements is TRUE for all sufficiently large values of n?',
   options: ['n^3 = O(n^2)', '2^n = O(n!)', 'n log n = O(n)', 'n! = O(2^n)'],
   answer: 1,
@@ -2590,7 +2590,7 @@ window.GATE_DATA.questions['algo'].topics.find(function(t){return t.id==='algo-a
 },
 {
   id: 'algo-asymptotic-pyq2',
-  pyqYear: 2016,
+  pyqStyle: true,
   q: 'Arrange the following functions in increasing order of asymptotic growth rate: f1(n)=n^1.5, f2(n)=n log^2 n, f3(n)=2^(sqrt(n)), f4(n)=n^2/log n.',
   options: ['f2 < f1 < f4 < f3', 'f1 < f2 < f4 < f3', 'f2 < f1 < f3 < f4', 'f1 < f4 < f2 < f3'],
   answer: 0,
@@ -2601,7 +2601,7 @@ window.GATE_DATA.questions['algo'].topics.find(function(t){return t.id==='algo-a
 },
 {
   id: 'algo-asymptotic-pyq3',
-  pyqYear: 2017,
+  pyqStyle: true,
   q: 'The running time of an algorithm satisfies T(n) = T(n/2) + c for a constant c, with T(1) = c. What is the tight asymptotic bound on T(n)?',
   options: ['Theta(log n)', 'Theta(n)', 'Theta(n log n)', 'Theta(sqrt(n))'],
   answer: 0,
@@ -2612,7 +2612,7 @@ window.GATE_DATA.questions['algo'].topics.find(function(t){return t.id==='algo-a
 },
 {
   id: 'algo-asymptotic-pyq4',
-  pyqYear: 2018,
+  pyqStyle: true,
   q: 'Using the Master theorem, what is the tight asymptotic bound for the recurrence T(n) = 4T(n/2) + n^2, with T(1) = 1?',
   options: ['Theta(n^2 log n)', 'Theta(n^2)', 'Theta(n^3)', 'Theta(n^2.5)'],
   answer: 0,
@@ -2623,7 +2623,7 @@ window.GATE_DATA.questions['algo'].topics.find(function(t){return t.id==='algo-a
 },
 {
   id: 'algo-asymptotic-pyq5',
-  pyqYear: 2019,
+  pyqStyle: true,
   q: 'Consider functions f(n) = n^2 and g(n) = n^2 * (2 + sin(n)). Which of the following statements is/are TRUE? (Multiple Select Question)',
   options: ['f(n) = O(g(n))', 'f(n) = Omega(g(n))', 'g(n) = O(f(n))', 'f(n) = Theta(g(n))'],
   answers: [0, 1, 3],
@@ -2634,7 +2634,7 @@ window.GATE_DATA.questions['algo'].topics.find(function(t){return t.id==='algo-a
 },
 {
   id: 'algo-asymptotic-pyq6',
-  pyqYear: 2020,
+  pyqStyle: true,
   q: 'The recurrence T(n) = 2T(n/2) + n*log(n), with T(1) = 1, describes the running time of an algorithm. What is the tight asymptotic bound on T(n)?',
   options: ['Theta(n * log^2 n)', 'Theta(n log n)', 'Theta(n^2)', 'Theta(n)'],
   answer: 0,
@@ -2645,7 +2645,7 @@ window.GATE_DATA.questions['algo'].topics.find(function(t){return t.id==='algo-a
 },
 {
   id: 'algo-asymptotic-pyq7',
-  pyqYear: 2021,
+  pyqStyle: true,
   q: 'Let f(n) = n^1.5 and g(n) = n * sqrt(n) * log(n). Which relationship holds between f(n) and g(n)?',
   options: ['f(n) = o(g(n))', 'f(n) = omega(g(n))', 'f(n) = Theta(g(n))', 'f(n) and g(n) are incomparable'],
   answer: 0,
@@ -2656,7 +2656,7 @@ window.GATE_DATA.questions['algo'].topics.find(function(t){return t.id==='algo-a
 },
 {
   id: 'algo-asymptotic-pyq8',
-  pyqYear: 2022,
+  pyqStyle: true,
   q: 'Which of the following orderings correctly lists the functions in strictly increasing order of asymptotic growth rate: log(n!), n log n, n^(log n), 2^n?',
   options: ['log(n!) = Theta(n log n) < n^(log n) < 2^n', 'n log n < log(n!) < 2^n < n^(log n)', 'n^(log n) < log(n!) = Theta(n log n) < 2^n', 'log(n!) < n^(log n) = Theta(n log n) < 2^n'],
   answer: 0,
@@ -2667,7 +2667,7 @@ window.GATE_DATA.questions['algo'].topics.find(function(t){return t.id==='algo-a
 },
 {
   id: 'algo-asymptotic-pyq9',
-  pyqYear: 2023,
+  pyqStyle: true,
   q: 'An algorithm processes an input of size n with running time governed by T(n) = T(n-1) + n, and T(0) = 0. What is the tight asymptotic bound on T(n)?',
   options: ['Theta(n^2)', 'Theta(n log n)', 'Theta(n)', 'Theta(2^n)'],
   answer: 0,
@@ -2678,7 +2678,7 @@ window.GATE_DATA.questions['algo'].topics.find(function(t){return t.id==='algo-a
 },
 {
   id: 'algo-asymptotic-pyq10',
-  pyqYear: 2024,
+  pyqStyle: true,
   q: 'Which of the following statements about asymptotic notation are TRUE? (Multiple Select Question)',
   options: [
     'If f(n) = O(g(n)) and g(n) = O(h(n)), then f(n) = O(h(n))',
@@ -2694,7 +2694,7 @@ window.GATE_DATA.questions['algo'].topics.find(function(t){return t.id==='algo-a
 },
 {
   id: 'algo-asymptotic-pyq11',
-  pyqYear: 2025,
+  pyqStyle: true,
   q: 'Using the Master theorem, the recurrence T(n) = 3T(n/4) + n log n (with T(1)=1) falls into which case, and what is T(n)?',
   options: ['Case 3 (f(n) dominates): Theta(n log n)', 'Case 1 (recursive term dominates): Theta(n^(log_4 3))', 'Case 2 (balanced): Theta(n log^2 n)', 'Master theorem cannot be applied at all'],
   answer: 0,
@@ -2705,7 +2705,7 @@ window.GATE_DATA.questions['algo'].topics.find(function(t){return t.id==='algo-a
 },
 {
   id: 'algo-asymptotic-pyq12',
-  pyqYear: 2026,
+  pyqStyle: true,
   q: 'An algorithm performs a sequence of n operations on an initially empty stack: each operation is either a single push, or a multipop(k) that pops min(k, current stack size) elements. What is the tight worst-case AMORTIZED cost per operation, using the aggregate method?',
   options: ['O(1)', 'O(log n)', 'O(n)', 'O(n^2) total but O(1) is impossible'],
   answer: 0,
@@ -2718,7 +2718,7 @@ window.GATE_DATA.questions['algo'].topics.find(function(t){return t.id==='algo-a
 window.GATE_DATA.questions['algo'].topics.find(function(t){return t.id==='algo-divide-conquer';}).questions.push(
 {
   id: 'algo-divide-conquer-pyq1',
-  pyqYear: 2015,
+  pyqStyle: true,
   q: 'A divide-and-conquer algorithm splits a problem of size n into 2 subproblems of size n/2 each, does O(n) work to combine the results, and has base case T(1) = O(1). What is the tight asymptotic running time?',
   options: ['Theta(n log n)', 'Theta(n)', 'Theta(n^2)', 'Theta(log n)'],
   answer: 0,
@@ -2729,7 +2729,7 @@ window.GATE_DATA.questions['algo'].topics.find(function(t){return t.id==='algo-d
 },
 {
   id: 'algo-divide-conquer-pyq2',
-  pyqYear: 2016,
+  pyqStyle: true,
   q: 'A closest-pair-of-points style algorithm splits n points into two halves of size n/2, recursively solves each half, and does O(n) work to merge/check the boundary strip. What recurrence governs its running time, and what is the solution?',
   options: ['T(n) = 2T(n/2) + O(n), giving Theta(n log n)', 'T(n) = 2T(n/2) + O(n^2), giving Theta(n^2)', 'T(n) = 2T(n/2) + O(1), giving Theta(n)', 'T(n) = T(n/2) + O(n), giving Theta(n)'],
   answer: 0,
@@ -2740,7 +2740,7 @@ window.GATE_DATA.questions['algo'].topics.find(function(t){return t.id==='algo-d
 },
 {
   id: 'algo-divide-conquer-pyq3',
-  pyqYear: 2017,
+  pyqStyle: true,
   q: 'Using the Master theorem, what is the tight bound for T(n) = 8T(n/2) + n^2, T(1) = 1 (the recurrence for the naive divide-and-conquer matrix multiplication algorithm)?',
   options: ['Theta(n^3)', 'Theta(n^2 log n)', 'Theta(n^2)', 'Theta(n^2.81)'],
   answer: 0,
@@ -2751,7 +2751,7 @@ window.GATE_DATA.questions['algo'].topics.find(function(t){return t.id==='algo-d
 },
 {
   id: 'algo-divide-conquer-pyq4',
-  pyqYear: 2018,
+  pyqStyle: true,
   q: 'Strassen\'s algorithm for matrix multiplication satisfies T(n) = 7T(n/2) + O(n^2). What is the tight asymptotic running time, and how does it compare to the naive Theta(n^3) algorithm?',
   options: ['Theta(n^2.81), which is asymptotically faster than Theta(n^3)', 'Theta(n^3), same as naive', 'Theta(n^2 log n), asymptotically faster', 'Theta(n^2), asymptotically faster'],
   answer: 0,
@@ -2762,7 +2762,7 @@ window.GATE_DATA.questions['algo'].topics.find(function(t){return t.id==='algo-d
 },
 {
   id: 'algo-divide-conquer-pyq5',
-  pyqYear: 2019,
+  pyqStyle: true,
   q: 'The randomized QuickSelect algorithm for finding the k-th smallest element has expected-case recurrence T(n) = T(n/2) + O(n) (informally, the partition on average discards about half the elements). What is the tight bound on the EXPECTED running time?',
   options: ['Theta(n)', 'Theta(n log n)', 'Theta(n^2)', 'Theta(log n)'],
   answer: 0,
@@ -2773,7 +2773,7 @@ window.GATE_DATA.questions['algo'].topics.find(function(t){return t.id==='algo-d
 },
 {
   id: 'algo-divide-conquer-pyq6',
-  pyqYear: 2020,
+  pyqStyle: true,
   q: 'An unbalanced divide-and-conquer algorithm splits a problem of size n into one subproblem of size n/3 and one of size 2n/3, doing O(n) work to combine, i.e., T(n) = T(n/3) + T(2n/3) + O(n). What is the tight asymptotic bound?',
   options: ['Theta(n log n)', 'Theta(n)', 'Theta(n^1.5)', 'Theta(n log_3 n)'],
   answer: 0,
@@ -2784,7 +2784,7 @@ window.GATE_DATA.questions['algo'].topics.find(function(t){return t.id==='algo-d
 },
 {
   id: 'algo-divide-conquer-pyq7',
-  pyqYear: 2021,
+  pyqStyle: true,
   q: 'Binary search is applied to find an element in a sorted array of n = 200 elements. In the worst case, what is the MAXIMUM number of comparisons (element comparisons against the target) needed?',
   options: [],
   kind: 'nat',
@@ -2796,7 +2796,7 @@ window.GATE_DATA.questions['algo'].topics.find(function(t){return t.id==='algo-d
 },
 {
   id: 'algo-divide-conquer-pyq8',
-  pyqYear: 2022,
+  pyqStyle: true,
   q: 'Which of the following recurrences, when solved, give a tight bound of Theta(n log n)? (Multiple Select Question)',
   options: [
     'T(n) = 2T(n/2) + n',
@@ -2812,7 +2812,7 @@ window.GATE_DATA.questions['algo'].topics.find(function(t){return t.id==='algo-d
 },
 {
   id: 'algo-divide-conquer-pyq9',
-  pyqYear: 2023,
+  pyqStyle: true,
   q: 'A divide-and-conquer algorithm for the maximum-subarray problem splits the array into two halves, recursively finds the best subarray fully within each half, and does O(n) extra work to find the best subarray CROSSING the midpoint. What recurrence and running time does this give?',
   options: ['T(n) = 2T(n/2) + O(n), giving Theta(n log n)', 'T(n) = 2T(n/2) + O(n^2), giving Theta(n^2)', 'T(n) = 2T(n/2) + O(log n), giving Theta(n)', 'T(n) = 2T(n/2) + O(1), giving Theta(n)'],
   answer: 0,
@@ -2823,7 +2823,7 @@ window.GATE_DATA.questions['algo'].topics.find(function(t){return t.id==='algo-d
 },
 {
   id: 'algo-divide-conquer-pyq10',
-  pyqYear: 2024,
+  pyqStyle: true,
   q: 'For the recurrence T(n) = 3T(n/3) + n/2, T(1) = 1, which Master theorem case applies, and what is T(n)?',
   options: ['Case 2: Theta(n log n)', 'Case 1: Theta(n)', 'Case 3: Theta(n/2)', 'Master theorem does not apply'],
   answer: 0,
@@ -2834,7 +2834,7 @@ window.GATE_DATA.questions['algo'].topics.find(function(t){return t.id==='algo-d
 },
 {
   id: 'algo-divide-conquer-pyq11',
-  pyqYear: 2025,
+  pyqStyle: true,
   q: 'A comparison-based algorithm to find both the MINIMUM and MAXIMUM of an unsorted array of n elements uses a divide-and-conquer approach: split into two halves, recursively find (min,max) of each half, then merge with 2 comparisons. What is the tight TOTAL number of comparisons in the worst case, expressed asymptotically?',
   options: ['Theta(n) (specifically about 3n/2)', 'Theta(n log n)', 'Theta(2n)', 'Theta(n^2)'],
   answer: 0,
@@ -2845,7 +2845,7 @@ window.GATE_DATA.questions['algo'].topics.find(function(t){return t.id==='algo-d
 },
 {
   id: 'algo-divide-conquer-pyq12',
-  pyqYear: 2026,
+  pyqStyle: true,
   q: 'A divide-and-conquer algorithm makes 2 recursive calls on subproblems of size n/4 each, and does O(sqrt(n)) work to combine, i.e., T(n) = 2T(n/4) + O(sqrt(n)). What is the tight asymptotic running time?',
   options: ['Theta(sqrt(n) log n)', 'Theta(n^0.5)', 'Theta(n^0.79)', 'Theta(n)'],
   answer: 0,
@@ -2858,7 +2858,7 @@ window.GATE_DATA.questions['algo'].topics.find(function(t){return t.id==='algo-d
 window.GATE_DATA.questions['algo'].topics.find(function(t){return t.id==='algo-greedy';}).questions.push(
 {
   id: 'algo-greedy-pyq1',
-  pyqYear: 2015,
+  pyqStyle: true,
   q: 'For the Fractional Knapsack problem with items (value, weight) = (60,10), (100,20), (120,30) and knapsack capacity 50, what is the MAXIMUM total value achievable?',
   options: [],
   kind: 'nat',
@@ -2870,7 +2870,7 @@ window.GATE_DATA.questions['algo'].topics.find(function(t){return t.id==='algo-g
 },
 {
   id: 'algo-greedy-pyq2',
-  pyqYear: 2016,
+  pyqStyle: true,
   q: 'Which of the following statements about the standard greedy algorithm for Job Sequencing with Deadlines (maximize total profit, one unit-time job per slot, each job has a deadline) is/are TRUE? (Multiple Select Question)',
   options: [
     'Jobs should be considered in decreasing order of profit',
@@ -2886,7 +2886,7 @@ window.GATE_DATA.questions['algo'].topics.find(function(t){return t.id==='algo-g
 },
 {
   id: 'algo-greedy-pyq3',
-  pyqYear: 2017,
+  pyqStyle: true,
   q: 'Jobs with (profit, deadline) pairs are J1(100,2), J2(19,1), J3(27,2), J4(25,1), J5(15,3). Each job takes 1 unit of time and at most one job can run per time slot (slots 1, 2, 3). Using the standard greedy algorithm (highest profit first, placed in latest free slot at or before its deadline), what is the MAXIMUM total profit achievable?',
   options: [],
   kind: 'nat',
@@ -2898,7 +2898,7 @@ window.GATE_DATA.questions['algo'].topics.find(function(t){return t.id==='algo-g
 },
 {
   id: 'algo-greedy-pyq4',
-  pyqYear: 2018,
+  pyqStyle: true,
   q: 'Consider a coin system with denominations {1, 3, 4}. To make change for the amount 6 using the standard GREEDY algorithm (always pick the largest denomination that does not exceed the remaining amount), how many coins are used, and is this the minimum possible?',
   options: ['3 coins used (4+1+1); NOT minimum, since 3+3 uses only 2 coins', '2 coins used (4+... ); this IS minimum', '3 coins used; this IS minimum', '4 coins used; NOT minimum'],
   answer: 0,
@@ -2909,7 +2909,7 @@ window.GATE_DATA.questions['algo'].topics.find(function(t){return t.id==='algo-g
 },
 {
   id: 'algo-greedy-pyq5',
-  pyqYear: 2019,
+  pyqStyle: true,
   q: 'Which of the following statements correctly explains WHY Prim\'s and Kruskal\'s greedy algorithms for Minimum Spanning Tree are provably correct?',
   options: [
     'The cut property: for any cut (partition of vertices into two sets), the minimum-weight edge crossing the cut is safe to include in some MST',
@@ -2925,7 +2925,7 @@ window.GATE_DATA.questions['algo'].topics.find(function(t){return t.id==='algo-g
 },
 {
   id: 'algo-greedy-pyq6',
-  pyqYear: 2020,
+  pyqStyle: true,
   q: 'A set of 6 activities have (start, finish) times: A(1,4), B(3,5), C(0,6), D(5,7), E(3,9), F(6,10), G(8,11). Using the greedy earliest-finish-time algorithm, how many mutually non-overlapping activities are selected in the maximum-size set?',
   options: [],
   kind: 'nat',
@@ -2937,7 +2937,7 @@ window.GATE_DATA.questions['algo'].topics.find(function(t){return t.id==='algo-g
 },
 {
   id: 'algo-greedy-pyq7',
-  pyqYear: 2021,
+  pyqStyle: true,
   q: 'Character frequencies are A:5, B:9, C:12, D:13, E:16, F:45 (same as a well-known example). Which of the following is/are TRUE about the Huffman code constructed for these frequencies? (Multiple Select Question)',
   options: [
     'The two least frequent symbols (A and B) are merged first',
@@ -2953,7 +2953,7 @@ window.GATE_DATA.questions['algo'].topics.find(function(t){return t.id==='algo-g
 },
 {
   id: 'algo-greedy-pyq8',
-  pyqYear: 2022,
+  pyqStyle: true,
   q: 'A set of 5 symbols has frequencies 2, 3, 5, 7, 11 (total 28). Using Huffman\'s algorithm, what is the total number of bits needed to encode one occurrence of each symbol (the total weighted path length)?',
   options: [],
   kind: 'nat',
@@ -2965,7 +2965,7 @@ window.GATE_DATA.questions['algo'].topics.find(function(t){return t.id==='algo-g
 },
 {
   id: 'algo-greedy-pyq9',
-  pyqYear: 2023,
+  pyqStyle: true,
   q: 'Which of the following problems CANNOT be solved optimally by a simple greedy algorithm (i.e., requires dynamic programming or another technique for optimality)?',
   options: ['0/1 Knapsack (items are indivisible, each item taken fully or not at all)', 'Minimum Spanning Tree', 'Activity Selection (maximize number of non-overlapping activities)', 'Huffman Coding (minimize total weighted code length)'],
   answer: 0,
@@ -2976,7 +2976,7 @@ window.GATE_DATA.questions['algo'].topics.find(function(t){return t.id==='algo-g
 },
 {
   id: 'algo-greedy-pyq10',
-  pyqYear: 2024,
+  pyqStyle: true,
   q: 'In a min-heap-based implementation of Huffman\'s algorithm processing n symbols, what is the tight asymptotic time complexity of building the complete Huffman tree?',
   options: ['Theta(n log n)', 'Theta(n)', 'Theta(n^2)', 'Theta(log n)'],
   answer: 0,
@@ -2987,7 +2987,7 @@ window.GATE_DATA.questions['algo'].topics.find(function(t){return t.id==='algo-g
 },
 {
   id: 'algo-greedy-pyq11',
-  pyqYear: 2025,
+  pyqStyle: true,
   q: 'A greedy interval-point-covering algorithm is given n intervals on a line and must choose the minimum number of POINTS such that every interval contains at least one chosen point. The standard greedy strategy is:',
   options: [
     'Sort intervals by RIGHT endpoint; repeatedly pick the right endpoint of the earliest not-yet-covered interval as a point, then skip all intervals it covers',
@@ -3003,7 +3003,7 @@ window.GATE_DATA.questions['algo'].topics.find(function(t){return t.id==='algo-g
 },
 {
   id: 'algo-greedy-pyq12',
-  pyqYear: 2026,
+  pyqStyle: true,
   q: 'Consider the greedy algorithm for MST using Prim\'s method starting from an arbitrary vertex, versus Kruskal\'s method. Which of the following statements is/are TRUE? (Multiple Select Question)',
   options: [
     'If all edge weights in the graph are distinct, the MST is unique, and both Prim\'s and Kruskal\'s algorithms will find the same MST',
@@ -3021,7 +3021,7 @@ window.GATE_DATA.questions['algo'].topics.find(function(t){return t.id==='algo-g
 window.GATE_DATA.questions['algo'].topics.find(function(t){return t.id==='algo-dp';}).questions.push(
 {
   id: 'algo-dp-pyq1',
-  pyqYear: 2015,
+  pyqStyle: true,
   q: 'For the 0/1 Knapsack problem with items of (weight, value) = (1,1), (3,4), (4,5), (5,7) and knapsack capacity W = 7, what is the MAXIMUM total value achievable (each item taken at most once)?',
   options: [],
   kind: 'nat',
@@ -3033,7 +3033,7 @@ window.GATE_DATA.questions['algo'].topics.find(function(t){return t.id==='algo-d
 },
 {
   id: 'algo-dp-pyq2',
-  pyqYear: 2016,
+  pyqStyle: true,
   q: 'What is the minimum EDIT DISTANCE (using insert, delete, and substitute, each cost 1) between the strings "SUNDAY" and "SATURDAY"?',
   options: [],
   kind: 'nat',
@@ -3045,7 +3045,7 @@ window.GATE_DATA.questions['algo'].topics.find(function(t){return t.id==='algo-d
 },
 {
   id: 'algo-dp-pyq3',
-  pyqYear: 2017,
+  pyqStyle: true,
   q: 'What is the length of the Longest Common Subsequence (LCS) between "ABCBDAB" and "BDCABA"?',
   options: [],
   kind: 'nat',
@@ -3057,7 +3057,7 @@ window.GATE_DATA.questions['algo'].topics.find(function(t){return t.id==='algo-d
 },
 {
   id: 'algo-dp-pyq4',
-  pyqYear: 2018,
+  pyqStyle: true,
   q: 'For matrix chain multiplication with matrices of dimensions 5x10, 10x3, 3x12, 12x5, 5x50, 50x6 (i.e., p = [5,10,3,12,5,50,6]), what is the MINIMUM number of scalar multiplications needed to compute the full product using optimal parenthesization?',
   options: [],
   kind: 'nat',
@@ -3069,7 +3069,7 @@ window.GATE_DATA.questions['algo'].topics.find(function(t){return t.id==='algo-d
 },
 {
   id: 'algo-dp-pyq5',
-  pyqYear: 2019,
+  pyqStyle: true,
   q: 'What is the length of the Longest Increasing Subsequence (LIS) of the array [10, 9, 2, 5, 3, 7, 101, 18]?',
   options: [],
   kind: 'nat',
@@ -3081,7 +3081,7 @@ window.GATE_DATA.questions['algo'].topics.find(function(t){return t.id==='algo-d
 },
 {
   id: 'algo-dp-pyq6',
-  pyqYear: 2020,
+  pyqStyle: true,
   q: 'Using the coin denominations {1, 2, 5}, what is the MINIMUM number of coins needed to make change for the amount 11 (using standard DP, not greedy)?',
   options: [],
   kind: 'nat',
@@ -3093,7 +3093,7 @@ window.GATE_DATA.questions['algo'].topics.find(function(t){return t.id==='algo-d
 },
 {
   id: 'algo-dp-pyq7',
-  pyqYear: 2021,
+  pyqStyle: true,
   q: 'Using coin denominations {1, 2, 5}, how many DISTINCT ways (order does not matter, i.e., counting combinations not permutations) are there to make change for the amount 5?',
   options: [],
   kind: 'nat',
@@ -3105,7 +3105,7 @@ window.GATE_DATA.questions['algo'].topics.find(function(t){return t.id==='algo-d
 },
 {
   id: 'algo-dp-pyq8',
-  pyqYear: 2022,
+  pyqStyle: true,
   q: 'The Rod Cutting problem has rod length 8 and price table (for lengths 1 through 8): [1, 5, 8, 9, 10, 17, 17, 20]. What is the MAXIMUM total revenue obtainable by optimally cutting the rod?',
   options: [],
   kind: 'nat',
@@ -3117,7 +3117,7 @@ window.GATE_DATA.questions['algo'].topics.find(function(t){return t.id==='algo-d
 },
 {
   id: 'algo-dp-pyq9',
-  pyqYear: 2023,
+  pyqStyle: true,
   q: 'A DP algorithm for the 0/1 Knapsack problem with n items and capacity W is implemented using the standard 2D table dp[i][w]. What are the TIGHT time and space complexities of this standard DP formulation?',
   options: ['Time O(nW), Space O(nW)', 'Time O(n log W), Space O(n)', 'Time O(2^n), Space O(n)', 'Time O(nW), Space O(n) using a rolling array, but NEVER O(nW) time'],
   answer: 0,
@@ -3128,7 +3128,7 @@ window.GATE_DATA.questions['algo'].topics.find(function(t){return t.id==='algo-d
 },
 {
   id: 'algo-dp-pyq10',
-  pyqYear: 2024,
+  pyqStyle: true,
   q: 'Which of the following statements about Dynamic Programming are TRUE? (Multiple Select Question)',
   options: [
     'DP is applicable when a problem has both optimal substructure and overlapping subproblems',
@@ -3144,7 +3144,7 @@ window.GATE_DATA.questions['algo'].topics.find(function(t){return t.id==='algo-d
 },
 {
   id: 'algo-dp-pyq11',
-  pyqYear: 2025,
+  pyqStyle: true,
   q: 'In the Longest Common Subsequence DP table for two strings of lengths m and n, if the two strings share NO characters in common at all, what value appears in every cell of the table (except the necessarily-zero base row/column, which are also zero)?',
   options: ['0', '1', 'min(m,n)', 'It varies depending on string content even with no common characters'],
   answer: 0,
@@ -3155,7 +3155,7 @@ window.GATE_DATA.questions['algo'].topics.find(function(t){return t.id==='algo-d
 },
 {
   id: 'algo-dp-pyq12',
-  pyqYear: 2026,
+  pyqStyle: true,
   q: 'The Fibonacci-like recurrence f(n) = f(n-1) + f(n-2) + f(n-3) (a "tribonacci" sequence) with f(0)=0, f(1)=0, f(2)=1 is computed using BOTTOM-UP dynamic programming (tabulation) storing only the last 3 values at any time (not a full array). What are the TIME and SPACE complexities to compute f(n)?',
   options: ['Time O(n), Space O(1)', 'Time O(n), Space O(n)', 'Time O(2^n), Space O(1)', 'Time O(n^2), Space O(1)'],
   answer: 0,
@@ -3168,7 +3168,7 @@ window.GATE_DATA.questions['algo'].topics.find(function(t){return t.id==='algo-d
 window.GATE_DATA.questions['algo'].topics.find(function(t){return t.id==='algo-graph';}).questions.push(
 {
   id: 'algo-graph-pyq1',
-  pyqYear: 2015,
+  pyqStyle: true,
   q: 'A weighted undirected graph has vertices A,B,C,D,E and edges A-B(2), A-C(3), B-C(1), B-D(5), C-D(4), C-E(6), D-E(2). Using Kruskal\'s algorithm, what is the TOTAL WEIGHT of the Minimum Spanning Tree?',
   options: [],
   kind: 'nat',
@@ -3180,7 +3180,7 @@ window.GATE_DATA.questions['algo'].topics.find(function(t){return t.id==='algo-g
 },
 {
   id: 'algo-graph-pyq2',
-  pyqYear: 2016,
+  pyqStyle: true,
   q: 'For the directed weighted graph with vertices A(source),B,C,D,E and edges A-B(4), A-C(1), C-B(2), B-D(1), C-D(5), D-E(3), running Dijkstra\'s algorithm from A, what is the shortest distance from A to E?',
   options: [],
   kind: 'nat',
@@ -3192,7 +3192,7 @@ window.GATE_DATA.questions['algo'].topics.find(function(t){return t.id==='algo-g
 },
 {
   id: 'algo-graph-pyq3',
-  pyqYear: 2017,
+  pyqStyle: true,
   q: 'A directed graph with vertices S,A,B,C,D has edges S-A(6), S-B(7), A-B(8), A-C(5), A-D(-4), B-C(-3), B-D(9), C-A(-2), D-C(7), D-S(2). This graph contains a NEGATIVE-weight edge. Using Bellman-Ford from S, what is the shortest distance from S to D?',
   options: [],
   kind: 'nat',
@@ -3204,7 +3204,7 @@ window.GATE_DATA.questions['algo'].topics.find(function(t){return t.id==='algo-g
 },
 {
   id: 'algo-graph-pyq4',
-  pyqYear: 2018,
+  pyqStyle: true,
   q: 'A directed graph has a cycle 0->1(1), 1->2(-1), 2->0(-1). What happens when Bellman-Ford is run on this graph, and what happens if Dijkstra\'s algorithm is (incorrectly) applied to a graph with negative edges like this one?',
   options: [
     'Bellman-Ford correctly detects the negative-weight cycle (distances keep decreasing after n-1 iterations); Dijkstra can produce incorrect shortest-path distances since its greedy finalization assumes no negative edges',
@@ -3220,7 +3220,7 @@ window.GATE_DATA.questions['algo'].topics.find(function(t){return t.id==='algo-g
 },
 {
   id: 'algo-graph-pyq5',
-  pyqYear: 2019,
+  pyqStyle: true,
   q: 'A weighted undirected graph has vertices A,B,C,D,E and edges A-B(2), A-C(3), B-C(4), B-D(5), C-D(1), C-E(6), D-E(7) -- note all edge weights here are DISTINCT. What can be concluded about its Minimum Spanning Tree, and what is its total weight?',
   options: ['The MST is unique (since all weights are distinct); total weight = 12', 'Multiple MSTs may exist; total weight = 12', 'The MST is unique; total weight = 15', 'Cannot determine uniqueness without running both Prim\'s and Kruskal\'s'],
   answer: 0,
@@ -3231,7 +3231,7 @@ window.GATE_DATA.questions['algo'].topics.find(function(t){return t.id==='algo-g
 },
 {
   id: 'algo-graph-pyq6',
-  pyqYear: 2020,
+  pyqStyle: true,
   q: 'In an unweighted, undirected, connected graph with 7 vertices numbered 0-6 and edges forming a structure where vertex 0 connects to 1 and 2, vertices 1 and 2 both connect to 3, and vertex 3 connects to 4, which then connects to 5 and 6, a BFS starting from vertex 0 is performed. What is the shortest-path distance (in number of edges) from vertex 0 to vertex 5?',
   options: [],
   kind: 'nat',
@@ -3243,7 +3243,7 @@ window.GATE_DATA.questions['algo'].topics.find(function(t){return t.id==='algo-g
 },
 {
   id: 'algo-graph-pyq7',
-  pyqYear: 2021,
+  pyqStyle: true,
   q: 'A DAG has vertices 0,1,2,3,4 with edges 0->1, 0->2, 0->3, 1->4, 2->4, 3->4 (vertex 0 is the unique source with three independent "middle" vertices 1,2,3, all feeding into the unique sink 4). How MANY distinct topological orderings does this DAG have?',
   options: [],
   kind: 'nat',
@@ -3255,7 +3255,7 @@ window.GATE_DATA.questions['algo'].topics.find(function(t){return t.id==='algo-g
 },
 {
   id: 'algo-graph-pyq8',
-  pyqYear: 2022,
+  pyqStyle: true,
   q: 'Which of the following statements about Depth-First Search (DFS) edge classification in a directed graph are TRUE? (Multiple Select Question)',
   options: [
     'A back edge connects a vertex to one of its ancestors in the DFS tree',
@@ -3271,7 +3271,7 @@ window.GATE_DATA.questions['algo'].topics.find(function(t){return t.id==='algo-g
 },
 {
   id: 'algo-graph-pyq9',
-  pyqYear: 2023,
+  pyqStyle: true,
   q: 'A weighted undirected graph has 6 vertices and 9 edges. If it is known to be connected, how many edges does its Minimum Spanning Tree contain, and how many edges are NOT part of the MST?',
   options: [],
   kind: 'nat',
@@ -3283,7 +3283,7 @@ window.GATE_DATA.questions['algo'].topics.find(function(t){return t.id==='algo-g
 },
 {
   id: 'algo-graph-pyq10',
-  pyqYear: 2024,
+  pyqStyle: true,
   q: 'A connected undirected graph G has V vertices and E edges, and it is known that G contains at least one cycle. If T is a spanning tree of G, how many "non-tree" edges (edges of G not in T) does removing a spanning tree leave, and what is true about each such non-tree edge added back to T?',
   options: [
     'E - (V-1) non-tree edges remain; adding any single one back to T creates EXACTLY ONE cycle',
@@ -3299,7 +3299,7 @@ window.GATE_DATA.questions['algo'].topics.find(function(t){return t.id==='algo-g
 },
 {
   id: 'algo-graph-pyq11',
-  pyqYear: 2025,
+  pyqStyle: true,
   q: 'For a directed graph with V vertices and E edges represented using an ADJACENCY LIST, what are the tight time complexities of (a) BFS/DFS traversal and (b) checking whether a specific edge (u,v) exists?',
   options: [
     'BFS/DFS: O(V+E); Edge existence check: O(degree(u)) in the worst case, i.e., up to O(V)',
@@ -3315,7 +3315,7 @@ window.GATE_DATA.questions['algo'].topics.find(function(t){return t.id==='algo-g
 },
 {
   id: 'algo-graph-pyq12',
-  pyqYear: 2026,
+  pyqStyle: true,
   q: 'Prim\'s algorithm for MST is implemented using a binary min-heap (priority queue) with decrease-key support, on a graph with V vertices and E edges. What is the tight time complexity?',
   options: ['O(E log V)', 'O(V^2)', 'O(E + V log V)', 'O(V*E)'],
   answer: 0,
@@ -3328,7 +3328,7 @@ window.GATE_DATA.questions['algo'].topics.find(function(t){return t.id==='algo-g
 window.GATE_DATA.questions['algo'].topics.find(function(t){return t.id==='algo-sorting-searching';}).questions.push(
 {
   id: 'algo-sorting-searching-pyq1',
-  pyqYear: 2015,
+  pyqStyle: true,
   q: 'Quicksort is run on the array [5, 3, 8, 4, 2, 7, 1, 6] using the FIRST element of each subarray as the pivot (elements less than pivot go left, others go right, then recurse on each side). What is the TOTAL number of element comparisons (pivot-to-element comparisons) performed?',
   options: [],
   kind: 'nat',
@@ -3340,7 +3340,7 @@ window.GATE_DATA.questions['algo'].topics.find(function(t){return t.id==='algo-s
 },
 {
   id: 'algo-sorting-searching-pyq2',
-  pyqYear: 2016,
+  pyqStyle: true,
   q: 'Merge sort is run on the same array [5, 3, 8, 4, 2, 7, 1, 6] (split at the midpoint each time, standard two-pointer merge). What is the TOTAL number of element comparisons performed during all the merge steps combined?',
   options: [],
   kind: 'nat',
@@ -3352,7 +3352,7 @@ window.GATE_DATA.questions['algo'].topics.find(function(t){return t.id==='algo-s
 },
 {
   id: 'algo-sorting-searching-pyq3',
-  pyqYear: 2017,
+  pyqStyle: true,
   q: 'Build-Max-Heap is applied to the array [4, 10, 3, 5, 1, 8, 9, 2, 6] using the standard bottom-up (Floyd\'s) heapify procedure. What is the array AFTER Build-Max-Heap completes?',
   options: ['[10, 6, 9, 5, 1, 8, 3, 2, 4]', '[10, 9, 8, 6, 5, 4, 3, 2, 1]', '[4, 10, 9, 5, 1, 8, 3, 2, 6]', '[9, 10, 8, 6, 5, 4, 3, 2, 1]'],
   answer: 0,
@@ -3363,7 +3363,7 @@ window.GATE_DATA.questions['algo'].topics.find(function(t){return t.id==='algo-s
 },
 {
   id: 'algo-sorting-searching-pyq4',
-  pyqYear: 2018,
+  pyqStyle: true,
   q: 'Given the max-heap array [10, 6, 9, 5, 1, 8, 3, 2, 4], one EXTRACT-MAX operation is performed (remove the max, move the last element to the root, then sift down). What is the resulting heap array?',
   options: ['[9, 6, 8, 5, 1, 4, 3, 2]', '[9, 6, 8, 5, 1, 2, 3, 4]', '[6, 9, 8, 5, 1, 4, 3, 2]', '[9, 5, 8, 6, 1, 4, 3, 2]'],
   answer: 0,
@@ -3374,7 +3374,7 @@ window.GATE_DATA.questions['algo'].topics.find(function(t){return t.id==='algo-s
 },
 {
   id: 'algo-sorting-searching-pyq5',
-  pyqYear: 2019,
+  pyqStyle: true,
   q: 'What is the MINIMUM possible number of comparisons needed, in the worst case, by ANY comparison-based sorting algorithm to sort 7 distinct elements (the information-theoretic lower bound)?',
   options: [],
   kind: 'nat',
@@ -3386,7 +3386,7 @@ window.GATE_DATA.questions['algo'].topics.find(function(t){return t.id==='algo-s
 },
 {
   id: 'algo-sorting-searching-pyq6',
-  pyqYear: 2020,
+  pyqStyle: true,
   q: 'Which of the following statements about comparison-based sorting lower bounds are TRUE? (Multiple Select Question)',
   options: [
     'Any comparison-based sorting algorithm requires Omega(n log n) comparisons in the worst case',
@@ -3402,7 +3402,7 @@ window.GATE_DATA.questions['algo'].topics.find(function(t){return t.id==='algo-s
 },
 {
   id: 'algo-sorting-searching-pyq7',
-  pyqYear: 2021,
+  pyqStyle: true,
   q: 'Quicksort is applied to an array that is ALREADY SORTED IN ASCENDING ORDER, using the LAST element as the pivot each time. What is the WORST-CASE time complexity for this specific scenario, and why?',
   options: [
     'Theta(n^2), because the pivot is always the maximum of its subarray, producing maximally unbalanced partitions (n-1 and 0)',
@@ -3418,7 +3418,7 @@ window.GATE_DATA.questions['algo'].topics.find(function(t){return t.id==='algo-s
 },
 {
   id: 'algo-sorting-searching-pyq8',
-  pyqYear: 2022,
+  pyqStyle: true,
   q: 'A sorting algorithm is described as STABLE. Which of the following statements correctly explains what this means, and which of the standard algorithms listed is/are stable? (Multiple Select Question)',
   options: [
     'A stable sort preserves the RELATIVE ORDER of elements that compare as equal',
@@ -3434,7 +3434,7 @@ window.GATE_DATA.questions['algo'].topics.find(function(t){return t.id==='algo-s
 },
 {
   id: 'algo-sorting-searching-pyq9',
-  pyqYear: 2023,
+  pyqStyle: true,
   q: 'Counting Sort is used to sort an array of 20 elements, where each element is an integer in the range [0, 9]. What is the TIGHT time complexity, expressed in terms of n=20 (number of elements) and k=10 (range size)?',
   options: ['Theta(n + k)', 'Theta(n log n)', 'Theta(n * k)', 'Theta(k log k)'],
   answer: 0,
@@ -3445,7 +3445,7 @@ window.GATE_DATA.questions['algo'].topics.find(function(t){return t.id==='algo-s
 },
 {
   id: 'algo-sorting-searching-pyq10',
-  pyqYear: 2024,
+  pyqStyle: true,
   q: 'Radix Sort is used to sort n integers, each having d digits (in some fixed base), using Counting Sort as the stable subroutine for each digit position (base b, so each digit is in range [0, b-1]). What is the TIGHT overall time complexity?',
   options: ['Theta(d * (n + b))', 'Theta(n log n)', 'Theta(d * n * b)', 'Theta(n^2)'],
   answer: 0,
@@ -3456,7 +3456,7 @@ window.GATE_DATA.questions['algo'].topics.find(function(t){return t.id==='algo-s
 },
 {
   id: 'algo-sorting-searching-pyq11',
-  pyqYear: 2025,
+  pyqStyle: true,
   q: 'A sorted array of 1000 distinct integers is searched using BINARY SEARCH for a value known to be present. What is the MAXIMUM number of iterations (comparisons against the target) the search can take?',
   options: [],
   kind: 'nat',
@@ -3468,7 +3468,7 @@ window.GATE_DATA.questions['algo'].topics.find(function(t){return t.id==='algo-s
 },
 {
   id: 'algo-sorting-searching-pyq12',
-  pyqYear: 2026,
+  pyqStyle: true,
   q: 'Which of the following statements comparing Quicksort and Merge Sort are TRUE? (Multiple Select Question)',
   options: [
     'Merge sort has Theta(n log n) time complexity in ALL cases (best, average, worst), while Quicksort\'s worst case is Theta(n^2)',

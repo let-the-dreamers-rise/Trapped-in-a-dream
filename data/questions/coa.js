@@ -2178,7 +2178,7 @@ window.GATE_DATA.questions['coa'].topics.find(function(t){return t.id==='coa-dat
 window.GATE_DATA.questions['coa'].topics.find(function(t){return t.id==='coa-instructions';}).questions.push(
 {
   id: 'coa-instructions-p1',
-  pyqYear: 2015,
+  pyqStyle: true,
   q: 'On a three-address machine (each instruction can name up to three operands directly from memory, e.g. ADD T,A,B), what is the minimum number of instructions needed to evaluate X = (A + B) * (C - D) / E?',
   options: ['3', '4', '5', '6'],
   answer: 1,
@@ -2189,7 +2189,7 @@ window.GATE_DATA.questions['coa'].topics.find(function(t){return t.id==='coa-ins
 },
 {
   id: 'coa-instructions-p2',
-  pyqYear: 2016,
+  pyqStyle: true,
   q: 'An instruction is 8 bits wide. Register operand fields are 3 bits each. Two-address (register-register) instructions use two such fields, leaving 2 bits for the opcode. If exactly 3 of the 4 opcode patterns are assigned to two-address instructions, what is the maximum number of one-address instructions obtainable from the unused pattern via expanding opcodes?',
   options: ['4', '6', '8', '16'],
   answer: 2,
@@ -2200,7 +2200,7 @@ window.GATE_DATA.questions['coa'].topics.find(function(t){return t.id==='coa-ins
 },
 {
   id: 'coa-instructions-p3',
-  pyqYear: 2017,
+  pyqStyle: true,
   q: 'An addressing mode computes the effective address as EA = Base register + (Index register x element size) + Displacement. Given Base = 2000, Index = 50, element size = 4 bytes, and Displacement = 100 (all in the same units), what effective address does the instruction access?',
   options: ['2300', '2150', '2250', '2400'],
   answer: 0,
@@ -2211,7 +2211,7 @@ window.GATE_DATA.questions['coa'].topics.find(function(t){return t.id==='coa-ins
 },
 {
   id: 'coa-instructions-p4',
-  pyqYear: 2018,
+  pyqStyle: true,
   q: 'A machine uses 12-bit instructions with 3-bit register fields. Two-address (register-register) instructions use two such fields, leaving 6 opcode bits (64 patterns). If 55 patterns are reserved for two-address instructions, what is the maximum number of one-address instructions (using a single 3-bit register field) obtainable from the remaining patterns via expanding opcodes?',
   options: ['63', '72', '81', '90'],
   answer: 1,
@@ -2222,7 +2222,7 @@ window.GATE_DATA.questions['coa'].topics.find(function(t){return t.id==='coa-ins
 },
 {
   id: 'coa-instructions-p5',
-  pyqYear: 2019,
+  pyqStyle: true,
   q: 'A branch instruction 4 bytes long is stored at address 3000. The processor uses PC-relative addressing where the signed offset is added to the PC after it has already been incremented past the current instruction. What signed offset must the instruction encode to branch backward to address 2960?',
   options: ['-44', '-40', '-48', '-36'],
   answer: 0,
@@ -2233,7 +2233,7 @@ window.GATE_DATA.questions['coa'].topics.find(function(t){return t.id==='coa-ins
 },
 {
   id: 'coa-instructions-p6',
-  pyqYear: 2020,
+  pyqStyle: true,
   q: 'Register R3 holds the memory address 500. The instruction MOV (R3)+, R1 uses auto-increment addressing: it first fetches the operand from the address in R3, then increments R3 by the operand size, 4 bytes. What is the value of R3 immediately after this instruction executes?',
   options: ['500', '504', '496', '508'],
   answer: 1,
@@ -2244,7 +2244,7 @@ window.GATE_DATA.questions['coa'].topics.find(function(t){return t.id==='coa-ins
 },
 {
   id: 'coa-instructions-p7',
-  pyqYear: 2021,
+  pyqStyle: true,
   q: 'An instruction ADD @X, R1 uses memory-indirect addressing for its source operand: location X in memory holds the address of the actual operand. Excluding the instruction fetch itself, how many memory read accesses are needed to obtain the source operand\'s value?',
   options: ['1', '2', '3', '4'],
   answer: 1,
@@ -2255,7 +2255,7 @@ window.GATE_DATA.questions['coa'].topics.find(function(t){return t.id==='coa-ins
 },
 {
   id: 'coa-instructions-p8',
-  pyqYear: 2022,
+  pyqStyle: true,
   q: 'On a one-address (accumulator-based) machine with LOAD, STORE, ADD, SUB and MUL instructions (each combining the accumulator with one memory operand), what is the minimum number of instructions needed to evaluate Y = (P + Q) * (R - S)?',
   options: ['5', '6', '7', '8'],
   answer: 2,
@@ -2266,7 +2266,7 @@ window.GATE_DATA.questions['coa'].topics.find(function(t){return t.id==='coa-ins
 },
 {
   id: 'coa-instructions-p9',
-  pyqYear: 2023,
+  pyqStyle: true,
   q: 'A CPU has 100 distinct opcodes and 16 general-purpose registers. A two-address register-register instruction format encodes the opcode plus two register operand fields, each field sized to just accommodate the register count. If the instruction must be a whole number of bytes, what is the minimum instruction length in bits?',
   options: ['15', '16', '14', '20'],
   answer: 1,
@@ -2277,7 +2277,7 @@ window.GATE_DATA.questions['coa'].topics.find(function(t){return t.id==='coa-ins
 },
 {
   id: 'coa-instructions-p10',
-  pyqYear: 2024,
+  pyqStyle: true,
   q: 'A zero-address (stack) machine evaluates the postfix expression A B + C D - * E / using PUSH, POP, ADD, SUB, MUL and DIV, where each arithmetic instruction pops its operands from the stack and pushes the result, and the final value must be popped into memory location X. What is the total number of instructions executed?',
   options: ['8', '9', '10', '11'],
   answer: 2,
@@ -2288,7 +2288,7 @@ window.GATE_DATA.questions['coa'].topics.find(function(t){return t.id==='coa-ins
 },
 {
   id: 'coa-instructions-p11',
-  pyqYear: 2025,
+  pyqStyle: true,
   q: 'An array of 8-byte double-precision elements begins at base address 1000 (encoded in the instruction). Indexed addressing computes EA = Base + (Index register x element size). If the index register holds 5, what effective address does the instruction access?',
   options: ['1040', '1005', '1008', '1045'],
   answer: 0,
@@ -2299,7 +2299,7 @@ window.GATE_DATA.questions['coa'].topics.find(function(t){return t.id==='coa-ins
 },
 {
   id: 'coa-instructions-p12',
-  pyqYear: 2026,
+  pyqStyle: true,
   q: 'A 10-bit instruction word has two 4-bit address fields for two-address instructions, leaving a 2-bit opcode (4 patterns). Three of the 4 patterns are used for two-address instructions, so the remaining pattern expands into one-address instructions using one freed 4-bit field (giving 16 one-address opcodes). If only 10 of those 16 one-address opcodes are actually used, how many zero-address instructions can the remaining opcodes support using the last 4-bit field?',
   options: ['16', '32', '64', '96'],
   answer: 3,
@@ -2310,7 +2310,7 @@ window.GATE_DATA.questions['coa'].topics.find(function(t){return t.id==='coa-ins
 },
 {
   id: 'coa-instructions-p13',
-  pyqYear: 2017,
+  pyqStyle: true,
   q: 'On a two-address machine (each arithmetic instruction destroys its first operand, e.g. ADD dst,src computes dst = dst + src), what is the minimum number of instructions to evaluate W = (A - B) / (C + D * E), assuming a MOV instruction is available to load a temporary from a memory operand?',
   options: ['6', '7', '8', '9'],
   answer: 2,
@@ -2321,7 +2321,7 @@ window.GATE_DATA.questions['coa'].topics.find(function(t){return t.id==='coa-ins
 },
 {
   id: 'coa-instructions-p14',
-  pyqYear: 2019,
+  pyqStyle: true,
   q: 'A 16-bit instruction reserves 6 bits for the opcode and the remaining 10 bits for a signed (two\'s complement) immediate operand. What is the largest positive integer value that can be encoded in the immediate field?',
   options: ['511', '512', '1023', '255'],
   answer: 0,
@@ -2335,7 +2335,7 @@ window.GATE_DATA.questions['coa'].topics.find(function(t){return t.id==='coa-ins
 window.GATE_DATA.questions['coa'].topics.find(function(t){return t.id==='coa-datapath';}).questions.push(
 {
   id: 'coa-datapath-p1',
-  pyqYear: 2015,
+  pyqStyle: true,
   q: 'A single-cycle processor has functional delays: instruction fetch 220 ps, register read 90 ps, ALU 140 ps, data memory access 210 ps, register write-back 90 ps. Every instruction, regardless of type, completes in exactly one clock cycle. What is the minimum clock period the design can use?',
   options: ['750 ps', '220 ps', '210 ps', '650 ps'],
   answer: 0,
@@ -2346,7 +2346,7 @@ window.GATE_DATA.questions['coa'].topics.find(function(t){return t.id==='coa-dat
 },
 {
   id: 'coa-datapath-p2',
-  pyqYear: 2015,
+  pyqStyle: true,
   q: 'Two 8-bit two\'s complement numbers, 01110010 (114) and 00110101 (53), are added. What are the resulting overflow (V) and carry-out flags?',
   options: ['V = 1, C = 0', 'V = 0, C = 1', 'V = 1, C = 1', 'V = 0, C = 0'],
   answer: 0,
@@ -2357,7 +2357,7 @@ window.GATE_DATA.questions['coa'].topics.find(function(t){return t.id==='coa-dat
 },
 {
   id: 'coa-datapath-p3',
-  pyqYear: 2016,
+  pyqStyle: true,
   q: 'A control memory holds 1024 microinstructions. Each microinstruction has 20 control-signal bits, a 4-bit condition-select field, and a next-address field sized to address the entire control memory. What is the total size of the control memory in bits?',
   options: ['34816', '30720', '24576', '35840'],
   answer: 0,
@@ -2368,7 +2368,7 @@ window.GATE_DATA.questions['coa'].topics.find(function(t){return t.id==='coa-dat
 },
 {
   id: 'coa-datapath-p4',
-  pyqYear: 2016,
+  pyqStyle: true,
   q: 'A CPU has 46 control signals divided into three mutually exclusive groups of 5, 9 and 20 signals; within a group at most one signal is active per cycle, and a group may also have no active signal that cycle. Using vertical microprogramming with one separately encoded field per group, how many total control bits does each microinstruction need?',
   options: ['12', '10', '15', '46'],
   answer: 0,
@@ -2379,7 +2379,7 @@ window.GATE_DATA.questions['coa'].topics.find(function(t){return t.id==='coa-dat
 },
 {
   id: 'coa-datapath-p5',
-  pyqYear: 2017,
+  pyqStyle: true,
   q: 'A multi-cycle processor with a 250 ps clock executes instructions in these cycle counts: load 5, store 4, ALU 4, branch 3. The instruction mix is 20% loads, 15% stores, 50% ALU and 15% branches. What is the average execution time per instruction?',
   options: ['1012.5 ps', '1000 ps', '900 ps', '1125 ps'],
   answer: 0,
@@ -2390,7 +2390,7 @@ window.GATE_DATA.questions['coa'].topics.find(function(t){return t.id==='coa-dat
 },
 {
   id: 'coa-datapath-p6',
-  pyqYear: 2018,
+  pyqStyle: true,
   q: 'A register file has 64 registers, three read ports and one write port. How many bits of control input are needed per cycle in total, to select the source/destination register on every port plus one write-enable bit?',
   options: ['25', '24', '18', '19'],
   answer: 0,
@@ -2401,7 +2401,7 @@ window.GATE_DATA.questions['coa'].topics.find(function(t){return t.id==='coa-dat
 },
 {
   id: 'coa-datapath-p7',
-  pyqYear: 2019,
+  pyqStyle: true,
   q: 'A hardwired control unit for a multi-cycle processor is implemented as a finite state machine with 35 distinct states, whose state register feeds combinational logic together with the opcode. What is the minimum number of flip-flops needed for the state register?',
   options: ['6', '5', '7', '35'],
   answer: 0,
@@ -2412,7 +2412,7 @@ window.GATE_DATA.questions['coa'].topics.find(function(t){return t.id==='coa-dat
 },
 {
   id: 'coa-datapath-p8',
-  pyqYear: 2020,
+  pyqStyle: true,
   q: 'Compared with horizontal microprogramming, vertical microprogramming:',
   options: [
     'uses narrower microinstruction words by encoding grouped signals, but needs a decoder and typically allows fewer signals to be activated per cycle',
@@ -2428,7 +2428,7 @@ window.GATE_DATA.questions['coa'].topics.find(function(t){return t.id==='coa-dat
 },
 {
   id: 'coa-datapath-p9',
-  pyqYear: 2021,
+  pyqStyle: true,
   q: 'In a microprogrammed CPU, each machine instruction is interpreted by an average of 8 microinstructions, and each control memory access (fetching one microinstruction) takes 25 ns. Ignoring all other delays, what is the average time to execute one machine instruction?',
   options: ['200 ns', '160 ns', '225 ns', '175 ns'],
   answer: 0,
@@ -2439,7 +2439,7 @@ window.GATE_DATA.questions['coa'].topics.find(function(t){return t.id==='coa-dat
 },
 {
   id: 'coa-datapath-p10',
-  pyqYear: 2022,
+  pyqStyle: true,
   q: 'Which of the following is a correct statement about a single-bus CPU organization, where one shared internal bus connects the ALU inputs/output and all registers?',
   options: [
     'Transferring a value from one register to another, or through the ALU, may require multiple clock cycles because the shared bus can carry only one value at a time',
@@ -2455,7 +2455,7 @@ window.GATE_DATA.questions['coa'].topics.find(function(t){return t.id==='coa-dat
 },
 {
   id: 'coa-datapath-p11',
-  pyqYear: 2023,
+  pyqStyle: true,
   q: 'A control memory holds 5000 microinstructions. What is the minimum number of bits required for the next-address field so that it can address any microinstruction in this control memory?',
   options: [],
   answer: 13,
@@ -2467,7 +2467,7 @@ window.GATE_DATA.questions['coa'].topics.find(function(t){return t.id==='coa-dat
 },
 {
   id: 'coa-datapath-p12',
-  pyqYear: 2024,
+  pyqStyle: true,
   q: 'A single-cycle datapath needs a 750 ps clock period because every instruction, even the fastest, must budget for the load instruction\'s full critical path. A multi-cycle version of the same underlying hardware uses a 150 ps clock, with load taking 5 cycles, store 4, ALU 4, and branch 3, in a mix of 25% load, 15% store, 40% ALU and 20% branch. Which design executes a given program faster, and by roughly what factor?',
   options: [
     'Multi-cycle is faster, by roughly 750/(4.05 x 150) ≈ 1.235x',
@@ -2483,7 +2483,7 @@ window.GATE_DATA.questions['coa'].topics.find(function(t){return t.id==='coa-dat
 },
 {
   id: 'coa-datapath-p13',
-  pyqYear: 2025,
+  pyqStyle: true,
   q: 'In a microprogrammed control unit, the microprogram sequencer\'s primary job is to:',
   options: [
     'determine the address of the next microinstruction to fetch from control memory, based on the current microinstruction\'s next-address field and, when needed, condition flags',
@@ -2499,7 +2499,7 @@ window.GATE_DATA.questions['coa'].topics.find(function(t){return t.id==='coa-dat
 },
 {
   id: 'coa-datapath-p14',
-  pyqYear: 2026,
+  pyqStyle: true,
   q: 'A CPU has 41 control signals split into three mutually exclusive groups of 6, 10 and 14 signals (each group may also have no signal active in a given cycle). Using vertical microprogramming with an independently encoded field per group, how many control bits does one microinstruction need in total?',
   options: ['11', '10', '9', '41'],
   answer: 0,
@@ -2513,7 +2513,7 @@ window.GATE_DATA.questions['coa'].topics.find(function(t){return t.id==='coa-dat
 window.GATE_DATA.questions['coa'].topics.find(function(t){return t.id==='coa-pipelining';}).questions.push(
 {
   id: 'coa-pipelining-p1',
-  pyqYear: 2015,
+  pyqStyle: true,
   q: 'A 5-stage pipeline has a clock cycle of 2.5 ns. With no stalls, how long does it take to execute a program of 200 instructions?',
   options: ['510 ns', '500 ns', '512.5 ns', '502.5 ns'],
   answer: 0,
@@ -2524,7 +2524,7 @@ window.GATE_DATA.questions['coa'].topics.find(function(t){return t.id==='coa-pip
 },
 {
   id: 'coa-pipelining-p2',
-  pyqYear: 2016,
+  pyqStyle: true,
   q: 'A 4-stage pipeline has stage delays of 180, 140, 190 and 150 ps, and each inter-stage latch adds 10 ps. What is the asymptotic (large n) speedup over a non-pipelined implementation of the same hardware, which needs no latches?',
   options: ['3.3', '4', '2.75', '3.0'],
   answer: 0,
@@ -2535,7 +2535,7 @@ window.GATE_DATA.questions['coa'].topics.find(function(t){return t.id==='coa-pip
 },
 {
   id: 'coa-pipelining-p3',
-  pyqYear: 2017,
+  pyqStyle: true,
   q: 'A 5-stage pipeline executes I1: ADD R1,R2,R3; I2: SUB R4,R1,R5; I3: MUL R6,R4,R7; I4: DIV R8,R6,R9, where each instruction is a RAW dependency on the one immediately before it. Without forwarding (each adjacent RAW dependency costs a 2-cycle stall, per the usual split-phase WB/ID convention), compared with full ALU-to-ALU forwarding (which entirely removes stalls for back-to-back single-cycle-EX dependencies), how many fewer cycles does the sequence take with forwarding?',
   options: ['6', '4', '8', '2'],
   answer: 0,
@@ -2546,7 +2546,7 @@ window.GATE_DATA.questions['coa'].topics.find(function(t){return t.id==='coa-pip
 },
 {
   id: 'coa-pipelining-p4',
-  pyqYear: 2018,
+  pyqStyle: true,
   q: 'In a pipelined processor, conditional branches are resolved at the end of the 4th pipeline stage. Instructions after the branch are fetched sequentially and squashed if the branch turns out to be taken. What is the branch penalty (number of wasted cycles) for a taken branch?',
   options: ['3', '4', '2', '1'],
   answer: 0,
@@ -2557,7 +2557,7 @@ window.GATE_DATA.questions['coa'].topics.find(function(t){return t.id==='coa-pip
 },
 {
   id: 'coa-pipelining-p5',
-  pyqYear: 2019,
+  pyqStyle: true,
   q: 'In a pipelined processor, 30% of instructions are branches. Half of all branches are taken, and each taken branch incurs a 2-cycle penalty; not-taken branches and all other instructions execute at CPI 1. What is the effective CPI?',
   options: ['1.3', '1.6', '1.15', '1.5'],
   answer: 0,
@@ -2568,7 +2568,7 @@ window.GATE_DATA.questions['coa'].topics.find(function(t){return t.id==='coa-pip
 },
 {
   id: 'coa-pipelining-p6',
-  pyqYear: 2020,
+  pyqStyle: true,
   q: 'A 4-stage pipeline has stage delays 4, 5, 11 and 5 ns (ignore latch delays). The 11 ns stage is split into two balanced stages of 5.5 ns each, turning it into a 5-stage pipeline. For a very long instruction stream, what speedup does the new 5-stage design achieve over the original 4-stage pipeline?',
   options: ['2', '2.2', '1.57', '4'],
   answer: 0,
@@ -2579,7 +2579,7 @@ window.GATE_DATA.questions['coa'].topics.find(function(t){return t.id==='coa-pip
 },
 {
   id: 'coa-pipelining-p7',
-  pyqYear: 2021,
+  pyqStyle: true,
   q: 'A processor uses branch prediction with 85% accuracy. Branches make up 20% of all instructions, and each misprediction costs a 4-cycle penalty. Non-branch instructions and correctly predicted branches execute at CPI 1. What is the effective CPI?',
   options: ['1.12', '1.20', '1.68', '1.05'],
   answer: 0,
@@ -2590,7 +2590,7 @@ window.GATE_DATA.questions['coa'].topics.find(function(t){return t.id==='coa-pip
 },
 {
   id: 'coa-pipelining-p8',
-  pyqYear: 2022,
+  pyqStyle: true,
   q: 'A 4-stage pipeline has stage latencies 500, 300, 450 and 350 ps, and each pipeline register (latch) adds 50 ps. What is the maximum clock frequency at which the pipeline can operate?',
   options: ['1.818 GHz', '2 GHz', '1.667 GHz', '1.538 GHz'],
   answer: 0,
@@ -2601,7 +2601,7 @@ window.GATE_DATA.questions['coa'].topics.find(function(t){return t.id==='coa-pip
 },
 {
   id: 'coa-pipelining-p9',
-  pyqYear: 2023,
+  pyqStyle: true,
   q: 'A pipelined processor has full operand forwarding from the EX/MEM and MEM/WB latches into the EX stage. A load instruction is immediately followed by another instruction that needs the loaded value as an ALU input. What is the minimum number of stall cycles this "load-use" hazard still requires, even with forwarding enabled?',
   options: ['1', '0', '2', '3'],
   answer: 0,
@@ -2612,7 +2612,7 @@ window.GATE_DATA.questions['coa'].topics.find(function(t){return t.id==='coa-pip
 },
 {
   id: 'coa-pipelining-p10',
-  pyqYear: 2024,
+  pyqStyle: true,
   q: 'A 5-stage pipeline uses a single-port unified memory, so every load or store instruction (25% of a 40-instruction program) stalls the pipeline for 1 extra cycle whenever its memory access overlaps an instruction fetch. Assuming every load/store instruction causes exactly one such stall, how many total clock cycles does the program take?',
   options: ['54', '50', '44', '49'],
   answer: 0,
@@ -2623,7 +2623,7 @@ window.GATE_DATA.questions['coa'].topics.find(function(t){return t.id==='coa-pip
 },
 {
   id: 'coa-pipelining-p11',
-  pyqYear: 2025,
+  pyqStyle: true,
   q: 'A 500-instruction program has 15% branches, each of which previously incurred a 2-cycle penalty. The compiler now fills the branch delay slot with a useful, always-executed instruction in 80% of branches (fully absorbing 1 of the 2 penalty cycles for those branches), while the remaining 20% of branches still pay the full 2-cycle penalty. How many total penalty cycles does delayed branching save compared to never using a delay slot?',
   options: ['60', '75', '100', '40'],
   answer: 0,
@@ -2634,7 +2634,7 @@ window.GATE_DATA.questions['coa'].topics.find(function(t){return t.id==='coa-pip
 },
 {
   id: 'coa-pipelining-p12',
-  pyqYear: 2026,
+  pyqStyle: true,
   q: 'A processor has a balanced 6-stage pipeline (ideal speedup would be 6 with zero stalls) but stalls give it an effective CPI of 1.25. What is the actual speedup of this pipelined processor over an equivalent non-pipelined implementation?',
   options: ['4.8', '6', '7.5', '4.25'],
   answer: 0,
@@ -2645,7 +2645,7 @@ window.GATE_DATA.questions['coa'].topics.find(function(t){return t.id==='coa-pip
 },
 {
   id: 'coa-pipelining-p13',
-  pyqYear: 2015,
+  pyqStyle: true,
   q: 'A 5-stage pipeline has every stage taking exactly 2 ns (ignore latch delay). For a program of 10 instructions, what is the actual speedup of the pipelined execution over a non-pipelined implementation of the same datapath (where each instruction takes 5 x 2 = 10 ns, executed one at a time)?',
   options: ['3.57', '5', '2.86', '4.5'],
   answer: 0,
@@ -2656,7 +2656,7 @@ window.GATE_DATA.questions['coa'].topics.find(function(t){return t.id==='coa-pip
 },
 {
   id: 'coa-pipelining-p14',
-  pyqYear: 2024,
+  pyqStyle: true,
   q: 'A 6-stage pipeline has stage delays 3, 4, 9, 5, 6 and 4 ns, with each latch adding 1 ns. The 9 ns stage is split into three equal 3 ns sub-stages, making an 8-stage pipeline (still with 1 ns latches). What is the asymptotic speedup of the new 8-stage design over the original 6-stage design?',
   options: ['1.43', '3', '2', '1.67'],
   answer: 0,
@@ -2670,7 +2670,7 @@ window.GATE_DATA.questions['coa'].topics.find(function(t){return t.id==='coa-pip
 window.GATE_DATA.questions['coa'].topics.find(function(t){return t.id==='coa-memory';}).questions.push(
 {
   id: 'coa-memory-p1',
-  pyqYear: 2015,
+  pyqStyle: true,
   q: 'A direct-mapped cache has a total capacity of 32 KB with a block size of 64 bytes, addressed by a 32-bit byte address. How many bits are used for the Tag field?',
   options: ['17', '18', '15', '20'],
   answer: 0,
@@ -2681,7 +2681,7 @@ window.GATE_DATA.questions['coa'].topics.find(function(t){return t.id==='coa-mem
 },
 {
   id: 'coa-memory-p2',
-  pyqYear: 2016,
+  pyqStyle: true,
   q: 'A 4-way set-associative cache has a total capacity of 64 KB, a block size of 32 bytes, and is addressed with a 32-bit byte address. How many bits are needed for the Tag field?',
   options: ['18', '17', '20', '15'],
   answer: 0,
@@ -2692,7 +2692,7 @@ window.GATE_DATA.questions['coa'].topics.find(function(t){return t.id==='coa-mem
 },
 {
   id: 'coa-memory-p3',
-  pyqYear: 2017,
+  pyqStyle: true,
   q: 'A fully associative cache has a total capacity of 16 KB with a block size of 16 bytes, addressed with a 32-bit byte address. How many bits does the Tag field require?',
   options: ['28', '24', '30', '26'],
   answer: 0,
@@ -2703,7 +2703,7 @@ window.GATE_DATA.questions['coa'].topics.find(function(t){return t.id==='coa-mem
 },
 {
   id: 'coa-memory-p4',
-  pyqYear: 2018,
+  pyqStyle: true,
   q: 'A processor has an L1 cache with 1 ns hit time and a 5% miss rate. On an L1 miss, it accesses an L2 cache with 8 ns hit time, whose LOCAL miss rate is 20%; an L2 miss then costs 80 ns to service from main memory. What is the average memory access time (AMAT)?',
   options: ['2.2 ns', '3.0 ns', '1.8 ns', '4.8 ns'],
   answer: 0,
@@ -2714,7 +2714,7 @@ window.GATE_DATA.questions['coa'].topics.find(function(t){return t.id==='coa-mem
 },
 {
   id: 'coa-memory-p5',
-  pyqYear: 2019,
+  pyqStyle: true,
   q: 'A direct-mapped cache has 4 lines (block numbers map to a line by block-number mod 4). The following sequence of block numbers is accessed in order: 0, 1, 2, 0, 1, 3, 0, 4, 0, 1. Starting from an empty cache, how many of these 10 accesses are misses?',
   options: ['6', '4', '5', '7'],
   answer: 0,
@@ -2725,7 +2725,7 @@ window.GATE_DATA.questions['coa'].topics.find(function(t){return t.id==='coa-mem
 },
 {
   id: 'coa-memory-p6',
-  pyqYear: 2020,
+  pyqStyle: true,
   q: 'A write-through, no-write-allocate cache serves 2000 memory references, of which 40% are writes, each writing one 4-byte word. Every write is sent through to main memory immediately. What is the total number of bytes written to main memory due to these writes?',
   options: ['3200', '2000', '8000', '1600'],
   answer: 0,
@@ -2736,7 +2736,7 @@ window.GATE_DATA.questions['coa'].topics.find(function(t){return t.id==='coa-mem
 },
 {
   id: 'coa-memory-p7',
-  pyqYear: 2020,
+  pyqStyle: true,
   q: 'A write-back cache with a 32-byte block size experiences 100 block evictions over the course of a program, of which 60% are dirty (have been written to since being loaded). What is the total number of bytes written back to main memory due to these evictions?',
   options: ['1920', '3200', '1200', '2880'],
   answer: 0,
@@ -2747,7 +2747,7 @@ window.GATE_DATA.questions['coa'].topics.find(function(t){return t.id==='coa-mem
 },
 {
   id: 'coa-memory-p8',
-  pyqYear: 2021,
+  pyqStyle: true,
   q: 'An L1 cache has a 2 ns hit time and an 8% miss rate. An L2 cache has a 10 ns hit time. Overall, 2% of ALL memory references (i.e. the GLOBAL miss rate) result in a main-memory access costing 100 ns. What is the average memory access time (AMAT)?',
   options: ['4.8 ns', '3.6 ns', '5.2 ns', '4.0 ns'],
   answer: 0,
@@ -2758,7 +2758,7 @@ window.GATE_DATA.questions['coa'].topics.find(function(t){return t.id==='coa-mem
 },
 {
   id: 'coa-memory-p9',
-  pyqYear: 2022,
+  pyqStyle: true,
   q: 'A 2-way set-associative cache has 2 sets (block-number mod 2 selects the set) and uses true LRU replacement within each set. Starting from an empty cache, this block-number trace is accessed: 0, 2, 1, 0, 4, 1, 2, 3, 0, 4. How many of these 10 accesses are hits?',
   options: ['2', '3', '4', '1'],
   answer: 0,
@@ -2769,7 +2769,7 @@ window.GATE_DATA.questions['coa'].topics.find(function(t){return t.id==='coa-mem
 },
 {
   id: 'coa-memory-p10',
-  pyqYear: 2022,
+  pyqStyle: true,
   q: 'A fully associative cache starts empty. The following block-number trace is accessed: 5, 3, 5, 7, 3, 9, 5, 11, 3, 7, 13. Assuming the cache is large enough that no block is ever evicted, how many of these 11 accesses are compulsory (cold-start) misses?',
   options: ['6', '5', '7', '11'],
   answer: 0,
@@ -2780,7 +2780,7 @@ window.GATE_DATA.questions['coa'].topics.find(function(t){return t.id==='coa-mem
 },
 {
   id: 'coa-memory-p11',
-  pyqYear: 2023,
+  pyqStyle: true,
   q: 'A cache uses a 40-bit byte address. The Tag field is 26 bits and the block size is 64 bytes. How many sets does this cache have?',
   options: ['256', '128', '512', '64'],
   answer: 0,
@@ -2791,7 +2791,7 @@ window.GATE_DATA.questions['coa'].topics.find(function(t){return t.id==='coa-mem
 },
 {
   id: 'coa-memory-p12',
-  pyqYear: 2024,
+  pyqStyle: true,
   q: 'Two proposed L1 cache designs are compared for the same processor. Design A: 1 ns hit time, 6% miss rate, 50 ns miss penalty. Design B: 1.5 ns hit time, 3% miss rate, the same 50 ns miss penalty. Which design gives the lower average memory access time (AMAT), and by how much?',
   options: [
     'Design B is faster, by 1 ns (AMAT_A = 4 ns, AMAT_B = 3 ns)',
@@ -2807,7 +2807,7 @@ window.GATE_DATA.questions['coa'].topics.find(function(t){return t.id==='coa-mem
 },
 {
   id: 'coa-memory-p13',
-  pyqYear: 2024,
+  pyqStyle: true,
   q: 'A write-back cache with a 64-byte block size experiences 100 block evictions during a program run, of which 70% are dirty. What is the total number of bytes written back to main memory?',
   options: ['4480', '6400', '3200', '4800'],
   answer: 0,
@@ -2818,7 +2818,7 @@ window.GATE_DATA.questions['coa'].topics.find(function(t){return t.id==='coa-mem
 },
 {
   id: 'coa-memory-p14',
-  pyqYear: 2025,
+  pyqStyle: true,
   q: 'An 8-way set-associative cache has a total capacity of 16 KB and a block size of 32 bytes. Byte address 8480 is accessed. Which set does this address map to?',
   options: ['Set 9', 'Set 34', 'Set 17', 'Set 0'],
   answer: 0,
@@ -2829,7 +2829,7 @@ window.GATE_DATA.questions['coa'].topics.find(function(t){return t.id==='coa-mem
 },
 {
   id: 'coa-memory-p15',
-  pyqYear: 2026,
+  pyqStyle: true,
   q: 'A three-level cache hierarchy has: L1 hit time 1 ns with a 6% miss rate; L2 hit time 6 ns with a LOCAL miss rate of 25%; L3 hit time 20 ns with a LOCAL miss rate of 30%; a main memory access on an L3 miss costs 120 ns. What is the overall AMAT?',
   options: ['2.2 ns', '3.1 ns', '1.9 ns', '2.6 ns'],
   answer: 0,
@@ -2840,7 +2840,7 @@ window.GATE_DATA.questions['coa'].topics.find(function(t){return t.id==='coa-mem
 },
 {
   id: 'coa-memory-p16',
-  pyqYear: 2026,
+  pyqStyle: true,
   q: 'A direct-mapped cache has 8 lines (block-number mod 8 selects the line). A tight loop repeatedly accesses block numbers 0, 8 and 16 in a fixed round-robin order (0, 8, 16, 0, 8, 16, 0, 8), for a total of 8 accesses, starting from an empty cache. How many of these accesses are hits?',
   options: ['0', '2', '5', '6'],
   answer: 0,
@@ -2854,7 +2854,7 @@ window.GATE_DATA.questions['coa'].topics.find(function(t){return t.id==='coa-mem
 window.GATE_DATA.questions['coa'].topics.find(function(t){return t.id==='coa-io';}).questions.push(
 {
   id: 'coa-io-p1',
-  pyqYear: 2015,
+  pyqStyle: true,
   q: 'A DMA controller uses cycle stealing: for every group of 5 CPU clock cycles, it steals exactly 1 cycle to transfer one word, leaving the CPU 4 cycles free in that group. What percentage of CPU cycles are stolen by the DMA during the transfer?',
   options: ['20%', '25%', '80%', '5%'],
   answer: 0,
@@ -2865,7 +2865,7 @@ window.GATE_DATA.questions['coa'].topics.find(function(t){return t.id==='coa-io'
 },
 {
   id: 'coa-io-p2',
-  pyqYear: 2016,
+  pyqStyle: true,
   q: 'A CPU has a 100 ns clock cycle. A DMA controller uses cycle stealing, taking exactly 1 CPU cycle for every word it transfers. If the DMA transfers a block of 10,000 words during a program\'s execution, by how much does this cycle stealing lengthen the program\'s total running time?',
   options: ['1,000,000 ns', '100,000 ns', '10,000 ns', '10,000,000 ns'],
   answer: 0,
@@ -2876,7 +2876,7 @@ window.GATE_DATA.questions['coa'].topics.find(function(t){return t.id==='coa-io'
 },
 {
   id: 'coa-io-p3',
-  pyqYear: 2017,
+  pyqStyle: true,
   q: 'A disk has a seek time of 6 ms, rotates at 6000 RPM, and has a sustained transfer rate of 50,000 bytes/ms (i.e. 50 MB/s using decimal MB). What is the total access time to read a 10,000-byte sector, assuming average rotational latency (half a revolution)?',
   options: ['11.2 ms', '11.0 ms', '5.2 ms', '16 ms'],
   answer: 0,
@@ -2887,7 +2887,7 @@ window.GATE_DATA.questions['coa'].topics.find(function(t){return t.id==='coa-io'
 },
 {
   id: 'coa-io-p4',
-  pyqYear: 2018,
+  pyqStyle: true,
   q: 'For the disk of the previous scenario (seek 6 ms, 6000 RPM giving 5 ms average rotational latency, transfer rate 50,000 bytes/ms, 10,000-byte sector, total access time 11.2 ms), what is the effective throughput for reading this single sector, expressed in bytes per millisecond?',
   options: ['≈892.9 bytes/ms', '≈500 bytes/ms', '≈1785.7 bytes/ms', '≈50,000 bytes/ms'],
   answer: 0,
@@ -2898,7 +2898,7 @@ window.GATE_DATA.questions['coa'].topics.find(function(t){return t.id==='coa-io'
 },
 {
   id: 'coa-io-p5',
-  pyqYear: 2019,
+  pyqStyle: true,
   q: 'An interrupt-driven I/O system handles 1000 device interrupts. Each interrupt requires 2 microseconds to save the CPU context, an ISR (interrupt service routine) body that runs for 5 microseconds, and 2 microseconds to restore the context afterward. What is the total CPU time consumed by servicing all 1000 interrupts?',
   options: ['9000 microseconds', '5000 microseconds', '4000 microseconds', '7000 microseconds'],
   answer: 0,
@@ -2909,7 +2909,7 @@ window.GATE_DATA.questions['coa'].topics.find(function(t){return t.id==='coa-io'
 },
 {
   id: 'coa-io-p6',
-  pyqYear: 2020,
+  pyqStyle: true,
   q: 'A device transfers one word every 10 microseconds and the CPU must move 1000 words in total. Under programmed I/O (the CPU busy-waits, polling the device\'s status register continuously until each word is ready, then transfers it), the CPU is occupied for the entire 10-microsecond gap between words. Under interrupt-driven I/O, the CPU spends only 2 microseconds of actual work per word (handling the interrupt and moving the word) and is otherwise free to do other work. How many microseconds of CPU time does interrupt-driven I/O save compared to programmed I/O, for this whole transfer?',
   options: ['8000 microseconds', '10000 microseconds', '2000 microseconds', '6000 microseconds'],
   answer: 0,
@@ -2920,7 +2920,7 @@ window.GATE_DATA.questions['coa'].topics.find(function(t){return t.id==='coa-io'
 },
 {
   id: 'coa-io-p7',
-  pyqYear: 2021,
+  pyqStyle: true,
   q: 'A centralized parallel bus arbitration scheme must uniquely identify which one of 64 possible I/O devices is requesting the bus, using a priority encoder that outputs a binary device number. How many output bits does this encoder need?',
   options: ['6', '5', '7', '64'],
   answer: 0,
@@ -2931,7 +2931,7 @@ window.GATE_DATA.questions['coa'].topics.find(function(t){return t.id==='coa-io'
 },
 {
   id: 'coa-io-p8',
-  pyqYear: 2022,
+  pyqStyle: true,
   q: 'A DMA controller transfers a 1 MB (decimal, 1,000,000 byte) block of data in burst mode over a bus with an effective bandwidth of 200 MB/s (decimal). Assuming the bus can be used at its full rated bandwidth for the entire transfer, how long does the transfer take?',
   options: ['5 ms', '2 ms', '0.5 ms', '20 ms'],
   answer: 0,
@@ -2942,7 +2942,7 @@ window.GATE_DATA.questions['coa'].topics.find(function(t){return t.id==='coa-io'
 },
 {
   id: 'coa-io-p9',
-  pyqYear: 2023,
+  pyqStyle: true,
   q: 'A disk rotates at 7200 RPM. What is its average rotational latency (assume it equals half of one full revolution)?',
   options: [],
   answer: 4.1667,
@@ -2954,7 +2954,7 @@ window.GATE_DATA.questions['coa'].topics.find(function(t){return t.id==='coa-io'
 },
 {
   id: 'coa-io-p10',
-  pyqYear: 2024,
+  pyqStyle: true,
   q: 'A CPU with a 50 ns clock cycle is serviced by a DMA controller using cycle stealing, which steals exactly 1 CPU cycle for every 8-cycle group during a data transfer. What percentage of CPU cycles are stolen?',
   options: ['12.5%', '8%', '20%', '87.5%'],
   answer: 0,
@@ -2965,7 +2965,7 @@ window.GATE_DATA.questions['coa'].topics.find(function(t){return t.id==='coa-io'
 },
 {
   id: 'coa-io-p11',
-  pyqYear: 2025,
+  pyqStyle: true,
   q: 'A disk has a seek time of 8 ms, rotates at 10,000 RPM, and has a transfer rate of 100,000 bytes/ms. What is the total access time to read a single 16,000-byte block, using average rotational latency?',
   options: ['11.16 ms', '11 ms', '14 ms', '9.16 ms'],
   answer: 0,
@@ -2976,7 +2976,7 @@ window.GATE_DATA.questions['coa'].topics.find(function(t){return t.id==='coa-io'
 },
 {
   id: 'coa-io-p12',
-  pyqYear: 2026,
+  pyqStyle: true,
   q: 'A real-time system requires that a device interrupt be fully serviced (from the moment the interrupt occurs to the moment the interrupted program resumes) within a hard deadline of 50 microseconds. The interrupt dispatch (recognizing and vectoring to the handler) takes 8 microseconds, saving the CPU context takes 5 microseconds, and restoring the context afterward takes another 5 microseconds. What is the maximum time budget left for the actual ISR body to run, while still meeting the deadline?',
   options: ['32 microseconds', '37 microseconds', '42 microseconds', '18 microseconds'],
   answer: 0,
@@ -2987,7 +2987,7 @@ window.GATE_DATA.questions['coa'].topics.find(function(t){return t.id==='coa-io'
 },
 {
   id: 'coa-io-p13',
-  pyqYear: 2015,
+  pyqStyle: true,
   q: 'A system has 16 I/O devices. Under polled (software) interrupt handling, the CPU must check each device\'s status register in a fixed priority order until it finds the one requesting service, at 2 microseconds per check. Under vectored interrupt handling, the requesting device directly supplies its own identifying vector, needing only 1 check-equivalent regardless of device count. What is the worst-case device-identification time for polled interrupt handling (i.e. if the lowest-priority device, checked last, is the one requesting service)?',
   options: ['32 microseconds', '16 microseconds', '2 microseconds', '30 microseconds'],
   answer: 0,
@@ -2998,7 +2998,7 @@ window.GATE_DATA.questions['coa'].topics.find(function(t){return t.id==='coa-io'
 },
 {
   id: 'coa-io-p14',
-  pyqYear: 2021,
+  pyqStyle: true,
   q: 'A CPU must move 5000 words from a device to memory. Under programmed I/O, the CPU busy-waits and spends 4 microseconds per word (checking status and moving the data), fully occupying the CPU throughout. Under DMA with cycle stealing (1 CPU cycle of 100 ns stolen per word), the CPU is otherwise free to run its own program. What is the total CPU time consumed by programmed I/O, and what is the total CPU time consumed (stolen) by the DMA approach, for this whole transfer?',
   options: [
     'Programmed I/O: 20,000 microseconds; DMA: 500 microseconds',

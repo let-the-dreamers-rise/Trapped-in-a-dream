@@ -2453,7 +2453,7 @@ window.GATE_DATA.questions['dbms'].topics.find(function(t){return t.id==='dbms-t
 window.GATE_DATA.questions['dbms'].topics.find(function(t){return t.id==='dbms-er';}).questions.push(
 {
   id: 'dbms-er-p1',
-  pyqYear: 2015,
+  pyqStyle: true,
   q: 'Relation R(A, B, C, D, E, F) has exactly one candidate key {A, B, C}. How many superkeys does R have? (Enter your numerical answer.)',
   options: [],
   answer: 8,
@@ -2465,7 +2465,7 @@ window.GATE_DATA.questions['dbms'].topics.find(function(t){return t.id==='dbms-e
 },
 {
   id: 'dbms-er-p2',
-  pyqYear: 2016,
+  pyqStyle: true,
   q: 'An ER diagram has strong entity sets Student and Course, an M:N relationship set Enrolls (with descriptive attribute Grade) between them, and a weak entity set Address owned by Student through an identifying relationship. What is the minimum number of tables needed to map this diagram to the relational model? (Enter your numerical answer.)',
   options: [],
   answer: 4,
@@ -2477,7 +2477,7 @@ window.GATE_DATA.questions['dbms'].topics.find(function(t){return t.id==='dbms-e
 },
 {
   id: 'dbms-er-p3',
-  pyqYear: 2017,
+  pyqStyle: true,
   q: 'Relation R(P, Q, R, S, T) has exactly two candidate keys: {P} and {Q, R}. Using inclusion-exclusion over their supersets, how many superkeys does R have? (Enter your numerical answer.)',
   options: [],
   answer: 20,
@@ -2489,7 +2489,7 @@ window.GATE_DATA.questions['dbms'].topics.find(function(t){return t.id==='dbms-e
 },
 {
   id: 'dbms-er-p4',
-  pyqYear: 2018,
+  pyqStyle: true,
   q: 'Which of the following statements about weak entity sets in the ER model are TRUE? (Select ALL that apply)',
   options: [
     'A weak entity set has no candidate key formed purely from its own attributes',
@@ -2505,7 +2505,7 @@ window.GATE_DATA.questions['dbms'].topics.find(function(t){return t.id==='dbms-e
 },
 {
   id: 'dbms-er-p5',
-  pyqYear: 2019,
+  pyqStyle: true,
   q: 'Relation R(A, B, C, D) has exactly two candidate keys, {A} and {D}, each a single attribute. How many superkeys does R have? (Enter your numerical answer.)',
   options: [],
   answer: 12,
@@ -2517,7 +2517,7 @@ window.GATE_DATA.questions['dbms'].topics.find(function(t){return t.id==='dbms-e
 },
 {
   id: 'dbms-er-p6',
-  pyqYear: 2020,
+  pyqStyle: true,
   q: 'An ER design has strong entity sets Customer, Account and Branch. Relationship AccountAt is N:1 from Account to Branch with Account participating totally (every account belongs to exactly one branch). Relationship Owns is M:N between Customer and Account. What is the minimum number of tables in the relational mapping? (Enter your numerical answer.)',
   options: [],
   answer: 4,
@@ -2529,7 +2529,7 @@ window.GATE_DATA.questions['dbms'].topics.find(function(t){return t.id==='dbms-e
 },
 {
   id: 'dbms-er-p7',
-  pyqYear: 2021,
+  pyqStyle: true,
   q: 'An ER diagram has a single ternary relationship set Supplies among three strong entity sets Supplier, Part and Project, with a descriptive attribute Quantity on the relationship. What is the minimum number of tables needed to represent this diagram? (Enter your numerical answer.)',
   options: [],
   answer: 4,
@@ -2541,7 +2541,7 @@ window.GATE_DATA.questions['dbms'].topics.find(function(t){return t.id==='dbms-e
 },
 {
   id: 'dbms-er-p8',
-  pyqYear: 2022,
+  pyqStyle: true,
   q: 'Which of the following statements about primary keys and foreign keys in the relational model are TRUE? (Select ALL that apply)',
   options: [
     'A primary key attribute can never be NULL in any tuple of the relation',
@@ -2557,7 +2557,7 @@ window.GATE_DATA.questions['dbms'].topics.find(function(t){return t.id==='dbms-e
 },
 {
   id: 'dbms-er-p9',
-  pyqYear: 2023,
+  pyqStyle: true,
   q: 'Relation R(A, B, C, D, E) has exactly two candidate keys, {A, B} and {A, C}. Using inclusion-exclusion, how many superkeys does R have? (Enter your numerical answer.)',
   options: [],
   answer: 12,
@@ -2569,7 +2569,7 @@ window.GATE_DATA.questions['dbms'].topics.find(function(t){return t.id==='dbms-e
 },
 {
   id: 'dbms-er-p10',
-  pyqYear: 2024,
+  pyqStyle: true,
   q: 'An ER diagram uses specialization: superclass Vehicle (attributes VehicleID, RegNo) specializes disjointly and totally into subclasses Car (attribute NumDoors) and Truck (attribute LoadCapacity). Using the "one table per subclass, no separate superclass table" mapping rule (attribute-defined disjoint total specialization), what is the minimum number of tables needed? (Enter your numerical answer.)',
   options: [],
   answer: 2,
@@ -2581,7 +2581,7 @@ window.GATE_DATA.questions['dbms'].topics.find(function(t){return t.id==='dbms-e
 },
 {
   id: 'dbms-er-p11',
-  pyqYear: 2025,
+  pyqStyle: true,
   q: 'A relationship set Manages is 1:1 between Department and Employee, where Department participates totally (every department has exactly one manager) and Employee participates partially (not every employee manages a department). To map this to the relational model with the minimum number of tables, the relationship should be merged as a foreign key into:',
   options: [
     'The Department table, since it has total participation in the relationship',
@@ -2597,7 +2597,7 @@ window.GATE_DATA.questions['dbms'].topics.find(function(t){return t.id==='dbms-e
 },
 {
   id: 'dbms-er-p12',
-  pyqYear: 2026,
+  pyqStyle: true,
   q: 'Consider a weak entity set Room owned by strong entity set Building through identifying relationship LocatedIn. Which of the following is the correct primary key for the relational table derived from Room, given that Room\'s own discriminator is RoomNumber and Building\'s primary key is BuildingID?',
   options: [
     'RoomNumber alone, since it is Room\'s discriminator',
@@ -2613,7 +2613,7 @@ window.GATE_DATA.questions['dbms'].topics.find(function(t){return t.id==='dbms-e
 },
 {
   id: 'dbms-er-p13',
-  pyqYear: 2016,
+  pyqStyle: true,
   q: 'Relation R has 7 attributes and exactly one candidate key consisting of 4 attributes. How many superkeys does R have? (Enter your numerical answer.)',
   options: [],
   answer: 8,
@@ -2625,7 +2625,7 @@ window.GATE_DATA.questions['dbms'].topics.find(function(t){return t.id==='dbms-e
 },
 {
   id: 'dbms-er-p14',
-  pyqYear: 2022,
+  pyqStyle: true,
   q: 'Which of the following statements about the entity integrity and referential integrity constraints are TRUE? (Select ALL that apply)',
   options: [
     'Entity integrity forbids NULL in any attribute that is part of the chosen primary key',
@@ -2644,7 +2644,7 @@ window.GATE_DATA.questions['dbms'].topics.find(function(t){return t.id==='dbms-e
 window.GATE_DATA.questions['dbms'].topics.find(function(t){return t.id==='dbms-ra-sql';}).questions.push(
 {
   id: 'dbms-ra-sql-p1',
-  pyqYear: 2015,
+  pyqStyle: true,
   q: 'Emp(EmpID, DeptID) has rows (1,10), (2,10), (3,20), (4,30), (5,10). Dept(DeptID, DeptName) has rows (10, HR), (20, IT). How many tuples does the natural join Emp NATURAL JOIN Dept produce? (Enter your numerical answer.)',
   options: [],
   answer: 4,
@@ -2656,7 +2656,7 @@ window.GATE_DATA.questions['dbms'].topics.find(function(t){return t.id==='dbms-r
 },
 {
   id: 'dbms-ra-sql-p2',
-  pyqYear: 2016,
+  pyqStyle: true,
   q: 'Using the same Emp(EmpID, DeptID) rows (1,10), (2,10), (3,20), (4,30), (5,10) and Dept(DeptID, DeptName) rows (10, HR), (20, IT), how many tuples does Emp LEFT OUTER JOIN Dept (on DeptID) produce? (Enter your numerical answer.)',
   options: [],
   answer: 5,
@@ -2668,7 +2668,7 @@ window.GATE_DATA.questions['dbms'].topics.find(function(t){return t.id==='dbms-r
 },
 {
   id: 'dbms-ra-sql-p3',
-  pyqYear: 2017,
+  pyqStyle: true,
   q: 'Employee(EmpID, ManagerID) has rows (1, NULL), (2, 1), (3, 1), (4, 2), (5, 2), (6, 3), where every non-NULL ManagerID value refers to an existing EmpID. A self-join query pairs each employee with their manager: SELECT E.EmpID, M.EmpID FROM Employee E, Employee M WHERE E.ManagerID = M.EmpID. How many result tuples does this produce? (Enter your numerical answer.)',
   options: [],
   answer: 5,
@@ -2680,7 +2680,7 @@ window.GATE_DATA.questions['dbms'].topics.find(function(t){return t.id==='dbms-r
 },
 {
   id: 'dbms-ra-sql-p4',
-  pyqYear: 2018,
+  pyqStyle: true,
   q: 'Table Orders(CustID) contains the values 1, 2, NULL, 3 (one row with a NULL CustID). Table Customers(CustID) contains 1, 2, 3, 4, 5. How many rows does "SELECT * FROM Customers WHERE CustID NOT IN (SELECT CustID FROM Orders)" return?',
   options: ['0', '2 (CustID 4 and 5)', '5 (all customers)', 'Error: the query cannot execute'],
   answer: 1,
@@ -2691,7 +2691,7 @@ window.GATE_DATA.questions['dbms'].topics.find(function(t){return t.id==='dbms-r
 },
 {
   id: 'dbms-ra-sql-p5',
-  pyqYear: 2019,
+  pyqStyle: true,
   q: 'Which of the following statements about SQL three-valued logic (TRUE, FALSE, UNKNOWN) are TRUE? (Select ALL that apply)',
   options: [
     'NULL = NULL evaluates to UNKNOWN, not TRUE',
@@ -2707,7 +2707,7 @@ window.GATE_DATA.questions['dbms'].topics.find(function(t){return t.id==='dbms-r
 },
 {
   id: 'dbms-ra-sql-p6',
-  pyqYear: 2020,
+  pyqStyle: true,
   q: 'Enroll(StudID, CourseID) has rows: (S1,C1), (S1,C2), (S1,C3), (S2,C1), (S2,C2), (S3,C1), (S3,C2), (S3,C3), (S3,C4). Using the relational algebra division operator, how many students have taken ALL of the courses {C1, C2, C3}? (Enter your numerical answer.)',
   options: [],
   answer: 2,
@@ -2719,7 +2719,7 @@ window.GATE_DATA.questions['dbms'].topics.find(function(t){return t.id==='dbms-r
 },
 {
   id: 'dbms-ra-sql-p7',
-  pyqYear: 2021,
+  pyqStyle: true,
   q: 'EmpSal(EmpID, DeptID, Salary) has rows (1,10,50), (2,10,70), (3,10,90), (4,20,60), (5,20,80). A correlated subquery selects employees whose salary exceeds the AVERAGE salary of their own department: SELECT E.EmpID FROM EmpSal E WHERE E.Salary > (SELECT AVG(Salary) FROM EmpSal WHERE DeptID = E.DeptID). How many rows does this return? (Enter your numerical answer.)',
   options: [],
   answer: 2,
@@ -2731,7 +2731,7 @@ window.GATE_DATA.questions['dbms'].topics.find(function(t){return t.id==='dbms-r
 },
 {
   id: 'dbms-ra-sql-p8',
-  pyqYear: 2022,
+  pyqStyle: true,
   q: 'Orders(CustID, Amount) has 10 rows total, grouped by CustID as: customer A places 3 orders, B places 1, C places 4, D places 2. How many customers satisfy "SELECT CustID FROM Orders GROUP BY CustID HAVING COUNT(*) > 2"? (Enter your numerical answer.)',
   options: [],
   answer: 2,
@@ -2743,7 +2743,7 @@ window.GATE_DATA.questions['dbms'].topics.find(function(t){return t.id==='dbms-r
 },
 {
   id: 'dbms-ra-sql-p9',
-  pyqYear: 2023,
+  pyqStyle: true,
   q: 'Which of the following statements about EXISTS and NOT EXISTS correlated subqueries are TRUE? (Select ALL that apply)',
   options: [
     'EXISTS returns TRUE as soon as the correlated subquery produces at least one row, regardless of whether any of its column values are NULL',
@@ -2759,7 +2759,7 @@ window.GATE_DATA.questions['dbms'].topics.find(function(t){return t.id==='dbms-r
 },
 {
   id: 'dbms-ra-sql-p10',
-  pyqYear: 2024,
+  pyqStyle: true,
   q: 'Relation R has 5 tuples and relation S has 4 tuples, both union-compatible. Exactly 2 tuples are identical between R and S. How many tuples does R UNION S (the SQL set-union, which eliminates duplicates) produce? (Enter your numerical answer.)',
   options: [],
   answer: 7,
@@ -2771,7 +2771,7 @@ window.GATE_DATA.questions['dbms'].topics.find(function(t){return t.id==='dbms-r
 },
 {
   id: 'dbms-ra-sql-p11',
-  pyqYear: 2025,
+  pyqStyle: true,
   q: 'EmpSal(Salary) contains values 50, 70, 90, 60, 80 (attribute DeptID omitted here); the subset with DeptID = D2 has salaries {60, 80}. How many rows satisfy "Salary > ALL (SELECT Salary FROM EmpSal WHERE DeptID = \'D2\')"? (Enter your numerical answer.)',
   options: [],
   answer: 1,
@@ -2783,7 +2783,7 @@ window.GATE_DATA.questions['dbms'].topics.find(function(t){return t.id==='dbms-r
 },
 {
   id: 'dbms-ra-sql-p12',
-  pyqYear: 2026,
+  pyqStyle: true,
   q: 'Relation R(A, B) has 4 tuples and relation S(C, D) has 3 tuples, with no join condition applied. How many tuples does the Cartesian product R x S produce, and which relational algebra expression is equivalent to R NATURAL JOIN S when R and S share NO common attribute names at all?',
   options: [
     '7 tuples; natural join is undefined when there are no common attributes',
@@ -2799,7 +2799,7 @@ window.GATE_DATA.questions['dbms'].topics.find(function(t){return t.id==='dbms-r
 },
 {
   id: 'dbms-ra-sql-p13',
-  pyqYear: 2017,
+  pyqStyle: true,
   q: 'Which of the following relational algebra identities are valid for all relations R, S and predicate p (assuming type-compatibility where required)? (Select ALL that apply)',
   options: [
     'sigma_p(R union S) = sigma_p(R) union sigma_p(S), when R and S are union-compatible',
@@ -2815,7 +2815,7 @@ window.GATE_DATA.questions['dbms'].topics.find(function(t){return t.id==='dbms-r
 },
 {
   id: 'dbms-ra-sql-p14',
-  pyqYear: 2019,
+  pyqStyle: true,
   q: 'Enroll(StudID, CourseID) has rows (S1,C1), (S1,C2), (S2,C1), (S3,C1), (S3,C2), (S3,C3). A nested subquery finds students enrolled in strictly MORE courses than student S2: SELECT StudID FROM Enroll GROUP BY StudID HAVING COUNT(*) > (SELECT COUNT(*) FROM Enroll WHERE StudID = \'S2\'). How many students satisfy this? (Enter your numerical answer.)',
   options: [],
   answer: 2,
@@ -2830,7 +2830,7 @@ window.GATE_DATA.questions['dbms'].topics.find(function(t){return t.id==='dbms-r
 window.GATE_DATA.questions['dbms'].topics.find(function(t){return t.id==='dbms-normalization';}).questions.push(
 {
   id: 'dbms-normalization-p1',
-  pyqYear: 2015,
+  pyqStyle: true,
   q: 'R(A, B, C, D) has FDs: AB -> C, C -> D, D -> A. How many candidate keys does R have? (Enter your numerical answer.)',
   options: [],
   answer: 3,
@@ -2842,7 +2842,7 @@ window.GATE_DATA.questions['dbms'].topics.find(function(t){return t.id==='dbms-n
 },
 {
   id: 'dbms-normalization-p2',
-  pyqYear: 2016,
+  pyqStyle: true,
   q: 'R(A, B, C, D, E) has FDs: A -> BC, CD -> E, B -> D, E -> A. Compute the attribute closure {C, D}+ using the standard closure algorithm. How many attributes does the closure contain? (Enter your numerical answer.)',
   options: [],
   answer: 5,
@@ -2854,7 +2854,7 @@ window.GATE_DATA.questions['dbms'].topics.find(function(t){return t.id==='dbms-n
 },
 {
   id: 'dbms-normalization-p3',
-  pyqYear: 2017,
+  pyqStyle: true,
   q: 'R(A, B, C, D) has the FDs: A -> B, A -> C, C -> D. The only candidate key is {A}. What is the highest normal form satisfied by R?',
   options: ['1NF', '2NF', '3NF', 'BCNF'],
   answer: 1,
@@ -2865,7 +2865,7 @@ window.GATE_DATA.questions['dbms'].topics.find(function(t){return t.id==='dbms-n
 },
 {
   id: 'dbms-normalization-p4',
-  pyqYear: 2018,
+  pyqStyle: true,
   q: 'R(A, B, C) has FDs F = {A -> B, B -> C}. It is decomposed into R1(A, B) and R2(B, C). Which of the following correctly evaluates this decomposition?',
   options: [
     'Lossless-join, because the common attribute B fully determines R2 (B -> C, and R2 consists exactly of B and C)',
@@ -2881,7 +2881,7 @@ window.GATE_DATA.questions['dbms'].topics.find(function(t){return t.id==='dbms-n
 },
 {
   id: 'dbms-normalization-p5',
-  pyqYear: 2019,
+  pyqStyle: true,
   q: 'Using the same R(A, B, C) with F = {A -> B, B -> C}, decomposed into R1(A, B) and R2(B, C), is this decomposition dependency-preserving?',
   options: [
     'Yes, because F1 = {A -> B} (projected onto R1) and F2 = {B -> C} (projected onto R2) together imply every FD in F',
@@ -2897,7 +2897,7 @@ window.GATE_DATA.questions['dbms'].topics.find(function(t){return t.id==='dbms-n
 },
 {
   id: 'dbms-normalization-p6',
-  pyqYear: 2020,
+  pyqStyle: true,
   q: 'R(A, B, C, D, E) has FDs: AB -> CDE and C -> A. How many candidate keys does R have? (Enter your numerical answer.)',
   options: [],
   answer: 2,
@@ -2909,7 +2909,7 @@ window.GATE_DATA.questions['dbms'].topics.find(function(t){return t.id==='dbms-n
 },
 {
   id: 'dbms-normalization-p7',
-  pyqYear: 2021,
+  pyqStyle: true,
   q: 'R(A, B, C, D, E) has FDs: AB -> C, C -> D, D -> E, and the only candidate key is {A, B}. What is the highest normal form satisfied by R?',
   options: ['1NF', '2NF', '3NF', 'BCNF'],
   answer: 1,
@@ -2920,7 +2920,7 @@ window.GATE_DATA.questions['dbms'].topics.find(function(t){return t.id==='dbms-n
 },
 {
   id: 'dbms-normalization-p8',
-  pyqYear: 2022,
+  pyqStyle: true,
   q: 'Which of the following statements about the attribute closure algorithm and Armstrong\'s axioms are TRUE? (Select ALL that apply)',
   options: [
     'An attribute that never appears on the right-hand side of any FD in F must belong to every candidate key of R',
@@ -2936,7 +2936,7 @@ window.GATE_DATA.questions['dbms'].topics.find(function(t){return t.id==='dbms-n
 },
 {
   id: 'dbms-normalization-p9',
-  pyqYear: 2023,
+  pyqStyle: true,
   q: 'R(A, B, C) has FDs F = {A -> B} only (note: B -> C does NOT hold). It is decomposed into R1(A, B) and R2(B, C). Is this decomposition lossless-join?',
   options: [
     'Yes, because B is common to both R1 and R2',
@@ -2952,7 +2952,7 @@ window.GATE_DATA.questions['dbms'].topics.find(function(t){return t.id==='dbms-n
 },
 {
   id: 'dbms-normalization-p10',
-  pyqYear: 2024,
+  pyqStyle: true,
   q: 'R(A, B, C) has FDs F = {AB -> C, C -> A}. It is decomposed into R1(B, C) and R2(A, C). Which of the following correctly describes this decomposition?',
   options: [
     'Lossless-join (via C -> A making C a key of R2), but NOT dependency-preserving, because AB -> C cannot be verified from either projected FD set alone',
@@ -2968,7 +2968,7 @@ window.GATE_DATA.questions['dbms'].topics.find(function(t){return t.id==='dbms-n
 },
 {
   id: 'dbms-normalization-p11',
-  pyqYear: 2025,
+  pyqStyle: true,
   q: 'R(A, B, C, D) has FDs: A -> B, B -> C, A -> D, and the only candidate key is {A}. What is the highest normal form satisfied by R?',
   options: ['1NF', '2NF', '3NF', 'BCNF'],
   answer: 1,
@@ -2979,7 +2979,7 @@ window.GATE_DATA.questions['dbms'].topics.find(function(t){return t.id==='dbms-n
 },
 {
   id: 'dbms-normalization-p12',
-  pyqYear: 2026,
+  pyqStyle: true,
   q: 'R(A, B, C, D) has FDs: AB -> CD and C -> B, with candidate keys {A, B} and {A, C}. What is the highest normal form satisfied by R?',
   options: ['1NF', '2NF', '3NF', 'BCNF'],
   answer: 2,
@@ -2990,7 +2990,7 @@ window.GATE_DATA.questions['dbms'].topics.find(function(t){return t.id==='dbms-n
 },
 {
   id: 'dbms-normalization-p13',
-  pyqYear: 2016,
+  pyqStyle: true,
   q: 'R(A, B) has FDs: A -> B and B -> A (a bijective, one-to-one relationship). Which of the following is TRUE?',
   options: [
     'R has two candidate keys, {A} and {B}, and R is in BCNF',
@@ -3006,7 +3006,7 @@ window.GATE_DATA.questions['dbms'].topics.find(function(t){return t.id==='dbms-n
 },
 {
   id: 'dbms-normalization-p14',
-  pyqYear: 2017,
+  pyqStyle: true,
   q: 'Which of the following statements about lossless-join and dependency-preserving decompositions are TRUE? (Select ALL that apply)',
   options: [
     'Every decomposition produced by the standard 3NF synthesis algorithm (using a minimal cover) is guaranteed to be both lossless-join and dependency-preserving',
@@ -3025,7 +3025,7 @@ window.GATE_DATA.questions['dbms'].topics.find(function(t){return t.id==='dbms-n
 window.GATE_DATA.questions['dbms'].topics.find(function(t){return t.id==='dbms-indexing';}).questions.push(
 {
   id: 'dbms-indexing-p1',
-  pyqYear: 2015,
+  pyqStyle: true,
   q: 'A B+-tree leaf node can hold at most 50 key values (order 51, i.e. 51 pointers per internal node). If the tree stores 5000 records and every leaf is packed to maximum capacity, what is the minimum possible number of leaf nodes? (Enter your numerical answer.)',
   options: [],
   answer: 100,
@@ -3037,7 +3037,7 @@ window.GATE_DATA.questions['dbms'].topics.find(function(t){return t.id==='dbms-i
 },
 {
   id: 'dbms-indexing-p2',
-  pyqYear: 2016,
+  pyqStyle: true,
   q: 'A B+-tree of order 101 (maximum 101 pointers and 100 keys per node, applying to both internal nodes and leaves) is used to index 1,000,000 records, with every node packed to maximum capacity. Counting the leaf level as one level and the root as the topmost level, how many levels does this fully-packed tree have? (Enter your numerical answer.)',
   options: [],
   answer: 3,
@@ -3049,7 +3049,7 @@ window.GATE_DATA.questions['dbms'].topics.find(function(t){return t.id==='dbms-i
 },
 {
   id: 'dbms-indexing-p3',
-  pyqYear: 2017,
+  pyqStyle: true,
   q: 'A B+-tree of order 4 has leaves that can hold up to 3 keys. A leaf currently holding the full 3 keys (10, 20, 30) receives a new insertion of key 25, causing it to temporarily hold 4 keys (10, 20, 25, 30) before splitting. Using the standard "split in half, copy first key of new right leaf up" rule, how many keys end up in the LEFT leaf after the split? (Enter your numerical answer.)',
   options: [],
   answer: 2,
@@ -3061,7 +3061,7 @@ window.GATE_DATA.questions['dbms'].topics.find(function(t){return t.id==='dbms-i
 },
 {
   id: 'dbms-indexing-p4',
-  pyqYear: 2018,
+  pyqStyle: true,
   q: 'When an internal (non-leaf) node of a B+-tree overflows and must split, which of the following correctly describes what happens to the middle key, in contrast to a leaf split?',
   options: [
     'The middle key is pushed up into the parent and REMOVED from the internal node, unlike a leaf split, where the first key of the new right leaf is COPIED up and remains in the leaf',
@@ -3077,7 +3077,7 @@ window.GATE_DATA.questions['dbms'].topics.find(function(t){return t.id==='dbms-i
 },
 {
   id: 'dbms-indexing-p5',
-  pyqYear: 2019,
+  pyqStyle: true,
   q: 'When the root of a B+-tree splits during an insertion (because the root itself overflowed), what is the effect on the tree\'s height?',
   options: [
     'The height increases by exactly 1, since a brand-new root is created above the two nodes resulting from the old root\'s split',
@@ -3093,7 +3093,7 @@ window.GATE_DATA.questions['dbms'].topics.find(function(t){return t.id==='dbms-i
 },
 {
   id: 'dbms-indexing-p6',
-  pyqYear: 2020,
+  pyqStyle: true,
   q: 'A B+-tree has height 2, meaning the root directly points to leaf nodes (root is level 1, leaves are level 2). The root can have at most p pointers (order p), and each leaf can hold at most p - 1 records. What is the minimum order p such that this 2-level tree can index at least 500 records? (Enter your numerical answer.)',
   options: [],
   answer: 23,
@@ -3105,7 +3105,7 @@ window.GATE_DATA.questions['dbms'].topics.find(function(t){return t.id==='dbms-i
 },
 {
   id: 'dbms-indexing-p7',
-  pyqYear: 2021,
+  pyqStyle: true,
   q: 'A data file has 1,000,000 records stored with a blocking factor of 100 records per block (so records are physically sorted by the index key). A sparse index has exactly one index entry per data block, and the index blocks themselves also hold 100 entries per block. How many blocks does the sparse index occupy? (Enter your numerical answer.)',
   options: [],
   answer: 100,
@@ -3117,7 +3117,7 @@ window.GATE_DATA.questions['dbms'].topics.find(function(t){return t.id==='dbms-i
 },
 {
   id: 'dbms-indexing-p8',
-  pyqYear: 2022,
+  pyqStyle: true,
   q: 'Which of the following statements comparing B-trees and B+-trees are TRUE? (Select ALL that apply)',
   options: [
     'In a B+-tree, all actual data (or record pointers) reside only at the leaf level; internal nodes hold only routing keys',
@@ -3133,7 +3133,7 @@ window.GATE_DATA.questions['dbms'].topics.find(function(t){return t.id==='dbms-i
 },
 {
   id: 'dbms-indexing-p9',
-  pyqYear: 2023,
+  pyqStyle: true,
   q: 'A B+-tree of order 101 (maximum 101 pointers and 100 keys per node) indexes 2,000,000 records with every node packed to maximum capacity. Counting the leaf level as level 1 up through the root as the topmost level, how many levels does this tree have? (Enter your numerical answer.)',
   options: [],
   answer: 4,
@@ -3145,7 +3145,7 @@ window.GATE_DATA.questions['dbms'].topics.find(function(t){return t.id==='dbms-i
 },
 {
   id: 'dbms-indexing-p10',
-  pyqYear: 2024,
+  pyqStyle: true,
   q: 'Which of the following statements about primary, clustering and secondary indexes are TRUE? (Select ALL that apply)',
   options: [
     'A primary index requires the data file to be physically sorted on a key that is also a unique (candidate/primary) key of the file',
@@ -3161,7 +3161,7 @@ window.GATE_DATA.questions['dbms'].topics.find(function(t){return t.id==='dbms-i
 },
 {
   id: 'dbms-indexing-p11',
-  pyqYear: 2025,
+  pyqStyle: true,
   q: 'A dense index has one entry per record of a data file containing 800,000 records, with each index block able to hold 200 index entries. A sparse index on the same file (which must be sorted on the index field) has one entry per data block, where each data block holds 40 records. How many FEWER blocks does the sparse index occupy compared to the dense index? (Enter your numerical answer.)',
   options: [],
   answer: 3900,
@@ -3173,7 +3173,7 @@ window.GATE_DATA.questions['dbms'].topics.find(function(t){return t.id==='dbms-i
 },
 {
   id: 'dbms-indexing-p12',
-  pyqYear: 2026,
+  pyqStyle: true,
   q: 'Which of the following statements about B+-tree deletion are TRUE? (Select ALL that apply)',
   options: [
     'If a leaf underflows (falls below the minimum occupancy) after a key is deleted, the B+-tree first tries to borrow (redistribute) a key from an adjacent sibling before resorting to merging',
@@ -3189,7 +3189,7 @@ window.GATE_DATA.questions['dbms'].topics.find(function(t){return t.id==='dbms-i
 },
 {
   id: 'dbms-indexing-p13',
-  pyqYear: 2017,
+  pyqStyle: true,
   q: 'A B+-tree of order 6 has internal nodes that can hold at most 5 keys and 6 pointers, with a minimum occupancy requirement of ceil(6/2) = 3 pointers (2 keys) for any non-root internal node. If a non-root internal node currently has exactly 3 pointers and loses one child due to a merge below it, what MUST happen to this node?',
   options: [
     'It now has only 2 pointers, violating the minimum of 3, so it must itself borrow from a sibling or merge with one',
@@ -3205,7 +3205,7 @@ window.GATE_DATA.questions['dbms'].topics.find(function(t){return t.id==='dbms-i
 },
 {
   id: 'dbms-indexing-p14',
-  pyqYear: 2021,
+  pyqStyle: true,
   q: 'Which of the following statements about hashing-based indexing (as an alternative to tree-based indexing) are TRUE? (Select ALL that apply)',
   options: [
     'Static hashing suffers from performance degradation as the data file grows well beyond the originally chosen number of buckets, due to increasing collisions and overflow chains',
@@ -3224,7 +3224,7 @@ window.GATE_DATA.questions['dbms'].topics.find(function(t){return t.id==='dbms-i
 window.GATE_DATA.questions['dbms'].topics.find(function(t){return t.id==='dbms-transactions';}).questions.push(
 {
   id: 'dbms-transactions-p1',
-  pyqYear: 2015,
+  pyqStyle: true,
   q: 'Schedule S1 = r1(A); w2(A); r2(B); w1(B), where ri/wi denote read/write by transaction Ti. Is S1 conflict serializable?',
   options: [
     'Yes, equivalent to the serial order T1, T2',
@@ -3240,7 +3240,7 @@ window.GATE_DATA.questions['dbms'].topics.find(function(t){return t.id==='dbms-t
 },
 {
   id: 'dbms-transactions-p2',
-  pyqYear: 2016,
+  pyqStyle: true,
   q: 'Schedule S4 = w1(X); w2(X); w2(Y); w1(Y). Which pair of conflicting operations, if reordered, would make this schedule conflict serializable (equivalent to a serial order)?',
   options: [
     'Swapping w2(X) and w2(Y) has no effect; the schedule is already serializable as written',
@@ -3256,7 +3256,7 @@ window.GATE_DATA.questions['dbms'].topics.find(function(t){return t.id==='dbms-t
 },
 {
   id: 'dbms-transactions-p3',
-  pyqYear: 2017,
+  pyqStyle: true,
   q: 'Schedule S5 = r1(X); w1(X); r2(X); w2(X); r1(Y); w1(Y); r2(Y); w2(Y). Which serial schedule is S5 conflict-equivalent to?',
   options: [
     'T1 followed by T2',
@@ -3272,7 +3272,7 @@ window.GATE_DATA.questions['dbms'].topics.find(function(t){return t.id==='dbms-t
 },
 {
   id: 'dbms-transactions-p4',
-  pyqYear: 2018,
+  pyqStyle: true,
   q: 'Schedule S3 involves three transactions on item A: r1(A); r2(A); w1(A); r3(A); w2(A); w3(A). How many edges does the resulting precedence graph have, and is S3 conflict serializable? (Enter the number of edges as your numerical answer; the schedule is NOT conflict serializable.)',
   options: [],
   answer: 5,
@@ -3284,7 +3284,7 @@ window.GATE_DATA.questions['dbms'].topics.find(function(t){return t.id==='dbms-t
 },
 {
   id: 'dbms-transactions-p5',
-  pyqYear: 2019,
+  pyqStyle: true,
   q: 'Schedule S = r1(A); w1(A); r2(A); w2(A); commit(T2); commit(T1), where T2 reads the value of A written by T1 (which has not yet committed) and T2 commits BEFORE T1. Is this schedule recoverable?',
   options: [
     'Yes, because T1 eventually commits after T2',
@@ -3300,7 +3300,7 @@ window.GATE_DATA.questions['dbms'].topics.find(function(t){return t.id==='dbms-t
 },
 {
   id: 'dbms-transactions-p6',
-  pyqYear: 2020,
+  pyqStyle: true,
   q: 'Schedule S = r1(A); w1(A); r2(A); w2(A); commit(T1); commit(T2), where T2 reads A (written by uncommitted T1) before T1 commits, but T1 does commit before T2 commits. Which classification best fits S?',
   options: [
     'Recoverable, and also cascadeless, since T1 committed before T2 read A',
@@ -3316,7 +3316,7 @@ window.GATE_DATA.questions['dbms'].topics.find(function(t){return t.id==='dbms-t
 },
 {
   id: 'dbms-transactions-p7',
-  pyqYear: 2021,
+  pyqStyle: true,
   q: 'Schedule S = w1(A); w2(A); commit(T1); commit(T2), where T2 overwrites A (written by uncommitted T1) before T1 commits, but T1 commits before T2 commits, and neither transaction ever reads A. Which classification best fits S?',
   options: [
     'Cascadeless, but NOT strict, because T2 wrote over T1\'s uncommitted value of A before T1 committed',
@@ -3332,7 +3332,7 @@ window.GATE_DATA.questions['dbms'].topics.find(function(t){return t.id==='dbms-t
 },
 {
   id: 'dbms-transactions-p8',
-  pyqYear: 2022,
+  pyqStyle: true,
   q: 'Schedule S = r1(A); w1(A); commit(T1); r2(A); w2(A); commit(T2). Which is the STRONGEST classification that correctly applies to S among recoverable, cascadeless, and strict?',
   options: [
     'Recoverable only',
@@ -3348,7 +3348,7 @@ window.GATE_DATA.questions['dbms'].topics.find(function(t){return t.id==='dbms-t
 },
 {
   id: 'dbms-transactions-p9',
-  pyqYear: 2023,
+  pyqStyle: true,
   q: 'Which of the following statements about the Two-Phase Locking (2PL) protocol are TRUE? (Select ALL that apply)',
   options: [
     'In the growing phase, a transaction may only acquire locks, never release any; in the shrinking phase, it may only release locks, never acquire any',
@@ -3364,7 +3364,7 @@ window.GATE_DATA.questions['dbms'].topics.find(function(t){return t.id==='dbms-t
 },
 {
   id: 'dbms-transactions-p10',
-  pyqYear: 2024,
+  pyqStyle: true,
   q: 'Which of the following statements about deadlock under Two-Phase Locking (2PL) are TRUE? (Select ALL that apply)',
   options: [
     'A deadlock can be represented as a cycle in a wait-for graph, where an edge Ti -> Tj means Ti is waiting for a lock currently held by Tj',
@@ -3380,7 +3380,7 @@ window.GATE_DATA.questions['dbms'].topics.find(function(t){return t.id==='dbms-t
 },
 {
   id: 'dbms-transactions-p11',
-  pyqYear: 2025,
+  pyqStyle: true,
   q: 'Under the basic Timestamp Ordering (TO) protocol, transaction Ti (with timestamp TS(Ti)) attempts to WRITE data item Q. Let R-TS(Q) and W-TS(Q) denote the largest timestamps of any transaction that has successfully read and written Q so far, respectively. Under which condition(s) must Ti\'s write be REJECTED and Ti rolled back? (Select ALL that apply)',
   options: [
     'TS(Ti) < R-TS(Q), because a transaction with a larger timestamp already read Q, expecting to see writes only from transactions ordered before it',
@@ -3396,7 +3396,7 @@ window.GATE_DATA.questions['dbms'].topics.find(function(t){return t.id==='dbms-t
 },
 {
   id: 'dbms-transactions-p12',
-  pyqYear: 2026,
+  pyqStyle: true,
   q: 'Which of the following statements about the Thomas Write Rule (a modification of basic Timestamp Ordering) are TRUE? (Select ALL that apply)',
   options: [
     'When TS(Ti) < W-TS(Q), instead of rejecting Ti\'s write and rolling it back, the Thomas Write Rule simply IGNORES (skips) that write and lets Ti continue',
@@ -3412,7 +3412,7 @@ window.GATE_DATA.questions['dbms'].topics.find(function(t){return t.id==='dbms-t
 },
 {
   id: 'dbms-transactions-p13',
-  pyqYear: 2018,
+  pyqStyle: true,
   q: 'Schedule S6 has three transactions each accessing entirely disjoint sets of data items: r1(A); r2(B); w1(A); r3(C); w2(B); w3(C). How many edges does the precedence graph of S6 contain, and is S6 conflict serializable? (Enter the number of edges as your numerical answer; note the schedule IS conflict serializable regardless of the count.)',
   options: [],
   answer: 0,
@@ -3424,7 +3424,7 @@ window.GATE_DATA.questions['dbms'].topics.find(function(t){return t.id==='dbms-t
 },
 {
   id: 'dbms-transactions-p14',
-  pyqYear: 2020,
+  pyqStyle: true,
   q: 'Schedule S7 = r1(A); w2(A); r3(A); w1(B); r2(B); w3(B). Compute the precedence graph and determine: is S7 conflict serializable, and if so, what is the unique equivalent serial order?',
   options: [
     'Conflict serializable, equivalent to T1, T2, T3',

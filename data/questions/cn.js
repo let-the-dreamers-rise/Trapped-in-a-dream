@@ -2103,7 +2103,7 @@ window.GATE_DATA.questions['cn'].topics.find(function(t){return t.id==='cn-trans
 window.GATE_DATA.questions['cn'].topics.find(function(t){return t.id==='cn-network';}).questions.push(
   {
     id: "cn-network-p1",
-    pyqYear: 2015,
+    pyqStyle: true,
     q: "A network administrator has the block 172.16.0.0/16 and must carve out one subnet large enough for 500 hosts, using Variable Length Subnet Masking (VLSM) so that the subnet wastes as few addresses as possible. What is the longest prefix length that still supports at least 500 usable host addresses?",
     options: ["/21", "/22", "/23", "/24"],
     answer: 2,
@@ -2114,7 +2114,7 @@ window.GATE_DATA.questions['cn'].topics.find(function(t){return t.id==='cn-netwo
   },
   {
     id: "cn-network-p2",
-    pyqYear: 2016,
+    pyqStyle: true,
     q: "An organization owns eight contiguous /24 blocks: 10.20.32.0/24 through 10.20.39.0/24. What is the single CIDR block that exactly summarizes all eight, with no extra addresses included?",
     options: ["10.20.32.0/20", "10.20.32.0/21", "10.20.32.0/22", "10.20.32.0/23"],
     answer: 1,
@@ -2125,7 +2125,7 @@ window.GATE_DATA.questions['cn'].topics.find(function(t){return t.id==='cn-netwo
   },
   {
     id: "cn-network-p3",
-    pyqYear: 2017,
+    pyqStyle: true,
     q: "A router's forwarding table has three entries: 172.20.0.0/16 via next-hop A, 172.20.16.0/20 via next-hop B, and 172.20.16.0/22 via next-hop C. Using longest-prefix matching, which next hop is chosen for a packet destined to 172.20.18.10?",
     options: ["A", "B", "C", "The packet cannot be forwarded; no entry matches"],
     answer: 2,
@@ -2136,7 +2136,7 @@ window.GATE_DATA.questions['cn'].topics.find(function(t){return t.id==='cn-netwo
   },
   {
     id: "cn-network-p4",
-    pyqYear: 2018,
+    pyqStyle: true,
     q: "An IP datagram has a total length of 3200 bytes, including its 20-byte header, giving a 3180-byte payload. It must cross a network with an MTU of 620 bytes (including a 20-byte IP header per fragment, so each fragment can carry at most 600 bytes of payload, already a multiple of 8). Into how many fragments must this datagram be split?",
     options: ["4", "5", "6", "7"],
     answer: 2,
@@ -2147,7 +2147,7 @@ window.GATE_DATA.questions['cn'].topics.find(function(t){return t.id==='cn-netwo
   },
   {
     id: "cn-network-p5",
-    pyqYear: 2019,
+    pyqStyle: true,
     q: "Continuing the same fragmentation scenario (3180-byte payload, 600-byte maximum fragment payload, 6 fragments total), what Fragmentation Offset value (in 8-byte units) does the last fragment carry, and what is the More Fragments (MF) flag set to in that last fragment?",
     options: ["Offset = 300, MF = 1", "Offset = 375, MF = 0", "Offset = 600, MF = 0", "Offset = 375, MF = 1"],
     answer: 1,
@@ -2158,7 +2158,7 @@ window.GATE_DATA.questions['cn'].topics.find(function(t){return t.id==='cn-netwo
   },
   {
     id: "cn-network-p6",
-    pyqYear: 2020,
+    pyqStyle: true,
     q: "Router M runs a distance-vector protocol and has three neighbours A, B, and C for reaching destination Z, with direct link costs M-A = 3, M-B = 2, and M-C = 5. The neighbours currently advertise their own best distances to Z as: A advertises 4, B advertises 6, and C advertises 1. What is router M's new best cost to Z after this update, and via which neighbour?",
     options: ["Cost 6, via C", "Cost 6, via A", "Cost 7, via A", "Cost 8, via B"],
     answer: 0,
@@ -2169,7 +2169,7 @@ window.GATE_DATA.questions['cn'].topics.find(function(t){return t.id==='cn-netwo
   },
   {
     id: "cn-network-p7",
-    pyqYear: 2021,
+    pyqStyle: true,
     q: "A NAT (Network Address Translation) router has exactly one public IPv4 address and dedicates the port range 1024 to 5119 (inclusive) for translating outbound TCP connections. Assuming each simultaneous connection to any external server needs its own distinct translated port number, what is the maximum number of simultaneous outbound TCP connections this NAT router can support?",
     options: [],
     kind: "nat",
@@ -2181,7 +2181,7 @@ window.GATE_DATA.questions['cn'].topics.find(function(t){return t.id==='cn-netwo
   },
   {
     id: "cn-network-p8",
-    pyqYear: 2022,
+    pyqStyle: true,
     q: "An organization is allocated a single /20 block and wants to split it into the maximum possible number of equal-sized /26 subnets. How many /26 subnets can be created from this /20 block?",
     options: [],
     kind: "nat",
@@ -2193,7 +2193,7 @@ window.GATE_DATA.questions['cn'].topics.find(function(t){return t.id==='cn-netwo
   },
   {
     id: "cn-network-p9",
-    pyqYear: 2023,
+    pyqStyle: true,
     q: "In distance-vector routing, split horizon with poison reverse is used to help mitigate the count-to-infinity problem. Which statement correctly describes what it does, and what it does NOT guarantee?",
     options: ["It advertises an infinite-cost route back to the neighbour a route was learned from, which prevents count-to-infinity in every possible topology including three-or-more-router loops", "It advertises an infinite-cost route back to the neighbour a route was learned from (rather than staying silent), which helps in simple two-router loops but does not eliminate count-to-infinity in all topologies, such as loops through three or more routers", "It physically disconnects the link to the neighbour whenever a route becomes unreachable", "It replaces distance-vector routing entirely with link-state routing whenever a failure is detected"],
     answer: 1,
@@ -2204,7 +2204,7 @@ window.GATE_DATA.questions['cn'].topics.find(function(t){return t.id==='cn-netwo
   },
   {
     id: "cn-network-p10",
-    pyqYear: 2024,
+    pyqStyle: true,
     q: "A host is configured with IP address 192.168.5.130 and subnet mask 255.255.255.224 (a /27 prefix). What are the network address and the broadcast address of the subnet this host belongs to?",
     options: ["Network 192.168.5.128, Broadcast 192.168.5.159", "Network 192.168.5.96, Broadcast 192.168.5.127", "Network 192.168.5.128, Broadcast 192.168.5.191", "Network 192.168.5.130, Broadcast 192.168.5.255"],
     answer: 0,
@@ -2215,7 +2215,7 @@ window.GATE_DATA.questions['cn'].topics.find(function(t){return t.id==='cn-netwo
   },
   {
     id: "cn-network-p11",
-    pyqYear: 2025,
+    pyqStyle: true,
     q: "An IP datagram has a total length of 5000 bytes, including its 20-byte header, giving a 4980-byte payload. It must cross a link with an MTU of 1000 bytes (including a 20-byte header per fragment, so the maximum usable payload per fragment must be rounded down to the nearest multiple of 8, giving 976 bytes). How many fragments are produced, and what is the Fragmentation Offset (in 8-byte units) of the last fragment?",
     options: ["5 fragments, offset 488", "6 fragments, offset 488", "6 fragments, offset 610", "7 fragments, offset 610"],
     answer: 2,
@@ -2226,7 +2226,7 @@ window.GATE_DATA.questions['cn'].topics.find(function(t){return t.id==='cn-netwo
   },
   {
     id: "cn-network-p12",
-    pyqYear: 2026,
+    pyqStyle: true,
     q: "A router's forwarding table has a default route 0.0.0.0/0 via G, along with 198.51.100.0/24 via H and 198.51.100.64/26 via I. Using longest-prefix matching, which next hop handles a packet destined to 198.51.100.70?",
     options: ["G, since the default route always takes priority when other routes also match", "H, because /24 is a more commonly used prefix length for this address range", "I, because /26 is the longest matching prefix among all three entries", "The packet is dropped since three entries match ambiguously"],
     answer: 2,
@@ -2237,7 +2237,7 @@ window.GATE_DATA.questions['cn'].topics.find(function(t){return t.id==='cn-netwo
   },
   {
     id: "cn-network-p13",
-    pyqYear: 2015,
+    pyqStyle: true,
     q: "An IPv4 header's checksum field is set to all zeros before computing the checksum. The remaining header, split into 16-bit words, is: 0x4500, 0x003C, 0x1234, 0x0000. Using the standard IPv4 ones-complement checksum algorithm (sum all words with end-around carry, then take the ones complement), what value is inserted into the checksum field?",
     options: ["0x5770", "0xA88F", "0xB88F", "0x5771"],
     answer: 1,
@@ -2248,7 +2248,7 @@ window.GATE_DATA.questions['cn'].topics.find(function(t){return t.id==='cn-netwo
   },
   {
     id: "cn-network-p14",
-    pyqYear: 2017,
+    pyqStyle: true,
     q: "The class C network 200.10.10.0/24 must be divided into exactly 4 equal-sized subnets. What subnet mask should be used, and how many usable host addresses does each resulting subnet have?",
     options: ["Mask 255.255.255.192 (/26), 62 usable hosts per subnet", "Mask 255.255.255.224 (/27), 30 usable hosts per subnet", "Mask 255.255.255.128 (/25), 126 usable hosts per subnet", "Mask 255.255.255.240 (/28), 14 usable hosts per subnet"],
     answer: 0,
@@ -2262,7 +2262,7 @@ window.GATE_DATA.questions['cn'].topics.find(function(t){return t.id==='cn-netwo
 window.GATE_DATA.questions['cn'].topics.find(function(t){return t.id==='cn-datalink';}).questions.push(
   {
     id: "cn-datalink-p1",
-    pyqYear: 2015,
+    pyqStyle: true,
     q: "Two stations are 1000 km apart, connected by a 100 Mbps link with signal propagation speed 2 x 10^8 m/s. Station A sends 8000-bit frames to B using the stop-and-wait ARQ protocol, waiting for each frame's acknowledgement (of negligible size and transmission time) before sending the next. What is the link utilization (efficiency)?",
     options: ["0.794%", "1.59%", "7.94%", "50%"],
     answer: 0,
@@ -2273,7 +2273,7 @@ window.GATE_DATA.questions['cn'].topics.find(function(t){return t.id==='cn-datal
   },
   {
     id: "cn-datalink-p2",
-    pyqYear: 2016,
+    pyqStyle: true,
     q: "For the same link (100 Mbps, 1000 km, propagation speed 2 x 10^8 m/s, 8000-bit frames, giving a = tp/tf = 62.5), what is the minimum sliding-window size W needed so the sender can transmit continuously with 100% link utilization (never idling waiting for an ACK)?",
     options: [],
     kind: "nat",
@@ -2285,7 +2285,7 @@ window.GATE_DATA.questions['cn'].topics.find(function(t){return t.id==='cn-datal
   },
   {
     id: "cn-datalink-p3",
-    pyqYear: 2017,
+    pyqStyle: true,
     q: "Continuing the same scenario (minimum window size 126 needed for 100% utilization), if Go-Back-N (GBN) is used, what is the minimum number of bits required in the frame sequence number field?",
     options: ["5", "6", "7", "8"],
     answer: 2,
@@ -2296,7 +2296,7 @@ window.GATE_DATA.questions['cn'].topics.find(function(t){return t.id==='cn-datal
   },
   {
     id: "cn-datalink-p4",
-    pyqYear: 2018,
+    pyqStyle: true,
     q: "Continuing the same scenario (minimum window size 126), if Selective Repeat (SR) is used instead of GBN, what is the minimum number of bits required in the frame sequence number field?",
     options: ["6", "7", "8", "9"],
     answer: 2,
@@ -2307,7 +2307,7 @@ window.GATE_DATA.questions['cn'].topics.find(function(t){return t.id==='cn-datal
   },
   {
     id: "cn-datalink-p5",
-    pyqYear: 2019,
+    pyqStyle: true,
     q: "Two stations using CSMA/CD are separated by 8 km on a 10 Mbps bus, with signal propagation speed 2 x 10^8 m/s. What is the minimum frame size (in bits) required so that a transmitting station is guaranteed to still be transmitting when a collision signal could arrive back from the far end?",
     options: ["400 bits", "800 bits", "1000 bits", "1600 bits"],
     answer: 1,
@@ -2318,7 +2318,7 @@ window.GATE_DATA.questions['cn'].topics.find(function(t){return t.id==='cn-datal
   },
   {
     id: "cn-datalink-p6",
-    pyqYear: 2020,
+    pyqStyle: true,
     q: "A sender wants to protect the 9-bit dataword 110101001 using a CRC with the 4-bit generator polynomial represented as 1011 (i.e. x^3 + x + 1). After appending 3 zero bits and performing modulo-2 division by 1011, what is the 3-bit CRC remainder that gets appended to form the transmitted codeword?",
     options: ["000", "001", "011", "101"],
     answer: 1,
@@ -2329,7 +2329,7 @@ window.GATE_DATA.questions['cn'].topics.find(function(t){return t.id==='cn-datal
   },
   {
     id: "cn-datalink-p7",
-    pyqYear: 2021,
+    pyqStyle: true,
     q: "A sliding-window protocol operates on a 2 Mbps link where each frame is 2000 bits (so transmission time tf = 1 ms) and the one-way propagation delay is 9.5 ms. If the sender's window size is fixed at W = 5 frames, what is the resulting link utilization?",
     options: ["12.5%", "20%", "25%", "50%"],
     answer: 2,
@@ -2340,7 +2340,7 @@ window.GATE_DATA.questions['cn'].topics.find(function(t){return t.id==='cn-datal
   },
   {
     id: "cn-datalink-p8",
-    pyqYear: 2022,
+    pyqStyle: true,
     q: "For the same link (a = tp/tf = 9.5), what is the minimum window size needed to achieve 100% link utilization?",
     options: [],
     kind: "nat",
@@ -2352,7 +2352,7 @@ window.GATE_DATA.questions['cn'].topics.find(function(t){return t.id==='cn-datal
   },
   {
     id: "cn-datalink-p9",
-    pyqYear: 2023,
+    pyqStyle: true,
     q: "For that same link requiring a minimum window of 20 frames for full utilization, what is the minimum number of sequence-number bits needed if Go-Back-N (GBN) is used?",
     options: ["4", "5", "6", "20"],
     answer: 1,
@@ -2363,7 +2363,7 @@ window.GATE_DATA.questions['cn'].topics.find(function(t){return t.id==='cn-datal
   },
   {
     id: "cn-datalink-p10",
-    pyqYear: 2024,
+    pyqStyle: true,
     q: "For that same link requiring a minimum window of 20 frames for full utilization, what is the minimum number of sequence-number bits needed if Selective Repeat (SR) is used instead?",
     options: ["5", "6", "7", "10"],
     answer: 1,
@@ -2374,7 +2374,7 @@ window.GATE_DATA.questions['cn'].topics.find(function(t){return t.id==='cn-datal
   },
   {
     id: "cn-datalink-p11",
-    pyqYear: 2025,
+    pyqStyle: true,
     q: "A data-link protocol uses bit stuffing with the standard HDLC rule: after any five consecutive 1-bits in the data, a 0 is inserted before transmission (and removed by the receiver), so that the true 6-consecutive-1s flag pattern never appears inside the data. Given the 22-bit data payload 0111111011111101111110, how many extra 0-bits does the stuffing process insert in total?",
     options: [],
     kind: "nat",
@@ -2386,7 +2386,7 @@ window.GATE_DATA.questions['cn'].topics.find(function(t){return t.id==='cn-datal
   },
   {
     id: "cn-datalink-p12",
-    pyqYear: 2026,
+    pyqStyle: true,
     q: "In CSMA/CD with binary exponential backoff, a station experiences its 4th consecutive collision on a given frame. From how many distinct integer values can it now randomly choose its backoff count k (in units of slot time), and what is the maximum possible number of slot times it might have to wait?",
     options: ["8 values (0 to 7); maximum wait 7 slot times", "16 values (0 to 15); maximum wait 15 slot times", "4 values (0 to 3); maximum wait 3 slot times", "32 values (0 to 31); maximum wait 31 slot times"],
     answer: 1,
@@ -2397,7 +2397,7 @@ window.GATE_DATA.questions['cn'].topics.find(function(t){return t.id==='cn-datal
   },
   {
     id: "cn-datalink-p13",
-    pyqYear: 2016,
+    pyqStyle: true,
     q: "A block error-correcting code is designed with a minimum Hamming distance of 6 between any two valid codewords. What is the maximum number of bit errors this code is guaranteed to detect, and the maximum number it is guaranteed to correct?",
     options: ["Detect 6, correct 3", "Detect 5, correct 2", "Detect 5, correct 3", "Detect 6, correct 2"],
     answer: 1,
@@ -2408,7 +2408,7 @@ window.GATE_DATA.questions['cn'].topics.find(function(t){return t.id==='cn-datal
   },
   {
     id: "cn-datalink-p14",
-    pyqYear: 2019,
+    pyqStyle: true,
     q: "In the basic stop-and-wait ARQ protocol (assuming reliable, though possibly delayed or duplicated, delivery over the link), what is the minimum number of distinct sequence numbers that must be used to correctly distinguish a new frame from a delayed duplicate of the previous frame?",
     options: ["1", "2", "4", "As many as the number of frames sent in the entire session"],
     answer: 1,
@@ -2422,7 +2422,7 @@ window.GATE_DATA.questions['cn'].topics.find(function(t){return t.id==='cn-datal
 window.GATE_DATA.questions['cn'].topics.find(function(t){return t.id==='cn-transport';}).questions.push(
   {
     id: "cn-transport-p1",
-    pyqYear: 2015,
+    pyqStyle: true,
     q: "Host A sends a TCP segment to host B with sequence number 100, carrying 200 bytes of data. Host B then sends a reply segment with sequence number 500 and acknowledgement number 300 (acknowledging A's data), carrying 100 bytes of its own data back to A. What sequence number and acknowledgement number does A's next segment to B carry?",
     options: ["Sequence 300, Acknowledgement 500", "Sequence 300, Acknowledgement 600", "Sequence 200, Acknowledgement 600", "Sequence 300, Acknowledgement 300"],
     answer: 1,
@@ -2433,7 +2433,7 @@ window.GATE_DATA.questions['cn'].topics.find(function(t){return t.id==='cn-trans
   },
   {
     id: "cn-transport-p2",
-    pyqYear: 2016,
+    pyqStyle: true,
     q: "A TCP connection begins with ssthresh = 16 (in segments) and cwnd = 1. Using standard slow start (cwnd doubles each RTT until reaching ssthresh) followed by congestion avoidance (cwnd increases by 1 each RTT), what is cwnd at the start of round 9, immediately before a timeout is detected?",
     options: [],
     kind: "nat",
@@ -2445,7 +2445,7 @@ window.GATE_DATA.questions['cn'].topics.find(function(t){return t.id==='cn-trans
   },
   {
     id: "cn-transport-p3",
-    pyqYear: 2017,
+    pyqStyle: true,
     q: "Continuing the same TCP connection (timeout detected with cwnd = 20 at round 9), the standard timeout response sets ssthresh = cwnd/2 and resets cwnd = 1, restarting slow start. After this reset, at which round number does cwnd first reach the new ssthresh value (i.e., when does the connection switch back to congestion avoidance)?",
     options: ["Round 12", "Round 13", "Round 14", "Round 15"],
     answer: 2,
@@ -2456,7 +2456,7 @@ window.GATE_DATA.questions['cn'].topics.find(function(t){return t.id==='cn-trans
   },
   {
     id: "cn-transport-p4",
-    pyqYear: 2018,
+    pyqStyle: true,
     q: "A TCP sender detects packet loss in two different ways: via a retransmission timeout (RTO expiry) versus via receiving three duplicate ACKs (triggering fast retransmit). According to the standard TCP congestion-control model taught for GATE, how does the sender's response to these two events differ?",
     options: ["Both events cause identical behaviour: ssthresh is halved and cwnd resets to 1, restarting slow start", "On a timeout, ssthresh is halved and cwnd resets to 1 (restarting slow start); on triple duplicate ACKs, ssthresh is halved and cwnd is also set to that same halved value, remaining in (or entering) congestion avoidance without dropping to 1", "On a timeout, cwnd is left completely unchanged; only triple duplicate ACKs reduce cwnd", "Triple duplicate ACKs are ignored entirely by TCP; only timeouts trigger any congestion response"],
     answer: 1,
@@ -2467,7 +2467,7 @@ window.GATE_DATA.questions['cn'].topics.find(function(t){return t.id==='cn-trans
   },
   {
     id: "cn-transport-p5",
-    pyqYear: 2019,
+    pyqStyle: true,
     q: "A TCP sender's cwnd is 20 segments when it receives three duplicate ACKs, triggering fast retransmit. Following the standard model (ssthresh = cwnd/2, then cwnd = ssthresh, remaining in congestion avoidance), what is cwnd one round-trip time after this event?",
     options: ["10", "11", "15", "20"],
     answer: 1,
@@ -2478,7 +2478,7 @@ window.GATE_DATA.questions['cn'].topics.find(function(t){return t.id==='cn-trans
   },
   {
     id: "cn-transport-p6",
-    pyqYear: 2020,
+    pyqStyle: true,
     q: "A TCP connection has a fixed send window of 64 KB (65536 bytes) and the round-trip time to the receiver is 100 ms. Ignoring all other delays and assuming the sender always has data ready to send, what is the maximum achievable throughput of this connection?",
     options: ["3.2 Mbps", "5.24 Mbps", "6.4 Mbps", "10.48 Mbps"],
     answer: 1,
@@ -2489,7 +2489,7 @@ window.GATE_DATA.questions['cn'].topics.find(function(t){return t.id==='cn-trans
   },
   {
     id: "cn-transport-p7",
-    pyqYear: 2021,
+    pyqStyle: true,
     q: "A path has available bandwidth 10 Mbps and round-trip time 50 ms. What is the bandwidth-delay product of this path, in bytes — i.e., the minimum TCP window size (in bytes) needed to keep the pipe fully utilized?",
     options: [],
     kind: "nat",
@@ -2501,7 +2501,7 @@ window.GATE_DATA.questions['cn'].topics.find(function(t){return t.id==='cn-trans
   },
   {
     id: "cn-transport-p8",
-    pyqYear: 2022,
+    pyqStyle: true,
     q: "A server machine simultaneously handles two independent TCP connections from two different client processes, both connecting to the exact same server IP address and the exact same server port number 80. What allows the server's operating system to correctly distinguish and demultiplex data belonging to these two separate connections?",
     options: ["It is impossible; a server can only handle one connection per port at a time", "The full 4-tuple (source IP, source port, destination IP, destination port) uniquely identifies each connection, so differing client IPs or client ports make the two connections distinct even though the server IP and port match", "The server assigns each connection a different destination port internally, even though the client believes it connected to port 80", "TCP uses only the destination port for demultiplexing, so this scenario is not actually possible"],
     answer: 1,
@@ -2512,7 +2512,7 @@ window.GATE_DATA.questions['cn'].topics.find(function(t){return t.id==='cn-trans
   },
   {
     id: "cn-transport-p9",
-    pyqYear: 2023,
+    pyqStyle: true,
     q: "In TCP flow control (as opposed to congestion control), the receiver advertises a window size in every ACK segment it sends back to the sender. If host B's TCP receive buffer is nearly full and it advertises a window size of 0, what must the sender do?",
     options: ["Immediately close the connection, since a zero window means the receiver has failed", "Stop sending new data (except small probe segments sent periodically to check if the window has reopened) until B advertises a nonzero window again", "Ignore the advertised window and continue sending at the same rate, since flow control is only advisory", "Switch the connection from TCP to UDP to avoid the flow-control restriction"],
     answer: 1,
@@ -2523,7 +2523,7 @@ window.GATE_DATA.questions['cn'].topics.find(function(t){return t.id==='cn-trans
   },
   {
     id: "cn-transport-p10",
-    pyqYear: 2024,
+    pyqStyle: true,
     q: "A TCP sender uses a Maximum Segment Size (MSS) of 1460 bytes of application data per segment, with a combined TCP + IP header overhead of 40 bytes per segment (20 bytes each). Over a 10 Mbps link running at full capacity, what is the effective application-level throughput (goodput), accounting for this header overhead?",
     options: ["8.90 Mbps", "9.33 Mbps", "9.73 Mbps", "10.00 Mbps"],
     answer: 2,
@@ -2534,7 +2534,7 @@ window.GATE_DATA.questions['cn'].topics.find(function(t){return t.id==='cn-trans
   },
   {
     id: "cn-transport-p11",
-    pyqYear: 2025,
+    pyqStyle: true,
     q: "TCP's congestion avoidance phase uses an Additive-Increase, Multiplicative-Decrease (AIMD) strategy. Which statement correctly describes why AIMD, rather than, say, Multiplicative-Increase Multiplicative-Decrease (MIMD), is used for TCP's congestion window adjustment?",
     options: ["AIMD converges towards fair, stable bandwidth-sharing among competing connections, since additive increase probes gently for spare capacity while multiplicative decrease backs off sharply and quickly upon detecting congestion; MIMD's aggressive multiplicative growth can instead amplify unfairness and oscillate wildly", "AIMD was chosen purely for historical, arbitrary reasons with no mathematical justification for fairness or stability", "MIMD actually provides strictly better throughput and fairness than AIMD in every scenario, but is harder to implement", "AIMD only affects the receiver's advertised window, never the sender's actual congestion window"],
     answer: 0,
@@ -2545,7 +2545,7 @@ window.GATE_DATA.questions['cn'].topics.find(function(t){return t.id==='cn-trans
   },
   {
     id: "cn-transport-p12",
-    pyqYear: 2026,
+    pyqStyle: true,
     q: "TCP estimates its retransmission timeout using Jacobson's exponentially weighted moving average: EstimatedRTT_new = (1 - alpha) x EstimatedRTT_old + alpha x SampleRTT, with the standard alpha = 0.125. If the current EstimatedRTT is 100 ms and a fresh SampleRTT measurement of 120 ms is observed, what is the updated EstimatedRTT?",
     options: [],
     kind: "nat",
@@ -2557,7 +2557,7 @@ window.GATE_DATA.questions['cn'].topics.find(function(t){return t.id==='cn-trans
   },
   {
     id: "cn-transport-p13",
-    pyqYear: 2016,
+    pyqStyle: true,
     q: "During TCP's three-way handshake, host A sends a SYN segment with an Initial Sequence Number (ISN) of 3000. Host B replies with SYN+ACK, using its own ISN of 8000. What sequence number and acknowledgement number does B's SYN+ACK segment carry?",
     options: ["Sequence 8000, Acknowledgement 3000", "Sequence 8000, Acknowledgement 3001", "Sequence 8001, Acknowledgement 3000", "Sequence 3001, Acknowledgement 8000"],
     answer: 1,
@@ -2568,7 +2568,7 @@ window.GATE_DATA.questions['cn'].topics.find(function(t){return t.id==='cn-trans
   },
   {
     id: "cn-transport-p14",
-    pyqYear: 2019,
+    pyqStyle: true,
     q: "The TCP checksum is computed over a pseudo-header (containing the source IP, destination IP, protocol number, and TCP segment length) in addition to the TCP header and data. Why does TCP deliberately include this network-layer information from the IP header in its own checksum computation, even though IP has its own separate header checksum?",
     options: ["It is redundant and serves no purpose; TCP could safely skip it since IP already checks its own header", "It lets TCP detect certain misdelivered segments, such as ones that arrived at the wrong destination IP address or were incorrectly attributed to the wrong upper-layer protocol, which IP's own header checksum (covering only the IP header, not these end-to-end associations) would not catch", "It allows TCP to encrypt the segment using the IP addresses as a key", "It is required so that NAT routers can rewrite the checksum without needing to touch the TCP header at all"],
     answer: 1,
@@ -2582,7 +2582,7 @@ window.GATE_DATA.questions['cn'].topics.find(function(t){return t.id==='cn-trans
 window.GATE_DATA.questions['cn'].topics.find(function(t){return t.id==='cn-application';}).questions.push(
   {
     id: "cn-application-p1",
-    pyqYear: 2015,
+    pyqStyle: true,
     q: "A browser must fetch a base HTML page plus 5 embedded objects, all hosted on the same server. Assume 1 RTT is needed for the initial DNS lookup (only once), transmission and processing times are negligible, and the browser uses non-persistent HTTP with no parallel connections (each object requires its own separate serial TCP connection). How many total RTTs elapse from starting the DNS lookup until all 6 items (page + 5 objects) are fully received?",
     options: [],
     kind: "nat",
@@ -2594,7 +2594,7 @@ window.GATE_DATA.questions['cn'].topics.find(function(t){return t.id==='cn-appli
   },
   {
     id: "cn-application-p2",
-    pyqYear: 2016,
+    pyqStyle: true,
     q: "Continuing the same scenario (1 base page + 5 embedded objects, 1 RTT DNS lookup), if the browser instead uses non-persistent HTTP but is allowed up to 3 parallel TCP connections simultaneously, how many total RTTs elapse until everything is received?",
     options: ["5", "6", "7", "9"],
     answer: 2,
@@ -2605,7 +2605,7 @@ window.GATE_DATA.questions['cn'].topics.find(function(t){return t.id==='cn-appli
   },
   {
     id: "cn-application-p3",
-    pyqYear: 2017,
+    pyqStyle: true,
     q: "Continuing the same scenario (1 base page + 5 embedded objects, 1 RTT DNS lookup), if the browser instead uses persistent HTTP with pipelining (a single TCP connection is reused, and all requests for the 5 objects are sent back-to-back without waiting for individual responses), how many total RTTs elapse until everything is received?",
     options: ["2", "3", "4", "6"],
     answer: 2,
@@ -2616,7 +2616,7 @@ window.GATE_DATA.questions['cn'].topics.find(function(t){return t.id==='cn-appli
   },
   {
     id: "cn-application-p4",
-    pyqYear: 2018,
+    pyqStyle: true,
     q: "Continuing the same scenario once more, if the browser uses persistent HTTP but WITHOUT pipelining (the same TCP connection is reused for every object, but each object's request must still wait for the previous object's response before being sent), how many total RTTs elapse until everything is received?",
     options: ["4", "6", "7", "8"],
     answer: 3,
@@ -2627,7 +2627,7 @@ window.GATE_DATA.questions['cn'].topics.find(function(t){return t.id==='cn-appli
   },
   {
     id: "cn-application-p5",
-    pyqYear: 2019,
+    pyqStyle: true,
     q: "A client's local DNS server has an empty cache (no records for root, TLD, or authoritative servers) and must resolve a domain name using iterative queries: it queries the root server, then the appropriate TLD server, then the authoritative server for that domain, one after another. Assuming every query-response round trip (client-to-local-server, and each of the local server's three iterative queries) takes exactly 1 RTT, how many total RTTs elapse before the client receives the final resolved IP address?",
     options: [],
     kind: "nat",
@@ -2639,7 +2639,7 @@ window.GATE_DATA.questions['cn'].topics.find(function(t){return t.id==='cn-appli
   },
   {
     id: "cn-application-p6",
-    pyqYear: 2020,
+    pyqStyle: true,
     q: "In the DNS hierarchy, what is the key difference between a recursive query and an iterative query, as used between a client, its local DNS server, and the root/TLD/authoritative servers?",
     options: ["A recursive query means the server receiving it takes full responsibility for obtaining the complete final answer (possibly by issuing further queries of its own) before replying; an iterative query means the server receiving it may simply reply with a referral to another server that might know better, rather than the final answer itself", "A recursive query always takes exactly one RTT while an iterative query always takes multiple RTTs, regardless of caching", "Iterative queries are used only for IPv6 addresses, recursive queries only for IPv4", "There is no functional difference; the terms are interchangeable synonyms for the same query mechanism"],
     answer: 0,
@@ -2650,7 +2650,7 @@ window.GATE_DATA.questions['cn'].topics.find(function(t){return t.id==='cn-appli
   },
   {
     id: "cn-application-p7",
-    pyqYear: 2021,
+    pyqStyle: true,
     q: "FTP (File Transfer Protocol) is unusual among common application-layer protocols in that it uses two separate TCP connections for a single file-transfer session. What is each connection used for?",
     options: ["One connection carries only usernames/passwords; the other carries only file data, with no other information", "A control connection (typically port 21) stays open for the entire session carrying commands and status replies (like login, directory listing, file requests); a separate data connection (typically port 20 in active mode, or a negotiated port in passive mode) is opened only when actual file data needs to be transferred, and is closed after each transfer", "Both connections carry identical duplicate data for redundancy against packet loss", "One connection is TCP and the other is UDP, used interchangeably depending on file size"],
     answer: 1,
@@ -2661,7 +2661,7 @@ window.GATE_DATA.questions['cn'].topics.find(function(t){return t.id==='cn-appli
   },
   {
     id: "cn-application-p8",
-    pyqYear: 2022,
+    pyqStyle: true,
     q: "Why can SMTP (Simple Mail Transfer Protocol) not be used by an email client to retrieve (download) new messages waiting in a user's mailbox on their mail server, requiring a separate protocol like POP3 or IMAP instead?",
     options: ["SMTP is a push protocol, designed for a client (or relaying server) to push/send mail toward a destination mail server; it has no mechanism for a client to pull or query for mail waiting in a mailbox, which is exactly the pull-oriented job POP3 and IMAP are designed for", "SMTP cannot run over TCP, only UDP, making mailbox retrieval technically impossible", "SMTP is only used for encrypting emails, not for any actual transfer", "POP3 and IMAP are simply older, deprecated names for SMTP itself"],
     answer: 0,
@@ -2672,7 +2672,7 @@ window.GATE_DATA.questions['cn'].topics.find(function(t){return t.id==='cn-appli
   },
   {
     id: "cn-application-p9",
-    pyqYear: 2023,
+    pyqStyle: true,
     q: "A browser has a locally cached copy of an image and sends a conditional GET request to the origin server using an If-Modified-Since header. If the image has NOT changed since that cached timestamp, what does the server send back, and what benefit does this provide over an unconditional GET?",
     options: ["The server sends a fresh full copy of the image regardless, since conditional GET has no effect on the response body", "The server sends back a 304 Not Modified response with no image body, telling the browser its cached copy is still valid; this saves the bandwidth of re-transferring the unchanged image data, even though a round trip to the server is still required", "The server automatically deletes the cached copy from the browser to force a fresh download next time", "Conditional GET always uses UDP instead of TCP to reduce overhead"],
     answer: 1,
@@ -2683,7 +2683,7 @@ window.GATE_DATA.questions['cn'].topics.find(function(t){return t.id==='cn-appli
   },
   {
     id: "cn-application-p10",
-    pyqYear: 2024,
+    pyqStyle: true,
     q: "HTTP/1.1 persistent connections use a keep-alive mechanism where an idle TCP connection is left open for some time after a response is sent, in case the client sends further requests soon. What is the primary trade-off a server must balance when choosing how long to keep such idle connections open?",
     options: ["There is no trade-off; connections should always be kept open indefinitely with no downside", "Keeping connections open longer avoids the overhead of repeated TCP handshakes for closely-spaced future requests, but ties up server resources (memory, file descriptors, connection-table entries) on connections that may end up going unused, limiting how many total clients the server can serve simultaneously", "Longer keep-alive times always increase security vulnerabilities but have no effect on performance at all", "Keep-alive timeouts only matter for UDP-based protocols, not TCP-based HTTP"],
     answer: 1,
@@ -2694,7 +2694,7 @@ window.GATE_DATA.questions['cn'].topics.find(function(t){return t.id==='cn-appli
   },
   {
     id: "cn-application-p11",
-    pyqYear: 2025,
+    pyqStyle: true,
     q: "A local DNS server already has the TLD server's address cached from a previous lookup, but does not have the authoritative server's address cached (and does not need to query the root server at all, since the TLD server's address is already known). Using iterative queries for the remaining unresolved steps, how many total RTTs elapse from the client's query until it receives the resolved IP address?",
     options: [],
     kind: "nat",
@@ -2706,7 +2706,7 @@ window.GATE_DATA.questions['cn'].topics.find(function(t){return t.id==='cn-appli
   },
   {
     id: "cn-application-p12",
-    pyqYear: 2026,
+    pyqStyle: true,
     q: "HTTP is fundamentally a stateless protocol, meaning the server does not automatically retain any memory of previous requests from the same client across separate connections. Which mechanism is most commonly used to let a web server maintain state (such as recognizing a logged-in user) across multiple otherwise-stateless HTTP requests?",
     options: ["The server tracks state entirely using the client's source TCP port number, which never changes across requests", "HTTP cookies: the server sends a Set-Cookie header containing an identifying token, which the browser then automatically includes in the Cookie header of every subsequent request to that same server, letting the server look up the associated stored session state", "HTTP automatically upgrades to a stateful protocol like TCP whenever login is required", "State is maintained purely by the DNS server, which remembers which IP addresses have previously logged in"],
     answer: 1,
@@ -2717,7 +2717,7 @@ window.GATE_DATA.questions['cn'].topics.find(function(t){return t.id==='cn-appli
   },
   {
     id: "cn-application-p13",
-    pyqYear: 2016,
+    pyqStyle: true,
     q: "A client requests a web object through a caching web proxy server. If the proxy already has a valid, unexpired cached copy of the object, how many round trips (RTTs) are needed between the client and the proxy to deliver it, compared to how many RTTs would be needed if the client instead contacted the distant origin server directly (assuming the origin server RTT is much larger than the client-proxy RTT)?",
     options: ["Both cases require exactly the same number of RTTs, since caching provides no time benefit", "Using the cache requires only 1 RTT (client-to-proxy), while going to the origin server directly would require the (typically much larger) client-to-origin-server RTT — potentially several times larger — making the proxy noticeably faster for cached content", "Using the cache always requires more RTTs than going to the origin server, because the proxy must still separately verify the cached copy with the origin server every time", "Neither scenario requires any RTTs, since caching eliminates all network communication"],
     answer: 1,
@@ -2728,7 +2728,7 @@ window.GATE_DATA.questions['cn'].topics.find(function(t){return t.id==='cn-appli
   },
   {
     id: "cn-application-p14",
-    pyqYear: 2019,
+    pyqStyle: true,
     q: "Which of the following are valid application-layer protocols that primarily use UDP rather than TCP as their transport? (Select all that apply.)",
     options: ["DNS (for typical short queries)", "DHCP (Dynamic Host Configuration Protocol)", "HTTP (standard web browsing, HTTP/1.1 and HTTP/2)", "SNMP (Simple Network Management Protocol)"],
     answers: [0, 1, 3],
@@ -2742,7 +2742,7 @@ window.GATE_DATA.questions['cn'].topics.find(function(t){return t.id==='cn-appli
 window.GATE_DATA.questions['cn'].topics.find(function(t){return t.id==='cn-basics';}).questions.push(
   {
     id: "cn-basics-p1",
-    pyqYear: 2015,
+    pyqStyle: true,
     q: "A noiseless channel has a bandwidth of 4 kHz. Using a signal with 8 distinct levels, what is the maximum achievable bit rate according to the Nyquist formula?",
     options: ["8 kbps", "12 kbps", "16 kbps", "24 kbps"],
     answer: 3,
@@ -2753,7 +2753,7 @@ window.GATE_DATA.questions['cn'].topics.find(function(t){return t.id==='cn-basic
   },
   {
     id: "cn-basics-p2",
-    pyqYear: 2016,
+    pyqStyle: true,
     q: "A noisy telephone-line channel has a bandwidth of 3 kHz and a signal-to-noise ratio of 30 dB. Using Shannon's capacity formula, what is the approximate maximum channel capacity?",
     options: ["Approximately 9 kbps", "Approximately 20 kbps", "Approximately 30 kbps", "Approximately 60 kbps"],
     answer: 2,
@@ -2764,7 +2764,7 @@ window.GATE_DATA.questions['cn'].topics.find(function(t){return t.id==='cn-basic
   },
   {
     id: "cn-basics-p3",
-    pyqYear: 2017,
+    pyqStyle: true,
     q: "A 1 Mbps link connects two hosts 2000 km apart, with a signal propagation speed of 2 x 10^8 m/s. A single packet of 8000 bits is sent from one host to the other. What is the total one-way delay (transmission delay plus propagation delay) experienced by this packet, ignoring processing and queuing delay?",
     options: ["8 ms", "10 ms", "18 ms", "26 ms"],
     answer: 2,
@@ -2775,7 +2775,7 @@ window.GATE_DATA.questions['cn'].topics.find(function(t){return t.id==='cn-basic
   },
   {
     id: "cn-basics-p4",
-    pyqYear: 2018,
+    pyqStyle: true,
     q: "A message is sent as a single 5000-bit packet from a source to a destination across a path with 2 intermediate routers (so 3 links total), each link having a bandwidth of 10 Mbps. Assuming pure store-and-forward switching (each router fully receives the entire packet before starting to forward it) and negligible propagation and processing delay, what is the total end-to-end delay?",
     options: ["0.5 ms", "1.0 ms", "1.5 ms", "2.0 ms"],
     answer: 2,
@@ -2786,7 +2786,7 @@ window.GATE_DATA.questions['cn'].topics.find(function(t){return t.id==='cn-basic
   },
   {
     id: "cn-basics-p5",
-    pyqYear: 2019,
+    pyqStyle: true,
     q: "An analog voice signal has a maximum frequency component of 4 kHz. It is sampled at the Nyquist rate and each sample is quantized into 256 distinct levels (using Pulse Code Modulation). What is the resulting digital bit rate?",
     options: ["32 kbps", "64 kbps", "128 kbps", "256 kbps"],
     answer: 1,
@@ -2797,7 +2797,7 @@ window.GATE_DATA.questions['cn'].topics.find(function(t){return t.id==='cn-basic
   },
   {
     id: "cn-basics-p6",
-    pyqYear: 2020,
+    pyqStyle: true,
     q: "A modem uses QPSK (Quadrature Phase Shift Keying) modulation, which encodes 2 bits per transmitted symbol, at a symbol (baud) rate of 1200 symbols per second. What is the resulting bit rate?",
     options: ["600 bps", "1200 bps", "2400 bps", "4800 bps"],
     answer: 2,
@@ -2808,7 +2808,7 @@ window.GATE_DATA.questions['cn'].topics.find(function(t){return t.id==='cn-basic
   },
   {
     id: "cn-basics-p7",
-    pyqYear: 2021,
+    pyqStyle: true,
     q: "Manchester encoding represents each data bit using a transition in the middle of the bit interval (low-to-high for one binary value, high-to-low for the other), making it self-clocking but requiring more raw signal bandwidth than the underlying data rate. If a link uses Manchester encoding to send data at 10 Mbps, what minimum signal transition (baud) rate is required on the physical medium?",
     options: ["5 million transitions/second", "10 million transitions/second", "20 million transitions/second", "40 million transitions/second"],
     answer: 2,
@@ -2819,7 +2819,7 @@ window.GATE_DATA.questions['cn'].topics.find(function(t){return t.id==='cn-basic
   },
   {
     id: "cn-basics-p8",
-    pyqYear: 2022,
+    pyqStyle: true,
     q: "Which of the following correctly matches a networking device to the OSI layer at which it primarily operates, and briefly why?",
     options: ["A hub operates at the network layer because it forwards IP packets", "A switch (bridge) operates at the data link layer because it forwards frames using MAC address tables it learns by observing traffic", "A router operates at the physical layer because it only regenerates electrical signals", "A repeater operates at the transport layer because it manages end-to-end segment delivery"],
     answer: 1,
@@ -2830,7 +2830,7 @@ window.GATE_DATA.questions['cn'].topics.find(function(t){return t.id==='cn-basic
   },
   {
     id: "cn-basics-p9",
-    pyqYear: 2023,
+    pyqStyle: true,
     q: "A network path has a bandwidth of 2 Mbps and a round-trip time (RTT) of 40 ms. What is the bandwidth-delay product of this path, in bits, and what does it physically represent?",
     options: ["40,000 bits; the amount of data the receiver can buffer", "80,000 bits; the maximum amount of data that can be 'in flight' (transmitted but not yet acknowledged) on the path at any instant", "2,000,000 bits; the total data the link can carry in one second", "800 bits; the size of a single optimal packet for this path"],
     answer: 1,
@@ -2841,7 +2841,7 @@ window.GATE_DATA.questions['cn'].topics.find(function(t){return t.id==='cn-basic
   },
   {
     id: "cn-basics-p10",
-    pyqYear: 2024,
+    pyqStyle: true,
     q: "An 80-megabit (8 x 10^7 bit) file is transferred over a link with bandwidth 1 Mbps and one-way propagation delay 50 ms. Comparing the effect of (a) doubling the bandwidth to 2 Mbps versus (b) halving the propagation delay to 25 ms, which change reduces the total one-way transfer time more, and roughly by how much?",
     options: ["Halving propagation delay helps far more, cutting total time roughly in half", "Doubling bandwidth helps far more, cutting total time roughly in half, while halving propagation delay barely changes it", "Both changes produce an identical, negligible reduction in total time", "Neither change has any effect since total time is fixed by file size alone"],
     answer: 1,
@@ -2852,7 +2852,7 @@ window.GATE_DATA.questions['cn'].topics.find(function(t){return t.id==='cn-basic
   },
   {
     id: "cn-basics-p11",
-    pyqYear: 2025,
+    pyqStyle: true,
     q: "Four data sources, each producing data at exactly 2 kbps, are combined using synchronous Time Division Multiplexing (TDM) onto a single shared link. Each TDM frame carries exactly 1 bit from each of the 4 sources, plus 1 additional framing/synchronization bit, giving 5 bits per frame. What is the resulting total bit rate required on the shared multiplexed link?",
     options: ["8 kbps", "9 kbps", "10 kbps", "12 kbps"],
     answer: 2,
@@ -2863,7 +2863,7 @@ window.GATE_DATA.questions['cn'].topics.find(function(t){return t.id==='cn-basic
   },
   {
     id: "cn-basics-p12",
-    pyqYear: 2026,
+    pyqStyle: true,
     q: "A 1,000,000-bit (1 Mb) message is sent along a path with 4 links (3 intermediate routers), each link having bandwidth 1 Mbps and one-way propagation delay 5 ms. Compare: (a) circuit switching, where a 10 ms setup delay reserves a dedicated end-to-end circuit and the message then flows continuously (transmission delay counted once, all 4 links' propagation delays summed once, experienced as one continuous stream), versus (b) pure packet (store-and-forward) switching sending the ENTIRE message as one single packet, where each of the 4 links independently needs its own full transmission time before forwarding onward. Which technique finishes faster here, and what is the approximate total delay for each?",
     options: ["Circuit switching finishes faster: about 1030 ms, versus about 4020 ms for store-and-forward of the single large packet", "Store-and-forward finishes faster: about 1030 ms, versus about 4020 ms for circuit switching", "Both techniques take exactly the same total time, about 2000 ms each", "Circuit switching cannot be compared numerically to packet switching under any circumstances"],
     answer: 0,
@@ -2874,7 +2874,7 @@ window.GATE_DATA.questions['cn'].topics.find(function(t){return t.id==='cn-basic
   },
   {
     id: "cn-basics-p13",
-    pyqYear: 2016,
+    pyqStyle: true,
     q: "A channel with bandwidth 1 MHz needs to support a required data rate of at least 8 Mbps using Shannon's capacity formula (C = B x log2(1 + SNR)). What is the minimum signal-to-noise ratio (as a plain ratio, not dB) required to achieve this?",
     options: ["7", "15", "255", "256"],
     answer: 2,
@@ -2885,7 +2885,7 @@ window.GATE_DATA.questions['cn'].topics.find(function(t){return t.id==='cn-basic
   },
   {
     id: "cn-basics-p14",
-    pyqYear: 2019,
+    pyqStyle: true,
     q: "Match the correct Protocol Data Unit (PDU) name used at each layer of the TCP/IP stack: at the transport layer, network layer, data link layer, and physical layer respectively.",
     options: ["Segment (or datagram for UDP), Packet (or datagram), Frame, Bit(s)", "Packet, Segment, Bit(s), Frame", "Frame, Packet, Segment, Bit(s)", "Bit(s), Frame, Packet, Segment"],
     answer: 0,

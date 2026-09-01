@@ -2342,7 +2342,7 @@ window.GATE_DATA.questions['compiler'].topics.find(function(t){return t.id==='co
 window.GATE_DATA.questions['compiler'].topics.find(function(t){return t.id==='compiler-lexical';}).questions.push(
   {
     id: 'compiler-lexical-p1',
-    pyqYear: 2015,
+    pyqStyle: true,
     q: 'How many lexical tokens does a standard C tokenizer produce for the statement `int x = a + b * (c - 1);` (count each keyword, identifier, constant, operator and punctuation symbol as one token; do not count whitespace)?',
     options: ['11', '12', '13', '14'],
     answer: 2,
@@ -2353,7 +2353,7 @@ window.GATE_DATA.questions['compiler'].topics.find(function(t){return t.id==='co
   },
   {
     id: 'compiler-lexical-p2',
-    pyqYear: 2016,
+    pyqStyle: true,
     q: 'How many tokens are produced when a C lexer scans the statement `for(i=0;i<n;i++) sum=sum+i;` (count keywords, identifiers, constants, operators and punctuation individually; ++ and < are each single tokens)?',
     options: ['17', '18', '19', '20'],
     answer: 2,
@@ -2364,7 +2364,7 @@ window.GATE_DATA.questions['compiler'].topics.find(function(t){return t.id==='co
   },
   {
     id: 'compiler-lexical-p3',
-    pyqYear: 2017,
+    pyqStyle: true,
     q: 'Count the tokens in the C statement `if(a>b&&b>c) max=a; else max=c;` (&& is one token; each identifier/keyword/operator/punctuation counts once).',
     options: ['17', '18', '19', '20'],
     answer: 2,
@@ -2375,7 +2375,7 @@ window.GATE_DATA.questions['compiler'].topics.find(function(t){return t.id==='co
   },
   {
     id: 'compiler-lexical-p4',
-    pyqYear: 2018,
+    pyqStyle: true,
     q: 'How many tokens does a C lexer generate for the expression statement `x = (a+b)*(c-d)/e;`?',
     options: ['13', '14', '15', '16'],
     answer: 3,
@@ -2386,7 +2386,7 @@ window.GATE_DATA.questions['compiler'].topics.find(function(t){return t.id==='co
   },
   {
     id: 'compiler-lexical-p5',
-    pyqYear: 2019,
+    pyqStyle: true,
     q: 'How many tokens are produced by a C lexer for the statement `while(*p!=\'\\0\') p++;` (treat the character constant \'\\0\' as a single token, and != as a single relational-operator token)?',
     options: ['8', '9', '10', '11'],
     answer: 2,
@@ -2397,7 +2397,7 @@ window.GATE_DATA.questions['compiler'].topics.find(function(t){return t.id==='co
   },
   {
     id: 'compiler-lexical-p6',
-    pyqYear: 2020,
+    pyqStyle: true,
     q: 'How many tokens does the C declaration `struct node *next;` tokenize into?',
     options: ['3', '4', '5', '6'],
     answer: 2,
@@ -2408,7 +2408,7 @@ window.GATE_DATA.questions['compiler'].topics.find(function(t){return t.id==='co
   },
   {
     id: 'compiler-lexical-p7',
-    pyqYear: 2021,
+    pyqStyle: true,
     q: 'How many tokens are produced when tokenizing the C statement `a[i]=a[i]+a[j]-1;`?',
     options: ['14', '15', '16', '17'],
     answer: 3,
@@ -2419,7 +2419,7 @@ window.GATE_DATA.questions['compiler'].topics.find(function(t){return t.id==='co
   },
   {
     id: 'compiler-lexical-p8',
-    pyqYear: 2022,
+    pyqStyle: true,
     q: 'How many tokens does the C statement `printf("sum=%d\\n",sum);` tokenize into (treat the entire double-quoted string literal as a single token)?',
     options: ['5', '6', '7', '8'],
     answer: 2,
@@ -2430,7 +2430,7 @@ window.GATE_DATA.questions['compiler'].topics.find(function(t){return t.id==='co
   },
   {
     id: 'compiler-lexical-p9',
-    pyqYear: 2023,
+    pyqStyle: true,
     q: 'How many tokens does the C declaration statement `int arr[10],i,sum=0;` tokenize into? (Enter your numerical answer.)',
     options: [],
     answer: 12,
@@ -2442,7 +2442,7 @@ window.GATE_DATA.questions['compiler'].topics.find(function(t){return t.id==='co
   },
   {
     id: 'compiler-lexical-p10',
-    pyqYear: 2024,
+    pyqStyle: true,
     q: 'How many tokens does the C statement `return (x>0)?x:-x;` tokenize into? (Enter your numerical answer.)',
     options: [],
     answer: 12,
@@ -2454,7 +2454,7 @@ window.GATE_DATA.questions['compiler'].topics.find(function(t){return t.id==='co
   },
   {
     id: 'compiler-lexical-p11',
-    pyqYear: 2025,
+    pyqStyle: true,
     q: 'A lexical analyzer uses the maximal-munch (longest-match) rule. Applying this rule, how is the input `a=b<=c` correctly split into tokens?',
     options: [
       'a  ,  =  ,  b  ,  <=  ,  c   (identifier, assign, identifier, relop, identifier -- 5 tokens)',
@@ -2470,7 +2470,7 @@ window.GATE_DATA.questions['compiler'].topics.find(function(t){return t.id==='co
   },
   {
     id: 'compiler-lexical-p12',
-    pyqYear: 2026,
+    pyqStyle: true,
     q: 'How many tokens does the C statement `do{ i=i+1; }while(i<10);` tokenize into? (Enter your numerical answer.)',
     options: [],
     answer: 16,
@@ -2485,7 +2485,7 @@ window.GATE_DATA.questions['compiler'].topics.find(function(t){return t.id==='co
 window.GATE_DATA.questions['compiler'].topics.find(function(t){return t.id==='compiler-parsing';}).questions.push(
   {
     id: 'compiler-parsing-p1',
-    pyqYear: 2015,
+    pyqStyle: true,
     q: 'Consider the grammar S -> A B c, A -> a | epsilon, B -> b | epsilon. What is FIRST(S)?',
     options: ['{a, b, c}', '{a, b}', '{a}', '{a, b, c, epsilon}'],
     answer: 0,
@@ -2496,7 +2496,7 @@ window.GATE_DATA.questions['compiler'].topics.find(function(t){return t.id==='co
   },
   {
     id: 'compiler-parsing-p2',
-    pyqYear: 2016,
+    pyqStyle: true,
     q: 'Grammar: S -> A | B, A -> aA | a, B -> ab | b. Filling in the LL(1) parsing table entry M[S, a], what do you find?',
     options: [
       'M[S,a] contains only S -> A, so the grammar is LL(1) on this cell',
@@ -2512,7 +2512,7 @@ window.GATE_DATA.questions['compiler'].topics.find(function(t){return t.id==='co
   },
   {
     id: 'compiler-parsing-p3',
-    pyqYear: 2017,
+    pyqStyle: true,
     q: 'For the augmented grammar S\' -> S, S -> aS | b, how many states are there in the canonical collection of LR(0) items (including the initial state)?',
     options: ['3', '4', '5', '6'],
     answer: 2,
@@ -2523,7 +2523,7 @@ window.GATE_DATA.questions['compiler'].topics.find(function(t){return t.id==='co
   },
   {
     id: 'compiler-parsing-p4',
-    pyqYear: 2018,
+    pyqStyle: true,
     q: 'Grammar: S -> A a A b | C b C a, with A -> epsilon and C -> epsilon. In the SLR(1) construction, the state containing both items A -> . and C -> . has a reduce-reduce conflict because FOLLOW(A) and FOLLOW(C) overlap. What is FOLLOW(A) intersect FOLLOW(C)?',
     options: ['{a}', '{b}', '{a, b}', 'the empty set (no actual conflict)'],
     answer: 2,
@@ -2534,7 +2534,7 @@ window.GATE_DATA.questions['compiler'].topics.find(function(t){return t.id==='co
   },
   {
     id: 'compiler-parsing-p5',
-    pyqYear: 2019,
+    pyqStyle: true,
     q: 'A grammar generates the language L = { aⁿbⁿcⁿ : n >= 1 } using productions S -> aSBC | abc, CB -> BC, bB -> bb, bC -> bc, cC -> cc. Since L is well known NOT to be a context-free language, what is the minimal Chomsky classification of this grammar?',
     options: ['Type 3 (regular)', 'Type 2 (context-free)', 'Type 1 (context-sensitive, non-context-free)', 'Type 0 (unrestricted / recursively enumerable only)'],
     answer: 2,
@@ -2545,7 +2545,7 @@ window.GATE_DATA.questions['compiler'].topics.find(function(t){return t.id==='co
   },
   {
     id: 'compiler-parsing-p6',
-    pyqYear: 2020,
+    pyqStyle: true,
     q: 'Using the classically ambiguous dangling-else grammar (stmt -> if expr then stmt | if expr then stmt else stmt | other), how many distinct parse trees exist for the string "if E1 then if E2 then S1 else S2"?',
     options: ['1', '2', '3', '4'],
     answer: 1,
@@ -2556,7 +2556,7 @@ window.GATE_DATA.questions['compiler'].topics.find(function(t){return t.id==='co
   },
   {
     id: 'compiler-parsing-p7',
-    pyqYear: 2021,
+    pyqStyle: true,
     q: 'Standard expression grammar: E -> T E\', E\' -> + T E\' | epsilon, T -> F T\', T\' -> * F T\' | epsilon, F -> ( E ) | id. What is FOLLOW(T\')?',
     options: ['{+, *, ), $}', '{+, ), $}', '{*, +, id, (}', '{$}'],
     answer: 1,
@@ -2567,7 +2567,7 @@ window.GATE_DATA.questions['compiler'].topics.find(function(t){return t.id==='co
   },
   {
     id: 'compiler-parsing-p8',
-    pyqYear: 2022,
+    pyqStyle: true,
     q: 'When an LR(1) canonical parsing table is reduced to an LALR(1) table by merging states, which condition determines that two LR(1) states get merged into a single LALR(1) state?',
     options: [
       'The two states have the same CORE (identical set of LR(0) items, ignoring lookahead symbols), regardless of what their lookaheads are',
@@ -2583,7 +2583,7 @@ window.GATE_DATA.questions['compiler'].topics.find(function(t){return t.id==='co
   },
   {
     id: 'compiler-parsing-p9',
-    pyqYear: 2023,
+    pyqStyle: true,
     q: 'Grammar: S -> aA | b, A -> cA | epsilon. Building the LL(1) parsing table for nonterminals {S, A} against terminal columns {a, b, c, $}, how many of the 8 table cells are BLANK (error) entries? (Enter your numerical answer.)',
     options: [],
     answer: 4,
@@ -2595,7 +2595,7 @@ window.GATE_DATA.questions['compiler'].topics.find(function(t){return t.id==='co
   },
   {
     id: 'compiler-parsing-p10',
-    pyqYear: 2024,
+    pyqStyle: true,
     q: 'Grammar: S -> A B, A -> a | epsilon, B -> b A | c. What is |FOLLOW(A)|, the number of terminals in FOLLOW(A)? (Enter your numerical answer.)',
     options: [],
     answer: 3,
@@ -2607,7 +2607,7 @@ window.GATE_DATA.questions['compiler'].topics.find(function(t){return t.id==='co
   },
   {
     id: 'compiler-parsing-p11',
-    pyqYear: 2025,
+    pyqStyle: true,
     q: 'For the string "if E1 then if E2 then if E3 then S1 else S2" parsed with the standard ambiguous dangling-else grammar, how many distinct parse trees exist (i.e., to how many different unmatched "then" clauses could the single "else" be attached)? (Enter your numerical answer.)',
     options: [],
     answer: 3,
@@ -2619,7 +2619,7 @@ window.GATE_DATA.questions['compiler'].topics.find(function(t){return t.id==='co
   },
   {
     id: 'compiler-parsing-p12',
-    pyqYear: 2026,
+    pyqStyle: true,
     q: 'Which of the following statements about the standard grammar-class hierarchy used in parser construction are TRUE? (Select ALL that apply)',
     options: [
       'Every regular language can be generated by some context-free grammar',
@@ -2638,7 +2638,7 @@ window.GATE_DATA.questions['compiler'].topics.find(function(t){return t.id==='co
 window.GATE_DATA.questions['compiler'].topics.find(function(t){return t.id==='compiler-sdt';}).questions.push(
   {
     id: 'compiler-sdt-p1',
-    pyqYear: 2015,
+    pyqStyle: true,
     q: 'A synthesized-attribute SDD for arithmetic expressions is: E -> E1 + T {E.val = E1.val + T.val} | T {E.val = T.val}; T -> T1 * F {T.val = T1.val * F.val} | F {T.val = F.val}; F -> digit {F.val = digit.lexval}. Using this SDD, what value is computed for E.val on input "2+3*4"? (Enter your numerical answer.)',
     options: [],
     answer: 14,
@@ -2650,7 +2650,7 @@ window.GATE_DATA.questions['compiler'].topics.find(function(t){return t.id==='co
   },
   {
     id: 'compiler-sdt-p2',
-    pyqYear: 2016,
+    pyqStyle: true,
     q: 'Consider the SDD: D -> T L {L.in = T.type}; T -> int {T.type = integer} | real {T.type = real}; L -> L1 , id {L1.in = L.in; addtype(id.entry, L.in)} | id {addtype(id.entry, L.in)}. Here L.in is an INHERITED attribute passed down from D to L and then leftward from L to L1. How should this SDD be classified?',
     options: [
       'S-attributed only (uses only synthesized attributes)',
@@ -2666,7 +2666,7 @@ window.GATE_DATA.questions['compiler'].topics.find(function(t){return t.id==='co
   },
   {
     id: 'compiler-sdt-p3',
-    pyqYear: 2017,
+    pyqStyle: true,
     q: 'Using the same type-distribution SDD as before (D -> T L {L.in=T.type}; L -> L1,id {L1.in=L.in; addtype(id.entry,L.in)} | id {addtype(id.entry,L.in)}), how many times is addtype() invoked while processing the declaration "real x, y, z"? (Enter your numerical answer.)',
     options: [],
     answer: 3,
@@ -2678,7 +2678,7 @@ window.GATE_DATA.questions['compiler'].topics.find(function(t){return t.id==='co
   },
   {
     id: 'compiler-sdt-p4',
-    pyqYear: 2018,
+    pyqStyle: true,
     q: 'An S-attributed SDD evaluates left-associative subtraction and addition: E -> E1 - T {E.val=E1.val-T.val} | E1 + T {E.val=E1.val+T.val} | T {E.val=T.val}; T -> digit {T.val=digit.lexval}. What value does E.val evaluate to for the input "9-5+2"? (Enter your numerical answer.)',
     options: [],
     answer: 6,
@@ -2690,7 +2690,7 @@ window.GATE_DATA.questions['compiler'].topics.find(function(t){return t.id==='co
   },
   {
     id: 'compiler-sdt-p5',
-    pyqYear: 2019,
+    pyqStyle: true,
     q: 'Consider the SDD rule A -> B C {B.in = C.val}, where B.in is an inherited attribute assigned from C.val, and C.val is a synthesized attribute of C computed independently. Is this SDD L-attributed?',
     options: [
       'Yes, because B.in is still an inherited attribute, and any inherited attribute assignment automatically satisfies the L-attributed condition',
@@ -2706,7 +2706,7 @@ window.GATE_DATA.questions['compiler'].topics.find(function(t){return t.id==='co
   },
   {
     id: 'compiler-sdt-p6',
-    pyqYear: 2020,
+    pyqStyle: true,
     q: 'An SDT assigns storage offsets using inherited attributes: D -> D1 ; D2, with a running "offset" counter, where each declaration "id : T" gets addtype(id.entry, T.type, offset) and then offset is incremented by T.width (int has width 4, real has width 8). Processing the declarations "a:int; b:real; c:int" left to right, starting offset = 0, what offset is assigned to c? (Enter your numerical answer.)',
     options: [],
     answer: 12,
@@ -2718,7 +2718,7 @@ window.GATE_DATA.questions['compiler'].topics.find(function(t){return t.id==='co
   },
   {
     id: 'compiler-sdt-p7',
-    pyqYear: 2021,
+    pyqStyle: true,
     q: 'An S-attributed SDD for expressions with unary minus is: E -> E1+E2 {E.val=E1.val+E2.val} | E1*E2 {E.val=E1.val*E2.val} | -E1 {E.val = -E1.val} | digit {E.val=digit.lexval}, with the grammar structured so that * binds tighter than + and unary minus binds tighter than both. What value does E.val evaluate to for "-3+4*2"? (Enter your numerical answer.)',
     options: [],
     answer: 5,
@@ -2730,7 +2730,7 @@ window.GATE_DATA.questions['compiler'].topics.find(function(t){return t.id==='co
   },
   {
     id: 'compiler-sdt-p8',
-    pyqYear: 2022,
+    pyqStyle: true,
     q: 'Which of the following syntax-directed definitions are S-ATTRIBUTED (use only synthesized attributes, with every semantic action computable after all of a production\'s children have been parsed)? (Select ALL that apply)',
     options: [
       'Every semantic action in the SDD sits at the end of the production\'s right-hand side and computes the LHS attribute purely from the SYNTHESIZED attributes of the RHS symbols',
@@ -2746,7 +2746,7 @@ window.GATE_DATA.questions['compiler'].topics.find(function(t){return t.id==='co
   },
   {
     id: 'compiler-sdt-p9',
-    pyqYear: 2023,
+    pyqStyle: true,
     q: 'Using a postfix (S-attributed) SDT that evaluates * before + according to standard precedence, what value does the expression "3*4+5*2" evaluate to? (Enter your numerical answer.)',
     options: [],
     answer: 22,
@@ -2758,7 +2758,7 @@ window.GATE_DATA.questions['compiler'].topics.find(function(t){return t.id==='co
   },
   {
     id: 'compiler-sdt-p10',
-    pyqYear: 2024,
+    pyqStyle: true,
     q: 'In a proper L-attributed SDD, for a production A -> X1 X2 ... Xn, an INHERITED attribute of the symbol Xi (for some i) is allowed to depend only on:',
     options: [
       'inherited attributes of A, and attributes (synthesized or inherited) of X1, X2, ..., X(i-1), i.e., only symbols to the LEFT of Xi plus the parent',
@@ -2774,7 +2774,7 @@ window.GATE_DATA.questions['compiler'].topics.find(function(t){return t.id==='co
   },
   {
     id: 'compiler-sdt-p11',
-    pyqYear: 2025,
+    pyqStyle: true,
     q: 'A type-checking SDD promotes an arithmetic expression\'s type to "real" if ANY operand involved is real, and keeps it "int" only if EVERY operand is int, following the rule E -> E1 + E2 {E.type = if (E1.type==real or E2.type==real) then real else int}. Given the expression id1 + id2 + id3 where id1 is int, id2 is real, and id3 is int (left-associative, i.e. parsed as (id1+id2)+id3), what is the resulting E.type for the whole expression?',
     options: ['int', 'real', 'undefined / type error', 'depends on evaluation order, cannot be determined'],
     answer: 1,
@@ -2785,7 +2785,7 @@ window.GATE_DATA.questions['compiler'].topics.find(function(t){return t.id==='co
   },
   {
     id: 'compiler-sdt-p12',
-    pyqYear: 2026,
+    pyqStyle: true,
     q: 'Using a postfix SDT that respects standard precedence and left-to-right associativity for equal-precedence operators, evaluate the expression "6/2+3*2-1". (Enter your numerical answer.)',
     options: [],
     answer: 8,
@@ -2800,7 +2800,7 @@ window.GATE_DATA.questions['compiler'].topics.find(function(t){return t.id==='co
 window.GATE_DATA.questions['compiler'].topics.find(function(t){return t.id==='compiler-icg';}).questions.push(
   {
     id: 'compiler-icg-p1',
-    pyqYear: 2015,
+    pyqStyle: true,
     q: 'Using the standard naive three-address-code translation (one TAC instruction per operator application, no common-subexpression sharing), how many three-address statements are generated for "a = b*c + b*c - d;"? (Enter your numerical answer.)',
     options: [],
     answer: 5,
@@ -2812,7 +2812,7 @@ window.GATE_DATA.questions['compiler'].topics.find(function(t){return t.id==='co
   },
   {
     id: 'compiler-icg-p2',
-    pyqYear: 2016,
+    pyqStyle: true,
     q: 'Building a DAG (directed acyclic graph) for the expression "a = b*c + b*c - d" (which automatically shares identical subexpressions as a single node), how many total DAG nodes are there, counting both leaf (identifier/constant) nodes and interior (operator) nodes?',
     options: ['4', '5', '6', '7'],
     answer: 2,
@@ -2823,7 +2823,7 @@ window.GATE_DATA.questions['compiler'].topics.find(function(t){return t.id==='co
   },
   {
     id: 'compiler-icg-p3',
-    pyqYear: 2017,
+    pyqStyle: true,
     q: 'Using standard TAC translation for the statement "if (a<b) x=1; else x=2;" (with labels not counted as separate instructions), how many three-address instructions are generated? (Enter your numerical answer.)',
     options: [],
     answer: 4,
@@ -2835,7 +2835,7 @@ window.GATE_DATA.questions['compiler'].topics.find(function(t){return t.id==='co
   },
   {
     id: 'compiler-icg-p4',
-    pyqYear: 2018,
+    pyqStyle: true,
     q: 'How many total DAG nodes (leaves plus interior operator nodes) are needed to represent the expression "(a+b)*(a+b-c)", exploiting the shared common subexpression "a+b"?',
     options: ['5', '6', '7', '8'],
     answer: 1,
@@ -2846,7 +2846,7 @@ window.GATE_DATA.questions['compiler'].topics.find(function(t){return t.id==='co
   },
   {
     id: 'compiler-icg-p5',
-    pyqYear: 2019,
+    pyqStyle: true,
     q: 'How many three-address instructions (excluding labels) are generated by the standard translation of "while(i<n) { i=i+1; }"? (Enter your numerical answer.)',
     options: [],
     answer: 3,
@@ -2858,7 +2858,7 @@ window.GATE_DATA.questions['compiler'].topics.find(function(t){return t.id==='co
   },
   {
     id: 'compiler-icg-p6',
-    pyqYear: 2020,
+    pyqStyle: true,
     q: 'Using standard indexed-addressing TAC translation (4 bytes per array element, requiring an explicit offset-multiply temporary for each array access) for the statement "a[i] = b[j] + c[k];", how many three-address instructions are generated? (Enter your numerical answer.)',
     options: [],
     answer: 7,
@@ -2870,7 +2870,7 @@ window.GATE_DATA.questions['compiler'].topics.find(function(t){return t.id==='co
   },
   {
     id: 'compiler-icg-p7',
-    pyqYear: 2021,
+    pyqStyle: true,
     q: 'How many total DAG nodes represent the expression "-(a+b)*(a+b)+c", where the two occurrences of "(a+b)" are recognized as the same subexpression?',
     options: ['5', '6', '7', '8'],
     answer: 2,
@@ -2881,7 +2881,7 @@ window.GATE_DATA.questions['compiler'].topics.find(function(t){return t.id==='co
   },
   {
     id: 'compiler-icg-p8',
-    pyqYear: 2022,
+    pyqStyle: true,
     q: 'Using standard TAC translation for the chained conditional "if(a==1) x=10; else if(a==2) x=20; else x=30;" (labels not counted as instructions), how many three-address instructions are generated? (Enter your numerical answer.)',
     options: [],
     answer: 7,
@@ -2893,7 +2893,7 @@ window.GATE_DATA.questions['compiler'].topics.find(function(t){return t.id==='co
   },
   {
     id: 'compiler-icg-p9',
-    pyqYear: 2023,
+    pyqStyle: true,
     q: 'How many total DAG nodes represent the boolean expression "(a<b) && (c<d) || (a<b)", where the two identical occurrences of "(a<b)" are recognized as the same subexpression?',
     options: ['6', '7', '8', '9'],
     answer: 2,
@@ -2904,7 +2904,7 @@ window.GATE_DATA.questions['compiler'].topics.find(function(t){return t.id==='co
   },
   {
     id: 'compiler-icg-p10',
-    pyqYear: 2024,
+    pyqStyle: true,
     q: 'Using standard naive TAC translation respecting operator precedence (no CSE), how many three-address instructions (including the final assignment to x) are generated for "x = a+b*c-d/e+f;", given the expression associates as (((a+(b*c))-(d/e))+f)?',
     options: [],
     answer: 5,
@@ -2916,7 +2916,7 @@ window.GATE_DATA.questions['compiler'].topics.find(function(t){return t.id==='co
   },
   {
     id: 'compiler-icg-p11',
-    pyqYear: 2025,
+    pyqStyle: true,
     q: 'How many total DAG nodes are needed for the block of statements "t1=a+b; t2=a+b; t3=t1*t2; t4=a+b;" (recognizing that all three occurrences of "a+b" use the same unchanged operands a and b)?',
     options: ['3', '4', '5', '6'],
     answer: 1,
@@ -2927,7 +2927,7 @@ window.GATE_DATA.questions['compiler'].topics.find(function(t){return t.id==='co
   },
   {
     id: 'compiler-icg-p12',
-    pyqYear: 2026,
+    pyqStyle: true,
     q: 'Using standard TAC translation with 4-byte array elements for "for(i=0;i<n;i++) sum=sum+a[i];" (labels not counted as instructions), how many three-address instructions are generated? (Enter your numerical answer.)',
     options: [],
     answer: 7,
@@ -2942,7 +2942,7 @@ window.GATE_DATA.questions['compiler'].topics.find(function(t){return t.id==='co
 window.GATE_DATA.questions['compiler'].topics.find(function(t){return t.id==='compiler-runtime';}).questions.push(
   {
     id: 'compiler-runtime-p1',
-    pyqYear: 2015,
+    pyqStyle: true,
     q: 'Consider: int x=1; void p(){ print(x); } void q(){ int x=2; p(); } void main(){ q(); }. What does this program print under STATIC scoping and under DYNAMIC scoping, respectively?',
     options: ['1 and 2', '2 and 1', '1 and 1', '2 and 2'],
     answer: 0,
@@ -2953,7 +2953,7 @@ window.GATE_DATA.questions['compiler'].topics.find(function(t){return t.id==='co
   },
   {
     id: 'compiler-runtime-p2',
-    pyqYear: 2016,
+    pyqStyle: true,
     q: 'void swap(int a, int b){ int t=a; a=b; b=t; } void main(){ int x=5,y=10; swap(x,y); print(x,y); }. What is printed under call-by-value versus call-by-reference respectively?',
     options: ['"5 10" and "5 10"', '"5 10" and "10 5"', '"10 5" and "5 10"', '"10 5" and "10 5"'],
     answer: 1,
@@ -2964,7 +2964,7 @@ window.GATE_DATA.questions['compiler'].topics.find(function(t){return t.id==='co
   },
   {
     id: 'compiler-runtime-p3',
-    pyqYear: 2017,
+    pyqStyle: true,
     q: 'int a[3]={1,2,3}; void f(int x, int y){ x=x+1; y=y+2; } void main(){ f(a[0], a[1]); print(a[0]+a[1]); }. Under call-by-VALUE parameter passing, what value does this print? (Enter your numerical answer.)',
     options: [],
     answer: 3,
@@ -2976,7 +2976,7 @@ window.GATE_DATA.questions['compiler'].topics.find(function(t){return t.id==='co
   },
   {
     id: 'compiler-runtime-p4',
-    pyqYear: 2018,
+    pyqStyle: true,
     q: 'int x=4; void A(){ int x=1; B(); } void B(){ print(x); } void main(){ x=9; A(); }. What does this print under static scoping and dynamic scoping respectively?',
     options: ['9 and 1', '1 and 9', '4 and 1', '9 and 9'],
     answer: 0,
@@ -2987,7 +2987,7 @@ window.GATE_DATA.questions['compiler'].topics.find(function(t){return t.id==='co
   },
   {
     id: 'compiler-runtime-p5',
-    pyqYear: 2019,
+    pyqStyle: true,
     q: 'void p(int i){ i=i+1; print(i); } void main(){ int a=5; p(a); print(a); }. Under call-by-VALUE, what two values are printed, in order (first the print inside p, then the print after p returns)?',
     options: ['5, 5', '6, 5', '6, 6', '5, 6'],
     answer: 1,
@@ -2998,7 +2998,7 @@ window.GATE_DATA.questions['compiler'].topics.find(function(t){return t.id==='co
   },
   {
     id: 'compiler-runtime-p6',
-    pyqYear: 2020,
+    pyqStyle: true,
     q: 'int x=1; void f(){ print(x); } void g(){ int x=2; f(); } void h(){ int x=3; g(); } void main(){ h(); }. What does this print under static scoping, and under dynamic scoping, respectively?',
     options: ['1 and 2', '1 and 3', '3 and 1', '2 and 1'],
     answer: 0,
@@ -3009,7 +3009,7 @@ window.GATE_DATA.questions['compiler'].topics.find(function(t){return t.id==='co
   },
   {
     id: 'compiler-runtime-p7',
-    pyqYear: 2021,
+    pyqStyle: true,
     q: 'int a=2; void f(int x){ x=x*2; a=a+3; } void main(){ f(a); print(a); }. (Here f\'s body directly references the global variable a as well as its own parameter x.) What does print(a) show under call-by-value, call-by-reference, and call-by-value-result respectively?',
     options: ['5, 7, 4', '4, 7, 5', '7, 5, 4', '5, 4, 7'],
     answer: 0,
@@ -3020,7 +3020,7 @@ window.GATE_DATA.questions['compiler'].topics.find(function(t){return t.id==='co
   },
   {
     id: 'compiler-runtime-p8',
-    pyqYear: 2022,
+    pyqStyle: true,
     q: 'In a block-structured language with static scoping, procedures are nested three levels deep: A (outermost) statically contains B, which statically contains C. From within C\'s activation record, how many static links must be traversed to reach A\'s activation record and access a variable declared in A? (Enter your numerical answer.)',
     options: [],
     answer: 2,
@@ -3032,7 +3032,7 @@ window.GATE_DATA.questions['compiler'].topics.find(function(t){return t.id==='co
   },
   {
     id: 'compiler-runtime-p9',
-    pyqYear: 2023,
+    pyqStyle: true,
     q: 'int i=1; int a[3]={2,4,6}; (0-indexed: a[0]=2, a[1]=4, a[2]=6) void f(int x){ i=2; x=0; } void main(){ i=1; f(a[i]); print(a[1], a[2]); }. What does print(a[1], a[2]) show under call-by-REFERENCE and under call-by-NAME respectively?',
     options: ['(0, 6) and (4, 0)', '(4, 0) and (0, 6)', '(0, 0) and (4, 6)', '(4, 6) and (0, 0)'],
     answer: 0,
@@ -3043,7 +3043,7 @@ window.GATE_DATA.questions['compiler'].topics.find(function(t){return t.id==='co
   },
   {
     id: 'compiler-runtime-p10',
-    pyqYear: 2024,
+    pyqStyle: true,
     q: 'int x=5; void f(int x){ print(x); } void g(){ int x=10; f(20); } void main(){ g(); }. What does f print, under static scoping and under dynamic scoping respectively?',
     options: ['20 under both scoping disciplines', '5 (static) and 10 (dynamic)', '10 (static) and 20 (dynamic)', '5 under both scoping disciplines'],
     answer: 0,
@@ -3054,7 +3054,7 @@ window.GATE_DATA.questions['compiler'].topics.find(function(t){return t.id==='co
   },
   {
     id: 'compiler-runtime-p11',
-    pyqYear: 2025,
+    pyqStyle: true,
     q: 'In a statically scoped, block-structured language, procedure D is nested directly inside C, which is nested directly inside B, which is nested directly inside A (so the static nesting depth order, outermost first, is A, B, C, D). From D\'s activation record, how many access (static) links must be traversed to reach the activation record of B, in order to access a variable declared in B? (Enter your numerical answer.)',
     options: [],
     answer: 2,
@@ -3066,7 +3066,7 @@ window.GATE_DATA.questions['compiler'].topics.find(function(t){return t.id==='co
   },
   {
     id: 'compiler-runtime-p12',
-    pyqYear: 2026,
+    pyqStyle: true,
     q: 'int x=0; void inc(){ x=x+1; } void f(){ int x=100; inc(); print(x); } void main(){ f(); }. What does print(x) inside f show under static scoping and under dynamic scoping respectively?',
     options: ['100 and 101', '101 and 100', '100 and 100', '101 and 101'],
     answer: 0,
@@ -3080,7 +3080,7 @@ window.GATE_DATA.questions['compiler'].topics.find(function(t){return t.id==='co
 window.GATE_DATA.questions['compiler'].topics.find(function(t){return t.id==='compiler-optimization';}).questions.push(
   {
     id: 'compiler-optimization-p1',
-    pyqYear: 2015,
+    pyqStyle: true,
     q: 'Given the three-address code (line numbers shown): 1: i=0; 2: t1=i<n; 3: ifFalse t1 goto 9; 4: t2=i*4; 5: t3=a[t2]; 6: sum=sum+t3; 7: i=i+1; 8: goto 2; 9: print sum. Using the standard leader-identification rules, how many basic blocks does this code split into? (Enter your numerical answer.)',
     options: [],
     answer: 4,
@@ -3092,7 +3092,7 @@ window.GATE_DATA.questions['compiler'].topics.find(function(t){return t.id==='co
   },
   {
     id: 'compiler-optimization-p2',
-    pyqYear: 2016,
+    pyqStyle: true,
     q: 'A basic block computes: S1: x=a+b; S2: y=x*c; S3: a=y-d; S4: z=a+b. Only z is live on exit (LiveOut(S4)={z}). Using backward live-variable analysis (LiveIn(S)=use(S) U (LiveOut(S)-def(S))), how many distinct variables are in LiveIn(S1)? (Enter your numerical answer.)',
     options: [],
     answer: 4,
@@ -3104,7 +3104,7 @@ window.GATE_DATA.questions['compiler'].topics.find(function(t){return t.id==='co
   },
   {
     id: 'compiler-optimization-p3',
-    pyqYear: 2017,
+    pyqStyle: true,
     q: 'Given the code: 1: x=5; 2: y=x+3; 3: z=y*2; 4: w=z+a; (a is not a compile-time constant). After forward constant propagation followed by constant folding, which of the following resulting statements are CORRECT? (Select ALL that apply)',
     options: [
       'Statement 2 folds to: y=8',
@@ -3120,7 +3120,7 @@ window.GATE_DATA.questions['compiler'].topics.find(function(t){return t.id==='co
   },
   {
     id: 'compiler-optimization-p4',
-    pyqYear: 2018,
+    pyqStyle: true,
     q: 'Inside a loop, the statement "t = i*4;" recomputes a multiple of the loop index i every iteration, where i increases by exactly 1 each pass. Which classic compiler optimization directly replaces this per-iteration multiplication with successive additions of the constant 4 to an accumulator, exploiting the fact that i changes by a fixed amount each iteration?',
     options: ['Constant folding', 'Strength reduction', 'Dead-code elimination', 'Loop unrolling'],
     answer: 1,
@@ -3131,7 +3131,7 @@ window.GATE_DATA.questions['compiler'].topics.find(function(t){return t.id==='co
   },
   {
     id: 'compiler-optimization-p5',
-    pyqYear: 2019,
+    pyqStyle: true,
     q: 'Inside the loop body "for(i=0;i<n;i++){ x=a*b; sum=sum+x+i; }", assuming a and b are never modified anywhere inside the loop, which statement is LOOP-INVARIANT and can be safely hoisted out of the loop (computed once before the loop starts)?',
     options: ['x=a*b', 'sum=sum+x+i', 'the loop condition i<n', 'i=i+1 (the increment)'],
     answer: 0,
@@ -3142,7 +3142,7 @@ window.GATE_DATA.questions['compiler'].topics.find(function(t){return t.id==='co
   },
   {
     id: 'compiler-optimization-p6',
-    pyqYear: 2020,
+    pyqStyle: true,
     q: 'A basic block contains: 1: x=a+b; 2: y=a-b; 3: x=c+d; 4: print(x); Assume y is never used anywhere else in the program. Which of the following statements are DEAD CODE that can be safely eliminated from this block? (Select ALL that apply)',
     options: [
       'Statement 1 (x=a+b)',
@@ -3158,7 +3158,7 @@ window.GATE_DATA.questions['compiler'].topics.find(function(t){return t.id==='co
   },
   {
     id: 'compiler-optimization-p7',
-    pyqYear: 2021,
+    pyqStyle: true,
     q: 'Local common-subexpression elimination, applied within a single basic block, can detect and eliminate a redundant recomputation of "a+b" occurring twice in the SAME block. Why might it fail to eliminate a redundant recomputation of "a+b" that instead occurs in a DIFFERENT (later) basic block, one that is reached along every possible control-flow path from the block where "a+b" was first computed?',
     options: [
       'Because local CSE only examines expressions strictly within a single basic block and has no mechanism to track which expressions remain available across block boundaries; catching such cases requires a global, data-flow-based "available expressions" analysis over the whole control-flow graph',
@@ -3174,7 +3174,7 @@ window.GATE_DATA.questions['compiler'].topics.find(function(t){return t.id==='co
   },
   {
     id: 'compiler-optimization-p8',
-    pyqYear: 2022,
+    pyqStyle: true,
     q: 'Given the three-address code: 1: a=1; 2: b=2; 3: if a<b goto 6; 4: c=3; 5: goto 7; 6: c=4; 7: print c. Using standard leader-identification rules, how many basic blocks does this code split into? (Enter your numerical answer.)',
     options: [],
     answer: 4,
@@ -3186,7 +3186,7 @@ window.GATE_DATA.questions['compiler'].topics.find(function(t){return t.id==='co
   },
   {
     id: 'compiler-optimization-p9',
-    pyqYear: 2023,
+    pyqStyle: true,
     q: 'A basic block computes: S1: t=a*b; S2: c=t+d; S3: e=c-a; with LiveOut(S3)={e} (e is the only variable live on exit). How many distinct variables are in LiveOut(S2)? (Enter your numerical answer.)',
     options: [],
     answer: 2,
@@ -3198,7 +3198,7 @@ window.GATE_DATA.questions['compiler'].topics.find(function(t){return t.id==='co
   },
   {
     id: 'compiler-optimization-p10',
-    pyqYear: 2024,
+    pyqStyle: true,
     q: 'Consider the loop "for(i=1;i<=n;i++){ y=i*i; z=b*c; arr[i]=y+z; }", where b and c are never modified inside the loop. Which of the following statements about optimizing this loop are TRUE? (Select ALL that apply)',
     options: [
       'z=b*c is loop-invariant and can be hoisted out of the loop, computed just once before it starts',
@@ -3214,7 +3214,7 @@ window.GATE_DATA.questions['compiler'].topics.find(function(t){return t.id==='co
   },
   {
     id: 'compiler-optimization-p11',
-    pyqYear: 2025,
+    pyqStyle: true,
     q: 'A statement d: "x = y op z" inside a basic block can be safely deleted as dead code if and only if which condition holds?',
     options: [
       'x is not live immediately after d (i.e., x is not in LiveOut(d)), AND the operation has no other observable side effect (such as I/O or memory write through a pointer)',
@@ -3230,7 +3230,7 @@ window.GATE_DATA.questions['compiler'].topics.find(function(t){return t.id==='co
   },
   {
     id: 'compiler-optimization-p12',
-    pyqYear: 2026,
+    pyqStyle: true,
     q: 'Given the three-address code: 1: i=0; 2: j=0; 3: if i>=n goto 11; 4: if j>=m goto 9; 5: t=i*m+j; 6: a[t]=0; 7: j=j+1; 8: goto 4; 9: i=i+1; 10: goto 2; 11: print done. Using standard leader-identification rules, how many basic blocks does this code split into? (Enter your numerical answer.)',
     options: [],
     answer: 6,
