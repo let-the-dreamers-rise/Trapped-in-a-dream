@@ -3050,3 +3050,110 @@ window.GATE_DATA.questions['apti'].topics.find(function(t){return t.id==='apti-v
   }
 );
 
+
+window.GATE_DATA.questions['apti'].topics.find(function(t){return t.id==='apti-data-spatial';}).questions.push(
+  {
+    id: 'apti-data-spatial-h1',
+    q: 'Table 1 (Revenue, Rs. lakh): Branch X: 2022 = 80, 2023 = 100; Branch Y: 2022 = 60, 2023 = 90. Table 2 (Cost, Rs. lakh): Branch X: 2022 = 60, 2023 = 70; Branch Y: 2022 = 50, 2023 = 60. Using both tables, find the ratio of Branch X\'s profit margin (profit/revenue) to Branch Y\'s profit margin, for the year 2023.',
+    options: ['9 : 10', '10 : 9', '3 : 1', '1 : 1'],
+    answer: 0,
+    marks: 2,
+    difficulty: 'hard',
+    type: 'numerical',
+    explanation: 'This question requires pulling one figure from each of the two linked tables before any ratio can be formed. For 2023, Branch X: profit = revenue - cost = 100 - 70 = 30, so its profit margin is 30/100 = 0.30 (30%). Branch Y: profit = 90 - 60 = 30, so its profit margin is 30/90 = 1/3 (33.33%). Notice both branches earn the identical absolute profit of Rs. 30 lakh — this is the trap, since a hasty reader might conclude the margins (and hence the ratio) are equal simply because the profits are equal, ignoring that margin depends on revenue too. The actual ratio is 0.30 : (1/3), which multiplying both sides by 3 gives 0.9 : 1, i.e. 9 : 10. Fast route: convert both margins to a common fraction form immediately (30/100 and 30/90) and cross-multiply the ratio (30x90 : 30x100 = 9:10 after canceling the common 30 and the common factor of 10) rather than converting to decimal percentages, which invites rounding errors. The equal-profit trap is exactly why this margin ratio is not 1:1 despite both branches earning the same absolute profit that year.'
+  },
+  {
+    id: 'apti-data-spatial-h2',
+    q: 'Two industries, P and Q, reported the following production index values (base year 100): 2020: P = 100, Q = 100. 2021: P = 120, Q = 150. Between which pair of years, using only this data, did industry P show a HIGHER percentage growth than industry Q over the SAME one-year period?',
+    options: ['2020 to 2021 (P grew faster than Q)', '2020 to 2021 (Q grew faster than P)', 'Both grew at exactly the same rate', 'Cannot be determined from the data given'],
+    answer: 1,
+    marks: 1,
+    difficulty: 'hard',
+    type: 'numerical',
+    explanation: 'From 2020 to 2021, P\'s index moved from 100 to 120 and Q\'s moved from 100 to 150. Since both start from the same base value of 100, the percentage growth can be read directly from the new values without any division: P grew by 20 points on a base of 100, i.e. 20%, and Q grew by 50 points on the same base of 100, i.e. 50%. Because the starting values are identical here, the comparison collapses to simply comparing the two ending index values directly — Q\'s 150 exceeds P\'s 120, so Q grew faster, not P. Fast route: whenever a growth comparison starts from the same base value for both quantities, skip computing percentages altogether and just compare the ending values directly, since the base cancels out of the ratio entirely. The trap here is the phrasing of option 1, which sounds like the "obvious" default answer pattern from similar questions, tempting a rushed reader who assumes without checking which of the two actually grew faster; the data unambiguously shows Q, not P, had the higher growth.'
+  },
+  {
+    id: 'apti-data-spatial-h3',
+    q: 'In a college of 100 students, 50 play cricket, 40 play football, and 30 play hockey. 15 play both cricket and football, 12 play both football and hockey, 10 play both cricket and hockey, and 5 play all three sports. How many students play NONE of the three sports? (Enter your numerical answer.)',
+    options: [],
+    answer: 12,
+    kind: 'nat',
+    marks: 2,
+    difficulty: 'hard',
+    type: 'numerical',
+    explanation: 'Use the inclusion-exclusion principle for three sets: |A U B U C| = |A| + |B| + |C| - |A intersect B| - |B intersect C| - |A intersect C| + |A intersect B intersect C|. Substituting: 50 + 40 + 30 - 15 - 12 - 10 + 5 = 120 - 37 + 5 = 88. This gives the number of students who play at least one sport. The number playing none is the complement within the total: 100 - 88 = 12. Fast route: add the three single-set totals, subtract the three pairwise overlaps (each of which was double-counted once), then add back the triple overlap (which was subtracted three times as part of the pairwise terms but should only be excluded, so it needs restoring once) — this add-subtract-add pattern is the entire inclusion-exclusion formula for three sets, and it always ends with a single addition of the triple-overlap term. The trap is forgetting the final "+5" term (the all-three overlap), which if omitted would wrongly give 83 people playing at least one sport and 17 playing none — a very tempting wrong answer that results from only subtracting pairwise overlaps without correcting for the triple-counted center region.'
+  },
+  {
+    id: 'apti-data-spatial-h4',
+    q: 'A square sheet of paper is folded exactly in half vertically, and then the resulting rectangle is folded exactly in half horizontally, producing a smaller square made of 4 layers. A hole is punched exactly at the one corner of this small folded square where BOTH fold creases meet (i.e., the corner diagonally opposite to the two open, unfolded edges). How many distinct holes appear on the sheet once it is completely unfolded? (Enter your numerical answer.)',
+    options: [],
+    answer: 1,
+    kind: 'nat',
+    marks: 2,
+    difficulty: 'hard',
+    type: 'concept',
+    explanation: 'The usual rule "n folds give 2^n layers, and a single punch away from every crease gives 2^n holes" only holds when the punch point is strictly inside all folded edges. Here, the punch point is exactly the corner where BOTH creases intersect — and that specific point is precisely the geometric CENTER of the original, fully unfolded square sheet, because both folds are reflections that map the sheet\'s center to itself. Since a reflection always fixes points lying exactly on its own fold line, and this corner lies on both fold lines simultaneously, all 4 layers at that corner correspond to the exact same physical point on the original sheet, not four different points. Punching through all 4 layers there therefore only ever removes material from that single, self-corresponding location, so unfolding reveals exactly 1 hole, sitting precisely at the center of the sheet. Fast route: before applying the standard 2^n layers-equals-holes shortcut, always check whether the punch point lies on a crease (which merges holes across that fold) or, more extremely, on the intersection of ALL creases (which collapses all layers to a single point) — the doubling rule is a default, not an unconditional law. The trap is applying "2 folds means 4 holes" mechanically without checking the punch location against the fold lines themselves.'
+  },
+  {
+    id: 'apti-data-spatial-h5',
+    q: 'A die is placed in two different positions. Position 1: top face shows 2, front face shows 3, right face shows 5. Position 2: top face shows 2, front face shows 4, right face shows 6. (This is not necessarily a standard die where opposite faces sum to 7 — treat it as an unknown die and reason only from the two views given.) Which number lies on the face opposite to the face showing 2?',
+    options: ['3', '4', '1', '6'],
+    answer: 2,
+    marks: 2,
+    difficulty: 'hard',
+    type: 'concept',
+    explanation: 'Every face of a cube is adjacent (shares an edge) with exactly 4 of the other 5 faces, and opposite to exactly 1. So, to find the face opposite to the face showing 2, the fastest method is to identify every face that has ever been seen adjacent to the "2" face across all given views, and eliminate them — whatever number never appears as an adjacent neighbour of "2" must be the one opposite it. In Position 1, the "2" face (top) is directly adjacent to the front face (3) and the right face (5), since top, front and right all meet at a common corner and are pairwise adjacent. In Position 2, the "2" face (still top) is adjacent to the front face (4) and the right face (6). Combining both views, the faces confirmed adjacent to "2" are {3, 5, 4, 6} — four distinct numbers, which is the maximum possible number of neighbours a single face can have. Since the six faces must be numbered using six distinct values and 2, 3, 4, 5, 6 have all already been placed (as the "2" face itself, plus its four confirmed neighbours), the only remaining number, 1, cannot be adjacent to 2, and must therefore be the face opposite it. Fast route: as soon as four distinct neighbours of a face have been identified across any combination of views, stop — the opposite face is forced by elimination, with no need for a third view. The trap is assuming a standard opposite-sum-of-7 die (which would also give 1, but only by lucky coincidence here) instead of actually verifying the adjacency logic, which is the only method that works when the die is explicitly stated to be non-standard.'
+  },
+  {
+    id: 'apti-data-spatial-h6',
+    q: 'Table (Population, in lakh): City A = 24, City B = 36, City C = 18, City D = 30. Table (Area, in sq. km): City A = 120, City B = 150, City C = 90, City D = 100. Using both tables, which city has the HIGHEST population density (population per unit area)?',
+    options: ['City A', 'City B', 'City C', 'City D'],
+    answer: 3,
+    marks: 2,
+    difficulty: 'hard',
+    type: 'numerical',
+    explanation: 'Population density requires combining one value from each of the two linked tables (population divided by area) for every city before any comparison is valid — comparing raw population or raw area alone, from a single table, answers a different question entirely. Compute each ratio as a simple fraction: City A = 24/120 = 1/5 = 0.20; City B = 36/150 = 6/25 = 0.24; City C = 18/90 = 1/5 = 0.20; City D = 30/100 = 3/10 = 0.30. Comparing these four decimals directly, City D has the highest density at 0.30 (30,000 per sq. km if population is read in lakh and area in sq. km, though the exact unit does not matter for comparison purposes). Fast route: reduce each population-to-area pair to a simple fraction with small numbers before comparing, rather than computing unwieldy decimals from the raw lakh figures; A and C both reduce cleanly to 1/5, immediately telling you they are tied for third, so only B and D need a closer look. The trap is picking City B, which has by far the largest raw population (36 lakh, the highest of all four) — a rushed reader who conflates "most populous" with "most densely populated" ignores that B is also spread over the largest area (150 sq. km), diluting its density below City D\'s.'
+  },
+  {
+    id: 'apti-data-spatial-h7',
+    q: 'Company P\'s revenue grew from Rs. 175 crore in 2020 to Rs. 210 crore in 2021. Company Q\'s revenue grew from Rs. 240 crore in 2020 to Rs. 276 crore in 2021. Which company recorded the higher PERCENTAGE growth in revenue over this period?',
+    options: ['Company P', 'Company Q', 'Both grew by the same percentage', 'Cannot be determined from the data given'],
+    answer: 0,
+    marks: 2,
+    difficulty: 'hard',
+    type: 'numerical',
+    explanation: 'Percentage growth must be measured against each company\'s OWN starting value, not compared by the size of the absolute increase. Company P increased by 210 - 175 = Rs. 35 crore on a base of 175, which is 35/175 = 1/5 = 20%. Company Q increased by 276 - 240 = Rs. 36 crore on a base of 240, which is 36/240 = 3/20 = 15%. Even though Q\'s absolute increase (Rs. 36 crore) is larger than P\'s (Rs. 35 crore), P\'s percentage growth (20%) is clearly higher than Q\'s (15%), because P grew from a much smaller base. Fast route: to compare two percentage growths without full division, cross-multiply the "new value x other base" pairs: compare 210 x 240 against 276 x 175. Here 210 x 240 = 50,400 and 276 x 175 = 48,300; since 50,400 > 48,300, P\'s growth ratio (210/175) exceeds Q\'s (276/240), confirming P grew faster without ever computing an explicit percentage. The trap is judging growth by the larger absolute increase (Rs. 36 crore for Q edges out Rs. 35 crore for P), which completely ignores the very different bases the two increases are measured against — a classic error when skimming a table for the "bigger number" instead of the correct ratio.'
+  },
+  {
+    id: 'apti-data-spatial-h8',
+    q: 'In a survey of 200 readers about three newspapers A, B and C: 100 read A, 80 read B, 60 read C. 30 read both A and B, 20 read both B and C, 25 read both A and C, and 10 read all three newspapers. How many readers read EXACTLY TWO of the three newspapers (not all three, not just one)? (Enter your numerical answer.)',
+    options: [],
+    answer: 45,
+    kind: 'nat',
+    marks: 2,
+    difficulty: 'hard',
+    type: 'numerical',
+    explanation: 'The given pairwise overlap figures (30, 20, 25) each include the readers who read ALL THREE newspapers, since anyone reading all three is automatically counted in every pairwise overlap as well. To isolate the readers who read EXACTLY two, the all-three group (10) must be subtracted out of each pairwise figure before adding them: exactly-A-and-B-only = 30 - 10 = 20; exactly-B-and-C-only = 20 - 10 = 10; exactly-A-and-C-only = 25 - 10 = 15. Summing these three "exactly two" regions: 20 + 10 + 15 = 45. Fast route: never add the raw pairwise overlap numbers directly when a question asks for "exactly two," since each pairwise figure is contaminated by the all-three group by construction — always subtract the triple-overlap once from each pairwise number first, then add. The trap is answering with the raw sum 30 + 20 + 25 = 75, which overstates the true exactly-two count because it triple-counts the 10 all-three readers within all three pairwise terms (each of them is wrongly included as "exactly two" three times over, once in each pair), when they should not appear in the exactly-two count at all.'
+  },
+  {
+    id: 'apti-data-spatial-h9',
+    q: 'A clock\'s image, when viewed in a vertical mirror, shows the time as 8:20. What is the angle between the hour hand and the minute hand at the ACTUAL time (not the mirror image)?',
+    options: ['130 degrees', '110 degrees', '150 degrees', '100 degrees'],
+    answer: 0,
+    marks: 2,
+    difficulty: 'hard',
+    type: 'numerical',
+    explanation: 'This problem chains two separate rules and must be solved in the correct order. First, convert the mirror-image time to the actual time using the identity: actual time + mirror time = 11 hours 60 minutes (i.e., 12:00, expressed this way so both sides can be handled purely in hours and minutes without carrying). Mirror time is 8:20, so actual time = 11:60 - 8:20 = 3:40 — subtract minutes first (60 - 20 = 40) then hours (11 - 8 = 3). Only now, with the correct actual time in hand, apply the clock-angle formula: angle = |30H - 5.5M| with H = 3, M = 40, giving |90 - 220| = 130 degrees, which is already the smaller of the two possible angles (130 and 360 - 130 = 230), so no further adjustment is needed. Fast route: always perform the mirror-to-actual time conversion as one full subtraction from 11:60 in a single step, rather than converting to total minutes past midnight and back, which is more error-prone; only after obtaining a clean H:M value should the angle formula be applied. The trap is applying the clock-angle formula directly to the mirror-displayed time (8:20), which gives a real but completely irrelevant angle for a clock that was never actually showing that time — the question explicitly asks for the angle at the ACTUAL time, a distinction that is easy to skip past when solving quickly.'
+  },
+  {
+    id: 'apti-data-spatial-h10',
+    q: 'The figure below shows a flat net of six squares that, when folded along the internal edges, forms a cube. When folded into a cube, which number lies on the face opposite the face numbered 3?',
+    figure: '<svg viewBox="0 0 160 120" width="100%" style="max-width:320px;height:auto" xmlns="http://www.w3.org/2000/svg"><rect x="0" y="40" width="40" height="40" fill="none" stroke="currentColor"/><text x="20" y="65" font-size="18" text-anchor="middle" fill="currentColor">2</text><rect x="40" y="40" width="40" height="40" fill="none" stroke="currentColor"/><text x="60" y="65" font-size="18" text-anchor="middle" fill="currentColor">4</text><rect x="80" y="40" width="40" height="40" fill="none" stroke="currentColor"/><text x="100" y="65" font-size="18" text-anchor="middle" fill="currentColor">5</text><rect x="120" y="40" width="40" height="40" fill="none" stroke="currentColor"/><text x="140" y="65" font-size="18" text-anchor="middle" fill="currentColor">1</text><rect x="40" y="0" width="40" height="40" fill="none" stroke="currentColor"/><text x="60" y="25" font-size="18" text-anchor="middle" fill="currentColor">3</text><rect x="80" y="80" width="40" height="40" fill="none" stroke="currentColor"/><text x="100" y="105" font-size="18" text-anchor="middle" fill="currentColor">6</text></svg>',
+    options: ['6', '5', '1', '2'],
+    answer: 0,
+    marks: 2,
+    difficulty: 'hard',
+    type: 'concept',
+    explanation: 'The net has a horizontal strip of four consecutive squares — numbered 2, 4, 5, 1 from left to right — with two extra squares folded off this strip: the 3 sits above the second square (4), and the 6 sits below the third square (5). For any strip of four squares attached consecutively in a straight line within a cube net, folding always brings the 1st and 3rd squares to opposite faces, and the 2nd and 4th squares to opposite faces — this is because folding a 4-long strip wraps it exactly halfway around the cube, landing the 1st and 3rd (two squares apart) directly across from each other. Applying this to the strip 2, 4, 5, 1: the 1st and 3rd give 2 opposite 5, and the 2nd and 4th give 4 opposite 1. That accounts for four of the six faces, leaving only 3 and 6 unpaired. Since a cube has exactly three pairs of opposite faces and two pairs are already determined, the two squares left over, 3 and 6, must be opposite each other by elimination, even though they are not part of the same straight strip and are attached to the net at different points (3 above the "4" square, 6 below the "5" square). Fast route: always locate the single longest straight run of four or more squares first and resolve its 1st-3rd and 2nd-4th opposite pairs immediately, then assign any remaining squares as opposite by elimination rather than attempting to mentally fold the entire net at once.'
+  }
+);
