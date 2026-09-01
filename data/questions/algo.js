@@ -3325,3 +3325,161 @@ window.GATE_DATA.questions['algo'].topics.find(function(t){return t.id==='algo-g
   explanation: 'With a binary heap implementation, Prim\'s algorithm performs V EXTRACT-MIN operations (one per vertex added to the MST, each costing O(log V)) and, across the whole run, performs at most E DECREASE-KEY operations in total (each edge can trigger at most one decrease-key, when it offers a cheaper connection to a vertex not yet in the tree, and each decrease-key also costs O(log V) with a binary heap). Total time = O(V log V) for extractions + O(E log V) for decrease-keys = O((V+E) log V), which simplifies to O(E log V) for connected graphs where E >= V-1 (E dominates V asymptotically in this sum). This matches Kruskal\'s O(E log E) = O(E log V) (since E is at most V^2, log E = O(log V)) -- both classic MST algorithms land at the same O(E log V) tight bound with these standard data structures, though a FIBONACCI heap implementation of Prim\'s can improve decrease-key to O(1) amortized, achieving the better O(E + V log V) bound instead (a distinction sometimes tested at a more advanced level).'
 }
 );
+window.GATE_DATA.questions['algo'].topics.find(function(t){return t.id==='algo-sorting-searching';}).questions.push(
+{
+  id: 'algo-sorting-searching-pyq1',
+  pyqYear: 2015,
+  q: 'Quicksort is run on the array [5, 3, 8, 4, 2, 7, 1, 6] using the FIRST element of each subarray as the pivot (elements less than pivot go left, others go right, then recurse on each side). What is the TOTAL number of element comparisons (pivot-to-element comparisons) performed?',
+  options: [],
+  kind: 'nat',
+  answer: 14,
+  marks: 2,
+  difficulty: 'hard',
+  type: 'pyq-style',
+  explanation: 'Trace the partitioning at each level. Level 1: pivot=5, compare against {3,8,4,2,7,1,6} = 7 comparisons; splits into left=[3,4,2,1] and right=[8,7,6]. Level 2 (left=[3,4,2,1]): pivot=3, compare against {4,2,1} = 3 comparisons; splits into left=[2,1] and right=[4]. Level 2 (right=[8,7,6]): pivot=8, compare against {7,6} = 2 comparisons; splits into left=[7,6] and right=[] (empty, since both are less than 8). Level 3 (left=[2,1]): pivot=2, compare against {1} = 1 comparison. Level 3 (right=[7,6] from the right branch): pivot=7, compare against {6} = 1 comparison. All remaining subarrays have size <=1, requiring no more comparisons. Total: 7+3+2+1+1 = 14 comparisons. This exercise (already sorted arrays or first-element-pivot on adversarial-ish input) tests careful hand-tracing of the partition recursion, a frequently examined skill distinct from just knowing Quicksort\'s O(n log n) average / O(n^2) worst case asymptotic bounds.'
+},
+{
+  id: 'algo-sorting-searching-pyq2',
+  pyqYear: 2016,
+  q: 'Merge sort is run on the same array [5, 3, 8, 4, 2, 7, 1, 6] (split at the midpoint each time, standard two-pointer merge). What is the TOTAL number of element comparisons performed during all the merge steps combined?',
+  options: [],
+  kind: 'nat',
+  answer: 17,
+  marks: 2,
+  difficulty: 'hard',
+  type: 'pyq-style',
+  explanation: 'Merge sort first recursively splits [5,3,8,4,2,7,1,6] down to 8 singleton subarrays (no comparisons during pure splitting), then merges bottom-up. Merging pairs of singletons into sorted pairs: (5,3)->1 cmp, (8,4)->1 cmp, (2,7)->1 cmp, (1,6)->1 cmp = 4 comparisons total, producing [3,5],[4,8],[2,7],[1,6]. Merging pairs of sorted-2-lists into sorted-4-lists: merging [3,5] and [4,8] takes 3 comparisons (3 vs 4, 5 vs 4, 5 vs 8) giving [3,4,5,8]; merging [2,7] and [1,6] takes 3 comparisons (2 vs 1, 2 vs 6, 7 vs 6) giving [1,2,6,7] -- subtotal 6 comparisons. Merging the two sorted-4-lists [3,4,5,8] and [1,2,6,7] into the final sorted-8 list takes 7 comparisons (3v1,3v2,3v6,4v6,5v6,5v7,8v7 -- tracing the standard merge pointer walk) giving the fully sorted [1,2,3,4,5,6,7,8]. Total comparisons: 4 + 6 + 7 = 17. This differs from quicksort\'s comparison count (14) on the identical input, illustrating that even though both are Theta(n log n) on average, their EXACT comparison counts on a specific input can differ.'
+},
+{
+  id: 'algo-sorting-searching-pyq3',
+  pyqYear: 2017,
+  q: 'Build-Max-Heap is applied to the array [4, 10, 3, 5, 1, 8, 9, 2, 6] using the standard bottom-up (Floyd\'s) heapify procedure. What is the array AFTER Build-Max-Heap completes?',
+  options: ['[10, 6, 9, 5, 1, 8, 3, 2, 4]', '[10, 9, 8, 6, 5, 4, 3, 2, 1]', '[4, 10, 9, 5, 1, 8, 3, 2, 6]', '[9, 10, 8, 6, 5, 4, 3, 2, 1]'],
+  answer: 0,
+  marks: 2,
+  difficulty: 'hard',
+  type: 'pyq-style',
+  explanation: 'Build-Max-Heap calls Max-Heapify on every non-leaf node, starting from index floor(n/2)-1 = 3 down to index 0 (0-indexed array of 9 elements). Heapify(3) on subtree rooted at a[3]=5 with children a[7]=2,a[8]=6: largest is 6 at index 8, swap -> array becomes [4,10,3,6,1,8,9,2,5]. Heapify(2) on a[2]=3 with children a[5]=8,a[6]=9: largest is 9 at index 6, swap -> [4,10,9,6,1,8,3,2,5]. Heapify(1) on a[1]=10 with children a[3]=6,a[4]=1: 10 already largest, no change. Heapify(0) on a[0]=4 with children a[1]=10,a[2]=9: largest is 10 at index 1, swap -> [10,4,9,6,1,8,3,2,5]; recurse into index 1 (value now 4) with children a[3]=6,a[4]=1: largest is 6 at index 3, swap -> [10,6,9,4,1,8,3,2,5]; recurse into index 3 (value now 4) with children a[7]=2 only (index 8 out of subtree range for this node, index 3\'s children are 7 and 8: a[7]=2, a[8]=5): largest between 4,2,5 is 5 at index 8, swap -> [10,6,9,5,1,8,3,2,4]. Final heap array: [10,6,9,5,1,8,3,2,4], matching option 1.'
+},
+{
+  id: 'algo-sorting-searching-pyq4',
+  pyqYear: 2018,
+  q: 'Given the max-heap array [10, 6, 9, 5, 1, 8, 3, 2, 4], one EXTRACT-MAX operation is performed (remove the max, move the last element to the root, then sift down). What is the resulting heap array?',
+  options: ['[9, 6, 8, 5, 1, 4, 3, 2]', '[9, 6, 8, 5, 1, 2, 3, 4]', '[6, 9, 8, 5, 1, 4, 3, 2]', '[9, 5, 8, 6, 1, 4, 3, 2]'],
+  answer: 0,
+  marks: 2,
+  difficulty: 'hard',
+  type: 'pyq-style',
+  explanation: 'Extract-Max removes a[0]=10 (the max, to be returned), moves the LAST element (a[8]=4) to the root, and shrinks the heap size to 8: array becomes [4, 6, 9, 5, 1, 8, 3, 2]. Now sift-down (max-heapify) from index 0: children of index 0 are a[1]=6, a[2]=9; largest of {4,6,9} is 9 at index 2, swap -> [9,6,4,5,1,8,3,2]; recurse into index 2 (value now 4) with children a[5]=8, a[6]=3: largest of {4,8,3} is 8 at index 5, swap -> [9,6,8,5,1,4,3,2]; recurse into index 5 (value now 4), which is a leaf (no children within heap size 8, since 2*5+1=11 exceeds the array), so sifting stops. Final heap array after extraction: [9,6,8,5,1,4,3,2], matching option 1. This exact chain of two operations (Build-Max-Heap then one Extract-Max) is a very common two-part GATE-style question testing careful heap manipulation tracing.'
+},
+{
+  id: 'algo-sorting-searching-pyq5',
+  pyqYear: 2019,
+  q: 'What is the MINIMUM possible number of comparisons needed, in the worst case, by ANY comparison-based sorting algorithm to sort 7 distinct elements (the information-theoretic lower bound)?',
+  options: [],
+  kind: 'nat',
+  answer: 13,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: 'Any comparison-based sorting algorithm must be able to distinguish between all n! possible orderings of n distinct elements, and each comparison has only 2 possible outcomes, so a decision tree modeling the algorithm must have at least n! leaves and hence height at least ceil(log2(n!)) (since a binary tree of height h has at most 2^h leaves). For n=7: 7! = 5040. log2(5040) ≈ 12.299, so ceil(log2(5040)) = 13. This means NO comparison-based sorting algorithm can sort 7 elements in fewer than 13 comparisons in the worst case, regardless of cleverness -- this is a fundamental INFORMATION-THEORETIC lower bound, not tied to any specific algorithm\'s implementation. Merge sort\'s actual worst-case comparison count for n=7 is close to but can exceed this bound slightly (merge sort is not always comparison-optimal for every n), while more specialized optimal sorting networks or algorithms can sometimes achieve exactly this bound for small n.'
+},
+{
+  id: 'algo-sorting-searching-pyq6',
+  pyqYear: 2020,
+  q: 'Which of the following statements about comparison-based sorting lower bounds are TRUE? (Multiple Select Question)',
+  options: [
+    'Any comparison-based sorting algorithm requires Omega(n log n) comparisons in the worst case',
+    'Counting sort and Radix sort can sort in O(n) time because they are NOT comparison-based (they use key values directly, not pairwise comparisons)',
+    'The Omega(n log n) lower bound applies to ALL sorting algorithms, including non-comparison-based ones like Radix sort',
+    'Merge sort and Heap sort both achieve the Theta(n log n) worst-case bound, matching the lower bound asymptotically'
+  ],
+  answers: [0, 1, 3],
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: 'Statement 1 is TRUE: the decision-tree argument (a binary tree with at least n! leaves needs height >= log2(n!) = Omega(n log n) by Stirling\'s approximation) applies to ANY algorithm that only gains information via pairwise comparisons, establishing Omega(n log n) as a universal lower bound for that MODEL of computation. Statement 2 is TRUE: Counting sort and Radix sort achieve O(n) or O(n+k) time precisely because they sidestep the comparison model entirely -- they use the actual VALUES of keys (e.g., as array indices in counting sort, or digit-by-digit bucketing in radix sort) rather than comparing pairs of elements, so the comparison-based lower bound simply does not constrain them. Statement 3 is FALSE: this is exactly the common misconception the question tests -- the Omega(n log n) bound is specific to the COMPARISON-BASED model; algorithms that exploit extra structure (bounded integer keys, fixed digit counts) can and do beat it, achieving linear time under different (reasonable) assumptions about the input. Statement 4 is TRUE: both merge sort and heap sort are comparison-based and achieve Theta(n log n) in the WORST case (unlike quicksort, whose worst case is Theta(n^2) despite Theta(n log n) average case), making them asymptotically optimal comparison-based sorts.'
+},
+{
+  id: 'algo-sorting-searching-pyq7',
+  pyqYear: 2021,
+  q: 'Quicksort is applied to an array that is ALREADY SORTED IN ASCENDING ORDER, using the LAST element as the pivot each time. What is the WORST-CASE time complexity for this specific scenario, and why?',
+  options: [
+    'Theta(n^2), because the pivot is always the maximum of its subarray, producing maximally unbalanced partitions (n-1 and 0)',
+    'Theta(n log n), because sorted input is always the best case for Quicksort',
+    'Theta(n), because no swaps are needed on already-sorted input',
+    'Theta(n^2), but only because the FIRST element is used as pivot, not the last'
+  ],
+  answer: 0,
+  marks: 1,
+  difficulty: 'easy',
+  type: 'pyq-style',
+  explanation: 'When the array is already sorted ascending and the LAST element is always chosen as the pivot, that pivot is always the LARGEST element in its current subarray (since everything before it, being sorted ascending, is smaller). Partitioning around the maximum element produces one side with all n-1 other elements and an empty other side -- the most UNBALANCED partition possible. This gives the recurrence T(n) = T(n-1) + T(0) + Theta(n) = T(n-1) + Theta(n), which unrolls to Theta(n^2) (the classic linear-decrease-with-linear-work pattern, same as insertion sort\'s worst case). This is precisely why naive Quicksort implementations that always pick a FIXED position (first or last element) as pivot are considered risky on nearly-sorted or adversarially-crafted input, motivating randomized pivot selection or median-of-three pivot strategies in practice, which make this specific worst-case scenario extremely unlikely.'
+},
+{
+  id: 'algo-sorting-searching-pyq8',
+  pyqYear: 2022,
+  q: 'A sorting algorithm is described as STABLE. Which of the following statements correctly explains what this means, and which of the standard algorithms listed is/are stable? (Multiple Select Question)',
+  options: [
+    'A stable sort preserves the RELATIVE ORDER of elements that compare as equal',
+    'Merge sort (with a standard <= comparison in the merge step) is stable',
+    'Standard in-place Heap sort and standard Quicksort (Lomuto/Hoare partition) are typically NOT stable',
+    'Stability is only relevant when sorting arrays of primitive numbers with no associated data'
+  ],
+  answers: [0, 1, 2],
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: 'Statement 1 correctly defines stability: a sort is stable if, whenever two elements are considered EQUAL by the comparison used, their relative order in the output matches their relative order in the input (important when sorting records/objects by one field, wanting ties broken by original order). Statement 2 is TRUE: merge sort, when its merge step consistently takes from the LEFT sublist on ties (using <= rather than <), never reorders equal elements relative to each other, making it stable. Statement 3 is TRUE: heap sort\'s repeated extract-max/swap-with-last operations, and quicksort\'s partitioning (which swaps elements across large jumps based on pivot comparisons), both routinely move equal elements past each other in ways that do not preserve original relative order -- both are standardly considered NOT stable (though quicksort CAN be made stable with extra space/tricks, that is not the default implementation). Statement 4 is FALSE: stability matters most precisely when sorting composite records by a subset of fields (e.g., sorting employee records by department while wanting ties within a department to remain in original name order) -- it is irrelevant only for pure primitive values with no distinguishing "identity" beyond their value, which is the opposite of when stability actually matters.'
+},
+{
+  id: 'algo-sorting-searching-pyq9',
+  pyqYear: 2023,
+  q: 'Counting Sort is used to sort an array of 20 elements, where each element is an integer in the range [0, 9]. What is the TIGHT time complexity, expressed in terms of n=20 (number of elements) and k=10 (range size)?',
+  options: ['Theta(n + k)', 'Theta(n log n)', 'Theta(n * k)', 'Theta(k log k)'],
+  answer: 0,
+  marks: 1,
+  difficulty: 'easy',
+  type: 'pyq-style',
+  explanation: 'Counting sort works by: (1) initializing a count array of size k (here k=10, for values 0 through 9) and counting occurrences of each value, taking Theta(n) to scan the input plus Theta(k) to initialize the count array; (2) computing prefix sums over the count array, taking Theta(k); (3) placing each of the n input elements into its correct output position using the (adjusted) counts, taking Theta(n). Summing all phases: Theta(n) + Theta(k) + Theta(k) + Theta(n) = Theta(n + k). For n=20 and k=10, this is Theta(30) = Theta(n) in this specific case since n and k are comparable in size, but the general tight bound in terms of both parameters is Theta(n+k) -- crucially NOT Theta(n*k) (which would be pessimistic) nor Theta(n log n) (that bound applies to comparison-based sorts; counting sort is not comparison-based and can beat that bound when k = O(n)).'
+},
+{
+  id: 'algo-sorting-searching-pyq10',
+  pyqYear: 2024,
+  q: 'Radix Sort is used to sort n integers, each having d digits (in some fixed base), using Counting Sort as the stable subroutine for each digit position (base b, so each digit is in range [0, b-1]). What is the TIGHT overall time complexity?',
+  options: ['Theta(d * (n + b))', 'Theta(n log n)', 'Theta(d * n * b)', 'Theta(n^2)'],
+  answer: 0,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: 'Radix sort processes the d digit positions one at a time (typically from least significant to most significant), running a STABLE sort (counting sort) on each digit position. Each single counting-sort pass over n numbers, with each digit in range [0,b-1] (so b distinct digit values), costs Theta(n+b) as established for counting sort. Since there are d such passes (one per digit position), and each pass\'s stability is essential to guarantee overall correctness (preserving the sorted order established by less-significant digits when sorting by a more-significant digit), the total time is d * Theta(n+b) = Theta(d*(n+b)). This is why radix sort is advantageous specifically when d is small (few digits/passes needed) and b is not too large relative to n (each pass stays cheap) -- for example, sorting n numbers each with d=O(log_b(max value)) digits can beat Theta(n log n) comparison sorts when the maximum value is polynomially bounded in n, since d then becomes O(log n / log b), and choosing b=Theta(n) makes each pass Theta(n) and the number of passes Theta(log n / log n) = O(1), giving overall Theta(n) -- a classic "beating the comparison lower bound via structure" argument.'
+},
+{
+  id: 'algo-sorting-searching-pyq11',
+  pyqYear: 2025,
+  q: 'A sorted array of 1000 distinct integers is searched using BINARY SEARCH for a value known to be present. What is the MAXIMUM number of iterations (comparisons against the target) the search can take?',
+  options: [],
+  kind: 'nat',
+  answer: 10,
+  marks: 1,
+  difficulty: 'easy',
+  type: 'pyq-style',
+  explanation: 'The worst-case number of comparisons for binary search on n elements is floor(log2(n)) + 1. For n=1000: since 2^9=512 and 2^10=1024, we have 512 <= 1000 < 1024, so floor(log2(1000)) = 9, giving worst-case comparisons = 9+1 = 10. Intuitively, each comparison discards (at least) half of the remaining candidate range, so after k comparisons, at most ceil(n/2^k) candidates remain (roughly); the search needs enough halvings to shrink the search space from 1000 down to a single element, requiring exactly ceil(log2(1000+1)) = 10 comparisons in the worst case (searching for the value at one of the extreme "hardest to find quickly" positions). This is a standard NAT-format question drilling the precise comparison-count formula, distinct from just knowing the Theta(log n) asymptotic class.'
+},
+{
+  id: 'algo-sorting-searching-pyq12',
+  pyqYear: 2026,
+  q: 'Which of the following statements comparing Quicksort and Merge Sort are TRUE? (Multiple Select Question)',
+  options: [
+    'Merge sort has Theta(n log n) time complexity in ALL cases (best, average, worst), while Quicksort\'s worst case is Theta(n^2)',
+    'Merge sort typically requires Theta(n) additional (auxiliary) space, while a well-implemented in-place Quicksort needs only O(log n) additional space (for the recursion stack)',
+    'Quicksort is generally preferred in practice for in-memory array sorting due to better cache locality and lower constant factors, despite its worse worst-case bound',
+    'Merge sort cannot be used to sort linked lists efficiently, unlike Quicksort'
+  ],
+  answers: [0, 1, 2],
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: 'Statement 1 is TRUE: merge sort\'s divide-always-in-half-then-merge structure gives Theta(n log n) regardless of input arrangement (the recurrence T(n)=2T(n/2)+Theta(n) does not depend on data values at all), while quicksort\'s partition sizes DO depend on pivot choice relative to data, degrading to Theta(n^2) when partitions are maximally unbalanced (e.g., already-sorted input with naive pivot selection). Statement 2 is TRUE: merge sort\'s merge step conventionally needs an auxiliary array of size Theta(n) to merge two sorted halves without overwriting unread elements, while in-place quicksort partitions within the original array, needing only recursion-stack space, which is O(log n) on average (and can be bounded to O(log n) worst-case too, with the "recurse on smaller half first" tail-call optimization trick). Statement 3 is TRUE and reflects real-world practice: despite merge sort\'s better worst-case guarantee, quicksort\'s in-place operation (better cache behavior, less memory allocation/copying overhead) and smaller constant factors make it the more commonly used default in many standard library implementations for arrays (though many production sorts are hybrids, like Introsort, that fall back to heap sort to avoid quicksort\'s worst case). Statement 4 is FALSE: merge sort is actually PARTICULARLY well-suited to linked lists (merging two sorted linked lists needs only O(1) extra space via pointer rearrangement, unlike arrays), while quicksort\'s in-place partitioning advantage is specific to random-access arrays and is much less natural/efficient on linked lists (no O(1) random access for partitioning).'
+}
+);

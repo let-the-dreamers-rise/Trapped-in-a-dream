@@ -2578,3 +2578,163 @@ window.GATE_DATA.questions['cn'].topics.find(function(t){return t.id==='cn-trans
     explanation: "IP's own header checksum only verifies that the IP header itself was not corrupted in transit; it says nothing about whether the packet ended up correctly associated with the right upper-layer protocol or the right source/destination IP pairing further down the stack, especially since the IP header is technically outside of what TCP itself receives as its payload. By folding the source IP, destination IP, protocol field, and segment length into its own checksum computation via the pseudo-header, TCP can additionally catch scenarios like a segment being misrouted to the wrong destination address or misidentified as belonging to a different protocol, providing an extra end-to-end sanity check that complements, rather than duplicates, IP's more narrowly scoped header-only checksum."
   }
 );
+
+window.GATE_DATA.questions['cn'].topics.find(function(t){return t.id==='cn-application';}).questions.push(
+  {
+    id: "cn-application-p1",
+    pyqYear: 2015,
+    q: "A browser must fetch a base HTML page plus 5 embedded objects, all hosted on the same server. Assume 1 RTT is needed for the initial DNS lookup (only once), transmission and processing times are negligible, and the browser uses non-persistent HTTP with no parallel connections (each object requires its own separate serial TCP connection). How many total RTTs elapse from starting the DNS lookup until all 6 items (page + 5 objects) are fully received?",
+    options: [],
+    kind: "nat",
+    answer: 13,
+    marks: 2,
+    difficulty: "hard",
+    type: "pyq-style",
+    explanation: "The DNS lookup itself costs 1 RTT. Fetching the base HTML page under non-persistent HTTP needs 1 RTT to set up a new TCP connection plus 1 RTT to send the request and receive the response, totaling 2 RTT. Since there are no parallel connections, each of the 5 embedded objects must then be fetched one at a time, each also needing its own fresh TCP connection: 1 RTT (setup) + 1 RTT (request/response) = 2 RTT per object, so 5 x 2 = 10 RTT for all objects combined, done strictly serially. Adding it all up: 1 (DNS) + 2 (base page) + 10 (five objects, serial) = 13 RTT total. This fully serial, connection-per-object behaviour is exactly why non-persistent HTTP without any parallelism is by far the slowest of the standard HTTP transfer models."
+  },
+  {
+    id: "cn-application-p2",
+    pyqYear: 2016,
+    q: "Continuing the same scenario (1 base page + 5 embedded objects, 1 RTT DNS lookup), if the browser instead uses non-persistent HTTP but is allowed up to 3 parallel TCP connections simultaneously, how many total RTTs elapse until everything is received?",
+    options: ["5", "6", "7", "9"],
+    answer: 2,
+    marks: 2,
+    difficulty: "hard",
+    type: "pyq-style",
+    explanation: "DNS lookup still costs 1 RTT, and the base page still needs 2 RTT (connection setup + request/response), just as before, since it must be fetched before the browser even knows which 5 objects it needs. With 3 parallel connections available for the 5 embedded objects, the browser can fetch 3 objects simultaneously in the first batch (taking 2 RTT for that batch, since all 3 run in parallel and finish together) and the remaining 2 objects in a second batch (also 2 RTT, running in parallel with each other). So the objects need ceil(5/3) = 2 sequential batches x 2 RTT each = 4 RTT total for all embedded objects. Grand total: 1 (DNS) + 2 (base page) + 4 (objects, 2 parallel batches) = 7 RTT."
+  },
+  {
+    id: "cn-application-p3",
+    pyqYear: 2017,
+    q: "Continuing the same scenario (1 base page + 5 embedded objects, 1 RTT DNS lookup), if the browser instead uses persistent HTTP with pipelining (a single TCP connection is reused, and all requests for the 5 objects are sent back-to-back without waiting for individual responses), how many total RTTs elapse until everything is received?",
+    options: ["2", "3", "4", "6"],
+    answer: 2,
+    marks: 2,
+    difficulty: "medium",
+    type: "pyq-style",
+    explanation: "DNS lookup costs 1 RTT. With persistent HTTP, only a single TCP connection needs to be established for the entire page, costing 1 RTT for the handshake, after which the base page's request and response take another 1 RTT. Once the base page is parsed and the 5 embedded object URLs are known, pipelining lets the browser fire off all 5 object requests back-to-back over the same already-open connection without waiting for each response individually, so all 5 responses can stream back within a single additional RTT. Total: 1 (DNS) + 1 (TCP setup) + 1 (base page) + 1 (all 5 objects, pipelined) = 4 RTT — dramatically fewer round trips than either non-persistent variant, which is exactly why HTTP/1.1 made persistent connections (and pipelining) the norm."
+  },
+  {
+    id: "cn-application-p4",
+    pyqYear: 2018,
+    q: "Continuing the same scenario once more, if the browser uses persistent HTTP but WITHOUT pipelining (the same TCP connection is reused for every object, but each object's request must still wait for the previous object's response before being sent), how many total RTTs elapse until everything is received?",
+    options: ["4", "6", "7", "8"],
+    answer: 3,
+    marks: 2,
+    difficulty: "medium",
+    type: "pyq-style",
+    explanation: "As before: 1 RTT for DNS, 1 RTT for the single TCP connection setup, and 1 RTT for the base page's request/response, using the same persistent connection. Without pipelining, however, each of the 5 embedded objects must be requested strictly one after another, each needing its own full RTT (request out, response back) before the next object's request can even be sent, even though no new TCP connection is needed each time. That is 5 x 1 = 5 RTT for the objects. Total: 1 (DNS) + 1 (TCP setup) + 1 (base page) + 5 (objects, serial requests over the reused connection) = 8 RTT. This sits between the fully serial non-persistent case (13 RTT) and the pipelined persistent case (4 RTT), isolating exactly how much benefit pipelining alone contributes once the connection-reuse benefit is already accounted for."
+  },
+  {
+    id: "cn-application-p5",
+    pyqYear: 2019,
+    q: "A client's local DNS server has an empty cache (no records for root, TLD, or authoritative servers) and must resolve a domain name using iterative queries: it queries the root server, then the appropriate TLD server, then the authoritative server for that domain, one after another. Assuming every query-response round trip (client-to-local-server, and each of the local server's three iterative queries) takes exactly 1 RTT, how many total RTTs elapse before the client receives the final resolved IP address?",
+    options: [],
+    kind: "nat",
+    answer: 4,
+    marks: 2,
+    difficulty: "medium",
+    type: "pyq-style",
+    explanation: "The client sends its query to the local (recursive) DNS server and waits for a reply — but that single client-observed round trip actually encompasses everything the local server does internally first. With an empty cache, the local server must itself perform three sequential iterative queries: first to a root server (1 RTT), then to the TLD server the root pointed it to (1 RTT), then to the authoritative server the TLD server pointed it to (1 RTT) — 3 RTT total just for the local server's own resolution work. Only after obtaining the final answer does the local server reply to the client, which is the 4th RTT from the client's perspective (client-to-local-server and back). So the total elapsed time, as experienced by the client, is 1 + 3 = 4 RTT, even though the client itself only ever sent one query."
+  },
+  {
+    id: "cn-application-p6",
+    pyqYear: 2020,
+    q: "In the DNS hierarchy, what is the key difference between a recursive query and an iterative query, as used between a client, its local DNS server, and the root/TLD/authoritative servers?",
+    options: ["A recursive query means the server receiving it takes full responsibility for obtaining the complete final answer (possibly by issuing further queries of its own) before replying; an iterative query means the server receiving it may simply reply with a referral to another server that might know better, rather than the final answer itself", "A recursive query always takes exactly one RTT while an iterative query always takes multiple RTTs, regardless of caching", "Iterative queries are used only for IPv6 addresses, recursive queries only for IPv4", "There is no functional difference; the terms are interchangeable synonyms for the same query mechanism"],
+    answer: 0,
+    marks: 1,
+    difficulty: "easy",
+    type: "concept",
+    explanation: "In a recursive query, the queried server is obligated to fully resolve the request on the client's behalf, chasing down whatever further queries are needed itself, and only sends back the final, complete answer (this is what a client typically sends to its local DNS server). In an iterative query, the queried server is allowed to respond immediately with 'I don't know the final answer, but here is a referral to a server that might' — it does not do the follow-up work itself (this is what a local DNS server typically sends to root and TLD servers). This asymmetry is why the local DNS server bears the burden of walking down the DNS hierarchy step by step on the client's behalf, while the client itself only ever issues one recursive-style request and waits for the fully resolved answer."
+  },
+  {
+    id: "cn-application-p7",
+    pyqYear: 2021,
+    q: "FTP (File Transfer Protocol) is unusual among common application-layer protocols in that it uses two separate TCP connections for a single file-transfer session. What is each connection used for?",
+    options: ["One connection carries only usernames/passwords; the other carries only file data, with no other information", "A control connection (typically port 21) stays open for the entire session carrying commands and status replies (like login, directory listing, file requests); a separate data connection (typically port 20 in active mode, or a negotiated port in passive mode) is opened only when actual file data needs to be transferred, and is closed after each transfer", "Both connections carry identical duplicate data for redundancy against packet loss", "One connection is TCP and the other is UDP, used interchangeably depending on file size"],
+    answer: 1,
+    marks: 1,
+    difficulty: "easy",
+    type: "concept",
+    explanation: "FTP's dual-connection design separates control information from bulk data. The control connection, conventionally on port 21, remains open for the entire duration of an FTP session, carrying commands the client sends (like USER, PASS, LIST, RETR) and the server's textual status replies. A separate data connection is opened specifically whenever an actual file transfer or directory listing needs to happen; in active mode the server initiates this from port 20 back to the client, while in passive mode (more firewall/NAT-friendly) the client initiates it to a port the server specifies. This data connection is typically closed once that particular transfer completes, while the control connection persists, allowing multiple file transfers to occur in sequence within one login session without needing to re-authenticate each time."
+  },
+  {
+    id: "cn-application-p8",
+    pyqYear: 2022,
+    q: "Why can SMTP (Simple Mail Transfer Protocol) not be used by an email client to retrieve (download) new messages waiting in a user's mailbox on their mail server, requiring a separate protocol like POP3 or IMAP instead?",
+    options: ["SMTP is a push protocol, designed for a client (or relaying server) to push/send mail toward a destination mail server; it has no mechanism for a client to pull or query for mail waiting in a mailbox, which is exactly the pull-oriented job POP3 and IMAP are designed for", "SMTP cannot run over TCP, only UDP, making mailbox retrieval technically impossible", "SMTP is only used for encrypting emails, not for any actual transfer", "POP3 and IMAP are simply older, deprecated names for SMTP itself"],
+    answer: 0,
+    marks: 1,
+    difficulty: "easy",
+    type: "concept",
+    explanation: "SMTP was designed purely as a push protocol: a sending mail client or relaying mail server actively pushes an outgoing message to the next mail server in the delivery chain, ending at the recipient's mail server, where the message is deposited into that recipient's mailbox for storage. SMTP has no defined operations for a client to later come along and ask 'is there any new mail waiting for me?' or to download and manage messages sitting in that mailbox — that pull-style interaction (checking, downloading, marking as read, deleting, organizing into folders) is exactly what POP3 and IMAP were separately designed to provide. This push/pull split is why a complete email system always needs SMTP for outgoing/relay delivery alongside POP3 or IMAP for the recipient's actual retrieval from their mailbox."
+  },
+  {
+    id: "cn-application-p9",
+    pyqYear: 2023,
+    q: "A browser has a locally cached copy of an image and sends a conditional GET request to the origin server using an If-Modified-Since header. If the image has NOT changed since that cached timestamp, what does the server send back, and what benefit does this provide over an unconditional GET?",
+    options: ["The server sends a fresh full copy of the image regardless, since conditional GET has no effect on the response body", "The server sends back a 304 Not Modified response with no image body, telling the browser its cached copy is still valid; this saves the bandwidth of re-transferring the unchanged image data, even though a round trip to the server is still required", "The server automatically deletes the cached copy from the browser to force a fresh download next time", "Conditional GET always uses UDP instead of TCP to reduce overhead"],
+    answer: 1,
+    marks: 2,
+    difficulty: "medium",
+    type: "concept",
+    explanation: "Conditional GET is a caching-validation mechanism: the browser tells the server the timestamp of the version it already has cached, via If-Modified-Since. If the resource has not changed since then, the server responds with HTTP status 304 Not Modified and an empty (or near-empty) response body, rather than re-sending the entire image data the browser already possesses. This still costs one full round trip (the request must go out and a response must come back), so it does not eliminate RTT-based latency, but it saves substantial bandwidth by avoiding retransmission of unchanged, potentially large, resource bodies. Only if the resource actually changed would the server instead respond with a normal 200 OK and the fresh content."
+  },
+  {
+    id: "cn-application-p10",
+    pyqYear: 2024,
+    q: "HTTP/1.1 persistent connections use a keep-alive mechanism where an idle TCP connection is left open for some time after a response is sent, in case the client sends further requests soon. What is the primary trade-off a server must balance when choosing how long to keep such idle connections open?",
+    options: ["There is no trade-off; connections should always be kept open indefinitely with no downside", "Keeping connections open longer avoids the overhead of repeated TCP handshakes for closely-spaced future requests, but ties up server resources (memory, file descriptors, connection-table entries) on connections that may end up going unused, limiting how many total clients the server can serve simultaneously", "Longer keep-alive times always increase security vulnerabilities but have no effect on performance at all", "Keep-alive timeouts only matter for UDP-based protocols, not TCP-based HTTP"],
+    answer: 1,
+    marks: 1,
+    difficulty: "easy",
+    type: "concept",
+    explanation: "Persistent connections avoid the cost of a fresh TCP handshake (and, for HTTPS, a fresh TLS handshake) for every subsequent request from the same client, which is a substantial round-trip and CPU savings when requests are closely spaced, such as loading a page's many embedded objects. However, every open connection consumes real server-side resources, such as memory buffers and an entry in the operating system's connection table, whether or not the client actually sends another request soon. If a server sets its keep-alive timeout too long, many idle connections accumulate and can exhaust these resources, reducing the total number of clients the server can serve concurrently; too short a timeout, conversely, forfeits much of persistent HTTP's round-trip-saving benefit. Servers must tune this timeout to balance these competing costs."
+  },
+  {
+    id: "cn-application-p11",
+    pyqYear: 2025,
+    q: "A local DNS server already has the TLD server's address cached from a previous lookup, but does not have the authoritative server's address cached (and does not need to query the root server at all, since the TLD server's address is already known). Using iterative queries for the remaining unresolved steps, how many total RTTs elapse from the client's query until it receives the resolved IP address?",
+    options: [],
+    kind: "nat",
+    answer: 3,
+    marks: 2,
+    difficulty: "medium",
+    type: "pyq-style",
+    explanation: "Because the TLD server's address is already cached, the local DNS server can skip querying the root server entirely and go straight to the TLD server, then on to the authoritative server. This means the local server itself only needs 2 RTT of iterative querying: one RTT to the (already-known) TLD server, and one more RTT to the authoritative server it points to. Adding the client's own round trip to and from the local DNS server (1 RTT, which encompasses this internal work), the total elapsed time is 1 + 2 = 3 RTT — one fewer than the fully uncached case (which needed 4 RTT, including a root-server query). This illustrates precisely why DNS caching, even partial caching of just the TLD-level record, meaningfully speeds up subsequent resolutions."
+  },
+  {
+    id: "cn-application-p12",
+    pyqYear: 2026,
+    q: "HTTP is fundamentally a stateless protocol, meaning the server does not automatically retain any memory of previous requests from the same client across separate connections. Which mechanism is most commonly used to let a web server maintain state (such as recognizing a logged-in user) across multiple otherwise-stateless HTTP requests?",
+    options: ["The server tracks state entirely using the client's source TCP port number, which never changes across requests", "HTTP cookies: the server sends a Set-Cookie header containing an identifying token, which the browser then automatically includes in the Cookie header of every subsequent request to that same server, letting the server look up the associated stored session state", "HTTP automatically upgrades to a stateful protocol like TCP whenever login is required", "State is maintained purely by the DNS server, which remembers which IP addresses have previously logged in"],
+    answer: 1,
+    marks: 1,
+    difficulty: "easy",
+    type: "concept",
+    explanation: "Since plain HTTP requests carry no inherent memory of prior interactions (each request-response exchange is handled independently by the server), cookies were introduced specifically to bridge this gap. When a server wants to remember something about a client (such as its logged-in identity or shopping-cart contents), it issues a Set-Cookie header in a response, containing a token, typically an opaque session identifier the server can look up in its own server-side session store. The browser stores this cookie and automatically re-attaches it via a Cookie header on every subsequent request to that same server (or matching domain/path), letting the server recognize returning requests as belonging to the same client session and retrieve the associated stored state, all despite HTTP itself never natively tracking connections across requests."
+  },
+  {
+    id: "cn-application-p13",
+    pyqYear: 2016,
+    q: "A client requests a web object through a caching web proxy server. If the proxy already has a valid, unexpired cached copy of the object, how many round trips (RTTs) are needed between the client and the proxy to deliver it, compared to how many RTTs would be needed if the client instead contacted the distant origin server directly (assuming the origin server RTT is much larger than the client-proxy RTT)?",
+    options: ["Both cases require exactly the same number of RTTs, since caching provides no time benefit", "Using the cache requires only 1 RTT (client-to-proxy), while going to the origin server directly would require the (typically much larger) client-to-origin-server RTT — potentially several times larger — making the proxy noticeably faster for cached content", "Using the cache always requires more RTTs than going to the origin server, because the proxy must still separately verify the cached copy with the origin server every time", "Neither scenario requires any RTTs, since caching eliminates all network communication"],
+    answer: 1,
+    marks: 1,
+    difficulty: "easy",
+    type: "concept",
+    explanation: "When a web proxy holds a valid cached copy of the requested object, it can respond directly to the client using just the client-to-proxy round trip, typically 1 RTT, without needing to contact the origin server at all. By contrast, fetching the same object directly from a distant origin server requires the client-to-origin RTT, which is frequently much larger (crossing more network hops, larger physical distance, and possibly a slower or more congested path) than the client-to-nearby-proxy RTT. This RTT reduction, combined with reduced load on the origin server and reduced traffic on the wider network path, is the core performance rationale for deploying web caching proxies (and, at larger scale, Content Delivery Networks) close to end users."
+  },
+  {
+    id: "cn-application-p14",
+    pyqYear: 2019,
+    q: "Which of the following are valid application-layer protocols that primarily use UDP rather than TCP as their transport? (Select all that apply.)",
+    options: ["DNS (for typical short queries)", "DHCP (Dynamic Host Configuration Protocol)", "HTTP (standard web browsing, HTTP/1.1 and HTTP/2)", "SNMP (Simple Network Management Protocol)"],
+    answers: [0, 1, 3],
+    marks: 2,
+    difficulty: "medium",
+    type: "concept",
+    explanation: "DNS typically uses UDP for its usual short query/response exchanges (falling back to TCP only for larger responses like zone transfers or responses exceeding UDP's size limits), since the simplicity and low overhead of UDP suits DNS's typically small, single-round-trip request/response pattern well. DHCP also uses UDP (ports 67/68), since a client obtaining an IP address has no existing IP/TCP connection to use yet, and broadcast-based UDP messaging fits the discovery process needed. SNMP similarly uses UDP for its typically small, periodic management queries and traps, prioritizing low overhead over guaranteed delivery. HTTP, by contrast, is built on TCP (both HTTP/1.1 and HTTP/2 use TCP; only the newer HTTP/3 uses UDP-based QUIC), since reliable, ordered, in-sequence delivery of potentially large web content is essential to HTTP's design, making it the one protocol in this list that is NOT UDP-based."
+  }
+);

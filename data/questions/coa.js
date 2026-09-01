@@ -2667,3 +2667,187 @@ window.GATE_DATA.questions['coa'].topics.find(function(t){return t.id==='coa-pip
   explanation: 'The original pipeline\'s cycle time is its slowest stage plus one latch: max(3,4,9,5,6,4) + 1 = 9 + 1 = 10 ns. After splitting the 9 ns stage into three 3 ns sub-stages, the stage delays become {3,4,3,3,3,5,6,4}; the new slowest stage is now the 6 ns one (previously hidden behind the larger 9 ns stage), giving a new cycle time of 6 + 1 = 7 ns. For a very long instruction stream, both pipelines approach one instruction completed per cycle, so the asymptotic speedup of the new design over the old one is simply the ratio of cycle times: 10 / 7 ≈ 1.43. This illustrates an important subtlety: splitting the single worst stage does not automatically deliver a proportional speedup, because as soon as that stage shrinks, a different, previously-hidden stage (here the 6 ns one) becomes the new bottleneck and caps the achievable improvement.'
 }
 );
+
+window.GATE_DATA.questions['coa'].topics.find(function(t){return t.id==='coa-memory';}).questions.push(
+{
+  id: 'coa-memory-p1',
+  pyqYear: 2015,
+  q: 'A direct-mapped cache has a total capacity of 32 KB with a block size of 64 bytes, addressed by a 32-bit byte address. How many bits are used for the Tag field?',
+  options: ['17', '18', '15', '20'],
+  answer: 0,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: 'The Offset field must address every byte within a block: with a 64-byte block (2^6), the offset needs 6 bits. The Index field must select among all the cache lines: with a 32 KB cache and 64-byte blocks, there are 32768/64 = 512 = 2^9 lines, so the index needs 9 bits (in a direct-mapped cache there is exactly one line per set, so index bits also equal set-select bits). The Tag field takes whatever remains of the 32-bit address: 32 - 9 - 6 = 17 bits. This tag is stored alongside each line and compared against every incoming address\'s tag bits to confirm a hit, since many different blocks in memory share the same index but differ in their tag.'
+},
+{
+  id: 'coa-memory-p2',
+  pyqYear: 2016,
+  q: 'A 4-way set-associative cache has a total capacity of 64 KB, a block size of 32 bytes, and is addressed with a 32-bit byte address. How many bits are needed for the Tag field?',
+  options: ['18', '17', '20', '15'],
+  answer: 0,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: 'The Offset field addresses bytes within a 32-byte block: 32 = 2^5, so 5 offset bits. The total number of cache lines is 64 KB / 32 B = 65536/32 = 2048 lines; since this is 4-way associative, the lines are grouped into sets of 4, giving 2048/4 = 512 = 2^9 sets, so the Index field needs 9 bits (set-associative caches index by SET, not by individual line, which is exactly why increasing associativity at fixed capacity shrinks the index field). The Tag field then takes the remaining bits: 32 - 9 - 5 = 18 bits. Doubling the associativity while holding capacity and block size fixed always removes exactly one index bit and adds it to the tag, since it halves the number of sets while doubling the ways per set.'
+},
+{
+  id: 'coa-memory-p3',
+  pyqYear: 2017,
+  q: 'A fully associative cache has a total capacity of 16 KB with a block size of 16 bytes, addressed with a 32-bit byte address. How many bits does the Tag field require?',
+  options: ['28', '24', '30', '26'],
+  answer: 0,
+  marks: 1,
+  difficulty: 'easy',
+  type: 'pyq-style',
+  explanation: 'In a fully associative cache, a block can be placed in ANY line, so there is no index field at all -- the address splits into only Offset and Tag. The Offset field addresses bytes within a 16-byte block: 16 = 2^4, so 4 offset bits. The Tag field then consumes everything else: 32 - 4 = 28 bits, and every line\'s stored tag must be compared in parallel against this 28-bit value to detect a hit, which is why fully associative caches need expensive parallel (content-addressable) tag comparison hardware and are practical only for small, highly associative structures such as a TLB, not for large L1/L2 data caches.'
+},
+{
+  id: 'coa-memory-p4',
+  pyqYear: 2018,
+  q: 'A processor has an L1 cache with 1 ns hit time and a 5% miss rate. On an L1 miss, it accesses an L2 cache with 8 ns hit time, whose LOCAL miss rate is 20%; an L2 miss then costs 80 ns to service from main memory. What is the average memory access time (AMAT)?',
+  options: ['2.2 ns', '3.0 ns', '1.8 ns', '4.8 ns'],
+  answer: 0,
+  marks: 2,
+  difficulty: 'hard',
+  type: 'pyq-style',
+  explanation: 'AMAT is built from the inside out: the time to service an L2 access is its own hit time plus its local miss rate times the memory access time: T_L2 = 8 + 0.20 x 80 = 8 + 16 = 24 ns. Then AMAT = L1 hit time + L1 miss rate x T_L2 = 1 + 0.05 x 24 = 1 + 1.2 = 2.2 ns. The key idea in multi-level cache AMAT is that you only pay the L2 access cost when L1 actually misses (weighted by the L1 miss rate), and within L2 the LOCAL miss rate (misses in L2 divided by ACCESSES to L2, not by total references) correctly weights how often the even-more-expensive main-memory access is needed. This nested-average structure extends the same way to any number of cache levels.'
+},
+{
+  id: 'coa-memory-p5',
+  pyqYear: 2019,
+  q: 'A direct-mapped cache has 4 lines (block numbers map to a line by block-number mod 4). The following sequence of block numbers is accessed in order: 0, 1, 2, 0, 1, 3, 0, 4, 0, 1. Starting from an empty cache, how many of these 10 accesses are misses?',
+  options: ['6', '4', '5', '7'],
+  answer: 0,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: 'Mapping each block to line = block mod 4: block 0 to line 0, block 1 to line 1, block 2 to line 2, block 3 to line 3, and block 4 also to line 0 (since 4 mod 4 = 0), directly conflicting with block 0. Walking the trace: 0(miss,fills line0), 1(miss,fills line1), 2(miss,fills line2), 0(hit, line0 still holds block0), 1(hit), 3(miss,fills line3), 0(hit), 4(miss -- evicts block0 from line0, since 4 also maps to line0), 0(miss -- block0 was just evicted by 4), 1(hit). Counting misses: 0,1,2,3,4,0 -- that is 6 misses (0M,1M,2M,3M,4M and the final re-access of 0 is also a miss), and the remaining 4 accesses are hits. This trace exercises exactly the conflict-miss idea: blocks 0 and 4 alias to the same line and repeatedly evict each other despite plenty of unused capacity in the other three lines.'
+},
+{
+  id: 'coa-memory-p6',
+  pyqYear: 2020,
+  q: 'A write-through, no-write-allocate cache serves 2000 memory references, of which 40% are writes, each writing one 4-byte word. Every write is sent through to main memory immediately. What is the total number of bytes written to main memory due to these writes?',
+  options: ['3200', '2000', '8000', '1600'],
+  answer: 0,
+  marks: 1,
+  difficulty: 'easy',
+  type: 'pyq-style',
+  explanation: 'In a write-through policy, every single write updates both the cache and main memory at the same time, regardless of whether it was a cache hit or miss (with no-write-allocate, a write miss simply writes straight to memory without pulling the block into the cache at all). The number of write references is 40% of 2000 = 800, and since each write is exactly one 4-byte word, the total bytes written to main memory is 800 x 4 = 3200 bytes. Write-through keeps memory always consistent with the cache, which simplifies multiprocessor cache coherence, but it generates far more memory bus traffic than write-back for write-heavy workloads, since every individual write reaches memory rather than only the final value of a block when it is evicted.'
+},
+{
+  id: 'coa-memory-p7',
+  pyqYear: 2020,
+  q: 'A write-back cache with a 32-byte block size experiences 100 block evictions over the course of a program, of which 60% are dirty (have been written to since being loaded). What is the total number of bytes written back to main memory due to these evictions?',
+  options: ['1920', '3200', '1200', '2880'],
+  answer: 0,
+  marks: 1,
+  difficulty: 'easy',
+  type: 'pyq-style',
+  explanation: 'In a write-back cache, individual writes only update the cached copy of a block (setting its dirty bit) and do NOT go to main memory immediately; a block is written back to memory only when it is evicted AND it is dirty. Here, 60% of the 100 evictions are dirty: 0.60 x 100 = 60 dirty evictions. Each writeback transfers the ENTIRE 32-byte block, not just the specific bytes that were modified, since the cache typically tracks dirty status per block rather than per byte. Total bytes written back = 60 x 32 = 1920 bytes. This is dramatically less traffic than a write-through cache would generate for the same number of writes (which could easily exceed hundreds of individual word-sized writes), illustrating why write-back caches are preferred when write traffic to memory is a bottleneck, at the cost of needing extra hardware (the dirty bit) and more complex coherence handling.'
+},
+{
+  id: 'coa-memory-p8',
+  pyqYear: 2021,
+  q: 'An L1 cache has a 2 ns hit time and an 8% miss rate. An L2 cache has a 10 ns hit time. Overall, 2% of ALL memory references (i.e. the GLOBAL miss rate) result in a main-memory access costing 100 ns. What is the average memory access time (AMAT)?',
+  options: ['4.8 ns', '3.6 ns', '5.2 ns', '4.0 ns'],
+  answer: 0,
+  marks: 2,
+  difficulty: 'hard',
+  type: 'pyq-style',
+  explanation: 'The global L2 miss rate (2%) is the fraction of ALL references, not just of L1 misses, that end up needing main memory. To use it inside the standard nested-AMAT formula, first convert it into L2\'s LOCAL miss rate: local miss rate = global miss rate / L1 miss rate = 0.02 / 0.08 = 0.25 (25%), since L2 is only even accessed on the 8% of references that miss in L1. Then AMAT = L1 hit time + L1 miss rate x (L2 hit time + L2 local miss rate x memory time) = 2 + 0.08 x (10 + 0.25 x 100) = 2 + 0.08 x (10 + 25) = 2 + 0.08 x 35 = 2 + 2.8 = 4.8 ns. The recurring trap here is plugging a GLOBAL miss rate directly into the local-miss-rate slot of the formula without first dividing by the enclosing level\'s miss rate to convert it.'
+},
+{
+  id: 'coa-memory-p9',
+  pyqYear: 2022,
+  q: 'A 2-way set-associative cache has 2 sets (block-number mod 2 selects the set) and uses true LRU replacement within each set. Starting from an empty cache, this block-number trace is accessed: 0, 2, 1, 0, 4, 1, 2, 3, 0, 4. How many of these 10 accesses are hits?',
+  options: ['2', '3', '4', '1'],
+  answer: 0,
+  marks: 2,
+  difficulty: 'hard',
+  type: 'pyq-style',
+  explanation: 'Even-numbered blocks (0, 2, 4) map to set 0, and odd-numbered blocks (1, 3) map to set 1, each set holding up to 2 blocks under LRU. Tracing set 0: access 0 (miss, set0=[0]); access 2 (miss, set0=[0,2]); access 0 (HIT, reorders to set0=[2,0], making 2 the LRU entry); access 4 (miss, set0 full so evicts LRU=2, set0=[0,4]); access 2 (miss, since 2 was evicted, now evicts LRU=0, set0=[4,2]); access 0 (miss, evicts LRU=4, set0=[2,0]); access 4 (miss, evicts LRU=2, set0=[0,4]). Tracing set 1: access 1 (miss, set1=[1]); access 1 again (HIT, set1=[1]); access 3 (miss, set1=[1,3], not full so no eviction needed). Counting all hits across both sets: exactly 2 hits (the two marked HIT above), and the other 8 accesses are misses -- even with 2-way associativity, three distinct even blocks (0,2,4) competing for only 2 ways in set 0 causes repeated LRU thrashing.'
+},
+{
+  id: 'coa-memory-p10',
+  pyqYear: 2022,
+  q: 'A fully associative cache starts empty. The following block-number trace is accessed: 5, 3, 5, 7, 3, 9, 5, 11, 3, 7, 13. Assuming the cache is large enough that no block is ever evicted, how many of these 11 accesses are compulsory (cold-start) misses?',
+  options: ['6', '5', '7', '11'],
+  answer: 0,
+  marks: 1,
+  difficulty: 'easy',
+  type: 'pyq-style',
+  explanation: 'A compulsory (cold) miss occurs the very first time a particular block is ever referenced, since it cannot possibly already be in the cache -- no replacement policy or associativity level can avoid this category of miss. Scanning the trace for each block\'s FIRST appearance: 5 (1st ref, miss), 3 (1st ref, miss), 5 (repeat, hit), 7 (1st ref, miss), 3 (repeat, hit), 9 (1st ref, miss), 5 (repeat, hit), 11 (1st ref, miss), 3 (repeat, hit), 7 (repeat, hit), 13 (1st ref, miss). The distinct blocks that ever appear are {5,3,7,9,11,13} -- exactly 6 distinct blocks -- so there are exactly 6 compulsory misses, one per distinct block, and the remaining 5 accesses (all repeat references, since the cache never evicts anything here) are hits.'
+},
+{
+  id: 'coa-memory-p11',
+  pyqYear: 2023,
+  q: 'A cache uses a 40-bit byte address. The Tag field is 26 bits and the block size is 64 bytes. How many sets does this cache have?',
+  options: ['256', '128', '512', '64'],
+  answer: 0,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: 'The block size of 64 bytes fixes the Offset field at log2(64) = 6 bits. Since the three address fields (Tag, Index, Offset) always partition the full 40-bit address exactly, the Index field width is whatever remains after removing the given Tag and the computed Offset: 40 - 26 - 6 = 8 bits. The number of sets a cache has is always 2^(index bits), so the number of sets is 2^8 = 256. This is the reverse of the usual tag/index/offset problem: instead of being given the cache\'s capacity and associativity to compute the tag, you are given the tag width and must work backward to recover the index width and hence the set count -- the governing identity, tag + index + offset = total address width, applies in either direction.'
+},
+{
+  id: 'coa-memory-p12',
+  pyqYear: 2024,
+  q: 'Two proposed L1 cache designs are compared for the same processor. Design A: 1 ns hit time, 6% miss rate, 50 ns miss penalty. Design B: 1.5 ns hit time, 3% miss rate, the same 50 ns miss penalty. Which design gives the lower average memory access time (AMAT), and by how much?',
+  options: [
+    'Design B is faster, by 1 ns (AMAT_A = 4 ns, AMAT_B = 3 ns)',
+    'Design A is faster, by 1 ns',
+    'Both designs have identical AMAT',
+    'Design B is faster, by 0.5 ns'
+  ],
+  answer: 0,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: 'AMAT = hit time + miss rate x miss penalty for each design. For Design A: AMAT_A = 1 + 0.06 x 50 = 1 + 3 = 4 ns. For Design B: AMAT_B = 1.5 + 0.03 x 50 = 1.5 + 1.5 = 3 ns. Even though Design B has a slower hit time (1.5 ns versus 1 ns), its lower miss rate (3% versus 6%) more than compensates, since each miss is expensive (50 ns). Design B therefore achieves the lower AMAT, beating Design A by 4 - 3 = 1 ns. This exercise reflects a very real design tension in cache engineering: a larger or more associative cache (Design B, say) typically has a somewhat slower hit time but a meaningfully lower miss rate, and only computing full AMAT -- never comparing hit time or miss rate in isolation -- correctly captures which trade-off wins.'
+},
+{
+  id: 'coa-memory-p13',
+  pyqYear: 2024,
+  q: 'A write-back cache with a 64-byte block size experiences 100 block evictions during a program run, of which 70% are dirty. What is the total number of bytes written back to main memory?',
+  options: ['4480', '6400', '3200', '4800'],
+  answer: 0,
+  marks: 1,
+  difficulty: 'easy',
+  type: 'pyq-style',
+  explanation: 'Only dirty evictions trigger a writeback in a write-back cache, since a clean (unmodified) block being evicted is already identical to what main memory holds and can simply be discarded. The number of dirty evictions is 70% of 100 = 70. Each writeback transfers the full 64-byte block, regardless of how many bytes within it were actually modified, because dirty status is tracked per block, not per byte. Total bytes written back = 70 x 64 = 4480 bytes. Comparing this to the earlier write-back example (60 dirty evictions of 32-byte blocks giving 1920 bytes) shows how both the eviction count, the dirty fraction, and the block size all directly scale the total writeback traffic -- doubling the block size, for instance, doubles the traffic for the same eviction pattern.'
+},
+{
+  id: 'coa-memory-p14',
+  pyqYear: 2025,
+  q: 'An 8-way set-associative cache has a total capacity of 16 KB and a block size of 32 bytes. Byte address 8480 is accessed. Which set does this address map to?',
+  options: ['Set 9', 'Set 34', 'Set 17', 'Set 0'],
+  answer: 0,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: 'The total number of cache lines is 16384/32 = 512, and since the cache is 8-way associative, these lines form 512/8 = 64 sets. The block number containing byte address 8480 is floor(8480/32) = 265 (integer division discards the offset within the block). The set that this block maps to is the block number modulo the number of sets: 265 mod 64 = 9, since 64 x 4 = 256 and 265 - 256 = 9. So address 8480 maps to Set 9. This mirrors the direct division method used to double-check tag/index/offset bit extraction: block number = floor(address / block size), and set number = block number mod (number of sets) -- both must agree with whatever the bit-field partition of the address gives directly.'
+},
+{
+  id: 'coa-memory-p15',
+  pyqYear: 2026,
+  q: 'A three-level cache hierarchy has: L1 hit time 1 ns with a 6% miss rate; L2 hit time 6 ns with a LOCAL miss rate of 25%; L3 hit time 20 ns with a LOCAL miss rate of 30%; a main memory access on an L3 miss costs 120 ns. What is the overall AMAT?',
+  options: ['2.2 ns', '3.1 ns', '1.9 ns', '2.6 ns'],
+  answer: 0,
+  marks: 2,
+  difficulty: 'hard',
+  type: 'pyq-style',
+  explanation: 'Build the nested AMAT formula from the innermost (slowest) level outward. First, the effective time when L3 is accessed: T_L3 = L3 hit time + L3 local miss rate x memory time = 20 + 0.30 x 120 = 20 + 36 = 56 ns. Next, the effective time when L2 is accessed: T_L2 = L2 hit time + L2 local miss rate x T_L3 = 6 + 0.25 x 56 = 6 + 14 = 20 ns. Finally, overall AMAT = L1 hit time + L1 miss rate x T_L2 = 1 + 0.06 x 20 = 1 + 1.2 = 2.2 ns. Each level is only ever charged when the level above it actually misses, and every LOCAL miss rate is with respect to accesses reaching that specific level, not the original reference stream -- exactly the pattern that extends the standard two-level AMAT formula to any number of cache levels.'
+},
+{
+  id: 'coa-memory-p16',
+  pyqYear: 2026,
+  q: 'A direct-mapped cache has 8 lines (block-number mod 8 selects the line). A tight loop repeatedly accesses block numbers 0, 8 and 16 in a fixed round-robin order (0, 8, 16, 0, 8, 16, 0, 8), for a total of 8 accesses, starting from an empty cache. How many of these accesses are hits?',
+  options: ['0', '2', '5', '6'],
+  answer: 0,
+  marks: 1,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: 'All three block numbers alias to the very same line, since 0 mod 8 = 0, 8 mod 8 = 0, and 16 mod 8 = 0 -- despite the cache having 8 lines total, this particular working set of 3 blocks only ever uses 1 of them and repeatedly evicts itself. Walking the trace: block 0 (miss, fills line0), block 8 (miss, evicts 0), block 16 (miss, evicts 8), block 0 (miss, evicts 16, since 0 is no longer present), block 8 (miss), block 16 (miss), block 0 (miss), block 8 (miss) -- every single access is a miss, giving 0 hits out of 8. This is a classic cache-thrashing / conflict-miss scenario: even though the cache is far from full in absolute capacity, poor address alignment (all three blocks conflict-mapping to the same line) destroys temporal locality entirely, which is exactly why real caches use set-associativity to tolerate a handful of simultaneously "hot" but conflicting addresses.'
+}
+);
