@@ -3274,3 +3274,94 @@ window.GATE_DATA.questions['cn'].topics.find(function(t){return t.id==='cn-basic
     explanation: "Since the message is NOT split into packets (pure message switching), the entire 600,000 bits must be fully received at each intermediate node before any part of it can be forwarded onward -- so each link independently pays the FULL message's transmission time at that link's own (different) rate. Link 1: Tt = 600,000/(3x10^6) = 200 ms. Link 2: Tt = 600,000/(1.5x10^6) = 400 ms. Link 3: Tt = 600,000/(6x10^6) = 100 ms. Sum of transmission delays = 200+400+100 = 700 ms. Sum of propagation delays across 3 links = 3x6 = 18 ms. Sum of nodal processing delays at the 2 intermediate nodes (not the destination) = 2x2 = 4 ms. Total = 700+18+4 = 722 ms. The trap is that with three DIFFERENT link rates, the middle (slowest, 1.5 Mbps) link dominates the transmission-delay sum at 400 ms alone -- a solver who assumes all links share one 'representative' rate, or forgets that pure (unfragmented) message switching forces each hop to pay the FULL message transmission time rather than a pipelined fraction of it, will compute a substantially different, wrong total."
   }
 );
+
+window.GATE_DATA.questions['cn'].topics.find(function(t){return t.id==='cn-application';}).questions.push(
+  {
+    id: 'cn-application-h1',
+    q: "A web page consists of 1 base HTML file plus 5 embedded objects (images), all served from the same server, all previously uncached (cold cache). DNS resolution for this server requires 2 sequential iterative lookups, each taking 20 ms (so 40 ms of DNS time total, paid once). RTT between client and server is 50 ms; transmission times are negligible. The client uses NON-PERSISTENT HTTP with NO parallel connections: every single object (including the base page) requires its own fresh TCP connection (1 RTT for the TCP handshake) followed by 1 RTT for the HTTP request/response, all done strictly one object at a time. What is the total page load time, in ms?",
+    options: [],
+    answer: 640,
+    kind: 'nat',
+    marks: 2,
+    difficulty: 'hard',
+    type: 'numerical',
+    explanation: "Total objects to fetch = 1 base page + 5 images = 6 objects. DNS resolution happens once, up front: 2 x 20 ms = 40 ms. Under non-persistent HTTP with no parallelism, EACH of the 6 objects requires its own new TCP connection: 1 RTT to complete the handshake, then 1 more RTT to send the HTTP GET and receive the response, for 2 RTT = 100 ms per object. With 6 objects done strictly serially: 6 x 100 = 600 ms. Total = DNS + serial object fetches = 40 + 600 = 640 ms. The trap is forgetting to count the BASE PAGE ITSELF as one of the objects requiring its own full connection setup (a common mistake is to count only the 5 images, giving a smaller and incorrect answer) -- non-persistent HTTP tears down the connection after every single response, including the very first one that fetches the HTML itself, so all 6 fetches pay the full 2-RTT connection-plus-request cost."
+  },
+  {
+    id: 'cn-application-h2',
+    q: "Using the identical setup as before (1 base page + 5 objects, DNS = 40 ms total, RTT = 50 ms, transmission times negligible), the client now uses PERSISTENT (non-pipelined) HTTP: a single TCP connection is opened once (1 RTT handshake) and reused for all 6 requests, but the client still waits for each response before sending the next request (no pipelining, so each of the 6 requests still costs its own separate RTT, just without repeating the handshake). What is the total page load time, in ms?",
+    options: [],
+    answer: 390,
+    kind: 'nat',
+    marks: 2,
+    difficulty: 'hard',
+    type: 'numerical',
+    explanation: "DNS = 40 ms (unchanged, paid once regardless of HTTP mode). The TCP handshake now happens only ONCE for the whole session: 1 RTT = 50 ms. Then, since there is no pipelining, each of the 6 objects (base page + 5 images) still requires its own separate request/response RTT, done one after another: 6 x 50 = 300 ms. Total = 40 + 50 + 300 = 390 ms. Compare this to the 640 ms non-persistent result: persistent connections save exactly 5 RTTs' worth of redundant handshakes (250 ms saved), since only 1 handshake is paid instead of 6, while the request/response RTTs themselves are unchanged in count. The trap is double-counting the handshake (adding it once for the connection AND again folding it into a '2 RTT per object' formula left over from the non-persistent case) or, conversely, forgetting to add it at all since it is easy to focus only on the 6 serial request RTTs and skip the initial connection-setup RTT entirely."
+  },
+  {
+    id: 'cn-application-h3',
+    q: "Using the same setup once more (1 base page + 5 objects, DNS = 40 ms total, RTT = 50 ms, transmission times negligible), the client now uses PERSISTENT PIPELINED HTTP: the single TCP connection is opened once (1 RTT), the base HTML page is fetched first (1 RTT, since the client must see the HTML to discover the URLs of the 5 embedded objects), and then all 5 embedded objects are requested together in a single pipelined burst, with their responses streaming back so that all 5 are received within 1 additional RTT total. What is the total page load time, in ms?",
+    options: [],
+    answer: 190,
+    kind: 'nat',
+    marks: 2,
+    difficulty: 'hard',
+    type: 'numerical',
+    explanation: "DNS = 40 ms (unchanged). TCP handshake = 1 RTT = 50 ms (paid once). Fetching the base HTML page requires its own RTT (50 ms), since the client cannot know what the 5 embedded object URLs even are until it has parsed the HTML -- this RTT cannot be pipelined away. Once the base page is known, however, the client can fire off all 5 remaining object requests back-to-back on the now-open, now-warm connection, and pipelining lets all 5 responses come back within a single additional RTT (50 ms), rather than 5 separate serial RTTs. Total = 40 + 50 + 50 + 50 = 190 ms. Comparing all three modes: non-persistent = 640 ms, persistent non-pipelined = 390 ms, persistent pipelined = 190 ms -- pipelining roughly halves the time again versus plain persistent connections, but the base-page RTT can never be eliminated or folded into the pipelined burst, since the object URLs are genuinely unknown before that first response arrives; this is the trap most likely to be missed (treating ALL 6 objects, including the base page itself, as pipelinable into one RTT, which would incorrectly give 140 ms)."
+  },
+  {
+    id: 'cn-application-h4',
+    q: "A web page load involves resolving a domain name that is NOT cached anywhere, requiring a full DNS resolution chain of 3 sequential lookups (client to local resolver to root server, then TLD server, then authoritative server), each taking 15 ms (total DNS time = 45 ms, paid once, up front). The browser then uses NON-PERSISTENT HTTP but opens up to 3 PARALLEL connections at a time. It must first fetch the base HTML page alone (1 connection, 2 RTT: handshake + request/response, since the base page's own URL is already known and can start immediately after DNS), THEN, once the base page reveals 8 embedded object URLs, it fetches those 8 objects in parallel batches of at most 3 connections at a time (each object still needs its own fresh 2-RTT connection: handshake + request/response; a new batch of up to 3 starts only once the previous batch of up to 3 fully completes). RTT = 40 ms throughout; transmission times are negligible. What is the total page load time, in ms?",
+    options: [],
+    answer: 365,
+    kind: 'nat',
+    marks: 2,
+    difficulty: 'hard',
+    type: 'numerical',
+    explanation: "DNS = 45 ms (3 x 15 ms, paid once up front). Base page fetch = 1 connection x 2 RTT = 2 x 40 = 80 ms (must happen before anything else, since the 8 object URLs are unknown until this response arrives). The 8 remaining objects, fetched in parallel batches of up to 3: ceil(8/3) = 3 batches (sizes 3, 3, 2 -- the last batch is smaller but still takes the SAME time as a full batch, since batch time is governed by the slowest connection in it, and all connections in a batch run the same 2-RTT process concurrently). Each batch takes 2 RTT = 80 ms, and batches run strictly one after another (a new batch cannot start until the previous one's connections are all free): 3 batches x 80 ms = 240 ms. Total = 45 + 80 + 240 = 365 ms. The trap is assuming all 8 objects can be fetched in a single wave just because there are 'only' 8 of them -- with a parallelism cap of 3 connections, they must be split into 3 sequential batches, and a partial final batch (only 2 objects) still costs a FULL batch's worth of time, not a discounted fraction."
+  },
+  {
+    id: 'cn-application-h5',
+    q: "Using RSA with small toy primes p = 5 and q = 11: compute n = p x q and phi(n) = (p-1)(q-1), choose public exponent e = 7 (which is coprime to phi(n)), then find the private exponent d as the modular inverse of e mod phi(n). Using this key pair, what is the RSA ciphertext c = m^e mod n for the plaintext message m = 8?",
+    options: [],
+    answer: 2,
+    kind: 'nat',
+    marks: 2,
+    difficulty: 'hard',
+    type: 'numerical',
+    explanation: "n = p x q = 5 x 11 = 55. phi(n) = (p-1)(q-1) = 4 x 10 = 40. e = 7 is coprime to 40 (gcd(7,40)=1), so it is a valid public exponent (d itself is not needed to compute the ciphertext here, only n and e are, though a full RSA setup would also find d = 23 via the extended Euclidean algorithm for later decryption). Encrypt: c = m^e mod n = 8^7 mod 55. Computing via repeated squaring: 8^2 = 64 mod 55 = 9; 8^4 = 9^2 = 81 mod 55 = 26; 8^7 = 8^4 x 8^2 x 8^1 = 26 x 9 x 8 mod 55. First 26 x 9 = 234 mod 55 = 234 - 220 = 14; then 14 x 8 = 112 mod 55 = 112 - 110 = 2. So c = 2. The trap is attempting to compute 8^7 = 2,097,152 directly and then reducing mod 55 in one shot (error-prone by hand for larger exponents) instead of using repeated squaring mod n at each step, which keeps every intermediate number small and manageable -- and also mistakenly using p or q individually as the modulus instead of the product n=55."
+  },
+  {
+    id: 'cn-application-h6',
+    q: "Using RSA with small toy primes p = 3 and q = 11: n = p x q = 33, phi(n) = (p-1)(q-1) = 2 x 10 = 20. Public exponent e = 3 (coprime to 20). Find the private exponent d (the modular inverse of e mod phi(n), i.e., the value satisfying e x d = 1 mod phi(n)), then use d to decrypt a received ciphertext c = 5. What is the resulting plaintext message m = c^d mod n?",
+    options: [],
+    answer: 14,
+    kind: 'nat',
+    marks: 2,
+    difficulty: 'hard',
+    type: 'numerical',
+    explanation: "First find d: we need 3d = 1 (mod 20). Testing small values (or using the extended Euclidean algorithm on 3 and 20): 3x7 = 21 = 1 (mod 20), so d = 7. Now decrypt: m = c^d mod n = 5^7 mod 33. Using repeated squaring: 5^2 = 25 mod 33 = 25; 5^4 = 25^2 = 625 mod 33 = 625 - 594 = 31 (since 33x18=594); 5^7 = 5^4 x 5^2 x 5^1 = 31 x 25 x 5 mod 33. First 31 x 25 = 775 mod 33: 33x23=759, 775-759=16. Then 16 x 5 = 80 mod 33 = 80-66=14. So m = 14. The trap is finding d via naive trial-and-error without a systematic method (the extended Euclidean algorithm) for larger, less friendly numbers, and separately, forgetting that decryption uses the SAME modulus n=33 as encryption (not phi(n)=20) -- confusing the two moduli is one of the most common RSA-toy-example errors."
+  },
+  {
+    id: 'cn-application-h7',
+    q: "A DNS record has a Time-To-Live (TTL) of 300 seconds. A client's FIRST request for this domain, with a completely cold local cache, requires a full recursive resolution chain of 3 RTTs (root, then TLD, then authoritative server), each RTT = 25 ms (so the first lookup costs 75 ms total); the result is then cached locally for exactly 300 seconds. The client goes on to make 11 total requests to this domain over the course of a session: requests 2 through 10 all occur well within the 300-second TTL window (so they incur 0 additional DNS delay, served entirely from cache), but request 11 occurs AFTER the cached entry's TTL has expired, forcing the FULL 3-RTT resolution chain to run again. What is the TOTAL DNS resolution overhead, in ms, summed across all 11 requests in this session?",
+    options: [],
+    answer: 150,
+    kind: 'nat',
+    marks: 2,
+    difficulty: 'hard',
+    type: 'numerical',
+    explanation: "Each full DNS resolution chain (whenever the cache is cold or has expired) costs 3 RTTs x 25 ms = 75 ms. This full chain runs exactly TWICE across the whole session: once for the very first request (cold cache), and once again for request 11 (after the 300-second TTL has expired, forcing a fresh lookup exactly as if the cache were cold again). Requests 2 through 10 (9 requests) each incur 0 ms of DNS overhead, since they all fall within the still-valid 300-second cache window. Total DNS overhead = 2 x 75 = 150 ms. The trap is assuming that because only ONE of the 11 requests (request 11) is 'late', its DNS cost is somehow smaller or partial -- a TTL expiry does not produce a cheaper, incremental re-lookup; it triggers the exact SAME full 3-RTT chain as the very first cold-cache lookup, since the cache entry is simply gone once its TTL elapses, with no partial credit for having been resolved before."
+  },
+  {
+    id: 'cn-application-h8',
+    q: "A client loads a page over HTTPS. RTT = 30 ms throughout, transmission times negligible. The sequence of round trips required, IN ORDER, is: (1) DNS resolution, 1 RTT; (2) TCP handshake, 1 RTT; (3) TLS 1.2 full handshake, 2 RTT (TLS 1.2, unlike the newer TLS 1.3's single-RTT handshake, requires 2 full round trips to complete its key exchange before any application data can flow); (4) HTTP request for the base HTML page, 1 RTT; (5) all 4 remaining embedded objects fetched together via a single pipelined HTTP request/response burst on the now-open, encrypted connection, 1 more RTT. What is the total page load time, in ms?",
+    options: [],
+    answer: 180,
+    kind: 'nat',
+    marks: 2,
+    difficulty: 'hard',
+    type: 'numerical',
+    explanation: "Add up every stage in sequence, each stage's RTT-count times 30 ms: DNS = 1 x 30 = 30 ms; TCP handshake = 1 x 30 = 30 ms; TLS 1.2 handshake = 2 x 30 = 60 ms; base HTML page request/response = 1 x 30 = 30 ms; pipelined fetch of the 4 remaining objects = 1 x 30 = 30 ms. Total = 30+30+60+30+30 = 180 ms. The trap is treating the TLS handshake as costing just 1 RTT the way the TCP handshake does -- TLS 1.2's full handshake genuinely requires 2 round trips (ClientHello/ServerHello-with-certificate, then the key-exchange-and-finished messages) before the first byte of encrypted application data can be sent, roughly doubling the 'connection setup tax' compared to plain unencrypted HTTP over the same network path; this extra RTT is exactly the overhead that TLS 1.3's redesigned single-round-trip (and 0-RTT resumption) handshake was created to eliminate."
+  }
+);
