@@ -3061,3 +3061,159 @@ window.GATE_DATA.questions['os'].topics.find(function(t){return t.id==='os-memor
   explanation: 'Since each page table entry corresponds to exactly one page of the virtual address space, having 2^10 = 1024 entries means the process can address at most 1024 distinct pages. The total addressable space is then the number of pages multiplied by the size of each page: 1024 pages x 4 KB/page = 4096 KB = 4 MB. This is exactly the reverse computation of finding "how many entries are needed for a given address space size" (as in a related question): here, the page table SIZE (number of entries) is given, and we compute the maximum address space it can support, which is a common way GATE frames this same underlying relationship -- (address space size) = (number of page table entries) x (page size) -- from the opposite direction.'
 }
 );
+
+window.GATE_DATA.questions['os'].topics.find(function(t){return t.id==='os-virtual-memory';}).questions.push(
+{
+  id: 'os-virtual-memory-p1',
+  pyqYear: 2015,
+  q: 'A process references pages in the order: 1, 2, 3, 4, 1, 2, 5, 1, 2, 3, 4, 5. The system has exactly 3 page frames, all initially empty, and uses the FIFO page replacement algorithm. How many page faults occur in total? (Enter your numerical answer.)',
+  options: [],
+  answer: 9,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: 'Simulating FIFO with 3 empty frames (oldest-loaded page is evicted first): ref 1,2,3 each fault, filling frames to [1,2,3]. Ref 4 faults, evicting 1 (the oldest), giving [2,3,4]. Ref 1 faults again, evicting 2, giving [3,4,1]. Ref 2 faults, evicting 3, giving [4,1,2]. Ref 5 faults, evicting 4, giving [1,2,5]. Ref 1 and ref 2 are now HITS (both present). Ref 3 faults, evicting 1 (oldest), giving [2,5,3]. Ref 4 faults, evicting 2, giving [5,3,4]. Ref 5 is a HIT. Counting: faults occur at references 1,2,3,4,1,2,5,3,4 -- that is 9 faults out of 12 references, with hits only at the two later occurrences of 1, 2, and the final 5. This reference string with 3 frames is the standard textbook example used to demonstrate Belady\'s Anomaly, since increasing the frame count to 4 actually increases the fault count under FIFO rather than reducing it.'
+},
+{
+  id: 'os-virtual-memory-p2',
+  pyqYear: 2016,
+  q: 'Using the SAME reference string as before -- 1, 2, 3, 4, 1, 2, 5, 1, 2, 3, 4, 5 -- and the SAME FIFO algorithm, but now with 4 page frames instead of 3, the number of page faults is found to be 10 (MORE than the 9 faults with only 3 frames). What OS concept does this surprising result illustrate?',
+  options: ['A simulation error -- more frames can never cause more page faults under any algorithm', 'Belady\'s Anomaly: for FIFO specifically, increasing the number of available frames can, for certain reference strings, counter-intuitively INCREASE rather than decrease the number of page faults', 'This proves FIFO is actually a stack algorithm like LRU and Optimal', 'This only happens when the reference string contains no repeated page numbers'],
+  answer: 1,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: 'Belady\'s Anomaly is the well-known, genuinely counter-intuitive phenomenon where, for SOME page replacement algorithms and SOME specific reference strings, adding more physical frames results in MORE page faults rather than fewer or the same. It occurs because FIFO (and some other non-stack algorithms) do not guarantee that the set of pages held in memory with k frames is always a SUBSET of the pages held with k+1 frames at every point in time -- this "subset property" is what stack algorithms like LRU and Optimal satisfy by construction, which is exactly why LRU and Optimal are mathematically PROVEN immune to Belady\'s Anomaly, while FIFO is not. This reference string (1,2,3,4,1,2,5,1,2,3,4,5) is the specific, famous example originally used to demonstrate the anomaly in Belady\'s 1969 paper, going from 9 faults (3 frames) to 10 faults (4 frames) under FIFO.'
+},
+{
+  id: 'os-virtual-memory-p3',
+  pyqYear: 2017,
+  q: 'A process references pages in the order: 7, 0, 1, 2, 0, 3, 0, 4, 2, 3, 0, 3, 2. The system has 3 page frames, all initially empty, and uses the LRU (Least Recently Used) page replacement algorithm. How many page faults occur in total? (Enter your numerical answer.)',
+  options: [],
+  answer: 9,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'hard',
+  type: 'pyq-style',
+  explanation: 'Tracing LRU with 3 frames: ref 7,0,1 each fault, filling [7,0,1]. Ref 2 faults, evicting 7 (least recently used, since 0 and 1 were referenced more recently), giving [0,1,2]. Ref 0 is a HIT. Ref 3 faults, evicting 1 (now the LRU page, since 0 was just used and 2 before that), giving [0,2,3]. Ref 0 is a HIT. Ref 4 faults, evicting 2 (LRU), giving [0,3,4]. Ref 2 faults, evicting 3 (LRU), giving [0,4,2]. Ref 3 faults, evicting 0 (LRU, since 4 and 2 were used more recently), giving [4,2,3]. Ref 0 faults, evicting 4 (LRU), giving [2,3,0]. Ref 3 and ref 2 are both HITS at the end. Counting faults: 7,0,1,2,3,4,2,3,0 -- that is 9 faults out of 13 references.'
+},
+{
+  id: 'os-virtual-memory-p4',
+  pyqYear: 2018,
+  q: 'Using the SAME reference string -- 7, 0, 1, 2, 0, 3, 0, 4, 2, 3, 0, 3, 2 -- and the SAME LRU algorithm, but now with 4 page frames instead of 3, how many page faults occur? (Enter your numerical answer.)',
+  options: [],
+  answer: 6,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'hard',
+  type: 'pyq-style',
+  explanation: 'Tracing LRU with 4 frames: ref 7,0,1,2 each fault, filling [7,0,1,2]. Ref 0 is a HIT. Ref 3 faults, evicting 7 (LRU, the only page never touched again since its initial load), giving [0,1,2,3]. Ref 0 is a HIT. Ref 4 faults, evicting 1 (LRU, since 0, 2, and 3 have all been referenced more recently than 1), giving [0,2,3,4]. From here, references 2, 3, 0, 3, 2 are ALL hits, since all five of these page numbers (0, 2, 3, 4 currently held, referenced repeatedly) are already resident and no new page number ever appears again. Counting faults: 7,0,1,2,3,4 -- exactly 6 faults out of 13 references. Notice this is FEWER faults than with 3 frames (9), which is the expected, well-behaved monotonic relationship -- confirming that LRU, being a stack algorithm, never exhibits Belady\'s Anomaly.'
+},
+{
+  id: 'os-virtual-memory-p5',
+  pyqYear: 2019,
+  q: 'A process references pages in the order: 1, 2, 3, 4, 1, 2, 5, 1, 2, 3, 4, 5. The system has 3 page frames, all initially empty, and uses the OPTIMAL (Belady\'s optimal, OPT) page replacement algorithm, which always evicts the page that will not be used for the longest time in the future. How many page faults occur in total? (Enter your numerical answer.)',
+  options: [],
+  answer: 7,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'hard',
+  type: 'pyq-style',
+  explanation: 'Tracing Optimal with 3 frames: ref 1,2,3 each fault, filling [1,2,3]. Ref 4 faults: looking ahead at the remaining string (1,2,5,1,2,3,4,5), page 1 is needed again very soon (next reference), page 2 is needed soon after, but page 3 is not needed again until much later (position 10) -- so Optimal evicts 3, giving [1,2,4]. Ref 1 and 2 are HITS. Ref 5 faults: looking ahead (1,2,3,4,5), page 1 and 2 are needed again very soon, but page 4 is not needed again until much later (position 11) -- so Optimal evicts 4, giving [1,2,5]. Ref 1 and 2 are HITS again. Ref 3 faults: looking ahead (4,5), page 1 is never referenced again, so Optimal evicts 1, giving [2,5,3]. Ref 4 faults: looking ahead (5), page 2 is never referenced again, so Optimal evicts 2, giving [5,3,4]. Ref 5 is a HIT. Counting faults: 1,2,3,4,5,3,4 -- exactly 7 faults, the fewest possible for any algorithm on this reference string with 3 frames, since Optimal is provably the best achievable (though it requires future knowledge and is not implementable in practice).'
+},
+{
+  id: 'os-virtual-memory-p6',
+  pyqYear: 2020,
+  q: 'For ANY given reference string and ANY fixed number of frames, which of the following relationships among the number of page faults produced by FIFO, LRU, and Optimal (OPT) is GUARANTEED to always hold?',
+  options: ['OPT\'s fault count is always less than or equal to both LRU\'s and FIFO\'s fault count, since OPT is provably optimal, but no fixed ordering between LRU and FIFO is guaranteed in general', 'LRU always produces strictly fewer faults than FIFO for every possible reference string', 'FIFO always produces strictly fewer faults than LRU for every possible reference string', 'All three algorithms always produce exactly the same number of faults for any given reference string and frame count'],
+  answer: 0,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: 'The Optimal (OPT/Belady) algorithm is mathematically proven to produce the minimum possible number of page faults for any given reference string and frame count, since it always evicts the page that will not be needed for the longest stretch of future references -- no other algorithm, however clever, can ever do strictly better than OPT (though achieving this in practice is impossible without knowing the future). This guarantees OPT\'s fault count is always <= both FIFO\'s and LRU\'s fault counts. However, there is NO universal guarantee comparing LRU and FIFO against each other: for most "typical" workloads with strong temporal locality, LRU tends to perform better (fewer faults) than FIFO because recently-used pages are indeed likely to be used again soon, but one can construct specific adversarial reference strings where FIFO happens to outperform LRU, or where they tie exactly. This is why GATE questions comparing LRU and FIFO always require an actual trace/simulation rather than a shortcut rule, while OPT can always be cited as a guaranteed lower bound.'
+},
+{
+  id: 'os-virtual-memory-p7',
+  pyqYear: 2021,
+  q: 'Belady\'s Anomaly -- where increasing the number of page frames can increase the number of page faults -- is a well-known property of the FIFO page replacement algorithm. Can this same anomaly ever occur with the LRU (Least Recently Used) or Optimal (OPT) algorithms?',
+  options: ['No -- LRU and OPT are both classified as "stack algorithms" (the set of pages held with k frames is always a subset of the pages held with k+1 frames), and it is a proven mathematical theorem that stack algorithms can never exhibit Belady\'s Anomaly', 'Yes -- Belady\'s Anomaly can occur with any page replacement algorithm, including LRU and OPT, for sufficiently adversarial reference strings', 'Only LRU is immune to Belady\'s Anomaly; OPT can still exhibit it in rare cases', 'Only OPT is immune to Belady\'s Anomaly; LRU can still exhibit it in rare cases'],
+  answer: 0,
+  marks: 2,
+  difficulty: 'hard',
+  type: 'pyq-style',
+  explanation: 'A "stack algorithm" is formally defined as one where, for every reference string and at every point in time, the set of pages that would be resident in memory with k frames is always a subset of the set of pages that would be resident with (k+1) frames. LRU and Optimal both satisfy this subset property by construction (LRU always keeps the k most-recently-used distinct pages, and OPT always keeps the k pages needed soonest -- both are naturally "nested" as k grows), and it is a proven theorem in the seminal Belady, Nelson, and Shedler paper that any stack algorithm can NEVER exhibit Belady\'s Anomaly: adding frames can only ever maintain or decrease the fault count, never increase it. FIFO, by contrast, is NOT a stack algorithm -- its eviction choice depends purely on load order rather than recency or future use, so the resident set with k frames is not guaranteed to be a subset of the resident set with k+1 frames, which is exactly the loophole that allows the anomaly to occur (as directly demonstrated by the classic 1,2,3,4,1,2,5,1,2,3,4,5 reference string).'
+},
+{
+  id: 'os-virtual-memory-p8',
+  pyqYear: 2022,
+  q: 'A system uses a TLB (Translation Lookaside Buffer) with a hit ratio of 80%, a TLB access time of 20 ns, and a main memory access time of 100 ns. On a TLB hit, the effective access requires one TLB lookup plus one memory access (for the actual data); on a TLB miss, it requires one TLB lookup, one memory access (to read the page table entry), plus one more memory access (for the actual data). What is the Effective Memory Access Time (EMAT), in ns? (Enter your numerical answer.)',
+  options: [],
+  answer: 140,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: 'The Effective Memory Access Time is the probability-weighted average of the hit-case time and the miss-case time. On a TLB HIT (probability 0.8), the total time is TLB access + one memory access for the data = 20 + 100 = 120 ns. On a TLB MISS (probability 1 - 0.8 = 0.2), the total time is TLB access (which still happens and fails to find the mapping) + one memory access to fetch the page table entry + one more memory access to fetch the actual data = 20 + 100 + 100 = 220 ns. The EMAT is then: EMAT = (hit ratio x hit time) + (miss ratio x miss time) = (0.8 x 120) + (0.2 x 220) = 96 + 44 = 140 ns. This formula -- weighting the fast TLB-hit path against the slower TLB-miss path by their respective probabilities -- is the standard technique for every TLB-related EMAT computation in GATE.'
+},
+{
+  id: 'os-virtual-memory-p9',
+  pyqYear: 2023,
+  q: 'A system uses 2-level paging for a 32-bit virtual address space with a 4 KB page size (12 bits of offset). The remaining 20 bits are split EVENLY between the outer (first-level) page table index and the inner (second-level) page table index, so that each page table itself exactly fits within a single page. How many bits are used for the OUTER page table index? (Enter your numerical answer.)',
+  options: [],
+  answer: 10,
+  kind: 'nat',
+  marks: 1,
+  difficulty: 'easy',
+  type: 'pyq-style',
+  explanation: 'The 32-bit virtual address is divided into three fields for 2-level paging: the outer index, the inner index, and the offset. The offset field is fixed at 12 bits (since the page size is 4 KB = 2^12 bytes). This leaves 32 - 12 = 20 bits to be split between the outer and inner index fields. Since the problem states this remaining 20 bits is split EVENLY between the two levels, each gets 20 / 2 = 10 bits. So the outer page table index uses 10 bits (and, by the same reasoning, so does the inner index). This even split is not a coincidence in real systems either: with 10-bit indices, each page table (at either level) has 2^10 = 1024 entries, and if each entry is 4 bytes, each individual page table occupies exactly 1024 x 4 = 4096 bytes = 4 KB -- exactly one page, which is precisely why this particular split is the conventional choice for classic 32-bit x86-style 2-level paging.'
+},
+{
+  id: 'os-virtual-memory-p10',
+  pyqYear: 2024,
+  q: 'A system uses 2-level paging (so translating an address requires accessing 2 levels of page tables before the actual data) together with a TLB. The TLB hit ratio is 90%, TLB access time is 10 ns, and main memory access time is 80 ns. On a TLB hit, the total time is TLB access + 1 memory access (for data). On a TLB miss, the total time is TLB access + 2 memory accesses (one per page table level) + 1 memory access (for the actual data). What is the Effective Memory Access Time (EMAT), in ns? (Enter your numerical answer.)',
+  options: [],
+  answer: 106,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'hard',
+  type: 'pyq-style',
+  explanation: 'On a TLB HIT (probability 0.9), the time is TLB access + 1 memory access for data = 10 + 80 = 90 ns. On a TLB MISS (probability 1 - 0.9 = 0.1), because this system uses 2-level paging, the CPU must walk BOTH page table levels in memory before it can find the actual frame, and then make one final access to fetch the real data -- that is TLB access + 2 page-table-level memory accesses + 1 data memory access = 10 + (2 x 80) + 80 = 10 + 160 + 80 = 250 ns. The EMAT is then the probability-weighted average: EMAT = (0.9 x 90) + (0.1 x 250) = 81 + 25 = 106 ns. This illustrates why deeper (multi-level) page table hierarchies make TLB misses progressively more expensive -- each additional level adds one more mandatory memory access to the miss penalty -- which is exactly why hardware designers push hard for high TLB hit ratios as page tables get deeper.'
+},
+{
+  id: 'os-virtual-memory-p11',
+  pyqYear: 2025,
+  q: 'A system uses 3-level paging (a page table hierarchy with 3 levels) and has NO TLB at all. Every single memory reference by the CPU must therefore walk all 3 page table levels (one memory access per level) before finally accessing the actual data (one more memory access). If main memory access time is 100 ns, what is the Effective Memory Access Time (EMAT) for this system, in ns? (Enter your numerical answer.)',
+  options: [],
+  answer: 400,
+  kind: 'nat',
+  marks: 1,
+  difficulty: 'easy',
+  type: 'pyq-style',
+  explanation: 'Without a TLB, every memory reference must pay the FULL cost of walking the entire page table hierarchy, with no possibility of a fast-path shortcut. For an n-level page table, this means n separate memory accesses are needed just to resolve the address translation (one to fetch each level\'s table entry, since each level\'s table itself resides in memory), PLUS one final memory access to actually fetch the requested data using the now-fully-resolved physical address. Here n=3, so the total number of memory accesses per reference is 3 (page table levels) + 1 (actual data) = 4. Since each memory access costs 100 ns, the Effective Memory Access Time is simply 4 x 100 = 400 ns. This stark 4x slowdown compared to a single flat memory access (100 ns) is exactly why TLBs are essential in any system using multi-level paging -- without one, deeper page table hierarchies make every single memory reference proportionally and unavoidably more expensive.'
+},
+{
+  id: 'os-virtual-memory-p12',
+  pyqYear: 2026,
+  q: 'A process uses 2-level paging where each second-level (inner) page table has 2^10 = 1024 entries, and each entry is 4 bytes. If the process\'s memory usage pattern is sparse enough that only 3 distinct second-level page tables have actually been allocated (i.e., only 3 outer-table entries point to real inner tables; the rest are marked invalid and consume no inner-table memory), what is the TOTAL memory (in KB) consumed by just these allocated inner-level page tables (ignore the outer table\'s own size)? (Enter your numerical answer.)',
+  options: [],
+  answer: 12,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: 'Each individual second-level (inner) page table has 1024 entries x 4 bytes/entry = 4096 bytes = 4 KB of memory, regardless of how many of its entries are actually used for valid mappings (the entire table must be allocated as a unit). Since only 3 such inner tables have actually been allocated (because the process\'s virtual address space usage is sparse, so most outer-table entries simply point to nothing and no corresponding inner table is created for them), the total memory consumed is 3 x 4 KB = 12 KB. This demonstrates the core memory-saving benefit of multi-level (hierarchical) paging over a single flat page table: a flat table would need to reserve space for EVERY possible page number in the entire virtual address space up front, but a multi-level table only allocates inner-level tables for the regions of the address space the process actually uses, at the cost of one extra memory access per translation (or a TLB miss) to walk the additional level.'
+},
+{
+  id: 'os-virtual-memory-p13',
+  pyqYear: 2018,
+  q: 'For the reference string 1, 2, 3, 4, 1, 2, 5, 1, 2, 3, 4, 5 with exactly 3 page frames, how many FEWER page faults does the OPTIMAL (OPT) algorithm produce compared to FIFO? (Enter your numerical answer.)',
+  options: [],
+  answer: 2,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: 'From the FIFO trace on this reference string with 3 frames, the fault count is 9 (faults occur at references 1,2,3,4,1,2,5,3,4, with hits only at the repeated 1, 2, and the final 5). From the OPTIMAL trace on the same reference string with the same 3 frames, the fault count is 7 (faults occur at references 1,2,3,4,5,3,4, since OPT makes smarter eviction choices by always discarding the page needed furthest in the future -- for example, evicting page 3 instead of page 1 when page 4 first causes a fault, since 3 is not needed again until much later than 1 or 2). The difference is 9 - 7 = 2 fewer faults under OPT. This 2-fault gap on an otherwise identical workload and frame count is a concrete, numerical illustration of exactly how much "smarter" eviction decisions (impossible in practice without knowing the future, but useful as a theoretical yardstick) can save compared to the simplistic, order-based FIFO policy.'
+}
+);
