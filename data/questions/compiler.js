@@ -3076,3 +3076,168 @@ window.GATE_DATA.questions['compiler'].topics.find(function(t){return t.id==='co
     explanation: 'The final print(x) is inside f, referring to f\'s OWN locally declared variable x -- this is not a free-variable lookup at all, so its value is printed exactly as f\'s local x currently stands, under EITHER scoping rule; the scoping discipline only affects how inc()\'s free reference to x (inc has no local x of its own) gets resolved. Under STATIC scoping, inc() is defined at the top level, so its free x always binds to the GLOBAL x (0), completely independent of f\'s local x; inc() increments the global x from 0 to 1, but f\'s own local x=100 is never touched, so f\'s later print(x) shows 100. Under DYNAMIC scoping, inc()\'s free reference to x is resolved by searching the live call chain main->f->inc for the nearest active x: f\'s local x=100 is the nearest one found, so inc() increments THIS variable instead, changing it from 100 to 101; f\'s subsequent print(x) then shows 101 (since it is the very same local x that inc() just modified). So the outputs are 100 (static) and 101 (dynamic), matching option 1.'
   }
 );
+
+window.GATE_DATA.questions['compiler'].topics.find(function(t){return t.id==='compiler-optimization';}).questions.push(
+  {
+    id: 'compiler-optimization-p1',
+    pyqYear: 2015,
+    q: 'Given the three-address code (line numbers shown): 1: i=0; 2: t1=i<n; 3: ifFalse t1 goto 9; 4: t2=i*4; 5: t3=a[t2]; 6: sum=sum+t3; 7: i=i+1; 8: goto 2; 9: print sum. Using the standard leader-identification rules, how many basic blocks does this code split into? (Enter your numerical answer.)',
+    options: [],
+    answer: 4,
+    kind: 'nat',
+    marks: 2,
+    difficulty: 'medium',
+    type: 'pyq-style',
+    explanation: 'Leaders are: (a) the first statement, line 1; (b) any statement that is the TARGET of a conditional or unconditional jump: line 9 (target of the ifFalse at line 3) and line 2 (target of the goto at line 8); (c) any statement immediately following a conditional or unconditional jump: line 4 (follows the ifFalse at line 3; line 9 is already a leader from rule b). Collecting all leaders: {1, 2, 4, 9} -- exactly 4 leaders. Each leader begins a new basic block that extends up to (but not including) the next leader, giving the blocks {1}, {2,3}, {4,5,6,7,8}, {9}. So there are 4 basic blocks.'
+  },
+  {
+    id: 'compiler-optimization-p2',
+    pyqYear: 2016,
+    q: 'A basic block computes: S1: x=a+b; S2: y=x*c; S3: a=y-d; S4: z=a+b. Only z is live on exit (LiveOut(S4)={z}). Using backward live-variable analysis (LiveIn(S)=use(S) U (LiveOut(S)-def(S))), how many distinct variables are in LiveIn(S1)? (Enter your numerical answer.)',
+    options: [],
+    answer: 4,
+    kind: 'nat',
+    marks: 2,
+    difficulty: 'hard',
+    type: 'pyq-style',
+    explanation: 'Working backward: LiveOut(S4)={z}. LiveIn(S4)=use(S4) U (LiveOut(S4)-def(S4)) = {a,b} U ({z}-{z}) = {a,b}, so LiveOut(S3)={a,b}. LiveIn(S3)=use(S3) U (LiveOut(S3)-def(S3)) = {y,d} U ({a,b}-{a}) = {y,d,b}, so LiveOut(S2)={y,d,b}. LiveIn(S2)=use(S2) U (LiveOut(S2)-def(S2)) = {x,c} U ({y,d,b}-{y}) = {x,c,d,b}, so LiveOut(S1)={x,c,d,b}. LiveIn(S1)=use(S1) U (LiveOut(S1)-def(S1)) = {a,b} U ({x,c,d,b}-{x}) = {a,b,c,d}. This set has exactly 4 distinct variables (a, b, c, d), while all of x, y, z are purely internal temporaries fully produced and consumed within the block.'
+  },
+  {
+    id: 'compiler-optimization-p3',
+    pyqYear: 2017,
+    q: 'Given the code: 1: x=5; 2: y=x+3; 3: z=y*2; 4: w=z+a; (a is not a compile-time constant). After forward constant propagation followed by constant folding, which of the following resulting statements are CORRECT? (Select ALL that apply)',
+    options: [
+      'Statement 2 folds to: y=8',
+      'Statement 3 folds to: z=16',
+      'Statement 4 folds to: w=20+a',
+      'Statement 4 can be fully folded into a single constant, eliminating variable a entirely'
+    ],
+    answers: [0, 1],
+    marks: 2,
+    difficulty: 'medium',
+    type: 'pyq-style',
+    explanation: 'Since x=5 is a compile-time constant, propagating it into statement 2 gives y=5+3, which constant-folds to y=8 -- option 1 is correct. Propagating this new constant y=8 into statement 3 gives z=8*2, which folds to z=16 -- option 2 is correct. Propagating z=16 into statement 4 gives w=16+a, NOT w=20+a as option 3 incorrectly claims (20 does not arise from any correct computation here), so option 3 is false. Since a is not a compile-time constant, w=16+a cannot be folded any further into a single constant -- a must remain a run-time addition, so option 4 is also false. Only options 1 and 2 are correct.'
+  },
+  {
+    id: 'compiler-optimization-p4',
+    pyqYear: 2018,
+    q: 'Inside a loop, the statement "t = i*4;" recomputes a multiple of the loop index i every iteration, where i increases by exactly 1 each pass. Which classic compiler optimization directly replaces this per-iteration multiplication with successive additions of the constant 4 to an accumulator, exploiting the fact that i changes by a fixed amount each iteration?',
+    options: ['Constant folding', 'Strength reduction', 'Dead-code elimination', 'Loop unrolling'],
+    answer: 1,
+    marks: 1,
+    difficulty: 'easy',
+    type: 'pyq-style',
+    explanation: 'This is the textbook definition of STRENGTH REDUCTION applied to an induction variable: because i increases by a fixed constant (1) on every iteration, the derived value i*4 also increases by a fixed constant (4) on every iteration, so instead of recomputing the multiplication i*4 from scratch each time, the compiler introduces a new variable that starts at the initial value of i*4 and is simply INCREMENTED by 4 each iteration -- replacing an expensive multiplication with a cheaper addition. Constant folding (option 1) only applies to expressions with purely compile-time-constant operands, which i*4 is not since i varies; dead-code elimination (option 3) removes computations whose results are never used, which does not apply here since t is presumably used; loop unrolling (option 4) replicates the loop body to reduce branch overhead, an unrelated transformation.'
+  },
+  {
+    id: 'compiler-optimization-p5',
+    pyqYear: 2019,
+    q: 'Inside the loop body "for(i=0;i<n;i++){ x=a*b; sum=sum+x+i; }", assuming a and b are never modified anywhere inside the loop, which statement is LOOP-INVARIANT and can be safely hoisted out of the loop (computed once before the loop starts)?',
+    options: ['x=a*b', 'sum=sum+x+i', 'the loop condition i<n', 'i=i+1 (the increment)'],
+    answer: 0,
+    marks: 1,
+    difficulty: 'easy',
+    type: 'pyq-style',
+    explanation: 'A statement is loop-invariant if the value it computes does not change across iterations of the loop -- typically because all of its operands are either constants or variables not modified anywhere within the loop body. Since a and b are never reassigned inside this loop, the expression a*b always yields the same result on every iteration, so "x=a*b" is loop-invariant and can be computed just once before the loop and reused every iteration (code motion). By contrast, "sum=sum+x+i" depends on sum and i, both of which change every iteration, so it is NOT invariant; the loop condition i<n depends on the changing i, so it must be re-evaluated each pass; and the increment i=i+1 obviously changes i itself every time and cannot be hoisted.'
+  },
+  {
+    id: 'compiler-optimization-p6',
+    pyqYear: 2020,
+    q: 'A basic block contains: 1: x=a+b; 2: y=a-b; 3: x=c+d; 4: print(x); Assume y is never used anywhere else in the program. Which of the following statements are DEAD CODE that can be safely eliminated from this block? (Select ALL that apply)',
+    options: [
+      'Statement 1 (x=a+b)',
+      'Statement 2 (y=a-b)',
+      'Statement 3 (x=c+d)',
+      'Statement 4 (print(x))'
+    ],
+    answers: [0, 1],
+    marks: 2,
+    difficulty: 'medium',
+    type: 'pyq-style',
+    explanation: 'Statement 1 assigns a+b to x, but x is REASSIGNED at statement 3 (x=c+d) before that first value is ever read anywhere in between -- so the value computed by statement 1 is never used by anyone, making statement 1 dead code that can be safely deleted. Statement 2 assigns a value to y, but the problem states y is never used anywhere else in the program at all -- an assignment whose result is never subsequently read is by definition dead code, so statement 2 can also be safely deleted. Statement 3 assigns to x, and this value IS used at statement 4 (print(x)), so it is live and must be kept. Statement 4 is the print itself, a statement with an observable side effect (I/O), so it can never be treated as dead code. Only statements 1 and 2 qualify as dead code.'
+  },
+  {
+    id: 'compiler-optimization-p7',
+    pyqYear: 2021,
+    q: 'Local common-subexpression elimination, applied within a single basic block, can detect and eliminate a redundant recomputation of "a+b" occurring twice in the SAME block. Why might it fail to eliminate a redundant recomputation of "a+b" that instead occurs in a DIFFERENT (later) basic block, one that is reached along every possible control-flow path from the block where "a+b" was first computed?',
+    options: [
+      'Because local CSE only examines expressions strictly within a single basic block and has no mechanism to track which expressions remain available across block boundaries; catching such cases requires a global, data-flow-based "available expressions" analysis over the whole control-flow graph',
+      'Because "a+b" computed in two different basic blocks is never actually the same expression, regardless of any data-flow reasoning',
+      'Because CSE can only ever be applied to array-indexing expressions, never to simple arithmetic like a+b',
+      'Because local CSE always automatically extends its analysis across every basic block in the entire procedure with no extra work needed'
+    ],
+    answer: 0,
+    marks: 2,
+    difficulty: 'medium',
+    type: 'pyq-style',
+    explanation: 'Local (basic-block-level) common-subexpression elimination works purely by scanning statements within one block, using a simple table of already-computed expressions valid only for that block\'s duration; it has no visibility into what was computed in a DIFFERENT block, since its analysis never crosses block boundaries. To recognize that "a+b" computed in an earlier block is STILL available (i.e., a and b have not been reassigned along any path reaching the later block) requires a GLOBAL, control-flow-graph-wide data-flow analysis known as "available expressions" -- which explicitly tracks, for every point in the program, the set of expressions guaranteed to have already been computed and not since invalidated along every incoming path. Without this global analysis, purely local CSE genuinely cannot catch such cross-block redundancy, matching option 1.'
+  },
+  {
+    id: 'compiler-optimization-p8',
+    pyqYear: 2022,
+    q: 'Given the three-address code: 1: a=1; 2: b=2; 3: if a<b goto 6; 4: c=3; 5: goto 7; 6: c=4; 7: print c. Using standard leader-identification rules, how many basic blocks does this code split into? (Enter your numerical answer.)',
+    options: [],
+    answer: 4,
+    kind: 'nat',
+    marks: 2,
+    difficulty: 'medium',
+    type: 'pyq-style',
+    explanation: 'Leaders: (a) line 1 (first statement); (b) targets of jumps: line 6 (target of the conditional goto at line 3) and line 7 (target of the unconditional goto at line 5); (c) statements immediately following a jump: line 4 (follows the conditional at line 3) and line 6 (follows the goto at line 5, but it is already a leader from rule b). Collecting: {1, 4, 6, 7} -- exactly 4 leaders, giving 4 basic blocks: {1,2,3}, {4,5}, {6}, {7}.'
+  },
+  {
+    id: 'compiler-optimization-p9',
+    pyqYear: 2023,
+    q: 'A basic block computes: S1: t=a*b; S2: c=t+d; S3: e=c-a; with LiveOut(S3)={e} (e is the only variable live on exit). How many distinct variables are in LiveOut(S2)? (Enter your numerical answer.)',
+    options: [],
+    answer: 2,
+    kind: 'nat',
+    marks: 2,
+    difficulty: 'medium',
+    type: 'pyq-style',
+    explanation: 'LiveOut(S3)={e} (given). LiveIn(S3)=use(S3) U (LiveOut(S3)-def(S3)) = {c,a} U ({e}-{e}) = {c,a}. Since S3 is the only (and immediate) successor of S2 in this straight-line block, LiveOut(S2) = LiveIn(S3) = {c,a}, which contains exactly 2 distinct variables: c and a. This makes intuitive sense: right after S2 computes c, that value is still needed by S3 (to compute e), and a is also still needed by S3 for the subtraction, while t (defined and fully consumed within S1-S2) is not needed again afterward.'
+  },
+  {
+    id: 'compiler-optimization-p10',
+    pyqYear: 2024,
+    q: 'Consider the loop "for(i=1;i<=n;i++){ y=i*i; z=b*c; arr[i]=y+z; }", where b and c are never modified inside the loop. Which of the following statements about optimizing this loop are TRUE? (Select ALL that apply)',
+    options: [
+      'z=b*c is loop-invariant and can be hoisted out of the loop, computed just once before it starts',
+      'y=i*i is loop-invariant in exactly the same way as z=b*c, and can likewise be hoisted out of the loop entirely',
+      'y=i*i is a natural candidate for induction-variable strength reduction: since i changes by a fixed amount each iteration, y can instead be maintained by cheaper incremental updates rather than being recomputed via multiplication every iteration',
+      'Because z=b*c is textually written inside the loop body, it can never be classified as loop-invariant regardless of what the actual data flow shows'
+    ],
+    answers: [0, 2],
+    marks: 2,
+    difficulty: 'hard',
+    type: 'pyq-style',
+    explanation: 'Option 1 is true: since b and c are never modified anywhere inside the loop, the value of b*c is the same on every iteration, making z=b*c a textbook loop-invariant computation eligible for hoisting (code motion) to just before the loop. Option 2 is FALSE: y=i*i depends directly on the loop-control variable i, which changes on every iteration, so its value is genuinely different each time around the loop -- it cannot be treated as loop-invariant or hoisted out. Option 3 is true: this is exactly the classic induction-variable optimization -- since i increases by a constant 1 each iteration, i*i can be tracked by cheaper incremental updates (its own induction-variable recurrence) rather than paying for a fresh multiplication every single iteration, which is a form of strength reduction applied via induction-variable analysis. Option 4 is false: whether a statement is loop-invariant depends entirely on the DATA-FLOW facts (whether its operands are ever modified inside the loop along any executed path), not on where it happens to be written textually within the loop body.'
+  },
+  {
+    id: 'compiler-optimization-p11',
+    pyqYear: 2025,
+    q: 'A statement d: "x = y op z" inside a basic block can be safely deleted as dead code if and only if which condition holds?',
+    options: [
+      'x is not live immediately after d (i.e., x is not in LiveOut(d)), AND the operation has no other observable side effect (such as I/O or memory write through a pointer)',
+      'y is not live immediately before d, regardless of whether x is used afterward',
+      'z is a compile-time constant, regardless of whether x is ever subsequently used',
+      'd is the very last statement physically written in the source program\'s basic block'
+    ],
+    answer: 0,
+    marks: 1,
+    difficulty: 'medium',
+    type: 'pyq-style',
+    explanation: 'The defining condition for dead-code elimination of an assignment is precisely liveness of its DEFINED variable: statement d defines x, so d can be safely removed exactly when x is NOT live immediately after d -- meaning no later use of x can be reached along any control-flow path without x being redefined first -- AND the statement produces no other externally observable effect (a call with I/O, a write through a pointer/array that might alias other live storage, etc., must always be kept regardless of whether its "result" variable is later used). The liveness of the OPERANDS y and z (options 2 and 3) is irrelevant to whether d itself is dead; those operands\' own liveness only matters for deciding whether THEIR defining statements, further up, are dead. Option 4 (textual position) has no bearing on dead-code analysis, which is a data-flow property, not a textual one.'
+  },
+  {
+    id: 'compiler-optimization-p12',
+    pyqYear: 2026,
+    q: 'Given the three-address code: 1: i=0; 2: j=0; 3: if i>=n goto 11; 4: if j>=m goto 9; 5: t=i*m+j; 6: a[t]=0; 7: j=j+1; 8: goto 4; 9: i=i+1; 10: goto 2; 11: print done. Using standard leader-identification rules, how many basic blocks does this code split into? (Enter your numerical answer.)',
+    options: [],
+    answer: 6,
+    kind: 'nat',
+    marks: 2,
+    difficulty: 'hard',
+    type: 'pyq-style',
+    explanation: 'Leaders: (a) line 1 (first statement); (b) targets of any jump: line 11 (target of the conditional at line 3), line 9 (target of the conditional at line 4), line 4 (target of the goto at line 8), line 2 (target of the goto at line 10); (c) statements immediately following a jump: line 4 (follows line 3, already a leader), line 5 (follows the conditional at line 4), line 9 (follows the goto at line 8, already a leader), line 11 (follows the goto at line 10, already a leader). Collecting all distinct leaders: {1, 2, 4, 5, 9, 11} -- exactly 6 leaders, giving 6 basic blocks: {1}, {2,3}, {4}, {5,6,7,8}, {9,10}, {11}.'
+  }
+);
