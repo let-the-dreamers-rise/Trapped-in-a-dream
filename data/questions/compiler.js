@@ -3241,3 +3241,107 @@ window.GATE_DATA.questions['compiler'].topics.find(function(t){return t.id==='co
     explanation: 'Leaders: (a) line 1 (first statement); (b) targets of any jump: line 11 (target of the conditional at line 3), line 9 (target of the conditional at line 4), line 4 (target of the goto at line 8), line 2 (target of the goto at line 10); (c) statements immediately following a jump: line 4 (follows line 3, already a leader), line 5 (follows the conditional at line 4), line 9 (follows the goto at line 8, already a leader), line 11 (follows the goto at line 10, already a leader). Collecting all distinct leaders: {1, 2, 4, 5, 9, 11} -- exactly 6 leaders, giving 6 basic blocks: {1}, {2,3}, {4}, {5,6,7,8}, {9,10}, {11}.'
   }
 );
+
+window.GATE_DATA.questions['compiler'].topics.find(function(t){return t.id==='compiler-parsing';}).questions.push(
+{
+  id: 'compiler-parsing-h1',
+  q: 'Which of the following grammars are SLR(1)? (Select ALL that apply)',
+  options: [
+    "E -> E + T | T ; T -> T * F | F ; F -> ( E ) | id",
+    "S -> L = R | R ; L -> * R | id ; R -> L",
+    "S -> a S b S | b S a S | epsilon",
+    "S -> ( S ) S | epsilon"
+  ],
+  answers: [0, 3],
+  marks: 2,
+  difficulty: 'hard',
+  type: 'concept',
+  explanation: "Each grammar needs its own item-set/table check. Option A is the canonical unambiguous expression grammar with precedence built in via the E/T/F nonterminal layering; its LR(0) automaton has no state where a shift and a reduce (or two reduces) compete under SLR's FOLLOW-set lookaheads, so it is SLR(1) (and consequently also LALR(1) and LR(1), since SLR(1) grammars are always LALR(1) and LR(1) too). Option B is the classic Dragon-book example that is NOT SLR(1): in the state reached after parsing L, containing items S -> L . = R and R -> L ., SLR must decide whether to shift on '=' or reduce R -> L . using FOLLOW(R); computing FOLLOW(R) reveals it includes '=' (because of the mutual dependency FOLLOW(R) contains FOLLOW(L), and FOLLOW(L) contains '=' from S -> L.=R), so SLR sees a shift/reduce conflict on '=' - this grammar IS LALR(1) and LR(1), just not SLR(1), because those stronger methods track more precise, state-specific lookaheads that correctly rule out '=' for the reduce in this particular context. Option C is a genuinely ambiguous grammar (multiple parse trees exist for strings like 'abab'), and ambiguous grammars are never SLR(1), LALR(1), or LR(k) for any k, since genuine ambiguity produces unavoidable conflicts no fixed amount of lookahead can resolve. Option D is the standard balanced-parentheses grammar, which is not only SLR(1) but even LL(1) (FIRST/FOLLOW sets cleanly separate the '(' -continuing production from the epsilon-production on any other lookahead), and by the parser-power hierarchy LL(1) subset-of SLR(1), so it is automatically SLR(1) too."
+},
+{
+  id: 'compiler-parsing-h2',
+  q: 'In the SLR(1) parsing table for the grammar S -> L = R | R ; L -> * R | id ; R -> L, a genuine conflict arises in one particular state. Which of the following correctly identifies the conflicting item set and the exact nature of the conflict?',
+  options: [
+    "Shift-reduce conflict in the state containing items S -> L . = R and R -> L ., on lookahead '=': SLR's table uses FOLLOW(R) = {=, $}, causing a spurious reduce-on-'=' action that conflicts with the shift action demanded by S -> L.=R; LALR(1) instead computes a context-specific lookahead of just {$} for the item R -> L . in this exact state, which removes the conflict.",
+    "Reduce-reduce conflict in the state containing items L -> id . and R -> L ., since both are complete items whose FOLLOW sets happen to overlap on '='.",
+    "Shift-reduce conflict in the initial state I0, between shifting on the terminal 'id' and reducing via S -> R ., triggered by the lookahead 'id'.",
+    "Reduce-reduce conflict between the completed items S -> R . and R -> L . occurring together in the same state after reading a single 'id' token."
+  ],
+  answer: 0,
+  marks: 2,
+  difficulty: 'hard',
+  type: 'concept',
+  explanation: "Building the canonical LR(0) item sets for this grammar, the state reached by taking the goto on L from the initial state contains exactly the two items S -> L . = R and R -> L . (this is the state you reach after the parser has recognized an L and must decide what comes next). SLR resolves the completed item R -> L . by reducing whenever the lookahead lies in FOLLOW(R). Computing FOLLOW(R) requires resolving a mutual dependency: R appears in S -> L=R and S -> R, contributing FOLLOW(S) = {$}; L appears in R -> L, contributing FOLLOW(R) to FOLLOW(L); and L appears in S -> L=R, contributing '=' to FOLLOW(L). Chasing this cycle to its fixed point puts '=' into BOTH FOLLOW(L) and FOLLOW(R). So in the state described, SLR's table says: shift on '=' (from the item S -> L . = R) AND reduce R -> L . on lookahead '=' (since '=' is in FOLLOW(R)) - a genuine shift-reduce conflict, exactly as option A states. LALR(1), by contrast, computes lookaheads specific to each numbered state rather than using the grammar-wide FOLLOW set, and in this particular state the item R -> L . only ever needs to be reduced when the actual next symbol is end-of-input ($), never '=' (because whenever '=' truly follows, the parser is instead in the process of matching S -> L.=R, not needing this reduction at all) - so LALR(1)'s more precise lookahead set for this item is just {$}, and the conflict disappears. The other three options describe item sets or conflicts that do not actually arise in this grammar's canonical construction."
+},
+{
+  id: 'compiler-parsing-h3',
+  q: 'Which of the following statements about converting grammars toward LL(1) form are TRUE? (Select ALL that apply)',
+  options: [
+    "S -> S a | b, after eliminating left recursion, becomes S -> b S', S' -> a S' | epsilon, and this transformed grammar is LL(1).",
+    "The dangling-else grammar stmt -> if expr then stmt | if expr then stmt else stmt | other cannot be made LL(1) (or even unambiguous) by any amount of left-factoring, because the ambiguity is inherent to the grammar's structure, not a mere FIRST/FIRST prefix-overlap issue.",
+    "Left-factoring alone is always sufficient to convert any unambiguous, non-left-recursive context-free grammar into an equivalent LL(1) grammar.",
+    "A grammar with no left recursion and no common prefixes among the alternative productions of any single nonterminal is automatically guaranteed to be LL(1)."
+  ],
+  answers: [0, 1],
+  marks: 2,
+  difficulty: 'hard',
+  type: 'concept',
+  explanation: "A is TRUE: this is the textbook left-recursion-elimination transformation, and the result is LL(1) - FIRST(S) = {b}, and S' cleanly separates on FIRST(aS')={a} versus FOLLOW(S') for the epsilon-alternative, with no overlap, giving a conflict-free predictive parsing table. B is TRUE: the dangling-else ambiguity is a structural/semantic ambiguity (a given 'if-then-else' sequence can be parsed by associating the else with either enclosing unmatched if), not a superficial common-prefix issue that left-factoring is designed to fix; left-factoring only merges alternatives that share an initial symbol sequence, and cannot invent a way to disambiguate two genuinely different, equally valid parse structures for the same token sequence - real compilers instead resolve it by an external convention (match each else to the nearest unmatched if) enforced procedurally, outside the raw ambiguous grammar. C is FALSE: left-factoring only removes FIRST/FIRST conflicts caused by common prefixes; it does nothing about other LL(1) obstructions such as left recursion (a different transformation entirely) or FIRST/FOLLOW conflicts on nullable nonterminals, and there exist unambiguous, non-left-recursive CFGs that are inherently not LL(k) for any k due to structural reasons no amount of left-factoring can repair, so the blanket 'always sufficient' claim is false. D is FALSE and is a classic incomplete-checklist trap: absence of left recursion and absence of common prefixes are NECESSARY conditions for LL(1) but not SUFFICIENT - a nullable nonterminal also needs FIRST and FOLLOW to be disjoint (e.g. A -> a | epsilon fails LL(1) if FOLLOW(A) also contains 'a', even though there is no left recursion or shared prefix among A's own two alternatives)."
+},
+{
+  id: 'compiler-parsing-h4',
+  q: 'Which of the following grammars is LR(1) (i.e., parseable by the canonical/CLR method) but NOT LALR(1), due to a reduce-reduce conflict introduced specifically by merging LR(1) states that share the same core?',
+  options: [
+    "S -> a A d | b B d | a B e | b A e ; A -> c ; B -> c",
+    "S -> L = R | R ; L -> * R | id ; R -> L",
+    "E -> E + T | T ; T -> T * F | F ; F -> ( E ) | id",
+    "S -> a S b S | b S a S | epsilon"
+  ],
+  answer: 0,
+  marks: 2,
+  difficulty: 'hard',
+  type: 'concept',
+  explanation: "Option A is the standard textbook example distinguishing LALR(1) from full canonical LR(1). In the canonical LR(1) automaton, the item 'A -> c .' appears in one state carrying only the lookahead 'd' (reached via the a...c... path), while the item 'B -> c .' appears in a DIFFERENT state carrying only the lookahead 'e' (reached via the b...c... path) - these two states have the same underlying LR(0) core (both just contain a completed '. -> c .' item after seeing 'c') but different, non-overlapping lookahead sets, so canonical LR(1) keeps them separate and conflict-free. LALR(1) construction merges any states sharing the same core to save space, which here forces 'A -> c .' and 'B -> c .' into a single merged state carrying the UNION of both lookaheads, {d, e}; since this merged state must decide between reducing to A or reducing to B while both 'd' and 'e' now look like valid lookaheads for either reduction, a reduce-reduce conflict appears that did not exist before merging - so this grammar is LR(1) but not LALR(1). Option B is the different, more commonly cited SLR-vs-LALR (not LALR-vs-CLR) example: it fails SLR(1) but succeeds at LALR(1) and CLR(1) equally, so it is not a valid answer to this specific question. Option C is fully SLR(1) already (and hence also LALR(1) and LR(1)) with no conflicts anywhere in its tables. Option D is genuinely ambiguous and therefore fails every deterministic parsing method, including full canonical LR(1), so it cannot be the LR(1)-but-not-LALR(1) example being asked for."
+},
+{
+  id: 'compiler-parsing-h5',
+  q: 'Consider the classic dangling-else grammar S -> i S e S | i S | a (where i stands for "if", e for "else", a for any other statement), used to illustrate the dangling-else ambiguity in a parser generator. Constructing its SLR(1) parsing table reveals exactly how many shift-reduce conflict CELLS? Enter your numerical answer.',
+  options: [],
+  answer: 1,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'hard',
+  type: 'numerical',
+  explanation: "Building the canonical LR(0) automaton for this grammar produces exactly one problematic state: the state reached after recognizing 'i S' (i.e., containing the item S -> i S . e S alongside the completed item S -> i S .). At this point, the parser must decide, upon seeing the next input token, whether to shift a pending 'e' (continuing to match S -> iS.eS, i.e., attaching the else to THIS if) or to reduce via the completed S -> iS. (closing off this if without an else, letting the else, if any, attach to some OUTER enclosing if instead). Since FOLLOW(S) includes 'e' (because e can indeed follow an S inside the iSeS production), the SLR table's reduce action for S -> iS. is triggered by lookahead 'e', exactly the same lookahead that also triggers the shift action for S -> iS.eS - this produces exactly one shift-reduce conflict cell, at the row for this state and the column for terminal 'e'. No other state in this small grammar's automaton has any competing actions. Real parser generators such as yacc/bison resolve this specific, well-understood conflict by a documented default rule: prefer shift over reduce, which has the effect of always attaching a dangling else to the nearest unmatched if - exactly the conventional disambiguation rule used by essentially every real programming language, so the 'conflict' is intentionally left in place and silently resolved rather than treated as a grammar error."
+},
+{
+  id: 'compiler-parsing-h6',
+  q: 'Which of the following nonterminal definitions, taken in isolation together with the stated FOLLOW set, would cause a table-construction conflict that prevents the grammar from being LL(1)? (Select ALL that apply)',
+  options: [
+    "A -> a | epsilon, with FOLLOW(A) = { a, $ }",
+    "B -> b | epsilon, with FOLLOW(B) = { c, $ }",
+    "C -> d C | e, with FOLLOW(C) = { $ }",
+    "D -> f | f g, with FOLLOW(D) = { $ }"
+  ],
+  answers: [0, 3],
+  marks: 2,
+  difficulty: 'hard',
+  type: 'concept',
+  explanation: "A is a VIOLATION: since A can derive epsilon, LL(1) requires FIRST(A) minus {epsilon} = {a} to be disjoint from FOLLOW(A); here FOLLOW(A) = {a, $} contains 'a', so on lookahead 'a' the parser cannot decide whether to expand A -> a (matching the 'a' directly) or A -> epsilon (skipping A and letting the following context consume the 'a') - a genuine FIRST/FOLLOW conflict that blocks LL(1). B is NOT a violation: FIRST(B) minus {epsilon} = {b}, and FOLLOW(B) = {c, $}, which share no common element, so there is no ambiguity about when to pick B -> b versus B -> epsilon. C is NOT a violation: the two alternatives dC and e have disjoint FIRST sets ({d} versus {e}), there is no left recursion (the recursion is on the right, in dC, which is fine for LL(1)), and C is not nullable, so no FIRST/FOLLOW check is even needed - this nonterminal causes no conflict. D IS a violation: both alternatives f and fg begin with the same terminal 'f' (a genuine FIRST/FIRST common-prefix conflict, the kind left-factoring is designed to fix), so on seeing lookahead 'f' the parser cannot tell which alternative to commit to without additional lookahead - this nonterminal, as given, is not LL(1) and needs left-factoring into D -> f D', D' -> g | epsilon before it can be used in a predictive parser."
+},
+{
+  id: 'compiler-parsing-h7',
+  q: 'Which of the following statements about the relative power of parsing methods are TRUE? (Select ALL that apply)',
+  options: [
+    "Every grammar that is LL(1) is also SLR(1).",
+    "Every grammar that is SLR(1) is also LALR(1).",
+    "Every grammar that is LALR(1) is also LR(1) (parseable by the canonical/CLR method).",
+    "Every grammar that is LR(1) (CLR) is also LALR(1)."
+  ],
+  answers: [0, 1, 2],
+  marks: 2,
+  difficulty: 'hard',
+  type: 'concept',
+  explanation: "These four options trace the standard strict hierarchy of deterministic bottom-up-friendly grammar classes: LL(1) subset-of SLR(1) subset-of LALR(1) subset-of LR(1), with each containment proper (there exist grammars in each stronger class that fail the weaker one, though none are needed to answer this particular true/false battery). A is TRUE: it is a standard theorem that every LL(1) grammar is also SLR(1) - roughly, LL(1)'s FIRST/FOLLOW-based predictive determinism is strong enough to guarantee the weaker set of conditions SLR(1) parsing needs at the state level. B is TRUE: LALR(1) tables are built by taking the same canonical automaton structure SLR(1) implicitly relies on but resolving reduce actions with strictly more precise, state-specific lookahead sets rather than the coarser grammar-wide FOLLOW sets, so any state that was conflict-free under SLR's coarser lookahead remains conflict-free (or becomes even more clearly resolvable) under LALR's finer-grained lookahead - hence SLR(1) grammars are always LALR(1). C is TRUE: LALR(1) is built by merging states of the full canonical LR(1) automaton that share the same core; merging can only ever CREATE new conflicts (by unioning together lookahead sets that were previously kept safely separate), never remove a conflict that was already there - so if the merged (LALR) automaton is conflict-free, the unmerged (canonical LR(1)) automaton, having strictly more separated states and hence at least as much discriminating power, must also have been conflict-free, meaning every LALR(1) grammar is also LR(1). D is FALSE: this is the converse of C and is exactly the false direction - the LALR-vs-CLR example S -> aAd|bBd|aBe|bAe;A->c;B->c is LR(1) precisely because canonical LR(1) keeps two same-core states separate, yet it is NOT LALR(1) precisely because merging those same two states creates a reduce-reduce conflict, directly disproving this option."
+}
+);

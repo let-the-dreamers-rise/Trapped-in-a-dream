@@ -3439,3 +3439,470 @@ window.GATE_DATA.questions['dbms'].topics.find(function(t){return t.id==='dbms-t
   explanation: 'On item A: r1(A) precedes w2(A), giving edge T1->T2 (a read-write conflict); w2(A) precedes r3(A), giving edge T2->T3. On item B: w1(B) precedes r2(B), giving edge T1->T2 (already present, reinforcing it); r2(B) precedes w3(B), giving edge T2->T3 (already present, reinforcing it). So the complete edge set is exactly {T1->T2, T2->T3}, plus the transitively implied T1->T3 relationship is consistent with (though not separately drawn as) these two edges - there is no edge in the reverse direction anywhere. This graph is a simple directed chain T1 -> T2 -> T3 with no cycle, so S7 IS conflict serializable. Performing a topological sort of this chain yields exactly one valid linear order: T1, then T2, then T3 - and since the chain has no branching or alternative paths, this is the UNIQUE equivalent serial order (unlike graphs with independent, unconnected components, which could admit multiple valid topological orderings).'
 }
 );
+
+window.GATE_DATA.questions['dbms'].topics.find(function(t){return t.id==='dbms-normalization';}).questions.push(
+{
+  id: 'dbms-normalization-h1',
+  pyqStyle: true,
+  q: 'Relation R(A,B,C,D,E) has FD set F = { AB→C, C→A, BC→D, ACD→B, D→E }. How many distinct candidate keys does R have?',
+  options: [],
+  answer: 3,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'hard',
+  type: 'pyq-style',
+  explanation: 'Compute closures systematically. AB+: AB→C gives C; C→A already have A; BC→D gives D; D→E gives E. So AB+ = ABCDE, AB is a superkey, and neither A+ = {A} nor B+ = {B} is a superkey, so AB is a minimal candidate key. BC+: C→A gives A; now have A,B,C, and AB→C is already satisfied, ACD→B needs D which is missing so no help yet; but BC→D gives D directly; then D→E gives E. So BC+ = ABCDE, a superkey; B+={B} and C+={A,C} are not superkeys, so BC is minimal. CD+: C→A gives A; D→E gives E; now have A,C,D,E, and ACD→B gives B. So CD+ = ABCDE, a superkey; C+={A,C} and D+={D,E} are not superkeys, so CD is minimal. Any other pair (e.g. AC, AD, BD, DE, etc.) either fails to reach a superkey or is a superset of one of AB/BC/CD already found (checking each confirms no fourth minimal key exists, e.g. AD+ = {A,D,E} only, and BD+ = {B,D,E} only). Hence exactly three candidate keys exist: AB, BC and CD, which overlap pairwise on a single attribute each (B, C, and C/D respectively) - this overlapping-key structure is exactly why a naive count based on "the" primary key alone would undercount the true candidate-key set.'
+},
+{
+  id: 'dbms-normalization-h2',
+  pyqStyle: true,
+  q: 'Relation R(A,B,C,D,E) has FD set F = { AB→C, C→A, AB→D, D→E }. What is the highest normal form satisfied by R?',
+  options: ['BCNF', '3NF', '2NF', '1NF only'],
+  answer: 2,
+  marks: 2,
+  difficulty: 'hard',
+  type: 'pyq-style',
+  explanation: 'First find the keys: AB+ = AB,C(via AB→C),A already there,D(via AB→D),E(via D→E) = ABCDE, so AB is a candidate key. Since C→A, check BC+: A,B,C then AB→C,AB→D applicable once A,B present so D,E follow = ABCDE, so BC is also a candidate key. Prime attributes = {A,B,C}; non-prime = {D,E}. Check 2NF: proper subsets of AB are A and B; A+={A} and B+={B}, neither determines D or E, so no partial dependency on AB. Proper subsets of BC are B and C; B+={B}, C+={A,C}, neither reaches D or E either. So no non-prime attribute is partially dependent on any candidate key - 2NF holds. Check 3NF/BCNF FD by FD: AB→C (AB is a key, fine for both). C→A: C is NOT a superkey (C+={A,C}), but A IS prime, so this satisfies the 3NF exception clause even though it violates BCNF. AB→D (AB is a key, fine). D→E: D is NOT a superkey (D+={D,E} only) and E is NOT prime - this violates 3NF outright (no exception applies). Since one FD violates 3NF, R is not in 3NF, but since 2NF is fully satisfied, the highest normal form is exactly 2NF - the trap being that C→A looks like the only "problem" FD (BCNF-violating but 3NF-safe), while the real, easily missed 3NF-breaker is D→E.'
+},
+{
+  id: 'dbms-normalization-h3',
+  pyqStyle: true,
+  q: 'R(A,B,C,D,E) has FD set F = { AB→C, C→A, C→D, D→E }. R is decomposed into R1(A,B,C), R2(C,D), R3(C,E). Is this decomposition lossless-join, and is it dependency-preserving?',
+  options: ['Lossless-join and dependency-preserving', 'Lossless-join but NOT dependency-preserving', 'NOT lossless-join but dependency-preserving', 'Neither lossless-join nor dependency-preserving'],
+  answer: 1,
+  marks: 2,
+  difficulty: 'hard',
+  type: 'pyq-style',
+  explanation: 'Lossless-join test: R1∩R2 = {C}, and R2 = {C,D}; since C→D holds directly, {R1,R2} is lossless pairwise, giving a combined relation with attributes A,B,C,D. Now check {R1,R2} combined against R3={C,E}: the common attribute is still C, and R3-R1R2 = {E}. Does C→E hold in F+? Yes - by transitivity C→D and D→E give C→E, even though it is not stated directly. So the full 3-way join reconstructs R exactly: the decomposition IS lossless-join. Dependency preservation: project F onto each piece. On R1={A,B,C}: AB→C and C→A hold locally. On R2={C,D}: C→D holds; does D→C hold? D+ = {D,E} only, so no. On R3={C,E}: does C→E hold? Yes (shown above); does E→C hold? E+ = {E} only, so no. Collecting the local FDs gives Flocal = {AB→C, C→A, C→D, C→E}. Now check whether Flocal logically implies the original D→E: under Flocal, D\'s closure is just {D} (no FD in Flocal has D alone as an LHS - only C→D exists, not D→something), so D+ under Flocal never reaches E. Since D→E cannot be derived from the local, decomposition-visible FDs, dependency preservation FAILS - even though the decomposition is lossless. This shows the two properties are independent: one can hold without the other.'
+},
+{
+  id: 'dbms-normalization-h4',
+  pyqStyle: true,
+  q: 'F = { A→B, B→A, A→C, B→C, C→D } is a functional dependency set on R(A,B,C,D). Which of the following IS a valid minimal cover of F?',
+  options: ['{ A→B, B→A, B→C, C→D }', '{ A→B, B→A, A→C, B→C, C→D }', '{ A→B, A→C, B→C, C→D }', '{ B→A, B→C, C→D }'],
+  answer: 0,
+  marks: 2,
+  difficulty: 'hard',
+  type: 'pyq-style',
+  explanation: 'All RHS in F are already singleton and no LHS has an extraneous attribute (all LHS are single attributes), so only redundant-FD removal remains. Check A→C: using the rest {A→B,B→A,B→C,C→D}, A+ = A,B(via A→B),A(via B→A, no new),C(via B→C),D(via C→D) = ABCD, so A→C is redundant and can be dropped, leaving { A→B, B→A, B→C, C→D } (option A) - now check B→C using {A→B,B→A,C→D}: B+ = B,A,and nothing else (no path to C remains since A→C was already removed) = {A,B}, so B→C is NOT redundant here - stop, this 4-FD set is a genuine minimal cover equivalent to F, making option A correct. Option B keeps all 5 FDs including the redundant A→C, so it is equivalent to F but NOT minimal - a classic trap since it "looks safe" by including everything. Option C drops B→A entirely: checking B+ under {A→B,A→C,B→C,C→D} never reaches A (no FD has B alone reaching A), so this set\'s closure differs from F\'s (F requires B→A to hold) - not equivalent, hence invalid. Option D drops A→B: A\'s closure under {B→A,B→C,C→D} is just {A} (no FD starts with A), so A can no longer reach B,C,D as it does in F - not equivalent, invalid. Only option A is both equivalent to F and irreducible.'
+},
+{
+  id: 'dbms-normalization-h5',
+  pyqStyle: true,
+  q: 'Relation R(A,B,C,D,E) has FD set F = { AB→CDE, CD→AB, E→C }. Which of the following attribute sets are candidate keys of R? (Select ALL that apply)',
+  options: ['{A, B}', '{C, D}', '{A, E}', '{D, E}'],
+  answers: [0, 1, 3],
+  marks: 2,
+  difficulty: 'hard',
+  type: 'pyq-style',
+  explanation: 'Option A, {A,B}: AB→CDE directly gives C,D,E, so AB+ = ABCDE - a superkey; A+={A} and B+={B} alone give nothing, so AB is minimal - a genuine candidate key. Option B, {C,D}: CD→AB directly gives A,B, so CD+ = ABCDE - a superkey; C+={C} and D+={D} alone give nothing, so CD is minimal too - a genuine candidate key. Option C, {A,E}: E→C gives C, so we have A,C,E; but no FD has LHS contained in {A,C,E} that yields B or D (AB→CDE needs B which is missing, CD→AB needs D which is missing), so AE+ = {A,C,E} only - NOT a superkey, hence NOT a candidate key, despite superficially looking like a reasonable two-attribute combination. Option D, {D,E}: E→C gives C, now have C,D,E; CD→AB now applies (C and D both present) giving A,B. So DE+ = ABCDE - a superkey; D+={D} and E+={E,C} alone are not superkeys, so DE is minimal - a genuine candidate key. This forces three separate closure computations plus one failing computation (option C) to correctly identify exactly the three real candidate keys AB, CD, DE while rejecting the plausible-looking distractor AE.'
+},
+{
+  id: 'dbms-normalization-h6',
+  pyqStyle: true,
+  q: 'Relation R(A,B,C,D,E) has FD set F = { AB→C, C→D, BD→A, A→E }. What is the highest normal form satisfied by R?',
+  options: ['BCNF', '3NF', '2NF', '1NF only'],
+  answer: 3,
+  marks: 2,
+  difficulty: 'hard',
+  type: 'pyq-style',
+  explanation: 'Find all candidate keys. AB+: C(via AB→C),D(via C→D),A already,E(via A→E) = ABCDE, so AB is a key. BC+: using C→D get D, then BD→A gives A, then A→E gives E: BC+ = ABCDE, so BC is a key. BD+: BD→A gives A directly, then AB→C gives C, then C→D already have, A→E gives E: BD+ = ABCDE, so BD is a key too. So there are three candidate keys: AB, BC, BD; prime attributes = {A,B,C,D}; the only non-prime attribute is E. Now check 2NF by testing every PROPER SUBSET of every candidate key against the non-prime attribute E. For key AB: check subset {A} - does A alone determine E? Yes! A→E is given directly, and A is a proper subset of the candidate key AB. This is precisely a partial dependency of the non-prime attribute E on part of the composite key AB, so 2NF is VIOLATED. This is easy to miss because A→E looks like an innocuous, isolated FD unrelated to the AB→C, C→D, BD→A "cycle" among the prime attributes, which on its own might look like a clean BCNF-ish structure - but the real problem is this one FD whose LHS happens to be a strict subset of a candidate key. Since 2NF already fails, the highest normal form R satisfies is only 1NF.'
+},
+{
+  id: 'dbms-normalization-h7',
+  pyqStyle: true,
+  q: 'R(A,B,C,D,E) has FD set F = { A→B, C→D, D→E }. R is decomposed into R1(A,B), R2(C,D), R3(D,E). Is this decomposition lossless-join, and is it dependency-preserving?',
+  options: ['Lossless-join and dependency-preserving', 'Lossless-join but NOT dependency-preserving', 'NOT lossless-join but dependency-preserving', 'Neither lossless-join nor dependency-preserving'],
+  answer: 2,
+  marks: 2,
+  difficulty: 'hard',
+  type: 'pyq-style',
+  explanation: 'The unique candidate key of R is AC, since A+={A,B} and C+={C,D,E} individually fall short, but AC+ = ABCDE. Lossless-join test via the chase: R1={A,B} shares NO attribute at all with R2={C,D} or with R3={D,E} - A and B never reappear anywhere else in the decomposition. Since the key AC is split with A isolated in R1 and disconnected from every other piece by any common column, there is no functional dependency that can tie A\'s row-identity back to the rest; the chase procedure leaves the tableau row for R1 permanently distinguishable from the others (no symbol ever becomes "all-a"), so the join of R1,R2,R3 produces spurious extra tuples beyond the original R - the decomposition is NOT lossless-join. Dependency preservation, however, is straightforward here: A→B is fully contained within R1, C→D is fully contained within R2, and D→E is fully contained within R3 - every FD in F can be checked using only attributes that appear together in a single relation of the decomposition, so nothing needs to be inferred by combining relations. Hence dependency preservation trivially holds. This is the mirror image of the standard "lossless but not dependency-preserving" trap: here the decomposition is dependency-preserving but fails the lossless-join test, reinforcing that the two properties are logically independent of each other.'
+},
+{
+  id: 'dbms-normalization-h8',
+  pyqStyle: true,
+  q: 'F = { A→B, B→A, A→C, B→C, C→D, D→E, E→D } is a functional dependency set on R(A,B,C,D,E). Which of the following IS a valid minimal cover of F?',
+  options: ['{ A→B, B→A, B→C, C→D, D→E, E→D }', '{ A→B, B→A, A→C, B→C, C→D, D→E, E→D }', '{ A→B, A→C, B→C, C→D, D→E }', '{ A→B, B→A, A→C, C→D, D→E }'],
+  answer: 0,
+  marks: 2,
+  difficulty: 'hard',
+  type: 'pyq-style',
+  explanation: 'All RHS are singleton and all LHS are single attributes, so only redundant-FD elimination is needed. Checking the full set, A→C is redundant: using the rest, A+ = A,B(A→B),A(B→A),C(B→C),D(C→D),E(D→E) = ABCDE, so A→C can be dropped, leaving { A→B, B→A, B→C, C→D, D→E, E→D }. Re-checking within this reduced set: is B→C now redundant? B+ using {A→B,B→A,C→D,D→E,E→D} = just {A,B} (no path from A or B to C remains once A→C is gone), so B→C is NOT redundant - it must stay. Are D→E or E→D redundant? D+ without D→E is {D} alone (nothing else has D as LHS), so D→E is needed; symmetric argument keeps E→D. This yields the genuine minimal cover in option A (6 FDs). Option B is F itself unreduced - equivalent but NOT minimal since A→C is still present redundantly, a tempting "safe-looking" trap. Option C drops both B→A and E→D: without B→A, B\'s closure never reaches A, changing F\'s closure - not equivalent. Option D drops B→C and E→D: without E→D, E\'s closure is just {E} (E→D was the only way to recover D from E), whereas in F, E+ includes D - not equivalent. Only option A is both irreducible and closure-equivalent to F.'
+}
+);
+
+window.GATE_DATA.questions['dbms'].topics.find(function(t){return t.id==='dbms-ra-sql';}).questions.push(
+{
+  id: 'dbms-ra-sql-h1',
+  pyqStyle: true,
+  q: 'Table Emp(id, dept) has rows: (1,CS), (2,CS), (3,NULL), (4,EE), (5,NULL), (6,CS). What are the results of COUNT(*), COUNT(dept), and COUNT(DISTINCT dept) respectively, all evaluated on this table?',
+  options: ['6, 4, 2', '6, 6, 3', '4, 4, 2', '6, 4, 3'],
+  answer: 0,
+  marks: 2,
+  difficulty: 'hard',
+  type: 'pyq-style',
+  explanation: 'COUNT(*) counts every row regardless of NULLs, so it counts all 6 rows: (1,CS),(2,CS),(3,NULL),(4,EE),(5,NULL),(6,CS) - COUNT(*) = 6. COUNT(dept) counts only rows where dept is NOT NULL (COUNT of a specific column always skips NULLs in that column); the non-NULL dept values are CS, CS, EE, CS from rows 1,2,4,6 - that is 4 rows, so COUNT(dept) = 4 (the two NULL-dept rows, id 3 and 5, are silently dropped). COUNT(DISTINCT dept) first removes NULLs (NULL is never counted as a distinct value under standard SQL semantics), then deduplicates the remaining values: {CS, CS, EE, CS} collapses to the distinct set {CS, EE}, giving COUNT(DISTINCT dept) = 2. The trap here is twofold: students often forget that COUNT(column) silently excludes NULLs (unlike COUNT(*)), and separately forget that DISTINCT on top of that also removes the duplicate CS entries, so the three numbers 6, 4, 2 arise from three different, non-obvious filtering rules applied to the exact same six rows.'
+},
+{
+  id: 'dbms-ra-sql-h2',
+  pyqStyle: true,
+  q: 'Enrolled(sid, cid): (S1,C1),(S1,C2),(S1,C3),(S2,C1),(S2,C2),(S3,C1),(S3,C2),(S3,C3),(S3,C4),(S4,C2),(S4,C3). Course(cid): C1,C2,C3. Consider: SELECT DISTINCT e1.sid FROM Enrolled e1 WHERE NOT EXISTS (SELECT c.cid FROM Course c WHERE NOT EXISTS (SELECT * FROM Enrolled e2 WHERE e2.sid = e1.sid AND e2.cid = c.cid)); Which set of student IDs does this query return?',
+  options: ['{S1}', '{S1, S3}', '{S1, S2, S3}', '{S3}'],
+  answer: 1,
+  marks: 2,
+  difficulty: 'hard',
+  type: 'pyq-style',
+  explanation: 'This is the classic relational-division idiom: for a student to be returned, there must be NO course in Course for which that student has NO matching Enrolled row - i.e. the student must have taken EVERY course listed in Course = {C1,C2,C3}. Check S1: takes {C1,C2,C3} - covers all three required courses, so the inner NOT EXISTS finds no missing course - S1 qualifies. Check S2: takes {C1,C2} - missing C3, so for c=C3 the inner-inner NOT EXISTS finds no Enrolled row for (S2,C3), making the middle NOT EXISTS true for c=C3, which fails the outer condition - S2 is excluded. Check S3: takes {C1,C2,C3,C4} - this includes all of C1,C2,C3 (the extra C4 enrollment is irrelevant since C4 is not in the Course table being checked against) - S3 qualifies. Check S4: takes {C2,C3} - missing C1, so S4 is excluded by the same logic as S2. The result is exactly {S1, S3} - the trap is both under-including (forgetting S3 qualifies despite its irrelevant extra C4 row) and over-including S2 or S4 (assuming "took most of the courses" is enough, when division requires ALL of them with zero exceptions).'
+},
+{
+  id: 'dbms-ra-sql-h3',
+  pyqStyle: true,
+  q: 'Table A(id) has rows 1, 2, 3, 4. Table B(id, val) has rows (1,x), (1,y), (2,z), (5,w). How many rows does SELECT * FROM A LEFT OUTER JOIN B ON A.id = B.id return?',
+  options: [],
+  answer: 5,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'hard',
+  type: 'pyq-style',
+  explanation: 'In a LEFT OUTER JOIN, every row of the left table A must appear at least once in the result, matched with every B row that satisfies the join condition, and padded with NULLs if there is no match at all. A.id=1 matches TWO rows in B (both (1,x) and (1,y) share id=1), producing 2 result rows - this fan-out from a duplicate join-key in B is the key trap, since it is easy to assume each A row contributes exactly one output row. A.id=2 matches exactly one B row, (2,z), producing 1 result row. A.id=3 has no match in B at all (B has no row with id=3), so under LEFT OUTER JOIN this row is still preserved, padded with NULLs for B\'s columns, producing 1 result row. A.id=4 similarly has no match, producing 1 NULL-padded result row. B\'s row (5,w) has no counterpart in A and is simply dropped since this is a LEFT (not FULL) outer join. Total rows = 2 (for id=1) + 1 (for id=2) + 1 (for id=3, NULL-padded) + 1 (for id=4, NULL-padded) = 5. Getting this right requires tracking the duplicate-key fan-out and the NULL-padding separately rather than assuming a simple one-to-one row count equal to |A| = 4.'
+},
+{
+  id: 'dbms-ra-sql-h4',
+  pyqStyle: true,
+  q: 'Orders(cust): the cust column has these values across 14 order rows: A,A,A,B,C,C,D,D,E,E,E,E,E,E (i.e. A appears 3 times, B once, C twice, D twice, E six times). Consider: SELECT cust FROM Orders GROUP BY cust HAVING COUNT(*) > (SELECT AVG(cnt) FROM (SELECT COUNT(*) AS cnt FROM Orders GROUP BY cust) t); How many customers are returned?',
+  options: [],
+  answer: 2,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'hard',
+  type: 'pyq-style',
+  explanation: 'First compute the per-customer order counts from the outer GROUP BY cust: A=3, B=1, C=2, D=2, E=6. The inner derived table t computes exactly these five counts as its "cnt" column: {3, 1, 2, 2, 6}. The subquery then takes AVG(cnt) over these FIVE group-counts (not over the original 14 rows) - sum = 3+1+2+2+6 = 14, divided by 5 groups = 2.8. This is the key trap: the average is of the per-group counts, not a simple average of something else, and it lands on a non-integer (2.8), which rules out any group whose count exactly equals a "round" threshold. Now apply HAVING COUNT(*) > 2.8 to each group: A has count 3 > 2.8, qualifies. B has count 1, fails. C has count 2, fails (2 is not > 2.8). D has count 2, fails. E has count 6 > 2.8, qualifies. So exactly two customers, A and E, are returned. The nested aggregation (an aggregate over a table of aggregates) combined with the non-round average is what makes this require careful two-level computation rather than a single GROUP BY pass.'
+},
+{
+  id: 'dbms-ra-sql-h5',
+  pyqStyle: true,
+  q: 'Relation R has primary key A and exactly 100 tuples. Relation S has a foreign key A referencing R, and S has exactly 500 tuples; the foreign key column in S is allowed to be NULL. What are the minimum and maximum possible number of tuples in the natural join R ⋈ S (on attribute A)?',
+  options: ['Minimum 0, Maximum 500', 'Minimum 100, Maximum 500', 'Minimum 0, Maximum 100', 'Minimum 100, Maximum 100'],
+  answer: 0,
+  marks: 2,
+  difficulty: 'hard',
+  type: 'pyq-style',
+  explanation: 'Since A is the PRIMARY KEY of R, every value of A in R is unique, so each tuple of S can match AT MOST ONE tuple of R (never more) - this rules out any fan-out multiplication on the S side, meaning the join size can never exceed |S| = 500. The maximum of 500 is achieved when every one of the 500 tuples in S has a non-NULL foreign-key value that matches some existing tuple in R (a valid referential-integrity state, since it is entirely possible - though not required - for all 500 foreign keys to point to rows that do exist in R, even if R has just 100 distinct values that get reused across S). The minimum is 0, achieved when the foreign key values in S are either all NULL (a NULL foreign key never matches anything in a natural join) or, more generally, when none of the (possibly non-NULL) foreign-key values in S happen to coincide with any of the 100 keys currently present in R at the same time - both are legal states under a foreign-key constraint (NULL is explicitly permitted here). The trap is assuming the join must be at least |S| - |R| or some other floor derived from set-difference reasoning: because S\'s foreign key can be entirely NULL, the true floor is a hard 0, not 400 or any other positive number.'
+},
+{
+  id: 'dbms-ra-sql-h6',
+  pyqStyle: true,
+  q: 'EMP(id, dept, sal): (1,D1,50), (2,D1,70), (3,D1,30), (4,D2,100), (5,D2,60), (6,D2,80), (7,D3,40). Consider: SELECT e.id FROM EMP e WHERE e.sal > (SELECT AVG(sal) FROM EMP e2 WHERE e2.dept = e.dept); How many employee ids does this query return?',
+  options: [],
+  answer: 2,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'hard',
+  type: 'pyq-style',
+  explanation: 'This is a correlated subquery: for each candidate row e, the inner query recomputes AVG(sal) restricted to e\'s OWN department only, not a single global average. Department D1 has salaries {50,70,30}, average = 150/3 = 50. Comparing each D1 row\'s salary to 50: id1(50) is not > 50, fails; id2(70) > 50, qualifies; id3(30) is not > 50, fails. Department D2 has salaries {100,60,80}, average = 240/3 = 80. Comparing: id4(100) > 80, qualifies; id5(60) is not > 80, fails; id6(80) is not > 80 (equal, not strictly greater), fails. Department D3 has only salary {40}, average = 40/1 = 40; id7(40) is not > 40 (a department of size 1 can never satisfy a strict "greater than its own average" condition, since a single value always equals its own average) - fails. So exactly two employees, id2 and id4, satisfy the condition. The trap is applying one global average across all 7 employees instead of re-deriving a fresh per-department average for every single row via the correlation on e2.dept = e.dept, and separately forgetting that a department average computed from a single employee can never be strictly exceeded by that same employee.'
+},
+{
+  id: 'dbms-ra-sql-h7',
+  pyqStyle: true,
+  q: 'T1(x) has rows 1, 2, 2, 3 (in that order, with 2 appearing twice). T2(x) has rows 2, 3, 3, 4 (with 3 appearing twice). What are the number of rows returned by (i) T1 UNION T2, (ii) T1 UNION ALL T2, and (iii) T1 INTERSECT T2, respectively?',
+  options: ['4, 8, 2', '4, 8, 3', '6, 8, 2', '4, 7, 2'],
+  answer: 0,
+  marks: 2,
+  difficulty: 'hard',
+  type: 'pyq-style',
+  explanation: 'SQL\'s UNION operator uses SET semantics: it appends all rows from both tables and then removes ALL duplicates (bag semantics only apply to UNION ALL). T1 as a set is {1,2,3} and T2 as a set is {2,3,4}; their union as sets is {1,2,3,4}, so T1 UNION T2 returns exactly 4 rows, discarding not just cross-table duplicates but also the internal duplicate 2 within T1 and the internal duplicate 3 within T2. UNION ALL, in contrast, preserves every row from both tables with no deduplication at all (bag semantics): T1 contributes all 4 of its rows (1,2,2,3) and T2 contributes all 4 of its rows (2,3,3,4), giving 4+4 = 8 rows total, duplicates and all. INTERSECT also uses SET semantics: it returns only the DISTINCT values present in BOTH tables\' underlying sets - T1\'s set {1,2,3} and T2\'s set {2,3,4} share exactly {2,3}, giving 2 rows, NOT counting how many times 2 or 3 happened to repeat inside either original table. The recurring trap is assuming any of these three operators respects the original per-table duplicate counts - only UNION ALL does; UNION and INTERSECT both silently collapse to distinct-value set semantics first.'
+},
+{
+  id: 'dbms-ra-sql-h8',
+  pyqStyle: true,
+  q: 'Score(id, marks): (1,80), (2,NULL), (3,60), (4,NULL), (5,100). What is the value of [SELECT AVG(marks) FROM Score] minus [SELECT SUM(marks)/COUNT(*) FROM Score], evaluated as a single number?',
+  options: [],
+  answer: 32,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'hard',
+  type: 'pyq-style',
+  explanation: 'AVG(marks) in standard SQL silently ignores rows where marks IS NULL, both when summing and when determining the divisor - only the 3 non-NULL rows (80, 60, 100) participate: sum = 240, and the divisor is 3 (the count of NON-NULL marks values), giving AVG(marks) = 240/3 = 80. In sharp contrast, SUM(marks) also ignores NULLs when summing (SUM never treats NULL as zero; it simply skips those rows), so SUM(marks) = 80+60+100 = 240 exactly as before - but COUNT(*) counts ALL rows regardless of NULLs, including the two rows where marks is NULL, giving COUNT(*) = 5 (not 3). So SUM(marks)/COUNT(*) = 240/5 = 48. The difference is therefore 80 - 48 = 32. This question isolates a genuinely common source of production bugs: AVG(col) and SUM(col)/COUNT(*) look like they should be interchangeable "the same average" but silently diverge the moment the column contains any NULLs, because AVG uses a NULL-aware divisor while COUNT(*) is deliberately NULL-blind - mixing the two gives a systematically deflated result whenever NULLs are present.'
+}
+);
+
+window.GATE_DATA.questions['dbms'].topics.find(function(t){return t.id==='dbms-indexing';}).questions.push(
+{
+  id: 'dbms-indexing-h1',
+  pyqStyle: true,
+  q: 'Starting from an empty B+-tree of order 3 (maximum 3 pointers / 2 keys per node), the keys 5, 15, 25, 35, 45, 55, 65 are inserted one at a time, in that ascending order. How many total node splits occur during this entire insertion sequence?',
+  options: [],
+  answer: 4,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'hard',
+  type: 'pyq-style',
+  explanation: 'Order 3 means a leaf holds at most 2 keys and an internal node has at most 2 keys / 3 children; a node overflows the instant it would need to hold a 3rd key. Insert 5: leaf[5]. Insert 15: leaf[5,15], no overflow. Insert 25: leaf[5,15,25] overflows (SPLIT #1) into leaf[5,15] and leaf[25], with 25 copied up to a new root[25]. Insert 35: goes into leaf[25], becomes leaf[25,35], no overflow. Insert 45: leaf[25,35,45] overflows (SPLIT #2) into leaf[25,35] and leaf[45], copying up 45; root becomes [25,45] with three leaf children - the root itself does not yet overflow since it now holds exactly 2 keys (the order-3 maximum). Insert 55: goes into leaf[45], becomes leaf[45,55], no overflow. Insert 65: leaf[45,55,65] overflows (SPLIT #3) into leaf[45,55] and leaf[65], copying up 65 into the root, which now holds keys [25,45,65] - THREE keys, exceeding the order-3 internal-node maximum of 2, so the ROOT ITSELF must also split (SPLIT #4): it splits into [25] and [65] with the middle key 45 pushed up to form a brand-new root[45]. This is the cascading part that is easy to miss - the final key insertion (65) triggers not one but TWO splits in immediate succession (its own leaf, then the root). Counting split-by-split: one split at 25, one at 45, and two at 65 (leaf then root) gives a running total of 1+1+2 = 4 splits, with the tree ending at height 3.'
+},
+{
+  id: 'dbms-indexing-h2',
+  pyqStyle: true,
+  q: 'Starting from an empty B+-tree of order 4 (maximum 4 pointers / 3 keys per node), the keys 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 are inserted one at a time in that ascending order. What are the total number of node splits and the final height of the tree (counting the leaf level)?',
+  options: ['5 splits, height 3', '4 splits, height 2', '6 splits, height 3', '5 splits, height 2'],
+  answer: 0,
+  marks: 2,
+  difficulty: 'hard',
+  type: 'pyq-style',
+  explanation: 'Order 4 allows up to 3 keys per node before overflow. Keys 10,20,30 fill the first leaf with no overflow. Inserting 40 overflows this leaf (SPLIT #1: [10,20]/[30,40], 30 copied up), creating root[30]. Inserting 50,60 fill leaf[30,40] to [30,40,50] then attempting 60 forces overflow (SPLIT #2: leaf splits into [30,40]/[50,60], 50 copied up), root becomes [30,50]. Inserting 70 goes to the rightmost leaf uneventfully; inserting 80 overflows it (SPLIT #3: [50,60]... wait tracing carefully - after 60, leaf holding 50s is [50,60]; 70 makes it [50,60,70]; 80 overflows it into [50,60]/[70,80], copying up 70), root becomes [30,50,70] - exactly 3 keys, still within the order-4 limit, no root split yet. Inserting 90 goes to leaf[70,80] uneventfully, becoming [70,80,90]. Inserting 100 overflows this leaf (SPLIT #4: [70,80]/[90,100], 90 copied up) - but this pushes the root to [30,50,70,90], FOUR keys, exceeding the order-4 internal max of 3, forcing a ROOT SPLIT (SPLIT #5): root splits into [30,50]/[90] with 70 pushed up to a new top root[70]. Total splits = 5 (at insertions of 40, 60, 80, and 100 twice), and the tree now has 3 levels: root, one internal level, and the leaf level - height 3.'
+},
+{
+  id: 'dbms-indexing-h3',
+  pyqStyle: true,
+  q: 'A file has 50,000,000 records and uses a dense secondary B+-tree index (one index entry per record). The block size is 2048 bytes, each search-key value occupies 20 bytes, and each block pointer occupies 10 bytes (leaf nodes reserve one extra pointer-sized slot for the next-leaf chain). How many block accesses are needed, in the worst case, to retrieve ONE specific record using this index (root-to-leaf traversal plus one final access to fetch the actual data block, since this is a non-clustering index)?',
+  options: [],
+  answer: 6,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'hard',
+  type: 'pyq-style',
+  explanation: 'Internal node order n (max pointers) satisfies n·10 + (n-1)·20 ≤ 2048, i.e. 30n ≤ 2068, giving n ≤ 68.9, so n = 68 pointers max (67 keys) per internal node. Leaf capacity m (max key+record-pointer pairs, plus one next-leaf pointer of 10 bytes) satisfies m·(20+10) + 10 ≤ 2048, i.e. 30m ≤ 2038, giving m ≤ 67.9, so m = 67 entries per leaf. With N = 50,000,000 records: number of leaves = ceil(50,000,000 / 67) = 746,269. Going up one level: ceil(746,269 / 68) = 10,975. Up again: ceil(10,975 / 68) = 162. Up again: ceil(162 / 68) = 3. Up again: ceil(3 / 68) = 1 (the root). Counting levels from the leaf level up to and including the root gives 5 levels total (746269 → 10975 → 162 → 3 → 1), meaning a root-to-leaf traversal costs 5 block accesses. Since this is a DENSE SECONDARY (non-clustering) index, the leaf entry only holds a pointer to the actual record\'s block, which is a further, separate 6th block access to fetch the real data. Total = 5 + 1 = 6 block accesses. The awkward, non-round block/key/pointer sizes are deliberately chosen so that naive rounding (rather than careful floor/ceiling arithmetic at every level) gives a wrong order or a wrong final level count.'
+},
+{
+  id: 'dbms-indexing-h4',
+  pyqStyle: true,
+  q: 'A file has 2,000,000 records with a fixed blocking factor of 250 records per physical block (records are stored in primary-key order). A B+-tree of order 100 is built once as a SPARSE clustering primary index on this key, and separately once as a DENSE non-clustering secondary index on a different, unordered field. A range query matches exactly 2000 records. What are the total block accesses via the primary index and via the secondary index, respectively (index traversal + data-block reads, assuming worst-case scattering for the secondary index)?',
+  options: ['11 (primary), 2005 (secondary)', '11 (primary), 2000 (secondary)', '8 (primary), 2005 (secondary)', '11 (primary), 2002 (secondary)'],
+  answer: 0,
+  marks: 2,
+  difficulty: 'hard',
+  type: 'pyq-style',
+  explanation: 'Sparse primary index: it has exactly ONE entry per data block, so its entry count is 2,000,000 / 250 = 8000. With order 100: level sizes are 8000 → ceil(8000/100)=80 → ceil(80/100)=1 (root), giving 3 levels total, so root-to-leaf traversal costs 3 block accesses. Because this is a CLUSTERING index, the 2000 matching records are stored CONTIGUOUSLY in the file, spanning only ceil(2000/250) = 8 data blocks - so total access = 3 (traversal) + 8 (contiguous data blocks) = 11. Dense secondary index: it has one entry PER RECORD, so 2,000,000 entries; level sizes: 2,000,000 → ceil(2000000/100)=20000 → ceil(20000/100)=200 → ceil(200/100)=2 → ceil(2/100)=1 (root), giving 5 levels, so traversal costs 5. Because this index is NON-CLUSTERING, the 2000 matching records are scattered arbitrarily across the file with no guaranteed contiguity, so in the worst case EACH of the 2000 records requires its own separate block access: total = 5 + 2000 = 2005. The dramatic gap (11 vs 2005) is the entire point - clustering collapses many matching records into few shared blocks, while a non-clustering index pays close to one full block access per matching record.'
+},
+{
+  id: 'dbms-indexing-h5',
+  pyqStyle: true,
+  q: 'An extendible hashing scheme uses bucket capacity 2 and hashes keys to these 4-bit binary values (the LAST bits of the hash, read right to left, decide directory placement): a=1001, b=0011, c=1010, d=0101, e=1000. Keys are inserted into an initially empty structure (global depth 1, two buckets) in the order a, b, c, d, e. What is the final global depth, and how many entries does the directory contain after all five insertions?',
+  options: ['Global depth 2, directory size 4', 'Global depth 1, directory size 2', 'Global depth 3, directory size 8', 'Global depth 2, directory size 8'],
+  answer: 0,
+  marks: 2,
+  difficulty: 'hard',
+  type: 'pyq-style',
+  explanation: 'Start: global depth 1, directory[0,1], both buckets empty, local depth 1. Insert a(...1): goes to bucket1, bucket1=[a]. Insert b(...1): also bucket1, bucket1=[a,b] (capacity 2, fits exactly). Insert c(...0): bucket0, bucket0=[c]. Insert d(...1): targets bucket1, which is FULL - overflow. Bucket1\'s local depth (1) equals the global depth (1), so the directory must DOUBLE: global depth becomes 2, directory becomes [old0, old1, old0, old1] i.e. 4 entries. Bucket1 splits into a bucket keeping local depth 2 and a new sibling bucket also at local depth 2; re-examining the last-2-bits of the entries that pointed to bucket1 (indices 1 and 3 in the new 4-slot directory) determines which of the two new buckets each points to. Re-inserting the old contents {a,b} plus the new d using the LAST 2 BITS now: a="01"→slot1, b="11"→slot3, d="01"→slot1 - so slot1\'s bucket ends up holding {a,d} and slot3\'s bucket holds {b}. Insert e(...00): targets slot0 = bucket holding [c], which has room (capacity 2), so bucket0 becomes [c,e], no further split needed. Final state: global depth = 2, directory size = 2^2 = 4 entries - only ONE doubling ever occurred, triggered exactly once when d caused bucket1 to overflow while its local depth matched the global depth.'
+},
+{
+  id: 'dbms-indexing-h6',
+  pyqStyle: true,
+  q: 'Order p = 5, and a B+-tree built with this order has height h = 3 (three levels: root, one internal level, and the leaf level). Using the standard bounds (root: minimum 2 children; every other internal node: between ceil(p/2)=3 and p=5 children; every leaf: between ceil((p-1)/2)=2 and p-1=4 key entries), what are the minimum and maximum possible total number of records (leaf-level entries) this tree can hold?',
+  options: ['Minimum 12, Maximum 100', 'Minimum 8, Maximum 100', 'Minimum 12, Maximum 80', 'Minimum 18, Maximum 100'],
+  answer: 0,
+  marks: 2,
+  difficulty: 'hard',
+  type: 'pyq-style',
+  explanation: 'For the MINIMUM: the root is a special case allowed as few as 2 children (rather than the usual ceil(p/2)=3), so the root has 2 children. Each of those children is a non-root internal node (since height 3 puts one internal level between root and leaves), so each must have at least ceil(5/2)=3 children of its own (i.e. 3 leaves each). Each leaf must hold at least ceil((5-1)/2)=2 entries. Multiplying down the minimal tree shape: 2 (root branches) × 3 (leaves per branch) × 2 (entries per leaf) = 12 records minimum. For the MAXIMUM: every node, including the root, is packed to its absolute ceiling: the root can have up to p=5 children, each of THOSE internal nodes can also have up to p=5 children (5 leaves each), and each leaf can hold up to p-1=4 entries: 5 × 5 × 4 = 100 records maximum. The trap is using the SAME "minimum children" rule for the root as for every other internal node (which would wrongly compute 3×3×2=18 as the minimum) - the root uniquely gets a lower bound of just 2, not ceil(p/2), which is precisely why 12, not 18, is the true minimum.'
+},
+{
+  id: 'dbms-indexing-h7',
+  pyqStyle: true,
+  q: 'A file has 8,000,000 records with a fixed blocking factor of 200 records per physical block (records are stored in primary-key order). A B+-tree of order 80 is built once as a SPARSE clustering primary index, and separately once as a DENSE non-clustering secondary index on a different field. A range query matches exactly 4000 records. What are the total block accesses via the primary index and via the secondary index, respectively?',
+  options: ['24 (primary), 4005 (secondary)', '20 (primary), 4005 (secondary)', '24 (primary), 4000 (secondary)', '7 (primary), 4005 (secondary)'],
+  answer: 0,
+  marks: 2,
+  difficulty: 'hard',
+  type: 'pyq-style',
+  explanation: 'Sparse primary index entries = 8,000,000 / 200 = 40,000 (one per block, since a sparse index needs only one entry per physical block, not per record). With order 80: level sizes are 40,000 → ceil(40000/80)=500 → ceil(500/80)=7 → ceil(7/80)=1 (root) - that is 4 distinct levels (40000, 500, 7, 1), so a root-to-leaf traversal costs 4 block accesses. Because this is a CLUSTERING index, the 4000 matching records sit contiguously in primary-key order and span only ceil(4000/200) = 20 data blocks. Total via the primary index = 4 (traversal) + 20 (contiguous data blocks) = 24. Dense secondary index entries = 8,000,000 (one per record, since a dense index needs an entry for every record). Level sizes: 8,000,000 → ceil(8000000/80)=100,000 → ceil(100000/80)=1250 → ceil(1250/80)=16 → ceil(16/80)=1 (root) - that is 5 levels, so traversal costs 5 block accesses. Because this index is NON-CLUSTERING, the 4000 matching records are scattered with no guaranteed contiguity, so worst-case each needs its own block access: total = 5 + 4000 = 4005. The huge gap (24 vs 4005) for an IDENTICAL range query size again demonstrates why clustering vs non-clustering is the dominant factor in range-query cost, not the raw index height difference (4 vs 5 levels) alone.'
+},
+{
+  id: 'dbms-indexing-h8',
+  pyqStyle: true,
+  q: 'An extendible hashing scheme uses bucket capacity 3 and hashes keys to these 5-bit binary values (LAST bits decide directory placement): p=10110, q=00101, r=11010, s=01100, t=10011, u=00001, v=11101, w=01010, x=10000. Keys are inserted in that order into an initially empty structure (global depth 1, two buckets). How many times does the directory double during this entire sequence, and what is the final global depth?',
+  options: ['1 doubling, final global depth 2', '2 doublings, final global depth 3', '1 doubling, final global depth 3', '0 doublings, final global depth 1'],
+  answer: 0,
+  marks: 2,
+  difficulty: 'hard',
+  type: 'pyq-style',
+  explanation: 'Using the last bit only (global depth 1) to start: p(...0)\u2192bucket0, q(...1)\u2192bucket1, r(...0)\u2192bucket0, s(...0)\u2192bucket0 - bucket0 is now [p,r,s], exactly at capacity 3, no overflow yet. t(...1)\u2192bucket1, bucket1=[q,t]. u(...1)\u2192bucket1, bucket1=[q,t,u], at capacity, no overflow. v(...1) targets bucket1, which overflows (capacity 3 already full). Bucket1\'s local depth (1) equals the current global depth (1), so this is the ONE moment a directory doubling is forced: global depth becomes 2, the directory grows from 2 to 4 entries, and bucket1 splits into two buckets at local depth 2, redistributing q,t,u,v (plus any directory entries that pointed at bucket1) using the last 2 bits of each hash. This is the only doubling in the whole sequence. w(...0) and x(...0) both target the bucket0 side; bucket0 is already at capacity 3, so inserting either forces IT to split too - but by this point bucket0\'s local depth (1) is strictly LESS than the now-current global depth (2), so this second split redistributes bucket0\'s contents into two buckets at local depth 2 WITHOUT needing to double the directory again (the directory already has enough slots at depth 2 to address both halves). So across all nine insertions, exactly ONE doubling event occurs (triggered by v), and the directory settles at global depth 2 with 4 entries - the trap is assuming that BOTH overflow events (bucket1 via v, and bucket0 via w/x) must each force their own doubling, when only the first one - the one where local depth equals global depth at the moment of overflow - actually does.'
+}
+);
+
+window.GATE_DATA.questions['dbms'].topics.find(function(t){return t.id==='dbms-transactions';}).questions.push(
+{
+  id: 'dbms-transactions-h1',
+  pyqStyle: true,
+  q: 'Four transactions T1, T2, T3, T4 produce schedule S: r1(A); r2(B); w3(B); r3(C); w1(D); r4(D); w2(A); w4(C); (operations listed left to right in execution order). Is S conflict-serializable, and if so what is the equivalent serial order?',
+  options: ['Not conflict-serializable; the precedence graph has a 4-cycle', 'Conflict-serializable, equivalent to T1, T2, T3, T4', 'Conflict-serializable, equivalent to T4, T3, T2, T1', 'Conflict-serializable, but two different equivalent serial orders exist'],
+  answer: 1,
+  marks: 2,
+  difficulty: 'hard',
+  type: 'pyq-style',
+  explanation: 'Build the precedence graph item by item. Item A: r1(A) precedes w2(A) → edge T1→T2. Item B: r2(B) precedes w3(B) → edge T2→T3. Item C: r3(C) precedes w4(C) → edge T3→T4. Item D: w1(D) precedes r4(D) → edge T1→T4. The complete edge set is {T1→T2, T2→T3, T3→T4, T1→T4}. At first glance, with four transactions and four separate data items all touched by different pairs, it is tempting to suspect the round-robin pattern hides a T4→T1 edge closing a cycle - but no operation pair actually produces that reverse edge; D is written by T1 and only ever READ (not written) by T4, and that is the only pair on D. This graph is simply the chain T1→T2→T3→T4 plus one extra, entirely consistent transitive edge T1→T4 - it is acyclic. A topological sort of an acyclic graph shaped like a straight chain (with only forward-consistent extra edges) yields exactly ONE valid order: T1, T2, T3, T4. So S is conflict-serializable, and unlike a graph with independent unconnected branches, this fully chained structure admits no alternative ordering - making option D\'s claim of "two valid orders" a plausible but incorrect trap.'
+},
+{
+  id: 'dbms-transactions-h2',
+  pyqStyle: true,
+  q: 'Four transactions T1, T2, T3, T4 produce schedule S: w1(E); r1(A); r2(B); r3(C); r4(D); w2(A); w3(B); w4(C); w1(D); r3(E); (operations listed left to right in execution order). How many edges does the precedence graph of S contain, and is S conflict-serializable?',
+  options: ['5 edges; NOT conflict-serializable', '4 edges; conflict-serializable', '5 edges; conflict-serializable', '4 edges; NOT conflict-serializable'],
+  answer: 0,
+  marks: 2,
+  difficulty: 'hard',
+  type: 'pyq-style',
+  explanation: 'Check every item in turn. Item E: w1(E) (1st operation) precedes r3(E) (10th operation) → edge T1→T3 (a write-read conflict). Item A: r1(A) precedes w2(A) → edge T1→T2. Item B: r2(B) precedes w3(B) → edge T2→T3. Item C: r3(C) precedes w4(C) → edge T3→T4. Item D: r4(D) precedes w1(D) → edge T4→T1. That gives FIVE edges total: T1→T3, T1→T2, T2→T3, T3→T4, T4→T1. The edge T1→T3 is an extra, transitively-redundant-looking edge that can distract from the real question - but focus on the core chain T1→T2→T3→T4→T1: this is a genuine 4-cycle (T1 to T2 to T3 to T4 and back to T1), so the graph IS cyclic regardless of the extra T1→T3 edge. Since a cycle exists, S is NOT conflict-serializable. The trap here is exactly the reverse of a simpler question: rather than obscuring a cycle behind noise that turns out to be nothing, this schedule genuinely does contain the cycle, and the extra edge (T1→T3) must not be mistaken for evidence that "there are too many constraints for a simple cycle" - cycles and extra transitive edges can and do coexist.'
+},
+{
+  id: 'dbms-transactions-h3',
+  pyqStyle: true,
+  q: 'T1: r1(A); w1(B). T2: r2(B); w2(C). T3: r3(C); w3(A). Four candidate schedules interleave these three transactions (each preserving its own internal instruction order): S1 = r1(A); w1(B); r2(B); w2(C); r3(C); w3(A). S2 = r1(A); r3(C); r2(B); w2(C); w1(B); w3(A). S3 = r3(C); r2(B); w3(A); r1(A); w2(C); w1(B). S4 = r2(B); r1(A); w2(C); r3(C); w1(B); w3(A). Which of these schedules are conflict-serializable? (Select ALL that apply)',
+  options: ['S1', 'S2', 'S3', 'S4'],
+  answers: [0, 2, 3],
+  marks: 2,
+  difficulty: 'hard',
+  type: 'pyq-style',
+  explanation: 'Each schedule needs its own independent precedence-graph derivation since the three shared items (A between T1,T3; B between T1,T2; C between T2,T3) can appear in a different relative order in each schedule. S1: r1(A) before w3(A) → T1→T3; w1(B) before r2(B) → T1→T2; w2(C) before r3(C) → T2→T3. Edges {T1→T3, T1→T2, T2→T3} form a chain, acyclic - serializable (order T1,T2,T3). S2: r1(A) before w3(A) → T1→T3; r2(B) before w1(B) → T2→T1; r3(C) before w2(C) → T3→T2. Edges {T1→T3, T2→T1, T3→T2} form the cycle T1→T3→T2→T1 - NOT serializable. S3: w3(A) before r1(A) → T3→T1; r2(B) before w1(B) → T2→T1; r3(C) before w2(C) → T3→T2. Edges {T3→T1, T2→T1, T3→T2} - T3 points to both T1 and T2, and T2 points to T1; this is the transitive chain T3→T2→T1 (plus the consistent direct edge T3→T1) - acyclic, serializable (order T3,T2,T1). S4: r1(A) before w3(A) → T1→T3; r2(B) before w1(B) → T2→T1; w2(C) before r3(C) → T2→T3. Edges {T1→T3, T2→T1, T2→T3} - chain T2→T1→T3 (plus consistent direct T2→T3) - acyclic, serializable (order T2,T1,T3). So S1, S3, and S4 are conflict-serializable; only S2 contains a genuine 3-cycle.'
+},
+{
+  id: 'dbms-transactions-h4',
+  pyqStyle: true,
+  q: 'Three transactions perform blind and non-blind writes/reads on a single item Q, producing schedule S: r1(Q); w2(Q); w1(Q); w3(Q) (operations in execution order). Is S conflict-serializable? Is S view-serializable, and if so, to which serial order?',
+  options: ['Not conflict-serializable; also not view-serializable', 'Not conflict-serializable, but view-serializable to T1, T2, T3', 'Conflict-serializable, equivalent to T1, T2, T3', 'Not conflict-serializable, but view-serializable to T3, T2, T1'],
+  answer: 1,
+  marks: 2,
+  difficulty: 'hard',
+  type: 'pyq-style',
+  explanation: 'Precedence graph on Q: r1(Q) before w2(Q) → T1→T2 (read-write conflict); r1(Q) before w3(Q) → T1→T3; w2(Q) before w1(Q) → T2→T1 (write-write conflict); w2(Q) before w3(Q) → T2→T3. The edges T1→T2 AND T2→T1 both exist simultaneously - a 2-cycle - so S is definitely NOT conflict-serializable. Now test view-serializability against the candidate order T1,T2,T3 using the three view-equivalence conditions: (i) initial reads - in S, T1\'s read r1(Q) reads the initial value of Q (nothing has written Q yet at that point); in the serial order T1,T2,T3, T1 also reads first, so it also reads the initial value - matches. (ii) read-from relationships - S has exactly one read, r1(Q), reading the initial value; the serial order T1,T2,T3 has T1 read first, also reading the initial value - the (only) read-from pair matches exactly. (iii) final writes - in S, the LAST write to Q is w3(Q) by T3; in the serial order T1,T2,T3, the last write is also by T3 (executed last) - matches. All three view-equivalence conditions hold, so S IS view-serializable to T1,T2,T3, even though it is NOT conflict-serializable. This is the classic case, driven by BLIND WRITES (w1(Q) and w3(Q) never read Q first): the write-write conflict T2→T1 is a real conflict-graph edge, but it does not correspond to any actual difference in what any transaction observes or in the final database state, which is exactly why conflict-serializability (a purely syntactic, conflict-based test) is strictly more conservative than view-serializability here.'
+},
+{
+  id: 'dbms-transactions-h5',
+  pyqStyle: true,
+  q: 'Four candidate lock request/release sequences are proposed for a transaction (XL = exclusive lock, UL = unlock): Seq1: XL(A); XL(B); R(A); W(B); UL(A); UL(B). Seq2: XL(A); R(A); UL(A); XL(B); W(B); UL(B). Seq3: XL(A); XL(B); R(A); UL(B); XL(C); W(C); UL(A); UL(C). Seq4: XL(A); XL(B); XL(C); R(A); W(B); UL(A); UL(C); UL(B). Which of these sequences satisfy the Two-Phase Locking (2PL) protocol? (Select ALL that apply)',
+  options: ['Seq1', 'Seq2', 'Seq3', 'Seq4'],
+  answers: [0, 3],
+  marks: 2,
+  difficulty: 'hard',
+  type: 'pyq-style',
+  explanation: 'Each sequence must be scanned independently for any lock ACQUISITION that occurs AFTER a lock RELEASE has already happened - that single pattern is what breaks 2PL\'s growing/shrinking phase separation, regardless of how many locks are correctly ordered elsewhere. Seq1: acquisitions XL(A), XL(B) both happen before any release; releases UL(A), UL(B) both happen only afterward - clean growing phase then clean shrinking phase - VALID, with lock point right after XL(B). Seq2: XL(A) acquired, then UL(A) released - but then XL(B) is ACQUIRED AFTER this release - a brand-new acquisition occurring after the transaction has already entered its shrinking phase - INVALID (violates 2PL). Seq3: XL(A), XL(B) acquired, then UL(B) released - but then XL(C) is ACQUIRED AFTER this release - same violation pattern as Seq2 - INVALID. Seq4: XL(A), XL(B), XL(C) are ALL acquired first, with zero releases interleaved among them; only after all three acquisitions are complete do releases begin (UL(A), UL(C), UL(B), in that order - the order of releases is irrelevant to 2PL validity) - VALID, with lock point right after XL(C). So exactly Seq1 and Seq4 obey 2PL; Seq2 and Seq3 both fail via the identical "acquire right after a release" trap, just on different items.'
+},
+{
+  id: 'dbms-transactions-h6',
+  pyqStyle: true,
+  q: 'Four transactions hold and request locks as follows: T1 holds A, requests B (held by T2). T2 holds B, requests C (held by T3). T3 holds C, requests D (held by T1). T4 holds E, requests B (held by T2). How many transactions are actually part of a deadlock cycle in the wait-for graph (as opposed to merely being blocked while waiting on a transaction that is itself part of a cycle)?',
+  options: [],
+  answer: 3,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'hard',
+  type: 'pyq-style',
+  explanation: 'Build the wait-for graph: T1 waits for T2 (T1 wants B, held by T2) → edge T1→T2. T2 waits for T3 (T2 wants C, held by T3) → edge T2→T3. T3 waits for T1 (T3 wants D, held by T1) → edge T3→T1. T4 waits for T2 (T4 wants B, held by T2) → edge T4→T2. Tracing the graph: T1→T2→T3→T1 forms a closed cycle - T1, T2, and T3 are all mutually waiting on each other in a loop with no possible progress, which is the formal definition of deadlock. T4→T2 is a SEPARATE edge - T4 is genuinely blocked (it cannot proceed until T2 releases B), but T4 itself is not part of any cycle; T4 has no incoming edge from within the cycle, meaning none of T1, T2, or T3 is waiting on T4. If the deadlock is resolved by aborting one of the cycle members (say T3, releasing C so T2 can proceed), T4 will eventually be unblocked once T2 finishes with B - T4 was simply a downstream dependent, not a true participant in the circular wait. So even though all FOUR transactions are technically not making progress at this instant, only THREE of them (T1, T2, T3) are part of the actual deadlock cycle that a deadlock-detection algorithm would report.'
+},
+{
+  id: 'dbms-transactions-h7',
+  pyqStyle: true,
+  q: 'Transactions T1 and T2 both perform two blind writes each on the same two items: T1: w1(A); w1(B). T2: w2(A); w2(B). Considering all distinct interleavings of these four operations that preserve each transaction\'s own internal instruction order, how many of the resulting schedules are conflict-serializable?',
+  options: [],
+  answer: 4,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'hard',
+  type: 'pyq-style',
+  explanation: 'The total number of interleavings preserving each transaction\'s internal order is C(4,2) = 6 (choosing which 2 of the 4 slots go to T1\'s operations, in their fixed order, with T2\'s operations filling the rest in their fixed order). Enumerate all six and build each precedence graph (both operations on the same item are writes, so ANY pairing on A or on B creates a conflict edge in whichever direction the writes occur): (1) w1A,w1B,w2A,w2B → only T1\'s writes precede T2\'s on both items → edge T1→T2 only → acyclic, serializable. (2) w1A,w2A,w1B,w2B → same edge T1→T2 only → serializable. (3) w1A,w2A,w2B,w1B → on A: T1 before T2 (T1→T2); on B: T2 before T1 (T2→T1) → BOTH directions present → 2-cycle → NOT serializable. (4) w2A,w1A,w1B,w2B → on A: T2→T1; on B: T1→T2 → both directions → NOT serializable. (5) w2A,w1A,w2B,w1B → on A: T2→T1; on B: T2→T1 (consistent) → single edge T2→T1 → serializable. (6) w2A,w2B,w1A,w1B → edge T2→T1 only → serializable. Counting: schedules 1,2,5,6 are serializable (4 of them), while 3 and 4 are not. The pattern is that a schedule is non-serializable exactly when the two transactions "cross over" each other\'s write order between the two items (T1 first on one item but second on the other) - which happens in exactly 2 of the 6 interleavings, leaving 4 conflict-serializable.'
+},
+{
+  id: 'dbms-transactions-h8',
+  pyqStyle: true,
+  q: 'Transactions T1, T2, T3, T4 have timestamps TS(T1)=10, TS(T2)=20, TS(T3)=30, TS(T4)=40 (smaller = older = started first). Under the Wait-Die scheme, the following lock requests occur in order: (1) T3 requests A - granted (no holder). (2) T1 requests A - conflicts with T3. (3) T2 requests A - conflicts with T3. (4) T4 requests B - granted (no holder). (5) T3 requests B - conflicts with T4. (6) T4 requests A - conflicts with T3. Out of these six requests, how many result in the REQUESTER being aborted (i.e., the requester "dies")?',
+  options: [],
+  answer: 1,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'hard',
+  type: 'pyq-style',
+  explanation: 'Process each conflicting request in order, comparing the REQUESTER\'s timestamp against the current HOLDER\'s timestamp. Request 1 (T3 wants A): no conflict, simply granted. Request 2 (T1 wants A, held by T3): TS(T1)=10 is SMALLER than TS(T3)=30, meaning T1 is OLDER than the holder - T1 WAITS (does not die). Request 3 (T2 wants A, still held by T3): TS(T2)=20 is smaller than TS(T3)=30, so T2 is also older than the holder - T2 WAITS (does not die). Request 4 (T4 wants B): no conflict, granted. Request 5 (T3 wants B, held by T4): TS(T3)=30 is smaller than TS(T4)=40, so T3 is older than the holder - T3 WAITS (does not die). Request 6 (T4 wants A, held by T3): TS(T4)=40 is LARGER than TS(T3)=30, meaning T4 is YOUNGER than the holder this time - a younger requester conflicting with an older holder DIES (is aborted and restarted, typically with its original timestamp preserved) rather than waiting. So among the six requests, exactly ONE (request 6, T4 on A) results in the requester dying; the other three conflicting requests (2, 3, 5) all result in waits because in each of those cases the requester happened to be older than the current holder. This mixture is what makes Wait-Die\'s deadlock-freedom work: since a chain of waits can only ever go from an older to a younger transaction, timestamps strictly increase along any wait chain, making a cycle back to a smaller timestamp structurally impossible.'
+}
+);
+
+window.GATE_DATA.questions['dbms'].topics.find(function(t){return t.id==='dbms-er';}).questions.push(
+{
+  id: 'dbms-er-h1',
+  pyqStyle: true,
+  q: 'An ER diagram has: strong entity Department; weak entity Project, identifying-dependent on Department; strong entity Employee; a TERNARY relationship Assigned among Department, Project, and Employee (with no attributes of its own beyond the three participant keys); and Employee undergoes a TOTAL, DISJOINT specialization into Manager and Engineer, mapped using the method where NO separate Employee table is kept and each subclass table independently carries all inherited superclass attributes plus its own. What is the minimum number of relational tables needed to represent this entire structure?',
+  options: ['4', '5', '6', '7'],
+  answer: 1,
+  marks: 2,
+  difficulty: 'hard',
+  type: 'pyq-style',
+  explanation: 'Count each construct separately using standard minimal-table mapping rules. Department is a strong entity → 1 table. Project is a WEAK entity → it still gets its own table (1 table), which must additionally carry Department\'s primary key as part of its own composite key, but this does not eliminate the need for the table itself. The TERNARY relationship Assigned CANNOT be merged into any single participant\'s table (unlike binary 1:1 or 1:N relationships) - a relationship among three or more entities always needs its own separate table containing the keys of all three participants → 1 table. For the specialization of Employee: since it is TOTAL (every employee is either a Manager or an Engineer, no employee is unclassified) and the chosen method explicitly keeps NO base Employee table, using instead one table per subclass carrying all attributes → this is valid specifically because the specialization is total (if it were partial, this method would lose any employee not in either subclass) → 2 tables (Manager, Engineer). Total = 1 (Department) + 1 (Project) + 1 (Assigned) + 2 (Manager, Engineer) = 5 tables. The trap is forgetting that a ternary relationship, unlike a binary 1:1/1:N one, can never be absorbed into an entity\'s table regardless of any cardinality constraint, and separately confirming that the "no base table" specialization method is only legal here because the specialization was explicitly stated to be total.'
+},
+{
+  id: 'dbms-er-h2',
+  pyqStyle: true,
+  q: 'An ER diagram has: strong entities X, Y, Z; a TERNARY relationship T among X, Y, Z; a binary MANY-TO-MANY relationship R between X and Y; weak entity W, identifying-dependent on Z; and X undergoes specialization into subclasses X1 and X2, mapped using the method that keeps a base table for X AND a separate table for each subclass (regardless of totality/disjointness). What is the minimum number of relational tables needed to represent this entire structure?',
+  options: ['6', '7', '8', '9'],
+  answer: 2,
+  marks: 2,
+  difficulty: 'hard',
+  type: 'pyq-style',
+  explanation: 'Handle the X-hierarchy first: the stated method always keeps the base table PLUS one table per subclass, independent of whether the specialization is total/partial or disjoint/overlapping - so X contributes 1 (base X) + 1 (X1) + 1 (X2) = 3 tables. Y is a strong entity with no relationships mapped into it for free → 1 table. Z is a strong entity → 1 table. W is a weak entity depending on Z → 1 table (it needs Z\'s key as part of its own composite key, but still requires its own table). The ternary relationship T among X, Y, Z cannot be merged into any entity\'s table (ternary relationships always need their own table, regardless of any pairwise cardinality) → 1 table, referencing the base X table\'s key (still available since this method retains it), plus Y and Z keys. The binary M:N relationship R between X and Y also cannot be merged into either participant\'s table (only 1:1 or 1:N relationships can sometimes be merged) → 1 separate table, distinct from T even though both R and T happen to involve X and Y - they represent semantically different associations and must never be collapsed together. Total = 3 (X-hierarchy) + 1 (Y) + 1 (Z) + 1 (W) + 1 (T) + 1 (R) = 8 tables. The trap is assuming R and T could somehow share a table since they overlap in participants, or forgetting that the chosen specialization method here always retains the base table regardless of totality, unlike other mapping methods.'
+},
+{
+  id: 'dbms-er-h3',
+  pyqStyle: true,
+  q: 'Strong entity Employee has a COMPOSITE primary key {CompanyID, EmpID} (employees are numbered per-company, not globally unique). Weak entity Dependent is identifying-dependent on Employee via a relationship "HasDependent", with partial key DependentName (which only distinguishes dependents WITHIN the same employee, not globally). After standard relational mapping, what is the primary key of the resulting Dependent relation?',
+  options: ['{DependentName}', '{EmpID, DependentName}', '{CompanyID, EmpID, DependentName}', '{CompanyID, DependentName}'],
+  answer: 2,
+  marks: 2,
+  difficulty: 'hard',
+  type: 'pyq-style',
+  explanation: 'The standard rule for mapping a weak entity is: its relational primary key = (the OWNER entity\'s ENTIRE primary key, in full) UNION (the weak entity\'s own partial key). Here the owner, Employee, has a COMPOSITE two-attribute primary key {CompanyID, EmpID} - NOT just EmpID alone - because EmpID by itself is only unique within a single company (two different companies could both have an "EmpID 7"). So the full owner key that must be imported into Dependent is {CompanyID, EmpID}, both attributes, not merely EmpID. Combining this with Dependent\'s own partial key, DependentName (which by itself only distinguishes dependents belonging to the SAME employee), gives the complete primary key of the Dependent relation: {CompanyID, EmpID, DependentName} - three attributes total. The trap is assuming that because "EmpID" is colloquially treated as "the" employee identifier, only EmpID needs to be imported (giving option B, {EmpID, DependentName}) - this would be WRONG and would fail to guarantee uniqueness, since it silently assumes EmpID is globally unique across companies when the problem explicitly states it is only unique per-company. Only by combining the OWNER\'S FULL composite key with the partial key do you get a primary key that is actually guaranteed unique.'
+},
+{
+  id: 'dbms-er-h4',
+  pyqStyle: true,
+  q: 'A many-to-many relationship Enrolls connects Student (key SID) and Course (key CID), and carries a descriptive attribute Semester. A student may enroll in the same course in different semesters, but at most once within a given semester. After relational mapping, what is the primary key of the resulting Enrolls relation?',
+  options: ['{SID, CID}', '{SID, CID, Semester}', '{SID, Semester}', '{CID, Semester}'],
+  answer: 1,
+  marks: 2,
+  difficulty: 'hard',
+  type: 'pyq-style',
+  explanation: 'The default rule for mapping an M:N relationship without descriptive attributes is that the primary key of the relationship table is the union of both participating entities\' keys, here {SID, CID}. However, this default silently assumes each (SID, CID) pair can occur AT MOST ONCE in the relationship - and the problem statement explicitly breaks that assumption: "a student MAY enroll in the SAME course in DIFFERENT semesters", meaning the SAME (SID, CID) pair can legitimately appear as multiple distinct rows, once per semester. If the primary key were left as just {SID, CID}, the table could not represent a student taking the same course twice across two semesters without violating key uniqueness - a real, described business scenario would then be structurally impossible to store. Since the constraint additionally says "at most once within a given semester", the triple {SID, CID, Semester} IS guaranteed unique and must be the actual primary key. This is a classic trap in relationship-to-key mapping: descriptive/attribute data on a relationship is not automatically excluded from the key - whenever the entity-pair alone is not guaranteed unique (because of a stated repeating scenario), the descriptive attribute that makes each occurrence distinct must be folded into the primary key itself, not treated as "just another column".'
+},
+{
+  id: 'dbms-er-h5',
+  pyqStyle: true,
+  q: 'A ternary relationship Supplies connects Supplier, Part, and Project. The stated cardinality constraint is: for any given (Part, Project) combination, there is AT MOST ONE Supplier who supplies that part to that project (i.e. Supplier is functionally determined by the pair Part, Project). After relational mapping, what is the primary key of the resulting Supplies relation?',
+  options: ['{SupplierID, PartID, ProjectID}', '{PartID, ProjectID}', '{SupplierID, PartID}', '{SupplierID, ProjectID}'],
+  answer: 1,
+  marks: 2,
+  difficulty: 'hard',
+  type: 'pyq-style',
+  explanation: 'The naive default for a ternary relationship\'s primary key is the union of ALL THREE participants\' keys - {SupplierID, PartID, ProjectID} - which is always a valid SUPERKEY (since the combination of all three participant keys trivially identifies each Supplies row uniquely). But the stated cardinality constraint is stronger: (PartID, ProjectID) FUNCTIONALLY DETERMINES SupplierID (at most one supplier per part-project pair), which means the functional dependency PartID,ProjectID → SupplierID holds. Whenever such a "look-across" cardinality constraint exists in a ternary relationship, the MINIMAL primary key is the smaller determining set, NOT the full three-attribute union - because {PartID, ProjectID} alone is already sufficient to uniquely identify each row (SupplierID becomes a functionally-dependent, non-key attribute stored alongside, still present as a column and typically also a foreign key into Supplier, but not part of the primary key itself). Using all three attributes as the key (option A) would technically still be unique but would NOT be minimal - a candidate/primary key must be minimal by definition, so once the smaller determining set {PartID, ProjectID} is identified as a superkey, the full three-attribute combination is disqualified from being the primary key. This is the key trap: cardinality constraints on ternary relationships change which subset of the "obvious" full-key combination is actually minimal.'
+},
+{
+  id: 'dbms-er-h6',
+  pyqStyle: true,
+  q: 'Strong entity Vehicle undergoes a PARTIAL, DISJOINT specialization into Car and Truck (some vehicles are neither explicitly categorized as a Car nor a Truck). Weak entity Wheel is identifying-dependent on Vehicle. Strong entity Person has a 1:N relationship Drives with Vehicle (each vehicle is driven by at most one person; a person may drive many vehicles), mapped by merging the relationship into the "many" side\'s table. Using the CORRECT and minimal-table-count mapping method for a PARTIAL specialization, what is the minimum number of tables required, and which method must be used for the Vehicle specialization?',
+  options: ['3 tables; single Vehicle table with a type-discriminator column and nullable Car/Truck-specific attributes', '2 tables; separate Car and Truck tables only, no base Vehicle table', '4 tables; separate base Vehicle table plus one table each for Car and Truck', '3 tables; separate Car and Truck tables only (still valid despite partiality)'],
+  answer: 0,
+  marks: 2,
+  difficulty: 'hard',
+  type: 'pyq-style',
+  explanation: 'Because the specialization is explicitly PARTIAL, the "subclass tables only, no base table" method is structurally INVALID here: some vehicles belong to NEITHER Car nor Truck, and if there is no base Vehicle table at all, those uncategorized vehicles would have nowhere to be stored - this immediately rules out any option that omits a base table (ruling out options B and D, even though option D disguises this as "3 tables" and might look economical). The valid minimal-table approach for a partial specialization that still wants to minimize table count is the SINGLE-TABLE-WITH-DISCRIMINATOR method: one Vehicle table holds all base attributes plus every Car-specific and Truck-specific attribute as NULLABLE columns, plus a type-discriminator column indicating whether a row is a Car, a Truck, or neither - this correctly handles partiality by simply leaving both sets of subclass-specific columns NULL for an uncategorized vehicle. Count: Vehicle (with merged Car/Truck columns) = 1 table; Wheel (weak, dependent on Vehicle) = 1 table; Person = 1 table; the 1:N Drives relationship merges into Vehicle\'s table as a foreign key to Person (no separate table needed, since 1:N relationships can always be absorbed into the "many" side). Total = 1 + 1 + 1 = 3 tables, using the single-table-with-nulls method. Option C\'s 4-table answer uses a valid method (base + subclass tables always works, partial or not) but is NOT minimal since it uses one more table than necessary.'
+},
+{
+  id: 'dbms-er-h7',
+  pyqStyle: true,
+  q: 'Strong entity Employee undergoes TWO INDEPENDENT, ORTHOGONAL specializations simultaneously: by job type into {Engineer, Manager} (total, disjoint), and separately by employment type into {FullTime, PartTime} (total, disjoint). Using the mapping method that keeps ONE shared base Employee table plus a separate table for EACH subclass in BOTH hierarchies, what is the minimum total number of tables needed to represent Employee and both of its specializations?',
+  options: [],
+  answer: 5,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'hard',
+  type: 'pyq-style',
+  explanation: 'The key subtlety is that Employee has only ONE underlying entity set, even though it participates in TWO SEPARATE, ORTHOGONAL specialization hierarchies simultaneously - this means only ONE shared base Employee table is needed, not two (it is easy to mistakenly double-count the base table, once per hierarchy). Count each hierarchy\'s subclass tables independently: the job-type hierarchy contributes 2 tables (Engineer, Manager); the employment-type hierarchy contributes another 2 tables (FullTime, PartTime) - these are entirely separate subclass tables since they represent different, independent classification criteria (an employee is simultaneously a row in the base table, a row in exactly one of {Engineer,Manager}, AND a row in exactly one of {FullTime,PartTime} - overlapping membership across the two DIFFERENT hierarchies is completely normal and expected, unlike overlapping membership within a single disjoint hierarchy which would be disallowed). Total = 1 (shared base Employee) + 2 (Engineer, Manager) + 2 (FullTime, PartTime) = 5 tables. The trap is either double-counting the base table as if each hierarchy needed its own copy (which would wrongly give 6), or forgetting that both specializations, despite being "total and disjoint" individually, coexist independently on the very same base entity without requiring the base table to be duplicated.'
+},
+{
+  id: 'dbms-er-h8',
+  pyqStyle: true,
+  q: 'An ER diagram has: strong entities Doctor, Patient, Hospital; a TERNARY relationship Treats among Doctor, Patient, and Hospital (with no mergeable cardinality simplification); weak entity Prescription, identifying-dependent on Patient (unrelated to the Treats relationship); and a separate binary MANY-TO-MANY relationship Refers between Doctor and Hospital (semantically distinct from Treats, even though both involve Doctor and Hospital). What is the minimum number of relational tables needed to represent this entire structure?',
+  options: [],
+  answer: 6,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'hard',
+  type: 'pyq-style',
+  explanation: 'Count each strong entity: Doctor = 1 table, Patient = 1 table, Hospital = 1 table. The weak entity Prescription depends on Patient (via its own identifying relationship, separate from Treats) → 1 table, carrying Patient\'s key plus its own partial key. The ternary relationship Treats among Doctor, Patient, and Hospital cannot be decomposed into or merged with any binary relationship, and specifically cannot be merged into any single participant\'s table → 1 separate table holding all three participant keys. The binary M:N relationship Refers between Doctor and Hospital is a SEPARATE, semantically distinct association from Treats, even though both happen to involve the same two entity types (Doctor and Hospital) - Treats additionally involves Patient and represents "which doctor treated which patient at which hospital", while Refers represents an entirely different real-world fact ("which doctor refers cases to which hospital"), with no patient involved at all. Because they capture different facts, they absolutely cannot share a table or be collapsed together, no matter how similar their participant lists look - Refers needs its OWN table → 1 table. Total = 1 (Doctor) + 1 (Patient) + 1 (Hospital) + 1 (Prescription) + 1 (Treats) + 1 (Refers) = 6 tables. The trap is assuming that because Doctor and Hospital both participate in Treats and in Refers, the two relationships could somehow be merged or that Refers is redundant - relationships are merged only when they represent the SAME association, never merely because they share some participants.'
+}
+);
