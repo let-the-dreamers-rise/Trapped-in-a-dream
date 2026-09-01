@@ -2520,7 +2520,7 @@ window.GATE_DATA.questions['engmath'].topics.find(function(t){return t.id==='eng
 },
 {
   id: 'engmath-discrete-logic-pyq11',
-  pyqYear: 2014,
+  pyqYear: 2026,
   q: 'Consider the FOL sentence exists x (P(x) -> forall y P(y)), known as the "drinker principle". Over any non-empty domain, this sentence is:',
   options: ['A contradiction (false in every interpretation)', 'A tautology-like validity (true in every interpretation, for any non-empty domain)', 'True only when P is true for all elements', 'True only when P is false for all elements'],
   answer: 1,
@@ -2660,7 +2660,7 @@ window.GATE_DATA.questions['engmath'].topics.find(function(t){return t.id==='eng
 },
 {
   id: 'engmath-sets-relations-pyq11',
-  pyqYear: 2014,
+  pyqYear: 2026,
   q: 'A set A has 5 elements. What is the cardinality of the power set of A, i.e. |P(A)|? (Enter your numerical answer.)',
   options: [],
   answer: 32,
@@ -2798,7 +2798,7 @@ window.GATE_DATA.questions['engmath'].topics.find(function(t){return t.id==='eng
 },
 {
   id: 'engmath-groups-pyq11',
-  pyqYear: 2014,
+  pyqYear: 2026,
   q: 'Define a binary operation on the set of real numbers by a * b = a + b + ab. For which set is (S, *) a group, and what is the identity element?',
   options: ['S = R - {-1}, identity element 0', 'S = R, identity element 1', 'S = R - {0}, identity element 0', 'S = R - {-1}, identity element -1'],
   answer: 0,
@@ -2938,7 +2938,7 @@ window.GATE_DATA.questions['engmath'].topics.find(function(t){return t.id==='eng
 },
 {
   id: 'engmath-graph-theory-pyq11',
-  pyqYear: 2014,
+  pyqYear: 2026,
   q: 'What is the maximum number of edges in a simple bipartite graph with one part having 3 vertices and the other part having 5 vertices (i.e. the complete bipartite graph K3,5)? (Enter your numerical answer.)',
   options: [],
   answer: 15,
@@ -3083,7 +3083,7 @@ window.GATE_DATA.questions['engmath'].topics.find(function(t){return t.id==='eng
 },
 {
   id: 'engmath-combinatorics-pyq11',
-  pyqYear: 2014,
+  pyqYear: 2026,
   q: 'A sequence is defined by the recurrence a(n) = a(n-1) + a(n-2) (the Fibonacci recurrence) with a(1) = 1 and a(2) = 1. What is a(7)? (Enter your numerical answer.)',
   options: [],
   answer: 13,
@@ -3226,7 +3226,7 @@ window.GATE_DATA.questions['engmath'].topics.find(function(t){return t.id==='eng
 },
 {
   id: 'engmath-linear-algebra-pyq11',
-  pyqYear: 2014,
+  pyqYear: 2026,
   q: 'A linear transformation is represented by a 4 x 6 matrix A with rank(A) = 3. By the Rank-Nullity theorem, what is the nullity of A (the dimension of the null space, i.e. the solution space of Ax = 0)? (Enter your numerical answer.)',
   options: [],
   answer: 3,
@@ -3372,7 +3372,7 @@ window.GATE_DATA.questions['engmath'].topics.find(function(t){return t.id==='eng
 },
 {
   id: 'engmath-calculus-pyq11',
-  pyqYear: 2014,
+  pyqYear: 2026,
   q: 'Evaluate: lim (x -> 0) of (e^(2x) - 1) / x. (Enter your numerical answer.)',
   options: [],
   answer: 2,
@@ -3392,5 +3392,153 @@ window.GATE_DATA.questions['engmath'].topics.find(function(t){return t.id==='eng
   difficulty: 'medium',
   type: 'pyq-style',
   explanation: "First verify x=1 is indeed a critical point: f'(x) = 3x^2 - 3, and f'(1) = 3(1)-3 = 0, confirming it. To classify it, compute the second derivative: f''(x) = 6x, so f''(1) = 6(1) = 6, which is strictly POSITIVE. By the second derivative test, f''(c) > 0 at a critical point c indicates the function is concave up there, meaning it is a LOCAL MINIMUM, not a maximum - option A is correct (note the question intentionally sets up the trap of expecting a maximum, but the actual sign of f''(1) determines the classification, and it comes out positive). This is a companion critical point to x=-1 (the other root of f'(x)=3x^2-3=0), where f''(-1) = 6(-1) = -6 < 0, giving a local MAXIMUM there instead - together x=-1 (local max) and x=1 (local min) are the two turning points of this cubic's characteristic 'S-shape'. Always compute and check the actual sign of f'' rather than guessing based on the shape of the function name or intuition."
+}
+);
+window.GATE_DATA.questions['engmath'].topics.find(function(t){return t.id==='engmath-probability';}).questions.push(
+{
+  id: 'engmath-probability-pyq1',
+  pyqYear: 2015,
+  q: 'A disease affects 1% of a population. A diagnostic test has a 99% true positive rate (sensitivity) and a 2% false positive rate (i.e. 98% specificity). If a randomly chosen person tests POSITIVE, what is the probability they actually have the disease? (Give your answer as a decimal.)',
+  options: [],
+  answer: 0.3333,
+  tolerance: 0.01,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'hard',
+  type: 'pyq-style',
+  explanation: "Apply Bayes' theorem: P(Disease | Positive) = [P(Positive | Disease) * P(Disease)] / P(Positive), where the denominator is expanded using the Law of Total Probability over both disease and no-disease cases. Given: P(Disease) = 0.01, P(No Disease) = 0.99, P(Positive | Disease) = 0.99 (sensitivity), P(Positive | No Disease) = 0.02 (false positive rate). Compute the numerator: 0.99 * 0.01 = 0.0099. Compute the total probability of testing positive: P(Positive) = P(Pos|D)*P(D) + P(Pos|~D)*P(~D) = 0.99*0.01 + 0.02*0.99 = 0.0099 + 0.0198 = 0.0297. So P(Disease | Positive) = 0.0099 / 0.0297 = 0.3333. This strikingly low result (only about 1 in 3 positive tests are true positives) illustrates the base-rate fallacy: because the disease is rare, even a highly accurate test produces many more false positives (from the huge healthy population) than true positives (from the tiny diseased population) in absolute terms. This exact style of Bayes' theorem diagnostic-test question is one of GATE's most frequently repeated probability patterns."
+},
+{
+  id: 'engmath-probability-pyq2',
+  pyqYear: 2016,
+  q: 'A fair six-sided die is rolled once. Given that the outcome is an EVEN number, what is the probability that the outcome is also GREATER than 4?',
+  options: ['1/3', '1/2', '2/3', '1/6'],
+  answer: 0,
+  marks: 1,
+  difficulty: 'easy',
+  type: 'pyq-style',
+  explanation: "Use the definition of conditional probability: P(A|B) = P(A intersect B) / P(B), where A = 'outcome > 4' = {5,6} and B = 'outcome is even' = {2,4,6}. The intersection A intersect B (even AND greater than 4) is {6}, containing just 1 outcome out of the 6 total equally likely outcomes, so P(A intersect B) = 1/6. P(B) = |{2,4,6}|/6 = 3/6 = 1/2. So P(A|B) = (1/6) / (1/2) = (1/6)*(2/1) = 2/6 = 1/3 - option A. Equivalently, once we KNOW the outcome is even, the sample space effectively shrinks to just {2, 4, 6} (3 equally likely outcomes), and within this restricted space, only the single outcome 6 satisfies 'greater than 4', giving probability 1/3 directly. This 'restrict the sample space to the conditioning event' intuition is often faster than mechanically applying the formula for simple discrete conditional-probability questions."
+},
+{
+  id: 'engmath-probability-pyq3',
+  pyqYear: 2017,
+  q: 'A random variable X has E[X] = 4. What is E[3X + 2]? (Enter your numerical answer.)',
+  options: [],
+  answer: 14,
+  kind: 'nat',
+  marks: 1,
+  difficulty: 'easy',
+  type: 'pyq-style',
+  explanation: "By the Linearity of Expectation, for any random variable X and constants a and b, E[aX + b] = a*E[X] + b - this holds unconditionally, with no assumptions about the distribution of X or independence of anything (expectation is always a linear operator on the underlying probability measure, since it is defined as an integral/sum, and both integration and summation are linear operations). Here a = 3, b = 2, and E[X] = 4, so E[3X+2] = 3*E[X] + 2 = 3*4 + 2 = 12 + 2 = 14. This linearity property is one of the most powerful and frequently exploited tools in probability, since it lets you compute expectations of complicated linear combinations of random variables (even DEPENDENT ones) by simply working with their individual expectations - a shortcut that GATE tests constantly, often disguised inside larger multi-step problems involving sums of several random variables."
+},
+{
+  id: 'engmath-probability-pyq4',
+  pyqYear: 2018,
+  q: 'A random variable X has Var(X) = 5. What is Var(2X + 3)? (Enter your numerical answer.)',
+  options: [],
+  answer: 20,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: "For any random variable X and constants a, b, the variance transformation rule is Var(aX + b) = a^2 * Var(X) - note that the ADDITIVE constant b has NO effect on variance (shifting a distribution does not change its spread), while the MULTIPLICATIVE constant a is squared (since variance measures squared deviation from the mean, scaling the variable by a scales the squared deviations by a^2). Here a = 2, b = 3, and Var(X) = 5, so Var(2X+3) = 2^2 * 5 = 4 * 5 = 20. This can be derived directly from the definition Var(Y) = E[(Y-E[Y])^2]: with Y = aX+b, E[Y] = aE[X]+b, so Y - E[Y] = aX+b - (aE[X]+b) = a(X-E[X]), and squaring gives a^2*(X-E[X])^2, whose expectation is a^2*Var(X). A common error is forgetting to square the coefficient 'a' (incorrectly computing 2*5=10 instead of 4*5=20), or incorrectly including the additive constant b in the variance computation."
+},
+{
+  id: 'engmath-probability-pyq5',
+  pyqYear: 2019,
+  q: 'Two random variables X and Y each take values in {0, 1}, with the joint probability mass function: P(X=0,Y=0)=0.3, P(X=0,Y=1)=0.2, P(X=1,Y=0)=0.1, P(X=1,Y=1)=0.4. What is the MARGINAL probability P(X=1)?',
+  options: [],
+  answer: 0.5,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: "The marginal probability P(X=1) is obtained by summing the joint probabilities over ALL possible values of the other variable Y, since the events {X=1,Y=0} and {X=1,Y=1} are disjoint and together cover the entire event {X=1} (Y must be either 0 or 1). So P(X=1) = P(X=1,Y=0) + P(X=1,Y=1) = 0.1 + 0.4 = 0.5. As a sanity check, all four joint probabilities should sum to exactly 1 (since they cover the entire sample space): 0.3+0.2+0.1+0.4 = 1.0, confirming this is a valid joint distribution. Similarly, the marginal P(X=0) = 0.3+0.2 = 0.5, and P(X=0)+P(X=1) = 0.5+0.5=1, another consistency check. This 'sum out the other variable's row or column of the joint table' technique for computing marginals from a joint distribution is fundamental and appears throughout GATE's probability and information-theory sections."
+},
+{
+  id: 'engmath-probability-pyq6',
+  pyqYear: 2020,
+  q: 'The number of typos on a page follows a Poisson distribution with mean (rate parameter) lambda = 4 typos per page. What is the probability that a randomly selected page has EXACTLY 2 typos? (Give your answer as a decimal, rounded to 4 places.)',
+  options: [],
+  answer: 0.1465,
+  tolerance: 0.01,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: "The Poisson probability mass function is P(X=k) = (e^(-lambda) * lambda^k) / k!, which models the number of independent rare events (like typos) occurring at a constant average rate over a fixed interval. Here lambda = 4 and k = 2: P(X=2) = (e^(-4) * 4^2) / 2! = (e^(-4) * 16) / 2. Computing e^(-4) ≈ 0.018316, so P(X=2) ≈ 0.018316 * 16 / 2 = 0.018316 * 8 = 0.146525, which rounds to 0.1465. This is a direct plug-and-compute application of the Poisson pmf formula, which GATE expects students to have memorized cold - along with the key fact that for a Poisson(lambda) distribution, both the mean AND the variance are exactly lambda (a property unique among common discrete distributions, useful for cross-checking whether a given scenario truly fits a Poisson model)."
+},
+{
+  id: 'engmath-probability-pyq7',
+  pyqYear: 2021,
+  q: 'A random variable X follows a Uniform distribution on the interval [2, 10]. What is P(3 < X < 7)? (Enter your numerical answer.)',
+  options: [],
+  answer: 0.5,
+  kind: 'nat',
+  marks: 1,
+  difficulty: 'easy',
+  type: 'pyq-style',
+  explanation: "For a continuous Uniform distribution on [a,b], probability is directly proportional to the LENGTH of the sub-interval in question, relative to the total length of the support: P(c < X < d) = (d-c)/(b-a) for any [c,d] within [a,b]. Here [a,b] = [2,10], with total length 10-2=8, and the sub-interval of interest is (3,7), with length 7-3=4. So P(3<X<7) = 4/8 = 0.5. This proportional-length rule follows directly from the constant density function f(x) = 1/(b-a) for a Uniform(a,b) distribution: integrating this constant density over [3,7] gives (7-3)*(1/8) = 4/8 = 0.5, the same result. Uniform distribution probability questions on GATE almost always reduce to this simple length-ratio computation, making them among the fastest probability marks available once the interval boundaries are correctly identified."
+},
+{
+  id: 'engmath-probability-pyq8',
+  pyqYear: 2022,
+  q: 'Which of the following statements about Covariance and Correlation are TRUE? (Select ALL that apply)',
+  options: ['Cov(X, X) = Var(X)', 'If X and Y are independent, then Cov(X, Y) = 0', 'If Cov(X, Y) = 0, then X and Y must be independent', 'The correlation coefficient rho(X, Y) always lies in the range [-1, 1]'],
+  answers: [0, 1, 3],
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: "Option A follows directly from the definition Cov(X,Y) = E[XY] - E[X]E[Y]; setting Y=X gives Cov(X,X) = E[X^2] - E[X]^2, which is exactly the standard variance formula - true. Option B is a standard consequence of independence: if X and Y are independent, E[XY] = E[X]*E[Y] (their joint expectation factors), so Cov(X,Y) = E[XY]-E[X]E[Y] = 0 - true. Option C is FALSE - this is the converse of B, and it fails in general: zero covariance means only that X and Y have no LINEAR relationship, but they can still be strongly dependent in a nonlinear way (the classic counterexample: let X be uniform on [-1,1] and Y = X^2; then Cov(X,Y) = E[X^3] - E[X]E[X^2] = 0 - 0 = 0 since E[X^3]=0 by symmetry and E[X]=0, yet Y is completely determined by X, the strongest possible dependence). Option D is the Cauchy-Schwarz-derived bound on correlation: rho(X,Y) = Cov(X,Y)/(sigma_X * sigma_Y) is always mathematically confined to [-1,1], with the extremes achieved only for perfect linear relationships - true. So A, B, D are true; C is the classic 'uncorrelated does not imply independent' trap."
+},
+{
+  id: 'engmath-probability-pyq9',
+  pyqYear: 2023,
+  q: 'A factory has two machines, A and B. Machine A produces 60% of all items and has a 5% defect rate; Machine B produces 40% of all items and has a 10% defect rate. Using the Law of Total Probability, what is the overall probability that a randomly selected item is defective? (Give your answer as a decimal.)',
+  options: [],
+  answer: 0.07,
+  tolerance: 0.005,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: "The Law of Total Probability states that if the sample space is partitioned into mutually exclusive and exhaustive events (here, Machine A and Machine B, which together account for all production), then P(Defective) = sum over each partition of [P(Defective | partition) * P(partition)]. Here: P(Defective | A) = 0.05, P(A) = 0.60, P(Defective | B) = 0.10, P(B) = 0.40. So P(Defective) = P(Defective|A)*P(A) + P(Defective|B)*P(B) = 0.05*0.60 + 0.10*0.40 = 0.03 + 0.04 = 0.07. This overall defect rate (7%) is a weighted average of the two individual defect rates (5% and 10%), weighted by each machine's share of total production - conceptually, it must lie between the two individual rates, which 0.07 correctly does. This weighted-average structure, partitioning by 'which source/category produced the item', is the standard setup for Total Probability questions and is also the essential first step (the denominator) inside any subsequent Bayes' theorem calculation for this same scenario (e.g. finding P(Machine A | Defective))."
+},
+{
+  id: 'engmath-probability-pyq10',
+  pyqYear: 2024,
+  q: 'Two cards are drawn WITHOUT replacement from a standard well-shuffled deck of 52 playing cards (which contains exactly 4 aces). What is the probability that BOTH cards drawn are aces? (Give your answer as a decimal, rounded to 4 places.)',
+  options: [],
+  answer: 0.0045,
+  tolerance: 0.001,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: "Use sequential conditional probability. The probability the first card drawn is an ace is 4/52 (4 favorable aces out of 52 total cards). Given the first card was an ace, only 3 aces remain among the 51 remaining cards, so the probability the second card is also an ace, GIVEN the first was an ace, is 3/51. By the multiplication rule for dependent events, P(both aces) = P(1st ace) * P(2nd ace | 1st ace) = (4/52) * (3/51) = 12/2652 = 1/221 ≈ 0.004525, which rounds to 0.0045. Equivalently, using combinations: the number of ways to choose 2 aces from the 4 available is C(4,2)=6, and the total number of ways to choose any 2 cards from 52 is C(52,2)=1326, giving probability 6/1326 = 1/221, the same result. This 'without replacement' sequential-probability setup, where the denominator shrinks by 1 and the favorable count shrinks according to what was already drawn, is the standard model for card, ball, and similar finite-population drawing problems."
+},
+{
+  id: 'engmath-probability-pyq11',
+  pyqYear: 2026,
+  q: 'A random variable X follows a standard Normal distribution N(0,1). Using the property that the standard Normal is symmetric about 0, and given that P(0 < Z < 1) ≈ 0.3413, what is P(-1 < Z < 1)? (Give your answer as a decimal.)',
+  options: [],
+  answer: 0.6826,
+  tolerance: 0.01,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: "The standard Normal distribution N(0,1) is symmetric about its mean 0, so the area (probability) from -1 to 0 exactly mirrors the area from 0 to 1: P(-1 < Z < 0) = P(0 < Z < 1) ≈ 0.3413, by symmetry of the bell curve around the y-axis. Since the event -1 < Z < 1 can be split into the two disjoint pieces (-1,0) and (0,1), their probabilities simply add: P(-1<Z<1) = P(-1<Z<0) + P(0<Z<1) = 0.3413 + 0.3413 = 0.6826. This matches the well-known '68-95-99.7' empirical rule for Normal distributions, which states that approximately 68% of the probability mass lies within 1 standard deviation of the mean, 95% within 2 standard deviations, and 99.7% within 3 - here confirming the 1-standard-deviation figure of about 68.26%. Using the symmetry of the standard Normal curve to double a half-interval probability (rather than looking up two separate table values and subtracting) is a fast, exam-friendly shortcut."
+},
+{
+  id: 'engmath-probability-pyq12',
+  pyqYear: 2025,
+  q: 'The Exponential distribution is known for its MEMORYLESS property: P(X > s+t | X > s) = P(X > t) for all s, t >= 0. If a component\\u2019s lifetime X is Exponential and it has already survived 5 years, what is the probability it survives at least 3 MORE years, in terms of the unconditional survival function?',
+  options: ['It equals P(X > 3), exactly the same as a brand-new component surviving 3 years, regardless of the 5 years already survived', 'It equals P(X > 8), since the total elapsed time must be counted from the original start', 'It equals P(X > 3) * P(X > 5), by independence of past and future', 'It is always smaller than P(X > 3), since the component has already aged 5 years'],
+  answer: 0,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: "The defining memoryless property of the Exponential distribution states P(X > s+t | X > s) = P(X > t) - meaning that GIVEN survival up to time s, the probability of surviving an ADDITIONAL t units is exactly the same as the probability a brand-new item survives t units from time zero, with the elapsed time s having no bearing whatsoever on future survival odds. Substituting s=5 (already survived) and t=3 (additional years needed), the answer is P(X > 3), completely ignoring the 5 already-elapsed years - option A. Option B wrongly adds the times as if memorylessness didn't apply (that would be the answer only for the UNCONDITIONAL probability of surviving past year 8 counted from time zero, not the conditional probability asked here). Option C invents a spurious multiplication that has no basis in the memoryless formula. Option D wrongly assumes 'aging' or 'wear' effects, which is precisely the intuition the Exponential distribution's memoryless property defies - unlike, say, a Weibull distribution with an increasing hazard rate, the Exponential distribution's failure rate is CONSTANT over time, so past survival provides zero information about future survival. This is a heavily conceptual GATE favorite, often phrased as 'a bulb that has already burned for h hours'."
 }
 );
