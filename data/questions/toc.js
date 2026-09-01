@@ -2771,3 +2771,160 @@ window.GATE_DATA.questions['toc'].topics.find(function(t){return t.id==='toc-dec
   explanation: "This precisely captures the defining gap between the RE and REC classes. Being RE means a recognizer exists that correctly halts and accepts every string genuinely in L, giving positive confirmation whenever the answer is 'yes', but such a recognizer is explicitly permitted to behave unhelpfully on strings NOT in L, either by halting and rejecting, or (crucially, and this is the source of the asymmetry) by looping forever and never producing any answer at all. Being additionally NOT recursive (not REC) means that no matter how cleverly one tries to build a machine, it is provably impossible to also guarantee a halt on every input across the board, meaning there is no way to reliably detect and confirm the 'no' case in finite time for at least some non-member strings. Option B describes full decidability (REC), the opposite of what is being asked about (a language failing to be REC explicitly lacks this property). Options C and D are false generalizations: RE-but-not-REC languages, like A_TM, are typically infinite and are never regular, since every regular language is automatically decidable, making 'RE but not REC' and 'regular' mutually exclusive descriptions rather than compatible ones."
 }
 );
+
+window.GATE_DATA.questions['toc'].topics.find(function(t){return t.id==='toc-hierarchy';}).questions.push(
+{
+  id: 'toc-hierarchy-p1',
+  pyqYear: 2015,
+  q: "Consider L = { a^n b^n c^n d^n : n >= 0 }, a language requiring four blocks of equal length. What is the tightest correct classification of L in the Chomsky hierarchy?",
+  options: ['L is regular', 'L is context-free but not regular', 'L is context-sensitive but not context-free', 'L cannot be recognized by any Turing machine'],
+  answer: 2,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: "L is not regular, since restricting to fixed b,c,d-lengths (e.g. considering the projection onto just the a and b blocks) recovers non-regular equal-count sub-patterns similar to a^n b^n. L is not context-free either: applying the CFL pumping lemma to w = a^p b^p c^p d^p, any decomposition with |vxy| <= p forces the pumped substring to lie within a window that can touch at most two of the four equal-length blocks (since each block already has length p, a window of length at most p cannot span three or four separated blocks), so pumping is guaranteed to disturb at most two of the four counts while leaving at least one other count fixed, breaking the required four-way equality n=n=n=n and producing a string outside L for every possible decomposition -- this is the direct four-block generalization of the classic a^n b^n c^n non-context-freeness proof. However, L IS context-sensitive: a context-sensitive grammar (equivalently, a Linear Bounded Automaton) can mark and cross-check all four counts using space proportional to the input length, similarly to how a^n b^n c^n is handled, by systematically 'cancelling' one symbol from each block per pass while staying within bounded tape. Since L is recognizable at all (it is even decidable, being context-sensitive, hence certainly Turing-recognizable), option D is false, making option C the correct tightest classification."
+},
+{
+  id: 'toc-hierarchy-p2',
+  pyqYear: 2016,
+  q: "Consider L = { a^i b^j c^k : i,j,k >= 0 and i < j < k }, requiring three counts in strictly increasing order. Is L context-free?",
+  options: ['Yes, L is context-free (though not regular)', 'No, L is not context-free (it requires context-sensitive or greater power)', 'Yes, L is even regular', 'The context-freeness of L is undecidable in general'],
+  answer: 1,
+  marks: 2,
+  difficulty: 'hard',
+  type: 'pyq-style',
+  explanation: "This language fails to be context-free for essentially the same structural reason as a^n b^n c^n: it demands a simultaneous three-way numerical relationship across three separated blocks, which exceeds what a single stack (the only memory a PDA has) can verify. Apply the CFL pumping lemma with w = a^p b^{p+1} c^{p+2} (satisfying i=p < j=p+1 < k=p+2, a valid member of L for the chosen pumping length p). Any decomposition uvxyz with |vxy| <= p and |vy| >= 1 forces vxy into a window touching at most two of the three blocks, exactly as in the classic proof. Consider the pumping-down case (i=0, deleting v and y): this removes some symbols from at most two of the three blocks while leaving the third block's count completely unchanged. Careful case analysis shows that in every possible position of vxy (within the a-block, within the b-block, within the c-block, or straddling one boundary), deleting v and y either fails to decrease any count sufficiently to preserve strict inequality, or decreases counts in a way that violates i < j < k (for instance, if vxy lies entirely in the b-block, deleting it decreases j while leaving i and k fixed, and since j started as p+1 with i=p, decreasing j risks making j <= i, violating i < j). Careful pumping-lemma casework (a standard but detailed exercise) confirms no decomposition survives all pump amounts, so L is not context-free, requiring at least context-sensitive power (a linear bounded automaton can verify the two consecutive strict-inequality checks digit by digit using bounded tape)."
+},
+{
+  id: 'toc-hierarchy-p3',
+  pyqYear: 2017,
+  q: "Consider L = { a^n b^m : n,m >= 0 and (n = 2m OR m = 2n) }, the union of two proportional-count conditions. What is the tightest correct classification of L?",
+  options: ['L is regular', 'L is context-free but not regular', 'L is not context-free', 'L is finite'],
+  answer: 1,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: "L is the union of two individually simple context-free languages: L1 = { a^n b^m : n = 2m } (a PDA pushes two markers for every a and pops one marker per b, or equivalently pushes one marker per a and pops two per b depending on direction of counting) and L2 = { a^n b^m : m = 2n } (symmetric construction with roles reversed). Each of L1 and L2 individually is a simple single-counter CFL generated by grammars like S1 -> a a S1 b | epsilon (for n=2m, reading two a's per one eventual b) and S2 -> a S2 b b | epsilon (for m=2n, reading one a per two eventual b's), and since context-free languages are closed under union, L = L1 union L2 is context-free. L is not regular: restricting to just L1 (by additionally requiring, say, that m is always paired correctly which the pumping lemma can isolate) reduces to a fixed-ratio counting language directly analogous to a^n b^n, which fails the pumping lemma exactly as the classic equal-count case does (pumping the a's or b's alone breaks the required 2:1 or 1:2 ratio for arbitrarily large strings), so L cannot be regular. L is also clearly infinite (option D false, since arbitrarily large n and m satisfying either ratio condition exist), leaving option B, context-free but not regular, as the correct tightest classification."
+},
+{
+  id: 'toc-hierarchy-p4',
+  pyqYear: 2018,
+  q: "A grammar has every production restricted to the forms A -> a B or A -> a (where A, B are nonterminals and a is a terminal symbol, with the nonterminal always immediately preceding, if present, on the right). What Chomsky hierarchy TYPE does this grammar belong to?",
+  options: ['Type 3 (regular grammar)', 'Type 2 (context-free grammar) but not Type 3', 'Type 1 (context-sensitive grammar) but not Type 2', 'Type 0 (unrestricted grammar) but not Type 1'],
+  answer: 0,
+  marks: 1,
+  difficulty: 'easy',
+  type: 'pyq-style',
+  explanation: "The production forms A -> aB and A -> a are exactly the defining forms of a RIGHT-LINEAR grammar: each production has a single nonterminal on the left-hand side, and the right-hand side consists of at most one terminal symbol followed by at most one nonterminal symbol (with the nonterminal, if present, positioned at the rightmost end of the string). This is precisely the Type 3 (regular grammar) restriction in the Chomsky hierarchy, and right-linear grammars are known to generate exactly the regular languages, equivalent in power to finite automata (a direct translation exists: each nonterminal becomes a state, each production A -> aB becomes a transition on symbol a from state A to state B, and each production A -> a becomes a transition on symbol a from state A directly to a designated accepting state). Since every regular grammar is trivially also a valid context-free grammar (Type 2), and every context-free grammar is (modulo epsilon-handling technicalities) generally expressible within Type 1 restrictions, and Type 1 is contained within Type 0, this grammar technically satisfies all of Type 2, Type 1, and Type 0's restrictions as well -- but the question asks for its TYPE in the sense of the tightest/most specific classification it satisfies, which is Type 3, making option A the intended and correct answer."
+},
+{
+  id: 'toc-hierarchy-p5',
+  pyqYear: 2019,
+  q: "Which class of machines exactly characterizes the context-sensitive languages (Type 1 in the Chomsky hierarchy)?",
+  options: ['Pushdown Automata (PDA)', 'Linear Bounded Automata (LBA)', 'Finite Automata (DFA/NFA)', 'Unrestricted Turing Machines with no tape bound'],
+  answer: 1,
+  marks: 1,
+  difficulty: 'easy',
+  type: 'pyq-style',
+  explanation: "A Linear Bounded Automaton is precisely a Turing machine whose tape usage is restricted to a fixed linear multiple of the input length (in the most common definition, the machine may only use the tape cells originally occupied by the input itself, though variants allowing a constant multiplicative bound are equivalent in power) -- it cannot ever write outside this bounded region, unlike a general Turing machine which has access to unbounded tape. This exact restriction corresponds precisely to the Type 1 (context-sensitive) grammar restriction, where every production is length-non-decreasing (the right-hand side is never shorter than the left-hand side, aside from a special-cased S -> epsilon exception when S never appears on any right-hand side), meaning any string derivable by such a grammar can be verified/generated using only space proportional to its own final length -- exactly what an LBA's bounded tape allows. Pushdown Automata (option A) instead exactly characterize the strictly weaker Type 2 (context-free) languages, using only a single unbounded stack rather than general bounded tape access. Finite Automata (option C) characterize the even weaker Type 3 (regular) languages. Unrestricted, unbounded-tape Turing Machines (option D) characterize the strictly more powerful Type 0 (recursively enumerable) languages, since they may use arbitrarily much tape and may even fail to halt, unlike the always-halting LBA."
+},
+{
+  id: 'toc-hierarchy-p6',
+  pyqYear: 2020,
+  q: "Which language is the standard textbook WITNESS used to prove that CFL is a STRICT (proper) subset of CSL, i.e. a language that is context-sensitive but demonstrably NOT context-free?",
+  options: ['L = { a^n b^n : n >= 0 }', 'L = { a^n b^n c^n : n >= 0 }', 'L = { w w : w is in {a,b}* }', 'L = { a^n : n is a prime number }'],
+  answer: 1,
+  marks: 1,
+  difficulty: 'easy',
+  type: 'pyq-style',
+  explanation: "L = { a^n b^n c^n : n >= 0 } is the canonical strict-separation witness between CFL and CSL. It fails to be context-free by the standard CFL pumping lemma argument (any pumpable window of bounded length, given the pumping-length constraint |vxy| <= p, can touch at most two of the three equal-length blocks in the string a^p b^p c^p, so pumping is guaranteed to break the required three-way equality for some choice of decomposition), which is a foundational, frequently re-derived proof in every formal languages course. Yet it IS context-sensitive: a length-non-decreasing grammar can be constructed (using a classical technique involving auxiliary nonterminals that 'shepherd' one a, one b, and one c through the derivation together per round, using productions that never shrink the overall string length, consistent with the Type 1 restriction) to generate exactly this language, and correspondingly a Linear Bounded Automaton can verify it directly using bounded tape. Option A ({a^n b^n}) is itself context-free, so it cannot witness this particular separation (it instead witnesses the REGULAR-versus-CFL gap). Option C ({ww}) is also not context-free, but it is a less standard choice for this specific CFL-vs-CSL separation in most textbook treatments compared to the extremely standard three-block a^n b^n c^n example. Option D is a sparse non-regular, non-context-free set less commonly used as the canonical CSL-separation witness."
+},
+{
+  id: 'toc-hierarchy-p7',
+  pyqYear: 2021,
+  q: "Which statement about the relative power of deterministic and nondeterministic pushdown automata is TRUE?",
+  options: ['DPDA and NPDA are equally powerful, exactly as DFA and NFA are equally powerful for regular languages', 'NPDA is STRICTLY more powerful than DPDA: the class of languages accepted by NPDAs (CFL) is a proper superset of the class accepted by DPDAs (DCFL)', 'DPDA is strictly more powerful than NPDA', 'Neither DPDA nor NPDA can be meaningfully compared, since they accept incomparable classes of languages'],
+  answer: 1,
+  marks: 1,
+  difficulty: 'easy',
+  type: 'pyq-style',
+  explanation: "This is one of the most important asymmetries in automata theory, and a common point of confusion precisely because it contradicts the analogous (and much better known) equivalence between DFA and NFA. For finite automata, allowing nondeterminism does NOT increase expressive power -- the subset construction always converts any NFA into an equivalent DFA. For pushdown automata, however, nondeterminism genuinely adds power: the class DCFL (languages accepted by some deterministic PDA) is a STRICT, proper subset of CFL (languages accepted by some, possibly nondeterministic, PDA). The standard witness demonstrating this strictness is { w w^R : w in {a,b}* } (even-length palindromes), which is accepted by a nondeterministic PDA (which can freely guess where the midpoint of the input falls, then switch from pushing to popping and match the reversed second half against the stack), but which provably cannot be accepted by ANY deterministic PDA (since there is no symbol or marker signalling the midpoint, and a DPDA must commit deterministically without the ability to guess). This makes option B correct, and firmly rules out both the false equal-power claim (option A, which would only be true for finite automata) and the reversed-power claim (option C, which is never true, since every DPDA is trivially also a valid NPDA, so NPDA's class can only be as large or larger, never smaller)."
+},
+{
+  id: 'toc-hierarchy-p8',
+  pyqYear: 2022,
+  q: "A grammar has all of its productions restricted to the general form alpha A beta -> alpha gamma beta (where alpha, beta are arbitrary strings of terminals and nonterminals, A is a single nonterminal, and gamma is a NONEMPTY string), so that overall the right-hand side of every production is never shorter than the left-hand side. What Chomsky hierarchy TYPE does this restriction correspond to?",
+  options: ['Type 0 (unrestricted)', 'Type 1 (context-sensitive)', 'Type 2 (context-free)', 'Type 3 (regular)'],
+  answer: 1,
+  marks: 1,
+  difficulty: 'easy',
+  type: 'pyq-style',
+  explanation: "This exact production form, alpha A beta -> alpha gamma beta with gamma required to be nonempty, is precisely the standard definition of a Type 1 (context-sensitive) grammar: the nonterminal A can only be rewritten to the nonempty string gamma when it appears in the specific surrounding CONTEXT of alpha immediately before it and beta immediately after it (hence the name 'context-sensitive', as opposed to context-free grammars where a nonterminal can be rewritten regardless of its surrounding context). The nonempty requirement on gamma directly enforces the length-non-decreasing property that characterizes the entire class (|left-hand side| <= |right-hand side| always, aside from the special S -> epsilon exception when S never appears on any right-hand side), which is exactly what allows a Linear Bounded Automaton to verify derivations using only tape space proportional to the final string's length. Type 0 (option A) permits arbitrary length-DEcreasing productions too (using an unrestricted Turing machine with full tape access), so it is strictly more permissive than this restriction. Type 2 (option C) drops the context requirement entirely, allowing A -> gamma unconditionally regardless of surrounding symbols. Type 3 (option D) is even more restrictive, requiring right-linear or left-linear forms specifically. So option B, Type 1, is the exact match."
+},
+{
+  id: 'toc-hierarchy-p9',
+  pyqYear: 2023,
+  q: "Where does the class REC (recursive, i.e. decidable languages) sit relative to CSL (context-sensitive languages) and RE (recursively enumerable languages) in the language-class hierarchy?",
+  options: ['REC is exactly equal to CSL (they are the same class)', 'REC sits strictly between CSL and RE: CSL is a proper subset of REC, which is itself a proper subset of RE', 'REC sits strictly between REGULAR and CFL', 'REC is exactly equal to RE (they are the same class)'],
+  answer: 1,
+  marks: 1,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: "Although REC is not one of the four classical Chomsky grammar types, it is an essential intermediate class that fits precisely between CSL and RE in the overall containment chain. Every context-sensitive language is guaranteed to be decidable: a Linear Bounded Automaton's tape usage is bounded by the input length, giving it only finitely many possible configurations, so a simulator can detect non-halting via configuration-repetition and safely reject, guaranteeing the LBA always effectively halts one way or another -- this proves CSL is a subset of REC. This containment is STRICT (there exist decidable languages that require more than context-sensitive/linear-bounded resources to generate via any context-sensitive grammar, keeping CSL a proper subset). Separately, REC is a strict subset of RE: every decidable language is trivially recognizable (the decider itself already serves as a valid recognizer), but the Halting Problem and A_TM are standard witnesses of languages that are RE yet not decidable, keeping this containment strict as well. So the correct positioning is CSL properly-inside REC properly-inside RE, matching option B, while options A, C, and D each misplace REC relative to the wrong pair of classes or falsely equate distinct classes."
+},
+{
+  id: 'toc-hierarchy-p10',
+  pyqYear: 2024,
+  q: "Which of the following statements about the Chomsky hierarchy are TRUE? (Select ALL that apply)",
+  options: ['L = { a^n b^n : n >= 0 } is a regular language', 'L = { a^n b^n c^n : n >= 0 } is context-sensitive', 'L = { a^n b^n c^n : n >= 0 } is context-free', 'Every context-free language is also context-sensitive (modulo the standard epsilon-production technicality)'],
+  answers: [1, 3],
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: "Option A is FALSE: { a^n b^n } is the textbook example of a language that is context-free but explicitly NOT regular (provable via the pumping lemma for regular languages or via an infinite count of Myhill-Nerode equivalence classes on the a-prefixes), so calling it regular is a direct misclassification. Option B is TRUE: { a^n b^n c^n } is context-sensitive, generated by a length-non-decreasing grammar (a classical construction using auxiliary nonterminals to shepherd matching a's, b's, and c's through the derivation together while never shrinking overall string length) and recognizable by a Linear Bounded Automaton using bounded tape to cross off one symbol from each of the three blocks per verification pass. Option C is FALSE: this same language is the standard example proving CFL is a strict subset of CSL, since the CFL pumping lemma shows no context-free grammar or pushdown automaton can enforce the three-way equal-count requirement (any pumpable substring within a bounded window touches at most two of the three separated blocks). Option D is TRUE: every context-free production A -> alpha with |alpha| >= 1 already satisfies the length-non-decreasing requirement of context-sensitive grammars trivially (since the left side has length exactly 1 and the right side has length >= 1), and CFG's own epsilon-production handling exception (only S -> epsilon, when S never appears on a right-hand side) exactly parallels the same exception CSL requires, so CFL is properly nested inside CSL with this caveat consistently applied."
+},
+{
+  id: 'toc-hierarchy-p11',
+  pyqYear: 2025,
+  q: "A grammar contains a mixture of both right-linear productions (of the form A -> aB or A -> a) AND left-linear productions (of the form A -> Ba or A -> a) within the SAME grammar (for example, some rules are right-linear while other, different rules in the same grammar are left-linear). What can we correctly conclude about the language generated by such a mixed grammar?",
+  options: ['It is still always guaranteed to be regular, since both individual forms (right-linear and left-linear) are each regular on their own', 'It may FAIL to be regular; mixing right-linear and left-linear productions within one grammar is not guaranteed to preserve regularity, so the language must be checked/derived independently rather than assumed regular by default', 'It is always context-free but is guaranteed to never be regular in this mixed case', 'The language generated becomes automatically undecidable'],
+  answer: 1,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: "This is a classic and important trap: while a grammar that is PURELY right-linear (all productions use the A -> aB / A -> a form consistently) is guaranteed regular, and a grammar that is PURELY left-linear (all productions use A -> Ba / A -> a consistently) is also guaranteed regular, a grammar that MIXES both styles within the same rule set loses this guarantee. The formal definition of a Type 3 (regular) grammar specifically requires consistency: either every production is right-linear, or every production is left-linear, but not an arbitrary mixture of the two forms within one grammar. When productions of both kinds are combined and allowed to interact freely (a nonterminal reachable via a right-linear rule from one part of the grammar and via a left-linear rule from another part, potentially forcing nonterminals in the 'middle' of derivations rather than consistently at one end), the resulting derivations can in principle build up structure that a finite automaton cannot track, potentially generating a non-regular language, so no blanket guarantee of regularity applies anymore -- each specific mixed grammar must be analyzed on its own merits. Option A is the tempting but false generalization this question is designed to catch; options C and D are unwarranted overcorrections with no general justification."
+},
+{
+  id: 'toc-hierarchy-p12',
+  pyqYear: 2026,
+  q: "Which of the following languages requires the full generative power of an unrestricted (Type 0) grammar in the sense that it is recursively enumerable (RE) but NOT decidable, and hence cannot be generated by any context-sensitive (Type 1) grammar?",
+  options: ['A_TM = { <M,w> : Turing machine M accepts input w }', 'L = { a^n b^n c^n : n >= 0 }', 'L = { w w : w is in {a,b}* }', 'Any finite language over a fixed alphabet'],
+  answer: 0,
+  marks: 1,
+  difficulty: 'easy',
+  type: 'pyq-style',
+  explanation: "A_TM is the standard example of a language sitting at the very top boundary of the classical hierarchy: it is recursively enumerable (a universal Turing machine can simulate <M,w> and halt-accept exactly when the simulated M halts and accepts), but it is provably NOT decidable (by Turing's diagonalization argument), and since every context-sensitive language is guaranteed to be decidable (via the Linear Bounded Automaton configuration-repetition argument), A_TM being undecidable immediately proves it cannot be context-sensitive either -- it genuinely requires the unrestricted, unbounded-tape power of a full Type 0 grammar/Turing machine, with no bound on tape usage or guaranteed halting. In contrast, options B and C, while both requiring more than context-free power in some cases (well, {a^n b^n c^n} is definitely not context-free) or exactly context-free power (actually {ww} is not context-free either, both need at least context-sensitive power), are both still decidable and hence context-sensitive (LBAs can verify both using bounded, input-proportional tape), placing them well below the RE-but-undecidable tier that A_TM occupies. Option D, any finite language, is always trivially regular (a simple union of exact-match paths), the simplest possible classification, nowhere near requiring Type 0 power."
+},
+{
+  id: 'toc-hierarchy-p13',
+  pyqYear: 2016,
+  q: "Consider L = { a^n b^n : n >= 0 } UNION { a^n c^n : n >= 0 }, i.e. either an equal block of a's and b's, or an equal block of a's and c's (but not both patterns mixed in the same string). What is the tightest correct classification of L?",
+  options: ['L is regular', 'L is context-free but not regular', 'L is not context-free', 'L is undecidable'],
+  answer: 1,
+  marks: 1,
+  difficulty: 'easy',
+  type: 'pyq-style',
+  explanation: "L is the union of two individually simple, well-known context-free languages, L1 = { a^n b^n } and L2 = { a^n c^n }, each generated by a straightforward single-counter grammar (S1 -> a S1 b | epsilon and S2 -> a S2 c | epsilon respectively). Since context-free languages are closed under union (a standard closure property, constructed by adding a new start symbol S -> S1 | S2 branching to either sub-grammar's own start symbol), L = L1 union L2 is guaranteed to be context-free, ruling out option C. L is not regular: intersecting L with the regular language a*b* isolates exactly L1 = { a^n b^n } (since no string of L2's form a^n c^n, other than the trivial empty string case, can also be in a*b* once n > 0), and since regular languages are closed under intersection, if L were regular then L1 would have to be regular too -- but L1 = { a^n b^n } is the textbook non-regular language (via the standard pumping lemma argument), giving a direct contradiction, so L cannot be regular either, ruling out option A. L is also clearly decidable (any context-free language is decidable via CYK-style algorithms), ruling out option D. So option B, context-free but not regular, is the correct tightest classification."
+},
+{
+  id: 'toc-hierarchy-p14',
+  pyqYear: 2020,
+  q: "Which type of automaton exactly corresponds to (is equivalent in power to) Type 1 (context-sensitive) grammars in the classical Chomsky hierarchy?",
+  options: ['Pushdown Automaton (PDA)', 'Pushdown Automaton with two independent stacks', 'Linear Bounded Automaton (LBA)', 'Unrestricted Turing Machine with unbounded tape'],
+  answer: 2,
+  marks: 1,
+  difficulty: 'easy',
+  type: 'pyq-style',
+  explanation: "The Linear Bounded Automaton is the machine model exactly matched to Type 1 context-sensitive grammars: an LBA is defined as a (possibly nondeterministic) Turing machine restricted to using only tape space proportional to (typically exactly equal to, in the standard definition) the length of its input, and this bounded-tape restriction corresponds precisely to context-sensitive grammars' length-non-decreasing production restriction, since both formalisms guarantee that any valid derivation/computation for a string of length n can be carried out using only O(n) space. A plain single-stack Pushdown Automaton (option A) instead corresponds exactly to the strictly weaker Type 2 (context-free) languages, using unbounded stack memory but with the strict last-in-first-out access discipline of a single stack, which cannot enforce cross-checking three or more independent counts simultaneously. Interestingly, a Pushdown Automaton augmented with TWO independent stacks (option B) is actually far MORE powerful than a single-stack PDA -- a two-stack PDA is exactly as powerful as a full, unbounded-tape Turing Machine (Type 0), since two stacks can simulate an arbitrary Turing machine tape, so option B is not the correct match for context-sensitive languages either. An unrestricted Turing Machine with unbounded tape (option D) corresponds instead to the strictly more powerful Type 0 (recursively enumerable) languages, since it has no tape-usage bound and may fail to halt, unlike the always-effectively-halting LBA."
+}
+);

@@ -2465,3 +2465,180 @@ window.GATE_DATA.questions['digital'].topics.find(function(t){return t.id==='dig
   explanation: "A ring counter circulates a single active bit through n flip-flops with direct (uninverted) feedback from the last stage to the first, so the single 1 simply visits each of the n flip-flop positions once before returning to the start, giving exactly n distinct states. A Johnson counter instead feeds back the COMPLEMENT of the last stage, which means the register fills up with 1s one bit at a time over n clocks, then empties back to all 0s one bit at a time over another n clocks, giving 2n distinct states from the same n flip-flops before the cycle repeats — double the ring counter's state count for the same hardware cost. Both designs share the major practical advantage of being easy to decode: ring counter states are already self-decoded (one flip-flop per state), and Johnson counter states, though not self-decoded, differ from their neighbors by only one bit (like Gray code) and so can be decoded from just two flip-flop outputs per state using simple 2-input gates. Neither achieves the full 2^n states of an unconstrained n-bit binary counter (option d), since the shift-register feedback structure heavily restricts which state sequences are reachable."
 }
 );
+
+window.GATE_DATA.questions['digital'].topics.find(function(t){return t.id==='digital-number-systems';}).questions.push(
+{
+  id: 'digital-number-systems-p1',
+  pyqYear: 2015,
+  q: "If the equation 44 + 33 = 121 holds in some radix r (all numerals written in base r), the value of r is:",
+  options: ["5", "6", "7", "8"],
+  answer: 1,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: "Translate every numeral into its polynomial form in base r: 44_r = 4r + 4, 33_r = 3r + 3, and 121_r = r^2 + 2r + 1. Setting up the equation: (4r + 4) + (3r + 3) = r^2 + 2r + 1, which simplifies to 7r + 7 = r^2 + 2r + 1, or r^2 - 5r - 6 = 0. Factoring gives (r - 6)(r + 1) = 0, so r = 6 (the negative root r = -1 is not a valid radix). Always sanity-check by verifying every digit used is legal in the found radix: the digits appearing are 4, 3, 1, 2 — all strictly less than 6, so r = 6 is a valid radix for this equation (a digit equal to or exceeding the found radix would invalidate that root, a frequently planted trap in this exact question style). Direct verification: 44 base 6 = 4×6+4 = 28, 33 base 6 = 3×6+3 = 21, and 28+21 = 49; 121 base 6 = 1×36 + 2×6 + 1 = 49, confirming the equation holds exactly at r = 6."
+},
+{
+  id: 'digital-number-systems-p2',
+  pyqYear: 2016,
+  q: "The range of values representable by a 6-bit 2's complement number is:",
+  options: ["-31 to +31", "-32 to +31", "-32 to +32", "-63 to +63"],
+  answer: 1,
+  marks: 1,
+  difficulty: 'easy',
+  type: 'pyq-style',
+  explanation: "For an n-bit 2's complement representation, the range is -2^(n-1) to +2^(n-1) - 1 — asymmetric, with one extra negative value compared to positive values. For n = 6: the minimum is -2^5 = -32 (represented as 100000, the sign bit alone contributing its full negative weight with all other bits 0) and the maximum is 2^5 - 1 = 31 (represented as 011111, the largest pattern with the sign bit clear). This asymmetry arises because the all-zero pattern is reserved for 0, using up one of the 64 total bit patterns that would otherwise represent +0, leaving only 31 positive nonzero values (000001 through 011111) but a full 32 negative values (100000 through 111111) since 2's complement has no separate negative zero. Option (a) -31 to +31 is the symmetric range of 1's complement or sign-magnitude representation for the same width, not 2's complement. Option (c) incorrectly makes the range symmetric on both ends. Option (d) mistakenly doubles the exponent, corresponding to 7 bits' worth of range instead of 6."
+},
+{
+  id: 'digital-number-systems-p3',
+  pyqYear: 2017,
+  q: "Adding the 6-bit 2's complement numbers 011111 (31) and 000011 (3), the sum obtained is 100010. Regarding this addition:",
+  options: [
+    "The binary sum is correct and equals 34 in decimal, no overflow",
+    "Overflow has occurred: both operands are positive but the result 100010 has its sign bit set (appears negative)",
+    "Overflow cannot occur here since both operands are positive",
+    "The result is 100010, which is a valid representation of -30, and this is the correct sum"
+  ],
+  answer: 1,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: "Both operands here are positive (their sign bits, the leftmost bit, are 0 in 011111 and 000011), and the true decimal sum 31 + 3 = 34 exceeds the maximum representable positive value for 6-bit 2's complement, which is 31 (range -32 to +31). Adding the two bit patterns in binary gives 011111 + 000011 = 100010, and this result's sign bit is 1, making it appear to be a negative number (specifically, 100010 as a 2's complement pattern represents -30) — but two positive numbers can never legitimately sum to a negative result. This is exactly the classic 'same-sign operands, opposite-sign result' overflow signature: whenever both operands share a sign and the result's sign differs, the true mathematical sum has exceeded the representable range and overflow must be flagged. The equivalent carry-based test also confirms this: the carry into the sign bit position and the carry out of the sign bit position differ here, which is the hardware-level overflow detector. Option (a) wrongly accepts the corrupted result at face value; option (c) is simply false, since same-sign overflow is exactly the case that can occur (only mixed-sign addition is guaranteed overflow-free)."
+},
+{
+  id: 'digital-number-systems-p4',
+  pyqYear: 2018,
+  q: "The 4-bit Gray code corresponding to the binary number 1011 is:",
+  options: ["1101", "1110", "1010", "0110"],
+  answer: 1,
+  marks: 1,
+  difficulty: 'easy',
+  type: 'pyq-style',
+  explanation: "Binary-to-Gray conversion copies the most significant bit unchanged, then each subsequent Gray bit is the XOR of the current binary bit and the binary bit immediately to its left: g_i = b_i ⊕ b_(i+1), with the MSB copied directly (g_3 = b_3). For binary b3b2b1b0 = 1011: g3 = b3 = 1. g2 = b3 ⊕ b2 = 1 ⊕ 0 = 1. g1 = b2 ⊕ b1 = 0 ⊕ 1 = 1. g0 = b1 ⊕ b0 = 1 ⊕ 1 = 0. So the Gray code is g3g2g1g0 = 1110. The defining property of Gray code — that consecutive values differ in exactly one bit — can be spot-checked here: binary 1010 (decimal 10) converts to Gray 1111, and binary 1011 (decimal 11) converts to Gray 1110; these two Gray codes differ in only the last bit, consistent with the two binary values being consecutive integers. Option (a) 1101 and option (c) 1010 do not follow the XOR-with-left-neighbor rule correctly. Option (d) 0110 wrongly flips the MSB, which should always be copied unchanged from the binary MSB."
+},
+{
+  id: 'digital-number-systems-p5',
+  pyqYear: 2019,
+  q: "The Excess-3 code for the decimal digit 6 is:",
+  options: ["0110", "1001", "0011", "1100"],
+  answer: 1,
+  marks: 1,
+  difficulty: 'easy',
+  type: 'pyq-style',
+  explanation: "Excess-3 encodes each decimal digit d as the 4-bit binary representation of d + 3. For digit 6: 6 + 3 = 9, and 9 in 4-bit binary is 1001. So the Excess-3 code for 6 is 1001. Excess-3 is called 'self-complementing' because the code for the 9's complement of a digit (9 - d) is exactly the bitwise complement of the code for d — check here: the 9's complement of 6 is 3, and the Excess-3 code for 3 is (3+3=6) 0110, which is indeed the bitwise complement of 1001 (flip each bit of 1001 to get 0110). This self-complementing property made Excess-3 attractive in early decimal arithmetic hardware, since 9's-complement subtraction (a decimal analogue of 2's complement subtraction) could be performed by simply inverting bits, exactly as 1's complement does for binary subtraction. Option (a) 0110 is actually the Excess-3 code for digit 3, not 6 — a classic mix-up between a digit and its 9's complement partner. Option (c) 0011 is the plain binary code for 3, ignoring the +3 offset entirely. Option (d) 1100 does not correspond to any valid Excess-3 digit encoding in range."
+},
+{
+  id: 'digital-number-systems-p6',
+  pyqYear: 2020,
+  q: "Adding the BCD digits 8 (1000) and 7 (0111) using a 4-bit binary adder followed by BCD correction logic, the final corrected BCD result (including the decimal carry-out bit) is:",
+  options: ["0 1111 (no correction needed)", "1 0101 (decimal carry = 1, digit = 5)", "0 0101 (digit = 5, no carry)", "1 1111 (decimal carry = 1, digit = 15)"],
+  answer: 1,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: "First, add the two 4-bit binary patterns directly: 1000 (8) + 0111 (7) = 1111 (15 in raw binary, with no carry out of the 4-bit adder). Since the raw sum 1111 (15) exceeds 9, it is not a valid single BCD digit, so BCD correction logic adds 0110 (6) to push the sum past the next multiple of 16 and force a carry: 1111 + 0110 = 1 0101. The result is a carry-out of 1 (representing the decimal tens digit) and a corrected nibble of 0101 (decimal 5) — together correctly representing 8 + 7 = 15 as the BCD digit pair 'carry=1, ones digit=5', i.e. 15 in BCD form. This +6 correction rule works because adding 6 accounts for exactly the 6 unused 4-bit codes (1010 through 1111) that binary counting passes through between each valid BCD digit but that a decimal digit sequence must skip; the correction realigns the raw binary sum with the BCD encoding, sacrificing 6 codes' worth of range per correction step. Option (a) fails to apply the needed correction at all, since 1111 is not a valid BCD digit. Option (d) misreads the corrected nibble as still equalling the raw uncorrected 1111."
+},
+{
+  id: 'digital-number-systems-p7',
+  pyqYear: 2021,
+  q: "The total number of distinct values representable by a 5-bit 1's complement number is:",
+  options: ["32", "31", "16", "30"],
+  answer: 1,
+  marks: 1,
+  difficulty: 'easy',
+  type: 'pyq-style',
+  explanation: "An n-bit 1's complement representation has 2^n total bit patterns, but two of those patterns — all-0s and all-1s — both represent zero (positive zero and negative zero respectively), so only 2^n - 1 distinct numeric values are actually representable. For n = 5: 2^5 = 32 total bit patterns, but one is 'wasted' on the duplicate zero, leaving 2^5 - 1 = 31 distinct representable values, spanning -15 to +15 (with two codes both meaning 0). This is the key practical drawback of 1's complement compared to 2's complement: 2's complement has only a single representation of zero, so all 2^n bit patterns are distinct, giving n bits one extra usable value compared to 1's complement of the same width — for n=5 that is 32 distinct values in 2's complement (range -16 to +15) versus only 31 in 1's complement. Option (a) 32 wrongly assumes every bit pattern gives a distinct value, ignoring the double-zero. Option (c) 16 is a plain power-of-2 slip unrelated to the correct formula. Option (d) 30 undercounts by one, perhaps double-subtracting for the two zero codes instead of recognizing they still map to one distinct value (zero itself)."
+},
+{
+  id: 'digital-number-systems-p8',
+  pyqYear: 2022,
+  q: "If the equation 51 - 26 = 23 holds in some radix r (all numerals in base r), the value of r is:",
+  options: ["7", "8", "9", "10"],
+  answer: 1,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: "Translate each numeral into its polynomial form in base r: 51_r = 5r + 1, 26_r = 2r + 6, and 23_r = 2r + 3. The equation becomes (5r + 1) - (2r + 6) = 2r + 3, which simplifies to 3r - 5 = 2r + 3, giving r = 8. Check that every digit used is legal in base 8: the digits appearing are 5, 1, 2, 6, 2, 3 — all strictly less than 8, so r = 8 is valid (note the digit 6 in particular must be less than r, ruling out r = 7 immediately even before solving algebraically, since 6 would not be a legal base-7 digit... actually 6 < 7 is legal, so this check alone doesn't eliminate r=7, but the algebra does). Direct verification: 51 base 8 = 5×8+1 = 41, 26 base 8 = 2×8+6 = 22, and 41 - 22 = 19; 23 base 8 = 2×8+3 = 19, confirming the equation holds exactly at r = 8. Option (a) r=7 fails the algebra (plugging in gives 3(7)-5=16 but 2(7)+3=17, a mismatch), even though all digits would be individually legal in base 7."
+},
+{
+  id: 'digital-number-systems-p9',
+  pyqYear: 2023,
+  q: "A 4-bit Gray code value 1101 is to be converted back to its corresponding binary value. The correct binary value is:",
+  options: ["1001", "1011", "1101", "0110"],
+  answer: 0,
+  marks: 1,
+  difficulty: 'easy',
+  type: 'pyq-style',
+  explanation: "Gray-to-binary conversion works from the most significant bit down: the binary MSB equals the Gray MSB directly (b3 = g3), and each subsequent binary bit is the XOR of the previous binary bit (just computed) with the current Gray bit: b_i = b_(i+1) ⊕ g_i. For Gray g3g2g1g0 = 1101: b3 = g3 = 1. b2 = b3 ⊕ g2 = 1 ⊕ 1 = 0. b1 = b2 ⊕ g1 = 0 ⊕ 0 = 0. b0 = b1 ⊕ g0 = 0 ⊕ 1 = 1. So the binary value is b3b2b1b0 = 1001 (decimal 9). This XOR-chain (cascading from the MSB down, unlike the binary-to-Gray direction which only XORs adjacent bits independently) is necessary because each Gray bit only encodes a 'change' relative to the previous binary bit, so recovering the actual binary bit requires accumulating all the changes from the MSB downward. As a sanity check, converting 9 back to Gray using the standard formula gives g3=b3=1, g2=b3⊕b2=1⊕0=1, g1=b2⊕b1=0⊕0=0, g0=b1⊕b0=0⊕1=1, i.e. 1101 — exactly the original Gray code, confirming the round trip. Option (b) 1011 and option (d) 0110 do not survive this round-trip check."
+},
+{
+  id: 'digital-number-systems-p10',
+  pyqYear: 2024,
+  q: "Adding the 5-bit 2's complement numbers 10011 (-13) and 10101 (-11), the raw binary sum is 01000, with a carry of 0 produced into the sign bit position and a carry of 1 produced out of the sign bit position. What can be concluded?",
+  options: [
+    "No overflow occurred; the result 01000 (+8) is correct",
+    "Overflow occurred, since the carry into the sign bit (0) differs from the carry out of the sign bit (1)",
+    "Overflow cannot be determined from carries alone; only the sign rule applies",
+    "The discarded carry-out of 1 by itself proves overflow, regardless of the carry into the sign bit"
+  ],
+  answer: 1,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: "The hardware-level overflow test compares the carry INTO the sign (most significant) bit position against the carry OUT of the sign bit position: if they differ, overflow has occurred; if they match, the addition is valid even if a carry was produced or discarded. Here the carry into the sign bit is 0 and the carry out of the sign bit is 1 — they differ, so overflow is correctly flagged. This matches the sign-based check too: -13 + -11 = -24 in true arithmetic, but the 5-bit 2's complement range is only -16 to +15, so -24 cannot be represented and the corrupted result 01000 (+8) is indeed wrong, consistent with the carry-based detection. This question specifically targets the most common misconception in the topic: the discarded carry-out of the whole addition (option d treats it as decisive on its own) is NOT by itself a valid overflow indicator — what matters is whether that carry-out disagrees with the carry into the same bit position. A same-sign 2's complement addition can produce a carry-out with no overflow (if the carry into the sign bit also occurred) or overflow with no discarded carry-out at all (if carry into the sign bit occurred but none out) — only the XOR of the two carries reliably detects it."
+},
+{
+  id: 'digital-number-systems-p11',
+  pyqYear: 2025,
+  q: "In standard 8-4-2-1 BCD encoding, the number of 4-bit binary codes that are unused (invalid, not assigned to any decimal digit) is:",
+  options: ["4", "5", "6", "7"],
+  answer: 2,
+  marks: 1,
+  difficulty: 'easy',
+  type: 'pyq-style',
+  explanation: "BCD encodes each decimal digit 0-9 using its direct 4-bit binary equivalent, using 10 of the 16 possible 4-bit patterns (0000 through 1001). The remaining 6 patterns — 1010, 1011, 1100, 1101, 1110, and 1111 (decimal 10 through 15) — are never assigned to any decimal digit and are therefore invalid BCD codes. This is precisely the source of the +6 correction rule used in BCD adders: whenever a raw binary addition of two BCD digits lands on or passes through one of these 6 unused codes, adding 6 skips over them and realigns the result with a valid BCD digit (plus a carry into the next decimal position if needed). Detecting an invalid BCD code (for example, to catch corrupted data) typically checks for the pattern 1xx x with at least one of the lower combinations forming ≥10 — concretely, a code is invalid exactly when bit3=1 AND (bit2=1 OR bit1=1) is satisfied appropriately covering 1010-1111. Option (a) 4 undercounts; option (d) 7 overcounts by including 1001 (decimal 9), which is in fact a valid, commonly used BCD code."
+},
+{
+  id: 'digital-number-systems-p12',
+  pyqYear: 2026,
+  q: "For an n-bit representation, how does the count of distinct representable values in 2's complement compare to the count in 1's complement?",
+  options: [
+    "2's complement always has exactly one more distinct representable value than 1's complement, for any n",
+    "2's complement always has exactly 2^(n-1) more distinct values than 1's complement",
+    "Both schemes always represent exactly the same number of distinct values",
+    "1's complement always has more distinct values, since it is symmetric around zero"
+  ],
+  answer: 0,
+  marks: 1,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: "Both 2's complement and 1's complement use all 2^n bit patterns of an n-bit word, but 1's complement wastes one pattern (the all-1s code) as a duplicate representation of zero alongside the all-0s code, giving only 2^n - 1 distinct numeric values. 2's complement has a single unique code for zero (all-0s only, since inverting and adding 1 to all-0s wraps back to all-0s), so every one of its 2^n bit patterns maps to a distinct value. The difference between the two counts is therefore always exactly (2^n) - (2^n - 1) = 1, regardless of n — 2's complement always has precisely one more representable value than 1's complement of the same width, which shows up as 2's complement's extra representable negative number (its range is asymmetric: -2^(n-1) to +2^(n-1)-1) compared to 1's complement's symmetric but value-poorer range (-(2^(n-1)-1) to +(2^(n-1)-1)). Option (b) proposes a difference that scales with n, which is not the case — the '+1' gap is constant. Option (d) is backwards: symmetry is exactly what costs 1's complement a distinct value, since it must sacrifice a code to negative zero."
+},
+{
+  id: 'digital-number-systems-p13',
+  pyqYear: 2016,
+  q: "Excess-3 code is called 'self-complementing' because:",
+  options: [
+    "The Excess-3 code of a digit d and the Excess-3 code of its 9's complement (9-d) are bitwise complements of each other",
+    "The Excess-3 code of any digit equals its own bitwise complement",
+    "Excess-3 codes never require a carry when added to each other",
+    "Excess-3 and BCD codes are always identical for digits 0 through 6"
+  ],
+  answer: 0,
+  marks: 1,
+  difficulty: 'medium',
+  type: 'concept',
+  explanation: "Self-complementing means that inverting every bit of a digit's Excess-3 code automatically produces the Excess-3 code of that digit's 9's complement, without any further computation. Check with digit 3: Excess-3(3) = 3+3 = 6 = 0110. The 9's complement of 3 is 9-3 = 6, and Excess-3(6) = 6+3 = 9 = 1001. Bitwise complementing 0110 gives 1001 — exactly Excess-3(6), confirming the property. This works algebraically because Excess-3(d) + Excess-3(9-d) = (d+3) + (9-d+3) = 15, and any two 4-bit codes summing to 15 (1111) are automatically bitwise complements of each other, since each bit position must contribute 1 to that column's sum without any carry (0+1 or 1+0 in every position). This property made Excess-3 valuable in early decimal computers using 9's-complement (diminished radix) subtraction, since a full digit complement could be obtained by simple bit inversion, mirroring how 1's complement simplifies binary subtraction. Option (b) misdescribes self-complementing as a property of a single digit's own code, not a pairing between a digit and its 9's-complement partner. Option (c) and (d) describe unrelated (and false) properties."
+},
+{
+  id: 'digital-number-systems-p14',
+  pyqYear: 2019,
+  q: "Which of the following decimal fractions has a terminating (finite) binary representation?",
+  options: ["0.3", "0.6", "0.125", "0.9"],
+  answer: 2,
+  marks: 1,
+  difficulty: 'easy',
+  type: 'pyq-style',
+  explanation: "A decimal fraction terminates in binary if and only if, written in lowest terms as a fraction p/q, the denominator q is a power of 2 (since binary place values are all powers of 2, only fractions expressible as a sum of such place values can terminate). Here, 0.125 = 1/8 = 1/2^3, so it terminates exactly: 0.125 = 0.001 in binary (2^-3 alone). By contrast, 0.3 = 3/10, 0.6 = 3/5, and 0.9 = 9/10 all have a factor of 5 in their denominator once reduced to lowest terms, and since 5 is not a power of 2, none of these can be expressed as a finite sum of binary place values — each produces an infinitely repeating binary fraction (analogous to how 1/3 repeats forever in decimal, since 3 is not a factor of 10's prime base either). This is a frequent source of real floating-point surprises: even a 'simple-looking' decimal like 0.1 (= 1/10) never terminates in binary and must be stored as a rounded approximation in any IEEE 754 format, which is why repeated additions of 0.1 in floating-point arithmetic can accumulate small but visible errors."
+}
+);
