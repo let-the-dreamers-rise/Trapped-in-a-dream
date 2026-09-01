@@ -137,3 +137,4 @@ input[type=date], input[type=number], select, textarea { background: none; color
 .day-grid i { height: 7px; display: block; background: rgba(243,242,242,.16); }
 .day-grid i.done { background: var(--accent); }
 .day-grid i.now { background: var(--text); }
+.pill.pyq { color: var(--accent); }

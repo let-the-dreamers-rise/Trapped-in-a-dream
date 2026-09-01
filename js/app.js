@@ -73,7 +73,8 @@
   function nextQuestion(topicId, sessionSeen, diffFilter) {
     var entry = topicById(topicId);
     var qs = entry ? entry.topic.questions : [];
-    if (diffFilter && diffFilter !== 'all') qs = qs.filter(function (qq) { return qq.difficulty === diffFilter; });
+    if (diffFilter === 'pyq') qs = qs.filter(function (qq) { return !!qq.pyqYear; });
+    else if (diffFilter && diffFilter !== 'all') qs = qs.filter(function (qq) { return qq.difficulty === diffFilter; });
     var due = [], unseen = [], rest = [];
     qs.forEach(function (qq) {
       if (sessionSeen[qq.id]) { rest.push(qq); return; }
@@ -114,7 +115,7 @@
     });
   }
   var mockTimer = null;
-  function nav(name, arg) {
+  function nav(name, arg, arg2) {
     if (mockTimer && name !== 'mock-run') { clearInterval(mockTimer); mockTimer = null; }
     window.scrollTo(0, 0);
     setTab(name === 'topic' || name === 'quiz' ? 'subjects' : (name.indexOf('mock') === 0 ? 'test' : name));
@@ -122,7 +123,7 @@
     if (name === 'subjects') return viewSubjects();
     if (name === 'subject') return viewSubject(arg);
     if (name === 'topic') return viewTopic(arg);
-    if (name === 'quiz') return viewQuiz(arg);
+    if (name === 'quiz') return viewQuiz(arg, arg2);
     if (name === 'test') return viewMockLanding();
     if (name === 'progress') return viewProgress();
     if (name === 'plan') return viewPlan();
@@ -271,6 +272,10 @@
     });
   }
 
+  function pyqCount(t) {
+    return (t.questions || []).filter(function (q) { return !!q.pyqYear; }).length;
+  }
+
   // ---------- TOPIC (theory) ----------
   function viewTopic(tid) {
     var e = topicById(tid); if (!e) return viewSubjects();
@@ -283,7 +288,8 @@
       (t.theory && t.theory.deep ? '<button data-tt="deep">Deep dive</button>' : '') +
       '<button data-tt="strategy">Exam strategy</button></div>' +
       '<div class="card"><div class="theory-body" id="tbody"></div></div>' +
-      '<button class="btn block good" id="practice">Practice &mdash; infinite quiz</button>';
+      '<button class="btn block good" id="practice">Practice &mdash; infinite quiz</button>' +
+      (pyqCount(t) ? '<button class="btn block ghost" id="pyq-set" style="margin-top:8px">Past-year set &mdash; ' + pyqCount(t) + ' questions</button>' : '');
     $view.innerHTML = html;
     var body = document.getElementById('tbody');
     function show(k) {
@@ -296,6 +302,8 @@
     });
     document.getElementById('back').addEventListener('click', function () { nav('subject', e.subject); });
     document.getElementById('practice').addEventListener('click', function () { nav('quiz', tid); });
+    var pb = document.getElementById('pyq-set');
+    if (pb) pb.addEventListener('click', function () { nav('quiz', tid, 'pyq'); });
   }
 
   // Figures: questions may carry an inline SVG diagram (automata, circuits, graphs, Gantt...).
@@ -323,6 +331,9 @@
     var got = (selArr || []).slice().sort().join(',');
     return want === got && got !== '';
   }
+  function pyqPill(qq) {
+    return qq.pyqYear ? '<span class="pill pyq">GATE ' + qq.pyqYear + '</span>' : '';
+  }
   function kindPill(qq) {
     var k = qKind(qq);
     if (k === 'msq') return '<span class="pill">MSQ · pick all</span>';
@@ -337,11 +348,11 @@
   }
 
   // ---------- QUIZ (infinite topic practice) ----------
-  function viewQuiz(tid) {
+  function viewQuiz(tid, startFilter) {
     var e = topicById(tid); if (!e) return viewSubjects();
-    var sessionSeen = {}; var num = 0; var right = 0; var diffFilter = 'all'; var qStart = 0;
+    var sessionSeen = {}; var num = 0; var right = 0; var diffFilter = startFilter || 'all'; var qStart = 0;
     function filterBar() {
-      return '<div class="theory-tabs" style="margin-top:8px">' + ['all', 'easy', 'medium', 'hard'].map(function (d) {
+      return '<div class="theory-tabs" style="margin-top:8px">' + ['all', 'pyq', 'easy', 'medium', 'hard'].map(function (d) {
         return '<button data-df="' + d + '" class="' + (diffFilter === d ? 'active' : '') + '">' + d + '</button>';
       }).join('') + '</div>';
     }
@@ -355,7 +366,7 @@
       var repeatTag = (L && L.seen > 0 && qq.type !== 'generated') ? '<span class="pill">repeat</span>' : '';
       var genTag = qq.type === 'generated' ? '<span class="pill gen">∞ generated</span>' : '';
       var html = '<button class="back-link" id="back">‹ ' + esc(e.topic.name) + '</button>' + filterBar() +
-        '<div class="quiz-meta"><span>Q' + num + ' · ' + right + ' correct</span><span><span class="pill ' + qq.difficulty + '">' + qq.difficulty + '</span><span class="pill">' + qq.marks + ' mark' + (qq.marks > 1 ? 's' : '') + '</span>' + kindPill(qq) + repeatTag + genTag + '</span></div>' +
+        '<div class="quiz-meta"><span>Q' + num + ' · ' + right + ' correct</span><span><span class="pill ' + qq.difficulty + '">' + qq.difficulty + '</span><span class="pill">' + qq.marks + ' mark' + (qq.marks > 1 ? 's' : '') + '</span>' + pyqPill(qq) + kindPill(qq) + repeatTag + genTag + '</span></div>' +
         '<div class="card"><div class="q-text">' + esc(qq.q) + '</div>' + figureHtml(qq) + '<div id="opts">';
       var kind = qKind(qq);
       if (kind === 'nat') {
