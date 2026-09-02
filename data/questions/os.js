@@ -3217,3 +3217,245 @@ window.GATE_DATA.questions['os'].topics.find(function(t){return t.id==='os-virtu
   explanation: 'From the FIFO trace on this reference string with 3 frames, the fault count is 9 (faults occur at references 1,2,3,4,1,2,5,3,4, with hits only at the repeated 1, 2, and the final 5). From the OPTIMAL trace on the same reference string with the same 3 frames, the fault count is 7 (faults occur at references 1,2,3,4,5,3,4, since OPT makes smarter eviction choices by always discarding the page needed furthest in the future -- for example, evicting page 3 instead of page 1 when page 4 first causes a fault, since 3 is not needed again until much later than 1 or 2). The difference is 9 - 7 = 2 fewer faults under OPT. This 2-fault gap on an otherwise identical workload and frame count is a concrete, numerical illustration of exactly how much "smarter" eviction decisions (impossible in practice without knowing the future, but useful as a theoretical yardstick) can save compared to the simplistic, order-based FIFO policy.'
 }
 );
+window.GATE_DATA.questions['os'].topics.find(function(t){return t.id==='os-virtual-memory';}).questions.push(
+{
+  id: 'os-virtual-memory-h1',
+  q: 'A CPU has a TLB access time of 15 ns and a main memory access time of 120 ns. The TLB hit ratio is 0.85. The system uses a 2-level page table, so on a TLB miss the page table must be walked through both levels (one memory access per level) before the frame number is known, followed by one more memory access to fetch the actual data. Independently of all this, 1 in every 5000 memory references made by the process (probability 0.0002) triggers a genuine page fault, whose service (bringing the page in from disk and restarting) takes 9 ms. What is the overall effective access time, in ns (nearest integer)?',
+  options: ['1305', '1800', '1971', '2142'],
+  answer: 2,
+  marks: 2,
+  difficulty: 'hard',
+  type: 'numerical',
+  explanation: 'This must be solved in two nested stages. Stage 1: find the ordinary (non-faulting) effective memory access time using the TLB and the 2-level page table. On a TLB HIT (prob 0.85): time = TLB(15) + 1 data access(120) = 135 ns. On a TLB MISS (prob 0.15): the CPU must walk both page-table levels, one memory access each, then fetch the data: 15 + 2x120 + 120 = 375 ns. So the ordinary EMAT = 0.85x135 + 0.15x375 = 114.75 + 56.25 = 171 ns. Stage 2: fold in the page-fault probability, which is independent of whether the reference hit or missed the TLB (a fault means the page is simply absent from memory, discovered during the walk). Treating the 171 ns figure as the cost of a non-faulting reference and 9 ms = 9,000,000 ns as the cost of a faulting one: EAT = (1 - 0.0002) x 171 + 0.0002 x 9,000,000 = 0.9998x171 + 1800 = 170.97 + 1800 = 1970.97 ns, which rounds to 1971 ns. The trap is stopping after Stage 1 (giving 171, not even an option) or after computing only the fault contribution (1800) -- the question deliberately forces both the TLB/multi-level-walk layer AND the page-fault layer to be combined, since a real address translation is exposed to both hazards simultaneously and the astronomically larger page-fault cost still lets the tiny 0.0002 probability contribute over 1800 ns to the final answer.'
+},
+{
+  id: 'os-virtual-memory-h2',
+  q: 'For the reference string 1, 2, 3, 4, 1, 2, 5, 1, 2, 3, 4, 5 and page-replacement simulated with exactly 3 and then exactly 4 frames, which of the following statements are TRUE? (Select all that apply.)',
+  options: [
+    'With 3 frames, FIFO produces exactly 9 page faults',
+    'Going from 3 frames to 4 frames, FIFO produces MORE page faults, not fewer (Belady\'s anomaly)',
+    'Going from 3 frames to 4 frames, LRU\'s fault count also increases, so LRU exhibits the same anomaly as FIFO here',
+    'With 3 frames, OPTIMAL produces fewer faults than FIFO does with 3 frames'
+  ],
+  answers: [0, 1, 3],
+  marks: 2,
+  difficulty: 'hard',
+  type: 'msq',
+  kind: 'msq',
+  explanation: 'Each option needs its own independent trace. Tracing FIFO with 3 frames: faults occur at 1,2,3,4(evict1),1(evict2),2(evict3... ) -- carrying it through carefully gives exactly 9 faults, so option A is TRUE. Tracing FIFO with 4 frames on the same string gives 10 faults -- MORE than with 3 frames, even though a larger cache should intuitively never do worse. This counter-intuitive increase is precisely Belady\'s anomaly, and it is a documented property of FIFO specifically, so option B is TRUE. Tracing LRU on the same string gives 10 faults with 3 frames and 8 faults with 4 frames -- the count DECREASES as expected, because LRU is a stack algorithm (the set of pages held with k frames is always a subset of the set held with k+1 frames), which mathematically guarantees LRU can never exhibit Belady\'s anomaly. So option C is FALSE. Tracing OPTIMAL with 3 frames gives 7 faults, which is indeed fewer than FIFO\'s 9 faults with the same 3 frames (OPT is provably optimal for any fixed frame count), so option D is TRUE. The question is deliberately built around the one reference string where FIFO genuinely misbehaves, specifically to test whether a student blindly assumes "more frames always means fewer or equal faults" -- true for stack algorithms like LRU and OPT, but famously false for FIFO.'
+},
+{
+  id: 'os-virtual-memory-h3',
+  q: 'A process makes the following sequence of 12 page references, numbered by reference time t = 1 to 12: 1, 2, 3, 4, 5, 3, 4, 5, 6, 3, 4, 5. The working-set window size is delta = 4 (i.e., WS(t) is the set of distinct pages referenced during references t-3, t-2, t-1, t -- clipped at t=1 for the earliest references). What is the working-set size |WS(t)| at t = 5?',
+  options: [],
+  answer: 4,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'hard',
+  type: 'numerical',
+  explanation: 'With delta = 4, WS(5) looks at the window of the 4 most recent references ending at t=5, i.e., references at times 2, 3, 4, 5, which are the pages 2, 3, 4, 5. All four are distinct, so |WS(5)| = 4. The trap here is edge handling: a careless solver might use references 1-5 (five references, since delta could be mis-applied as "delta plus the current one") or might forget that the window slides and instead count all distinct pages referenced so far (which up to t=5 would wrongly give 5, since pages 1,2,3,4,5 have all appeared at least once by then). The correct Denning working-set definition is strictly the most recent delta references counted backward from t, not the cumulative distinct-page count since the process started -- that distinction is exactly what separates a correct working-set computation from an all-time footprint calculation, and is precisely the subtlety this reference string is built to expose since t=5 is the one point where the cumulative and windowed answers coincidentally differ by exactly one page (page 1, which fell out of the 4-wide window but is still counted if you (wrongly) use the cumulative set).'
+},
+{
+  id: 'os-virtual-memory-h4',
+  q: 'Five independent processes have working-set sizes (in frames) of 12, 10, 9, 11, and 8 respectively. The system has exactly 45 frames of physical memory available for these processes (OS overhead already excluded). If processes are admitted for concurrent execution strictly in increasing order of their working-set size (smallest first) and a process is admitted only if its full working set can be accommodated within the frames still remaining, what is the MAXIMUM number of these processes that can run concurrently without triggering thrashing?',
+  options: [],
+  answer: 4,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'hard',
+  type: 'numerical',
+  explanation: 'Thrashing occurs precisely when the sum of the working sets of the concurrently running processes exceeds the number of physical frames available -- at that point the OS cannot keep everyone\'s working set resident and must start stealing frames that are still actively needed, causing a storm of page faults. Sorting the working-set sizes ascending gives 8, 9, 10, 11, 12. Admitting greedily smallest-first: after process with WSS=8, total=8 (<=45, admit); +9 -> total=17 (admit); +10 -> total=27 (admit); +11 -> total=38 (admit, still <=45); the fifth process needs 12 more, which would push the total to 38+12=50, exceeding the 45-frame budget -- so it cannot be admitted without causing thrashing. Hence exactly 4 processes (the four smallest working sets, summing to 38 frames) can run concurrently, leaving 7 frames unused but safely avoiding thrashing, while admitting the fifth would force the system past its physical frame budget. The trap is admitting in an arbitrary or given order rather than realizing the question already tells you to sort by working-set size -- but even more commonly, students simply sum all five (12+10+9+11+8=50) and, seeing 50 > 45, wrongly conclude that NO safe combination exists, missing that a strict subset of 4 fits comfortably.'
+},
+{
+  id: 'os-virtual-memory-h5',
+  q: 'In a system, the TLB is always probed first, taking 10 ns. On a TLB hit (ratio 0.92), one further memory access (100 ns) fetches the data. On a TLB miss, in addition to the mandatory 10 ns TLB probe, the "miss penalty" advertised by the manufacturer is 240 ns -- this figure is defined by the manufacturer as covering ONLY the multi-level page-table walk needed to resolve the frame number, and does NOT include the final memory access needed to then actually fetch the data using that resolved address. What is the correct effective access time, in ns?',
+  options: ['121.2', '128.4', '129.2', '130.0'],
+  answer: 2,
+  marks: 2,
+  difficulty: 'hard',
+  type: 'numerical',
+  explanation: 'The trap is entirely about correctly accounting for what the "240 ns miss penalty" does and does not include. On a hit, total time = TLB probe(10) + data access(100) = 110 ns. On a miss, the TLB is STILL probed first (that 10 ns is unavoidable and always paid, hit or miss) -- then the 240 ns penalty resolves the frame number -- and since the question explicitly states this penalty excludes the final data fetch, one more 100 ns memory access must be added: total miss time = 10 + 240 + 100 = 350 ns. EAT = 0.92x110 + 0.08x350 = 101.2 + 28 = 129.2 ns, option C. The distractors correspond to the three most common mistakes: 121.2 comes from forgetting the final data-fetch memory access on the miss path entirely (using 250 instead of 350); 128.4 comes from forgetting that the TLB is still probed (unnecessarily) on the miss path, using just 240+100=340; and 130.0 comes from double-counting the TLB probe on the miss path (10+240+100+10=360). Only counting the TLB probe exactly once AND correctly extending the vendor-quoted "miss penalty" with the data access it excludes gives the right answer.'
+},
+{
+  id: 'os-virtual-memory-h6',
+  q: 'A system uses 48-bit virtual addresses with 4 KB pages (12-bit page offset). Each page-table entry is 8 bytes, and every level of the (hierarchical, radix-style) page table is designed to fit exactly within one 4 KB page. TLB access time is 5 ns, hit ratio is 0.95, and main memory access time is 80 ns. Given this, what is the effective access time, in ns?',
+  options: ['85', '96', '101', '405'],
+  answer: 2,
+  marks: 2,
+  difficulty: 'hard',
+  type: 'numerical',
+  explanation: 'First derive the unstated intermediate: the number of page-table levels. Each level-table must fit in one 4 KB = 4096-byte page, and each entry is 8 bytes, so each level indexes 4096/8 = 512 = 2^9 entries, i.e. 9 bits of the virtual page number per level. The virtual page number itself is 48 - 12 (offset bits) = 36 bits. Since 36 / 9 = 4 exactly, this address space requires exactly 4 page-table levels (a common real-world design, e.g. x86-64-style 4-level paging). Now compute EAT: on a TLB HIT (0.95), time = TLB(5) + 1 data access(80) = 85 ns. On a TLB MISS (0.05), the CPU must walk all 4 levels (one memory access each) then fetch data: 5 + 4x80 + 80 = 5+320+80 = 405 ns. EAT = 0.95x85 + 0.05x405 = 80.75 + 20.25 = 101 ns exactly. The entire question hinges on correctly deriving "4 levels" from the page size and PTE size before the EAT arithmetic can even begin -- a student who guesses 2 or 3 levels (common defaults memorised from textbook examples) gets a plausible-looking but wrong answer; 96 ns is what a (wrong) 3-level assumption would give, underscoring why the derivation step cannot be skipped.'
+},
+{
+  id: 'os-virtual-memory-h7',
+  q: 'A process references pages in the order 1, 2, 3, 4, 1, 2, 5, 1, 2, 3, 4, 5, 1, 2, 3, 6, 1, 2, 3, 4 (20 references total) and is allocated exactly 3 frames, managed by LRU replacement. First determine the resulting page-fault rate (faults per reference). Then, using a normal memory access time of 100 ns and a page-fault service time of 5 ms, compute the effective access time. Report your answer in milliseconds (nearest 0.1 ms).',
+  options: [],
+  answer: 4.5,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'hard',
+  type: 'numerical',
+  tolerance: 0.15,
+  explanation: 'This chains two mechanisms: an LRU page-fault trace, followed by an effective-access-time computation using the derived fault rate. Simulating LRU reference-by-reference with 3 frames on this deliberately poor-locality string (it keeps cycling through more than 3 distinct pages before any page repeats) produces 18 faults out of the 20 references -- the working set genuinely does not fit in 3 frames, so nearly every reference is a fresh fault. The fault rate is therefore 18/20 = 0.9 faults per reference (a deliberately extreme, awkward figure precisely because 3 frames are grossly insufficient for this access pattern). EAT = (1 - 0.9) x 100 ns + 0.9 x 5,000,000 ns = 10 + 4,500,000 = 4,500,010 ns = 4.50001 ms, which rounds to 4.5 ms. The scale of the numbers is itself the trap: because a page-fault service time (millisecond, disk-speed) is roughly 50,000 times larger than a memory access (nanosecond speed), even reducing the fault rate from 1.0 to 0.9 barely changes the EAT compared to reducing it further -- the EAT is almost entirely dominated by the fault-handling term, which is exactly why real systems fight so hard to keep fault rates near zero rather than merely "low".'
+},
+{
+  id: 'os-virtual-memory-h8',
+  q: 'A system runs several identical processes, each of which follows the reference pattern 1, 2, 3, 4, 5, 3, 4, 5, 6, 3, 4, 5 with a working-set window of delta = 4. The system has 45 physical frames of usable memory. What is the MAXIMUM number of these identical processes that can run concurrently without the total demand exceeding available frames (i.e., without thrashing)?',
+  options: [],
+  answer: 11,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'hard',
+  type: 'numerical',
+  explanation: 'This requires first deriving the per-process working-set requirement, then dividing it into the system-wide frame budget. Sliding a window of size 4 across the reference string 1,2,3,4,5,3,4,5,6,3,4,5 and recomputing the distinct-page count at every time t gives working-set sizes 1,2,3,4,4,3,3,3,4,4,4,4 -- the maximum value reached at any point is 4 (occurring, for example, at t=4 and again at t=9 through 12, windows like {2,3,4,5} or {6,3,4,5}). To guarantee this process never thrashes, the OS must reserve its PEAK working-set demand, not its average, since the whole point of the working-set model is to keep every process\'s currently-needed pages resident at all times -- so each process needs 4 frames reserved. With 45 total frames and 4 frames needed per process, the system can support floor(45/4) = 11 processes concurrently (44 frames used, 1 frame left over), and admitting a 12th would require 48 frames, exceeding the 45-frame budget and inducing thrashing. The trap is using the AVERAGE working-set size across the trace (roughly 3.25) instead of the peak -- averaging would wrongly suggest floor(45/3.25) = 13 processes fit, but a process\'s working set can spike to 4 at specific moments, and under-provisioning for that peak is exactly what causes thrashing in practice.'
+},
+{
+  id: 'os-virtual-memory-h9',
+  q: 'For the reference string 1, 2, 3, 4, 1, 2, 5, 1, 2, 3, 4, 5, when EXACTLY 5 frames are allocated (one frame per distinct page appearing in the entire string), which statement correctly describes the fault counts under FIFO, LRU, and OPTIMAL?',
+  options: [
+    'All three produce exactly 5 faults, since with enough frames for every distinct page, only the first (compulsory) reference to each page can ever fault',
+    'OPTIMAL produces fewer faults than FIFO and LRU because it can still evict early even when frames are unused',
+    'FIFO produces more faults than at 4 frames, repeating Belady\'s anomaly',
+    'LRU produces zero faults because every page has already been seen by the end of the string'
+  ],
+  answer: 0,
+  marks: 2,
+  difficulty: 'hard',
+  type: 'concept',
+  explanation: 'The string contains exactly 5 distinct pages: 1, 2, 3, 4, 5. With 5 frames available, there is room to keep every distinct page resident simultaneously once it has been loaded -- no replacement algorithm ever needs to evict anything, because a frame never needs to be reused while an unused frame still exists. Under this condition, a fault can only occur the very FIRST time each distinct page is referenced (a "compulsory" or "cold-start" fault); once loaded, a page is never evicted, so every subsequent reference to it is guaranteed to be a hit. Since there are exactly 5 distinct pages, all three algorithms -- FIFO, LRU, and OPTIMAL -- must produce exactly 5 faults, no more and no less, regardless of their differing eviction policies, because eviction policy is irrelevant when no eviction ever actually happens. This is precisely confirmed by direct simulation. Option B is wrong because OPT never evicts unnecessarily either. Option C is wrong: Belady\'s anomaly requires an actual eviction-order effect, which cannot occur once frames exceed the number of distinct pages. Option D is wrong because "faults" and "having been seen" are unrelated to frame count exhaustion here -- every page still faults exactly once on its first appearance, LRU included.'
+},
+{
+  id: 'os-virtual-memory-h10',
+  q: 'A demand-paging system uses the Page-Fault-Frequency (PFF) scheme with an upper threshold U = 0.006 faults/reference (a frame is ADDED if the measured rate exceeds this) and a lower threshold L = 0.004 faults/reference (a frame is REMOVED if the measured rate falls below this; the allocation is left unchanged if the rate lies between L and U inclusive). A process currently holds 8 frames. Over the last monitoring window of 10,000 memory references, the process suffered exactly 30 page faults. What is the process\'s measured fault rate, and what action does PFF take?',
+  options: [
+    '0.0030 faults/reference; frame allocation is increased',
+    '0.0030 faults/reference; frame allocation is decreased',
+    '0.0300 faults/reference; frame allocation is decreased',
+    '0.0060 faults/reference; frame allocation is increased'
+  ],
+  answer: 1,
+  marks: 2,
+  difficulty: 'hard',
+  type: 'numerical',
+  explanation: 'The measured fault rate is faults divided by references observed in the monitoring window: 30 / 10,000 = 0.0030 faults/reference. This immediately eliminates option C, which comes from a misplaced decimal point (mistakenly computing 30/1000 or misreading 10,000 as 1,000), and option D, which uses the wrong numerator entirely. Now compare 0.0030 against the two thresholds: it is BELOW the lower threshold L = 0.004, meaning the process is faulting less often than the policy considers necessary to justify its current 8-frame allocation -- in the PFF scheme this signals over-provisioning, so a frame is taken AWAY (decreased), tightening the allocation until the fault rate rises back toward the acceptable [L, U] band. This is the opposite of the far more common exam instinct, which is to assume "any page faults happening at all" must mean the process needs MORE memory (option A) -- but PFF is explicitly bidirectional: it removes frames from processes that are faulting too rarely (wasting memory that could serve another process) just as eagerly as it adds frames to processes faulting too often, and only checking the rate against BOTH thresholds (not just noticing faults occurred) determines which direction is correct.'
+}
+);
+window.GATE_DATA.questions['os'].topics.find(function(t){return t.id==='os-scheduling';}).questions.push(
+{
+  id: 'os-scheduling-h1',
+  q: 'Three processes have CPU-IO-CPU burst patterns (all times in ms): P1 (arrival 0): CPU 4, IO 3, CPU 3. P2 (arrival 1): CPU 3, IO 2, CPU 4. P3 (arrival 2): CPU 5, IO 1, CPU 2. The CPU is scheduled preemptively by Shortest-Remaining-Time-First, comparing only the CURRENT CPU burst\'s remaining time (a process doing I/O is simply not in the ready pool). Every time the CPU switches from running one process to running a different one, 1 ms of pure context-switch overhead is paid (the CPU does no useful work during that ms). What is the average turnaround time of the three processes, in ms?',
+  options: [],
+  answer: 17.33,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'hard',
+  type: 'numerical',
+  tolerance: 0.1,
+  explanation: 'Trace minute-by-minute. t=0: only P1 ready (rem 4); it runs 0-4. At t=4, P1 leaves for IO (until t=7); ready pool has P2 (rem 3, arrived t=1) and P3 (rem 5, arrived t=2) -- SRTF picks P2, but first a context switch (t=4 to 5) is paid since the CPU was running P1. P2 runs 5-8, then goes to IO (until t=10). At t=8, ready pool has P1 (back from IO at t=7, rem 3) and P3 (rem 5) -- SRTF picks P1; switch (8 to 9); P1 runs 9-12 and FINISHES (turnaround 12-0=12). At t=12, ready pool has P3 (rem 5) and P2 (back from IO at t=10, rem 4) -- SRTF picks P2; switch (12 to 13); P2 runs 13-17 and FINISHES (turnaround 17-1=16). At t=17, only P3 (rem 5) remains; switch (17 to 18); P3 runs 18-23, then goes to its final IO (until t=24) -- wait, P3\'s pattern is CPU5-IO1-CPU2, so after 5 units of CPU (18-23) it does 1 ms of IO (23-24), then its LAST CPU burst of 2 ms runs 24-26 and finishes (turnaround 26-2=24). Total context switches paid: 4 (before P2, before P1, before P2 again, before P3). Average turnaround = (12+16+24)/3 = 52/3 = 17.33 ms. The trap is forgetting that a process returning from I/O must re-enter the SRTF comparison using only its NEXT CPU burst\'s length, not its total remaining work, and that every one of those re-entries can trigger yet another context switch.'
+},
+{
+  id: 'os-scheduling-h2',
+  q: 'Four processes arrive as follows (burst times in ms): P1 arrives at 0 with burst 5; P2 arrives at 7 with burst 2; P3 arrives at 8 with burst 6; P4 arrives at 9 with burst 4. The CPU uses non-preemptive Shortest-Job-First. Every time the scheduler dispatches a process onto the CPU (whether from idle or from another process), it pays a fixed 1 ms dispatch/context-switch overhead before that process\'s burst actually starts. What is the average turnaround time, in ms?',
+  options: [],
+  answer: 7.25,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'hard',
+  type: 'numerical',
+  explanation: 'At t=0, only P1 is ready; pay 1 ms dispatch (0 to 1), then P1 runs 1-6, finishing at 6 (turnaround 6-0=6). At t=6, NO process has arrived yet (P2 arrives at 7) -- the CPU sits genuinely idle from t=6 to t=7 (this idle gap, forced purely by arrival timing, is the trap: a student who forgets to check arrivals against the completion time will wrongly try to dispatch immediately at t=6). At t=7, P2 becomes ready; dispatch (7 to 8), P2 runs 8-10, finishing at 10 (turnaround 10-7=3). At t=10, both P3 (arrived 8, burst 6) and P4 (arrived 9, burst 4) are ready and waiting -- SJF picks the SHORTER job, P4; dispatch (10 to 11), P4 runs 11-15, finishing at 15 (turnaround 15-9=6). At t=15, only P3 remains; dispatch (15 to 16), P3 runs 16-22, finishing at 22 (turnaround 22-8=14). Average turnaround = (6+3+6+14)/4 = 29/4 = 7.25 ms. Besides the idle-gap trap, the second trap is the SJF tie-break at t=10: it is easy to default to arrival order (P3 first, since it arrived earlier) and completely miss that SJF must compare burst LENGTHS (P4\'s 4 beats P3\'s 6) regardless of who arrived first.'
+},
+{
+  id: 'os-scheduling-h3',
+  q: 'Three processes P1 (arrival 0, burst 9), P2 (arrival 1, burst 5), and P3 (arrival 2, burst 7) are scheduled by Round Robin. Every context switch (a change of the running process) costs 1 ms of pure overhead. Compare quantum = 3 ms against quantum = 5 ms. By how much does the AVERAGE TURNAROUND TIME increase when the quantum is reduced from 5 ms to 3 ms?',
+  options: [],
+  answer: 4.67,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'hard',
+  type: 'numerical',
+  tolerance: 0.1,
+  explanation: 'For quantum=5 (ready order at t=0 is just P1, with P2 and P3 joining the tail as they arrive): P1 runs 0-5 (rem 4), switch, P2 runs 6-11 (rem 0, DONE at 11, turnaround 11-1=10), switch, P3 runs 12-17 (rem 2), switch, P1 runs 18-22 (rem 0, DONE, turnaround 22), switch, P3 runs 23-25 (DONE, turnaround 25-2=23). Average turnaround = (22+10+23)/3 = 55/3 = 18.33 ms. For quantum=3: P1 runs 0-3 (rem 6), switch, P2 runs 4-7 (rem 2), switch, P3 runs 8-11 (rem 4), switch, P1 runs 12-15 (rem 3), switch, P2 runs 16-18 (rem 0, DONE, turnaround 18-1=17), switch, P3 runs 19-22 (rem 1), switch, P1 runs 23-26 (rem 0, DONE, turnaround 26), switch, P3 runs 27-28 (DONE, turnaround 28-2=26). Average turnaround = (26+17+26)/3 = 69/3 = 23 ms. The increase is 23 - 18.33 = 4.67 ms. This is the fundamental RR trade-off made concrete: shrinking the quantum from 5 to 3 improves fairness/responsiveness (each process is revisited sooner) but forces MORE total context switches over the same total work, and since each switch has a fixed real cost, the average turnaround actually gets WORSE, not better -- a smaller quantum is not a free lunch.'
+},
+{
+  id: 'os-scheduling-h4',
+  q: 'Two processes P1 (burst 11 ms) and P2 (burst 4 ms), both arriving at t=0, are scheduled by a 2-level Multilevel Feedback Queue: Queue 0 (highest priority) is Round Robin with quantum 2 ms; a process that uses its full quantum without finishing is demoted to Queue 1, which is Round Robin with quantum 4 ms; a process that also uses its full Queue-1 quantum without finishing is demoted to Queue 2, which runs processes to completion (FCFS, no further preemption). Assume no context-switch overhead. What is the average turnaround time, in ms?',
+  options: [],
+  answer: 12.5,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'hard',
+  type: 'numerical',
+  explanation: 'Queue 0 (quantum 2): P1 runs 0-2 (rem 9, quantum expired, demoted to Queue 1). P2 runs 2-4 (rem 2, quantum expired, demoted to Queue 1). Queue 0 is now empty, so Queue 1 (quantum 4) is checked, which holds P1 then P2 (in that demotion order): P1 runs 4-8 (rem 5, quantum expired again, demoted to Queue 2). P2 runs 8-10 (needs only 2 more, finishes -- turnaround 10-0=10). Queue 1 is now empty, Queue 0 is empty, so Queue 2 (FCFS-to-completion) runs P1: P1 runs 10-15 (rem 5, completes -- turnaround 15-0=15). Average turnaround = (15+10)/2 = 12.5 ms. The trap is assuming a process keeps its accumulated "wait" or gets special treatment on demotion -- MLFQ always restarts the FULL quantum of whichever queue it lands in, and a process demoted all the way to the bottom queue (P1 here) can end up finishing LATER than a process that needed less total work but never got demoted as deep (P2), even though P1 arrived and started first -- MLFQ trades strict FCFS fairness for favoring short jobs early, at the cost of long jobs like P1 accumulating quantum-expiry penalties at every level.'
+},
+{
+  id: 'os-scheduling-h5',
+  q: 'Three processes have these CPU-IO-CPU-... patterns (ms): P1 (arrival 0): CPU 5, IO 4, CPU 2. P2 (arrival 0): CPU 3, IO 3, CPU 4. P3 (arrival 1): CPU 4, IO 2, CPU 3. Round Robin with quantum 3 ms is used for CPU scheduling (a process returning from I/O re-joins the back of the ready queue), and every context switch (change of running process) costs 1 ms. What is the average turnaround time, in ms?',
+  options: [],
+  answer: 25.33,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'hard',
+  type: 'numerical',
+  tolerance: 0.1,
+  explanation: 'Ready order at t=0 is P1, P2 (P3 joins at t=1). P1 runs 0-3 (rem 2 of first CPU burst). Switch(3-4). P2 runs 4-7 (its whole first CPU burst of 3 is used exactly, so P2 now goes to IO until t=10). Switch(7-8). P3 runs 8-11 (rem 1 of its first burst of 4). Switch(11-12). P1 runs 12-14 (finishes its first CPU burst of 5 total; goes to IO until t=18). Switch(14-15). P2 (back from IO at t=10, needs its final CPU burst of 4) runs 15-18 (rem 1). Switch(18-19). P3 runs 19-20 (finishes its first CPU burst of 4 total; goes to IO until t=22). Switch(20-21). P1 (back from IO at t=18, needs its final CPU burst of 2) runs 21-23, FINISHES (turnaround 23-0=23). Switch(23-24). P2 runs 24-25, FINISHES its remaining 1 ms (turnaround 25-0=25). Switch(25-26). P3 (back from IO at t=22, needs its final CPU burst of 3) runs 26-29, FINISHES (turnaround 29-1=28). Average turnaround = (23+25+28)/3 = 76/3 = 25.33 ms. The compounding trap here is that EVERY re-entry from I/O goes to the BACK of the ready queue as a fresh RR participant, competing afresh against whoever else is currently ready -- there is no special "resume priority", so a process\'s total turnaround depends heavily on exactly when its I/O happens to finish relative to the other two processes\' RR cycles.'
+},
+{
+  id: 'os-scheduling-h6',
+  q: 'Three processes P1 (burst 25), P2 (burst 4), P3 (burst 4), all arriving at t=0, are scheduled with Round Robin, quantum = 5 ms. A context-switch overhead of 2 ms is charged ONLY at the actual moments the CPU changes from running one process to running a genuinely different one (not once per quantum-slice, and not once per process). What is P1\'s finish time, in ms?',
+  options: ['37', '39', '41', '45'],
+  answer: 1,
+  marks: 2,
+  difficulty: 'hard',
+  type: 'numerical',
+  explanation: 'Trace it, counting a switch every time the identity of the running process actually changes: P1 runs 0-5 (rem 20, requeued). The running process changes from P1 to P2, so switch 1 is paid (5 to 7); P2 runs 7-11 and FINISHES (burst 4 <= quantum 5). The running process changes from P2 to P3, so switch 2 is paid (11 to 13); P3 runs 13-17 and FINISHES. The running process now changes from P3 back to P1, so switch 3 is paid (17 to 19) -- this switch counts too, even though P1 ran earlier in the schedule, because what matters is whether the IDENTITY of the running process changed at that specific instant, not whether it is a "new" process overall. From here on P1 is the ONLY process left in the system, so every subsequent RR cycle just dequeues P1, runs it for a quantum, and requeues it again -- since the running process never actually changes across these re-dispatches, NO further switch cost is paid: P1 runs 19-24 (rem 15), 24-29 (rem 10), 29-34 (rem 5), 34-39 (rem 0, FINISHES), with zero extra overhead across all four of these slices. Total context switches actually paid across the whole schedule: exactly 3 (P1-to-P2, P2-to-P3, P3-to-P1) -- NOT 2 (naively, number of OTHER processes) and NOT 6 (one per RR quantum-slice, of which there are 7 total: 1+1+5). Total overhead = 3 x 2 = 6 ms. P1\'s finish time = sum of all bursts (25+4+4=33) + total overhead (6) = 39 ms. This precise three-switches accounting -- crediting overhead only at true process-identity changes, including the switch back to a process that already ran earlier -- is exactly the distinction the question is built to test.'
+},
+{
+  id: 'os-scheduling-h7',
+  q: 'Four processes use non-preemptive priority scheduling (lower number = higher priority; ties broken by earlier arrival): P1 (arrival 0, burst 4, priority 3), P2 (arrival 6, burst 3, priority 1), P3 (arrival 7, burst 5, priority 2), P4 (arrival 9, burst 2, priority 4). What is the average turnaround time, in ms?',
+  options: [],
+  answer: 5.25,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'hard',
+  type: 'numerical',
+  explanation: 'At t=0, only P1 is ready (nothing else has arrived); it runs 0-4, finishing (turnaround 4-0=4). At t=4, the CPU goes genuinely IDLE -- P2 does not arrive until t=6, and no other process is ready in between, so the scheduler simply has nothing to dispatch from t=4 to t=6, regardless of priority rules (priority only matters once multiple processes are actually READY simultaneously). At t=6, P2 becomes ready and runs immediately (no competitor yet): 6-9, finishing (turnaround 9-6=3). At t=9, BOTH P3 (arrived at 7, priority 2, been waiting since t=7) and P4 (arrived at 9, priority 4) are ready -- priority scheduling picks P3 (priority 2 beats priority 4) even though P4 just arrived and P3 has already been waiting: P3 runs 9-14, finishing (turnaround 14-7=7). At t=14, only P4 remains: runs 14-16, finishing (turnaround 16-9=7). Average turnaround = (4+3+7+7)/4 = 21/4 = 5.25 ms. The two traps compound: first, recognizing the t=4-to-6 idle gap (a student who assumes the CPU is always busy the instant a process finishes will mis-schedule everything after); second, correctly applying priority (not arrival order or burst length) at the t=9 decision point.'
+},
+{
+  id: 'os-scheduling-h8',
+  q: 'Four processes are scheduled by preemptive Shortest-Remaining-Time-First (no context-switch overhead): P1 (arrival 0, burst 8), P2 (arrival 1, burst 4), P3 (arrival 2, burst 9), P4 (arrival 3, burst 5). Which of the following statements about the resulting schedule are TRUE? (Select all that apply.)',
+  options: [
+    'P1 is preempted exactly once during its entire execution',
+    'P2 runs to completion in one single uninterrupted stretch, without ever being preempted',
+    'P4 completes at the exact same instant that P1 resumes execution',
+    'P3 has the SHORTEST turnaround time among all four processes'
+  ],
+  answers: [0, 1, 2],
+  marks: 2,
+  difficulty: 'hard',
+  type: 'msq',
+  kind: 'msq',
+  explanation: 'Trace the full SRTF schedule: P1 runs 0-1 (rem 7) then is preempted by P2 (arrived at t=1 with a shorter remaining burst, 4 < 7). P2 runs 1-5 uninterrupted and finishes (P2\'s remaining burst, 4 then 3 then 2..., never exceeds any other ready process\'s remaining burst during this stretch, since P3 has 9 and P4 arrives at t=3 with 5, both larger than P2\'s dwindling remainder) -- turnaround 5-1=4. At t=5, ready processes are P1 (rem 7) and P4 (rem 5, just arrived) and P3 (rem 9) -- SRTF picks P4: runs 5-10, finishes -- turnaround 10-3=7. At t=10, only P1 (rem 7) and P3 (rem 9) remain -- P1 runs 10-17, finishing -- turnaround 17-0=17. At t=17, only P3 remains: runs 17-26, finishing -- turnaround 26-2=24. Checking each option against this trace: P1 was preempted at t=1 (once) and then ran uninterrupted from 10 to 17 -- exactly one preemption, so A is TRUE. P2 ran 1-5 with no interruption, so B is TRUE. P4 finishes exactly at t=10, which is precisely when P1 resumes -- C is TRUE. Turnarounds are P1=17, P2=4, P3=24, P4=7 -- P3 has the LONGEST turnaround (24), not the shortest (that is P2, at 4), so D is FALSE.'
+},
+{
+  id: 'os-scheduling-h9',
+  q: 'Three processes P1 (burst 13), P2 (burst 6), P3 (burst 3), all arriving at t=0, are scheduled by a 3-level Multilevel Feedback Queue with NO context-switch overhead: Queue 0 (highest priority) is Round Robin with quantum 2 ms; Queue 1 is Round Robin with quantum 4 ms; Queue 2 (lowest priority) is ALSO Round Robin, with quantum 4 ms (it is NOT run-to-completion FCFS). A process demoted to Queue 2 that does not finish within one Queue-2 quantum is simply requeued at the back of Queue 2 again. What is the average turnaround time, in ms?',
+  options: [],
+  answer: 17,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'hard',
+  type: 'numerical',
+  explanation: 'Queue 0 (quantum 2), in arrival order P1,P2,P3: P1 runs 0-2 (rem 11, demoted), P2 runs 2-4 (rem 4, demoted), P3 runs 4-6 (rem 1, demoted). Queue 0 empty; move to Queue 1 (quantum 4), order P1,P2,P3: P1 runs 6-10 (rem 7, demoted to Queue 2), P2 runs 10-14 (needs exactly 4 more, FINISHES -- turnaround 14-0=14), P3 runs 14-15 (needs only 1 more, FINISHES -- turnaround 15-0=15). Queue 1 and Queue 0 both empty; move to Queue 2 (quantum 4): only P1 (rem 7) is here. It runs 15-19 (rem 3, quantum expired -- since this is explicitly RR, not FCFS, P1 is requeued at the BACK of Queue 2 rather than allowed to keep running). But P1 is the only process left in Queue 2 (and every other queue is empty), so it is immediately dequeued again and runs 19-22, finishing its remaining 3 ms (turnaround 22-0=22). Average turnaround = (22+14+15)/3 = 51/3 = 17 ms. The trap is assuming the bottom queue is automatically FCFS/run-to-completion (the textbook-default MLFQ design) -- here it is explicitly still quantum-limited RR, so even a lone remaining process can technically be "preempted by its own quantum" and cycle through the queue mechanics again, though with no other process competing this happens to make no difference to the final finish time except by testing whether the solver correctly re-applies the Queue-2 quantum rule at all.'
+},
+{
+  id: 'os-scheduling-h10',
+  q: 'Six identical-priority processes P1..P6 all arrive at t=0 and are placed in the ready queue in that order. Round Robin scheduling with quantum q = 4 ms is used, and every context switch (there is one before every process\'s turn on the CPU except the very first process to run) costs c = 1 ms. Assume every process\'s total burst is far longer than several quanta, so none of them finish early during the stretch we care about. What is the RESPONSE TIME (time from t=0 until it FIRST gets the CPU) of process P4, in ms?',
+  options: [],
+  answer: 15,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'hard',
+  type: 'numerical',
+  explanation: 'P4 is 4th in the initial queue, so before it can first run, the CPU must give P1, P2, and P3 each one FULL quantum (none of them finish early, by assumption), and a context switch must occur before EACH of the 4 dispatches except the first (P1 to P2, P2 to P3, P3 to P4 -- that is 3 switches by the time P4 starts). P1 runs 0 to 4 (no switch beforehand, since it is the very first dispatch). Switch (4 to 5). P2 runs 5 to 9. Switch (9 to 10). P3 runs 10 to 14. Switch (14 to 15). P4 finally starts running at t=15. So P4\'s response time is 15 ms. In general, for the k-th process in the initial FIFO order (all with large-enough bursts), response time = (k-1) x (q + c) -- here (4-1) x (4+1) = 3 x 5 = 15, confirming the trace. The classic trap is charging the context-switch cost only "per process" (giving a wrong (k-1)xq + (k-1... miscounted)xc formula) or only "once per full lap" rather than once before EVERY single dispatch -- since there are exactly as many switches as there are prior dispatches (3, matching the 3 processes ahead of P4, not the total process count of 6 or the quantum count), getting the switch COUNT right before multiplying by c is the crux of the question.'
+}
+);
