@@ -2174,3 +2174,1282 @@ window.GATE_DATA.questions['coa'].topics.find(function(t){return t.id==='coa-dat
   explanation: 'The highlighted path shows the ALU computing a memory address (from a register value, typically added to an offset), that address being sent into Data Memory to be READ, and the value that comes back out of Data Memory being selected by the Mux (MemtoReg=1) to be written back into the Register File. This exact sequence -- compute address, read memory, write the loaded value into a register -- is precisely what a load word (lw) instruction does. It rules out sw (store word), since a store writes a register value INTO Data Memory and never routes anything back into the Register File, so there would be no active Mux-to-RegFile write path at all. It rules out add, since a register-register ALU instruction writes the ALU result directly back to the Register File, meaning the Mux would select the ALU output (the dashed path) rather than the Data Memory output. It rules out beq, since a branch does not write back to the Register File at all -- it only affects the PC via a separate branch-target adder and comparison, which is not shown as active here. Only lw matches every teal-highlighted segment in the diagram.'
 }
 );
+
+window.GATE_DATA.questions['coa'].topics.find(function(t){return t.id==='coa-instructions';}).questions.push(
+{
+  id: 'coa-instructions-p1',
+  pyqStyle: true,
+  q: 'On a three-address machine (each instruction can name up to three operands directly from memory, e.g. ADD T,A,B), what is the minimum number of instructions needed to evaluate X = (A + B) * (C - D) / E?',
+  options: ['3', '4', '5', '6'],
+  answer: 1,
+  marks: 1,
+  difficulty: 'easy',
+  type: 'pyq-style',
+  explanation: 'A three-address instruction can compute one binary operation per instruction, writing its result to a fresh temporary while reading both operands directly from memory or from earlier temporaries. The expression has exactly four binary operators: +, -, *, and /. So: ADD T1,A,B computes A+B; SUB T2,C,D computes C-D; MUL T3,T1,T2 computes (A+B)*(C-D); DIV X,T3,E computes the final quotient into X. That is exactly 4 instructions, one per operator, because a three-address format never needs extra MOV or LOAD/STORE instructions to hold intermediate results — the destination field of each instruction already serves as the temporary. This is the general rule GATE tests here: on a true three-address machine, instruction count equals the number of operators in the expression.'
+},
+{
+  id: 'coa-instructions-p2',
+  pyqStyle: true,
+  q: 'An instruction is 8 bits wide. Register operand fields are 3 bits each. Two-address (register-register) instructions use two such fields, leaving 2 bits for the opcode. If exactly 3 of the 4 opcode patterns are assigned to two-address instructions, what is the maximum number of one-address instructions obtainable from the unused pattern via expanding opcodes?',
+  options: ['4', '6', '8', '16'],
+  answer: 2,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: 'A 2-bit opcode field provides 2^2 = 4 distinct patterns. Two-address instructions consume 3 of these 4 patterns (each still followed by two 3-bit register fields). That leaves 4 - 3 = 1 opcode pattern unused. In the expanding opcode scheme, this single unused pattern can be extended: one of the two 3-bit fields that used to be a register operand is reinterpreted as additional opcode bits, while the other 3-bit field still supplies the single register operand needed by a one-address instruction. This gives 1 (leftover pattern) x 2^3 (bits of the freed field) = 8 distinct one-address opcodes. The governing rule, as always with expanding opcodes, is: number of leftover patterns at one level, multiplied by 2^(bits reclaimed), gives the instruction count achievable at the next level.'
+},
+{
+  id: 'coa-instructions-p3',
+  pyqStyle: true,
+  q: 'An addressing mode computes the effective address as EA = Base register + (Index register x element size) + Displacement. Given Base = 2000, Index = 50, element size = 4 bytes, and Displacement = 100 (all in the same units), what effective address does the instruction access?',
+  options: ['2300', '2150', '2250', '2400'],
+  answer: 0,
+  marks: 1,
+  difficulty: 'easy',
+  type: 'pyq-style',
+  explanation: 'This is base-indexed addressing with scaling, common for array-of-structures access where the index register counts elements rather than bytes. Substituting the given values: EA = 2000 + (50 x 4) + 100. First scale the index by the element size: 50 x 4 = 200, converting an element count into a byte offset. Then add the displacement: 200 + 100 = 300. Finally add the base: 2000 + 300 = 2300. A common error is forgetting to scale the index (which would wrongly give 2000+50+100=2150) or scaling the displacement as well (which is never scaled, since it is already a byte-granular constant baked into the instruction). The correct effective address is 2300.'
+},
+{
+  id: 'coa-instructions-p4',
+  pyqStyle: true,
+  q: 'A machine uses 12-bit instructions with 3-bit register fields. Two-address (register-register) instructions use two such fields, leaving 6 opcode bits (64 patterns). If 55 patterns are reserved for two-address instructions, what is the maximum number of one-address instructions (using a single 3-bit register field) obtainable from the remaining patterns via expanding opcodes?',
+  options: ['63', '72', '81', '90'],
+  answer: 1,
+  marks: 2,
+  difficulty: 'hard',
+  type: 'pyq-style',
+  explanation: 'The 6-bit opcode field allows 2^6 = 64 distinct patterns. Two-address instructions use 55 of them, each still followed by two 3-bit register fields. That leaves 64 - 55 = 9 unused patterns. Under expanding opcodes, each of these 9 patterns can absorb one of the two freed 3-bit register fields as extra opcode bits, while the remaining 3-bit field still supplies the one register operand a one-address instruction needs. So the maximum count is 9 (leftover patterns) x 2^3 (bits reclaimed from one freed field) = 9 x 8 = 72. This is the classic multi-level expanding-opcode calculation GATE has repeatedly tested: always compute leftover patterns at the current level first, then multiply by 2^(width of the field being folded into the opcode) to get the count achievable one level down.'
+},
+{
+  id: 'coa-instructions-p5',
+  pyqStyle: true,
+  q: 'A branch instruction 4 bytes long is stored at address 3000. The processor uses PC-relative addressing where the signed offset is added to the PC after it has already been incremented past the current instruction. What signed offset must the instruction encode to branch backward to address 2960?',
+  options: ['-44', '-40', '-48', '-36'],
+  answer: 0,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: 'By the time the offset is added, the PC has already advanced past this 4-byte instruction, so the base for the addition is 3000 + 4 = 3004, not 3000. The offset needed is target - (updated PC) = 2960 - 3004 = -44. Because the branch target lies before the current instruction, the offset must be negative, and PC-relative addressing handles this naturally using a signed (two\'s-complement) offset field. A very common mistake is using the un-incremented PC (3000) as the base, which would give -40 instead — always remember the fetch stage increments the PC first, and PC-relative effective-address computation happens relative to that already-updated value, not the address the instruction itself was fetched from.'
+},
+{
+  id: 'coa-instructions-p6',
+  pyqStyle: true,
+  q: 'Register R3 holds the memory address 500. The instruction MOV (R3)+, R1 uses auto-increment addressing: it first fetches the operand from the address in R3, then increments R3 by the operand size, 4 bytes. What is the value of R3 immediately after this instruction executes?',
+  options: ['500', '504', '496', '508'],
+  answer: 1,
+  marks: 1,
+  difficulty: 'easy',
+  type: 'pyq-style',
+  explanation: 'Auto-increment addressing performs the memory access using the register\'s current contents first, and only afterward updates the register by the size of the data item just accessed. Here R3 starts at 500, so the operand is fetched from address 500 for R1. Then, because the operand size is 4 bytes (a word), R3 is incremented by 4, giving 500 + 4 = 504. This mode is ideal for stepping sequentially through an array: a loop repeating MOV (R3)+, R1 automatically advances R3 to the next element\'s address after each access, without a separate increment instruction. The increment amount always equals the size of the operand actually transferred, not a fixed value of 1, which is the detail GATE most often tests here.'
+},
+{
+  id: 'coa-instructions-p7',
+  pyqStyle: true,
+  q: 'An instruction ADD @X, R1 uses memory-indirect addressing for its source operand: location X in memory holds the address of the actual operand. Excluding the instruction fetch itself, how many memory read accesses are needed to obtain the source operand\'s value?',
+  options: ['1', '2', '3', '4'],
+  answer: 1,
+  marks: 1,
+  difficulty: 'easy',
+  type: 'pyq-style',
+  explanation: 'Memory-indirect addressing requires two separate memory accesses to reach the operand. First, the processor reads location X to obtain the pointer stored there (this is one memory access). Second, it uses that pointer as an address and reads memory again to obtain the actual operand value (a second memory access). This is what distinguishes memory-indirect from register-indirect or direct addressing: register-indirect needs only one memory access (the register itself supplies the address for free), and direct addressing also needs only one access (the instruction directly embeds the operand address). Memory-indirect is more flexible (the pointer can be updated by other code) but strictly slower, needing exactly one extra memory reference compared to direct or register-indirect addressing.'
+},
+{
+  id: 'coa-instructions-p8',
+  pyqStyle: true,
+  q: 'On a one-address (accumulator-based) machine with LOAD, STORE, ADD, SUB and MUL instructions (each combining the accumulator with one memory operand), what is the minimum number of instructions needed to evaluate Y = (P + Q) * (R - S)?',
+  options: ['5', '6', '7', '8'],
+  answer: 2,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: 'A minimal accumulator-machine sequence is: LOAD P (AC=P); ADD Q (AC=P+Q); STORE T (T=P+Q, freeing the accumulator); LOAD R (AC=R); SUB S (AC=R-S); MUL T (AC=(R-S)*T=(R-S)*(P+Q), which equals the desired product since multiplication commutes); STORE Y (Y=AC). Counting these: LOAD, ADD, STORE, LOAD, SUB, MUL, STORE is exactly 7 instructions. The key saving compared to a naive count is that the second operand of the final MUL can be read directly from memory location T without a separate LOAD, since MUL is itself a one-address (accumulator, memory) instruction. Each binary operator still needs one arithmetic instruction, but only sub-expressions that must be preserved across another LOAD need an explicit STORE, which is why the total is 7 rather than a flat 3 instructions per operator.'
+},
+{
+  id: 'coa-instructions-p9',
+  pyqStyle: true,
+  q: 'A CPU has 100 distinct opcodes and 16 general-purpose registers. A two-address register-register instruction format encodes the opcode plus two register operand fields, each field sized to just accommodate the register count. If the instruction must be a whole number of bytes, what is the minimum instruction length in bits?',
+  options: ['15', '16', '14', '20'],
+  answer: 1,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: 'The opcode field must distinguish 100 distinct opcodes, needing ceil(log2 100) = 7 bits, since 2^6=64 is too few but 2^7=128 suffices. Each register field must distinguish 16 registers, needing ceil(log2 16) = 4 bits exactly, since 2^4=16. With two register operands, the raw total is 7 + 4 + 4 = 15 bits. However, the instruction is required to occupy a whole number of bytes, so 15 bits must be rounded up to the next multiple of 8, which is 16 bits. This is a two-step calculation GATE frequently tests: first compute the true information-theoretic minimum from ceil(log2(.)) on each field, then apply whatever alignment or word-size constraint the question states, since the raw bit count is very often not the final answer.'
+},
+{
+  id: 'coa-instructions-p10',
+  pyqStyle: true,
+  q: 'A zero-address (stack) machine evaluates the postfix expression A B + C D - * E / using PUSH, POP, ADD, SUB, MUL and DIV, where each arithmetic instruction pops its operands from the stack and pushes the result, and the final value must be popped into memory location X. What is the total number of instructions executed?',
+  options: ['8', '9', '10', '11'],
+  answer: 2,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: 'The postfix expression has 5 distinct operands (A, B, C, D, E) and 4 operators (+, -, *, /). Every operand needs exactly one PUSH instruction to place it on the stack (5 PUSH instructions). Every operator needs exactly one arithmetic instruction, since on a stack machine ADD/SUB/MUL/DIV implicitly pop their two operands and push the single result (4 instructions: ADD for A+B, SUB for C-D, MUL to multiply the two intermediate results, DIV to divide by E). Finally, the last value remaining on the stack must be explicitly popped into X with one POP instruction. Total = 5 (PUSH) + 4 (operators) + 1 (final POP) = 10 instructions. A common miscount is forgetting the terminal POP, which would wrongly give 9.'
+},
+{
+  id: 'coa-instructions-p11',
+  pyqStyle: true,
+  q: 'An array of 8-byte double-precision elements begins at base address 1000 (encoded in the instruction). Indexed addressing computes EA = Base + (Index register x element size). If the index register holds 5, what effective address does the instruction access?',
+  options: ['1040', '1005', '1008', '1045'],
+  answer: 0,
+  marks: 1,
+  difficulty: 'easy',
+  type: 'pyq-style',
+  explanation: 'Indexed addressing is designed for array traversal: the base address (fixed, embedded in the instruction) marks the start of the array, and the index register (which the program increments across loop iterations) selects which element to access, automatically scaled by the element size so the programmer works in element counts rather than raw byte offsets. Here the index register holds 5, meaning "the 6th element" (0-indexed), and each element occupies 8 bytes, so the byte offset is 5 x 8 = 40. Adding this to the base gives EA = 1000 + 40 = 1040. Forgetting to scale by element size (giving 1005) is the most common error GATE targets with this pattern — the index register almost always counts elements, not bytes, unless a question explicitly says otherwise.'
+},
+{
+  id: 'coa-instructions-p12',
+  pyqStyle: true,
+  q: 'A 10-bit instruction word has two 4-bit address fields for two-address instructions, leaving a 2-bit opcode (4 patterns). Three of the 4 patterns are used for two-address instructions, so the remaining pattern expands into one-address instructions using one freed 4-bit field (giving 16 one-address opcodes). If only 10 of those 16 one-address opcodes are actually used, how many zero-address instructions can the remaining opcodes support using the last 4-bit field?',
+  options: ['16', '32', '64', '96'],
+  answer: 3,
+  marks: 2,
+  difficulty: 'hard',
+  type: 'pyq-style',
+  explanation: 'Working top-down: the 2-bit opcode gives 4 patterns; 3 are used for two-address instructions, leaving 1 pattern, which expands across one freed 4-bit field to give 1 x 2^4 = 16 possible one-address opcodes (each still carrying one 4-bit address field). Of these 16, only 10 are assigned to actual one-address instructions, leaving 16 - 10 = 6 unused one-address-level patterns. Each of these 6 patterns can expand again by folding the last remaining 4-bit field into the opcode, since a zero-address instruction needs no address field at all. This gives 6 x 2^4 = 96 possible zero-address instructions. This three-level cascade — two-address to one-address to zero-address — is the fullest version of the expanding-opcode pattern GATE tests, and each level must be computed strictly in sequence using the previous level\'s leftover count.'
+},
+{
+  id: 'coa-instructions-p13',
+  pyqStyle: true,
+  q: 'On a two-address machine (each arithmetic instruction destroys its first operand, e.g. ADD dst,src computes dst = dst + src), what is the minimum number of instructions to evaluate W = (A - B) / (C + D * E), assuming a MOV instruction is available to load a temporary from a memory operand?',
+  options: ['6', '7', '8', '9'],
+  answer: 2,
+  marks: 2,
+  difficulty: 'hard',
+  type: 'pyq-style',
+  explanation: 'A safe two-address sequence, always evaluating into a temporary before it is overwritten, is: MOV T1,D; MUL T1,E (T1=D*E); MOV T2,C; ADD T2,T1 (T2=C+D*E); MOV T3,A; SUB T3,B (T3=A-B); DIV T3,T2 (T3=(A-B)/(C+D*E), using the two-address convention that DIV dst,src computes dst=dst/src); MOV W,T3. Counting instructions: 3 MOV-load pairs before their operators (6 instructions: 3 MOV + 3 operator) plus one more DIV plus the final MOV, giving MOV,MUL,MOV,ADD,MOV,SUB,DIV,MOV = 8 instructions total. Two-address machines need one extra MOV per operand that would otherwise be destroyed prematurely, which is why they typically need more instructions than an equivalent three-address machine for the same expression, even though each instruction is shorter.'
+},
+{
+  id: 'coa-instructions-p14',
+  pyqStyle: true,
+  q: 'A 16-bit instruction reserves 6 bits for the opcode and the remaining 10 bits for a signed (two\'s complement) immediate operand. What is the largest positive integer value that can be encoded in the immediate field?',
+  options: ['511', '512', '1023', '255'],
+  answer: 0,
+  marks: 1,
+  difficulty: 'easy',
+  type: 'pyq-style',
+  explanation: 'A 10-bit two\'s complement field can represent 2^10 = 1024 distinct values in total, split asymmetrically between negative and non-negative numbers: it covers the range from -2^9 = -512 up to +(2^9 - 1) = +511. The largest positive value is therefore 511, not 512, because value 0 is counted among the non-negative values, leaving only 511 positive slots above it (0 through 511 is 512 values, matching half of the 1024-value range, while -512 through -1 is the other 512 values). A frequent slip is to answer 512 by treating the field as unsigned, or 1023 by forgetting the sign bit consumes half the range entirely. This immediate-range calculation — 2^(n-1) - 1 for the positive extreme — recurs any time GATE asks about the reach of a signed literal or displacement field.'
+}
+);
+
+window.GATE_DATA.questions['coa'].topics.find(function(t){return t.id==='coa-datapath';}).questions.push(
+{
+  id: 'coa-datapath-p1',
+  pyqStyle: true,
+  q: 'A single-cycle processor has functional delays: instruction fetch 220 ps, register read 90 ps, ALU 140 ps, data memory access 210 ps, register write-back 90 ps. Every instruction, regardless of type, completes in exactly one clock cycle. What is the minimum clock period the design can use?',
+  options: ['750 ps', '220 ps', '210 ps', '650 ps'],
+  answer: 0,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: 'In a single-cycle datapath, every instruction must complete within one clock period, so that period must be long enough for the slowest instruction to pass through every stage its execution needs. The worst case is a load, which visits all five stages: fetch (220), register read (90), ALU address computation (140), data memory access (210) and write-back (90). Summing these gives 220+90+140+210+90 = 750 ps. It is not correct to take only the maximum individual stage delay (210 ps), because unlike a pipeline, a single-cycle design does not overlap stages across instructions at all -- every stage of the current instruction must finish sequentially before the clock edge that starts the next instruction. The clock period is therefore the sum of delays along the longest path through the datapath, not the largest single stage.'
+},
+{
+  id: 'coa-datapath-p2',
+  pyqStyle: true,
+  q: 'Two 8-bit two\'s complement numbers, 01110010 (114) and 00110101 (53), are added. What are the resulting overflow (V) and carry-out flags?',
+  options: ['V = 1, C = 0', 'V = 0, C = 1', 'V = 1, C = 1', 'V = 0, C = 0'],
+  answer: 0,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: 'Adding the two 8-bit values bit by bit gives the sum 10100111, with a carry of 1 entering the sign (bit 7) position but a carry of 0 leaving it (no carry out of the MSB). Overflow is detected exactly when these two carries differ: V = Cin(MSB) XOR Cout(MSB) = 1 XOR 0 = 1, so V = 1. Since the final carry out of the MSB is 0, C = 0. This matches the arithmetic check: 114 + 53 = 167 in true decimal, but the maximum representable positive value in 8-bit two\'s complement is 127, so the true sum cannot fit and must overflow -- and indeed the result bit pattern 10100111 decodes as a negative number (-89), confirming that two positive operands wrongly produced a negative result, the textbook signature of signed overflow.'
+},
+{
+  id: 'coa-datapath-p3',
+  pyqStyle: true,
+  q: 'A control memory holds 1024 microinstructions. Each microinstruction has 20 control-signal bits, a 4-bit condition-select field, and a next-address field sized to address the entire control memory. What is the total size of the control memory in bits?',
+  options: ['34816', '30720', '24576', '35840'],
+  answer: 0,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: 'The next-address field must be able to select any one of the 1024 = 2^10 microinstructions, so it needs ceil(log2 1024) = 10 bits. The full microinstruction width is therefore 20 (control bits) + 4 (condition-select) + 10 (next-address) = 34 bits. Since the control memory holds 1024 such microinstructions, the total control memory size is 1024 x 34 = 34816 bits. A common error is to size the next-address field from the number of control bits or from an unrelated main-memory address width instead of the actual depth of the control store -- the sequencer only ever needs to address locations within the microprogram memory itself, so log2(depth of control memory) is always the right basis for that field.'
+},
+{
+  id: 'coa-datapath-p4',
+  pyqStyle: true,
+  q: 'A CPU has 46 control signals divided into three mutually exclusive groups of 5, 9 and 20 signals; within a group at most one signal is active per cycle, and a group may also have no active signal that cycle. Using vertical microprogramming with one separately encoded field per group, how many total control bits does each microinstruction need?',
+  options: ['12', '10', '15', '46'],
+  answer: 0,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: 'In vertical microprogramming, each group of mutually exclusive signals is replaced by one encoded field wide enough to represent every signal in that group PLUS one extra pattern for "none active." A group of size k therefore needs ceil(log2(k+1)) bits. For the group of 5, ceil(log2 6) = 3 bits. For the group of 9, ceil(log2 10) = 4 bits. For the group of 20, ceil(log2 21) = 5 bits. Summing across the three independently encoded fields gives 3 + 4 + 5 = 12 bits total, far fewer than the 46 bits horizontal microprogramming would need (one bit per signal), at the cost of needing a decoder on each field before the signals can be used. This "+1 for none-active" detail is the step GATE most often catches students missing.'
+},
+{
+  id: 'coa-datapath-p5',
+  pyqStyle: true,
+  q: 'A multi-cycle processor with a 250 ps clock executes instructions in these cycle counts: load 5, store 4, ALU 4, branch 3. The instruction mix is 20% loads, 15% stores, 50% ALU and 15% branches. What is the average execution time per instruction?',
+  options: ['1012.5 ps', '1000 ps', '900 ps', '1125 ps'],
+  answer: 0,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: 'Average CPI is the mix-weighted sum of each instruction type\'s cycle count: CPI = 0.20x5 + 0.15x4 + 0.50x4 + 0.15x3 = 1.00 + 0.60 + 2.00 + 0.45 = 4.05 cycles per instruction. Multiplying by the clock period gives the average execution time per instruction: 4.05 x 250 ps = 1012.5 ps. This is the standard multi-cycle performance calculation: unlike a single-cycle design (one fixed, long cycle for every instruction) or an ideal pipeline (one cycle throughput after fill), a multi-cycle machine lets each instruction use only the cycles it needs, but the fair way to compare its overall speed against another design is always through this weighted-average CPI multiplied by the (typically much shorter) multi-cycle clock period.'
+},
+{
+  id: 'coa-datapath-p6',
+  pyqStyle: true,
+  q: 'A register file has 64 registers, three read ports and one write port. How many bits of control input are needed per cycle in total, to select the source/destination register on every port plus one write-enable bit?',
+  options: ['25', '24', '18', '19'],
+  answer: 0,
+  marks: 1,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: 'With 64 = 2^6 registers, selecting any one register requires n = 6 bits, and this same 6-bit select is needed independently on every port, since each port may access a different register in the same cycle. There are 3 read ports and 1 write port, i.e. 4 ports total, each needing its own 6-bit select field, giving 4 x 6 = 24 bits. In addition, the write port needs one write-enable bit to indicate whether the write should actually happen this cycle (reads are typically always "on" and simply return whatever is stored). Total control bits = 24 + 1 = 25. The general formula to remember is: (number of ports) x ceil(log2(number of registers)) + (number of write ports, for their enable bits).'
+},
+{
+  id: 'coa-datapath-p7',
+  pyqStyle: true,
+  q: 'A hardwired control unit for a multi-cycle processor is implemented as a finite state machine with 35 distinct states, whose state register feeds combinational logic together with the opcode. What is the minimum number of flip-flops needed for the state register?',
+  options: ['6', '5', '7', '35'],
+  answer: 0,
+  marks: 1,
+  difficulty: 'easy',
+  type: 'pyq-style',
+  explanation: 'An n-bit state register can distinguish 2^n distinct states, so the minimum n must satisfy 2^n >= 35. Since 2^5 = 32 is not enough to give each of the 35 states a unique code, but 2^6 = 64 comfortably covers all 35 (with 29 unused codes to spare), the minimum number of flip-flops is 6. This is the same ceil(log2 .) calculation that recurs throughout digital design questions -- for register file addressing, opcode field sizing, and control-store addressing alike -- and it is worth memorizing that the answer is always the smallest n with 2^n at least as large as the count being encoded, not the closest power of two below it.'
+},
+{
+  id: 'coa-datapath-p8',
+  pyqStyle: true,
+  q: 'Compared with horizontal microprogramming, vertical microprogramming:',
+  options: [
+    'uses narrower microinstruction words by encoding grouped signals, but needs a decoder and typically allows fewer signals to be activated per cycle',
+    'always executes machine instructions faster because its control memory is smaller',
+    'requires no decoding logic between the control-memory output and the datapath',
+    'is only usable in hardwired, not microprogrammed, control units'
+  ],
+  answer: 0,
+  marks: 1,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: 'Horizontal microprogramming dedicates one bit of the microinstruction to each control signal, so words are wide but every signal can be asserted independently and in full parallel with no decoding delay. Vertical microprogramming instead groups mutually exclusive signals and encodes each group into a compact field, shrinking the microinstruction width considerably -- but a decoder must now expand each field back into individual signal lines before they can drive the datapath, adding a small delay, and because signals within a group are mutually exclusive by construction, fewer signals can typically be active simultaneously than in the horizontal scheme. Vertical microprogramming does not inherently make the machine faster (control memory being smaller does not by itself reduce the number of microinstructions an instruction needs), and both horizontal and vertical styles apply specifically to microprogrammed control, not hardwired control, which has no control memory at all.'
+},
+{
+  id: 'coa-datapath-p9',
+  pyqStyle: true,
+  q: 'In a microprogrammed CPU, each machine instruction is interpreted by an average of 8 microinstructions, and each control memory access (fetching one microinstruction) takes 25 ns. Ignoring all other delays, what is the average time to execute one machine instruction?',
+  options: ['200 ns', '160 ns', '225 ns', '175 ns'],
+  answer: 0,
+  marks: 1,
+  difficulty: 'easy',
+  type: 'pyq-style',
+  explanation: 'In a microprogrammed control unit, executing one machine instruction means stepping the microprogram sequencer through its associated microroutine one microinstruction at a time, and each step costs exactly one control-memory access. If a machine instruction needs, on average, 8 microinstructions, and each such access takes 25 ns, the average execution time is simply 8 x 25 ns = 200 ns. This directly illustrates why microprogrammed control units are inherently slower than hardwired ones for the same instruction: a hardwired unit generates its control signals combinationally within a single machine cycle, while a microprogrammed unit pays one control-memory access latency for every microinstruction in the routine, and more complex (CISC-style) instructions with longer microroutines take proportionally longer.'
+},
+{
+  id: 'coa-datapath-p10',
+  pyqStyle: true,
+  q: 'Which of the following is a correct statement about a single-bus CPU organization, where one shared internal bus connects the ALU inputs/output and all registers?',
+  options: [
+    'Transferring a value from one register to another, or through the ALU, may require multiple clock cycles because the shared bus can carry only one value at a time',
+    'A single-bus organization always executes any given instruction faster than a multi-bus organization',
+    'A single-bus CPU cannot support register-to-register ALU operations at all',
+    'The ALU in a single-bus CPU never needs a temporary latch to hold one operand'
+  ],
+  answer: 0,
+  marks: 1,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: 'Because only one value can be present on the shared bus at any instant, an ALU operation needing two register operands cannot read both simultaneously the way a multi-bus datapath could. Instead, one operand is first moved onto the bus and latched into a temporary register feeding the ALU, and only then is the second operand placed on the bus for the ALU to combine with the latched value -- consuming an extra cycle compared to a design with multiple buses or dedicated ALU input latches. This is precisely why single-bus CPUs need at least one dedicated temporary register at an ALU input: without it, the single bus could never hold two different values at once for a binary operation. Register-to-register ALU operations are still fully supported, just spread across more cycles, and a single-bus design is simpler and cheaper in hardware but generally slower per instruction, not faster, than a multi-bus alternative.'
+},
+{
+  id: 'coa-datapath-p11',
+  pyqStyle: true,
+  q: 'A control memory holds 5000 microinstructions. What is the minimum number of bits required for the next-address field so that it can address any microinstruction in this control memory?',
+  options: [],
+  answer: 13,
+  kind: 'nat',
+  marks: 1,
+  difficulty: 'easy',
+  type: 'pyq-style',
+  explanation: 'The next-address field of a microinstruction must be wide enough to name any one of the 5000 locations in the control memory. Since 2^12 = 4096 is not enough to give a unique address to each of the 5000 microinstructions, but 2^13 = 8192 is more than enough (leaving 3192 unused addresses), the minimum field width is 13 bits. As with all such addressing-field problems, the answer is the smallest n satisfying 2^n >= (number of distinct items to be addressed), computed with ceil(log2 .), and it is never rounded down to the nearest power of two that falls short of the actual count -- 12 bits would leave 904 microinstructions with no valid address at all.'
+},
+{
+  id: 'coa-datapath-p12',
+  pyqStyle: true,
+  q: 'A single-cycle datapath needs a 750 ps clock period because every instruction, even the fastest, must budget for the load instruction\'s full critical path. A multi-cycle version of the same underlying hardware uses a 150 ps clock, with load taking 5 cycles, store 4, ALU 4, and branch 3, in a mix of 25% load, 15% store, 40% ALU and 20% branch. Which design executes a given program faster, and by roughly what factor?',
+  options: [
+    'Multi-cycle is faster, by roughly 750/(4.05 x 150) ≈ 1.235x',
+    'Single-cycle is faster, by roughly (4.05 x 150)/750 ≈ 0.81x',
+    'Both designs take exactly the same total time',
+    'Multi-cycle is faster by exactly 5x, matching the load instruction\'s cycle count'
+  ],
+  answer: 0,
+  marks: 2,
+  difficulty: 'hard',
+  type: 'pyq-style',
+  explanation: 'First compute the multi-cycle average CPI from the mix: 0.25x5 + 0.15x4 + 0.40x4 + 0.20x3 = 1.25 + 0.60 + 1.60 + 0.60 = 4.05 cycles per instruction. Its average time per instruction is then 4.05 x 150 ps = 607.5 ps. The single-cycle design, by contrast, spends a flat 750 ps on every instruction regardless of type, since its clock must always accommodate the worst-case (load) critical path. Comparing the two average-time-per-instruction figures, 750 ps (single-cycle) versus 607.5 ps (multi-cycle), the multi-cycle design is faster, by a factor of 750/607.5 ≈ 1.235x. The general lesson: single-cycle designs waste time on every instruction to accommodate the slowest one, while multi-cycle designs let simple instructions finish in fewer cycles, and the fair comparison is always total (or average) execution time, never cycle count or clock period alone.'
+},
+{
+  id: 'coa-datapath-p13',
+  pyqStyle: true,
+  q: 'In a microprogrammed control unit, the microprogram sequencer\'s primary job is to:',
+  options: [
+    'determine the address of the next microinstruction to fetch from control memory, based on the current microinstruction\'s next-address field and, when needed, condition flags',
+    'perform the arithmetic and logic operations specified by the current machine instruction',
+    'decode the machine instruction\'s opcode directly into datapath control signals with no control memory access',
+    'store the operands of the currently executing machine instruction'
+  ],
+  answer: 0,
+  marks: 1,
+  difficulty: 'easy',
+  type: 'pyq-style',
+  explanation: 'The microprogram sequencer is the piece of hardware that decides which control-memory location to read next, on every micro-cycle. Typically it takes the next-address field embedded in the current microinstruction as its default choice, but for conditional microbranches it also consults selected condition flags (or the machine instruction\'s opcode, at the start of a new microroutine) to choose among several possible next addresses. It does not itself perform arithmetic (that is the ALU\'s job), nor does it decode opcodes directly into datapath signals without going through control memory (that would describe hardwired control, which has no sequencer or control memory at all), nor does it store operands (that is the register file or memory\'s job). The sequencer is purely about navigating the microprogram, one microinstruction fetch at a time.'
+},
+{
+  id: 'coa-datapath-p14',
+  pyqStyle: true,
+  q: 'A CPU has 41 control signals split into three mutually exclusive groups of 6, 10 and 14 signals (each group may also have no signal active in a given cycle). Using vertical microprogramming with an independently encoded field per group, how many control bits does one microinstruction need in total?',
+  options: ['11', '10', '9', '41'],
+  answer: 0,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: 'Each group needs a field wide enough for its own signals plus one extra code for "none of this group\'s signals active." For the group of 6, ceil(log2(6+1)) = ceil(log2 7) = 3 bits. For the group of 10, ceil(log2(10+1)) = ceil(log2 11) = 4 bits. For the group of 14, ceil(log2(14+1)) = ceil(log2 15) = 4 bits. Adding the three independently encoded fields gives 3 + 4 + 4 = 11 bits total for the microinstruction\'s control portion -- a large reduction from the 41 bits that horizontal microprogramming would need if every signal got its own dedicated bit. The recurring trap is forgetting the "+1" for the inactive case within each group, which would undercount the required field width whenever a group need not always have exactly one signal firing.'
+}
+);
+
+window.GATE_DATA.questions['coa'].topics.find(function(t){return t.id==='coa-pipelining';}).questions.push(
+{
+  id: 'coa-pipelining-p1',
+  pyqStyle: true,
+  q: 'A 5-stage pipeline has a clock cycle of 2.5 ns. With no stalls, how long does it take to execute a program of 200 instructions?',
+  options: ['510 ns', '500 ns', '512.5 ns', '502.5 ns'],
+  answer: 0,
+  marks: 1,
+  difficulty: 'easy',
+  type: 'pyq-style',
+  explanation: 'With no hazards, a k-stage pipeline executing n instructions takes (k + n - 1) clock cycles: k cycles for the first instruction to fill the pipeline, and then one additional instruction completes every subsequent cycle. Here k = 5 and n = 200, so the total cycle count is 5 + 200 - 1 = 204 cycles. Multiplying by the 2.5 ns cycle time gives 204 x 2.5 = 510 ns. A frequent slip is to compute n x k = 1000 cycles (treating the pipeline as if it never overlapped instructions, i.e. as a non-pipelined machine), which massively overstates the time; the whole benefit of pipelining is that only the first instruction pays the full k-cycle latency, not every instruction.'
+},
+{
+  id: 'coa-pipelining-p2',
+  pyqStyle: true,
+  q: 'A 4-stage pipeline has stage delays of 180, 140, 190 and 150 ps, and each inter-stage latch adds 10 ps. What is the asymptotic (large n) speedup over a non-pipelined implementation of the same hardware, which needs no latches?',
+  options: ['3.3', '4', '2.75', '3.0'],
+  answer: 0,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: 'The non-pipelined machine executes each instruction by passing through all four stages sequentially with no latch overhead, taking 180+140+190+150 = 660 ps per instruction. The pipelined machine\'s cycle time is fixed by its slowest stage plus one latch delay: max(180,140,190,150) + 10 = 190 + 10 = 200 ps per cycle, and for a very large instruction count the pipeline completes essentially one instruction per cycle, so its per-instruction time approaches 200 ps. The asymptotic speedup is therefore 660 / 200 = 3.3. Note this falls short of the naive "speedup = number of stages = 4" because the stages are not perfectly balanced (190 ps dominates over the average) and the latch adds fixed overhead every cycle -- both of these are exactly what keep real pipelines below their ideal k-fold speedup.'
+},
+{
+  id: 'coa-pipelining-p3',
+  pyqStyle: true,
+  q: 'A 5-stage pipeline executes I1: ADD R1,R2,R3; I2: SUB R4,R1,R5; I3: MUL R6,R4,R7; I4: DIV R8,R6,R9, where each instruction is a RAW dependency on the one immediately before it. Without forwarding (each adjacent RAW dependency costs a 2-cycle stall, per the usual split-phase WB/ID convention), compared with full ALU-to-ALU forwarding (which entirely removes stalls for back-to-back single-cycle-EX dependencies), how many fewer cycles does the sequence take with forwarding?',
+  options: ['6', '4', '8', '2'],
+  answer: 0,
+  marks: 2,
+  difficulty: 'hard',
+  type: 'pyq-style',
+  explanation: 'Without any stalls at all, the base time for 4 instructions on a 5-stage pipeline is k+n-1 = 5+4-1 = 8 cycles. Without forwarding, each of the three adjacent RAW dependencies (I1 to I2, I2 to I3, I3 to I4) forces a 2-cycle stall so that the dependent instruction\'s ID lines up with its producer\'s WB, adding 2+2+2 = 6 stall cycles, for a total of 8+6 = 14 cycles. With full operand forwarding, the ALU result computed at the end of a producer\'s EX stage (available in the EX/MEM latch) is routed directly into the very next instruction\'s EX stage input in the following cycle -- exactly when a back-to-back dependent instruction needs it -- so none of these three dependencies causes any stall at all, and the sequence completes in the base 8 cycles. The difference is 14 - 8 = 6 cycles saved by forwarding.'
+},
+{
+  id: 'coa-pipelining-p4',
+  pyqStyle: true,
+  q: 'In a pipelined processor, conditional branches are resolved at the end of the 4th pipeline stage. Instructions after the branch are fetched sequentially and squashed if the branch turns out to be taken. What is the branch penalty (number of wasted cycles) for a taken branch?',
+  options: ['3', '4', '2', '1'],
+  answer: 0,
+  marks: 1,
+  difficulty: 'easy',
+  type: 'pyq-style',
+  explanation: 'While the branch instruction itself is moving through stages 1 through 4, the pipeline keeps fetching subsequent sequential instructions one per cycle behind it, since the outcome is not yet known. By the time the branch resolves at the end of stage 4, three younger instructions have already been fetched into the pipeline (one entering in each of the three cycles following the branch\'s own fetch). If the branch is taken, all three of these wrongly-fetched instructions must be squashed and the correct target fetched instead, wasting exactly 3 cycles. The general formula, confirmed here, is: if the branch outcome becomes known at the end of stage b, the taken-branch penalty is b - 1 cycles -- resolving branches earlier in the pipeline is precisely why architectures add a dedicated early comparator to shrink this penalty.'
+},
+{
+  id: 'coa-pipelining-p5',
+  pyqStyle: true,
+  q: 'In a pipelined processor, 30% of instructions are branches. Half of all branches are taken, and each taken branch incurs a 2-cycle penalty; not-taken branches and all other instructions execute at CPI 1. What is the effective CPI?',
+  options: ['1.3', '1.6', '1.15', '1.5'],
+  answer: 0,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: 'Effective CPI = base CPI + (fraction of instructions that stall) x (stall cycles each). Here 30% of instructions are branches, and of those, half (i.e. 0.30 x 0.5 = 0.15, or 15% of all instructions) are taken and each such taken branch adds a 2-cycle penalty on top of its own 1 base cycle. So the extra CPI contributed is 0.15 x 2 = 0.30, and effective CPI = 1 + 0.30 = 1.3. The not-taken half of the branches, along with every non-branch instruction, execute at the baseline CPI of 1 and contribute nothing extra. This weighted-penalty pattern -- base CPI plus (hazard frequency x penalty per hazard) -- is the single most reused formula across GATE\'s pipeline-performance questions, whether the hazard is a branch, a stall, or a cache miss.'
+},
+{
+  id: 'coa-pipelining-p6',
+  pyqStyle: true,
+  q: 'A 4-stage pipeline has stage delays 4, 5, 11 and 5 ns (ignore latch delays). The 11 ns stage is split into two balanced stages of 5.5 ns each, turning it into a 5-stage pipeline. For a very long instruction stream, what speedup does the new 5-stage design achieve over the original 4-stage pipeline?',
+  options: ['2', '2.2', '1.57', '4'],
+  answer: 0,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: 'The original 4-stage pipeline\'s cycle time is set by its slowest stage: max(4,5,11,5) = 11 ns. After splitting the 11 ns stage into two equal 5.5 ns halves, the stage delays become {4,5,5.5,5.5,5}, and the new slowest stage is 5.5 ns, so the new cycle time is 5.5 ns. For a very long instruction stream, throughput approaches one instruction completed per cycle in both designs, so the asymptotic speedup of the new design over the old one is the ratio of cycle times: 11 / 5.5 = 2. This is the clean case where splitting the single bottleneck stage in half does translate directly into a 2x speedup, precisely because every other stage (4, 5 and 5 ns) already comfortably fits under the new 5.5 ns cycle time and none of them becomes a new bottleneck. Whenever splitting the worst stage does NOT achieve the full proportional speedup, it is because some other, previously-hidden stage becomes the new maximum instead — always recompute the new max(.) explicitly rather than assuming a clean halving.'
+},
+{
+  id: 'coa-pipelining-p7',
+  pyqStyle: true,
+  q: 'A processor uses branch prediction with 85% accuracy. Branches make up 20% of all instructions, and each misprediction costs a 4-cycle penalty. Non-branch instructions and correctly predicted branches execute at CPI 1. What is the effective CPI?',
+  options: ['1.12', '1.20', '1.68', '1.05'],
+  answer: 0,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: 'The misprediction rate is 100% - 85% = 15%. The fraction of all instructions that are mispredicted branches is 0.20 (branch fraction) x 0.15 (misprediction rate) = 0.03, i.e. 3% of all instructions. Each of these adds 4 extra cycles beyond the baseline CPI of 1, contributing 0.03 x 4 = 0.12 to the effective CPI. Every other instruction -- non-branches and correctly predicted branches, together 97% of the stream -- runs at the baseline CPI of 1 with no penalty. Effective CPI = 1 + 0.12 = 1.12. This confirms the general principle that even a fairly accurate predictor (85%) leaves a small but real performance tax whenever the branch frequency and misprediction penalty are both non-trivial.'
+},
+{
+  id: 'coa-pipelining-p8',
+  pyqStyle: true,
+  q: 'A 4-stage pipeline has stage latencies 500, 300, 450 and 350 ps, and each pipeline register (latch) adds 50 ps. What is the maximum clock frequency at which the pipeline can operate?',
+  options: ['1.818 GHz', '2 GHz', '1.667 GHz', '1.538 GHz'],
+  answer: 0,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: 'The pipeline\'s clock period must be at least as long as its slowest stage plus the fixed latch overhead that every stage boundary incurs: cycle time = max(500,300,450,350) + 50 = 500 + 50 = 550 ps. The maximum clock frequency is the reciprocal of this cycle time: 1 / 550 ps = 1 / (550 x 10^-12 s) ≈ 1.818 x 10^9 Hz = 1.818 GHz. A common slip is to forget the latch delay entirely (giving 1/500ps = 2 GHz) or to add the latch delay to every stage and sum them rather than adding it once to only the bottleneck stage -- the clock period is set by the single slowest stage-plus-latch path, not by the sum of all stages, since stages execute concurrently once the pipeline is full.'
+},
+{
+  id: 'coa-pipelining-p9',
+  pyqStyle: true,
+  q: 'A pipelined processor has full operand forwarding from the EX/MEM and MEM/WB latches into the EX stage. A load instruction is immediately followed by another instruction that needs the loaded value as an ALU input. What is the minimum number of stall cycles this "load-use" hazard still requires, even with forwarding enabled?',
+  options: ['1', '0', '2', '3'],
+  answer: 0,
+  marks: 1,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: 'Forwarding eliminates stalls for ALU-to-ALU dependencies because the producer\'s result is available at the end of its EX stage, exactly one cycle before the consumer needs it in its own EX stage. A load, however, does not produce its result until the end of the MEM stage, one stage later than an ALU operation. If the very next instruction needs that loaded value in its EX stage, the timing is one cycle too tight even with forwarding: the load\'s MEM output is not ready until after the dependent instruction\'s EX stage would otherwise need it. So exactly 1 bubble (stall cycle) must still be inserted to delay the dependent instruction by one cycle, letting the load\'s MEM/WB result be forwarded into the now-delayed EX stage. This unavoidable single-cycle load-use hazard is why compilers try to schedule at least one independent instruction between a load and its first use.'
+},
+{
+  id: 'coa-pipelining-p10',
+  pyqStyle: true,
+  q: 'A 5-stage pipeline uses a single-port unified memory, so every load or store instruction (25% of a 40-instruction program) stalls the pipeline for 1 extra cycle whenever its memory access overlaps an instruction fetch. Assuming every load/store instruction causes exactly one such stall, how many total clock cycles does the program take?',
+  options: ['54', '50', '44', '49'],
+  answer: 0,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: 'With no hazards, a 5-stage pipeline running 40 instructions takes k+n-1 = 5+40-1 = 44 cycles. This particular structural hazard arises whenever a load or store\'s MEM-stage access collides with a younger instruction\'s IF-stage access to the same single-ported memory, forcing a 1-cycle stall. With 25% of the 40 instructions being loads/stores, that is 0.25 x 40 = 10 instructions, each contributing one stall cycle, for 10 extra cycles. Total execution time = 44 (base) + 10 (structural-hazard stalls) = 54 cycles. This is the standard fix-it-with-arithmetic version of the structural hazard question: first get the ideal (k+n-1) baseline, then add one stall per resource conflict, exactly as with data or control hazards.'
+},
+{
+  id: 'coa-pipelining-p11',
+  pyqStyle: true,
+  q: 'A 500-instruction program has 15% branches, each of which previously incurred a 2-cycle penalty. The compiler now fills the branch delay slot with a useful, always-executed instruction in 80% of branches (fully absorbing 1 of the 2 penalty cycles for those branches), while the remaining 20% of branches still pay the full 2-cycle penalty. How many total penalty cycles does delayed branching save compared to never using a delay slot?',
+  options: ['60', '75', '100', '40'],
+  answer: 0,
+  marks: 2,
+  difficulty: 'hard',
+  type: 'pyq-style',
+  explanation: 'The number of branches in the program is 15% of 500 = 75. Without any delayed-branch technique, every one of these 75 branches would pay the full 2-cycle penalty, for a baseline total of 75 x 2 = 150 penalty cycles. With delayed branching, 80% of the 75 branches (= 60 branches) have their delay slot filled with useful work, and that filled instruction executes regardless of the branch outcome, absorbing exactly 1 of the 2 penalty cycles per such branch — saving 60 x 1 = 60 cycles. The remaining 20% of branches (15 branches) gain nothing and still cost the full 2 cycles each. So the total saving compared to never using delayed branching is 60 cycles (only the successfully-filled branches contribute any saving at all — the unfilled ones are exactly as expensive as before).'
+},
+{
+  id: 'coa-pipelining-p12',
+  pyqStyle: true,
+  q: 'A processor has a balanced 6-stage pipeline (ideal speedup would be 6 with zero stalls) but stalls give it an effective CPI of 1.25. What is the actual speedup of this pipelined processor over an equivalent non-pipelined implementation?',
+  options: ['4.8', '6', '7.5', '4.25'],
+  answer: 0,
+  marks: 1,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: 'For a pipeline with perfectly balanced stages, the ideal (zero-stall) speedup over a non-pipelined machine equals the number of stages, k = 6, since the pipeline would then complete one instruction every single cycle instead of one every k cycles. Stalls reduce this ideal by inflating the effective CPI above 1: actual speedup = ideal speedup / effective CPI = k / CPI = 6 / 1.25 = 4.8. This captures the intuitive idea that a CPI of 1.25 means the pipeline is, on average, only 1/1.25 = 80% as efficient as the zero-stall ideal, so the realized speedup is 80% of the theoretical maximum: 0.8 x 6 = 4.8, matching the direct division. This k/CPI relationship is the fastest way to combine a pipeline\'s structural potential with its measured hazard overhead into one performance number.'
+},
+{
+  id: 'coa-pipelining-p13',
+  pyqStyle: true,
+  q: 'A 5-stage pipeline has every stage taking exactly 2 ns (ignore latch delay). For a program of 10 instructions, what is the actual speedup of the pipelined execution over a non-pipelined implementation of the same datapath (where each instruction takes 5 x 2 = 10 ns, executed one at a time)?',
+  options: ['3.57', '5', '2.86', '4.5'],
+  answer: 0,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: 'The non-pipelined machine executes all 5 stages of every instruction sequentially, taking 5 x 2 = 10 ns per instruction, so 10 instructions take 10 x 10 = 100 ns in total. The pipelined machine, with no hazards, takes (k+n-1) cycles = (5+10-1) = 14 cycles, each 2 ns long, giving 14 x 2 = 28 ns in total. The actual speedup for this finite instruction count is 100/28 ≈ 3.57 — noticeably less than the ideal asymptotic speedup of k = 5, because with only n = 10 instructions the pipeline fill/drain overhead (4 extra cycles beyond the ideal one-per-cycle rate) is still a significant fraction of the total time. This finite-n calculation, as opposed to the "for very large n" asymptotic shortcut, is exactly the distinction GATE tests when it specifies a concrete, small instruction count rather than saying "a very long instruction stream."'
+},
+{
+  id: 'coa-pipelining-p14',
+  pyqStyle: true,
+  q: 'A 6-stage pipeline has stage delays 3, 4, 9, 5, 6 and 4 ns, with each latch adding 1 ns. The 9 ns stage is split into three equal 3 ns sub-stages, making an 8-stage pipeline (still with 1 ns latches). What is the asymptotic speedup of the new 8-stage design over the original 6-stage design?',
+  options: ['1.43', '3', '2', '1.67'],
+  answer: 0,
+  marks: 2,
+  difficulty: 'hard',
+  type: 'pyq-style',
+  explanation: 'The original pipeline\'s cycle time is its slowest stage plus one latch: max(3,4,9,5,6,4) + 1 = 9 + 1 = 10 ns. After splitting the 9 ns stage into three 3 ns sub-stages, the stage delays become {3,4,3,3,3,5,6,4}; the new slowest stage is now the 6 ns one (previously hidden behind the larger 9 ns stage), giving a new cycle time of 6 + 1 = 7 ns. For a very long instruction stream, both pipelines approach one instruction completed per cycle, so the asymptotic speedup of the new design over the old one is simply the ratio of cycle times: 10 / 7 ≈ 1.43. This illustrates an important subtlety: splitting the single worst stage does not automatically deliver a proportional speedup, because as soon as that stage shrinks, a different, previously-hidden stage (here the 6 ns one) becomes the new bottleneck and caps the achievable improvement.'
+}
+);
+
+window.GATE_DATA.questions['coa'].topics.find(function(t){return t.id==='coa-memory';}).questions.push(
+{
+  id: 'coa-memory-p1',
+  pyqStyle: true,
+  q: 'A direct-mapped cache has a total capacity of 32 KB with a block size of 64 bytes, addressed by a 32-bit byte address. How many bits are used for the Tag field?',
+  options: ['17', '18', '15', '20'],
+  answer: 0,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: 'The Offset field must address every byte within a block: with a 64-byte block (2^6), the offset needs 6 bits. The Index field must select among all the cache lines: with a 32 KB cache and 64-byte blocks, there are 32768/64 = 512 = 2^9 lines, so the index needs 9 bits (in a direct-mapped cache there is exactly one line per set, so index bits also equal set-select bits). The Tag field takes whatever remains of the 32-bit address: 32 - 9 - 6 = 17 bits. This tag is stored alongside each line and compared against every incoming address\'s tag bits to confirm a hit, since many different blocks in memory share the same index but differ in their tag.'
+},
+{
+  id: 'coa-memory-p2',
+  pyqStyle: true,
+  q: 'A 4-way set-associative cache has a total capacity of 64 KB, a block size of 32 bytes, and is addressed with a 32-bit byte address. How many bits are needed for the Tag field?',
+  options: ['18', '17', '20', '15'],
+  answer: 0,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: 'The Offset field addresses bytes within a 32-byte block: 32 = 2^5, so 5 offset bits. The total number of cache lines is 64 KB / 32 B = 65536/32 = 2048 lines; since this is 4-way associative, the lines are grouped into sets of 4, giving 2048/4 = 512 = 2^9 sets, so the Index field needs 9 bits (set-associative caches index by SET, not by individual line, which is exactly why increasing associativity at fixed capacity shrinks the index field). The Tag field then takes the remaining bits: 32 - 9 - 5 = 18 bits. Doubling the associativity while holding capacity and block size fixed always removes exactly one index bit and adds it to the tag, since it halves the number of sets while doubling the ways per set.'
+},
+{
+  id: 'coa-memory-p3',
+  pyqStyle: true,
+  q: 'A fully associative cache has a total capacity of 16 KB with a block size of 16 bytes, addressed with a 32-bit byte address. How many bits does the Tag field require?',
+  options: ['28', '24', '30', '26'],
+  answer: 0,
+  marks: 1,
+  difficulty: 'easy',
+  type: 'pyq-style',
+  explanation: 'In a fully associative cache, a block can be placed in ANY line, so there is no index field at all -- the address splits into only Offset and Tag. The Offset field addresses bytes within a 16-byte block: 16 = 2^4, so 4 offset bits. The Tag field then consumes everything else: 32 - 4 = 28 bits, and every line\'s stored tag must be compared in parallel against this 28-bit value to detect a hit, which is why fully associative caches need expensive parallel (content-addressable) tag comparison hardware and are practical only for small, highly associative structures such as a TLB, not for large L1/L2 data caches.'
+},
+{
+  id: 'coa-memory-p4',
+  pyqStyle: true,
+  q: 'A processor has an L1 cache with 1 ns hit time and a 5% miss rate. On an L1 miss, it accesses an L2 cache with 8 ns hit time, whose LOCAL miss rate is 20%; an L2 miss then costs 80 ns to service from main memory. What is the average memory access time (AMAT)?',
+  options: ['2.2 ns', '3.0 ns', '1.8 ns', '4.8 ns'],
+  answer: 0,
+  marks: 2,
+  difficulty: 'hard',
+  type: 'pyq-style',
+  explanation: 'AMAT is built from the inside out: the time to service an L2 access is its own hit time plus its local miss rate times the memory access time: T_L2 = 8 + 0.20 x 80 = 8 + 16 = 24 ns. Then AMAT = L1 hit time + L1 miss rate x T_L2 = 1 + 0.05 x 24 = 1 + 1.2 = 2.2 ns. The key idea in multi-level cache AMAT is that you only pay the L2 access cost when L1 actually misses (weighted by the L1 miss rate), and within L2 the LOCAL miss rate (misses in L2 divided by ACCESSES to L2, not by total references) correctly weights how often the even-more-expensive main-memory access is needed. This nested-average structure extends the same way to any number of cache levels.'
+},
+{
+  id: 'coa-memory-p5',
+  pyqStyle: true,
+  q: 'A direct-mapped cache has 4 lines (block numbers map to a line by block-number mod 4). The following sequence of block numbers is accessed in order: 0, 1, 2, 0, 1, 3, 0, 4, 0, 1. Starting from an empty cache, how many of these 10 accesses are misses?',
+  options: ['6', '4', '5', '7'],
+  answer: 0,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: 'Mapping each block to line = block mod 4: block 0 to line 0, block 1 to line 1, block 2 to line 2, block 3 to line 3, and block 4 also to line 0 (since 4 mod 4 = 0), directly conflicting with block 0. Walking the trace: 0(miss,fills line0), 1(miss,fills line1), 2(miss,fills line2), 0(hit, line0 still holds block0), 1(hit), 3(miss,fills line3), 0(hit), 4(miss -- evicts block0 from line0, since 4 also maps to line0), 0(miss -- block0 was just evicted by 4), 1(hit). Counting misses: 0,1,2,3,4,0 -- that is 6 misses (0M,1M,2M,3M,4M and the final re-access of 0 is also a miss), and the remaining 4 accesses are hits. This trace exercises exactly the conflict-miss idea: blocks 0 and 4 alias to the same line and repeatedly evict each other despite plenty of unused capacity in the other three lines.'
+},
+{
+  id: 'coa-memory-p6',
+  pyqStyle: true,
+  q: 'A write-through, no-write-allocate cache serves 2000 memory references, of which 40% are writes, each writing one 4-byte word. Every write is sent through to main memory immediately. What is the total number of bytes written to main memory due to these writes?',
+  options: ['3200', '2000', '8000', '1600'],
+  answer: 0,
+  marks: 1,
+  difficulty: 'easy',
+  type: 'pyq-style',
+  explanation: 'In a write-through policy, every single write updates both the cache and main memory at the same time, regardless of whether it was a cache hit or miss (with no-write-allocate, a write miss simply writes straight to memory without pulling the block into the cache at all). The number of write references is 40% of 2000 = 800, and since each write is exactly one 4-byte word, the total bytes written to main memory is 800 x 4 = 3200 bytes. Write-through keeps memory always consistent with the cache, which simplifies multiprocessor cache coherence, but it generates far more memory bus traffic than write-back for write-heavy workloads, since every individual write reaches memory rather than only the final value of a block when it is evicted.'
+},
+{
+  id: 'coa-memory-p7',
+  pyqStyle: true,
+  q: 'A write-back cache with a 32-byte block size experiences 100 block evictions over the course of a program, of which 60% are dirty (have been written to since being loaded). What is the total number of bytes written back to main memory due to these evictions?',
+  options: ['1920', '3200', '1200', '2880'],
+  answer: 0,
+  marks: 1,
+  difficulty: 'easy',
+  type: 'pyq-style',
+  explanation: 'In a write-back cache, individual writes only update the cached copy of a block (setting its dirty bit) and do NOT go to main memory immediately; a block is written back to memory only when it is evicted AND it is dirty. Here, 60% of the 100 evictions are dirty: 0.60 x 100 = 60 dirty evictions. Each writeback transfers the ENTIRE 32-byte block, not just the specific bytes that were modified, since the cache typically tracks dirty status per block rather than per byte. Total bytes written back = 60 x 32 = 1920 bytes. This is dramatically less traffic than a write-through cache would generate for the same number of writes (which could easily exceed hundreds of individual word-sized writes), illustrating why write-back caches are preferred when write traffic to memory is a bottleneck, at the cost of needing extra hardware (the dirty bit) and more complex coherence handling.'
+},
+{
+  id: 'coa-memory-p8',
+  pyqStyle: true,
+  q: 'An L1 cache has a 2 ns hit time and an 8% miss rate. An L2 cache has a 10 ns hit time. Overall, 2% of ALL memory references (i.e. the GLOBAL miss rate) result in a main-memory access costing 100 ns. What is the average memory access time (AMAT)?',
+  options: ['4.8 ns', '3.6 ns', '5.2 ns', '4.0 ns'],
+  answer: 0,
+  marks: 2,
+  difficulty: 'hard',
+  type: 'pyq-style',
+  explanation: 'The global L2 miss rate (2%) is the fraction of ALL references, not just of L1 misses, that end up needing main memory. To use it inside the standard nested-AMAT formula, first convert it into L2\'s LOCAL miss rate: local miss rate = global miss rate / L1 miss rate = 0.02 / 0.08 = 0.25 (25%), since L2 is only even accessed on the 8% of references that miss in L1. Then AMAT = L1 hit time + L1 miss rate x (L2 hit time + L2 local miss rate x memory time) = 2 + 0.08 x (10 + 0.25 x 100) = 2 + 0.08 x (10 + 25) = 2 + 0.08 x 35 = 2 + 2.8 = 4.8 ns. The recurring trap here is plugging a GLOBAL miss rate directly into the local-miss-rate slot of the formula without first dividing by the enclosing level\'s miss rate to convert it.'
+},
+{
+  id: 'coa-memory-p9',
+  pyqStyle: true,
+  q: 'A 2-way set-associative cache has 2 sets (block-number mod 2 selects the set) and uses true LRU replacement within each set. Starting from an empty cache, this block-number trace is accessed: 0, 2, 1, 0, 4, 1, 2, 3, 0, 4. How many of these 10 accesses are hits?',
+  options: ['2', '3', '4', '1'],
+  answer: 0,
+  marks: 2,
+  difficulty: 'hard',
+  type: 'pyq-style',
+  explanation: 'Even-numbered blocks (0, 2, 4) map to set 0, and odd-numbered blocks (1, 3) map to set 1, each set holding up to 2 blocks under LRU. Tracing set 0: access 0 (miss, set0=[0]); access 2 (miss, set0=[0,2]); access 0 (HIT, reorders to set0=[2,0], making 2 the LRU entry); access 4 (miss, set0 full so evicts LRU=2, set0=[0,4]); access 2 (miss, since 2 was evicted, now evicts LRU=0, set0=[4,2]); access 0 (miss, evicts LRU=4, set0=[2,0]); access 4 (miss, evicts LRU=2, set0=[0,4]). Tracing set 1: access 1 (miss, set1=[1]); access 1 again (HIT, set1=[1]); access 3 (miss, set1=[1,3], not full so no eviction needed). Counting all hits across both sets: exactly 2 hits (the two marked HIT above), and the other 8 accesses are misses -- even with 2-way associativity, three distinct even blocks (0,2,4) competing for only 2 ways in set 0 causes repeated LRU thrashing.'
+},
+{
+  id: 'coa-memory-p10',
+  pyqStyle: true,
+  q: 'A fully associative cache starts empty. The following block-number trace is accessed: 5, 3, 5, 7, 3, 9, 5, 11, 3, 7, 13. Assuming the cache is large enough that no block is ever evicted, how many of these 11 accesses are compulsory (cold-start) misses?',
+  options: ['6', '5', '7', '11'],
+  answer: 0,
+  marks: 1,
+  difficulty: 'easy',
+  type: 'pyq-style',
+  explanation: 'A compulsory (cold) miss occurs the very first time a particular block is ever referenced, since it cannot possibly already be in the cache -- no replacement policy or associativity level can avoid this category of miss. Scanning the trace for each block\'s FIRST appearance: 5 (1st ref, miss), 3 (1st ref, miss), 5 (repeat, hit), 7 (1st ref, miss), 3 (repeat, hit), 9 (1st ref, miss), 5 (repeat, hit), 11 (1st ref, miss), 3 (repeat, hit), 7 (repeat, hit), 13 (1st ref, miss). The distinct blocks that ever appear are {5,3,7,9,11,13} -- exactly 6 distinct blocks -- so there are exactly 6 compulsory misses, one per distinct block, and the remaining 5 accesses (all repeat references, since the cache never evicts anything here) are hits.'
+},
+{
+  id: 'coa-memory-p11',
+  pyqStyle: true,
+  q: 'A cache uses a 40-bit byte address. The Tag field is 26 bits and the block size is 64 bytes. How many sets does this cache have?',
+  options: ['256', '128', '512', '64'],
+  answer: 0,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: 'The block size of 64 bytes fixes the Offset field at log2(64) = 6 bits. Since the three address fields (Tag, Index, Offset) always partition the full 40-bit address exactly, the Index field width is whatever remains after removing the given Tag and the computed Offset: 40 - 26 - 6 = 8 bits. The number of sets a cache has is always 2^(index bits), so the number of sets is 2^8 = 256. This is the reverse of the usual tag/index/offset problem: instead of being given the cache\'s capacity and associativity to compute the tag, you are given the tag width and must work backward to recover the index width and hence the set count -- the governing identity, tag + index + offset = total address width, applies in either direction.'
+},
+{
+  id: 'coa-memory-p12',
+  pyqStyle: true,
+  q: 'Two proposed L1 cache designs are compared for the same processor. Design A: 1 ns hit time, 6% miss rate, 50 ns miss penalty. Design B: 1.5 ns hit time, 3% miss rate, the same 50 ns miss penalty. Which design gives the lower average memory access time (AMAT), and by how much?',
+  options: [
+    'Design B is faster, by 1 ns (AMAT_A = 4 ns, AMAT_B = 3 ns)',
+    'Design A is faster, by 1 ns',
+    'Both designs have identical AMAT',
+    'Design B is faster, by 0.5 ns'
+  ],
+  answer: 0,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: 'AMAT = hit time + miss rate x miss penalty for each design. For Design A: AMAT_A = 1 + 0.06 x 50 = 1 + 3 = 4 ns. For Design B: AMAT_B = 1.5 + 0.03 x 50 = 1.5 + 1.5 = 3 ns. Even though Design B has a slower hit time (1.5 ns versus 1 ns), its lower miss rate (3% versus 6%) more than compensates, since each miss is expensive (50 ns). Design B therefore achieves the lower AMAT, beating Design A by 4 - 3 = 1 ns. This exercise reflects a very real design tension in cache engineering: a larger or more associative cache (Design B, say) typically has a somewhat slower hit time but a meaningfully lower miss rate, and only computing full AMAT -- never comparing hit time or miss rate in isolation -- correctly captures which trade-off wins.'
+},
+{
+  id: 'coa-memory-p13',
+  pyqStyle: true,
+  q: 'A write-back cache with a 64-byte block size experiences 100 block evictions during a program run, of which 70% are dirty. What is the total number of bytes written back to main memory?',
+  options: ['4480', '6400', '3200', '4800'],
+  answer: 0,
+  marks: 1,
+  difficulty: 'easy',
+  type: 'pyq-style',
+  explanation: 'Only dirty evictions trigger a writeback in a write-back cache, since a clean (unmodified) block being evicted is already identical to what main memory holds and can simply be discarded. The number of dirty evictions is 70% of 100 = 70. Each writeback transfers the full 64-byte block, regardless of how many bytes within it were actually modified, because dirty status is tracked per block, not per byte. Total bytes written back = 70 x 64 = 4480 bytes. Comparing this to the earlier write-back example (60 dirty evictions of 32-byte blocks giving 1920 bytes) shows how both the eviction count, the dirty fraction, and the block size all directly scale the total writeback traffic -- doubling the block size, for instance, doubles the traffic for the same eviction pattern.'
+},
+{
+  id: 'coa-memory-p14',
+  pyqStyle: true,
+  q: 'An 8-way set-associative cache has a total capacity of 16 KB and a block size of 32 bytes. Byte address 8480 is accessed. Which set does this address map to?',
+  options: ['Set 9', 'Set 34', 'Set 17', 'Set 0'],
+  answer: 0,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: 'The total number of cache lines is 16384/32 = 512, and since the cache is 8-way associative, these lines form 512/8 = 64 sets. The block number containing byte address 8480 is floor(8480/32) = 265 (integer division discards the offset within the block). The set that this block maps to is the block number modulo the number of sets: 265 mod 64 = 9, since 64 x 4 = 256 and 265 - 256 = 9. So address 8480 maps to Set 9. This mirrors the direct division method used to double-check tag/index/offset bit extraction: block number = floor(address / block size), and set number = block number mod (number of sets) -- both must agree with whatever the bit-field partition of the address gives directly.'
+},
+{
+  id: 'coa-memory-p15',
+  pyqStyle: true,
+  q: 'A three-level cache hierarchy has: L1 hit time 1 ns with a 6% miss rate; L2 hit time 6 ns with a LOCAL miss rate of 25%; L3 hit time 20 ns with a LOCAL miss rate of 30%; a main memory access on an L3 miss costs 120 ns. What is the overall AMAT?',
+  options: ['2.2 ns', '3.1 ns', '1.9 ns', '2.6 ns'],
+  answer: 0,
+  marks: 2,
+  difficulty: 'hard',
+  type: 'pyq-style',
+  explanation: 'Build the nested AMAT formula from the innermost (slowest) level outward. First, the effective time when L3 is accessed: T_L3 = L3 hit time + L3 local miss rate x memory time = 20 + 0.30 x 120 = 20 + 36 = 56 ns. Next, the effective time when L2 is accessed: T_L2 = L2 hit time + L2 local miss rate x T_L3 = 6 + 0.25 x 56 = 6 + 14 = 20 ns. Finally, overall AMAT = L1 hit time + L1 miss rate x T_L2 = 1 + 0.06 x 20 = 1 + 1.2 = 2.2 ns. Each level is only ever charged when the level above it actually misses, and every LOCAL miss rate is with respect to accesses reaching that specific level, not the original reference stream -- exactly the pattern that extends the standard two-level AMAT formula to any number of cache levels.'
+},
+{
+  id: 'coa-memory-p16',
+  pyqStyle: true,
+  q: 'A direct-mapped cache has 8 lines (block-number mod 8 selects the line). A tight loop repeatedly accesses block numbers 0, 8 and 16 in a fixed round-robin order (0, 8, 16, 0, 8, 16, 0, 8), for a total of 8 accesses, starting from an empty cache. How many of these accesses are hits?',
+  options: ['0', '2', '5', '6'],
+  answer: 0,
+  marks: 1,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: 'All three block numbers alias to the very same line, since 0 mod 8 = 0, 8 mod 8 = 0, and 16 mod 8 = 0 -- despite the cache having 8 lines total, this particular working set of 3 blocks only ever uses 1 of them and repeatedly evicts itself. Walking the trace: block 0 (miss, fills line0), block 8 (miss, evicts 0), block 16 (miss, evicts 8), block 0 (miss, evicts 16, since 0 is no longer present), block 8 (miss), block 16 (miss), block 0 (miss), block 8 (miss) -- every single access is a miss, giving 0 hits out of 8. This is a classic cache-thrashing / conflict-miss scenario: even though the cache is far from full in absolute capacity, poor address alignment (all three blocks conflict-mapping to the same line) destroys temporal locality entirely, which is exactly why real caches use set-associativity to tolerate a handful of simultaneously "hot" but conflicting addresses.'
+}
+);
+
+window.GATE_DATA.questions['coa'].topics.find(function(t){return t.id==='coa-io';}).questions.push(
+{
+  id: 'coa-io-p1',
+  pyqStyle: true,
+  q: 'A DMA controller uses cycle stealing: for every group of 5 CPU clock cycles, it steals exactly 1 cycle to transfer one word, leaving the CPU 4 cycles free in that group. What percentage of CPU cycles are stolen by the DMA during the transfer?',
+  options: ['20%', '25%', '80%', '5%'],
+  answer: 0,
+  marks: 1,
+  difficulty: 'easy',
+  type: 'pyq-style',
+  explanation: 'In cycle stealing, the DMA controller "borrows" individual bus cycles from the CPU rather than freezing it for the whole block transfer, so the CPU keeps making progress on its own program in between. Here, out of every group of 5 cycles, exactly 1 is stolen for the transfer, so the fraction stolen is 1/5 = 0.20, i.e. 20%. This is the direct opposite of burst-mode DMA, which would seize the bus continuously for the entire block transfer, stalling the CPU 100% of the time during that interval but finishing the transfer itself in less total wall-clock time -- cycle stealing sacrifices raw transfer speed to keep the CPU more responsive.'
+},
+{
+  id: 'coa-io-p2',
+  pyqStyle: true,
+  q: 'A CPU has a 100 ns clock cycle. A DMA controller uses cycle stealing, taking exactly 1 CPU cycle for every word it transfers. If the DMA transfers a block of 10,000 words during a program\'s execution, by how much does this cycle stealing lengthen the program\'s total running time?',
+  options: ['1,000,000 ns', '100,000 ns', '10,000 ns', '10,000,000 ns'],
+  answer: 0,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: 'Each word transferred costs the CPU exactly 1 stolen cycle, so transferring 10,000 words steals 10,000 CPU cycles in total, regardless of how those stolen cycles are spread out over time. At 100 ns per cycle, the total extra time added to the program\'s execution is 10,000 x 100 ns = 1,000,000 ns (i.e. 1 millisecond). This directly demonstrates why cycle stealing is described as adding a small, distributed overhead rather than one large stall: the CPU program\'s instructions are individually delayed by single stolen cycles scattered throughout the transfer, but summed across the whole block, the total lost CPU time is exactly (number of words) x (cycles stolen per word) x (cycle time).'
+},
+{
+  id: 'coa-io-p3',
+  pyqStyle: true,
+  q: 'A disk has a seek time of 6 ms, rotates at 6000 RPM, and has a sustained transfer rate of 50,000 bytes/ms (i.e. 50 MB/s using decimal MB). What is the total access time to read a 10,000-byte sector, assuming average rotational latency (half a revolution)?',
+  options: ['11.2 ms', '11.0 ms', '5.2 ms', '16 ms'],
+  answer: 0,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: 'Total disk access time is the sum of three components. Seek time is given directly as 6 ms. The rotational latency is, on average, half of one full revolution: at 6000 RPM the disk completes one revolution every 60,000/6000 = 10 ms, so average rotational latency is 10/2 = 5 ms. The transfer time is the sector size divided by the transfer rate: 10,000 bytes / 50,000 bytes-per-ms = 0.2 ms. Adding all three: 6 + 5 + 0.2 = 11.2 ms. This "seek + rotate + transfer" decomposition is the standard disk-timing formula, and it shows why transfer time is usually the smallest component for a single sector -- seek and rotational latency, both mechanical delays, dominate disk access time far more than the electronic data transfer itself.'
+},
+{
+  id: 'coa-io-p4',
+  pyqStyle: true,
+  q: 'For the disk of the previous scenario (seek 6 ms, 6000 RPM giving 5 ms average rotational latency, transfer rate 50,000 bytes/ms, 10,000-byte sector, total access time 11.2 ms), what is the effective throughput for reading this single sector, expressed in bytes per millisecond?',
+  options: ['≈892.9 bytes/ms', '≈500 bytes/ms', '≈1785.7 bytes/ms', '≈50,000 bytes/ms'],
+  answer: 0,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: 'Effective throughput is NOT the same as the raw transfer rate quoted for the disk (50,000 bytes/ms), because that number only describes the speed of the data-transfer phase itself, ignoring the mechanical seek and rotational-latency overhead that must also be paid before any bytes move. The effective (real, end-to-end) throughput is instead the total useful data delivered divided by the TOTAL access time, including seek and rotation: 10,000 bytes / 11.2 ms ≈ 892.9 bytes/ms. This large gap between the raw transfer rate (50,000 bytes/ms) and the effective throughput (≈892.9 bytes/ms) is exactly why disks perform far better on large sequential transfers, which amortize one seek and one rotational latency over many sectors, than on many small scattered single-sector reads, where the fixed mechanical overhead dominates each individual access.'
+},
+{
+  id: 'coa-io-p5',
+  pyqStyle: true,
+  q: 'An interrupt-driven I/O system handles 1000 device interrupts. Each interrupt requires 2 microseconds to save the CPU context, an ISR (interrupt service routine) body that runs for 5 microseconds, and 2 microseconds to restore the context afterward. What is the total CPU time consumed by servicing all 1000 interrupts?',
+  options: ['9000 microseconds', '5000 microseconds', '4000 microseconds', '7000 microseconds'],
+  answer: 0,
+  marks: 1,
+  difficulty: 'easy',
+  type: 'pyq-style',
+  explanation: 'Each individual interrupt costs the CPU three sequential phases: saving the interrupted program\'s context (2 us), running the actual interrupt-handling code (5 us), and restoring the saved context so the interrupted program can resume exactly where it left off (2 us). This gives 2 + 5 + 2 = 9 us per interrupt. Servicing 1000 such interrupts therefore costs 1000 x 9 = 9000 us in total CPU time. Note that the save and restore steps (4 us combined, or 4000 us across all 1000 interrupts) are pure overhead that does no useful work for the device -- they exist solely to make the interruption transparent to the interrupted program -- which is exactly why systems batching many small, frequent interrupts (versus fewer, larger ones) pay a proportionally larger overhead tax.'
+},
+{
+  id: 'coa-io-p6',
+  pyqStyle: true,
+  q: 'A device transfers one word every 10 microseconds and the CPU must move 1000 words in total. Under programmed I/O (the CPU busy-waits, polling the device\'s status register continuously until each word is ready, then transfers it), the CPU is occupied for the entire 10-microsecond gap between words. Under interrupt-driven I/O, the CPU spends only 2 microseconds of actual work per word (handling the interrupt and moving the word) and is otherwise free to do other work. How many microseconds of CPU time does interrupt-driven I/O save compared to programmed I/O, for this whole transfer?',
+  options: ['8000 microseconds', '10000 microseconds', '2000 microseconds', '6000 microseconds'],
+  answer: 0,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: 'Under programmed I/O, the CPU is fully tied up busy-waiting for the entire 10 microsecond period between successive words, giving a total occupied time of 1000 x 10 = 10,000 microseconds for the whole transfer -- none of that busy-wait time is available for other useful work. Under interrupt-driven I/O, the CPU is freed to do other work during the gap and only spends 2 microseconds of actual overhead per word (handling the interrupt and moving the data), giving a total CPU-occupied time of 1000 x 2 = 2,000 microseconds. The CPU time saved by switching to interrupt-driven I/O is therefore 10,000 - 2,000 = 8,000 microseconds. This is precisely why programmed I/O (busy-waiting) is avoided for anything but the simplest or fastest devices: it wastes CPU cycles that interrupt-driven or DMA-based schemes can instead give back to other programs.'
+},
+{
+  id: 'coa-io-p7',
+  pyqStyle: true,
+  q: 'A centralized parallel bus arbitration scheme must uniquely identify which one of 64 possible I/O devices is requesting the bus, using a priority encoder that outputs a binary device number. How many output bits does this encoder need?',
+  options: ['6', '5', '7', '64'],
+  answer: 0,
+  marks: 1,
+  difficulty: 'easy',
+  type: 'pyq-style',
+  explanation: 'A binary encoder must produce a distinct output code for each of the 64 possible requesting devices, and the minimum number of bits needed to represent 64 distinct values is ceil(log2 64) = 6, since 2^6 = 64 exactly matches the device count with no wasted codes. This is the same ceil(log2 .) sizing rule used throughout digital design, whether for register-file addressing, opcode field widths, or control-store next-address fields: the number of bits required to uniquely number N items is always the smallest n such that 2^n >= N. Centralized parallel arbitration like this is fast (one encoder decision per bus request cycle) but needs dedicated request/grant wiring to every device, unlike a daisy-chain scheme which needs only a single shared grant line but resolves priority more slowly, device by device.'
+},
+{
+  id: 'coa-io-p8',
+  pyqStyle: true,
+  q: 'A DMA controller transfers a 1 MB (decimal, 1,000,000 byte) block of data in burst mode over a bus with an effective bandwidth of 200 MB/s (decimal). Assuming the bus can be used at its full rated bandwidth for the entire transfer, how long does the transfer take?',
+  options: ['5 ms', '2 ms', '0.5 ms', '20 ms'],
+  answer: 0,
+  marks: 1,
+  difficulty: 'easy',
+  type: 'pyq-style',
+  explanation: 'In burst-mode DMA, the controller seizes the bus for the entire block transfer without releasing it back to the CPU between individual words, so the CPU is completely stalled but the transfer itself completes as fast as the bus bandwidth allows. Transfer time is simply the total data size divided by the bandwidth: 1,000,000 bytes / (200,000,000 bytes/s) = 0.005 s = 5 ms. Burst mode is the fastest way to move a large contiguous block (compared to cycle stealing, which spreads the same transfer over a longer wall-clock time while sharing the bus with the CPU), which is exactly why it is preferred for large sequential transfers such as disk-to-memory DMA where minimizing total transfer time matters more than keeping the CPU responsive during the transfer.'
+},
+{
+  id: 'coa-io-p9',
+  pyqStyle: true,
+  q: 'A disk rotates at 7200 RPM. What is its average rotational latency (assume it equals half of one full revolution)?',
+  options: [],
+  answer: 4.1667,
+  kind: 'nat',
+  marks: 1,
+  difficulty: 'easy',
+  type: 'pyq-style',
+  explanation: 'One full revolution takes 60,000 ms (i.e. 60 seconds, converted to milliseconds) divided by the RPM: 60,000 / 7200 = 8.333 ms per revolution. Average rotational latency assumes the disk head, on average, must wait for half a revolution before the desired sector arrives under it, so average latency = 8.333 / 2 ≈ 4.1667 ms. This "half of one revolution, on average" assumption is standard across GATE disk-performance questions: in the worst case a full revolution (8.333 ms here) might be needed if the target sector has just passed, and in the best case almost no wait is needed if the sector is about to arrive, so half a revolution is used as the expected (average-case) figure for performance calculations.'
+},
+{
+  id: 'coa-io-p10',
+  pyqStyle: true,
+  q: 'A CPU with a 50 ns clock cycle is serviced by a DMA controller using cycle stealing, which steals exactly 1 CPU cycle for every 8-cycle group during a data transfer. What percentage of CPU cycles are stolen?',
+  options: ['12.5%', '8%', '20%', '87.5%'],
+  answer: 0,
+  marks: 1,
+  difficulty: 'easy',
+  type: 'pyq-style',
+  explanation: 'Out of every group of 8 CPU cycles, the DMA controller takes exactly 1 for its own transfer, so the fraction of cycles stolen is 1/8 = 0.125, i.e. 12.5%. Note that the CPU\'s clock period itself (50 ns here) does not change this percentage at all -- the fraction stolen depends only on the ratio "cycles stolen per group" to "total cycles per group," not on how long each individual cycle lasts. The clock period would only matter if the question instead asked for the absolute TIME lost to stealing (which would be the number of stolen cycles multiplied by 50 ns), rather than the percentage of cycles stolen.'
+},
+{
+  id: 'coa-io-p11',
+  pyqStyle: true,
+  q: 'A disk has a seek time of 8 ms, rotates at 10,000 RPM, and has a transfer rate of 100,000 bytes/ms. What is the total access time to read a single 16,000-byte block, using average rotational latency?',
+  options: ['11.16 ms', '11 ms', '14 ms', '9.16 ms'],
+  answer: 0,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: 'One revolution at 10,000 RPM takes 60,000/10,000 = 6 ms, so the average rotational latency (half a revolution) is 6/2 = 3 ms. The transfer time for a 16,000-byte block at 100,000 bytes/ms is 16,000/100,000 = 0.16 ms. Adding all three components of disk access time: seek (8 ms) + average rotational latency (3 ms) + transfer time (0.16 ms) = 11.16 ms. As in every such problem, seek time and rotational latency together (11 ms of the 11.16 ms total here) dominate over the actual data transfer time (only 0.16 ms), which is why disks are so much more efficient when reads are large and sequential, amortizing the same fixed mechanical delay over far more transferred bytes.'
+},
+{
+  id: 'coa-io-p12',
+  pyqStyle: true,
+  q: 'A real-time system requires that a device interrupt be fully serviced (from the moment the interrupt occurs to the moment the interrupted program resumes) within a hard deadline of 50 microseconds. The interrupt dispatch (recognizing and vectoring to the handler) takes 8 microseconds, saving the CPU context takes 5 microseconds, and restoring the context afterward takes another 5 microseconds. What is the maximum time budget left for the actual ISR body to run, while still meeting the deadline?',
+  options: ['32 microseconds', '37 microseconds', '42 microseconds', '18 microseconds'],
+  answer: 0,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: 'The total 50 microsecond deadline must cover every phase of interrupt handling: dispatch, context save, the ISR body itself, and context restore. Three of these phases are fixed overhead that does no device-specific work: dispatch (8 us) + context save (5 us) + context restore (5 us) = 18 us. Subtracting this fixed overhead from the total deadline leaves the maximum time available for the actual ISR body: 50 - 18 = 32 microseconds. This is the essence of real-time interrupt-latency budgeting: system designers must account for every layer of fixed overhead (vectoring, context save/restore) before knowing how much time is actually left for the device-specific handling code, and if that fixed overhead alone approached or exceeded the deadline, no ISR body, however fast, could ever meet the requirement.'
+},
+{
+  id: 'coa-io-p13',
+  pyqStyle: true,
+  q: 'A system has 16 I/O devices. Under polled (software) interrupt handling, the CPU must check each device\'s status register in a fixed priority order until it finds the one requesting service, at 2 microseconds per check. Under vectored interrupt handling, the requesting device directly supplies its own identifying vector, needing only 1 check-equivalent regardless of device count. What is the worst-case device-identification time for polled interrupt handling (i.e. if the lowest-priority device, checked last, is the one requesting service)?',
+  options: ['32 microseconds', '16 microseconds', '2 microseconds', '30 microseconds'],
+  answer: 0,
+  marks: 1,
+  difficulty: 'easy',
+  type: 'pyq-style',
+  explanation: 'In the worst case for polled interrupt handling, the device actually requesting service is the very last one checked in priority order -- meaning the CPU must first check, and rule out, all 15 higher-priority devices before finally reaching the correct one, for a total of 16 checks (all 16 devices, including the requester itself). At 2 microseconds per check, this gives 16 x 2 = 32 microseconds in the absolute worst case. Vectored interrupts avoid this entire linear search: the device itself supplies an identifying vector (or address) directly to the CPU the moment its interrupt is acknowledged, so device identification takes a small, constant time regardless of how many devices exist or which one requested service -- a major reason vectored interrupts scale much better as device counts grow.'
+},
+{
+  id: 'coa-io-p14',
+  pyqStyle: true,
+  q: 'A CPU must move 5000 words from a device to memory. Under programmed I/O, the CPU busy-waits and spends 4 microseconds per word (checking status and moving the data), fully occupying the CPU throughout. Under DMA with cycle stealing (1 CPU cycle of 100 ns stolen per word), the CPU is otherwise free to run its own program. What is the total CPU time consumed by programmed I/O, and what is the total CPU time consumed (stolen) by the DMA approach, for this whole transfer?',
+  options: [
+    'Programmed I/O: 20,000 microseconds; DMA: 500 microseconds',
+    'Programmed I/O: 5,000 microseconds; DMA: 5,000 microseconds',
+    'Programmed I/O: 20,000 microseconds; DMA: 20,000 microseconds',
+    'Programmed I/O: 500 microseconds; DMA: 20,000 microseconds'
+  ],
+  answer: 0,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: 'Under programmed I/O, the CPU is fully occupied for 4 microseconds per word for the entire transfer, giving 5000 x 4 = 20,000 microseconds of CPU time consumed with no other work possible during that period. Under DMA with cycle stealing, the CPU only loses 1 cycle (100 ns) per word to the DMA controller, and is free to execute its own instructions the rest of the time: total CPU time actually consumed by the DMA transfer is 5000 x 100 ns = 500,000 ns = 500 microseconds. The contrast is stark -- 20,000 microseconds of CPU time under programmed I/O versus only 500 microseconds under DMA, a 40x reduction -- which is exactly the performance argument for using DMA (rather than programmed I/O) whenever bulk data must move between a device and memory: it frees the CPU to do useful work throughout almost all of the transfer.'
+}
+);
+
+window.GATE_DATA.questions['coa'].topics.find(function(t){return t.id==='coa-memory';}).questions.push(
+  {
+    id: 'coa-memory-h1',
+    q: 'A processor has a two-level cache. L1 has a hit time of 2 ns and a local miss rate of 8%. On an L1 miss, L2 is accessed with a hit time (from the point of the L1 miss) of 15 ns and a local miss rate of 25%. On an L2 miss, main memory is accessed, taking 150 ns. What is the average memory access time (AMAT)?',
+    options: ['6.2 ns', '8.45 ns', '4.2 ns', '15.2 ns'],
+    answer: 0,
+    marks: 2,
+    difficulty: 'hard',
+    type: 'numerical',
+    explanation: 'Build the AMAT from the outside in. Main memory is only reached after BOTH an L1 miss and an L2 miss, so its contribution is weighted by the product of the two local miss rates: L2 access cost = L2 hit time + L2 local miss rate x memory time = 15 + 0.25x150 = 15 + 37.5 = 52.5 ns. This 52.5 ns is what L1 "pays" whenever it misses, so the L1-miss contribution to AMAT = L1 local miss rate x 52.5 = 0.08 x 52.5 = 4.2 ns. Finally, every single access, hit or miss, pays the L1 hit time first: AMAT = 2 + 4.2 = 6.2 ns. The two traps here are (1) forgetting the guaranteed L1 hit-time term and reporting just 4.2 ns, and (2) applying the memory penalty using only the L1 miss rate instead of L1-miss-rate times L2-local-miss-rate, which would wrongly inflate the miss cost (e.g. treating L2 as if it always missed straight to memory, giving 2 + 0.08x165 = 15.2 ns). The nested weighting -- each level\'s miss rate applies only to accesses that actually reach it -- is the entire point of "local" miss rates in multilevel caches.'
+  },
+  {
+    id: 'coa-memory-h2',
+    q: 'A single-level, write-back, write-allocate cache has a hit time of 1 ns, a miss rate of 5%, and a miss penalty of 50 ns to fetch the needed block from memory. Whenever a miss forces eviction of a dirty block, an additional 50 ns is required to write that dirty block back to memory before the new block can be fetched. Historical data shows 40% of all misses evict a dirty block. What is the AMAT?',
+    options: ['4.5 ns', '3.5 ns', '6.0 ns', '4.0 ns'],
+    answer: 0,
+    marks: 2,
+    difficulty: 'hard',
+    type: 'numerical',
+    explanation: 'Every access pays the hit time regardless of outcome: 1 ns. On a miss (5% of accesses), the base cost is the 50 ns fetch penalty, but only the fraction of misses that evict a dirty line (40%) also pay the extra 50 ns writeback. So the expected extra cost per miss = 50 + 0.40x50 = 50 + 20 = 70 ns. Weight this by the miss rate: 0.05x70 = 3.5 ns. AMAT = 1 + 3.5 = 4.5 ns. The common errors are: assuming every miss causes a writeback (giving 1 + 0.05x100 = 6.0 ns, double-charging the write-back traffic), or ignoring the write-back entirely and just computing hit time plus fetch penalty (1 + 0.05x50 = 3.5 ns). Both are wrong because the question explicitly gives a dirty-eviction PROBABILITY, not a certainty -- the 40% figure must be applied as an expected-value weighting on top of the miss rate, not treated as always-true or always-false. This mirrors how real write-back caches add variable bus traffic depending on how "dirty" the working set is at eviction time.'
+  },
+  {
+    id: 'coa-memory-h3',
+    q: 'A 4-way set-associative cache has 8 sets and a 32-byte block size, using true LRU replacement, and starts empty. The following sequence of BYTE addresses (decimal) is accessed in order: 0, 32, 64, 96, 128, 4000, 160, 0, 320, 640, 0, 32. How many of these 12 accesses are hits? (Enter your numerical answer.)',
+    options: [],
+    answer: 3,
+    kind: 'nat',
+    marks: 2,
+    difficulty: 'hard',
+    type: 'numerical',
+    explanation: 'First convert every byte address to a block number by dividing by the block size (32): the sequence becomes blocks 0,1,2,3,4,125,5,0,10,20,0,1. Each block maps to set = block mod 8: sets accessed are 0,1,2,3,4,5,5,0,2,4,0,1. Now simulate each set (capacity 4, LRU) separately. Set 0 sees block 0 at positions 1, 8, and 11: the first is a compulsory miss (cache empty), but both later accesses find block 0 still resident (nothing else maps to set 0 in between) -- 2 hits. Set 1 sees block 1 at positions 2 and 12: miss then hit -- 1 hit. Set 2 sees blocks 2 and 10 (positions 3 and 9): two different blocks, both misses, 0 hits. Set 4 sees blocks 4 and 20 (positions 5 and 10): two different blocks, both misses. Set 5 sees blocks 125 and 5 (positions 6 and 7): two different blocks, both misses. Set 3 sees only block 3 once: 1 miss. Total hits = 2 (set 0) + 1 (set 1) = 3, out of 12 accesses, giving 9 misses. The trap is treating the raw byte addresses as block numbers directly -- addresses 0 and 32 look "different" but are actually blocks 0 and 1, an easy but critical division step to skip.'
+  },
+  {
+    id: 'coa-memory-h4',
+    q: 'A system has a 27-bit physical address space (128 MB main memory) and a 4-way set-associative cache of size 256 KB with a 64-byte block size. Each cache line also carries 1 valid bit and 1 dirty bit in addition to its tag. What is the total size of the tag directory (tags plus valid and dirty bits for every line), in KB?',
+    options: ['6.5 KB', '5.5 KB', '7 KB', '13 KB'],
+    answer: 0,
+    marks: 2,
+    difficulty: 'hard',
+    type: 'numerical',
+    explanation: 'Number of cache lines = cache size / block size = 262144 / 64 = 4096. With 4-way associativity, number of sets = 4096 / 4 = 1024, needing index bits = log2(1024) = 10. Block offset bits = log2(64) = 6. Since the physical address is 27 bits, tag bits = 27 - 10 - 6 = 11. Each line therefore stores 11 tag bits plus 1 valid bit plus 1 dirty bit = 13 bits of bookkeeping. Total tag-directory size = 4096 lines x 13 bits = 53248 bits = 6656 bytes = 6.5 KB. The two traps: forgetting the valid/dirty bits and reporting tag-only storage (4096x11 bits = 5.5 KB), and miscounting index bits by using the number of LINES (4096, giving 12 index bits) instead of the number of SETS (1024, giving 10 index bits) when the cache is set-associative rather than direct-mapped -- that slip yields a wrong tag width of 9 bits and an incorrect total. Always derive index bits from the number of sets, never the raw line count, whenever associativity exceeds 1.'
+  },
+  {
+    id: 'coa-memory-h5',
+    q: 'A processor uses a virtually-indexed, physically-tagged (VIPT) cache with a page size of 4 KB and 8-way set associativity, and the block size is 64 bytes. To guarantee that the cache index bits come entirely from the page offset (avoiding any synonym/aliasing problem between virtual and physical addressing), what is the maximum total cache size this design can have?',
+    options: ['32 KB', '4 KB', '8 KB', '64 KB'],
+    answer: 0,
+    marks: 2,
+    difficulty: 'hard',
+    type: 'numerical',
+    explanation: 'In a VIPT cache, indexing happens using the virtual address before translation, but the tag comparison uses the physical address after translation. To avoid the aliasing problem (two different virtual addresses that map to the same physical page landing in different cache sets), every bit used for the SET INDEX must come from bits that are guaranteed identical between the virtual and physical address -- and those are exactly the page-offset bits, since translation only changes the page number, not the offset within a page. With a 4 KB page, there are 12 offset bits available for (index bits + block-offset bits) combined. For one "way" of the cache, size per way = 2^(index bits) x block size, and this must fit within what the page offset can address, i.e. size per way <= page size = 4096 bytes. With 8-way associativity, total cache size = 8 x 4096 = 32768 bytes = 32 KB. The trap is forgetting to multiply by the associativity (giving just 4 KB, the per-way limit) or over-multiplying by an unrelated factor (like doubling for a supposed two-level exemption, giving 64 KB) -- the correct scaling factor is exactly the number of ways, since each way independently gets up to one page-size worth of cache.'
+  },
+  {
+    id: 'coa-memory-h6',
+    q: 'A processor has a TLB with a 96% hit rate and 1 ns access time. On a TLB miss, a page-table walk takes 100 ns, and there is a 0.1% chance (of TLB-miss cases) that this walk also encounters a page fault requiring a disk access of 8 ms to bring the page in. After address translation completes (by whichever path), the cache is accessed: 90% hit rate, 2 ns hit time, and a 60 ns miss penalty on a cache miss. What is the overall average time (in ns) for one memory reference, combining translation and cache access? (Enter your numerical answer; decimals allowed.)',
+    options: [],
+    answer: 332.76,
+    kind: 'nat',
+    marks: 2,
+    difficulty: 'hard',
+    type: 'numerical',
+    explanation: 'Split the problem into translation time and cache-access time, then add them (they happen sequentially: address must be translated before the cache can be probed). Translation time = TLB hit rate x TLB hit time + TLB miss rate x (page-table walk time + page-fault probability x disk time) = 0.96x1 + 0.04x(100 + 0.001x8,000,000) = 0.96 + 0.04x(100+8000) = 0.96 + 0.04x8100 = 0.96 + 324 = 324.96 ns. Note 8 ms was converted to 8,000,000 ns before use -- mixing ms and ns here is the classic units trap. Cache access time (independent of translation outcome) = 0.90x2 + 0.10x60 = 1.8 + 6 = 7.8 ns. Total average memory reference time = 324.96 + 7.8 = 332.76 ns. The page-fault term dominates everything else despite its tiny 0.1% probability, because disk access (8 ms) is roughly five orders of magnitude larger than every other term -- a useful sanity check: whenever a disk or page-fault term appears in an AMAT-style calculation, expect it to swamp the answer even at very low probability, and a "suspiciously small" final answer (under 10 ns here) would signal a units or omission error.'
+  },
+  {
+    id: 'coa-memory-h7',
+    q: 'A two-level cache has L1 hit time 1 ns and local miss rate 20%. For L2, only the GLOBAL miss rate (misses per ALL memory accesses, not per L1-miss) is given as 5%; L2 hit time is 10 ns and main memory access time is 100 ns. What is the AMAT?',
+    options: ['8 ns', '4 ns', '3.2 ns', '9 ns'],
+    answer: 0,
+    marks: 2,
+    difficulty: 'hard',
+    type: 'numerical',
+    explanation: 'The AMAT formula needs L2\'s LOCAL miss rate (misses per access to L2), but the question only gives the GLOBAL L2 miss rate (misses per access to the whole memory system). These are related by: global miss rate = L1 miss rate x L2 local miss rate, so L2 local miss rate = global miss rate / L1 miss rate = 0.05 / 0.20 = 0.25. Now apply the standard nested formula: AMAT = L1 hit time + L1 miss rate x (L2 hit time + L2 local miss rate x memory time) = 1 + 0.20x(10 + 0.25x100) = 1 + 0.20x(10+25) = 1 + 0.20x35 = 1 + 7 = 8 ns. The trap is plugging the GLOBAL miss rate directly into the local-miss-rate slot of the formula, as if it needed no conversion: doing that gives 1 + 0.20x(10+0.05x100) = 1+0.20x15 = 4 ns, a plausible-looking but wrong answer that silently double-counts the L1 miss-rate weighting (once explicitly, and once hidden inside the already-global L2 rate). Recognizing whether a given miss rate is local or global -- and converting between them -- is one of the most frequently tested traps in multilevel cache problems.'
+  },
+  {
+    id: 'coa-memory-h8',
+    q: 'A write-back cache has a 64-byte block size, a 4% miss rate, and 30% of all misses evict a dirty block (requiring a full block write-back in addition to the incoming block fetch). Word size is 4 bytes (irrelevant to this calculation since transfers move whole blocks). Over 1,000,000 total memory references, what is the total data traffic on the memory bus due to block fetches and write-backs combined, in KB? (Enter your numerical answer.)',
+    options: [],
+    answer: 3250,
+    kind: 'nat',
+    marks: 2,
+    difficulty: 'hard',
+    type: 'numerical',
+    explanation: 'Number of misses = 1,000,000 x 0.04 = 40,000. Each miss requires fetching one full 64-byte block regardless of anything else, so fetch traffic = 40,000 x 64 bytes. Additionally, 30% of these 40,000 misses (= 12,000) also evict a dirty block, and each such eviction pushes another full 64-byte block back to memory, adding write-back traffic = 12,000 x 64 bytes. Total bytes transferred = 64 x (40,000 + 12,000) = 64 x 52,000 = 3,328,000 bytes = 3,328,000 / 1024 = 3250 KB exactly. Two things to watch: the word size (4 bytes) is a deliberate distractor -- transfers move in whole BLOCKS on a miss/writeback, not word-by-word, so it plays no role in the byte count; and the write-back count must be taken as a fraction of MISSES (which cause evictions), never as a fraction of all 1,000,000 references, since only a miss can trigger an eviction in the first place. Skipping either check (using word size, or applying 30% to all references) produces a badly inflated or deflated traffic figure.'
+  }
+);
+
+window.GATE_DATA.questions['coa'].topics.find(function(t){return t.id==='coa-pipelining';}).questions.push(
+  {
+    id: 'coa-pipelining-h1',
+    q: 'A 5-stage pipeline (IF, ID, EX, MEM, WB) has full operand forwarding from the EX/MEM and MEM/WB latches into the EX stage, so a register-register result is available to the very next instruction\'s EX with zero stall. A LOAD result, however, is only ready after MEM, so forwarding it to an immediately following instruction\'s EX still costs exactly 1 stall cycle (no stall if separated by one instruction). Given the sequence: I1: LOAD R1,0(R2); I2: ADD R3,R1,R4; I3: SUB R5,R3,R6; I4: OR R7,R5,R8; I5: XOR R9,R1,R10 -- how many cycles are needed to complete all 5 instructions?',
+    options: ['10', '9', '11', '13'],
+    answer: 0,
+    marks: 2,
+    difficulty: 'hard',
+    type: 'numerical',
+    explanation: 'With zero hazards, 5 instructions take k-1+N = 4+5 = 9 cycles. Now check each dependence. I2 uses R1 from the immediately preceding LOAD (I1) -- this is a load-use hazard, forcing exactly 1 stall cycle since forwarding from a load is only available after MEM, one stage later than an ALU result. I3 uses R3 from I2 (the immediately preceding instruction), but I2 is an ALU op, so EX/MEM forwarding delivers it with zero extra stall. I4 uses R5 from I3, again adjacent ALU-to-ALU, zero stall. I5 uses R1 from I1 (LOAD), but I5 is three instructions later -- far more separation than the one instruction needed to clear a load-use hazard -- so zero stall. Total stalls = 1 (only from I1-I2). Total cycles = 9 + 1 = 10. The trap is applying the "1 stall" load-use rule to every dependence in the chain (which would overcount to 13), when in fact only the LOAD-to-immediate-next-use pattern costs a stall under full forwarding; ALU-to-ALU adjacency, even in a long dependent chain, costs nothing.'
+  },
+  {
+    id: 'coa-pipelining-h2',
+    q: 'A pipelined processor has a base CPI of 1. Branches make up 18% of all executed instructions. The branch predictor is 88% accurate (12% of branches are mispredicted), and each misprediction costs a 3-cycle penalty. For a program of 2,000,000 instructions running at a clock period of 2 ns, what is the total execution time, in microseconds? (Enter your numerical answer; decimals allowed.)',
+    options: [],
+    answer: 4259.2,
+    kind: 'nat',
+    marks: 2,
+    difficulty: 'hard',
+    type: 'numerical',
+    explanation: 'First find the effective CPI by adding the expected branch-penalty overhead to the base CPI: extra CPI from mispredictions = (fraction of instructions that are branches) x (misprediction rate) x (penalty) = 0.18 x 0.12 x 3 = 0.0648. Effective CPI = 1 + 0.0648 = 1.0648. Total cycles = instruction count x CPI = 2,000,000 x 1.0648 = 2,129,600 cycles. Total execution time = cycles x clock period = 2,129,600 x 2 ns = 4,259,200 ns. Converting nanoseconds to microseconds (divide by 1000) gives 4259.2 microseconds. The two places this goes wrong: applying the misprediction rate and penalty without first scaling by the branch FREQUENCY (18%), which would badly overstate the CPI as if every instruction were a branch; and forgetting to convert the final nanosecond figure into the requested microsecond units, submitting 4,259,200 as if it matched a microsecond-scaled answer choice. Always confirm which time unit the question asks for as the very last step of one of these compound CPI-to-execution-time chains.'
+  },
+  {
+    id: 'coa-pipelining-h3',
+    q: 'A 5-stage pipeline has non-uniform stage propagation delays (ns): IF = 4, ID = 3, EX = 7, MEM = 6, WB = 3. For a program of 1000 instructions, what is the approximate speedup of the pipelined execution over non-pipelined (sequential) execution, where non-pipelined execution takes the full sum of all stage delays per instruction?',
+    options: ['3.27', '5.75', '2.30', '4.10'],
+    answer: 0,
+    marks: 2,
+    difficulty: 'hard',
+    type: 'numerical',
+    explanation: 'The pipeline clock period must accommodate the SLOWEST stage, since every stage advances in lockstep: cycle time = max(4,3,7,6,3) = 7 ns. Pipelined execution time for N=1000 instructions = (number of stages - 1 + N) x cycle time = (5-1+1000) x 7 = 1004 x 7 = 7028 ns. Non-pipelined execution time per instruction = sum of all stage delays = 4+3+7+6+3 = 23 ns, so for 1000 instructions: 1000 x 23 = 23,000 ns. Speedup = non-pipelined time / pipelined time = 23,000 / 7028 = 3.2726, approximately 3.27. The trap is assuming an idealized speedup of exactly 5 (the number of stages), which only holds when all stages take EQUAL time -- here the 7 ns EX stage dominates the cycle time and is wasted overhead in every other, faster stage, dragging the achievable speedup well below 5. Whenever stage delays are given as unequal (non-round) numbers rather than a single shared value, that is the signal that the cycle time must be the maximum, not an average.'
+  },
+  {
+    id: 'coa-pipelining-h4',
+    q: 'A pipelined CPU has an ideal CPI of 1 at a 1 GHz clock (1 ns cycle time). In the instruction mix, 35% of instructions access the data cache (loads and stores combined); the data cache has a 6% miss rate and a 25-cycle miss penalty. Independently, 15% of instructions are branches that each cause a fixed 1-cycle structural stall regardless of outcome. For a program of 500,000 instructions, what is the total execution time in milliseconds? (Enter your numerical answer; decimals allowed.)',
+    options: [],
+    answer: 0.8375,
+    kind: 'nat',
+    marks: 2,
+    difficulty: 'hard',
+    type: 'numerical',
+    explanation: 'Combine the two independent stall sources on top of the ideal CPI. Memory-stall contribution to CPI = (fraction of instructions touching the cache) x (miss rate) x (miss penalty) = 0.35 x 0.06 x 25 = 0.525. Branch-stall contribution = (fraction of instructions that are branches) x (stall cycles) = 0.15 x 1 = 0.15. These stalls stack additively onto the ideal CPI since they arise from independent causes (memory system vs. control flow): effective CPI = 1 + 0.525 + 0.15 = 1.675. Total cycles = 500,000 x 1.675 = 837,500 cycles. At a 1 ns cycle time, total time = 837,500 ns = 0.8375 ms. The key trap is applying the 6% miss rate and 25-cycle penalty to ALL 500,000 instructions instead of only the 35% that actually touch the data cache -- non-memory instructions (the other 65%) never incur a cache-miss penalty at all, so that 35% weighting is not optional detail, it is the crux of the calculation.'
+  },
+  {
+    id: 'coa-pipelining-h5',
+    q: 'A pipelined CPU runs at 800 MHz with an ideal CPI of 1. One in every 6 instructions is a branch, mispredicted 20% of the time at a 3-cycle penalty each. Independently, 1 in every 10 instructions is a memory operation that suffers an average extra 4 cycles due to bank conflicts. What is the effective MIPS (millions of instructions per second) rating of this processor?',
+    options: ['533.3', '640.0', '480.0', '571.4'],
+    answer: 0,
+    marks: 2,
+    difficulty: 'hard',
+    type: 'numerical',
+    explanation: 'Compute the effective CPI first by adding both independent stall contributions to the ideal CPI of 1. Branch contribution = (1/6) x 0.20 x 3 = 0.1667 x 0.6 = 0.1. Memory bank-conflict contribution = (1/10) x 4 = 0.4. Effective CPI = 1 + 0.1 + 0.4 = 1.5. MIPS rating is defined as clock rate (in MHz) divided by CPI: MIPS = 800 / 1.5 = 533.33. The trap is combining the two stall fractions incorrectly -- for instance, assuming they are mutually exclusive and only applying the larger one, or multiplying instead of adding the two CPI contributions -- when in fact, since the two hazard sources (branch mispredictions and memory bank conflicts) are stated to affect independent, non-overlapping average fractions of the instruction stream, their expected extra-cycle contributions simply add on top of the ideal CPI of 1. Another common slip is forgetting to convert MIPS correctly, e.g. computing 800xCPI instead of 800/CPI, which inverts the relationship between clock speed and achieved instruction throughput.'
+  },
+  {
+    id: 'coa-pipelining-h6',
+    q: 'Repeat the pipeline of coa-pipelining-h1 (same instruction sequence I1-I5, same dependences) but now assume NO forwarding is implemented at all, and register writes happen in the first half of a clock cycle while register reads happen in the second half of the SAME cycle (so a dependent instruction may read a value in the very same cycle the producer writes it back, but no earlier). How many cycles are needed to complete all 5 instructions under this assumption?',
+    options: ['15', '17', '12', '18'],
+    answer: 0,
+    marks: 2,
+    difficulty: 'hard',
+    type: 'numerical',
+    explanation: 'Without forwarding, a dependent instruction\'s ID stage (register read) can happen no earlier than the producing instruction\'s WB stage (register write), and thanks to the write-then-read-same-cycle trick, they may coincide exactly. I1: IF1 ID2 EX3 MEM4 WB5. I2 needs R1, so its ID must be at cycle >= 5 (I1\'s WB); with IF at 2, this forces 2 extra stall cycles in ID (ID occupies cycles 3,4,5), giving I2: EX6 MEM7 WB8. I3 needs R3 from I2 (WB=8): I3 is blocked behind I2 in IF/ID until I2 vacates ID at cycle6, so I3\'s earliest ID is 6, but it must reach 8, forcing 2 more stall cycles: EX9 MEM10 WB11. I4 needs R5 from I3 (WB=11): earliest ID is 9 (right after I3 leaves ID), needs 11, again 2 stalls: EX12 MEM13 WB14. I5 needs R1 from I1 (WB=5, long satisfied by now): earliest ID is 12, well past 5, so zero extra stall: EX13 MEM14 WB15. Total completion = 15 cycles. The pattern -- each ALU-chain dependence without forwarding costs exactly 2 stalls (not 3, thanks to the half-cycle read/write trick, and not 0 as under full forwarding) -- is the crucial trap distinguishing this from both coa-pipelining-h1 (10 cycles, with forwarding) and a naive no-forwarding count that ignores the half-cycle optimization (which would give 3 stalls each, totalling 18).'
+  },
+  {
+    id: 'coa-pipelining-h7',
+    q: 'A processor has an ideal CPI of 1. Branches are 25% of all instructions. The current branch predictor achieves 70% accuracy (30% mispredicted) at a 4-cycle misprediction penalty. A proposed new predictor would raise accuracy to 92% (8% mispredicted) at the same 4-cycle penalty. What speedup (ratio of old execution time to new execution time) would upgrading to the new predictor achieve, considering only this effect?',
+    options: ['1.204', '1.333', '1.111', '1.480'],
+    answer: 0,
+    marks: 2,
+    difficulty: 'hard',
+    type: 'numerical',
+    explanation: 'Compute the effective CPI under each predictor, then take the ratio (since instruction count and clock period are unchanged, CPI ratio equals the execution-time speedup). Old CPI = 1 + (branch fraction) x (old misprediction rate) x (penalty) = 1 + 0.25x0.30x4 = 1 + 0.30 = 1.30. New CPI = 1 + 0.25x0.08x4 = 1 + 0.08 = 1.08. Speedup = old CPI / new CPI = 1.30 / 1.08 = 1.2037, approximately 1.204. The trap is computing the RATIO OF MISPREDICTION RATES (0.30/0.08 = 3.75) and mistaking that for the speedup -- but the misprediction penalty only contributes a fraction of the total CPI (the "1 +" base CPI dominates), so even a large relative improvement in prediction accuracy yields a comparatively modest overall speedup once diluted by the branch frequency and the fact that most cycles are unaffected instructions. This diminishing-returns effect (a special case of Amdahl\'s Law) is exactly why real processors need very high branch-prediction accuracy to see large returns, and why students who skip building the full CPI expression and instead directly compare misprediction rates get a wildly inflated answer.'
+  },
+  {
+    id: 'coa-pipelining-h8',
+    q: 'In a 5-stage pipeline, instruction fetch and data memory access share a single memory port. Every LOAD/STORE instruction (30% of the dynamic instruction mix) causes exactly 1 extra stall cycle from this structural hazard. Independently, 10% of ALL instructions are unconditional jumps that always cost exactly 1 extra stall cycle for control-flow resolution, unrelated to memory access. Assuming these two stall sources never overlap on the same instruction and the ideal CPI is 1, for a 3.2 GHz clock and a program of 4,000,000 instructions, what is the total execution time in milliseconds? (Enter your numerical answer; decimals allowed.)',
+    options: [],
+    answer: 1.75,
+    kind: 'nat',
+    marks: 2,
+    difficulty: 'hard',
+    type: 'numerical',
+    explanation: 'Since the two stall sources are stated to be independent and non-overlapping, their expected extra-CPI contributions simply add to the ideal CPI: effective CPI = 1 + (0.30 x 1) + (0.10 x 1) = 1 + 0.30 + 0.10 = 1.40. Total cycles = 4,000,000 x 1.40 = 5,600,000 cycles. Cycle time at 3.2 GHz = 1 / (3.2x10^9) seconds = 0.3125 ns. Total execution time = 5,600,000 x 0.3125 ns = 1,750,000 ns = 1.75x10^6 ns = 1.75 ms. The trap here is twofold: first, forgetting to convert the clock rate (given in GHz) into a cycle time before multiplying, and instead dividing cycles by the clock rate in GHz directly (which produces a numerically wrong, unit-mismatched result unless carefully tracked); second, assuming the two stall percentages must be combined multiplicatively (as if a stall only happens when BOTH conditions occur simultaneously) rather than additively, since the problem explicitly states these are separate stall-causing categories of instructions that never overlap, so their CPI contributions are simply summed.'
+  }
+);
+
+window.GATE_DATA.questions['coa'].topics.find(function(t){return t.id==='coa-instructions';}).questions.push(
+  {
+    id: 'coa-instructions-h1',
+    q: 'A machine has 14-bit instructions and 8 general-purpose registers. Two-address (register-to-register) instructions use an opcode field followed by two 3-bit register fields. Of the 200 two-address instructions actually defined (50 of these additionally use a 1-bit flag already embedded within their own opcode pattern to mark an alternate rounding mode -- this does not change their count), every remaining unused opcode pattern at this level is expanded into a one-address instruction using one of the two now-freed 3-bit register fields as extra opcode bits. What is the maximum number of one-address instructions obtainable this way?',
+    options: ['448', '512', '224', '896'],
+    answer: 0,
+    marks: 2,
+    difficulty: 'hard',
+    type: 'numerical',
+    explanation: 'Each register field needs 3 bits (8 registers), so a two-address instruction consumes 2x3 = 6 bits for registers, leaving 14-6 = 8 bits for the opcode: 2^8 = 256 total opcode patterns at this level. Of these, 200 are used for two-address instructions (the rounding-mode flag detail is a distractor -- it is already folded into those 200 opcodes and changes nothing), leaving 256-200 = 56 unused patterns. Each unused pattern expands by absorbing ONE of its two now-unneeded 3-bit register fields as additional opcode bits, freeing exactly one 3-bit field to remain as the single address of the new one-address instruction. So each of the 56 unused patterns yields 2^3 = 8 distinct one-address opcodes: 56 x 8 = 448. The trap is either double-subtracting the 50 rounding-mode instructions (as if they were separate from the 200, giving an unused count of 6 instead of 56) or absorbing both freed register fields into the opcode at once (which would leave zero bits for the one address field, an invalid one-address instruction) -- expanding opcodes must always leave exactly the number of address fields the new instruction class actually needs.'
+  },
+  {
+    id: 'coa-instructions-h2',
+    q: 'On a one-address (accumulator) machine with LOAD, STORE, ADD, SUB, MUL and DIV (each arithmetic op computes AC = AC op Memory), what is the minimum number of instructions needed to compute X = (A+B)*(C-D) + E*F, storing the final result in X?',
+    options: ['11', '15', '9', '13'],
+    answer: 0,
+    marks: 2,
+    difficulty: 'hard',
+    type: 'numerical',
+    explanation: 'The optimal sequence avoids storing every intermediate result. Compute (A+B) first and store it, since it will be needed again after the accumulator is overwritten: LOAD A; ADD B; STORE T1 (3 instructions, AC = A+B saved as T1). Now compute (C-D) directly in the accumulator and immediately multiply by the saved T1 without an extra store: LOAD C; SUB D; MUL T1 (3 more instructions, AC = (C-D)x(A+B)). This product must now be preserved before the accumulator is reused for E*F, so store it: STORE T3 (1 instruction, running total 7). Compute E*F fresh: LOAD E; MUL F (2 instructions, AC = E*F, running total 9). Finally combine and store: ADD T3; STORE X (2 instructions, running total 11). Total = 11 instructions. The trap is naively storing EVERY intermediate sub-result (A+B, C-D, and their product) before combining, which produces an inflated but still "valid" count of 15 -- the minimal count exploits that an accumulator machine only needs a STORE when the accumulator is about to be overwritten by an unrelated computation, not after every single arithmetic step.'
+  },
+  {
+    id: 'coa-instructions-h3',
+    q: 'An addressing mode computes the effective address in three steps: first, add the content of index register R (1500) to the instruction\'s displacement field (234) to get address P1; the value stored at memory location P1 is itself the address P2 of another pointer (first indirection); the value stored at location P2 is the final effective address of the operand (second indirection). Given Mem[1734] = 5000 and Mem[5000] = 6789 and Mem[6789] = 999, what value does the instruction ultimately fetch as its operand? (Enter your numerical answer.)',
+    options: [],
+    answer: 999,
+    kind: 'nat',
+    marks: 2,
+    difficulty: 'hard',
+    type: 'numerical',
+    explanation: 'Trace the address chain one hop at a time. Step 1 (indexing): P1 = R + displacement = 1500 + 234 = 1734. Step 2 (first indirection): read the value stored AT address P1 -- Mem[1734] = 5000 -- this 5000 is not the operand, it is the address P2 of the next pointer. Step 3 (second indirection): read the value stored AT address P2 -- Mem[5000] = 6789 -- this is the final effective address, EA = 6789. Step 4 (operand fetch): read the value stored at the effective address -- Mem[6789] = 999. That final value, 999, is the actual operand the instruction uses. The trap is stopping too early -- a student who treats the FIRST memory read (5000) or the second (6789) as the answer has confused an intermediate POINTER value with the final DATA value; in a multi-level indirect chain, every memory value fetched except the very last one is itself just another address, and only the value found at the effective address computed in the final hop is the actual operand.'
+  },
+  {
+    id: 'coa-instructions-h4',
+    q: 'A program has 150 instructions: 40 are three-address (opcode 6 bits + three 5-bit register fields), 70 are two-address (opcode 6 bits + two 5-bit register fields), and 40 are one-address with a 12-bit immediate (opcode 6 bits + one 5-bit register field + 12-bit immediate). Every instruction is independently padded up to the next whole byte boundary before being stored in memory. What is the total size of this program in bytes? (Enter your numerical answer.)',
+    options: [],
+    answer: 380,
+    kind: 'nat',
+    marks: 2,
+    difficulty: 'hard',
+    type: 'numerical',
+    explanation: 'Compute each instruction class\'s raw bit-width, then round UP independently to the next multiple of 8 (byte alignment), since the question states each instruction is padded on its own, not the whole program as a block. Three-address: 6 + 3x5 = 6+15 = 21 bits, rounds up to 24 bits = 3 bytes; for 40 instructions: 40x3 = 120 bytes. Two-address: 6 + 2x5 = 6+10 = 16 bits, which is ALREADY a multiple of 8, so no padding is added: 16 bits = 2 bytes; for 70 instructions: 70x2 = 140 bytes. One-address with immediate: 6 + 5 + 12 = 23 bits, rounds up to 24 bits = 3 bytes; for 40 instructions: 40x3 = 120 bytes. Total program size = 120 + 140 + 120 = 380 bytes. The trap is rounding UP the two-address instructions unnecessarily (16 bits is already byte-aligned, needing zero extra padding) or, conversely, forgetting to round the 21-bit and 23-bit classes up to a full extra byte (using 21/8=2.625 bytes or 23/8=2.875 bytes directly, an impossible fractional byte count) instead of the required ceiling operation.'
+  },
+  {
+    id: 'coa-instructions-h5',
+    q: 'A machine has 12-bit instructions and 4 registers (2-bit register fields), for a 3-address instruction format (opcode + three 2-bit register fields = opcode + 6 bits). If 50 of the possible 3-address opcodes are used, the unused patterns expand (each absorbing one freed 2-bit register field) into 2-address instructions; if 40 of those possible 2-address opcodes are used, the remaining unused patterns similarly expand into 1-address instructions; if 30 of those possible 1-address opcodes are used, the remaining patterns expand into 0-address instructions. What is the maximum number of 0-address instructions that can be defined?',
+    options: ['136', '64', '104', '160'],
+    answer: 0,
+    marks: 2,
+    difficulty: 'hard',
+    type: 'numerical',
+    explanation: 'Work through the cascade one level at a time, using the rule: (opcode patterns available) = (unused patterns from the previous level) x 2^(bits of the field just freed) = (unused) x 2^2 = (unused) x 4, since each register field here is 2 bits. Level 1 (3-address): opcode width = 12 - 3x2 = 6 bits, giving 2^6 = 64 patterns; 50 used, 14 unused. Level 2 (2-address): 14 unused patterns each absorb one freed 2-bit field, giving 14x4 = 56 possible 2-address opcodes; 40 used, 16 unused. Level 3 (1-address): 16 unused patterns each absorb another freed 2-bit field, giving 16x4 = 64 possible 1-address opcodes; 30 used, 34 unused. Level 4 (0-address): the final 34 unused patterns absorb the LAST remaining 2-bit field (there are no more address fields left after this), giving 34x4 = 136 possible 0-address opcodes. The bit budget is self-consistent throughout: 6 (final opcode) + 2+2+2 (the three register fields, each absorbed one level at a time) = 12 bits, matching the instruction width exactly at every level -- a useful check that no bits were invented or lost partway through the cascade.'
+  },
+  {
+    id: 'coa-instructions-h6',
+    q: 'Consider Z = A*B - C*D + E computed with unlimited scratch registers, MOV, ADD, SUB and MUL, where memory operands are allowed directly in any instruction. On a 3-address machine (format OP dst,src1,src2, memory operands allowed, no explicit loads needed) versus a 2-address machine (format OP dst,src, dst = dst op src, memory operands allowed, but a running computation must first be MOVed into a register before being modified), how many MORE instructions does the minimal 2-address sequence need compared to the minimal 3-address sequence?',
+    options: ['2', '3', '1', '4'],
+    answer: 0,
+    marks: 2,
+    difficulty: 'hard',
+    type: 'numerical',
+    explanation: 'On the 3-address machine, each instruction can read two memory operands and write a register directly, so: MUL R1,A,B; MUL R2,C,D; SUB R3,R1,R2; ADD R4,R3,E; STORE Z,R4 -- that is 5 instructions (4 arithmetic ops each combining two operands, plus 1 final store). On the 2-address machine, a computation must first be loaded into a register with MOV before any operation can modify it in place: MOV R1,A; MUL R1,B (R1=A*B); MOV R2,C; MUL R2,D (R2=C*D); SUB R1,R2 (R1=A*B-C*D); ADD R1,E (R1=...+E); MOV Z,R1 -- that is 7 instructions (2 MOVs to seed the two products, 2 MULs, 1 SUB, 1 ADD, 1 final MOV to store). Difference = 7 - 5 = 2 extra instructions for the 2-address version. The trap is forgetting that the 2-address format needs an explicit MOV before EVERY independent product chain (both A*B and C*D each need their own seeding MOV), not just one overall -- students who assume only a single extra MOV is needed will undercount the 2-address total as 6, giving a wrong difference of 1.'
+  },
+  {
+    id: 'coa-instructions-h7',
+    q: 'A CPU has a byte-addressable memory with a 20-bit address bus, and its instruction format is a 6-bit opcode, one 4-bit register field (16 registers), and one memory-operand address field wide enough to directly reference any byte of memory. Each instruction is padded up to the next whole byte before storage. For a program of 512 such instructions, what is the total program size, in KB? (Enter your numerical answer.)',
+    options: [],
+    answer: 2,
+    kind: 'nat',
+    marks: 2,
+    difficulty: 'hard',
+    type: 'numerical',
+    explanation: 'The address field must be wide enough to address every byte in a 20-bit address space, so it needs exactly 20 bits (not fewer, since the memory is byte-addressable and the bus width directly gives the required field size). Raw instruction width = opcode (6) + register field (4) + address field (20) = 30 bits. Since 30 is not a multiple of 8, round up to the next byte boundary: ceil(30/8) = 4 bytes (32 bits, with 2 bits of padding). Total program size = 512 instructions x 4 bytes = 2048 bytes = 2048/1024 = 2 KB exactly. The trap is assuming the address field can be shorter because "not all instructions need the full range" -- the field width is a fixed, worst-case design decision made once for the whole instruction format, not something that shrinks per-instruction; and separately, forgetting the byte-rounding step and using the raw 30 bits directly (giving an invalid 30/8 = 3.75-byte-per-instruction figure) rather than the required 4 bytes after padding.'
+  },
+  {
+    id: 'coa-instructions-h8',
+    q: 'A 0-address (stack) machine has PUSH, POP, ADD, SUB, MUL, DIV, and DUP (duplicates the top-of-stack value, pushing a second copy). What is the minimum number of instructions to evaluate W = (A+B)*(A+B) - C, storing the result in W?',
+    options: ['8', '10', '7', '9'],
+    answer: 0,
+    marks: 2,
+    difficulty: 'hard',
+    type: 'numerical',
+    explanation: 'Since (A+B) is needed twice, DUP lets the machine compute it only once and reuse the value, rather than recomputing it. Sequence: PUSH A (1); PUSH B (2); ADD (3, stack now holds one copy of A+B); DUP (4, stack now holds two copies of A+B); MUL (5, pops both copies and pushes (A+B)^2); PUSH C (6); SUB (7, pops (A+B)^2 and C, pushes (A+B)^2 - C); POP W (8, stores the final result to W). Total = 8 instructions. Without DUP, the machine would be forced to recompute A+B from scratch a second time (PUSH A, PUSH B, ADD again), adding 3 wasted instructions and bringing the total to 10 -- the DUP instruction is precisely what closes that gap. The trap is forgetting DUP is available (since it is not one of the "classic" four arithmetic ops most students default to) and defaulting to the naive recompute-everything strategy, silently inflating the minimal count from 8 to 10 while still producing a numerically correct final result -- the ANSWER value W would be right either way, but the instruction COUNT would not be minimal.'
+  }
+);
+
+window.GATE_DATA.questions['coa'].topics.find(function(t){return t.id==='coa-datapath';}).questions.push(
+  {
+    id: 'coa-datapath-h1',
+    q: 'A control unit has 42 total control signals, partitioned into 6 mutually-exclusive groups of sizes 5, 7, 3, 10, 9 and 8 (only one signal within a group can be active in a given microinstruction). Every microinstruction, horizontal or vertical, also carries an 8-bit next-address field and a 2-bit condition-select field. Under fully-vertical (encoded) control, each group is encoded using ceil(log2(group size + 1)) bits (the "+1" allows for "no signal in this group active"). What is the total width of a vertical microinstruction, in bits? (Enter your numerical answer.)',
+    options: [],
+    answer: 30,
+    kind: 'nat',
+    marks: 2,
+    difficulty: 'hard',
+    type: 'numerical',
+    explanation: 'Encode each group separately, since they are mutually exclusive and therefore independently encodable. Using ceil(log2(n+1)) bits per group of size n: group of 5 needs ceil(log2 6)=3 bits; group of 7 needs ceil(log2 8)=3 bits; group of 3 needs ceil(log2 4)=2 bits; group of 10 needs ceil(log2 11)=4 bits; group of 9 needs ceil(log2 10)=4 bits; group of 8 needs ceil(log2 9)=4 bits. Sum of encoded control-field bits = 3+3+2+4+4+4 = 20 bits. Add the two fields common to every microinstruction regardless of encoding style: the 8-bit next-address field and the 2-bit condition-select field. Total vertical width = 20 + 8 + 2 = 30 bits. The trap is using log2(n) instead of log2(n+1) for each group (undercounting, since that leaves no code point for "nothing in this group fires") -- and forgetting that the "8+2" overhead fields are NOT part of the signal-encoding savings at all; they are fixed overhead present in every microinstruction format, horizontal or vertical alike, and must always be added on top.'
+  },
+  {
+    id: 'coa-datapath-h2',
+    q: 'A multi-cycle datapath takes 4 cycles for R-type, 5 for LOAD, 4 for STORE, 3 for BRANCH, and 3 for JUMP instructions. The dynamic instruction mix is: R-type 40%, LOAD 25%, STORE 15%, BRANCH 15%, JUMP 5%. For a program of 3300 instructions at a 250 MHz clock, what is the total execution time, in microseconds? (Enter your numerical answer; decimals allowed.)',
+    options: [],
+    answer: 53.46,
+    kind: 'nat',
+    marks: 2,
+    difficulty: 'hard',
+    type: 'numerical',
+    explanation: 'First find the average CPI by weighting each instruction type\'s cycle count by its share of the mix: CPI = 0.40x4 + 0.25x5 + 0.15x4 + 0.15x3 + 0.05x3 = 1.6 + 1.25 + 0.6 + 0.45 + 0.15 = 4.05. Total cycles = 3300 x 4.05 = 13,365 cycles. The clock period at 250 MHz is 1/(250x10^6) = 4 ns. Total execution time = 13,365 x 4 ns = 53,460 ns = 53.46 microseconds. The trap is treating the instruction-type cycle counts as if they applied uniformly (e.g. assuming an "average" of 3.8 cycles by simply averaging the five numbers 4,5,4,3,3 without weighting by their actual mix percentages, which gives a wrong CPI of 3.8 instead of the correctly weighted 4.05) -- multi-cycle CPI must always be a mix-weighted average, since the different instruction types occur with very different frequencies, and a fast, common type (like R-type at 40%) should influence the average far more than a slow, rare one.'
+  },
+  {
+    id: 'coa-datapath-h3',
+    q: 'A faulty multi-cycle control unit asserts RegWrite for a LOAD instruction one cycle too early -- in the same cycle as the memory read (MEM) rather than the following cycle (WB) -- causing a bus contention stall of exactly 1 extra cycle every time a LOAD executes. LOAD instructions normally take 5 cycles (becoming 6 with this bug); every other instruction type is unaffected and averages 4 cycles. In a program of 8000 instructions where LOAD is 30% of the mix, what is the total number of execution cycles under this faulty design? (Enter your numerical answer.)',
+    options: [],
+    answer: 36800,
+    kind: 'nat',
+    marks: 2,
+    difficulty: 'hard',
+    type: 'numerical',
+    explanation: 'Split the instruction count by type first. LOAD instructions = 8000 x 0.30 = 2400, and each now takes 5+1 = 6 cycles due to the bug, contributing 2400 x 6 = 14,400 cycles. Non-LOAD instructions = 8000 x 0.70 = 5600, each taking the normal 4 cycles, contributing 5600 x 4 = 22,400 cycles. Total execution cycles = 14,400 + 22,400 = 36,800 cycles. The trap is applying the 1-cycle penalty to ALL 8000 instructions instead of only the 30% that are actually LOADs -- this is exactly the kind of control-signal sequencing bug (a signal asserted one cycle early against a stage it depends on) that shows up in real datapath design reviews, and it only manifests on the specific instruction type whose data isn\'t ready yet in that cycle; STORE, BRANCH, and other instruction types that never assert RegWrite off a memory read are entirely unaffected by this particular bug.'
+  },
+  {
+    id: 'coa-datapath-h4',
+    q: 'Using the horizontal (52-bit) and vertical (30-bit) microinstruction widths derived for the 42-signal control unit of coa-datapath-h1, if the control store must hold 300 microinstructions, what is the difference in total control-store size (horizontal minus vertical), in bytes? (Enter your numerical answer.)',
+    options: [],
+    answer: 825,
+    kind: 'nat',
+    marks: 2,
+    difficulty: 'hard',
+    type: 'numerical',
+    explanation: 'Horizontal width was 42 unencoded signal bits + 8-bit address field + 2-bit condition field = 52 bits; vertical width (from encoding the 6 mutually-exclusive groups) was 20 + 8 + 2 = 30 bits. Total horizontal control-store size = 300 x 52 bits = 15,600 bits = 1950 bytes. Total vertical control-store size = 300 x 30 bits = 9000 bits = 1125 bytes. Difference = 1950 - 1125 = 825 bytes. The trap is comparing the per-microinstruction BIT widths directly (52-30=22) and reporting that as if it were the answer in bytes, or forgetting to convert the bit totals to bytes (dividing by 8) before subtracting, both of which silently skip a required unit conversion step. This scenario captures the classic horizontal-vs-vertical trade-off in microprogrammed control: horizontal control is faster (no decode logic needed at run time) but uses roughly 1.7x more control-store space than the equivalent fully-encoded vertical design here, a cost that compounds directly with the number of microinstructions stored.'
+  },
+  {
+    id: 'coa-datapath-h5',
+    q: 'A multi-cycle datapath\'s clock period must be long enough to accommodate the slowest micro-operation used in any step: memory access + PC update = 22 ns, register-file read = 5 ns, ALU operation = 15 ns, memory access alone = 20 ns, register-file write = 3 ns. For a mix of R-type (4 cycles, 50%), LOAD (5 cycles, 20%), STORE (4 cycles, 10%), BRANCH (3 cycles, 15%) and JUMP (3 cycles, 5%) over 5000 instructions, what is the total execution time, in milliseconds? (Enter your numerical answer; decimals allowed.)',
+    options: [],
+    answer: 0.44,
+    kind: 'nat',
+    marks: 2,
+    difficulty: 'hard',
+    type: 'numerical',
+    explanation: 'First derive the clock period: since every instruction, regardless of type, must complete each of its steps within one fixed clock cycle, the cycle length must accommodate the single SLOWEST micro-operation across the whole design: max(22, 5, 15, 20, 3) = 22 ns. Next find the CPI, weighting cycle counts by mix percentages: CPI = 0.50x4 + 0.20x5 + 0.10x4 + 0.15x3 + 0.05x3 = 2.0+1.0+0.4+0.45+0.15 = 4.0. Total cycles = 5000 x 4.0 = 20,000 cycles. Total execution time = 20,000 x 22 ns = 440,000 ns = 0.44 ms. The trap is picking the WRONG delay to use as the clock period -- for instance using the plain "memory access" figure of 20 ns instead of the combined "memory access + PC update" figure of 22 ns that governs the actual IF step, a subtle 2 ns difference that nonetheless changes every downstream multiplication and shifts the final answer measurably (20,000x20=400,000 ns vs the correct 440,000 ns).'
+  },
+  {
+    id: 'coa-datapath-h6',
+    q: 'A control store holds 600 microinstructions. A horizontal microinstruction needs 35 unencoded signal bits, plus a next-address field wide enough to address any of the 600 microinstructions, plus a fixed 3-bit condition-select field. What is the total microinstruction width, in bits? (Enter your numerical answer.)',
+    options: [],
+    answer: 48,
+    kind: 'nat',
+    marks: 2,
+    difficulty: 'hard',
+    type: 'numerical',
+    explanation: 'The next-address field must be wide enough to uniquely address every one of the 600 microinstructions, so its width is ceil(log2(600)) bits. Since 2^9 = 512 is too small (512 < 600) but 2^10 = 1024 is enough (1024 >= 600), the address field needs 10 bits, not 9. Total microinstruction width = 35 (signal bits) + 10 (address field) + 3 (condition-select) = 48 bits. The trap is using log2(600) rounded to the NEAREST integer rather than rounded UP -- log2(600) is approximately 9.23, and a careless rounding gives 9 bits, but 2^9=512 addressable locations cannot reach microinstruction number 600, so 9 bits is simply insufficient and would leave 88 microinstructions unaddressable. Address-field sizing must always use a ceiling, never a round-to-nearest, because address space is a hard capacity requirement, not an approximation.'
+  },
+  {
+    id: 'coa-datapath-h7',
+    q: 'A shift-add multiplier examines the multiplier\'s bits one at a time over up to 32 cycles. On average, 20 of the 32 bits are 1 (requiring a full add-then-shift cycle costing 6 ns) while the remaining 12 bits are 0 (requiring only a shift, at 2 ns, since the skip-add optimization avoids the add entirely). For 500 multiply instructions in a program, what is the total time spent in the multiplier, in microseconds? (Enter your numerical answer.)',
+    options: [],
+    answer: 72,
+    kind: 'nat',
+    marks: 2,
+    difficulty: 'hard',
+    type: 'numerical',
+    explanation: 'Compute the average time for one multiplication first. The 20 "1" bits each need an add-and-shift cycle at 6 ns: 20 x 6 = 120 ns. The 12 "0" bits each need only a shift cycle at 2 ns: 12 x 2 = 24 ns. Total time for one multiplication = 120 + 24 = 144 ns. For 500 multiply instructions: 500 x 144 ns = 72,000 ns = 72 microseconds. The trap is assuming every one of the 32 cycles costs the same (either always using the slower 6 ns add-cycle cost for all 32 steps, giving a bloated 32x6x500=96,000 ns, or always using the faster 2 ns shift-only cost, giving an unrealistically small 32x2x500=32,000 ns) -- the entire point of a skip-add (Booth-like) optimization is that cycle cost depends on the multiplier BIT VALUE at each step, so the 20/12 split given in the question is not incidental detail, it is the only thing that makes the multiplier faster than a naive fixed-32-cycle design.'
+  },
+  {
+    id: 'coa-datapath-h8',
+    q: 'A multi-cycle datapath has a fixed 25 ns cycle time. The instruction mix is: R-type 45% (3 cycles), LOAD 20% (5 cycles), STORE 15% (4 cycles), BRANCH 15% (3 cycles), JUMP 5% (2 cycles). For 12,000 dynamic instructions, what is the effective MIPS (millions of instructions per second) rating, to two decimal places? (Enter your numerical answer; decimals allowed.)',
+    options: [],
+    answer: 11.43,
+    kind: 'nat',
+    marks: 2,
+    difficulty: 'hard',
+    type: 'numerical',
+    explanation: 'Find the mix-weighted CPI: 0.45x3 + 0.20x5 + 0.15x4 + 0.15x3 + 0.05x2 = 1.35+1.0+0.6+0.45+0.1 = 3.5. Total cycles for 12,000 instructions = 12,000 x 3.5 = 42,000 cycles. Total execution time = 42,000 x 25 ns = 1,050,000 ns = 1.05x10^-3 seconds. MIPS = (instructions executed) / (execution time in seconds) / 10^6 = 12,000 / 0.00105 / 10^6 = 11,428,571.4 / 10^6 = 11.43 MIPS (approximately). The trap is computing MIPS as (clock rate in MHz) / CPI the way it is done for simple pipelines -- here the "clock rate" is not directly given in Hz, only a cycle TIME in nanoseconds, so it must first be converted (1/25ns = 40 MHz) before that shortcut formula (40/3.5 = 11.43 MIPS, which happens to agree, confirming the two approaches are consistent) can be safely used; skipping the explicit time-based derivation and guessing at a clock rate is where errors creep in when only a cycle TIME, not a clock RATE, is given.'
+  }
+);
+
+window.GATE_DATA.questions['coa'].topics.find(function(t){return t.id==='coa-io';}).questions.push(
+  {
+    id: 'coa-io-h1',
+    q: 'A DMA controller transfers data in bursts of 8 words; each burst takes 8 memory cycles for the words plus 2 extra cycles of bus-arbitration overhead per burst. The memory cycle time is 50 ns. The controller must move 80,000 words total. Meanwhile, a CPU task that needs continuous memory access throughout would take 40 ms if run with no DMA contention at all. What percentage slowdown does the CPU task experience due to DMA cycle stealing during this transfer? (Enter your numerical answer, in percent; decimals allowed.)',
+    options: [],
+    answer: 14.29,
+    kind: 'nat',
+    marks: 2,
+    difficulty: 'hard',
+    type: 'numerical',
+    explanation: 'Number of bursts = 80,000 / 8 = 10,000. Each burst costs 8+2 = 10 memory cycles, so total DMA cycles = 10,000 x 10 = 100,000 cycles, taking 100,000 x 50 ns = 5,000,000 ns = 5 ms of memory-bus time. During the CPU task\'s original 40 ms, the total memory cycles available (at 50 ns each) = 40,000,000 ns / 50 ns = 800,000 cycles. The fraction of these cycles stolen by DMA = 100,000 / 800,000 = 0.125 (12.5%). Since the CPU can only make progress during cycles it actually gets, its effective time stretches to 40 / (1-0.125) = 40/0.875 = 45.714 ms. Percentage slowdown = (45.714-40)/40 x 100 = 14.29%. The trap is including the 2 arbitration overhead cycles per burst as if they were "free" (only counting 8 cycles per burst, undercounting total stolen cycles as 80,000 instead of 100,000), and separately, computing the slowdown as simply the fraction stolen (12.5%) rather than correctly applying it through the 1/(1-fraction) scaling that reflects the CPU\'s task taking LONGER, not just losing a proportional slice.'
+  },
+  {
+    id: 'coa-io-h2',
+    q: 'A device needs servicing, on average, once every 2000 microseconds. Under interrupt-driven I/O, servicing this device costs a fixed 12 microseconds of overhead (dispatch plus context save/restore), incurred only once per actual event. Under polling, the CPU checks the device\'s status register every P microseconds, at a cost of 3 microseconds per check, regardless of whether the device needed service. What poll interval P (in microseconds) makes the total polling overhead per 2000-microsecond window exactly equal the interrupt-driven overhead for that same window? (Enter your numerical answer.)',
+    options: [],
+    answer: 500,
+    kind: 'nat',
+    marks: 2,
+    difficulty: 'hard',
+    type: 'numerical',
+    explanation: 'In one 2000-microsecond window, the interrupt-driven approach spends exactly 12 microseconds (one fixed dispatch cost, since the device interrupts only when it actually needs service). Under polling, the number of checks performed in that same window is 2000/P, each costing 3 microseconds, so total polling cost = 3 x (2000/P) = 6000/P microseconds. Setting the two costs equal: 6000/P = 12, so P = 6000/12 = 500 microseconds. At any poll interval SHORTER than 500 microseconds, polling costs MORE than interrupts (more frequent unnecessary checks); at any interval LONGER than 500 microseconds, polling costs less overhead but risks missing rapid successive service requests, or responding late. The trap is treating the device\'s natural service interval (2000 microseconds) as if it were the poll interval itself, or computing the break-even using only a single poll\'s cost against the fixed interrupt cost (3 = 12, an inconsistent one-shot comparison) rather than properly amortizing polling cost over the full window during which exactly one interrupt-driven event would have occurred.'
+  },
+  {
+    id: 'coa-io-h3',
+    q: 'A disk rotates at 7200 RPM, has an average seek time of 6 ms, and 300 sectors per track. A file consists of 10 sectors that are scattered across the disk such that EACH sector requires its own independent seek, rotational latency, and transfer (no sequential locality between them at all). What is the total time to read all 10 sectors, in milliseconds? (Enter your numerical answer; decimals allowed.)',
+    options: [],
+    answer: 101.94,
+    kind: 'nat',
+    marks: 2,
+    difficulty: 'hard',
+    type: 'numerical',
+    explanation: 'One revolution takes 60,000/7200 = 8.333 ms. Average rotational latency (half a revolution, since the desired sector is on average half a rotation away) = 8.333/2 = 4.167 ms. Transfer time for one sector = one revolution time / sectors per track = 8.333/300 = 0.0278 ms. Since these 10 sectors are scattered (each needs its OWN full access), the time per sector = seek + rotational latency + transfer = 6 + 4.167 + 0.0278 = 10.194 ms. Total for 10 sectors = 10 x 10.194 = 101.94 ms. The trap is treating this like a SEQUENTIAL multi-sector read, where only ONE seek and ONE rotational latency would be paid up front, with subsequent sectors only costing their transfer time -- that would give a much smaller total of 6+4.167+(10x0.0278) = 10.44 ms. Here the question explicitly states each sector is scattered and independent, meaning the full seek-plus-rotation cost is paid all over again for every single sector, which is what makes random, fragmented file access so much slower than sequential access on rotating media.'
+  },
+  {
+    id: 'coa-io-h4',
+    q: 'Two DMA channels operate simultaneously on the same memory bus: Channel A transfers at 2x10^6 words/second and Channel B at 1.5x10^6 words/second, each consuming exactly 1 memory cycle per word. The memory cycle time is 100 ns. A CPU task that needs continuous memory access would take 20 ms if run with no DMA contention. With both channels active throughout, what is the CPU task\'s effective (stretched) execution time, in milliseconds? (Enter your numerical answer; decimals allowed.)',
+    options: [],
+    answer: 30.77,
+    kind: 'nat',
+    marks: 2,
+    difficulty: 'hard',
+    type: 'numerical',
+    explanation: 'Memory can perform 1/(100x10^-9) = 10^7 cycles per second. The two DMA channels together consume (2x10^6 + 1.5x10^6) = 3.5x10^6 memory cycles per second. Fraction of memory bandwidth stolen = 3.5x10^6 / 10^7 = 0.35 (35%). The CPU task, which needs continuous memory access, is stretched by the same factor that its available memory cycles are reduced: effective time = original time / (1 - fraction stolen) = 20 / (1-0.35) = 20/0.65 = 30.77 ms. The trap is ADDING the two channels\' individual slowdown factors separately (e.g. computing 20/(1-0.2) for channel A\'s own 20% share and 20/(1-0.15) for channel B\'s 15% share, then combining those results, which is NOT how simultaneous, competing cycle-stealing sources combine) rather than first summing their cycle-stealing RATES into one combined fraction (35%) and applying the 1/(1-fraction) scaling exactly once -- contention for a single shared resource must be aggregated before the slowdown formula is applied, not applied once per contending source.'
+  },
+  {
+    id: 'coa-io-h5',
+    q: 'A disk rotates at 6000 RPM with 200 sectors per track, an average seek time of 7 ms, and a head/track-switch time of 1 ms between consecutive tracks. A program reads 850 SEQUENTIAL sectors starting from a random position on the disk (one initial seek and one initial average rotational latency, then sequential transfer, switching tracks as needed). What is the total time for this read, in milliseconds? (Enter your numerical answer; decimals allowed.)',
+    options: [],
+    answer: 58.5,
+    kind: 'nat',
+    marks: 2,
+    difficulty: 'hard',
+    type: 'numerical',
+    explanation: 'One revolution = 60,000/6000 = 10 ms; average rotational latency = 10/2 = 5 ms; transfer time per sector = 10/200 = 0.05 ms. The 850 sectors span ceil(850/200) = 5 tracks (since 4 tracks hold only 800 sectors, a 5th track is needed for the remaining 50), requiring 5-1 = 4 track switches. Total time = seek + rotational latency + (sectors x transfer-per-sector) + (switches x switch time) = 7 + 5 + (850x0.05) + (4x1) = 7+5+42.5+4 = 58.5 ms. The trap is an off-by-one error in the track-switch count -- using 5 switches (the number of tracks touched) instead of 4 (the number of BOUNDARIES crossed between tracks, always one less than the number of tracks spanned) -- and separately, forgetting the head-switch time term entirely, which would understate the true total by 4 ms; sequential multi-track reads must always account for both the raw per-sector transfer cost AND the discrete switching cost paid only at track boundaries.'
+  },
+  {
+    id: 'coa-io-h6',
+    q: 'A device interrupt triggers an ISR that: (1) spends 5 microseconds on dispatch and context save, (2) then initiates a synchronous DMA burst of 4096 bytes at a transfer rate of 800 MB/s, during which the CPU is blocked waiting for the DMA to finish, and (3) finally spends 3 microseconds restoring context. For 200 such interrupts, what is the total CPU-blocked time across all of them, in microseconds? (Enter your numerical answer; decimals allowed.)',
+    options: [],
+    answer: 2624,
+    kind: 'nat',
+    marks: 2,
+    difficulty: 'hard',
+    type: 'numerical',
+    explanation: 'First find the DMA burst duration: 4096 bytes / (800x10^6 bytes/second) = 5.12x10^-6 seconds = 5.12 microseconds. Total time per interrupt event = dispatch (5) + DMA wait (5.12) + context restore (3) = 13.12 microseconds. For 200 such events: 200 x 13.12 = 2624 microseconds. The trap is treating the DMA transfer as happening "in the background" while the CPU does other useful work (as DMA is often taught to enable), but this question explicitly states the ISR waits SYNCHRONOUSLY for the DMA burst to complete before restoring context -- so unlike the usual cycle-stealing DMA model where the CPU keeps running its own program concurrently, here the entire 5.12 microsecond DMA duration is dead CPU time, fully serialized between the dispatch and restore phases, and must be added directly into the per-event total rather than treated as a background overlap with negligible CPU cost.'
+  },
+  {
+    id: 'coa-io-h7',
+    q: 'A CPU polls a device every 50 microseconds, and each poll (whether or not it finds work) costs 2 microseconds of CPU time. Over a 1-second window, the device actually needs service only 100 times (so only 100 of the polls performed in that second actually find real work; every other poll finds nothing). What percentage of the total 1-second window is spent on UNPRODUCTIVE polling (checks that found nothing)? (Enter your numerical answer, in percent; decimals allowed.)',
+    options: [],
+    answer: 3.98,
+    kind: 'nat',
+    marks: 2,
+    difficulty: 'hard',
+    type: 'numerical',
+    explanation: 'Total number of polls performed in 1 second = 1,000,000 microseconds / 50 microseconds per poll = 20,000 polls. Of these, only 100 actually coincide with a real service need; the remaining 20,000-100 = 19,900 polls find nothing and are pure overhead. Time spent on these unproductive polls = 19,900 x 2 microseconds = 39,800 microseconds. As a fraction of the full 1,000,000-microsecond window: 39,800/1,000,000 x 100 = 3.98%. The trap is including ALL 20,000 polls\' cost (2 microseconds each) as "wasted" (giving an inflated 4.0% almost by coincidence, but for the wrong reason -- treating even the 100 genuinely useful polls as pure waste), rather than correctly subtracting out the small number of polls that were actually productive before computing the wasted percentage; the difference is subtle here because 100 out of 20,000 is a small correction, but the underlying reasoning error -- not distinguishing a productive check from a wasted one -- would produce a badly wrong answer if the service-request rate were higher.'
+  },
+  {
+    id: 'coa-io-h8',
+    q: 'A disk rotates at 5400 RPM with 250 sectors per track, average seek time 9 ms, and a track-switch time of 0.5 ms. A DMA controller reads 500 sequential sectors, and during the actual data-TRANSFER phase only (not during seek or rotational latency), it steals exactly 1 memory cycle of 80 ns per sector transferred from a concurrently running CPU task. If that CPU task independently needs 10 ms of continuous memory access overlapping exactly with the transfer phase, what is its effective (stretched) time during that overlap, in milliseconds? (Enter your numerical answer; decimals allowed.)',
+    options: [],
+    answer: 10.02,
+    kind: 'nat',
+    marks: 2,
+    difficulty: 'hard',
+    type: 'numerical',
+    explanation: 'First find the transfer-phase duration (needed as the time base for cycle-stealing fraction). One revolution = 60,000/5400 = 11.111 ms; transfer time per sector = 11.111/250 = 0.04444 ms. For 500 sectors: transfer phase = 500 x 0.04444 = 22.222 ms (the seek of 9 ms, rotational latency of 5.556 ms, and any track-switch time are irrelevant here since the question asks only about contention DURING the transfer phase). During this phase, DMA steals 500 x 80 ns = 40,000 ns = 0.04 ms of memory cycles. Fraction of the transfer-phase time that memory is unavailable to the CPU = 0.04 / 22.222 = 0.0018 (0.18%). The CPU task\'s 10 ms, overlapping entirely with this window, stretches to 10/(1-0.0018) = 10.018, approximately 10.02 ms. The trap is computing the stolen fraction against the WRONG time base -- using the full disk service time (seek+rotation+transfer = 37.28 ms) instead of just the 22.222 ms transfer phase, since only during actual data transfer does the DMA controller touch memory at all; seek and rotational latency involve no memory-bus activity and contribute zero cycle stealing.'
+  }
+);

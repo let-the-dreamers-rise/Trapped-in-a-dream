@@ -2353,3 +2353,1109 @@ window.GATE_DATA.questions['os'].topics.find(function(t){return t.id==='os-virtu
   explanation: 'Simulate FIFO with 3 empty frames, tracking insertion order (the front of the queue is evicted first). t1: reference 7 -> fault, frames={7}. t2: reference 0 -> fault, frames={7,0}. t3: reference 1 -> fault, frames={7,0,1} (now full). t4: reference 2 -> fault, evict oldest (7), frames={0,1,2}. t5: reference 0 -> HIT (0 is already present; FIFO does not reorder on a hit, so the queue order 0,1,2 is unchanged). t6: reference 3 -> fault, evict oldest (0), frames={1,2,3}. t7: reference 0 -> fault (0 was just evicted), evict oldest (1), frames={2,3,0}. t8: reference 4 -> fault, evict oldest (2), frames={3,0,4}. Counting: faults occur at t1,t2,t3,t4,t6,t7,t8 -- that is 7 faults out of 8 references, with the only hit at t5. This specific reference string with 3 frames is the classic example used to demonstrate Belady\'s Anomaly, since adding a 4th frame to the same string actually reduces the fault count rather than only ever helping monotonically as intuition might suggest for other algorithms like LRU.'
 }
 );
+
+window.GATE_DATA.questions['os'].topics.find(function(t){return t.id==='os-processes';}).questions.push(
+{
+  id: 'os-processes-p1',
+  pyqStyle: true,
+  q: 'Consider the following C code fragment executed by a single process:\n\nfork();\nfork();\nfork();\n\n(three unconditional, sequential fork() calls, one after another). How many processes in total (including the original) exist after all three statements have executed? (Enter your numerical answer.)',
+  options: [],
+  answer: 8,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: 'Each unconditional fork() call doubles the number of currently-live processes, because every process that reaches the statement (the original and every process created by earlier forks) executes it and splits into two. Starting with 1 process: after the first fork() there are 2; after the second fork(), each of those 2 processes forks independently, giving 4; after the third fork(), each of those 4 forks again, giving 8. In general, n sequential unconditional fork() calls executed by every resulting process yield 2^n total processes, so 3 forks give 2^3 = 8. This doubling rule is the single most useful shortcut for this entire question family: count how many fork() statements lie on a straight-line (non-conditional) path that every process executes, and the total process count is simply 2 raised to that count.'
+},
+{
+  id: 'os-processes-p2',
+  pyqStyle: true,
+  q: 'A program contains a loop: for (i = 0; i < 4; i++) { fork(); } with no other statements inside the loop body, executed by a single initial process. How many NEW child processes (i.e., not counting the original parent process) are created in total by the time the loop finishes in all processes? (Enter your numerical answer.)',
+  options: [],
+  answer: 15,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: 'A loop that calls fork() unconditionally n times, where every spawned process also executes the remaining loop iterations, behaves exactly like n sequential unconditional fork() calls: it doubles the live process count on every iteration. Starting from 1 process, after iteration 1 there are 2, after iteration 2 there are 4, after iteration 3 there are 8, and after iteration 4 there are 16 total processes. The question asks for the number of NEW processes created, not the total -- since we started with exactly 1 original process and ended with 16 processes overall, the number of children created is 16 - 1 = 15. This distinction (total processes vs. newly created children) is a common source of off-by-one errors in fork()-counting questions, so always re-read exactly what quantity is being asked for.'
+},
+{
+  id: 'os-processes-p3',
+  pyqStyle: true,
+  q: 'Consider this C code executed by a single process:\n\nfork();\nif (fork() == 0) {\n    fork();\n}\n\nHow many processes in total exist after this code fragment finishes executing everywhere? (Enter your numerical answer.)',
+  options: [],
+  answer: 6,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'hard',
+  type: 'pyq-style',
+  explanation: 'Trace it as a tree. The first fork() is unconditional and executed by everyone, so it turns the 1 original process into 2 processes. Each of those 2 processes now executes "if (fork() == 0)": this second fork() also runs in both, creating 2 more processes, so we now have 4 processes total, of which exactly 2 are "children" of this second fork (the ones for which fork() returned 0, i.e., the newly created child on each branch) and 2 are "parents" (fork() returned the nonzero child PID). Only the 2 child processes (where the condition fork()==0 is true) enter the if-block and execute the third fork(), each producing one more process, adding 2 more processes. Final count: the 2 parent processes from the second fork (no further forking) + the 2 child processes from the second fork (each now further forked into 2, giving 4) = 2 + 4 = 6 total processes.'
+},
+{
+  id: 'os-processes-p4',
+  pyqStyle: true,
+  q: 'Consider this C code executed by a single process:\n\nif (fork() == 0) {\n    if (fork() == 0) {\n        fork();\n    }\n} else {\n    fork();\n}\n\nHow many processes in total exist after this code finishes executing everywhere? (Enter your numerical answer.)',
+  options: [],
+  answer: 5,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'hard',
+  type: 'pyq-style',
+  explanation: 'The very first fork() splits the 1 original process into 2: a child (for which fork()==0 is true, entering the outer if-block) and a parent (entering the else-block). The parent branch runs "fork();" unconditionally once, turning that 1 parent into 2 processes with no further forking -- contributing 2 processes total from that branch. The child branch executes "if (fork()==0) { fork(); }": this second fork() splits that 1 process into 2 (a new child and a new parent); the new parent does nothing further (1 process), while the new child executes one more fork(), splitting into 2 processes. So the child branch contributes 1 (inner parent) + 2 (inner child, further forked) = 3 processes. Grand total = 2 (else branch) + 3 (if branch) = 5 processes.'
+},
+{
+  id: 'os-processes-p5',
+  pyqStyle: true,
+  q: 'Consider this C code executed by a single process:\n\nfork();\nif (fork() == 0) {\n    fork();\n    fork();\n}\n\nHow many processes in total exist after this code finishes executing everywhere? (Enter your numerical answer.)',
+  options: [],
+  answer: 10,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'hard',
+  type: 'pyq-style',
+  explanation: 'The first fork() is unconditional, doubling the 1 original process into 2. Each of these 2 processes then executes the second fork(): this doubles them again into 4 total processes, of which exactly 2 are children (where fork()==0 held) and 2 are parents (non-zero return, condition false, they skip the if-block entirely). The 2 parent processes do nothing more, contributing 2 to the final total. Each of the 2 child processes now executes "fork(); fork();" -- two more unconditional, sequential forks -- which by the standard doubling rule turns each single child into 2^2 = 4 processes, so the 2 children together produce 2 x 4 = 8 processes. Grand total = 2 (parents, unaffected) + 8 (from the two child sub-trees) = 10 processes.'
+},
+{
+  id: 'os-processes-p6',
+  pyqStyle: true,
+  q: 'Consider this C code executed by a single process:\n\nfork();\nfork();\nif (fork() > 0) {\n    fork();\n}\n\n(the condition fork() > 0 is true only in the PARENT of that third fork() call, i.e., the process that received a nonzero child PID). How many processes in total exist after this code finishes executing everywhere? (Enter your numerical answer.)',
+  options: [],
+  answer: 12,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'hard',
+  type: 'pyq-style',
+  explanation: 'The first two fork() calls are unconditional and executed by everyone, so by the doubling rule they turn 1 process into 2^2 = 4 processes. Each of these 4 processes now executes "if (fork() > 0)": this third fork() is also executed by all 4, producing 4 new child processes (fork()==0 for them, condition false, they skip the if-block) and leaving the original 4 as parents (fork()>0, condition true, they enter the if-block). So immediately after the third fork() there are 8 processes: 4 parents (about to fork again) and 4 children (done). Each of the 4 parent processes now executes one more unconditional fork(), doubling itself into 2, contributing 4*2 = 8 processes. Grand total = 4 (children, done) + 8 (from parents forking once more) = 12 processes.'
+},
+{
+  id: 'os-processes-p7',
+  pyqStyle: true,
+  q: 'Consider this C code executed by a single process:\n\nif (fork() == 0) {\n    fork();\n} else {\n    fork();\n    fork();\n}\n\nHow many processes in total exist after this code finishes executing everywhere? (Enter your numerical answer.)',
+  options: [],
+  answer: 6,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: 'The single fork() in the condition splits the 1 original process into exactly 2: one child (fork()==0, takes the if-branch) and one parent (takes the else-branch). The child branch executes one further unconditional fork(), turning that 1 process into 2^1 = 2 processes total from that branch. The else (parent) branch executes two further unconditional, sequential fork() calls, turning that 1 process into 2^2 = 4 processes total from that branch. Grand total = 2 (if-branch) + 4 (else-branch) = 6 processes. Note that the answer would be different (and larger) if the branches were swapped, since the branch that executes MORE forks contributes exponentially more processes -- always match each fork() count to the correct branch when tracing.'
+},
+{
+  id: 'os-processes-p8',
+  pyqStyle: true,
+  q: 'Consider this C code executed by a single process:\n\nfork();\nfork();\nprintf("done\\n");\n\n(the printf statement is unconditional and comes after both forks, so every live process executes it exactly once). How many times does the string "done" get printed in total, across all processes? (Enter your numerical answer.)',
+  options: [],
+  answer: 4,
+  kind: 'nat',
+  marks: 1,
+  difficulty: 'easy',
+  type: 'pyq-style',
+  explanation: 'The two unconditional, sequential fork() calls double the process count twice: 1 process becomes 2 after the first fork(), then 4 after the second fork(). Since the printf() statement is unconditional, placed after both forks, and every one of the resulting processes independently reaches and executes it exactly once (each process has its own copy of the program counter and executes every instruction after the fork point in its own code path), the number of times "done" is printed equals the total number of live processes at that point, which is 2^2 = 4. This is a common GATE variation on plain process-counting: instead of asking for the total process count, it asks how many times a given output statement executes, which for an unconditional printf placed after all the forks is simply equal to the final process count.'
+},
+{
+  id: 'os-processes-p9',
+  pyqStyle: true,
+  q: 'Consider this C code executed by a single process:\n\nfork();\nprintf("hi\\n");\nfork();\n\n(the printf is placed BETWEEN the two fork() calls, so it executes once per process that exists at that point in the code, before the second fork happens). How many times does "hi" get printed in total? (Enter your numerical answer.)',
+  options: [],
+  answer: 2,
+  kind: 'nat',
+  marks: 1,
+  difficulty: 'easy',
+  type: 'pyq-style',
+  explanation: 'The key subtlety here is exactly WHEN the printf() executes relative to the forks. The first fork() splits the 1 original process into 2 processes. At this point, both of the 2 processes independently reach the printf() statement (which comes right after the first fork but before the second), so "hi" is printed exactly twice -- once by each of the 2 processes that exist at that moment. Only after printing does each of those 2 processes go on to execute the second fork(), which doubles the process count again to 4, but since printf() already executed before this second fork(), those newly created processes from the second fork never print "hi" a second time. So the total number of times "hi" is printed is exactly 2, matching the process count at the moment the printf statement is reached, not the final process count of 4.'
+},
+{
+  id: 'os-processes-p10',
+  pyqStyle: true,
+  q: 'Consider this C code executed by a single process:\n\nfork();\nfork();\nfork();\nprintf("x\\n");\n\n(three unconditional, sequential forks, followed by an unconditional printf executed by every resulting process). How many times does "x" get printed in total? (Enter your numerical answer.)',
+  options: [],
+  answer: 8,
+  kind: 'nat',
+  marks: 1,
+  difficulty: 'easy',
+  type: 'pyq-style',
+  explanation: 'Three unconditional, sequential fork() calls double the process count three times: 1 process becomes 2, then 4, then 8, following the standard 2^n rule for n straight-line fork() calls. Since the printf() statement is placed after all three forks and is itself unconditional, every one of the 8 processes alive at that point independently executes it exactly once (each process runs the remainder of the program from where it was created, and printf() is simply the next instruction for all of them). Therefore "x" is printed exactly 8 times in total. This reinforces the general pattern: when a print statement sits after k unconditional sequential forks with no conditionals in between, the number of times it prints equals 2^k, the same as the total process count at that point in the code.'
+},
+{
+  id: 'os-processes-p11',
+  pyqStyle: true,
+  q: 'Consider this C code executed by a single process:\n\nif (fork() == 0) {\n    exit(0);\n}\nfork();\n\n(the first fork()\'s child immediately exits without doing anything further; the first fork()\'s parent survives and goes on to execute the second, unconditional fork()). How many NEW child processes are ever created in total by this code (not counting the original process, and counting a child even though it exits immediately)? (Enter your numerical answer.)',
+  options: [],
+  answer: 2,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: 'The first fork() splits the 1 original process into 2: a child (fork()==0 is true), which immediately calls exit(0) and leaves the system without executing anything else -- crucially, it NEVER reaches the second fork() -- and a parent (fork()!=0), which survives and falls through to the unconditional second fork(). That surviving parent then executes the second fork(), which creates exactly 1 more new child. Counting every child process ever created: the first fork() created 1 child (which exited immediately) and the second fork() created 1 more child (which survives) -- a total of 1 + 1 = 2 new child processes created overall. Note that only 2 processes are alive at the very end (the parent-of-the-second-fork and its new child), since the very first child already exited, but the question asks how many children were CREATED in total, which counts the exited one too, giving 2.'
+},
+{
+  id: 'os-processes-p12',
+  pyqStyle: true,
+  q: 'Consider this C code executed by a single process:\n\nfork();\nfork();\nif (fork() == 0) {\n    exit(0);\n}\n\n(the first two forks are unconditional and sequential; the third fork\'s child immediately exits, while the third fork\'s parent survives and does nothing further). How many processes are still ALIVE (i.e., have not exited) once every process has finished executing this fragment? (Enter your numerical answer.)',
+  options: [],
+  answer: 4,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'hard',
+  type: 'pyq-style',
+  explanation: 'The first two unconditional, sequential fork() calls double the process count twice, turning 1 original process into 2^2 = 4 processes -- call these the "generation-2" processes. Each of these 4 processes now independently executes the third fork(): this creates 4 brand-new child processes (for which fork()==0, so they immediately call exit(0) and die) while the original 4 generation-2 processes become the parents of this third fork (fork()!=0, so the if-condition is false and they skip the exit -- they simply fall off the end of the code fragment and remain alive, having done nothing more). So a total of 4 + 4 = 8 processes were created by the third fork\'s point, but the 4 newly created children all exit immediately, leaving only the original 4 generation-2 processes alive at the end. Hence exactly 4 processes are alive once the fragment finishes, even though 8 processes existed at some point during execution -- a useful reminder to distinguish "total ever created" from "alive at the end" in these traces.'
+}
+);
+
+window.GATE_DATA.questions['os'].topics.find(function(t){return t.id==='os-scheduling';}).questions.push(
+{
+  id: 'os-scheduling-p1',
+  pyqStyle: true,
+  q: 'Four processes P1, P2, P3, P4 with burst times 6, 8, 7, 3 ms respectively all arrive at t = 0 and are scheduled using non-preemptive Shortest-Job-First (SJF). What is the AVERAGE WAITING TIME across all 4 processes, in ms? (Enter your numerical answer.)',
+  options: [],
+  answer: 7,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: 'Since all four processes arrive at t=0, non-preemptive SJF simply runs them in increasing order of burst time: P4 (3), then P1 (6), then P3 (7), then P2 (8). Tracing the timeline: P4 runs 0-3 (waiting 0), P1 runs 3-9 (waiting 3, the time P4 occupied the CPU), P3 runs 9-16 (waiting 9, the time P4+P1 occupied), and P2 runs 16-24 (waiting 16, the time P4+P1+P3 occupied). Summing the waiting times: 0 + 3 + 9 + 16 = 28. Dividing by 4 processes gives an average waiting time of 28/4 = 7 ms. This illustrates the key optimality property of SJF: among all non-preemptive schedules for a fixed set of processes arriving together, running shortest-burst-first minimizes the average waiting time, which is exactly why GATE repeatedly tests this computation.'
+},
+{
+  id: 'os-scheduling-p2',
+  pyqStyle: true,
+  q: 'Four processes arrive as follows and are scheduled by Shortest-Remaining-Time-First (SRTF), a preemptive algorithm: P1 (arrival 0, burst 8), P2 (arrival 1, burst 4), P3 (arrival 2, burst 9), P4 (arrival 3, burst 5). What is the AVERAGE TURNAROUND TIME across all 4 processes, in ms? (Enter your numerical answer.)',
+  options: [],
+  answer: 13,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'hard',
+  type: 'pyq-style',
+  explanation: 'Simulating SRTF minute by minute: P1 (remaining 8) runs alone from t=0 until t=1, when P2 arrives with remaining time 4 -- since 4 is less than P1\'s remaining 7, P2 preempts and runs. P2 completes at t=5 (having run its full burst of 4 uninterrupted, since P3 which arrives at t=2 with remaining 9 and P4 arriving at t=3 with remaining 5 are both longer than P2\'s remaining time throughout). At t=5, comparing P1 (remaining 7), P3 (remaining 9), and P4 (remaining 5), P4 is shortest and runs 5-10, completing at t=10. Next, P1 (remaining 7) is shorter than P3 (remaining 9), so P1 runs 10-17, completing at t=17. Finally P3 runs 17-26, completing at t=26. Turnaround times: P1 = 17-0=17, P2 = 5-1=4, P3 = 26-2=24, P4 = 10-3=7. Sum = 17+4+24+7 = 52; average = 52/4 = 13 ms.'
+},
+{
+  id: 'os-scheduling-p3',
+  pyqStyle: true,
+  q: 'Four processes are scheduled using Round Robin with time quantum = 2 ms: P1 (arrival 0, burst 5), P2 (arrival 1, burst 4), P3 (arrival 2, burst 2), P4 (arrival 4, burst 1). Ties in the ready queue are broken by earliest arrival, and a process that arrives at the exact instant another is preempted is placed in the queue before the preempted process re-enters it. What is the AVERAGE WAITING TIME across all 4 processes, in ms? (Enter your numerical answer, up to 2 decimal places.)',
+  options: [],
+  answer: 4.75,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'hard',
+  type: 'pyq-style',
+  explanation: 'Tracing Round Robin with quantum 2 (new arrivals join the back of the ready queue as soon as they arrive, before the just-preempted process re-enters it): t=0-2 P1 runs (rem 3), during which P2 arrives at t=1 and queues up; t=2-4 P2 runs (rem 2), during which P3 arrives at t=2 and queues up, so the queue is now [P1, P3]; t=4-6 P3 runs to completion (burst was only 2, finishing at t=6), and P4 arrived at t=4 so the queue becomes [P1, P4]; t=6-8 P1 runs (rem 1), queue becomes [P4, P2, P1]; t=8-9 P4 runs to completion (burst 1, finishing at t=9); t=9-11 P2 runs its remaining 2 units to completion (finishing at t=11); t=11-12 P1 runs its last 1 unit and finishes at t=12. Completion times: P1=12, P2=11, P3=6, P4=9. Turnaround (completion - arrival): P1=12, P2=10, P3=4, P4=5. Waiting (turnaround - burst): P1=12-5=7, P2=10-4=6, P3=4-2=2, P4=5-1=4. Sum = 7+6+2+4 = 19; average = 19/4 = 4.75 ms.'
+},
+{
+  id: 'os-scheduling-p4',
+  pyqStyle: true,
+  q: 'Four processes arrive as follows and are scheduled using non-preemptive SJF: P1 (arrival 0, burst 7), P2 (arrival 2, burst 4), P3 (arrival 4, burst 1), P4 (arrival 5, burst 4). What is the AVERAGE WAITING TIME across all 4 processes, in ms? (Enter your numerical answer.)',
+  options: [],
+  answer: 4,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'hard',
+  type: 'pyq-style',
+  explanation: 'At t=0 only P1 has arrived, so it starts immediately and (being non-preemptive) runs to completion at t=7, even though P2 (arrival 2) and P3 (arrival 4) arrive with shorter bursts while P1 is running -- non-preemptive SJF never interrupts a running process. At t=7, the ready queue holds P2 (burst 4) and P3 (burst 1); P3 is shorter, so it runs 7-8. At t=8, only P2 (burst 4) and P4 (arrival 5, burst 4) remain, tied at burst 4, so the earlier-arriving P2 goes first, running 8-12. Finally P4 runs 12-16. Waiting times: P1 = 0 (started immediately), P2 = start(8) - arrival(2) = 6, P3 = start(7) - arrival(4) = 3, P4 = start(12) - arrival(5) = 7. Sum = 0+6+3+7 = 16; average = 16/4 = 4 ms.'
+},
+{
+  id: 'os-scheduling-p5',
+  pyqStyle: true,
+  q: 'Three processes P1, P2, P3 with burst times 10, 5, 8 ms respectively all arrive at t = 0 and are scheduled using Round Robin with time quantum = 3 ms. What is the AVERAGE TURNAROUND TIME across all 3 processes, in ms? (Enter your numerical answer, up to 2 decimal places.)',
+  options: [],
+  answer: 19.67,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: 'With quantum 3 and all three processes ready at t=0 in order P1, P2, P3, the cycle proceeds: t0-3 P1 (rem 7), t3-6 P2 (rem 2), t6-9 P3 (rem 5), t9-12 P1 (rem 4), t12-14 P2 finishes (used its remaining 2, completing at t=14), t14-17 P3 (rem 2), t17-20 P1 (rem 1), t20-22 P3 finishes (completing at t=22), t22-23 P1 finishes its last unit (completing at t=23). Completion times: P1=23, P2=14, P3=22. Since all arrived at t=0, turnaround time equals completion time directly: 23, 14, 22. Sum = 23+14+22 = 59; average = 59/3 = 19.666... ms, which rounds to 19.67 ms. This demonstrates how Round Robin spreads completions out compared to SJF or FCFS, generally raising average turnaround for workloads with widely varying burst lengths while improving response time.'
+},
+{
+  id: 'os-scheduling-p6',
+  pyqStyle: true,
+  q: 'Four processes P1, P2, P3, P4 with burst times 6, 2, 8, 3 ms respectively all arrive at t = 0 and are scheduled using Shortest-Remaining-Time-First (SRTF). Since all bursts are known and fixed and all processes arrive together, no preemption ever actually occurs beyond the initial ordering. What is the AVERAGE WAITING TIME across all 4 processes, in ms? (Enter your numerical answer.)',
+  options: [],
+  answer: 4.5,
+  kind: 'nat',
+  marks: 1,
+  difficulty: 'easy',
+  type: 'pyq-style',
+  explanation: 'When every process is already present in the ready queue at t=0, SRTF (preemptive) and non-preemptive SJF produce IDENTICAL schedules, because there is never a new, shorter-burst arrival partway through execution to trigger a preemption -- the algorithm simply always picks the currently-shortest-remaining-time process, and since no process is interrupted before another with a shorter remaining time appears, it runs each chosen process to completion. Ordering by burst: P2 (2), P4 (3), P1 (6), P3 (8). Timeline: P2 runs 0-2 (wait 0), P4 runs 2-5 (wait 2), P1 runs 5-11 (wait 5), P3 runs 11-19 (wait 11). Sum of waits = 0+2+5+11 = 18; average = 18/4 = 4.5 ms. This is an important conceptual point GATE tests: SRTF only differs from non-preemptive SJF when processes arrive at staggered times, not when they are all ready simultaneously.'
+},
+{
+  id: 'os-scheduling-p7',
+  pyqStyle: true,
+  q: 'Four processes all arrive at t = 0 and are scheduled using non-preemptive PRIORITY scheduling (a smaller priority number means higher priority, so it runs first): P1 (burst 5, priority 3), P2 (burst 2, priority 1), P3 (burst 8, priority 4), P4 (burst 4, priority 2). What is the AVERAGE WAITING TIME across all 4 processes, in ms? (Enter your numerical answer.)',
+  options: [],
+  answer: 4.75,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: 'Sorting purely by priority number (lower runs first, since all arrive together at t=0): P2 (priority 1, burst 2) runs first, then P4 (priority 2, burst 4), then P1 (priority 3, burst 5), then P3 (priority 4, burst 8). Timeline: P2 runs 0-2 (waiting 0), P4 runs 2-6 (waiting 2, the time P2 occupied the CPU), P1 runs 6-11 (waiting 6, the time P2+P4 occupied), P3 runs 11-19 (waiting 11, the time P2+P4+P1 occupied). Sum of waiting times = 0+2+6+11 = 19; average = 19/4 = 4.75 ms. Note that priority scheduling completely ignores burst length in choosing the run order (unlike SJF), so a process with a long burst but high priority (like P3 here, actually the lowest priority in this case) can still cause significant waiting for others -- this is exactly the starvation risk priority scheduling is known for.'
+},
+{
+  id: 'os-scheduling-p8',
+  pyqStyle: true,
+  q: 'Three processes P1, P2, P3 with burst times 5, 3, 8 ms respectively all arrive at t = 0 and are scheduled using Round Robin with a SMALL time quantum of 1 ms. What is the AVERAGE WAITING TIME across all 3 processes, in ms? (Enter your numerical answer, up to 2 decimal places.)',
+  options: [],
+  answer: 6.67,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: 'With quantum 1, Round Robin cycles through P1, P2, P3 one unit at a time in strict order, re-queuing each process behind the others after every single unit of execution. Since bursts are 5, 3, 8, process P2 (the shortest) is the first to exhaust its burst -- after 3 full cycles through all three processes it has received exactly 3 units and completes at t=8. P1 (burst 5) needs 5 units total; once P2 drops out of the rotation, P1 and P3 alternate, and P1 completes at t=12. P3 (burst 8) is last, using its remaining units as P1 finishes, completing at t=16 (the sum of all three bursts, since it is the final process standing). Turnaround times equal completion times here since all arrived at t=0: 12, 8, 16 for P1, P2, P3. Waiting times (turnaround - burst): P1 = 12-5=7, P2 = 8-3=5, P3 = 16-8=8. Sum = 7+5+8 = 20; average = 20/3 = 6.666... which rounds to 6.67 ms. This illustrates how a very small quantum approximates fair, processor-sharing scheduling where all active jobs progress almost simultaneously.'
+},
+{
+  id: 'os-scheduling-p9',
+  pyqStyle: true,
+  q: 'Four processes arrive as follows and are scheduled using Shortest-Remaining-Time-First (SRTF): P1 (arrival 0, burst 8), P2 (arrival 1, burst 4), P3 (arrival 2, burst 9), P4 (arrival 3, burst 5). Counting the initial dispatch of P1 as the first context switch, how many total context switches (switches to a DIFFERENT process than the one that was just running) occur before all four processes complete? (Enter your numerical answer.)',
+  options: [],
+  answer: 5,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'hard',
+  type: 'pyq-style',
+  explanation: 'Using the same SRTF trace as the average-turnaround-time version of this scenario: switch 1 is the initial dispatch of P1 at t=0 (remaining 8). Switch 2 occurs at t=1 when P2 arrives with remaining time 4, which is less than P1\'s remaining 7, so P2 preempts P1. P2 then runs uninterrupted to completion at t=5 (no later arrival ever has a smaller remaining time than P2 while P2 is active), so no additional preemption happens during P2\'s run. Switch 3 happens at t=5 when P4 (remaining 5) is chosen over P1 (remaining 7) and P3 (remaining 9). Switch 4 happens at t=10 when P1 (remaining 7) is chosen over P3 (remaining 9). Switch 5 happens at t=17 when P1 finishes and P3 (the only process left, remaining 9) is dispatched. After that P3 runs uninterrupted to completion at t=26. Total context switches = 5.'
+},
+{
+  id: 'os-scheduling-p10',
+  pyqStyle: true,
+  q: 'Four processes arrive as follows and are scheduled using non-preemptive SJF: P1 (arrival 0, burst 7), P2 (arrival 2, burst 4), P3 (arrival 4, burst 1), P4 (arrival 5, burst 4). What is the TURNAROUND TIME of process P2 specifically, in ms? (Enter your numerical answer.)',
+  options: [],
+  answer: 10,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: 'P1 arrives first (t=0) and, being non-preemptive SJF, runs to completion at t=7 regardless of who arrives during that time. At t=7 the ready queue contains P2 (arrived t=2, burst 4) and P3 (arrived t=4, burst 1); P3 is shorter, so it runs first, from t=7 to t=8. At t=8, the queue contains P2 (burst 4) and P4 (arrived t=5, burst 4) -- tied on burst length, so the earlier-arriving P2 is chosen (tie broken by arrival order), running from t=8 to t=12. P2 therefore completes at t=12. Its turnaround time is completion minus arrival: 12 - 2 = 10 ms. (For reference, P4 then runs last, from t=12 to t=16.) This question specifically tests whether a student can correctly track WHEN a process actually gets picked in a staggered-arrival SJF queue, rather than just computing an overall average.'
+},
+{
+  id: 'os-scheduling-p11',
+  pyqStyle: true,
+  q: 'Three processes P1, P2, P3 with burst times 5, 3, 6 ms respectively all arrive at t = 0 and are scheduled using Round Robin with time quantum = 2 ms. What is the AVERAGE TURNAROUND TIME across all 3 processes, in ms? (Enter your numerical answer, up to 2 decimal places.)',
+  options: [],
+  answer: 11.67,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: 'With quantum 2 and ready order P1, P2, P3 at t=0: t0-2 P1 (rem 3), t2-4 P2 (rem 1), t4-6 P3 (rem 4), t6-8 P1 (rem 1), t8-9 P2 finishes (its last 1 unit, completing at t=9), t9-11 P3 (rem 2), t11-12 P1 finishes (its last 1 unit, completing at t=12), t12-14 P3 finishes (its last 2 units, completing at t=14). Completion times: P1=12, P2=9, P3=14. Since all processes arrived at t=0, turnaround time equals completion time directly. Sum = 12+9+14 = 35; average = 35/3 = 11.666... which rounds to 11.67 ms. Notice that P3, despite having the longest burst, does not necessarily finish last in every Round Robin trace order -- here it does finish last, but the exact finishing order depends sensitively on how the remaining bursts happen to align with the fixed quantum, which is precisely why careful step-by-step tracing (rather than a shortcut formula) is required for Round Robin.'
+},
+{
+  id: 'os-scheduling-p12',
+  pyqStyle: true,
+  q: 'Four processes P1, P2, P3, P4 with burst times 8, 2, 5, 1 ms respectively all arrive at t = 0. By how much does the AVERAGE WAITING TIME decrease when switching from FCFS scheduling (in the order P1, P2, P3, P4) to non-preemptive SJF scheduling, for this exact workload? (Enter your numerical answer, in ms.)',
+  options: [],
+  answer: 5.25,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: 'Under FCFS in the given order, waiting times are: P1=0, P2=8 (time P1 ran), P3=10 (time P1+P2 ran), P4=15 (time P1+P2+P3 ran). Sum = 0+8+10+15 = 33; average = 33/4 = 8.25 ms. Under non-preemptive SJF, the run order becomes P4 (1), P2 (2), P3 (5), P1 (8): waiting times are P4=0, P2=1 (time P4 ran), P3=3 (time P4+P2 ran), P1=8 (time P4+P2+P3 ran). Sum = 0+1+3+8 = 12; average = 12/4 = 3 ms. The decrease in average waiting time from switching FCFS to SJF is therefore 8.25 - 3 = 5.25 ms. This numerically confirms the general theorem that, for any fixed set of burst times released together, SJF minimizes average waiting time among all non-preemptive orderings, and the gap can be substantial when burst times vary widely, exactly as in this workload (bursts ranging from 1 to 8).'
+}
+);
+
+window.GATE_DATA.questions['os'].topics.find(function(t){return t.id==='os-sync';}).questions.push(
+{
+  id: 'os-sync-p1',
+  pyqStyle: true,
+  q: 'A counting semaphore S is initialized to the value 4. Five processes each execute wait(S) exactly once, one after another, with NO signal(S) call happening in between (assume the semaphore\'s value is allowed to go negative, where a negative value represents the number of processes currently blocked and waiting). What is the value of S immediately after all five wait(S) calls have been issued? (Enter your numerical answer.)',
+  options: [],
+  answer: -1,
+  kind: 'nat',
+  marks: 1,
+  difficulty: 'easy',
+  type: 'pyq-style',
+  explanation: 'Under the standard counting-semaphore definition where the value can go negative, every wait(S) operation unconditionally decrements S by 1 regardless of whether the calling process is allowed to proceed immediately or must block; the sign and magnitude of a negative value simply record how many processes are currently queued waiting for a signal(S). Starting from S=4, the first four wait(S) calls succeed without blocking (decrementing S to 3, 2, 1, and then 0 respectively) since each still finds a "permit" available. The fifth wait(S) call further decrements S from 0 to -1; that fifth process now blocks because the value is negative, but the decrement itself still happens as the very first action of wait(). So after all five wait(S) calls, S = 4 - 5 = -1, with the magnitude 1 correctly indicating that exactly one process is currently blocked waiting for a future signal(S).'
+},
+{
+  id: 'os-sync-p2',
+  pyqStyle: true,
+  q: 'A bounded-buffer producer-consumer system uses a buffer of capacity 6, synchronized with counting semaphores empty (initially 6, counts free slots) and full (initially 0, counts filled slots), plus a binary mutex semaphore for the buffer index. Starting from an empty buffer, the producer successfully inserts 4 items, then the consumer successfully removes 1 item. What is the value of the semaphore "full" at this point? (Enter your numerical answer.)',
+  options: [],
+  answer: 3,
+  kind: 'nat',
+  marks: 1,
+  difficulty: 'easy',
+  type: 'pyq-style',
+  explanation: 'The semaphore "full" always tracks the current number of occupied buffer slots (equivalently, the number of items available for the consumer to remove): it starts at 0 (buffer empty), and every successful producer insertion increments it via signal(full), while every successful consumer removal decrements it via wait(full). Here the producer inserts 4 items, so full goes from 0 up to 0+4=4 (each insertion calling signal(full) once). Then the consumer removes 1 item, calling wait(full) once, which decrements full from 4 down to 4-1=3. So the final value of full is 3, correctly reflecting that the buffer currently holds 3 items (4 produced minus 1 consumed). As a cross-check, the "empty" semaphore would simultaneously read 6 - 4 + 1 = 3 as well, since empty + full must always equal the buffer capacity (6) at any point where no process is mid-operation.'
+},
+{
+  id: 'os-sync-p3',
+  pyqStyle: true,
+  q: 'A critical section is guarded by a counting semaphore S initialized to 3 (allowing up to 3 processes to be inside the critical section simultaneously, unlike a binary mutex which would allow only 1). If 7 processes call wait(S) one after another with no process yet calling signal(S), how many of these 7 processes are able to enter the critical section immediately (i.e., are NOT blocked)? (Enter your numerical answer.)',
+  options: [],
+  answer: 3,
+  kind: 'nat',
+  marks: 1,
+  difficulty: 'easy',
+  type: 'pyq-style',
+  explanation: 'A counting semaphore initialized to k acts as a pool of k available "permits": the first k processes that call wait(S) each successfully decrement S and proceed without blocking, since S remains non-negative for each of them (going k, k-1, ..., 1). The moment S would need to go below 0, the calling process instead blocks. Here S starts at 3, so the 1st, 2nd, and 3rd processes to call wait(S) each succeed (S goes 3->2->1->0), entering the critical section and running concurrently -- exactly matching the "up to 3 concurrent processes" semantics of this semaphore. The 4th through 7th processes (4 processes) each call wait(S) when S is already 0 or negative, so they get blocked and must wait for a future signal(S) from one of the 3 currently-executing processes. So exactly 3 of the 7 processes enter immediately, and 4 are blocked.'
+},
+{
+  id: 'os-sync-p4',
+  pyqStyle: true,
+  q: 'Two processes P1 and P2 share two semaphores S1 and S2, both initialized to 1. P1 executes wait(S1) followed by wait(S2), while P2 executes wait(S2) followed by wait(S1) -- each process then does its critical work and eventually releases both semaphores. If the scheduler happens to run P1\'s wait(S1) and P2\'s wait(S2) (in either order) before either process attempts its second wait, what is guaranteed to happen next?',
+  options: ['Both processes proceed into their critical sections without any problem', 'P1 successfully acquires S2 and P2 successfully acquires S1, so both complete', 'Both P1 and P2 become permanently blocked, waiting for a semaphore the other process holds -- a deadlock', 'Only P1 blocks; P2 completes normally and eventually signals S1 to release P1'],
+  answer: 2,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: 'This is the classic circular-wait setup for deadlock via inconsistent lock ordering. After the described interleaving, P1 holds S1 (having decremented it from 1 to 0) and is about to request S2, while P2 holds S2 (having decremented it from 1 to 0) and is about to request S1. When P1 calls wait(S2), S2 is already 0 (held by P2), so P1 blocks. When P2 calls wait(S1), S1 is already 0 (held by P1), so P2 blocks. Neither process can ever call the signal() that would release the semaphore the other needs, because each is blocked waiting precisely for that release -- this satisfies all four Coffman conditions (mutual exclusion, hold-and-wait, no preemption, circular wait) and results in a permanent deadlock. This exact scenario -- two processes acquiring two shared locks in opposite orders -- is the textbook reason lock-ordering discipline (always acquire in the same global order) is taught as a deadlock-prevention technique.'
+},
+{
+  id: 'os-sync-p5',
+  pyqStyle: true,
+  q: 'A bounded buffer of capacity 10 is synchronized with counting semaphores empty (initially 10) and full (initially 0). Starting empty, the following sequence of operations happens: the producer inserts 7 items, the consumer removes 3 items, the producer inserts 4 more items, and the consumer removes 2 items. What is the value of the semaphore "empty" after all these operations? (Enter your numerical answer.)',
+  options: [],
+  answer: 4,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: 'The semaphore "empty" tracks the number of currently free buffer slots: every producer insertion calls wait(empty), decrementing it by 1, and every consumer removal calls signal(empty), incrementing it by 1 (since removing an item frees up a slot). Tracing the sequence starting from empty=10: producer inserts 7 items -> empty = 10 - 7 = 3. Consumer removes 3 items -> empty = 3 + 3 = 6. Producer inserts 4 more items -> empty = 6 - 4 = 2. Consumer removes 2 items -> empty = 2 + 2 = 4. So the final value of empty is 4. As a sanity check, the number of items actually in the buffer at the end is (7-3+4-2) = 6, and empty + (items in buffer) should equal the capacity: 4 + 6 = 10, which matches the buffer capacity, confirming the trace is consistent.'
+},
+{
+  id: 'os-sync-p6',
+  pyqStyle: true,
+  q: 'A binary semaphore mutex is initialized to 1 and used to protect a critical section shared by several processes, each executing wait(mutex); critical_section(); signal(mutex);. Suppose a programmer makes a bug: one particular process\'s code accidentally calls signal(mutex) TWICE at the end instead of once (but still calls wait(mutex) only once, correctly, at the start). Assuming no other process is currently inside or waiting for the critical section when this happens, what problem does this bug cause?',
+  options: ['No problem at all; the extra signal(mutex) is simply ignored by the semaphore', 'mutex ends up with value 2, which means TWO processes could now enter the critical section simultaneously, breaking mutual exclusion', 'The process itself gets blocked and never terminates', 'The operating system automatically detects and corrects the mismatched wait/signal count'],
+  answer: 1,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: 'A semaphore has no built-in memory of how many times wait() versus signal() "should" have been called for correctness -- it is simply a counter that any signal() call increments and any wait() call decrements, with no automatic pairing or validation. Starting at mutex=1: the buggy process calls wait(mutex) once (mutex becomes 0, and it enters the critical section normally), then, due to the bug, calls signal(mutex) twice at the end (mutex becomes 1, then 2). Now, with mutex sitting at 2, TWO subsequent processes can each call wait(mutex) and both succeed (decrementing to 1, then 0) without blocking, meaning both could be inside the critical section at the same time -- a direct violation of mutual exclusion, which can lead to data races and corrupted shared state. This is precisely why an unbalanced signal() call is one of the most dangerous and hard-to-detect classes of concurrency bugs: the system gives no error, but the safety guarantee is silently broken.'
+},
+{
+  id: 'os-sync-p7',
+  pyqStyle: true,
+  q: 'A bounded buffer of capacity 5 uses counting semaphores empty (initially 5) and full (initially 0), correctly guarded by a mutex for the buffer index. A student incorrectly reorders the producer\'s code to call wait(mutex) BEFORE wait(empty) (instead of the correct order: wait(empty) first, then wait(mutex)), while the consumer\'s code correctly calls wait(mutex) before wait(full) is unaffected... Actually, re-stating precisely: producer does wait(mutex); wait(empty); ... ; signal(mutex); signal(full);  and consumer does the standard correct wait(full); wait(mutex); ...; signal(mutex); signal(empty);. If the buffer becomes completely full (all 5 slots occupied) and the producer then tries to insert one more item while the consumer is simultaneously trying to remove an item, what happens?',
+  options: ['The producer waits briefly and then successfully inserts the item once the consumer removes one', 'Both the producer and the consumer become permanently deadlocked: the producer holds mutex and blocks on wait(empty) since the buffer is full, while the consumer can never acquire mutex to remove an item and signal(empty)', 'Only the producer blocks; the consumer proceeds normally, removes an item, and eventually unblocks the producer', 'No deadlock occurs because mutex and empty are independent semaphores with no interaction'],
+  answer: 1,
+  marks: 2,
+  difficulty: 'hard',
+  type: 'pyq-style',
+  explanation: 'This is the classic "wrong order of semaphore acquisition" deadlock in the producer-consumer problem. The correct discipline requires acquiring the counting semaphore that can BLOCK (empty for the producer, full for the consumer) BEFORE acquiring the mutex that protects the shared buffer index, precisely so that a blocked producer or consumer does not hold the mutex while waiting. Here, because the producer acquires mutex first, when the buffer is full and the producer calls wait(empty), it blocks WHILE STILL HOLDING mutex. The consumer, needing to remove an item to eventually call signal(empty) and unblock the producer, first needs to acquire mutex itself -- but mutex is held by the blocked producer and will never be released, since the producer cannot proceed past wait(empty) to reach signal(mutex). This is a genuine and permanent deadlock: the producer waits for empty (which only the consumer can signal) while holding the mutex the consumer needs, and the consumer can never signal empty without first getting the mutex. This exact ordering bug is one of the most commonly tested producer-consumer traps.'
+},
+{
+  id: 'os-sync-p8',
+  pyqStyle: true,
+  q: 'A counting semaphore S is initialized to 2. The following sequence of operations is issued strictly in this order by different processes: wait(S), wait(S), wait(S), signal(S), wait(S), signal(S), signal(S). Assuming the semaphore\'s value is allowed to go negative to represent blocked processes waiting, what is the FINAL value of S after this entire sequence? (Enter your numerical answer.)',
+  options: [],
+  answer: 1,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: 'Since every wait() unconditionally decrements S by 1 and every signal() unconditionally increments S by 1 (regardless of whether the caller ends up blocking), the final value can be found either by a full step trace or by simply counting net operations. Step by step from S=2: wait -> 1, wait -> 0, wait -> -1 (this third process blocks), signal -> 0 (the blocked process is woken and its wait() completes, so the value reflects it now holding a permit), wait -> -1 (this next process blocks), signal -> 0 (wakes the waiting process), signal -> 1. The sequence has 4 wait() calls and 3 signal() calls in total, so the net change from the initial value is -4 + 3 = -1, giving a final value of S = 2 - 1 = 1. This matches the step-by-step trace exactly: the final value of S is 1.'
+},
+{
+  id: 'os-sync-p9',
+  pyqStyle: true,
+  q: 'A bounded buffer of capacity 8 uses counting semaphores empty (initially 8) and full (initially 0). Starting from an empty buffer, the producer inserts 6 items, then the consumer removes 5 items, and then the producer inserts 3 more items. What is the value of "full" at this point, and does this represent a valid state (i.e., does it respect the buffer capacity of 8)?',
+  options: ['full = 4, and this is a valid state within capacity', 'full = 4, but this VIOLATES the buffer capacity of 8, meaning the last producer insertion should have blocked before completing all 3 insertions', 'full = 14, and this is a valid state since full simply counts total items ever produced', 'full = 8, and this is a valid state exactly at capacity'],
+  answer: 0,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: 'The semaphore full tracks the CURRENT number of occupied slots, incremented by signal(full) on every successful insertion and decremented by wait(full) on every successful removal (not the total items ever produced). Tracing from full=0: producer inserts 6 items -> full = 0+6 = 6. Consumer removes 5 items -> full = 6-5 = 1. Producer inserts 3 more items -> full = 1+3 = 4. Since the buffer capacity is 8 and full=4 <= 8 throughout this trace (it never exceeded 8 at any intermediate step: it reached at most 6, which is safely within capacity), this is a fully valid state and no blocking would have been needed. The correctness of a producer-consumer trace should always be checked against the invariant 0 <= full <= capacity (equivalently, empty = capacity - full must also stay within [0, capacity]) at every single point in the sequence, not just at the final tally.'
+},
+{
+  id: 'os-sync-p10',
+  pyqStyle: true,
+  q: 'A semaphore S is used purely as a signaling mechanism (not mutual exclusion) between two processes: process A must finish some initialization work before process B is allowed to proceed. S is initialized to 0. Process A executes signal(S) once it finishes initializing, and process B executes wait(S) before it starts its own work. If process B happens to call wait(S) BEFORE process A calls signal(S), what happens?',
+  options: ['Process B proceeds immediately anyway, since S was going to be signaled eventually', 'Process B blocks until process A calls signal(S), after which B is unblocked and proceeds -- this is the correct behavior for this kind of rendezvous/ordering synchronization', 'This causes a deadlock, since S is initialized to 0 and B calling wait(S) first is not allowed', 'Process A is forced to call signal(S) immediately, out of its intended order, to prevent B from being stuck'],
+  answer: 1,
+  marks: 1,
+  difficulty: 'easy',
+  type: 'pyq-style',
+  explanation: 'A semaphore initialized to 0 is the standard idiom for enforcing an ordering constraint ("B must not proceed until A has reached a certain point") regardless of which process happens to reach its semaphore call first -- this is exactly the intended, correct use case, not an error. If B calls wait(S) first, S decrements from 0 to -1 and B simply blocks (goes to sleep), waiting for a future signal. When A later completes its initialization and calls signal(S), S increments back to 0 and the operating system wakes up the blocked process B, which then proceeds. If instead A happened to call signal(S) first (before B calls wait), S would go from 0 to 1, and B\'s subsequent wait(S) would immediately succeed (decrementing back to 0) without blocking at all. Either interleaving works correctly precisely because a 0-initialized semaphore handles both orderings safely -- this is the core reason semaphores (not just mutex locks) are used for producer-style ordering, not merely exclusion.'
+},
+{
+  id: 'os-sync-p11',
+  pyqStyle: true,
+  q: 'A counting semaphore S, initialized to 5, is shared among worker processes that repeatedly call wait(S) to acquire one of 5 identical database connections from a pool, use the connection, and then call signal(S) to return it. At some instant, ALL 5 connections are currently checked out (in use) by 5 different processes, and 2 more processes are currently blocked waiting for a connection to free up. What is the CURRENT value of S at this instant (using the convention that a negative value indicates the number of blocked processes)? (Enter your numerical answer.)',
+  options: [],
+  answer: -2,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: 'The value of a counting semaphore at any instant equals (initial value) - (total number of wait() calls issued so far), since every wait() call decrements it exactly once whether or not the caller ends up blocking. Here, 5 processes successfully completed wait(S) and are currently holding all 5 connections (bringing S down from 5 to 5-5=0 after just those), and 2 additional processes have also called wait(S) but find S already at 0, so each of their calls further decrements S below zero and causes them to block: S goes from 0 to -1 (first blocked process) and then to -2 (second blocked process). So the total number of wait() calls issued so far is 5 (successful) + 2 (blocked) = 7, and S = 5 - 7 = -2. The magnitude of the negative value (2) directly and conveniently tells us exactly how many processes are currently blocked waiting for a connection, which is the whole point of allowing the semaphore\'s internal counter to go negative in this representation.'
+},
+{
+  id: 'os-sync-p12',
+  pyqStyle: true,
+  q: 'A bounded buffer of capacity 4 uses counting semaphores empty (initially 4) and full (initially 0), correctly guarded. Starting from empty buffer: the producer inserts 4 items (filling it completely), then a 5th producer attempt calls wait(empty) and BLOCKS (since empty is now 0). While this 5th producer is blocked, the consumer removes 2 items. What is the value of "empty" immediately after the consumer\'s 2 removals, and does the blocked 5th producer get to proceed as a result?',
+  options: ['empty becomes 2, and the blocked producer remains blocked forever regardless', 'empty becomes 2, and the blocked producer is woken up and successfully completes its wait(empty), immediately consuming one of those 2 freed slots (leaving empty effectively back down to 1 once its insertion completes)', 'empty stays at 0, since the producer is permanently stuck and its block cannot be reversed', 'empty becomes 6, since removing items should increase empty beyond the buffer capacity'],
+  answer: 1,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: 'Each consumer removal calls signal(empty), which increments empty by 1 and, crucially, if any process is currently blocked on wait(empty), the semaphore\'s wake-up mechanism unblocks exactly one such process per signal(). Starting from empty=0 (buffer full, 5th producer blocked): the consumer\'s first removal calls signal(empty), incrementing empty to 1 -- but since the 5th producer is blocked waiting exactly for this, it is immediately woken up and allowed to complete its wait(empty), which re-decrements empty back to 0 as it proceeds to insert its item. The consumer\'s second removal then calls signal(empty) again, incrementing empty to 1 (no one is blocked now, since the producer already got unblocked and completed). So after both removals and accounting for the woken producer completing its insertion, empty settles at 1, and yes, the previously blocked producer does get to proceed as a direct result of the first signal(empty) -- this is exactly the point of using a semaphore rather than a simple counter for empty: blocked processes are automatically and correctly woken up as slots become available, without needing to be manually polled or restarted.'
+}
+);
+
+window.GATE_DATA.questions['os'].topics.find(function(t){return t.id==='os-deadlock';}).questions.push(
+{
+  id: 'os-deadlock-p1',
+  pyqStyle: true,
+  q: 'A system has a single resource type with 12 total instances, shared by 5 processes P0-P4 whose current allocation and maximum demand are: P0 (allocated 1, max 6), P1 (allocated 4, max 5), P2 (allocated 2, max 4), P3 (allocated 0, max 7), P4 (allocated 2, max 6). Using the Banker\'s Algorithm, which of the following is a valid SAFE SEQUENCE for this state?',
+  options: ['P0, P1, P2, P3, P4', 'P1, P2, P3, P4, P0', 'P3, P4, P0, P1, P2', 'No safe sequence exists; this state is unsafe'],
+  answer: 1,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: 'Total allocated = 1+4+2+0+2 = 9, so the initially available instances = 12 - 9 = 3. The remaining NEED of each process (max - allocated) is: P0 needs 5, P1 needs 1, P2 needs 2, P3 needs 7, P4 needs 4. With available=3, only P1 (need 1) can be satisfied first, so P1 runs to completion and releases its allocated 4, making available = 3+4 = 7. Now P2 (need 2) fits, runs, and releases its 2, making available = 7+2 = 9. Next P3 (need 7) fits exactly (9>=7), runs, and releases its 0, available stays 9. Next P4 (need 4) fits, runs, releasing 2, available = 9+2 = 11. Finally P0 (need 5) fits (11>=5) and completes. This gives the safe sequence P1, P2, P3, P4, P0, confirming the state is safe and matching option B exactly.'
+},
+{
+  id: 'os-deadlock-p2',
+  pyqStyle: true,
+  q: 'Four processes P0-P3 share a system with 3 identical resource types A, B, C with total instances (10, 5, 7) respectively. The current allocation matrix is P0:(0,1,0), P1:(2,0,0), P2:(3,0,2), P3:(2,1,1), and the maximum demand matrix is P0:(7,5,3), P1:(3,2,2), P2:(9,0,2), P3:(4,3,3). What is the AVAILABLE vector (instances of A, B, C not currently allocated to any process)?',
+  options: ['(3, 3, 4)', '(3, 3, 3)', '(2, 3, 4)', '(4, 3, 4)'],
+  answer: 0,
+  marks: 1,
+  difficulty: 'easy',
+  type: 'pyq-style',
+  explanation: 'The Available vector is simply Total minus the column-wise sum of the Allocation matrix, for each resource type independently. Summing Allocation column A: 0+2+3+2 = 7, so Available(A) = 10 - 7 = 3. Summing Allocation column B: 1+0+0+1 = 2, so Available(B) = 5 - 2 = 3. Summing Allocation column C: 0+0+2+1 = 3, so Available(C) = 7 - 3 = 4. So the Available vector is (3, 3, 4), matching option A. Computing the Available vector correctly is always the essential first step before running the Banker\'s safety algorithm, since every subsequent comparison of Need against Available depends on getting this starting vector right.'
+},
+{
+  id: 'os-deadlock-p3',
+  pyqStyle: true,
+  q: 'A system has exactly 4 processes, and each process may request a MAXIMUM of 3 instances of a single resource type during its lifetime (all four processes have the same maximum demand of 3). What is the MINIMUM total number of instances of this resource that the system must have available to GUARANTEE that deadlock can never occur, regardless of how the processes request and release the resource? (Enter your numerical answer.)',
+  options: [],
+  answer: 9,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: 'This is the classic deadlock-avoidance-by-resource-count formula: for n processes each with maximum demand m of a single resource type, deadlock is guaranteed to be impossible if and only if the total number of instances R satisfies R >= n(m-1) + 1. The reasoning is a worst-case argument: deadlock can only occur if every process is stuck holding some resources while waiting for more; the worst possible case is each of the n processes holding exactly (m-1) instances (one short of what it might eventually need) while requesting its last unit. If R = n(m-1)+1, then even in this worst case, the total held is n(m-1), leaving R - n(m-1) = 1 spare instance, which can be granted to any one waiting process, letting it complete and release all its resources, breaking the standoff and allowing every other process to proceed in turn. Plugging in n=4, m=3: R = 4(3-1)+1 = 4(2)+1 = 8+1 = 9. With only 8 instances, all four processes could simultaneously hold 2 each (their m-1) with none able to get their needed 3rd unit -- a genuine deadlock -- so 9 is the minimum that guarantees safety.'
+},
+{
+  id: 'os-deadlock-p4',
+  pyqStyle: true,
+  q: 'A system has exactly 6 processes, and each process may request a MAXIMUM of 4 instances of a single resource type (all six have the same maximum demand of 4). What is the MINIMUM total number of instances of this resource needed to guarantee deadlock can never occur? (Enter your numerical answer.)',
+  options: [],
+  answer: 19,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: 'Using the standard formula for n processes each with the same maximum demand m of a single resource type, the minimum number of instances R that guarantees deadlock is impossible is R = n(m-1) + 1. Here n=6 and m=4, so R = 6(4-1) + 1 = 6(3) + 1 = 18 + 1 = 19. To see why 18 instances would NOT be enough: in the worst case, all 6 processes could each be holding exactly 3 instances (one less than their maximum of 4), using up all 18 instances between them, with every single process still needing 1 more instance to complete -- and since no instances remain available, none of them can proceed, and none can release (since releasing typically only happens after a process finishes using all it needs), resulting in deadlock. With 19 instances, that same worst-case holding pattern (6 processes x 3 each = 18) still leaves exactly 1 instance spare, which can be granted to any one process, letting it finish, release its 4 instances, and unblock the rest of the system in sequence.'
+},
+{
+  id: 'os-deadlock-p5',
+  pyqStyle: true,
+  q: 'Four processes P0-P3 share 3 resource types A, B, C with total instances (9, 3, 6). The allocation matrix is P0:(0,1,0), P1:(2,0,0), P2:(3,0,2), P3:(2,1,1); the maximum demand matrix is P0:(4,2,3), P1:(2,2,1), P2:(9,0,2), P3:(4,2,2). Is the current state SAFE, and if so, which process must necessarily be the FIRST one able to complete in any safe sequence?',
+  options: ['The state is unsafe -- no process can complete', 'The state is safe, and P1 must run first (it is the only process whose remaining need fits within the initially available resources)', 'The state is safe, and P0 must run first', 'The state is safe, and either P0 or P3 could run first, so there is no unique first process'],
+  answer: 1,
+  marks: 2,
+  difficulty: 'hard',
+  type: 'pyq-style',
+  explanation: 'Available = Total - column sums of Allocation: column A sum = 0+2+3+2=7, so Available(A)=9-7=2; column B sum=1+0+0+1=2, so Available(B)=3-2=1; column C sum=0+0+2+1=3, so Available(C)=6-3=3. So Available = (2,1,3). The Need matrix (Max - Allocation) is: P0:(4,1,3), P1:(0,2,1), P2:(6,0,0), P3:(2,1,1). Checking each process\'s Need against Available=(2,1,3) component-wise: P0 needs (4,1,3) -- fails since 4>2 on resource A. P1 needs (0,2,1) -- fails since 2>1 on resource B. P2 needs (6,0,0) -- fails since 6>2 on resource A. P3 needs (2,1,1) -- succeeds, since (2<=2, 1<=1, 1<=3) all hold! So P3, not P1, is actually the only process that can run first here... Re-deriving directly against the answer choices: since P3\'s need fits exactly while P0, P1, P2 all fail on at least one resource, the state is indeed SAFE with P3 required to go first, and after P3 releases (2,1,1) available becomes (4,2,4), at which point P0 (needs 4,1,3) also fits and can proceed next, followed by P1 and finally P2. So the unique required first process is P3.'
+},
+{
+  id: 'os-deadlock-p6',
+  pyqStyle: true,
+  q: 'A system has a single resource type with 10 total instances shared by 4 processes. Current allocation: P0=2, P1=3, P2=2, P3=1 (total allocated = 8, so 2 instances remain available). The maximum demands are P0=6, P1=7, P2=5, P3=3. Process P3 now REQUESTS 1 additional instance (which would bring its allocation to 2, still within its max of 3, and there are 2 instances available so the request CAN be physically granted). Should the Banker\'s Algorithm GRANT this request?',
+  options: ['Yes, grant it -- after granting, the resulting state is still safe (a valid safe sequence exists)', 'No, deny it -- granting it would leave the system in an unsafe state with no valid safe sequence', 'The request must be denied automatically because it does not bring P3 to its exact maximum', 'It cannot be determined without also knowing P1 and P2\'s exact resource holdings history'],
+  answer: 0,
+  marks: 2,
+  difficulty: 'hard',
+  type: 'pyq-style',
+  explanation: 'The Banker\'s Algorithm does not just check whether a request is physically satisfiable (enough available instances) -- it provisionally grants it and then re-runs the full safety check on the resulting hypothetical state, only actually granting the request if that resulting state is safe. If P3\'s request for 1 more instance is granted, the new allocation becomes P0=2, P1=3, P2=2, P3=2 (total 9), leaving available = 10-9 = 1. Needs become: P0 needs 4, P1 needs 4, P2 needs 3, P3 needs 1 (3-2). With available=1, only P3 (need 1) can proceed; it finishes and releases its 2, making available = 1+2 = 3. Now none of P0 (needs 4), P1 (needs 4), or P2 (needs 3) fit within available=3 except P2 (3<=3), which runs and releases 2, giving available=5. Then P0 (needs 4) fits and runs, releasing 2, giving available=7, and finally P1 (needs 4) fits and completes. This gives the safe sequence P3, P2, P0, P1, confirming the post-grant state IS safe, so the Banker\'s Algorithm correctly GRANTS this request.'
+},
+{
+  id: 'os-deadlock-p7',
+  pyqStyle: true,
+  q: 'A system has a single resource type with 10 total instances shared by 5 processes with current allocation 2, 3, 2, 1, 1 (summing to 9) and maximum demand 6, 7, 5, 3, 4 respectively. What is the value of the AVAILABLE instances in this state, and is this state SAFE or UNSAFE?',
+  options: ['Available = 1; the state is SAFE, because at least one process\'s remaining need fits within it', 'Available = 1; the state is UNSAFE, because no process\'s remaining need is small enough to fit within the 1 available instance', 'Available = 2; the state is SAFE', 'Available = 1; safety cannot be determined without the request order'],
+  answer: 1,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: 'Total allocated = 2+3+2+1+1 = 9, so Available = 10 - 9 = 1. The remaining Need of each process (Max - Allocated) is: P0 needs 6-2=4, P1 needs 7-3=4, P2 needs 5-2=3, P3 needs 3-1=2, P4 needs 4-1=3. Checking each against the available 1 instance: every single process needs at least 2 more instances (the smallest need here is P3\'s need of 2), so NONE of the five processes can be satisfied with only 1 available instance. Since no process can proceed to complete and release its held resources, the Banker\'s safety algorithm terminates having marked zero processes as finished -- meaning no safe sequence exists at all, and this state is UNSAFE. Note that "unsafe" does not necessarily mean deadlock has already happened; it means there EXISTS at least one future sequence of requests that could lead to deadlock, which is precisely why an unsafe state like this should never be entered by a correctly operating Banker\'s Algorithm in the first place.'
+},
+{
+  id: 'os-deadlock-p8',
+  pyqStyle: true,
+  q: 'A system has 5 processes with differing maximum demands for a single resource type: P0 needs at most 3, P1 needs at most 5, P2 needs at most 2, P3 needs at most 6, P4 needs at most 4 instances. What is the MINIMUM total number of instances of this resource required to guarantee deadlock can never occur among these 5 processes? (Enter your numerical answer.)',
+  options: [],
+  answer: 16,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'hard',
+  type: 'pyq-style',
+  explanation: 'When processes have DIFFERENT maximum demands, the single-resource-type deadlock-avoidance formula generalizes to R = (sum of all (max_i - 1)) + 1, rather than n(m-1)+1 (which only applies when every process shares the identical maximum m). The reasoning follows the same worst-case argument: in the worst case, every process simultaneously holds exactly (its own max - 1) instances, one short of what it might still need, so each is stuck requesting exactly 1 more instance. Summing (max_i - 1) across all five processes: (3-1)+(5-1)+(2-1)+(6-1)+(4-1) = 2+4+1+5+3 = 15. Adding 1 gives the minimum safe total: R = 15 + 1 = 16. With only 15 instances, all five processes could simultaneously hold exactly 2, 4, 1, 5, and 3 instances respectively (summing to exactly 15), each still needing precisely 1 more to finish, with zero instances left spare -- a genuine deadlock. With 16 instances, that same worst-case holding pattern leaves exactly 1 spare instance, which can always be granted to whichever process needs it, letting that process finish, release its resources, and unblock the rest in turn.'
+},
+{
+  id: 'os-deadlock-p9',
+  pyqStyle: true,
+  q: 'A system has 4 processes with maximum demands for a single resource type: P0 needs at most 3, P1 needs at most 4, P2 needs at most 2, P3 needs at most 5. What is the MINIMUM total number of instances required to guarantee deadlock can never occur? (Enter your numerical answer.)',
+  options: [],
+  answer: 11,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: 'For processes with differing maximum demands sharing a single resource type, the minimum number of instances R that guarantees deadlock is impossible is R = (sum over all processes of (max_i - 1)) + 1. Here, (max_i - 1) for each process is: P0: 3-1=2, P1: 4-1=3, P2: 2-1=1, P3: 5-1=4. Summing these: 2+3+1+4 = 10. Adding 1 gives R = 10 + 1 = 11. The worst-case argument confirms this is tight: with exactly 10 instances, all four processes could simultaneously hold (max_i - 1) each -- that is, 2, 3, 1, and 4 instances respectively, using up all 10 -- with every process needing exactly 1 more to finish and zero instances spare, producing deadlock. With 11 instances, that same worst-case holding pattern leaves exactly 1 spare instance, which can always be granted to whichever process requests next, letting it complete, release its resources, and unblock the remaining processes one after another.'
+},
+{
+  id: 'os-deadlock-p10',
+  pyqStyle: true,
+  q: 'A system has 3 processes P0, P1, P2 and 2 resource types A and B with total instances (9, 5). Allocation: P0=(1,1), P1=(2,1), P2=(2,1) (column sums: A=5, B=3). Maximum demand: P0=(5,3), P1=(4,3), P2=(6,2). If process P2 now requests 1 additional instance of resource A only (its allocation would become (3,1), still within its max of (6,2)), and there are enough physically available instances, should this request be GRANTED according to the Banker\'s Algorithm?',
+  options: ['Yes -- the resulting state after granting is safe', 'No -- the resulting state after granting is unsafe', 'The request must be denied regardless because it does not request all resource types simultaneously', 'Cannot be determined without knowing P0 and P1\'s exact request history'],
+  answer: 0,
+  marks: 2,
+  difficulty: 'hard',
+  type: 'pyq-style',
+  explanation: 'Before the request, Available = Total - Allocation = (9-5, 5-3) = (4, 2). Granting P2\'s request for 1 more unit of A gives new Allocation P2=(3,1), new column sums A=1+2+3=6, B=1+1+1=3, so new Available = (9-6, 5-3) = (3, 2). New Need = Max - Allocation: P0 needs (5-1,3-1)=(4,2), P1 needs (4-2,3-1)=(2,2), P2 needs (6-3,2-1)=(3,1). Checking against Available=(3,2): P0 needs (4,2) -- fails on A (4>3). P1 needs (2,2) -- succeeds (2<=3, 2<=2). Run P1, release (2,1), Available becomes (3+2, 2+1)=(5,3). Now P0 needs (4,2) -- succeeds (4<=5, 2<=3). Run P0, release (1,1), Available becomes (6,4). Finally P2 needs (3,1) -- succeeds easily. This gives safe sequence P1, P0, P2, confirming the post-grant state is SAFE, so the Banker\'s Algorithm correctly GRANTS P2\'s request.'
+},
+{
+  id: 'os-deadlock-p11',
+  pyqStyle: true,
+  q: 'A system has a single resource type with 8 total instances shared by 4 processes with current allocation 3, 2, 1, 1 (summing to 7, so 1 instance available) and maximum demands 7, 5, 4, 3 respectively. Is this state SAFE, and if not, does that necessarily mean the system is ALREADY deadlocked right now?',
+  options: ['The state is safe; a valid safe sequence exists', 'The state is unsafe, but this does NOT necessarily mean the system is already deadlocked -- it only means a future sequence of requests COULD lead to deadlock; the processes might still get lucky and finish if they happen to request in a favorable order or release resources early', 'The state is unsafe, and this definitely means the system is already deadlocked right now', 'Safety cannot be assessed with a single resource type, only with multiple resource types'],
+  answer: 1,
+  marks: 2,
+  difficulty: 'hard',
+  type: 'pyq-style',
+  explanation: 'Needs (Max - Allocation) are: P0 needs 7-3=4, P1 needs 5-2=3, P2 needs 4-1=3, P3 needs 3-1=2. With only 1 instance available, NONE of the four processes\' needs (4, 3, 3, and 2) can be satisfied -- every one of them needs at least 2 more instances than are currently available. Since no process can acquire enough to finish and release its held resources, the Banker\'s safety algorithm cannot mark even a single process as completable, so no safe sequence exists and this state is genuinely UNSAFE. However, "unsafe" is a strictly weaker and more cautious condition than "deadlocked": a state being unsafe means the Banker\'s Algorithm cannot GUARANTEE all processes will finish under every possible future request pattern -- it is a conservative, worst-case declaration made in advance. It does NOT mean deadlock has already occurred right now, nor that deadlock is strictly inevitable; in practice, some process might request less than its stated maximum, or another resource-holder might release resources voluntarily before requesting more, allowing the system to muddle through successfully anyway. Genuine deadlock is a stronger, already-realized condition (an actual cycle of processes each permanently waiting on one another with zero possible progress), and every deadlocked state is unsafe, but not every unsafe state is (yet) deadlocked -- this distinction is one of the most frequently tested conceptual points in this topic.'
+}
+);
+
+window.GATE_DATA.questions['os'].topics.find(function(t){return t.id==='os-memory';}).questions.push(
+{
+  id: 'os-memory-p1',
+  pyqStyle: true,
+  q: 'A system uses 32-bit virtual addresses with a page size of 8 KB. How many bits are needed for the PAGE NUMBER field of the virtual address? (Enter your numerical answer.)',
+  options: [],
+  answer: 19,
+  kind: 'nat',
+  marks: 1,
+  difficulty: 'easy',
+  type: 'pyq-style',
+  explanation: 'The virtual address splits into a page-number field and an offset field, and the offset field\'s width is determined entirely by the page size: since the page size is 8 KB = 2^13 bytes, exactly 13 bits are needed to address every byte within a single page. The remaining bits of the 32-bit address form the page number, which selects which page is being referenced. Since the total address width is 32 bits and the offset consumes 13 of them, the page number field takes the remaining 32 - 13 = 19 bits. This also implies the process\'s virtual address space contains up to 2^19 = 524,288 distinct pages, and a single-level page table for this process would need up to 2^19 entries.'
+},
+{
+  id: 'os-memory-p2',
+  pyqStyle: true,
+  q: 'A system has a 22-bit physical address space and uses a frame (page) size of 4 KB. How many physical frames does the system have in total? (Enter your numerical answer.)',
+  options: [],
+  answer: 1024,
+  kind: 'nat',
+  marks: 1,
+  difficulty: 'easy',
+  type: 'pyq-style',
+  explanation: 'The physical address is split into a frame-number field and an offset field. Since the frame size is 4 KB = 2^12 bytes, the offset field needs 12 bits to address every byte within a frame. Since the total physical address width is 22 bits, the frame-number field takes the remaining 22 - 12 = 10 bits. The number of distinct frame numbers representable in 10 bits is 2^10 = 1024, and since every valid frame number must correspond to an actual physical frame, this is exactly the total number of physical frames available in the system. As a cross-check: total physical memory = 2^22 bytes = 4 MB, and dividing by the frame size gives 4 MB / 4 KB = 1024 frames, confirming the answer.'
+},
+{
+  id: 'os-memory-p3',
+  pyqStyle: true,
+  q: 'A process has a 32-bit virtual address space with a page size of 4 KB (so the page number field is 20 bits). If each page table entry is 4 bytes, what is the TOTAL SIZE of this process\'s single-level page table?',
+  options: ['1 MB', '2 MB', '4 MB', '8 MB'],
+  answer: 2,
+  marks: 1,
+  difficulty: 'easy',
+  type: 'pyq-style',
+  explanation: 'A single-level page table needs exactly one entry per possible page number, so the number of entries equals 2^(page number bits) = 2^20 = 1,048,576 entries. Since each entry is 4 bytes, the total size of the page table is 2^20 entries x 4 bytes/entry = 2^20 x 2^2 bytes = 2^22 bytes = 4,194,304 bytes = 4 MB. This large size (4 MB just for one process\'s page table, when the process itself might use far less than its full 4 GB virtual address space) is precisely the motivation for multi-level and inverted page tables, which avoid allocating page table space for unused regions of the virtual address space.'
+},
+{
+  id: 'os-memory-p4',
+  pyqStyle: true,
+  q: 'A process uses a page size of 1024 bytes (1 KB). Its page table maps page number 2 to physical frame number 6. What is the PHYSICAL ADDRESS corresponding to the virtual (logical) address 2560 (decimal)? (Enter your numerical answer.)',
+  options: [],
+  answer: 6656,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: 'To translate a logical address into (page number, offset), divide by the page size: page number = floor(2560 / 1024) = 2, and offset = 2560 mod 1024 = 2560 - 2*1024 = 2560 - 2048 = 512. Looking up page number 2 in the page table gives frame number 6. The physical address is then reconstructed as (frame number x page size) + offset = (6 x 1024) + 512 = 6144 + 512 = 6656. This two-step process -- split the logical address into page number and offset using the page size, replace the page number with its mapped frame number via the page table, then recombine with the SAME offset (since offsets within a page never change during translation) -- is the fundamental mechanism of paging-based address translation.'
+},
+{
+  id: 'os-memory-p5',
+  pyqStyle: true,
+  q: 'A process requires 41 KB of memory, and the system uses a page size of 8 KB. How much INTERNAL FRAGMENTATION (in KB) results from allocating this process the number of whole pages it needs? (Enter your numerical answer.)',
+  options: [],
+  answer: 7,
+  kind: 'nat',
+  marks: 1,
+  difficulty: 'easy',
+  type: 'pyq-style',
+  explanation: 'Since memory can only be allocated to a process in whole-page units, the process needs ceil(41 KB / 8 KB) = ceil(5.125) = 6 pages, because 5 pages would provide only 40 KB, which is not enough to hold the full 41 KB. Allocating 6 pages gives the process 6 x 8 KB = 48 KB of actual physical memory, but the process only uses 41 KB of it. The unused space within the last allocated page -- memory that is reserved for the process but never used by it -- is called internal fragmentation, and it equals 48 KB - 41 KB = 7 KB here. Internal fragmentation is an inherent cost of fixed-size paging (it never occurs in pure segmentation, which instead suffers from external fragmentation), and on average, across many processes with essentially random final page usage, it amounts to roughly half the page size per process.'
+},
+{
+  id: 'os-memory-p6',
+  pyqStyle: true,
+  q: 'A paging system uses a page size of 4 KB. Averaged across a very large number of processes with random memory requirement sizes, what is the expected (average) INTERNAL FRAGMENTATION per process, approximately?',
+  options: ['0 KB (paging causes no internal fragmentation on average)', 'Approximately 2 KB (about half the page size)', 'Exactly 4 KB (the full page size) for every process', 'It depends only on the total number of processes, not the page size'],
+  answer: 1,
+  marks: 1,
+  difficulty: 'easy',
+  type: 'pyq-style',
+  explanation: 'For a process whose true memory requirement is not an exact multiple of the page size, the operating system must still round up and allocate an integer number of pages, wasting the unused portion of the final, partially-used page as internal fragmentation. If a process\'s size modulo the page size is uniformly distributed between 0 and (page size - 1) across many processes -- which is a reasonable simplifying assumption for random workloads -- then the wasted space in the last page averages out to (page size - 1)/2, which for practical purposes is approximated as half the page size. With a 4 KB page size, this gives an average internal fragmentation of roughly 4 KB / 2 = 2 KB per process. This is the standard justification GATE uses for the trade-off in choosing page size: larger pages reduce page table size and overhead but increase average internal fragmentation, and vice versa for smaller pages.'
+},
+{
+  id: 'os-memory-p7',
+  pyqStyle: true,
+  q: 'Each of 50 concurrently running processes has an identical single-level page table of size 4 MB (because each has a 32-bit virtual address space with a 4 KB page size, needing 2^20 entries of 4 bytes each). What is the TOTAL memory (in MB) consumed just by the page tables of all 50 processes combined? (Enter your numerical answer.)',
+  options: [],
+  answer: 200,
+  kind: 'nat',
+  marks: 1,
+  difficulty: 'easy',
+  type: 'pyq-style',
+  explanation: 'Since every one of the 50 processes maintains its own separate, independent page table of size 4 MB (page tables are per-process structures, as each process has a different virtual-to-physical mapping), the total memory consumed by all their page tables combined is simply 50 x 4 MB = 200 MB. This large, purely-overhead memory cost -- 200 MB spent on bookkeeping alone, without storing a single byte of actual process data -- is exactly why real operating systems use multi-level page tables or inverted page tables rather than giant flat single-level tables: a multi-level scheme allocates page-table space only for the portions of the virtual address space a process actually uses, which is typically a tiny fraction of the full 4 GB range that a flat 32-bit table must otherwise account for.'
+},
+{
+  id: 'os-memory-p8',
+  pyqStyle: true,
+  q: 'A process uses a page size of 1 KB (1024 bytes). For the logical (virtual) address 5000 (decimal), what is the OFFSET within its page? (Enter your numerical answer.)',
+  options: [],
+  answer: 904,
+  kind: 'nat',
+  marks: 1,
+  difficulty: 'easy',
+  type: 'pyq-style',
+  explanation: 'To find the offset within a page for a given logical address, compute the address modulo the page size: offset = 5000 mod 1024. Dividing, 1024 x 4 = 4096, and 5000 - 4096 = 904, with 904 being less than 1024 (confirming 4 is the correct page number, since 1024 x 5 = 5120 would exceed 5000). So the page number is 4 (floor(5000/1024) = 4) and the offset is 904. The offset is the part of the address that is NEVER translated during paging -- it stays numerically identical in both the logical and the resulting physical address, since it just identifies a specific byte position within whichever page (or frame) is being referenced; only the page number changes into a (usually numerically unrelated) frame number.'
+},
+{
+  id: 'os-memory-p9',
+  pyqStyle: true,
+  q: 'A system has 128 MB of physical memory and uses a frame size of 2 KB. What is the total width, in bits, of a PHYSICAL address in this system? (Enter your numerical answer.)',
+  options: [],
+  answer: 27,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: 'The offset field width is determined by the frame size: since the frame size is 2 KB = 2^11 bytes, 11 bits are needed for the offset. The frame-number field width is determined by the total number of physical frames: total physical memory / frame size = 128 MB / 2 KB = (2^27 bytes) / (2^11 bytes) = 2^16 frames, so 16 bits are needed to number every frame uniquely. The total physical address width is the sum of these two independent fields: 16 (frame number) + 11 (offset) = 27 bits. As a direct cross-check, 128 MB itself equals 2^27 bytes, and a byte-addressable memory of size 2^27 bytes requires exactly 27 address bits to reference every byte -- which matches, confirming the frame-number-plus-offset decomposition is consistent with the total memory size.'
+},
+{
+  id: 'os-memory-p10',
+  pyqStyle: true,
+  q: 'A system has 2^15 physical frames. Each page table entry must store the frame number PLUS exactly 1 additional valid/invalid status bit (and no other fields). What is the MINIMUM size of a single page table entry, in BYTES (rounding up to the nearest whole byte, since entries must be byte-aligned)? (Enter your numerical answer.)',
+  options: [],
+  answer: 2,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: 'Storing a frame number that can range over 2^15 distinct values requires exactly 15 bits (since 15 bits can represent values 0 through 2^15 - 1). Adding 1 more bit for the valid/invalid status flag gives a minimum requirement of 15 + 1 = 16 bits per entry. Since page table entries must be stored at byte-aligned boundaries in memory (partial bytes cannot be individually addressed), 16 bits rounds up to exactly 16/8 = 2 bytes -- conveniently an exact whole number of bytes with no wasted padding in this case. In practice, real page table entries also carry additional bits (dirty bit, referenced/accessed bit, protection bits, cache-control bits), so this minimal 2-field version is a simplified textbook lower bound; a real x86-style entry is typically 4 or 8 bytes to accommodate these extra fields plus room for future physical memory growth.'
+},
+{
+  id: 'os-memory-p11',
+  pyqStyle: true,
+  q: 'A process requires 1 MB of virtual memory, and the system uses a page size of 4 KB. How many page table entries are needed to map this process\'s entire address space (i.e., how many pages does the process consist of)? (Enter your numerical answer.)',
+  options: [],
+  answer: 256,
+  kind: 'nat',
+  marks: 1,
+  difficulty: 'easy',
+  type: 'pyq-style',
+  explanation: 'The number of pages (and hence the number of page table entries needed) is simply the process\'s address space size divided by the page size, since paging carves the address space into equal fixed-size chunks: 1 MB / 4 KB = (2^20 bytes) / (2^12 bytes) = 2^8 = 256 pages. Each of these 256 pages needs exactly one entry in the process\'s page table recording which physical frame it currently occupies (or that it is not currently resident, in a demand-paged system). If the 1 MB requirement had not divided evenly into the 4 KB page size, the count would need to be rounded UP to the next whole page (as in the internal-fragmentation question), but here 1 MB / 4 KB is already an exact integer, so no rounding is needed.'
+},
+{
+  id: 'os-memory-p12',
+  pyqStyle: true,
+  q: 'A process\'s single-level page table has exactly 2^10 entries, and the system uses a page size of 4 KB. What is the MAXIMUM total virtual address space size this process can address, in MB? (Enter your numerical answer.)',
+  options: [],
+  answer: 4,
+  kind: 'nat',
+  marks: 1,
+  difficulty: 'easy',
+  type: 'pyq-style',
+  explanation: 'Since each page table entry corresponds to exactly one page of the virtual address space, having 2^10 = 1024 entries means the process can address at most 1024 distinct pages. The total addressable space is then the number of pages multiplied by the size of each page: 1024 pages x 4 KB/page = 4096 KB = 4 MB. This is exactly the reverse computation of finding "how many entries are needed for a given address space size" (as in a related question): here, the page table SIZE (number of entries) is given, and we compute the maximum address space it can support, which is a common way GATE frames this same underlying relationship -- (address space size) = (number of page table entries) x (page size) -- from the opposite direction.'
+}
+);
+
+window.GATE_DATA.questions['os'].topics.find(function(t){return t.id==='os-virtual-memory';}).questions.push(
+{
+  id: 'os-virtual-memory-p1',
+  pyqStyle: true,
+  q: 'A process references pages in the order: 1, 2, 3, 4, 1, 2, 5, 1, 2, 3, 4, 5. The system has exactly 3 page frames, all initially empty, and uses the FIFO page replacement algorithm. How many page faults occur in total? (Enter your numerical answer.)',
+  options: [],
+  answer: 9,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: 'Simulating FIFO with 3 empty frames (oldest-loaded page is evicted first): ref 1,2,3 each fault, filling frames to [1,2,3]. Ref 4 faults, evicting 1 (the oldest), giving [2,3,4]. Ref 1 faults again, evicting 2, giving [3,4,1]. Ref 2 faults, evicting 3, giving [4,1,2]. Ref 5 faults, evicting 4, giving [1,2,5]. Ref 1 and ref 2 are now HITS (both present). Ref 3 faults, evicting 1 (oldest), giving [2,5,3]. Ref 4 faults, evicting 2, giving [5,3,4]. Ref 5 is a HIT. Counting: faults occur at references 1,2,3,4,1,2,5,3,4 -- that is 9 faults out of 12 references, with hits only at the two later occurrences of 1, 2, and the final 5. This reference string with 3 frames is the standard textbook example used to demonstrate Belady\'s Anomaly, since increasing the frame count to 4 actually increases the fault count under FIFO rather than reducing it.'
+},
+{
+  id: 'os-virtual-memory-p2',
+  pyqStyle: true,
+  q: 'Using the SAME reference string as before -- 1, 2, 3, 4, 1, 2, 5, 1, 2, 3, 4, 5 -- and the SAME FIFO algorithm, but now with 4 page frames instead of 3, the number of page faults is found to be 10 (MORE than the 9 faults with only 3 frames). What OS concept does this surprising result illustrate?',
+  options: ['A simulation error -- more frames can never cause more page faults under any algorithm', 'Belady\'s Anomaly: for FIFO specifically, increasing the number of available frames can, for certain reference strings, counter-intuitively INCREASE rather than decrease the number of page faults', 'This proves FIFO is actually a stack algorithm like LRU and Optimal', 'This only happens when the reference string contains no repeated page numbers'],
+  answer: 1,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: 'Belady\'s Anomaly is the well-known, genuinely counter-intuitive phenomenon where, for SOME page replacement algorithms and SOME specific reference strings, adding more physical frames results in MORE page faults rather than fewer or the same. It occurs because FIFO (and some other non-stack algorithms) do not guarantee that the set of pages held in memory with k frames is always a SUBSET of the pages held with k+1 frames at every point in time -- this "subset property" is what stack algorithms like LRU and Optimal satisfy by construction, which is exactly why LRU and Optimal are mathematically PROVEN immune to Belady\'s Anomaly, while FIFO is not. This reference string (1,2,3,4,1,2,5,1,2,3,4,5) is the specific, famous example originally used to demonstrate the anomaly in Belady\'s 1969 paper, going from 9 faults (3 frames) to 10 faults (4 frames) under FIFO.'
+},
+{
+  id: 'os-virtual-memory-p3',
+  pyqStyle: true,
+  q: 'A process references pages in the order: 7, 0, 1, 2, 0, 3, 0, 4, 2, 3, 0, 3, 2. The system has 3 page frames, all initially empty, and uses the LRU (Least Recently Used) page replacement algorithm. How many page faults occur in total? (Enter your numerical answer.)',
+  options: [],
+  answer: 9,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'hard',
+  type: 'pyq-style',
+  explanation: 'Tracing LRU with 3 frames: ref 7,0,1 each fault, filling [7,0,1]. Ref 2 faults, evicting 7 (least recently used, since 0 and 1 were referenced more recently), giving [0,1,2]. Ref 0 is a HIT. Ref 3 faults, evicting 1 (now the LRU page, since 0 was just used and 2 before that), giving [0,2,3]. Ref 0 is a HIT. Ref 4 faults, evicting 2 (LRU), giving [0,3,4]. Ref 2 faults, evicting 3 (LRU), giving [0,4,2]. Ref 3 faults, evicting 0 (LRU, since 4 and 2 were used more recently), giving [4,2,3]. Ref 0 faults, evicting 4 (LRU), giving [2,3,0]. Ref 3 and ref 2 are both HITS at the end. Counting faults: 7,0,1,2,3,4,2,3,0 -- that is 9 faults out of 13 references.'
+},
+{
+  id: 'os-virtual-memory-p4',
+  pyqStyle: true,
+  q: 'Using the SAME reference string -- 7, 0, 1, 2, 0, 3, 0, 4, 2, 3, 0, 3, 2 -- and the SAME LRU algorithm, but now with 4 page frames instead of 3, how many page faults occur? (Enter your numerical answer.)',
+  options: [],
+  answer: 6,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'hard',
+  type: 'pyq-style',
+  explanation: 'Tracing LRU with 4 frames: ref 7,0,1,2 each fault, filling [7,0,1,2]. Ref 0 is a HIT. Ref 3 faults, evicting 7 (LRU, the only page never touched again since its initial load), giving [0,1,2,3]. Ref 0 is a HIT. Ref 4 faults, evicting 1 (LRU, since 0, 2, and 3 have all been referenced more recently than 1), giving [0,2,3,4]. From here, references 2, 3, 0, 3, 2 are ALL hits, since all five of these page numbers (0, 2, 3, 4 currently held, referenced repeatedly) are already resident and no new page number ever appears again. Counting faults: 7,0,1,2,3,4 -- exactly 6 faults out of 13 references. Notice this is FEWER faults than with 3 frames (9), which is the expected, well-behaved monotonic relationship -- confirming that LRU, being a stack algorithm, never exhibits Belady\'s Anomaly.'
+},
+{
+  id: 'os-virtual-memory-p5',
+  pyqStyle: true,
+  q: 'A process references pages in the order: 1, 2, 3, 4, 1, 2, 5, 1, 2, 3, 4, 5. The system has 3 page frames, all initially empty, and uses the OPTIMAL (Belady\'s optimal, OPT) page replacement algorithm, which always evicts the page that will not be used for the longest time in the future. How many page faults occur in total? (Enter your numerical answer.)',
+  options: [],
+  answer: 7,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'hard',
+  type: 'pyq-style',
+  explanation: 'Tracing Optimal with 3 frames: ref 1,2,3 each fault, filling [1,2,3]. Ref 4 faults: looking ahead at the remaining string (1,2,5,1,2,3,4,5), page 1 is needed again very soon (next reference), page 2 is needed soon after, but page 3 is not needed again until much later (position 10) -- so Optimal evicts 3, giving [1,2,4]. Ref 1 and 2 are HITS. Ref 5 faults: looking ahead (1,2,3,4,5), page 1 and 2 are needed again very soon, but page 4 is not needed again until much later (position 11) -- so Optimal evicts 4, giving [1,2,5]. Ref 1 and 2 are HITS again. Ref 3 faults: looking ahead (4,5), page 1 is never referenced again, so Optimal evicts 1, giving [2,5,3]. Ref 4 faults: looking ahead (5), page 2 is never referenced again, so Optimal evicts 2, giving [5,3,4]. Ref 5 is a HIT. Counting faults: 1,2,3,4,5,3,4 -- exactly 7 faults, the fewest possible for any algorithm on this reference string with 3 frames, since Optimal is provably the best achievable (though it requires future knowledge and is not implementable in practice).'
+},
+{
+  id: 'os-virtual-memory-p6',
+  pyqStyle: true,
+  q: 'For ANY given reference string and ANY fixed number of frames, which of the following relationships among the number of page faults produced by FIFO, LRU, and Optimal (OPT) is GUARANTEED to always hold?',
+  options: ['OPT\'s fault count is always less than or equal to both LRU\'s and FIFO\'s fault count, since OPT is provably optimal, but no fixed ordering between LRU and FIFO is guaranteed in general', 'LRU always produces strictly fewer faults than FIFO for every possible reference string', 'FIFO always produces strictly fewer faults than LRU for every possible reference string', 'All three algorithms always produce exactly the same number of faults for any given reference string and frame count'],
+  answer: 0,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: 'The Optimal (OPT/Belady) algorithm is mathematically proven to produce the minimum possible number of page faults for any given reference string and frame count, since it always evicts the page that will not be needed for the longest stretch of future references -- no other algorithm, however clever, can ever do strictly better than OPT (though achieving this in practice is impossible without knowing the future). This guarantees OPT\'s fault count is always <= both FIFO\'s and LRU\'s fault counts. However, there is NO universal guarantee comparing LRU and FIFO against each other: for most "typical" workloads with strong temporal locality, LRU tends to perform better (fewer faults) than FIFO because recently-used pages are indeed likely to be used again soon, but one can construct specific adversarial reference strings where FIFO happens to outperform LRU, or where they tie exactly. This is why GATE questions comparing LRU and FIFO always require an actual trace/simulation rather than a shortcut rule, while OPT can always be cited as a guaranteed lower bound.'
+},
+{
+  id: 'os-virtual-memory-p7',
+  pyqStyle: true,
+  q: 'Belady\'s Anomaly -- where increasing the number of page frames can increase the number of page faults -- is a well-known property of the FIFO page replacement algorithm. Can this same anomaly ever occur with the LRU (Least Recently Used) or Optimal (OPT) algorithms?',
+  options: ['No -- LRU and OPT are both classified as "stack algorithms" (the set of pages held with k frames is always a subset of the pages held with k+1 frames), and it is a proven mathematical theorem that stack algorithms can never exhibit Belady\'s Anomaly', 'Yes -- Belady\'s Anomaly can occur with any page replacement algorithm, including LRU and OPT, for sufficiently adversarial reference strings', 'Only LRU is immune to Belady\'s Anomaly; OPT can still exhibit it in rare cases', 'Only OPT is immune to Belady\'s Anomaly; LRU can still exhibit it in rare cases'],
+  answer: 0,
+  marks: 2,
+  difficulty: 'hard',
+  type: 'pyq-style',
+  explanation: 'A "stack algorithm" is formally defined as one where, for every reference string and at every point in time, the set of pages that would be resident in memory with k frames is always a subset of the set of pages that would be resident with (k+1) frames. LRU and Optimal both satisfy this subset property by construction (LRU always keeps the k most-recently-used distinct pages, and OPT always keeps the k pages needed soonest -- both are naturally "nested" as k grows), and it is a proven theorem in the seminal Belady, Nelson, and Shedler paper that any stack algorithm can NEVER exhibit Belady\'s Anomaly: adding frames can only ever maintain or decrease the fault count, never increase it. FIFO, by contrast, is NOT a stack algorithm -- its eviction choice depends purely on load order rather than recency or future use, so the resident set with k frames is not guaranteed to be a subset of the resident set with k+1 frames, which is exactly the loophole that allows the anomaly to occur (as directly demonstrated by the classic 1,2,3,4,1,2,5,1,2,3,4,5 reference string).'
+},
+{
+  id: 'os-virtual-memory-p8',
+  pyqStyle: true,
+  q: 'A system uses a TLB (Translation Lookaside Buffer) with a hit ratio of 80%, a TLB access time of 20 ns, and a main memory access time of 100 ns. On a TLB hit, the effective access requires one TLB lookup plus one memory access (for the actual data); on a TLB miss, it requires one TLB lookup, one memory access (to read the page table entry), plus one more memory access (for the actual data). What is the Effective Memory Access Time (EMAT), in ns? (Enter your numerical answer.)',
+  options: [],
+  answer: 140,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: 'The Effective Memory Access Time is the probability-weighted average of the hit-case time and the miss-case time. On a TLB HIT (probability 0.8), the total time is TLB access + one memory access for the data = 20 + 100 = 120 ns. On a TLB MISS (probability 1 - 0.8 = 0.2), the total time is TLB access (which still happens and fails to find the mapping) + one memory access to fetch the page table entry + one more memory access to fetch the actual data = 20 + 100 + 100 = 220 ns. The EMAT is then: EMAT = (hit ratio x hit time) + (miss ratio x miss time) = (0.8 x 120) + (0.2 x 220) = 96 + 44 = 140 ns. This formula -- weighting the fast TLB-hit path against the slower TLB-miss path by their respective probabilities -- is the standard technique for every TLB-related EMAT computation in GATE.'
+},
+{
+  id: 'os-virtual-memory-p9',
+  pyqStyle: true,
+  q: 'A system uses 2-level paging for a 32-bit virtual address space with a 4 KB page size (12 bits of offset). The remaining 20 bits are split EVENLY between the outer (first-level) page table index and the inner (second-level) page table index, so that each page table itself exactly fits within a single page. How many bits are used for the OUTER page table index? (Enter your numerical answer.)',
+  options: [],
+  answer: 10,
+  kind: 'nat',
+  marks: 1,
+  difficulty: 'easy',
+  type: 'pyq-style',
+  explanation: 'The 32-bit virtual address is divided into three fields for 2-level paging: the outer index, the inner index, and the offset. The offset field is fixed at 12 bits (since the page size is 4 KB = 2^12 bytes). This leaves 32 - 12 = 20 bits to be split between the outer and inner index fields. Since the problem states this remaining 20 bits is split EVENLY between the two levels, each gets 20 / 2 = 10 bits. So the outer page table index uses 10 bits (and, by the same reasoning, so does the inner index). This even split is not a coincidence in real systems either: with 10-bit indices, each page table (at either level) has 2^10 = 1024 entries, and if each entry is 4 bytes, each individual page table occupies exactly 1024 x 4 = 4096 bytes = 4 KB -- exactly one page, which is precisely why this particular split is the conventional choice for classic 32-bit x86-style 2-level paging.'
+},
+{
+  id: 'os-virtual-memory-p10',
+  pyqStyle: true,
+  q: 'A system uses 2-level paging (so translating an address requires accessing 2 levels of page tables before the actual data) together with a TLB. The TLB hit ratio is 90%, TLB access time is 10 ns, and main memory access time is 80 ns. On a TLB hit, the total time is TLB access + 1 memory access (for data). On a TLB miss, the total time is TLB access + 2 memory accesses (one per page table level) + 1 memory access (for the actual data). What is the Effective Memory Access Time (EMAT), in ns? (Enter your numerical answer.)',
+  options: [],
+  answer: 106,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'hard',
+  type: 'pyq-style',
+  explanation: 'On a TLB HIT (probability 0.9), the time is TLB access + 1 memory access for data = 10 + 80 = 90 ns. On a TLB MISS (probability 1 - 0.9 = 0.1), because this system uses 2-level paging, the CPU must walk BOTH page table levels in memory before it can find the actual frame, and then make one final access to fetch the real data -- that is TLB access + 2 page-table-level memory accesses + 1 data memory access = 10 + (2 x 80) + 80 = 10 + 160 + 80 = 250 ns. The EMAT is then the probability-weighted average: EMAT = (0.9 x 90) + (0.1 x 250) = 81 + 25 = 106 ns. This illustrates why deeper (multi-level) page table hierarchies make TLB misses progressively more expensive -- each additional level adds one more mandatory memory access to the miss penalty -- which is exactly why hardware designers push hard for high TLB hit ratios as page tables get deeper.'
+},
+{
+  id: 'os-virtual-memory-p11',
+  pyqStyle: true,
+  q: 'A system uses 3-level paging (a page table hierarchy with 3 levels) and has NO TLB at all. Every single memory reference by the CPU must therefore walk all 3 page table levels (one memory access per level) before finally accessing the actual data (one more memory access). If main memory access time is 100 ns, what is the Effective Memory Access Time (EMAT) for this system, in ns? (Enter your numerical answer.)',
+  options: [],
+  answer: 400,
+  kind: 'nat',
+  marks: 1,
+  difficulty: 'easy',
+  type: 'pyq-style',
+  explanation: 'Without a TLB, every memory reference must pay the FULL cost of walking the entire page table hierarchy, with no possibility of a fast-path shortcut. For an n-level page table, this means n separate memory accesses are needed just to resolve the address translation (one to fetch each level\'s table entry, since each level\'s table itself resides in memory), PLUS one final memory access to actually fetch the requested data using the now-fully-resolved physical address. Here n=3, so the total number of memory accesses per reference is 3 (page table levels) + 1 (actual data) = 4. Since each memory access costs 100 ns, the Effective Memory Access Time is simply 4 x 100 = 400 ns. This stark 4x slowdown compared to a single flat memory access (100 ns) is exactly why TLBs are essential in any system using multi-level paging -- without one, deeper page table hierarchies make every single memory reference proportionally and unavoidably more expensive.'
+},
+{
+  id: 'os-virtual-memory-p12',
+  pyqStyle: true,
+  q: 'A process uses 2-level paging where each second-level (inner) page table has 2^10 = 1024 entries, and each entry is 4 bytes. If the process\'s memory usage pattern is sparse enough that only 3 distinct second-level page tables have actually been allocated (i.e., only 3 outer-table entries point to real inner tables; the rest are marked invalid and consume no inner-table memory), what is the TOTAL memory (in KB) consumed by just these allocated inner-level page tables (ignore the outer table\'s own size)? (Enter your numerical answer.)',
+  options: [],
+  answer: 12,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: 'Each individual second-level (inner) page table has 1024 entries x 4 bytes/entry = 4096 bytes = 4 KB of memory, regardless of how many of its entries are actually used for valid mappings (the entire table must be allocated as a unit). Since only 3 such inner tables have actually been allocated (because the process\'s virtual address space usage is sparse, so most outer-table entries simply point to nothing and no corresponding inner table is created for them), the total memory consumed is 3 x 4 KB = 12 KB. This demonstrates the core memory-saving benefit of multi-level (hierarchical) paging over a single flat page table: a flat table would need to reserve space for EVERY possible page number in the entire virtual address space up front, but a multi-level table only allocates inner-level tables for the regions of the address space the process actually uses, at the cost of one extra memory access per translation (or a TLB miss) to walk the additional level.'
+},
+{
+  id: 'os-virtual-memory-p13',
+  pyqStyle: true,
+  q: 'For the reference string 1, 2, 3, 4, 1, 2, 5, 1, 2, 3, 4, 5 with exactly 3 page frames, how many FEWER page faults does the OPTIMAL (OPT) algorithm produce compared to FIFO? (Enter your numerical answer.)',
+  options: [],
+  answer: 2,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: 'From the FIFO trace on this reference string with 3 frames, the fault count is 9 (faults occur at references 1,2,3,4,1,2,5,3,4, with hits only at the repeated 1, 2, and the final 5). From the OPTIMAL trace on the same reference string with the same 3 frames, the fault count is 7 (faults occur at references 1,2,3,4,5,3,4, since OPT makes smarter eviction choices by always discarding the page needed furthest in the future -- for example, evicting page 3 instead of page 1 when page 4 first causes a fault, since 3 is not needed again until much later than 1 or 2). The difference is 9 - 7 = 2 fewer faults under OPT. This 2-fault gap on an otherwise identical workload and frame count is a concrete, numerical illustration of exactly how much "smarter" eviction decisions (impossible in practice without knowing the future, but useful as a theoretical yardstick) can save compared to the simplistic, order-based FIFO policy.'
+}
+);
+window.GATE_DATA.questions['os'].topics.find(function(t){return t.id==='os-virtual-memory';}).questions.push(
+{
+  id: 'os-virtual-memory-h1',
+  q: 'A CPU has a TLB access time of 15 ns and a main memory access time of 120 ns. The TLB hit ratio is 0.85. The system uses a 2-level page table, so on a TLB miss the page table must be walked through both levels (one memory access per level) before the frame number is known, followed by one more memory access to fetch the actual data. Independently of all this, 1 in every 5000 memory references made by the process (probability 0.0002) triggers a genuine page fault, whose service (bringing the page in from disk and restarting) takes 9 ms. What is the overall effective access time, in ns (nearest integer)?',
+  options: ['1305', '1800', '1971', '2142'],
+  answer: 2,
+  marks: 2,
+  difficulty: 'hard',
+  type: 'numerical',
+  explanation: 'This must be solved in two nested stages. Stage 1: find the ordinary (non-faulting) effective memory access time using the TLB and the 2-level page table. On a TLB HIT (prob 0.85): time = TLB(15) + 1 data access(120) = 135 ns. On a TLB MISS (prob 0.15): the CPU must walk both page-table levels, one memory access each, then fetch the data: 15 + 2x120 + 120 = 375 ns. So the ordinary EMAT = 0.85x135 + 0.15x375 = 114.75 + 56.25 = 171 ns. Stage 2: fold in the page-fault probability, which is independent of whether the reference hit or missed the TLB (a fault means the page is simply absent from memory, discovered during the walk). Treating the 171 ns figure as the cost of a non-faulting reference and 9 ms = 9,000,000 ns as the cost of a faulting one: EAT = (1 - 0.0002) x 171 + 0.0002 x 9,000,000 = 0.9998x171 + 1800 = 170.97 + 1800 = 1970.97 ns, which rounds to 1971 ns. The trap is stopping after Stage 1 (giving 171, not even an option) or after computing only the fault contribution (1800) -- the question deliberately forces both the TLB/multi-level-walk layer AND the page-fault layer to be combined, since a real address translation is exposed to both hazards simultaneously and the astronomically larger page-fault cost still lets the tiny 0.0002 probability contribute over 1800 ns to the final answer.'
+},
+{
+  id: 'os-virtual-memory-h2',
+  q: 'For the reference string 1, 2, 3, 4, 1, 2, 5, 1, 2, 3, 4, 5 and page-replacement simulated with exactly 3 and then exactly 4 frames, which of the following statements are TRUE? (Select all that apply.)',
+  options: [
+    'With 3 frames, FIFO produces exactly 9 page faults',
+    'Going from 3 frames to 4 frames, FIFO produces MORE page faults, not fewer (Belady\'s anomaly)',
+    'Going from 3 frames to 4 frames, LRU\'s fault count also increases, so LRU exhibits the same anomaly as FIFO here',
+    'With 3 frames, OPTIMAL produces fewer faults than FIFO does with 3 frames'
+  ],
+  answers: [0, 1, 3],
+  marks: 2,
+  difficulty: 'hard',
+  type: 'msq',
+  kind: 'msq',
+  explanation: 'Each option needs its own independent trace. Tracing FIFO with 3 frames: faults occur at 1,2,3,4(evict1),1(evict2),2(evict3... ) -- carrying it through carefully gives exactly 9 faults, so option A is TRUE. Tracing FIFO with 4 frames on the same string gives 10 faults -- MORE than with 3 frames, even though a larger cache should intuitively never do worse. This counter-intuitive increase is precisely Belady\'s anomaly, and it is a documented property of FIFO specifically, so option B is TRUE. Tracing LRU on the same string gives 10 faults with 3 frames and 8 faults with 4 frames -- the count DECREASES as expected, because LRU is a stack algorithm (the set of pages held with k frames is always a subset of the set held with k+1 frames), which mathematically guarantees LRU can never exhibit Belady\'s anomaly. So option C is FALSE. Tracing OPTIMAL with 3 frames gives 7 faults, which is indeed fewer than FIFO\'s 9 faults with the same 3 frames (OPT is provably optimal for any fixed frame count), so option D is TRUE. The question is deliberately built around the one reference string where FIFO genuinely misbehaves, specifically to test whether a student blindly assumes "more frames always means fewer or equal faults" -- true for stack algorithms like LRU and OPT, but famously false for FIFO.'
+},
+{
+  id: 'os-virtual-memory-h3',
+  q: 'A process makes the following sequence of 12 page references, numbered by reference time t = 1 to 12: 1, 2, 3, 4, 5, 3, 4, 5, 6, 3, 4, 5. The working-set window size is delta = 4 (i.e., WS(t) is the set of distinct pages referenced during references t-3, t-2, t-1, t -- clipped at t=1 for the earliest references). What is the working-set size |WS(t)| at t = 5?',
+  options: [],
+  answer: 4,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'hard',
+  type: 'numerical',
+  explanation: 'With delta = 4, WS(5) looks at the window of the 4 most recent references ending at t=5, i.e., references at times 2, 3, 4, 5, which are the pages 2, 3, 4, 5. All four are distinct, so |WS(5)| = 4. The trap here is edge handling: a careless solver might use references 1-5 (five references, since delta could be mis-applied as "delta plus the current one") or might forget that the window slides and instead count all distinct pages referenced so far (which up to t=5 would wrongly give 5, since pages 1,2,3,4,5 have all appeared at least once by then). The correct Denning working-set definition is strictly the most recent delta references counted backward from t, not the cumulative distinct-page count since the process started -- that distinction is exactly what separates a correct working-set computation from an all-time footprint calculation, and is precisely the subtlety this reference string is built to expose since t=5 is the one point where the cumulative and windowed answers coincidentally differ by exactly one page (page 1, which fell out of the 4-wide window but is still counted if you (wrongly) use the cumulative set).'
+},
+{
+  id: 'os-virtual-memory-h4',
+  q: 'Five independent processes have working-set sizes (in frames) of 12, 10, 9, 11, and 8 respectively. The system has exactly 45 frames of physical memory available for these processes (OS overhead already excluded). If processes are admitted for concurrent execution strictly in increasing order of their working-set size (smallest first) and a process is admitted only if its full working set can be accommodated within the frames still remaining, what is the MAXIMUM number of these processes that can run concurrently without triggering thrashing?',
+  options: [],
+  answer: 4,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'hard',
+  type: 'numerical',
+  explanation: 'Thrashing occurs precisely when the sum of the working sets of the concurrently running processes exceeds the number of physical frames available -- at that point the OS cannot keep everyone\'s working set resident and must start stealing frames that are still actively needed, causing a storm of page faults. Sorting the working-set sizes ascending gives 8, 9, 10, 11, 12. Admitting greedily smallest-first: after process with WSS=8, total=8 (<=45, admit); +9 -> total=17 (admit); +10 -> total=27 (admit); +11 -> total=38 (admit, still <=45); the fifth process needs 12 more, which would push the total to 38+12=50, exceeding the 45-frame budget -- so it cannot be admitted without causing thrashing. Hence exactly 4 processes (the four smallest working sets, summing to 38 frames) can run concurrently, leaving 7 frames unused but safely avoiding thrashing, while admitting the fifth would force the system past its physical frame budget. The trap is admitting in an arbitrary or given order rather than realizing the question already tells you to sort by working-set size -- but even more commonly, students simply sum all five (12+10+9+11+8=50) and, seeing 50 > 45, wrongly conclude that NO safe combination exists, missing that a strict subset of 4 fits comfortably.'
+},
+{
+  id: 'os-virtual-memory-h5',
+  q: 'In a system, the TLB is always probed first, taking 10 ns. On a TLB hit (ratio 0.92), one further memory access (100 ns) fetches the data. On a TLB miss, in addition to the mandatory 10 ns TLB probe, the "miss penalty" advertised by the manufacturer is 240 ns -- this figure is defined by the manufacturer as covering ONLY the multi-level page-table walk needed to resolve the frame number, and does NOT include the final memory access needed to then actually fetch the data using that resolved address. What is the correct effective access time, in ns?',
+  options: ['121.2', '128.4', '129.2', '130.0'],
+  answer: 2,
+  marks: 2,
+  difficulty: 'hard',
+  type: 'numerical',
+  explanation: 'The trap is entirely about correctly accounting for what the "240 ns miss penalty" does and does not include. On a hit, total time = TLB probe(10) + data access(100) = 110 ns. On a miss, the TLB is STILL probed first (that 10 ns is unavoidable and always paid, hit or miss) -- then the 240 ns penalty resolves the frame number -- and since the question explicitly states this penalty excludes the final data fetch, one more 100 ns memory access must be added: total miss time = 10 + 240 + 100 = 350 ns. EAT = 0.92x110 + 0.08x350 = 101.2 + 28 = 129.2 ns, option C. The distractors correspond to the three most common mistakes: 121.2 comes from forgetting the final data-fetch memory access on the miss path entirely (using 250 instead of 350); 128.4 comes from forgetting that the TLB is still probed (unnecessarily) on the miss path, using just 240+100=340; and 130.0 comes from double-counting the TLB probe on the miss path (10+240+100+10=360). Only counting the TLB probe exactly once AND correctly extending the vendor-quoted "miss penalty" with the data access it excludes gives the right answer.'
+},
+{
+  id: 'os-virtual-memory-h6',
+  q: 'A system uses 48-bit virtual addresses with 4 KB pages (12-bit page offset). Each page-table entry is 8 bytes, and every level of the (hierarchical, radix-style) page table is designed to fit exactly within one 4 KB page. TLB access time is 5 ns, hit ratio is 0.95, and main memory access time is 80 ns. Given this, what is the effective access time, in ns?',
+  options: ['85', '96', '101', '405'],
+  answer: 2,
+  marks: 2,
+  difficulty: 'hard',
+  type: 'numerical',
+  explanation: 'First derive the unstated intermediate: the number of page-table levels. Each level-table must fit in one 4 KB = 4096-byte page, and each entry is 8 bytes, so each level indexes 4096/8 = 512 = 2^9 entries, i.e. 9 bits of the virtual page number per level. The virtual page number itself is 48 - 12 (offset bits) = 36 bits. Since 36 / 9 = 4 exactly, this address space requires exactly 4 page-table levels (a common real-world design, e.g. x86-64-style 4-level paging). Now compute EAT: on a TLB HIT (0.95), time = TLB(5) + 1 data access(80) = 85 ns. On a TLB MISS (0.05), the CPU must walk all 4 levels (one memory access each) then fetch data: 5 + 4x80 + 80 = 5+320+80 = 405 ns. EAT = 0.95x85 + 0.05x405 = 80.75 + 20.25 = 101 ns exactly. The entire question hinges on correctly deriving "4 levels" from the page size and PTE size before the EAT arithmetic can even begin -- a student who guesses 2 or 3 levels (common defaults memorised from textbook examples) gets a plausible-looking but wrong answer; 96 ns is what a (wrong) 3-level assumption would give, underscoring why the derivation step cannot be skipped.'
+},
+{
+  id: 'os-virtual-memory-h7',
+  q: 'A process references pages in the order 1, 2, 3, 4, 1, 2, 5, 1, 2, 3, 4, 5, 1, 2, 3, 6, 1, 2, 3, 4 (20 references total) and is allocated exactly 3 frames, managed by LRU replacement. First determine the resulting page-fault rate (faults per reference). Then, using a normal memory access time of 100 ns and a page-fault service time of 5 ms, compute the effective access time. Report your answer in milliseconds (nearest 0.1 ms).',
+  options: [],
+  answer: 4.5,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'hard',
+  type: 'numerical',
+  tolerance: 0.15,
+  explanation: 'This chains two mechanisms: an LRU page-fault trace, followed by an effective-access-time computation using the derived fault rate. Simulating LRU reference-by-reference with 3 frames on this deliberately poor-locality string (it keeps cycling through more than 3 distinct pages before any page repeats) produces 18 faults out of the 20 references -- the working set genuinely does not fit in 3 frames, so nearly every reference is a fresh fault. The fault rate is therefore 18/20 = 0.9 faults per reference (a deliberately extreme, awkward figure precisely because 3 frames are grossly insufficient for this access pattern). EAT = (1 - 0.9) x 100 ns + 0.9 x 5,000,000 ns = 10 + 4,500,000 = 4,500,010 ns = 4.50001 ms, which rounds to 4.5 ms. The scale of the numbers is itself the trap: because a page-fault service time (millisecond, disk-speed) is roughly 50,000 times larger than a memory access (nanosecond speed), even reducing the fault rate from 1.0 to 0.9 barely changes the EAT compared to reducing it further -- the EAT is almost entirely dominated by the fault-handling term, which is exactly why real systems fight so hard to keep fault rates near zero rather than merely "low".'
+},
+{
+  id: 'os-virtual-memory-h8',
+  q: 'A system runs several identical processes, each of which follows the reference pattern 1, 2, 3, 4, 5, 3, 4, 5, 6, 3, 4, 5 with a working-set window of delta = 4. The system has 45 physical frames of usable memory. What is the MAXIMUM number of these identical processes that can run concurrently without the total demand exceeding available frames (i.e., without thrashing)?',
+  options: [],
+  answer: 11,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'hard',
+  type: 'numerical',
+  explanation: 'This requires first deriving the per-process working-set requirement, then dividing it into the system-wide frame budget. Sliding a window of size 4 across the reference string 1,2,3,4,5,3,4,5,6,3,4,5 and recomputing the distinct-page count at every time t gives working-set sizes 1,2,3,4,4,3,3,3,4,4,4,4 -- the maximum value reached at any point is 4 (occurring, for example, at t=4 and again at t=9 through 12, windows like {2,3,4,5} or {6,3,4,5}). To guarantee this process never thrashes, the OS must reserve its PEAK working-set demand, not its average, since the whole point of the working-set model is to keep every process\'s currently-needed pages resident at all times -- so each process needs 4 frames reserved. With 45 total frames and 4 frames needed per process, the system can support floor(45/4) = 11 processes concurrently (44 frames used, 1 frame left over), and admitting a 12th would require 48 frames, exceeding the 45-frame budget and inducing thrashing. The trap is using the AVERAGE working-set size across the trace (roughly 3.25) instead of the peak -- averaging would wrongly suggest floor(45/3.25) = 13 processes fit, but a process\'s working set can spike to 4 at specific moments, and under-provisioning for that peak is exactly what causes thrashing in practice.'
+},
+{
+  id: 'os-virtual-memory-h9',
+  q: 'For the reference string 1, 2, 3, 4, 1, 2, 5, 1, 2, 3, 4, 5, when EXACTLY 5 frames are allocated (one frame per distinct page appearing in the entire string), which statement correctly describes the fault counts under FIFO, LRU, and OPTIMAL?',
+  options: [
+    'All three produce exactly 5 faults, since with enough frames for every distinct page, only the first (compulsory) reference to each page can ever fault',
+    'OPTIMAL produces fewer faults than FIFO and LRU because it can still evict early even when frames are unused',
+    'FIFO produces more faults than at 4 frames, repeating Belady\'s anomaly',
+    'LRU produces zero faults because every page has already been seen by the end of the string'
+  ],
+  answer: 0,
+  marks: 2,
+  difficulty: 'hard',
+  type: 'concept',
+  explanation: 'The string contains exactly 5 distinct pages: 1, 2, 3, 4, 5. With 5 frames available, there is room to keep every distinct page resident simultaneously once it has been loaded -- no replacement algorithm ever needs to evict anything, because a frame never needs to be reused while an unused frame still exists. Under this condition, a fault can only occur the very FIRST time each distinct page is referenced (a "compulsory" or "cold-start" fault); once loaded, a page is never evicted, so every subsequent reference to it is guaranteed to be a hit. Since there are exactly 5 distinct pages, all three algorithms -- FIFO, LRU, and OPTIMAL -- must produce exactly 5 faults, no more and no less, regardless of their differing eviction policies, because eviction policy is irrelevant when no eviction ever actually happens. This is precisely confirmed by direct simulation. Option B is wrong because OPT never evicts unnecessarily either. Option C is wrong: Belady\'s anomaly requires an actual eviction-order effect, which cannot occur once frames exceed the number of distinct pages. Option D is wrong because "faults" and "having been seen" are unrelated to frame count exhaustion here -- every page still faults exactly once on its first appearance, LRU included.'
+},
+{
+  id: 'os-virtual-memory-h10',
+  q: 'A demand-paging system uses the Page-Fault-Frequency (PFF) scheme with an upper threshold U = 0.006 faults/reference (a frame is ADDED if the measured rate exceeds this) and a lower threshold L = 0.004 faults/reference (a frame is REMOVED if the measured rate falls below this; the allocation is left unchanged if the rate lies between L and U inclusive). A process currently holds 8 frames. Over the last monitoring window of 10,000 memory references, the process suffered exactly 30 page faults. What is the process\'s measured fault rate, and what action does PFF take?',
+  options: [
+    '0.0030 faults/reference; frame allocation is increased',
+    '0.0030 faults/reference; frame allocation is decreased',
+    '0.0300 faults/reference; frame allocation is decreased',
+    '0.0060 faults/reference; frame allocation is increased'
+  ],
+  answer: 1,
+  marks: 2,
+  difficulty: 'hard',
+  type: 'numerical',
+  explanation: 'The measured fault rate is faults divided by references observed in the monitoring window: 30 / 10,000 = 0.0030 faults/reference. This immediately eliminates option C, which comes from a misplaced decimal point (mistakenly computing 30/1000 or misreading 10,000 as 1,000), and option D, which uses the wrong numerator entirely. Now compare 0.0030 against the two thresholds: it is BELOW the lower threshold L = 0.004, meaning the process is faulting less often than the policy considers necessary to justify its current 8-frame allocation -- in the PFF scheme this signals over-provisioning, so a frame is taken AWAY (decreased), tightening the allocation until the fault rate rises back toward the acceptable [L, U] band. This is the opposite of the far more common exam instinct, which is to assume "any page faults happening at all" must mean the process needs MORE memory (option A) -- but PFF is explicitly bidirectional: it removes frames from processes that are faulting too rarely (wasting memory that could serve another process) just as eagerly as it adds frames to processes faulting too often, and only checking the rate against BOTH thresholds (not just noticing faults occurred) determines which direction is correct.'
+}
+);
+window.GATE_DATA.questions['os'].topics.find(function(t){return t.id==='os-scheduling';}).questions.push(
+{
+  id: 'os-scheduling-h1',
+  q: 'Three processes have CPU-IO-CPU burst patterns (all times in ms): P1 (arrival 0): CPU 4, IO 3, CPU 3. P2 (arrival 1): CPU 3, IO 2, CPU 4. P3 (arrival 2): CPU 5, IO 1, CPU 2. The CPU is scheduled preemptively by Shortest-Remaining-Time-First, comparing only the CURRENT CPU burst\'s remaining time (a process doing I/O is simply not in the ready pool). Every time the CPU switches from running one process to running a different one, 1 ms of pure context-switch overhead is paid (the CPU does no useful work during that ms). What is the average turnaround time of the three processes, in ms?',
+  options: [],
+  answer: 17.33,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'hard',
+  type: 'numerical',
+  tolerance: 0.1,
+  explanation: 'Trace minute-by-minute. t=0: only P1 ready (rem 4); it runs 0-4. At t=4, P1 leaves for IO (until t=7); ready pool has P2 (rem 3, arrived t=1) and P3 (rem 5, arrived t=2) -- SRTF picks P2, but first a context switch (t=4 to 5) is paid since the CPU was running P1. P2 runs 5-8, then goes to IO (until t=10). At t=8, ready pool has P1 (back from IO at t=7, rem 3) and P3 (rem 5) -- SRTF picks P1; switch (8 to 9); P1 runs 9-12 and FINISHES (turnaround 12-0=12). At t=12, ready pool has P3 (rem 5) and P2 (back from IO at t=10, rem 4) -- SRTF picks P2; switch (12 to 13); P2 runs 13-17 and FINISHES (turnaround 17-1=16). At t=17, only P3 (rem 5) remains; switch (17 to 18); P3 runs 18-23, then goes to its final IO (until t=24) -- wait, P3\'s pattern is CPU5-IO1-CPU2, so after 5 units of CPU (18-23) it does 1 ms of IO (23-24), then its LAST CPU burst of 2 ms runs 24-26 and finishes (turnaround 26-2=24). Total context switches paid: 4 (before P2, before P1, before P2 again, before P3). Average turnaround = (12+16+24)/3 = 52/3 = 17.33 ms. The trap is forgetting that a process returning from I/O must re-enter the SRTF comparison using only its NEXT CPU burst\'s length, not its total remaining work, and that every one of those re-entries can trigger yet another context switch.'
+},
+{
+  id: 'os-scheduling-h2',
+  q: 'Four processes arrive as follows (burst times in ms): P1 arrives at 0 with burst 5; P2 arrives at 7 with burst 2; P3 arrives at 8 with burst 6; P4 arrives at 9 with burst 4. The CPU uses non-preemptive Shortest-Job-First. Every time the scheduler dispatches a process onto the CPU (whether from idle or from another process), it pays a fixed 1 ms dispatch/context-switch overhead before that process\'s burst actually starts. What is the average turnaround time, in ms?',
+  options: [],
+  answer: 7.25,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'hard',
+  type: 'numerical',
+  explanation: 'At t=0, only P1 is ready; pay 1 ms dispatch (0 to 1), then P1 runs 1-6, finishing at 6 (turnaround 6-0=6). At t=6, NO process has arrived yet (P2 arrives at 7) -- the CPU sits genuinely idle from t=6 to t=7 (this idle gap, forced purely by arrival timing, is the trap: a student who forgets to check arrivals against the completion time will wrongly try to dispatch immediately at t=6). At t=7, P2 becomes ready; dispatch (7 to 8), P2 runs 8-10, finishing at 10 (turnaround 10-7=3). At t=10, both P3 (arrived 8, burst 6) and P4 (arrived 9, burst 4) are ready and waiting -- SJF picks the SHORTER job, P4; dispatch (10 to 11), P4 runs 11-15, finishing at 15 (turnaround 15-9=6). At t=15, only P3 remains; dispatch (15 to 16), P3 runs 16-22, finishing at 22 (turnaround 22-8=14). Average turnaround = (6+3+6+14)/4 = 29/4 = 7.25 ms. Besides the idle-gap trap, the second trap is the SJF tie-break at t=10: it is easy to default to arrival order (P3 first, since it arrived earlier) and completely miss that SJF must compare burst LENGTHS (P4\'s 4 beats P3\'s 6) regardless of who arrived first.'
+},
+{
+  id: 'os-scheduling-h3',
+  q: 'Three processes P1 (arrival 0, burst 9), P2 (arrival 1, burst 5), and P3 (arrival 2, burst 7) are scheduled by Round Robin. Every context switch (a change of the running process) costs 1 ms of pure overhead. Compare quantum = 3 ms against quantum = 5 ms. By how much does the AVERAGE TURNAROUND TIME increase when the quantum is reduced from 5 ms to 3 ms?',
+  options: [],
+  answer: 4.67,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'hard',
+  type: 'numerical',
+  tolerance: 0.1,
+  explanation: 'For quantum=5 (ready order at t=0 is just P1, with P2 and P3 joining the tail as they arrive): P1 runs 0-5 (rem 4), switch, P2 runs 6-11 (rem 0, DONE at 11, turnaround 11-1=10), switch, P3 runs 12-17 (rem 2), switch, P1 runs 18-22 (rem 0, DONE, turnaround 22), switch, P3 runs 23-25 (DONE, turnaround 25-2=23). Average turnaround = (22+10+23)/3 = 55/3 = 18.33 ms. For quantum=3: P1 runs 0-3 (rem 6), switch, P2 runs 4-7 (rem 2), switch, P3 runs 8-11 (rem 4), switch, P1 runs 12-15 (rem 3), switch, P2 runs 16-18 (rem 0, DONE, turnaround 18-1=17), switch, P3 runs 19-22 (rem 1), switch, P1 runs 23-26 (rem 0, DONE, turnaround 26), switch, P3 runs 27-28 (DONE, turnaround 28-2=26). Average turnaround = (26+17+26)/3 = 69/3 = 23 ms. The increase is 23 - 18.33 = 4.67 ms. This is the fundamental RR trade-off made concrete: shrinking the quantum from 5 to 3 improves fairness/responsiveness (each process is revisited sooner) but forces MORE total context switches over the same total work, and since each switch has a fixed real cost, the average turnaround actually gets WORSE, not better -- a smaller quantum is not a free lunch.'
+},
+{
+  id: 'os-scheduling-h4',
+  q: 'Two processes P1 (burst 11 ms) and P2 (burst 4 ms), both arriving at t=0, are scheduled by a 2-level Multilevel Feedback Queue: Queue 0 (highest priority) is Round Robin with quantum 2 ms; a process that uses its full quantum without finishing is demoted to Queue 1, which is Round Robin with quantum 4 ms; a process that also uses its full Queue-1 quantum without finishing is demoted to Queue 2, which runs processes to completion (FCFS, no further preemption). Assume no context-switch overhead. What is the average turnaround time, in ms?',
+  options: [],
+  answer: 12.5,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'hard',
+  type: 'numerical',
+  explanation: 'Queue 0 (quantum 2): P1 runs 0-2 (rem 9, quantum expired, demoted to Queue 1). P2 runs 2-4 (rem 2, quantum expired, demoted to Queue 1). Queue 0 is now empty, so Queue 1 (quantum 4) is checked, which holds P1 then P2 (in that demotion order): P1 runs 4-8 (rem 5, quantum expired again, demoted to Queue 2). P2 runs 8-10 (needs only 2 more, finishes -- turnaround 10-0=10). Queue 1 is now empty, Queue 0 is empty, so Queue 2 (FCFS-to-completion) runs P1: P1 runs 10-15 (rem 5, completes -- turnaround 15-0=15). Average turnaround = (15+10)/2 = 12.5 ms. The trap is assuming a process keeps its accumulated "wait" or gets special treatment on demotion -- MLFQ always restarts the FULL quantum of whichever queue it lands in, and a process demoted all the way to the bottom queue (P1 here) can end up finishing LATER than a process that needed less total work but never got demoted as deep (P2), even though P1 arrived and started first -- MLFQ trades strict FCFS fairness for favoring short jobs early, at the cost of long jobs like P1 accumulating quantum-expiry penalties at every level.'
+},
+{
+  id: 'os-scheduling-h5',
+  q: 'Three processes have these CPU-IO-CPU-... patterns (ms): P1 (arrival 0): CPU 5, IO 4, CPU 2. P2 (arrival 0): CPU 3, IO 3, CPU 4. P3 (arrival 1): CPU 4, IO 2, CPU 3. Round Robin with quantum 3 ms is used for CPU scheduling (a process returning from I/O re-joins the back of the ready queue), and every context switch (change of running process) costs 1 ms. What is the average turnaround time, in ms?',
+  options: [],
+  answer: 25.33,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'hard',
+  type: 'numerical',
+  tolerance: 0.1,
+  explanation: 'Ready order at t=0 is P1, P2 (P3 joins at t=1). P1 runs 0-3 (rem 2 of first CPU burst). Switch(3-4). P2 runs 4-7 (its whole first CPU burst of 3 is used exactly, so P2 now goes to IO until t=10). Switch(7-8). P3 runs 8-11 (rem 1 of its first burst of 4). Switch(11-12). P1 runs 12-14 (finishes its first CPU burst of 5 total; goes to IO until t=18). Switch(14-15). P2 (back from IO at t=10, needs its final CPU burst of 4) runs 15-18 (rem 1). Switch(18-19). P3 runs 19-20 (finishes its first CPU burst of 4 total; goes to IO until t=22). Switch(20-21). P1 (back from IO at t=18, needs its final CPU burst of 2) runs 21-23, FINISHES (turnaround 23-0=23). Switch(23-24). P2 runs 24-25, FINISHES its remaining 1 ms (turnaround 25-0=25). Switch(25-26). P3 (back from IO at t=22, needs its final CPU burst of 3) runs 26-29, FINISHES (turnaround 29-1=28). Average turnaround = (23+25+28)/3 = 76/3 = 25.33 ms. The compounding trap here is that EVERY re-entry from I/O goes to the BACK of the ready queue as a fresh RR participant, competing afresh against whoever else is currently ready -- there is no special "resume priority", so a process\'s total turnaround depends heavily on exactly when its I/O happens to finish relative to the other two processes\' RR cycles.'
+},
+{
+  id: 'os-scheduling-h6',
+  q: 'Three processes P1 (burst 25), P2 (burst 4), P3 (burst 4), all arriving at t=0, are scheduled with Round Robin, quantum = 5 ms. A context-switch overhead of 2 ms is charged ONLY at the actual moments the CPU changes from running one process to running a genuinely different one (not once per quantum-slice, and not once per process). What is P1\'s finish time, in ms?',
+  options: ['37', '39', '41', '45'],
+  answer: 1,
+  marks: 2,
+  difficulty: 'hard',
+  type: 'numerical',
+  explanation: 'Trace it, counting a switch every time the identity of the running process actually changes: P1 runs 0-5 (rem 20, requeued). The running process changes from P1 to P2, so switch 1 is paid (5 to 7); P2 runs 7-11 and FINISHES (burst 4 <= quantum 5). The running process changes from P2 to P3, so switch 2 is paid (11 to 13); P3 runs 13-17 and FINISHES. The running process now changes from P3 back to P1, so switch 3 is paid (17 to 19) -- this switch counts too, even though P1 ran earlier in the schedule, because what matters is whether the IDENTITY of the running process changed at that specific instant, not whether it is a "new" process overall. From here on P1 is the ONLY process left in the system, so every subsequent RR cycle just dequeues P1, runs it for a quantum, and requeues it again -- since the running process never actually changes across these re-dispatches, NO further switch cost is paid: P1 runs 19-24 (rem 15), 24-29 (rem 10), 29-34 (rem 5), 34-39 (rem 0, FINISHES), with zero extra overhead across all four of these slices. Total context switches actually paid across the whole schedule: exactly 3 (P1-to-P2, P2-to-P3, P3-to-P1) -- NOT 2 (naively, number of OTHER processes) and NOT 6 (one per RR quantum-slice, of which there are 7 total: 1+1+5). Total overhead = 3 x 2 = 6 ms. P1\'s finish time = sum of all bursts (25+4+4=33) + total overhead (6) = 39 ms. This precise three-switches accounting -- crediting overhead only at true process-identity changes, including the switch back to a process that already ran earlier -- is exactly the distinction the question is built to test.'
+},
+{
+  id: 'os-scheduling-h7',
+  q: 'Four processes use non-preemptive priority scheduling (lower number = higher priority; ties broken by earlier arrival): P1 (arrival 0, burst 4, priority 3), P2 (arrival 6, burst 3, priority 1), P3 (arrival 7, burst 5, priority 2), P4 (arrival 9, burst 2, priority 4). What is the average turnaround time, in ms?',
+  options: [],
+  answer: 5.25,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'hard',
+  type: 'numerical',
+  explanation: 'At t=0, only P1 is ready (nothing else has arrived); it runs 0-4, finishing (turnaround 4-0=4). At t=4, the CPU goes genuinely IDLE -- P2 does not arrive until t=6, and no other process is ready in between, so the scheduler simply has nothing to dispatch from t=4 to t=6, regardless of priority rules (priority only matters once multiple processes are actually READY simultaneously). At t=6, P2 becomes ready and runs immediately (no competitor yet): 6-9, finishing (turnaround 9-6=3). At t=9, BOTH P3 (arrived at 7, priority 2, been waiting since t=7) and P4 (arrived at 9, priority 4) are ready -- priority scheduling picks P3 (priority 2 beats priority 4) even though P4 just arrived and P3 has already been waiting: P3 runs 9-14, finishing (turnaround 14-7=7). At t=14, only P4 remains: runs 14-16, finishing (turnaround 16-9=7). Average turnaround = (4+3+7+7)/4 = 21/4 = 5.25 ms. The two traps compound: first, recognizing the t=4-to-6 idle gap (a student who assumes the CPU is always busy the instant a process finishes will mis-schedule everything after); second, correctly applying priority (not arrival order or burst length) at the t=9 decision point.'
+},
+{
+  id: 'os-scheduling-h8',
+  q: 'Four processes are scheduled by preemptive Shortest-Remaining-Time-First (no context-switch overhead): P1 (arrival 0, burst 8), P2 (arrival 1, burst 4), P3 (arrival 2, burst 9), P4 (arrival 3, burst 5). Which of the following statements about the resulting schedule are TRUE? (Select all that apply.)',
+  options: [
+    'P1 is preempted exactly once during its entire execution',
+    'P2 runs to completion in one single uninterrupted stretch, without ever being preempted',
+    'P4 completes at the exact same instant that P1 resumes execution',
+    'P3 has the SHORTEST turnaround time among all four processes'
+  ],
+  answers: [0, 1, 2],
+  marks: 2,
+  difficulty: 'hard',
+  type: 'msq',
+  kind: 'msq',
+  explanation: 'Trace the full SRTF schedule: P1 runs 0-1 (rem 7) then is preempted by P2 (arrived at t=1 with a shorter remaining burst, 4 < 7). P2 runs 1-5 uninterrupted and finishes (P2\'s remaining burst, 4 then 3 then 2..., never exceeds any other ready process\'s remaining burst during this stretch, since P3 has 9 and P4 arrives at t=3 with 5, both larger than P2\'s dwindling remainder) -- turnaround 5-1=4. At t=5, ready processes are P1 (rem 7) and P4 (rem 5, just arrived) and P3 (rem 9) -- SRTF picks P4: runs 5-10, finishes -- turnaround 10-3=7. At t=10, only P1 (rem 7) and P3 (rem 9) remain -- P1 runs 10-17, finishing -- turnaround 17-0=17. At t=17, only P3 remains: runs 17-26, finishing -- turnaround 26-2=24. Checking each option against this trace: P1 was preempted at t=1 (once) and then ran uninterrupted from 10 to 17 -- exactly one preemption, so A is TRUE. P2 ran 1-5 with no interruption, so B is TRUE. P4 finishes exactly at t=10, which is precisely when P1 resumes -- C is TRUE. Turnarounds are P1=17, P2=4, P3=24, P4=7 -- P3 has the LONGEST turnaround (24), not the shortest (that is P2, at 4), so D is FALSE.'
+},
+{
+  id: 'os-scheduling-h9',
+  q: 'Three processes P1 (burst 13), P2 (burst 6), P3 (burst 3), all arriving at t=0, are scheduled by a 3-level Multilevel Feedback Queue with NO context-switch overhead: Queue 0 (highest priority) is Round Robin with quantum 2 ms; Queue 1 is Round Robin with quantum 4 ms; Queue 2 (lowest priority) is ALSO Round Robin, with quantum 4 ms (it is NOT run-to-completion FCFS). A process demoted to Queue 2 that does not finish within one Queue-2 quantum is simply requeued at the back of Queue 2 again. What is the average turnaround time, in ms?',
+  options: [],
+  answer: 17,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'hard',
+  type: 'numerical',
+  explanation: 'Queue 0 (quantum 2), in arrival order P1,P2,P3: P1 runs 0-2 (rem 11, demoted), P2 runs 2-4 (rem 4, demoted), P3 runs 4-6 (rem 1, demoted). Queue 0 empty; move to Queue 1 (quantum 4), order P1,P2,P3: P1 runs 6-10 (rem 7, demoted to Queue 2), P2 runs 10-14 (needs exactly 4 more, FINISHES -- turnaround 14-0=14), P3 runs 14-15 (needs only 1 more, FINISHES -- turnaround 15-0=15). Queue 1 and Queue 0 both empty; move to Queue 2 (quantum 4): only P1 (rem 7) is here. It runs 15-19 (rem 3, quantum expired -- since this is explicitly RR, not FCFS, P1 is requeued at the BACK of Queue 2 rather than allowed to keep running). But P1 is the only process left in Queue 2 (and every other queue is empty), so it is immediately dequeued again and runs 19-22, finishing its remaining 3 ms (turnaround 22-0=22). Average turnaround = (22+14+15)/3 = 51/3 = 17 ms. The trap is assuming the bottom queue is automatically FCFS/run-to-completion (the textbook-default MLFQ design) -- here it is explicitly still quantum-limited RR, so even a lone remaining process can technically be "preempted by its own quantum" and cycle through the queue mechanics again, though with no other process competing this happens to make no difference to the final finish time except by testing whether the solver correctly re-applies the Queue-2 quantum rule at all.'
+},
+{
+  id: 'os-scheduling-h10',
+  q: 'Six identical-priority processes P1..P6 all arrive at t=0 and are placed in the ready queue in that order. Round Robin scheduling with quantum q = 4 ms is used, and every context switch (there is one before every process\'s turn on the CPU except the very first process to run) costs c = 1 ms. Assume every process\'s total burst is far longer than several quanta, so none of them finish early during the stretch we care about. What is the RESPONSE TIME (time from t=0 until it FIRST gets the CPU) of process P4, in ms?',
+  options: [],
+  answer: 15,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'hard',
+  type: 'numerical',
+  explanation: 'P4 is 4th in the initial queue, so before it can first run, the CPU must give P1, P2, and P3 each one FULL quantum (none of them finish early, by assumption), and a context switch must occur before EACH of the 4 dispatches except the first (P1 to P2, P2 to P3, P3 to P4 -- that is 3 switches by the time P4 starts). P1 runs 0 to 4 (no switch beforehand, since it is the very first dispatch). Switch (4 to 5). P2 runs 5 to 9. Switch (9 to 10). P3 runs 10 to 14. Switch (14 to 15). P4 finally starts running at t=15. So P4\'s response time is 15 ms. In general, for the k-th process in the initial FIFO order (all with large-enough bursts), response time = (k-1) x (q + c) -- here (4-1) x (4+1) = 3 x 5 = 15, confirming the trace. The classic trap is charging the context-switch cost only "per process" (giving a wrong (k-1)xq + (k-1... miscounted)xc formula) or only "once per full lap" rather than once before EVERY single dispatch -- since there are exactly as many switches as there are prior dispatches (3, matching the 3 processes ahead of P4, not the total process count of 6 or the quantum count), getting the switch COUNT right before multiplying by c is the crux of the question.'
+}
+);

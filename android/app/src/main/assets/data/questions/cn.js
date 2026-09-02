@@ -2099,3 +2099,1269 @@ window.GATE_DATA.questions['cn'].topics.find(function(t){return t.id==='cn-trans
   explanation: "During slow start, cwnd doubles every RTT: starting at 1, it goes 1 (RTT1), 2 (RTT2), 4 (RTT3), 8 (RTT4) - at RTT4 it reaches ssthresh=8, so slow start ends there. From RTT4 onward the connection switches to congestion avoidance, where cwnd grows by only 1 segment per RTT (additive increase) instead of doubling. So at RTT5, cwnd = 8 + 1 = 9, and the connection is in congestion avoidance, not slow start. The marked point in the figure sits just past the dashed ssthresh=8 line, consistent with the curve's slope visibly flattening from exponential (doubling) to linear (+1 per RTT) right after RTT4 - the classic slow-start-to-congestion-avoidance transition tested in GATE CN."
 }
 );
+
+window.GATE_DATA.questions['cn'].topics.find(function(t){return t.id==='cn-network';}).questions.push(
+  {
+    id: "cn-network-p1",
+    pyqStyle: true,
+    q: "A network administrator has the block 172.16.0.0/16 and must carve out one subnet large enough for 500 hosts, using Variable Length Subnet Masking (VLSM) so that the subnet wastes as few addresses as possible. What is the longest prefix length that still supports at least 500 usable host addresses?",
+    options: ["/21", "/22", "/23", "/24"],
+    answer: 2,
+    marks: 2,
+    difficulty: "medium",
+    type: "pyq-style",
+    explanation: "With h host bits, a subnet gives 2^h - 2 usable addresses (subtracting the network and broadcast addresses). We need 2^h - 2 >= 500, i.e. 2^h >= 502. Since 2^8 = 256 is too small and 2^9 = 512 satisfies 512 - 2 = 510 >= 500, the minimum number of host bits required is h = 9. The prefix length is then 32 - 9 = 23, so the subnet mask is /23. This is the standard VLSM technique GATE tests repeatedly: find the smallest power-of-two block (in host bits) that can still hold the required number of usable hosts, then convert that into the longest (most address-efficient) prefix, since making the prefix any longer (like /24, giving only 254 usable hosts) would fail to fit 500 hosts."
+  },
+  {
+    id: "cn-network-p2",
+    pyqStyle: true,
+    q: "An organization owns eight contiguous /24 blocks: 10.20.32.0/24 through 10.20.39.0/24. What is the single CIDR block that exactly summarizes all eight, with no extra addresses included?",
+    options: ["10.20.32.0/20", "10.20.32.0/21", "10.20.32.0/22", "10.20.32.0/23"],
+    answer: 1,
+    marks: 2,
+    difficulty: "medium",
+    type: "pyq-style",
+    explanation: "Write the third octet of each block in binary: 32-39 are 00100000 through 00100111. All eight share the same top 5 bits (00100), while the bottom 3 bits vary across all 8 possible combinations (000 through 111), exactly matching 32 through 39 with nothing left over. Since 5 bits of the third octet are now fixed and shared, the aggregate prefix extends 5 bits into that octet beyond the first two full octets, giving a prefix length of 16 + 5 = 21. So the correct route summarizing exactly 10.20.32.0-10.20.39.255 is 10.20.32.0/21. A /20 would be too broad (16 blocks), and /22 or /23 would each cover fewer than all 8 required blocks."
+  },
+  {
+    id: "cn-network-p3",
+    pyqStyle: true,
+    q: "A router's forwarding table has three entries: 172.20.0.0/16 via next-hop A, 172.20.16.0/20 via next-hop B, and 172.20.16.0/22 via next-hop C. Using longest-prefix matching, which next hop is chosen for a packet destined to 172.20.18.10?",
+    options: ["A", "B", "C", "The packet cannot be forwarded; no entry matches"],
+    answer: 2,
+    marks: 2,
+    difficulty: "medium",
+    type: "pyq-style",
+    explanation: "Check each entry: the /16 route covers all of 172.20.0.0-172.20.255.255, which includes 172.20.18.10. The /20 route covers 172.20.16.0-172.20.31.255, which also includes 172.20.18.10. The /22 route covers only 172.20.16.0-172.20.19.255, a narrower range that still includes 172.20.18.10. All three entries match, but IP forwarding always applies longest-prefix matching, selecting the entry with the greatest number of matching prefix bits, since it represents the most specific known route. Here /22 is the longest of the three matching prefixes, so the packet is forwarded via next-hop C, even though the broader /16 and /20 entries technically also matched."
+  },
+  {
+    id: "cn-network-p4",
+    pyqStyle: true,
+    q: "An IP datagram has a total length of 3200 bytes, including its 20-byte header, giving a 3180-byte payload. It must cross a network with an MTU of 620 bytes (including a 20-byte IP header per fragment, so each fragment can carry at most 600 bytes of payload, already a multiple of 8). Into how many fragments must this datagram be split?",
+    options: ["4", "5", "6", "7"],
+    answer: 2,
+    marks: 2,
+    difficulty: "hard",
+    type: "pyq-style",
+    explanation: "Each fragment can carry at most 600 bytes of the 3180-byte payload. The number of fragments needed is ceil(3180 / 600) = ceil(5.3) = 6. Concretely, the first five fragments each carry a full 600 bytes (covering 3000 bytes total), and the sixth and final fragment carries the remaining 3180 - 3000 = 180 bytes. Since 600 is already a multiple of 8 (as fragment offsets, measured in 8-byte units, require every fragment's payload except possibly the last to be a multiple of 8), no further adjustment is needed. So the datagram is split into 6 fragments, and the destination host reassembles them using the shared Identification field along with each fragment's Offset and More Fragments flag."
+  },
+  {
+    id: "cn-network-p5",
+    pyqStyle: true,
+    q: "Continuing the same fragmentation scenario (3180-byte payload, 600-byte maximum fragment payload, 6 fragments total), what Fragmentation Offset value (in 8-byte units) does the last fragment carry, and what is the More Fragments (MF) flag set to in that last fragment?",
+    options: ["Offset = 300, MF = 1", "Offset = 375, MF = 0", "Offset = 600, MF = 0", "Offset = 375, MF = 1"],
+    answer: 1,
+    marks: 2,
+    difficulty: "hard",
+    type: "pyq-style",
+    explanation: "The first five fragments each carry 600 bytes, so together they cover payload bytes 0 through 2999, a total of 3000 bytes. The sixth (final) fragment therefore starts at byte 3000 within the original payload, and the Offset field records this position in units of 8 bytes: 3000 / 8 = 375. Since this is the last fragment, no more fragments follow it, so the More Fragments flag is cleared to MF = 0 — every other fragment before it (fragments 1 through 5) would carry MF = 1. Together, the shared Identification field, this Offset value, and the MF = 0 marker let the receiving host correctly detect it has all the pieces and reassemble the original 3180-byte payload."
+  },
+  {
+    id: "cn-network-p6",
+    pyqStyle: true,
+    q: "Router M runs a distance-vector protocol and has three neighbours A, B, and C for reaching destination Z, with direct link costs M-A = 3, M-B = 2, and M-C = 5. The neighbours currently advertise their own best distances to Z as: A advertises 4, B advertises 6, and C advertises 1. What is router M's new best cost to Z after this update, and via which neighbour?",
+    options: ["Cost 6, via C", "Cost 6, via A", "Cost 7, via A", "Cost 8, via B"],
+    answer: 0,
+    marks: 2,
+    difficulty: "hard",
+    type: "pyq-style",
+    explanation: "The distance-vector (Bellman-Ford) update rule computes, for each neighbour, the direct link cost to that neighbour plus the neighbour's own advertised distance to the destination, then keeps the minimum. Via A: 3 + 4 = 7. Via B: 2 + 6 = 8. Via C: 5 + 1 = 6. The smallest total is 6, achieved via C, so router M updates its routing table entry for Z to cost 6 with next hop C, replacing whatever it previously had if that was larger. This is exactly the per-neighbour minimization RIP-style protocols perform on every received distance-vector update, always preferring whichever combination of link cost plus advertised remaining distance is smallest."
+  },
+  {
+    id: "cn-network-p7",
+    pyqStyle: true,
+    q: "A NAT (Network Address Translation) router has exactly one public IPv4 address and dedicates the port range 1024 to 5119 (inclusive) for translating outbound TCP connections. Assuming each simultaneous connection to any external server needs its own distinct translated port number, what is the maximum number of simultaneous outbound TCP connections this NAT router can support?",
+    options: [],
+    kind: "nat",
+    answer: 4096,
+    marks: 2,
+    difficulty: "medium",
+    type: "pyq-style",
+    explanation: "NAT with port translation (NAPT/PAT) maps each simultaneous outbound connection to a unique (public IP, port) pair, and since there is only one public IP here, each connection needs a distinct port drawn from the dedicated range. The number of available ports is simply the count of integers from 1024 to 5119 inclusive, which is 5119 - 1024 + 1 = 4096. So this NAT router can support up to 4096 simultaneous outbound TCP connections before it runs out of translatable ports and must reject or queue further connection attempts. This directly tests the fencepost (inclusive-range counting) arithmetic that GATE frequently hides inside NAT and port-multiplexing questions."
+  },
+  {
+    id: "cn-network-p8",
+    pyqStyle: true,
+    q: "An organization is allocated a single /20 block and wants to split it into the maximum possible number of equal-sized /26 subnets. How many /26 subnets can be created from this /20 block?",
+    options: [],
+    kind: "nat",
+    answer: 64,
+    marks: 1,
+    difficulty: "easy",
+    type: "pyq-style",
+    explanation: "Splitting a /20 block into /26 subnets means extending the prefix length by 26 - 20 = 6 bits. Each additional bit of prefix doubles the number of subnets, so 6 extra bits give 2^6 = 64 equal-sized subnets. This is the standard subnetting-count formula tested repeatedly in GATE: the number of subnets obtainable equals 2 raised to the power of (new prefix length - original prefix length), regardless of the specific network address involved. Each of these 64 /26 subnets would then have 2^(32-26) - 2 = 62 usable host addresses, since /26 leaves 6 host bits, two of which (all-0s and all-1s) are reserved for the network and broadcast addresses respectively."
+  },
+  {
+    id: "cn-network-p9",
+    pyqStyle: true,
+    q: "In distance-vector routing, split horizon with poison reverse is used to help mitigate the count-to-infinity problem. Which statement correctly describes what it does, and what it does NOT guarantee?",
+    options: ["It advertises an infinite-cost route back to the neighbour a route was learned from, which prevents count-to-infinity in every possible topology including three-or-more-router loops", "It advertises an infinite-cost route back to the neighbour a route was learned from (rather than staying silent), which helps in simple two-router loops but does not eliminate count-to-infinity in all topologies, such as loops through three or more routers", "It physically disconnects the link to the neighbour whenever a route becomes unreachable", "It replaces distance-vector routing entirely with link-state routing whenever a failure is detected"],
+    answer: 1,
+    marks: 2,
+    difficulty: "medium",
+    type: "concept",
+    explanation: "Split horizon with poison reverse improves on plain split horizon by actively advertising a route back toward the neighbour it was learned from, but with an infinite (unreachable) cost, rather than simply omitting the advertisement. This makes the two-router case immediately clear: if a route becomes unreachable, the neighbour is explicitly told 'infinity' rather than being left to guess. However, this technique is only a partial mitigation, not a complete cure — in more complex topologies involving three or more routers forming a loop, routers can still slowly count up toward infinity because poison reverse only addresses direct back-and-forth pairs, not longer indirect cycles. This distinction between full prevention and partial mitigation is exactly what GATE tests on this topic."
+  },
+  {
+    id: "cn-network-p10",
+    pyqStyle: true,
+    q: "A host is configured with IP address 192.168.5.130 and subnet mask 255.255.255.224 (a /27 prefix). What are the network address and the broadcast address of the subnet this host belongs to?",
+    options: ["Network 192.168.5.128, Broadcast 192.168.5.159", "Network 192.168.5.96, Broadcast 192.168.5.127", "Network 192.168.5.128, Broadcast 192.168.5.191", "Network 192.168.5.130, Broadcast 192.168.5.255"],
+    answer: 0,
+    marks: 2,
+    difficulty: "medium",
+    type: "pyq-style",
+    explanation: "A /27 mask leaves 5 host bits, giving a subnet block size of 2^5 = 32 addresses. Dividing the last octet 130 by 32 gives 4 remainder 2, so this address falls in the 5th block, which starts at 4 x 32 = 128 and spans 128 through 159. The network address is therefore the first address of that block, 192.168.5.128, and the broadcast address is the last address of that block, 192.168.5.159. The usable host range within this subnet runs from 192.168.5.129 to 192.168.5.158 (30 usable addresses), with the host's own address 192.168.5.130 correctly falling inside that usable range, confirming the block boundaries are right."
+  },
+  {
+    id: "cn-network-p11",
+    pyqStyle: true,
+    q: "An IP datagram has a total length of 5000 bytes, including its 20-byte header, giving a 4980-byte payload. It must cross a link with an MTU of 1000 bytes (including a 20-byte header per fragment, so the maximum usable payload per fragment must be rounded down to the nearest multiple of 8, giving 976 bytes). How many fragments are produced, and what is the Fragmentation Offset (in 8-byte units) of the last fragment?",
+    options: ["5 fragments, offset 488", "6 fragments, offset 488", "6 fragments, offset 610", "7 fragments, offset 610"],
+    answer: 2,
+    marks: 2,
+    difficulty: "hard",
+    type: "pyq-style",
+    explanation: "The raw available payload space per fragment is 1000 - 20 = 980 bytes, but since offsets are measured in 8-byte units, each fragment's payload (except the last) must be a multiple of 8, so it is rounded down to floor(980/8) x 8 = 976 bytes. The number of fragments needed is ceil(4980 / 976) = ceil(5.10) = 6. The first five fragments each carry 976 bytes, covering 5 x 976 = 4880 bytes total, so the sixth and final fragment carries the remaining 4980 - 4880 = 100 bytes, starting at byte 4880 of the original payload. Its Offset field is therefore 4880 / 8 = 610, with More Fragments cleared to 0 since it is the last piece."
+  },
+  {
+    id: "cn-network-p12",
+    pyqStyle: true,
+    q: "A router's forwarding table has a default route 0.0.0.0/0 via G, along with 198.51.100.0/24 via H and 198.51.100.64/26 via I. Using longest-prefix matching, which next hop handles a packet destined to 198.51.100.70?",
+    options: ["G, since the default route always takes priority when other routes also match", "H, because /24 is a more commonly used prefix length for this address range", "I, because /26 is the longest matching prefix among all three entries", "The packet is dropped since three entries match ambiguously"],
+    answer: 2,
+    marks: 1,
+    difficulty: "easy",
+    type: "pyq-style",
+    explanation: "All three entries technically match 198.51.100.70: the default route 0.0.0.0/0 matches every address by definition; the /24 route covers 198.51.100.0-198.51.100.255; and the /26 route covers 198.51.100.64-198.51.100.127, all of which include .70. Longest-prefix matching always picks the entry with the most specific (longest) prefix among all matches, regardless of how commonly that prefix length is used or whether a default route also happens to match — the default route is deliberately the least specific (/0) and is only ever chosen when nothing more specific matches at all. Here /26 is the longest matching prefix, so next hop I is selected, with H and G only serving as fallbacks for addresses outside 198.51.100.64/26."
+  },
+  {
+    id: "cn-network-p13",
+    pyqStyle: true,
+    q: "An IPv4 header's checksum field is set to all zeros before computing the checksum. The remaining header, split into 16-bit words, is: 0x4500, 0x003C, 0x1234, 0x0000. Using the standard IPv4 ones-complement checksum algorithm (sum all words with end-around carry, then take the ones complement), what value is inserted into the checksum field?",
+    options: ["0x5770", "0xA88F", "0xB88F", "0x5771"],
+    answer: 1,
+    marks: 2,
+    difficulty: "medium",
+    type: "pyq-style",
+    explanation: "First add all four 16-bit words in ordinary binary: 0x4500 + 0x003C + 0x1234 + 0x0000 = 0x5770 (this particular sum happens to stay within 16 bits, so there is no end-around carry to fold back in — a case that does arise with other word choices and must not be forgotten there). The checksum is then the ones complement of this sum: bitwise-inverting 0x5770 gives 0xA88F. This value 0xA88F is what gets written into the checksum field before transmission. At the receiver (or any router along the path), summing all header words including this checksum field should yield exactly 0xFFFF (all ones) if no bit errors occurred, which is the standard verification step of the IPv4 checksum scheme."
+  },
+  {
+    id: "cn-network-p14",
+    pyqStyle: true,
+    q: "The class C network 200.10.10.0/24 must be divided into exactly 4 equal-sized subnets. What subnet mask should be used, and how many usable host addresses does each resulting subnet have?",
+    options: ["Mask 255.255.255.192 (/26), 62 usable hosts per subnet", "Mask 255.255.255.224 (/27), 30 usable hosts per subnet", "Mask 255.255.255.128 (/25), 126 usable hosts per subnet", "Mask 255.255.255.240 (/28), 14 usable hosts per subnet"],
+    answer: 0,
+    marks: 1,
+    difficulty: "easy",
+    type: "pyq-style",
+    explanation: "Creating exactly 4 equal subnets from one block requires borrowing enough bits so that 2^(borrowed bits) = 4, which means borrowing 2 bits. The original /24 prefix then extends to /24 + 2 = /26, corresponding to subnet mask 255.255.255.192. Each /26 subnet leaves 32 - 26 = 6 host bits, giving 2^6 = 64 total addresses per subnet, of which 2 are reserved (the all-0s network address and the all-1s broadcast address), leaving 64 - 2 = 62 usable host addresses per subnet. This borrow-bits-to-get-N-subnets-then-compute-remaining-host-bits chain is one of the most frequently repeated subnetting question patterns across GATE CN papers."
+  }
+);
+
+window.GATE_DATA.questions['cn'].topics.find(function(t){return t.id==='cn-datalink';}).questions.push(
+  {
+    id: "cn-datalink-p1",
+    pyqStyle: true,
+    q: "Two stations are 1000 km apart, connected by a 100 Mbps link with signal propagation speed 2 x 10^8 m/s. Station A sends 8000-bit frames to B using the stop-and-wait ARQ protocol, waiting for each frame's acknowledgement (of negligible size and transmission time) before sending the next. What is the link utilization (efficiency)?",
+    options: ["0.794%", "1.59%", "7.94%", "50%"],
+    answer: 0,
+    marks: 2,
+    difficulty: "hard",
+    type: "pyq-style",
+    explanation: "Transmission time per frame is tf = 8000 bits / 100,000,000 bps = 80 microseconds. One-way propagation delay is tp = 1,000,000 m / (2x10^8 m/s) = 5,000 microseconds = 5 ms. Since stop-and-wait sends one frame, then waits a full round trip (2 x tp) before the next frame can go out, the ratio a = tp/tf = 5000/80 = 62.5. Utilization for stop-and-wait is U = tf / (tf + 2tp) = 1 / (1 + 2a) = 1 / (1 + 125) = 1/126 = 0.00794, i.e. about 0.794%. This tiny efficiency is the classic motivation for sliding-window protocols: on long, fast links, stop-and-wait wastes over 99% of the available bandwidth idling for acknowledgements, which is exactly the numeric intuition GATE wants students to internalize here."
+  },
+  {
+    id: "cn-datalink-p2",
+    pyqStyle: true,
+    q: "For the same link (100 Mbps, 1000 km, propagation speed 2 x 10^8 m/s, 8000-bit frames, giving a = tp/tf = 62.5), what is the minimum sliding-window size W needed so the sender can transmit continuously with 100% link utilization (never idling waiting for an ACK)?",
+    options: [],
+    kind: "nat",
+    answer: 126,
+    marks: 2,
+    difficulty: "hard",
+    type: "pyq-style",
+    explanation: "In a sliding-window protocol, the sender can keep transmitting without stalling as long as it has not exhausted its window before the first ACK returns. The number of frames that can be sent in one full round-trip time is 1 + 2a, where a = tp/tf = 62.5, giving 1 + 2(62.5) = 126. So the sender needs a window of at least 126 frames outstanding at once to keep the link continuously busy: by the time it has sent frame 126, the ACK for frame 1 has just arrived, letting it slide the window forward without ever pausing. Any smaller window would force the sender to stop and wait partway through, dropping utilization below 100%, exactly the deficiency stop-and-wait (W = 1) suffers from in the extreme."
+  },
+  {
+    id: "cn-datalink-p3",
+    pyqStyle: true,
+    q: "Continuing the same scenario (minimum window size 126 needed for 100% utilization), if Go-Back-N (GBN) is used, what is the minimum number of bits required in the frame sequence number field?",
+    options: ["5", "6", "7", "8"],
+    answer: 2,
+    marks: 2,
+    difficulty: "medium",
+    type: "pyq-style",
+    explanation: "Go-Back-N requires the sender's window size W to satisfy W <= 2^n - 1, where n is the number of sequence-number bits, because the receiver must be able to unambiguously distinguish new frames from old duplicates using cumulative acknowledgements. Here W = 126, so we need 2^n - 1 >= 126, i.e. 2^n >= 127. Testing n = 6 gives 2^6 = 64, which is too small; testing n = 7 gives 2^7 = 128 >= 127, which works. So the minimum sequence-number field width for GBN is 7 bits, allowing sequence numbers 0 through 127 (128 total) to cycle safely without a new frame's sequence number colliding with an old, still-outstanding one within the window."
+  },
+  {
+    id: "cn-datalink-p4",
+    pyqStyle: true,
+    q: "Continuing the same scenario (minimum window size 126), if Selective Repeat (SR) is used instead of GBN, what is the minimum number of bits required in the frame sequence number field?",
+    options: ["6", "7", "8", "9"],
+    answer: 2,
+    marks: 2,
+    difficulty: "medium",
+    type: "pyq-style",
+    explanation: "Selective Repeat requires the stricter constraint W <= 2^(n-1), where n is the number of sequence-number bits, because both the sender's window and the receiver's buffering window must fit within half the sequence-number space to avoid ambiguity between a genuinely new frame and a retransmitted old one that the receiver already buffered. Here W = 126, so we need 2^(n-1) >= 126. Testing n = 7 gives 2^6 = 64, too small; testing n = 8 gives 2^7 = 128 >= 126, which works. So SR needs a minimum of 8 sequence-number bits — one more bit than GBN required for the identical window size, reflecting SR's extra ambiguity-avoidance overhead in exchange for its more selective, bandwidth-efficient retransmission behaviour."
+  },
+  {
+    id: "cn-datalink-p5",
+    pyqStyle: true,
+    q: "Two stations using CSMA/CD are separated by 8 km on a 10 Mbps bus, with signal propagation speed 2 x 10^8 m/s. What is the minimum frame size (in bits) required so that a transmitting station is guaranteed to still be transmitting when a collision signal could arrive back from the far end?",
+    options: ["400 bits", "800 bits", "1000 bits", "1600 bits"],
+    answer: 1,
+    marks: 2,
+    difficulty: "hard",
+    type: "pyq-style",
+    explanation: "For CSMA/CD's collision detection to work reliably, a station must still be transmitting when it could possibly hear about a collision, so the frame transmission time must be at least the full round-trip propagation delay. One-way propagation delay is tp = 8000 m / (2x10^8 m/s) = 40 microseconds, so the round-trip time is 2tp = 80 microseconds. The minimum frame size in bits is then bandwidth x round-trip time = 10,000,000 bps x 80x10^-6 s = 800 bits. If frames were shorter than this, a station could finish transmitting before a collision occurring near the far end propagates back, meaning it would falsely believe its frame was sent successfully — exactly the scenario this minimum-frame-size rule (mirrored by real Ethernet's 512-bit / 64-byte minimum) is designed to prevent."
+  },
+  {
+    id: "cn-datalink-p6",
+    pyqStyle: true,
+    q: "A sender wants to protect the 9-bit dataword 110101001 using a CRC with the 4-bit generator polynomial represented as 1011 (i.e. x^3 + x + 1). After appending 3 zero bits and performing modulo-2 division by 1011, what is the 3-bit CRC remainder that gets appended to form the transmitted codeword?",
+    options: ["000", "001", "011", "101"],
+    answer: 1,
+    marks: 2,
+    difficulty: "hard",
+    type: "pyq-style",
+    explanation: "CRC computation appends (n-1) zero bits, where n = 4 is the generator's bit length, to the 9-bit dataword, giving the 12-bit sequence 110101001000, then performs modulo-2 (XOR-based, no-borrow) binary long division by the generator 1011. Carrying out this division step by step yields a final remainder of 001. This remainder replaces the appended zero bits to form the transmitted codeword 110101001001. As a check, dividing this full codeword 110101001001 by the same generator 1011 using modulo-2 division yields a remainder of exactly 000, confirming the codeword is valid — this all-zero-remainder check is precisely what the receiver performs to detect whether any bit errors occurred in transit."
+  },
+  {
+    id: "cn-datalink-p7",
+    pyqStyle: true,
+    q: "A sliding-window protocol operates on a 2 Mbps link where each frame is 2000 bits (so transmission time tf = 1 ms) and the one-way propagation delay is 9.5 ms. If the sender's window size is fixed at W = 5 frames, what is the resulting link utilization?",
+    options: ["12.5%", "20%", "25%", "50%"],
+    answer: 2,
+    marks: 2,
+    difficulty: "medium",
+    type: "pyq-style",
+    explanation: "Here a = tp/tf = 9.5ms / 1ms = 9.5, so the number of frames that could be sent in one full round trip (the window needed for 100% utilization) is 1 + 2a = 1 + 19 = 20. Since the actual window W = 5 is smaller than this required value of 20, the sender exhausts its window and stalls waiting for ACKs well before the link would otherwise become idle on its own, so utilization is simply U = W / (1 + 2a) = 5/20 = 0.25, i.e. 25%. Only once W reaches or exceeds 20 would the link achieve 100% utilization; below that threshold, utilization scales linearly with window size, exactly the relationship this question tests."
+  },
+  {
+    id: "cn-datalink-p8",
+    pyqStyle: true,
+    q: "For the same link (a = tp/tf = 9.5), what is the minimum window size needed to achieve 100% link utilization?",
+    options: [],
+    kind: "nat",
+    answer: 20,
+    marks: 1,
+    difficulty: "medium",
+    type: "pyq-style",
+    explanation: "The number of frames that fit within one full round-trip time (transmission time plus the two-way propagation delay) is 1 + 2a. With a = tp/tf = 9.5, this is 1 + 2(9.5) = 1 + 19 = 20. Once the sender's window size reaches 20, it can keep transmitting frame after frame continuously: by the time it finishes sending its 20th frame, the acknowledgement for its very first frame has just arrived, letting the window slide forward with no idle gap. Any window smaller than 20 forces at least some idle waiting each cycle, which is exactly why the previous question with W = 5 achieved only 25% utilization (5 out of the needed 20)."
+  },
+  {
+    id: "cn-datalink-p9",
+    pyqStyle: true,
+    q: "For that same link requiring a minimum window of 20 frames for full utilization, what is the minimum number of sequence-number bits needed if Go-Back-N (GBN) is used?",
+    options: ["4", "5", "6", "20"],
+    answer: 1,
+    marks: 1,
+    difficulty: "medium",
+    type: "pyq-style",
+    explanation: "GBN's constraint is W <= 2^n - 1. With the required window W = 20, we need 2^n - 1 >= 20, i.e. 2^n >= 21. Testing n = 4 gives 2^4 = 16, too small. Testing n = 5 gives 2^5 = 32 >= 21, which works. So the minimum number of sequence-number bits for GBN here is 5, allowing sequence numbers 0 through 31 to cycle. Note that the answer is not simply the window size itself (20) — GBN's cumulative-ACK design only needs enough distinct sequence numbers to avoid ambiguity across one window's worth of outstanding frames, which is comfortably fewer bits than the window size would naively suggest."
+  },
+  {
+    id: "cn-datalink-p10",
+    pyqStyle: true,
+    q: "For that same link requiring a minimum window of 20 frames for full utilization, what is the minimum number of sequence-number bits needed if Selective Repeat (SR) is used instead?",
+    options: ["5", "6", "7", "10"],
+    answer: 1,
+    marks: 1,
+    difficulty: "medium",
+    type: "pyq-style",
+    explanation: "Selective Repeat's stricter constraint is W <= 2^(n-1). With the required window W = 20, we need 2^(n-1) >= 20. Testing n = 5 gives 2^4 = 16, too small. Testing n = 6 gives 2^5 = 32 >= 20, which works. So SR needs a minimum of 6 sequence-number bits here — one more than GBN's 5 bits for the same window size — because SR's individually-acknowledged, out-of-order-buffering design requires the sequence-number space to be at least twice the window size to prevent a retransmitted old frame from being mistaken for a new one by the receiver's buffer."
+  },
+  {
+    id: "cn-datalink-p11",
+    pyqStyle: true,
+    q: "A data-link protocol uses bit stuffing with the standard HDLC rule: after any five consecutive 1-bits in the data, a 0 is inserted before transmission (and removed by the receiver), so that the true 6-consecutive-1s flag pattern never appears inside the data. Given the 22-bit data payload 0111111011111101111110, how many extra 0-bits does the stuffing process insert in total?",
+    options: [],
+    kind: "nat",
+    answer: 3,
+    marks: 2,
+    difficulty: "medium",
+    type: "pyq-style",
+    explanation: "Scanning left to right and counting consecutive 1-bits, the 22-bit payload contains exactly three separate runs of six consecutive 1s (each followed by a single naturally-occurring 0 that is part of the original data, not stuffing). Every time a run of 1s reaches exactly five consecutive 1-bits, the stuffing rule inserts a single extra 0 immediately after that fifth one, then resumes counting from zero for whatever 1-bits follow (so a six-long run gets exactly one stuffed bit, not two, since the sixth 1 only reaches a fresh count of 1 after the reset). With three such six-long runs in this payload, stuffing inserts exactly 3 extra 0-bits in total, expanding the 22-bit payload to 25 bits on the wire — the receiver then strips out precisely these 3 bits during destuffing to recover the original data."
+  },
+  {
+    id: "cn-datalink-p12",
+    pyqStyle: true,
+    q: "In CSMA/CD with binary exponential backoff, a station experiences its 4th consecutive collision on a given frame. From how many distinct integer values can it now randomly choose its backoff count k (in units of slot time), and what is the maximum possible number of slot times it might have to wait?",
+    options: ["8 values (0 to 7); maximum wait 7 slot times", "16 values (0 to 15); maximum wait 15 slot times", "4 values (0 to 3); maximum wait 3 slot times", "32 values (0 to 31); maximum wait 31 slot times"],
+    answer: 1,
+    marks: 2,
+    difficulty: "medium",
+    type: "pyq-style",
+    explanation: "Binary exponential backoff picks a random integer k uniformly from the range 0 to 2^m - 1, where m is the number of collisions experienced so far (capped at 10 in real Ethernet, but that cap is irrelevant this early). After the 4th collision, m = 4, so k is chosen from 0 to 2^4 - 1 = 15, giving 2^4 = 16 distinct possible values overall. The station then waits k slot times before attempting retransmission, so the maximum possible wait is 15 slot times (if k happens to be chosen as 15). This doubling of the contention window after each successive collision is exactly the 'exponential' part of the algorithm, spreading out retransmission attempts to reduce the chance of repeated collisions among the same contending stations."
+  },
+  {
+    id: "cn-datalink-p13",
+    pyqStyle: true,
+    q: "A block error-correcting code is designed with a minimum Hamming distance of 6 between any two valid codewords. What is the maximum number of bit errors this code is guaranteed to detect, and the maximum number it is guaranteed to correct?",
+    options: ["Detect 6, correct 3", "Detect 5, correct 2", "Detect 5, correct 3", "Detect 6, correct 2"],
+    answer: 1,
+    marks: 2,
+    difficulty: "medium",
+    type: "pyq-style",
+    explanation: "For a code with minimum Hamming distance d_min, the guaranteed error-detection capability is d_min - 1 bits, and the guaranteed error-correction capability is floor((d_min - 1) / 2) bits. With d_min = 6, detection capability is 6 - 1 = 5 bit errors: any pattern of up to 5 bit flips cannot turn one valid codeword into another valid codeword, so it is always detectable. Correction capability is floor(5/2) = floor(2.5) = 2 bit errors: the receiver can always correctly identify and fix up to 2 bit errors by finding the nearest valid codeword, but a 3-bit error pattern could potentially land exactly as close to a different valid codeword, making correction unreliable beyond 2 bits."
+  },
+  {
+    id: "cn-datalink-p14",
+    pyqStyle: true,
+    q: "In the basic stop-and-wait ARQ protocol (assuming reliable, though possibly delayed or duplicated, delivery over the link), what is the minimum number of distinct sequence numbers that must be used to correctly distinguish a new frame from a delayed duplicate of the previous frame?",
+    options: ["1", "2", "4", "As many as the number of frames sent in the entire session"],
+    answer: 1,
+    marks: 1,
+    difficulty: "easy",
+    type: "concept",
+    explanation: "Because stop-and-wait only ever has one frame outstanding at a time (the sender waits for each frame's ACK before sending the next), the receiver only ever needs to distinguish 'this is the next new frame' from 'this is a delayed duplicate retransmission of the frame I already have.' Two sequence numbers, alternating 0 and 1, are sufficient for this: if the receiver just accepted sequence number 0, any further frame arriving still labelled 0 must be a duplicate (from a lost ACK causing retransmission) and is discarded (though re-acknowledged), while a frame labelled 1 is the genuinely new one. This is why stop-and-wait needs only a single sequence-number bit, in sharp contrast to sliding-window protocols like GBN and SR, which need many more bits to cover an entire window's worth of frames."
+  }
+);
+
+window.GATE_DATA.questions['cn'].topics.find(function(t){return t.id==='cn-transport';}).questions.push(
+  {
+    id: "cn-transport-p1",
+    pyqStyle: true,
+    q: "Host A sends a TCP segment to host B with sequence number 100, carrying 200 bytes of data. Host B then sends a reply segment with sequence number 500 and acknowledgement number 300 (acknowledging A's data), carrying 100 bytes of its own data back to A. What sequence number and acknowledgement number does A's next segment to B carry?",
+    options: ["Sequence 300, Acknowledgement 500", "Sequence 300, Acknowledgement 600", "Sequence 200, Acknowledgement 600", "Sequence 300, Acknowledgement 300"],
+    answer: 1,
+    marks: 2,
+    difficulty: "medium",
+    type: "pyq-style",
+    explanation: "A's first segment carried bytes numbered 100 through 299 (100 + 200 - 1), so A's next byte to send starts at sequence number 100 + 200 = 300. B's reply carried sequence number 500 and 100 bytes of data, covering bytes 500 through 599, so B's next expected byte to receive is 600; this means A must acknowledge up through byte 599 by sending acknowledgement number 600 (TCP acknowledgement numbers are cumulative and specify the next byte expected, not the last byte received). So A's next segment carries sequence number 300 (continuing its own byte stream) and acknowledgement number 600 (piggybacked acknowledgement of B's data) — sequence and acknowledgement numbers are tracked completely independently in each direction of a full-duplex TCP connection."
+  },
+  {
+    id: "cn-transport-p2",
+    pyqStyle: true,
+    q: "A TCP connection begins with ssthresh = 16 (in segments) and cwnd = 1. Using standard slow start (cwnd doubles each RTT until reaching ssthresh) followed by congestion avoidance (cwnd increases by 1 each RTT), what is cwnd at the start of round 9, immediately before a timeout is detected?",
+    options: [],
+    kind: "nat",
+    answer: 20,
+    marks: 2,
+    difficulty: "hard",
+    type: "pyq-style",
+    explanation: "Slow start doubles cwnd each round: round 1 -> 1, round 2 -> 2, round 3 -> 4, round 4 -> 8, round 5 -> 16 (cwnd now equals ssthresh, so the connection switches to congestion avoidance). From round 5 onward, cwnd increases by exactly 1 per round instead of doubling: round 6 -> 17, round 7 -> 18, round 8 -> 19, round 9 -> 20. So immediately before the timeout is detected (which is discovered at round 9, after cwnd has grown to 20 through this round-by-round process), cwnd = 20. This is the classic slow-start-then-linear-growth sawtooth pattern GATE repeatedly draws as a cwnd-vs-round-number graph and asks students to read values off or reconstruct numerically."
+  },
+  {
+    id: "cn-transport-p3",
+    pyqStyle: true,
+    q: "Continuing the same TCP connection (timeout detected with cwnd = 20 at round 9), the standard timeout response sets ssthresh = cwnd/2 and resets cwnd = 1, restarting slow start. After this reset, at which round number does cwnd first reach the new ssthresh value (i.e., when does the connection switch back to congestion avoidance)?",
+    options: ["Round 12", "Round 13", "Round 14", "Round 15"],
+    answer: 2,
+    marks: 2,
+    difficulty: "hard",
+    type: "pyq-style",
+    explanation: "After the timeout, the new ssthresh = 20/2 = 10, and cwnd resets to 1 at round 10. Slow start then doubles cwnd each round: round 10 -> 1, round 11 -> 2, round 12 -> 4, round 13 -> 8, and round 14 -> would double to 16, but since that exceeds the new ssthresh of 10, cwnd is instead capped at ssthresh = 10 for round 14. This is the round at which cwnd first reaches ssthresh, so the connection switches from slow start to congestion avoidance at round 14, after which cwnd increases by only 1 per round (round 15 -> 11, and so on). Capping growth exactly at ssthresh, rather than overshooting past it, is a detail GATE frequently tests."
+  },
+  {
+    id: "cn-transport-p4",
+    pyqStyle: true,
+    q: "A TCP sender detects packet loss in two different ways: via a retransmission timeout (RTO expiry) versus via receiving three duplicate ACKs (triggering fast retransmit). According to the standard TCP congestion-control model taught for GATE, how does the sender's response to these two events differ?",
+    options: ["Both events cause identical behaviour: ssthresh is halved and cwnd resets to 1, restarting slow start", "On a timeout, ssthresh is halved and cwnd resets to 1 (restarting slow start); on triple duplicate ACKs, ssthresh is halved and cwnd is also set to that same halved value, remaining in (or entering) congestion avoidance without dropping to 1", "On a timeout, cwnd is left completely unchanged; only triple duplicate ACKs reduce cwnd", "Triple duplicate ACKs are ignored entirely by TCP; only timeouts trigger any congestion response"],
+    answer: 1,
+    marks: 2,
+    difficulty: "medium",
+    type: "concept",
+    explanation: "A timeout is treated as a strong signal of serious congestion (since it typically means no ACKs are getting through at all), so TCP reacts drastically: ssthresh is set to half the current cwnd, and cwnd itself drops all the way back to 1, forcing the connection to restart from slow start. Triple duplicate ACKs, by contrast, indicate that most segments are still getting through (since ACKs are arriving, just not the one that would advance the cumulative acknowledgement), so this is treated as a milder congestion signal: ssthresh is still halved, but cwnd is set directly to that new (halved) ssthresh value rather than collapsing to 1, letting the connection continue in congestion avoidance's gentler linear-increase mode instead of re-entering the aggressive slow-start phase."
+  },
+  {
+    id: "cn-transport-p5",
+    pyqStyle: true,
+    q: "A TCP sender's cwnd is 20 segments when it receives three duplicate ACKs, triggering fast retransmit. Following the standard model (ssthresh = cwnd/2, then cwnd = ssthresh, remaining in congestion avoidance), what is cwnd one round-trip time after this event?",
+    options: ["10", "11", "15", "20"],
+    answer: 1,
+    marks: 2,
+    difficulty: "medium",
+    type: "pyq-style",
+    explanation: "On the triple duplicate ACK event, ssthresh is set to half the current cwnd: 20/2 = 10, and cwnd is immediately set to this same new ssthresh value of 10 (not reset to 1, since triple duplicate ACKs are a milder signal than a full timeout). Since cwnd now equals ssthresh, the connection is already in (or re-enters) congestion avoidance mode, where cwnd grows by exactly 1 segment per round-trip time rather than doubling. So one RTT after the event, cwnd = 10 + 1 = 11. This linear, additive growth immediately following a halving is exactly the 'AIMD' (Additive Increase, Multiplicative Decrease) sawtooth behaviour that gives TCP Reno's congestion window its characteristic sawtooth-shaped graph over time."
+  },
+  {
+    id: "cn-transport-p6",
+    pyqStyle: true,
+    q: "A TCP connection has a fixed send window of 64 KB (65536 bytes) and the round-trip time to the receiver is 100 ms. Ignoring all other delays and assuming the sender always has data ready to send, what is the maximum achievable throughput of this connection?",
+    options: ["3.2 Mbps", "5.24 Mbps", "6.4 Mbps", "10.48 Mbps"],
+    answer: 1,
+    marks: 2,
+    difficulty: "medium",
+    type: "pyq-style",
+    explanation: "With a fixed window W, TCP can have at most W bytes of unacknowledged data in flight at once, so once the pipe is full, throughput is capped at Throughput = W / RTT. Here W = 65536 bytes and RTT = 0.1 s, giving 65536 / 0.1 = 655360 bytes/second. Converting to bits per second: 655360 x 8 = 5,242,880 bps = 5.24 Mbps (approximately). No matter how much raw bandwidth the underlying link provides, a TCP connection can never exceed this window-over-RTT ceiling, which is exactly why applications needing higher throughput over high-RTT paths need a correspondingly larger TCP window (this is the basis of the 'bandwidth-delay product' sizing rule for TCP window scaling)."
+  },
+  {
+    id: "cn-transport-p7",
+    pyqStyle: true,
+    q: "A path has available bandwidth 10 Mbps and round-trip time 50 ms. What is the bandwidth-delay product of this path, in bytes — i.e., the minimum TCP window size (in bytes) needed to keep the pipe fully utilized?",
+    options: [],
+    kind: "nat",
+    answer: 62500,
+    marks: 2,
+    difficulty: "medium",
+    type: "pyq-style",
+    explanation: "The bandwidth-delay product represents the maximum amount of data that can be 'in flight' on the path at any instant, and is computed as Bandwidth x RTT. In bits, this is 10,000,000 bps x 0.05 s = 500,000 bits. Converting to bytes: 500,000 / 8 = 62,500 bytes. This means the sender's TCP window must be at least 62,500 bytes (about 61 KB) for the connection to keep the link continuously saturated with data; any smaller window forces the sender to pause and wait for acknowledgements before the pipe is full, just as with the sliding-window utilization formulas seen at the data-link layer, only here applied end-to-end across an entire network path rather than a single hop."
+  },
+  {
+    id: "cn-transport-p8",
+    pyqStyle: true,
+    q: "A server machine simultaneously handles two independent TCP connections from two different client processes, both connecting to the exact same server IP address and the exact same server port number 80. What allows the server's operating system to correctly distinguish and demultiplex data belonging to these two separate connections?",
+    options: ["It is impossible; a server can only handle one connection per port at a time", "The full 4-tuple (source IP, source port, destination IP, destination port) uniquely identifies each connection, so differing client IPs or client ports make the two connections distinct even though the server IP and port match", "The server assigns each connection a different destination port internally, even though the client believes it connected to port 80", "TCP uses only the destination port for demultiplexing, so this scenario is not actually possible"],
+    answer: 1,
+    marks: 1,
+    difficulty: "easy",
+    type: "concept",
+    explanation: "A TCP connection (a 'socket pair') is uniquely identified by the 4-tuple: (source IP address, source port, destination IP address, destination port). Two connections can share the same destination IP and destination port (both being the server's address and the well-known port 80) and still be entirely distinct, as long as they differ in source IP, source port, or both — which is virtually always the case for connections from different client processes, since each client typically uses a different IP address or, even from the same host, a different ephemeral source port per connection. The operating system's TCP stack uses this full 4-tuple as the demultiplexing key to route each arriving segment's data to the correct socket buffer and application process."
+  },
+  {
+    id: "cn-transport-p9",
+    pyqStyle: true,
+    q: "In TCP flow control (as opposed to congestion control), the receiver advertises a window size in every ACK segment it sends back to the sender. If host B's TCP receive buffer is nearly full and it advertises a window size of 0, what must the sender do?",
+    options: ["Immediately close the connection, since a zero window means the receiver has failed", "Stop sending new data (except small probe segments sent periodically to check if the window has reopened) until B advertises a nonzero window again", "Ignore the advertised window and continue sending at the same rate, since flow control is only advisory", "Switch the connection from TCP to UDP to avoid the flow-control restriction"],
+    answer: 1,
+    marks: 1,
+    difficulty: "easy",
+    type: "concept",
+    explanation: "TCP flow control exists to prevent a fast sender from overwhelming a slow receiver's buffer space, and the receiver communicates its available buffer capacity via the advertised (receive) window field in every ACK. A window size of 0 explicitly tells the sender 'do not send any more data right now, my buffer is full' — the sender must pause regular data transmission. To avoid a deadlock where the receiver's later window update is itself lost and never noticed, TCP senders periodically send small 'window probe' segments (typically carrying 1 byte of data) to elicit a fresh ACK carrying the receiver's current window size, resuming full-speed transmission once that advertised window becomes nonzero again."
+  },
+  {
+    id: "cn-transport-p10",
+    pyqStyle: true,
+    q: "A TCP sender uses a Maximum Segment Size (MSS) of 1460 bytes of application data per segment, with a combined TCP + IP header overhead of 40 bytes per segment (20 bytes each). Over a 10 Mbps link running at full capacity, what is the effective application-level throughput (goodput), accounting for this header overhead?",
+    options: ["8.90 Mbps", "9.33 Mbps", "9.73 Mbps", "10.00 Mbps"],
+    answer: 2,
+    marks: 2,
+    difficulty: "medium",
+    type: "pyq-style",
+    explanation: "Every segment sent on the wire actually occupies 1460 + 40 = 1500 bytes total (data plus headers), but only the 1460 bytes of data is useful application-level goodput; the remaining 40 bytes is protocol overhead. So the fraction of the link's raw bandwidth that translates into actual goodput is 1460/1500 = 0.9733, or 97.33%. Applying this fraction to the full 10 Mbps link capacity: 10 Mbps x 0.9733 = 9.733 Mbps (approximately 9.73 Mbps). This overhead fraction shrinks (goodput efficiency improves) as MSS increases relative to the fixed 40-byte header cost, which is exactly why protocols try to use as large an MSS as the path's MTU safely allows, to minimize this fixed per-segment overhead tax."
+  },
+  {
+    id: "cn-transport-p11",
+    pyqStyle: true,
+    q: "TCP's congestion avoidance phase uses an Additive-Increase, Multiplicative-Decrease (AIMD) strategy. Which statement correctly describes why AIMD, rather than, say, Multiplicative-Increase Multiplicative-Decrease (MIMD), is used for TCP's congestion window adjustment?",
+    options: ["AIMD converges towards fair, stable bandwidth-sharing among competing connections, since additive increase probes gently for spare capacity while multiplicative decrease backs off sharply and quickly upon detecting congestion; MIMD's aggressive multiplicative growth can instead amplify unfairness and oscillate wildly", "AIMD was chosen purely for historical, arbitrary reasons with no mathematical justification for fairness or stability", "MIMD actually provides strictly better throughput and fairness than AIMD in every scenario, but is harder to implement", "AIMD only affects the receiver's advertised window, never the sender's actual congestion window"],
+    answer: 0,
+    marks: 2,
+    difficulty: "medium",
+    type: "concept",
+    explanation: "A classical result in congestion-control theory (the Chiu-Jain analysis) shows that additive increase paired with multiplicative decrease is what drives multiple competing connections sharing a bottleneck link towards an equal, fair allocation of bandwidth over time, while remaining responsive enough to quickly back off when congestion is detected. Additive increase (growing cwnd by a fixed small amount, +1 MSS per RTT) is a cautious, gentle probe for any spare capacity that appears; multiplicative decrease (halving cwnd) is a fast, proportionally scaled retreat exactly when congestion signals appear, regardless of how large cwnd had grown. Multiplicative-increase alternatives grow far too aggressively and do not have the same fairness-converging mathematical property, risking oscillation and unfairness between competing flows instead of settling towards balance."
+  },
+  {
+    id: "cn-transport-p12",
+    pyqStyle: true,
+    q: "TCP estimates its retransmission timeout using Jacobson's exponentially weighted moving average: EstimatedRTT_new = (1 - alpha) x EstimatedRTT_old + alpha x SampleRTT, with the standard alpha = 0.125. If the current EstimatedRTT is 100 ms and a fresh SampleRTT measurement of 120 ms is observed, what is the updated EstimatedRTT?",
+    options: [],
+    kind: "nat",
+    answer: 102.5,
+    marks: 2,
+    difficulty: "medium",
+    type: "pyq-style",
+    explanation: "Substituting directly into the formula: EstimatedRTT_new = (1 - 0.125) x 100 + 0.125 x 120 = 0.875 x 100 + 0.125 x 120 = 87.5 + 15 = 102.5 ms. This exponentially weighted moving average deliberately gives most weight (87.5%) to the prior smoothed estimate and only a small weight (12.5%) to any single fresh sample, which smooths out noisy round-trip-time fluctuations from one measurement to the next while still gradually tracking real changes in network conditions over many samples. This EstimatedRTT (combined with a similarly smoothed deviation term) feeds into computing the actual retransmission timeout value TCP uses to decide when to declare a segment lost and retransmit it."
+  },
+  {
+    id: "cn-transport-p13",
+    pyqStyle: true,
+    q: "During TCP's three-way handshake, host A sends a SYN segment with an Initial Sequence Number (ISN) of 3000. Host B replies with SYN+ACK, using its own ISN of 8000. What sequence number and acknowledgement number does B's SYN+ACK segment carry?",
+    options: ["Sequence 8000, Acknowledgement 3000", "Sequence 8000, Acknowledgement 3001", "Sequence 8001, Acknowledgement 3000", "Sequence 3001, Acknowledgement 8000"],
+    answer: 1,
+    marks: 1,
+    difficulty: "easy",
+    type: "concept",
+    explanation: "Each side's SYN segment, though it carries no actual application data, is treated as consuming exactly one sequence number, so host A's SYN with ISN 3000 means the next byte A will send (or the byte number the connection logically continues from) is 3001; consequently, B must acknowledge A's SYN using acknowledgement number 3001 (not 3000), following TCP's rule that the acknowledgement number always names the next byte expected, one past the last byte (or SYN/FIN control bit) actually received. B's own segment carries its own chosen Initial Sequence Number, 8000, in the sequence number field, since it is starting its own independent byte stream in the other direction. So B's SYN+ACK carries sequence number 8000 and acknowledgement number 3001."
+  },
+  {
+    id: "cn-transport-p14",
+    pyqStyle: true,
+    q: "The TCP checksum is computed over a pseudo-header (containing the source IP, destination IP, protocol number, and TCP segment length) in addition to the TCP header and data. Why does TCP deliberately include this network-layer information from the IP header in its own checksum computation, even though IP has its own separate header checksum?",
+    options: ["It is redundant and serves no purpose; TCP could safely skip it since IP already checks its own header", "It lets TCP detect certain misdelivered segments, such as ones that arrived at the wrong destination IP address or were incorrectly attributed to the wrong upper-layer protocol, which IP's own header checksum (covering only the IP header, not these end-to-end associations) would not catch", "It allows TCP to encrypt the segment using the IP addresses as a key", "It is required so that NAT routers can rewrite the checksum without needing to touch the TCP header at all"],
+    answer: 1,
+    marks: 2,
+    difficulty: "medium",
+    type: "concept",
+    explanation: "IP's own header checksum only verifies that the IP header itself was not corrupted in transit; it says nothing about whether the packet ended up correctly associated with the right upper-layer protocol or the right source/destination IP pairing further down the stack, especially since the IP header is technically outside of what TCP itself receives as its payload. By folding the source IP, destination IP, protocol field, and segment length into its own checksum computation via the pseudo-header, TCP can additionally catch scenarios like a segment being misrouted to the wrong destination address or misidentified as belonging to a different protocol, providing an extra end-to-end sanity check that complements, rather than duplicates, IP's more narrowly scoped header-only checksum."
+  }
+);
+
+window.GATE_DATA.questions['cn'].topics.find(function(t){return t.id==='cn-application';}).questions.push(
+  {
+    id: "cn-application-p1",
+    pyqStyle: true,
+    q: "A browser must fetch a base HTML page plus 5 embedded objects, all hosted on the same server. Assume 1 RTT is needed for the initial DNS lookup (only once), transmission and processing times are negligible, and the browser uses non-persistent HTTP with no parallel connections (each object requires its own separate serial TCP connection). How many total RTTs elapse from starting the DNS lookup until all 6 items (page + 5 objects) are fully received?",
+    options: [],
+    kind: "nat",
+    answer: 13,
+    marks: 2,
+    difficulty: "hard",
+    type: "pyq-style",
+    explanation: "The DNS lookup itself costs 1 RTT. Fetching the base HTML page under non-persistent HTTP needs 1 RTT to set up a new TCP connection plus 1 RTT to send the request and receive the response, totaling 2 RTT. Since there are no parallel connections, each of the 5 embedded objects must then be fetched one at a time, each also needing its own fresh TCP connection: 1 RTT (setup) + 1 RTT (request/response) = 2 RTT per object, so 5 x 2 = 10 RTT for all objects combined, done strictly serially. Adding it all up: 1 (DNS) + 2 (base page) + 10 (five objects, serial) = 13 RTT total. This fully serial, connection-per-object behaviour is exactly why non-persistent HTTP without any parallelism is by far the slowest of the standard HTTP transfer models."
+  },
+  {
+    id: "cn-application-p2",
+    pyqStyle: true,
+    q: "Continuing the same scenario (1 base page + 5 embedded objects, 1 RTT DNS lookup), if the browser instead uses non-persistent HTTP but is allowed up to 3 parallel TCP connections simultaneously, how many total RTTs elapse until everything is received?",
+    options: ["5", "6", "7", "9"],
+    answer: 2,
+    marks: 2,
+    difficulty: "hard",
+    type: "pyq-style",
+    explanation: "DNS lookup still costs 1 RTT, and the base page still needs 2 RTT (connection setup + request/response), just as before, since it must be fetched before the browser even knows which 5 objects it needs. With 3 parallel connections available for the 5 embedded objects, the browser can fetch 3 objects simultaneously in the first batch (taking 2 RTT for that batch, since all 3 run in parallel and finish together) and the remaining 2 objects in a second batch (also 2 RTT, running in parallel with each other). So the objects need ceil(5/3) = 2 sequential batches x 2 RTT each = 4 RTT total for all embedded objects. Grand total: 1 (DNS) + 2 (base page) + 4 (objects, 2 parallel batches) = 7 RTT."
+  },
+  {
+    id: "cn-application-p3",
+    pyqStyle: true,
+    q: "Continuing the same scenario (1 base page + 5 embedded objects, 1 RTT DNS lookup), if the browser instead uses persistent HTTP with pipelining (a single TCP connection is reused, and all requests for the 5 objects are sent back-to-back without waiting for individual responses), how many total RTTs elapse until everything is received?",
+    options: ["2", "3", "4", "6"],
+    answer: 2,
+    marks: 2,
+    difficulty: "medium",
+    type: "pyq-style",
+    explanation: "DNS lookup costs 1 RTT. With persistent HTTP, only a single TCP connection needs to be established for the entire page, costing 1 RTT for the handshake, after which the base page's request and response take another 1 RTT. Once the base page is parsed and the 5 embedded object URLs are known, pipelining lets the browser fire off all 5 object requests back-to-back over the same already-open connection without waiting for each response individually, so all 5 responses can stream back within a single additional RTT. Total: 1 (DNS) + 1 (TCP setup) + 1 (base page) + 1 (all 5 objects, pipelined) = 4 RTT — dramatically fewer round trips than either non-persistent variant, which is exactly why HTTP/1.1 made persistent connections (and pipelining) the norm."
+  },
+  {
+    id: "cn-application-p4",
+    pyqStyle: true,
+    q: "Continuing the same scenario once more, if the browser uses persistent HTTP but WITHOUT pipelining (the same TCP connection is reused for every object, but each object's request must still wait for the previous object's response before being sent), how many total RTTs elapse until everything is received?",
+    options: ["4", "6", "7", "8"],
+    answer: 3,
+    marks: 2,
+    difficulty: "medium",
+    type: "pyq-style",
+    explanation: "As before: 1 RTT for DNS, 1 RTT for the single TCP connection setup, and 1 RTT for the base page's request/response, using the same persistent connection. Without pipelining, however, each of the 5 embedded objects must be requested strictly one after another, each needing its own full RTT (request out, response back) before the next object's request can even be sent, even though no new TCP connection is needed each time. That is 5 x 1 = 5 RTT for the objects. Total: 1 (DNS) + 1 (TCP setup) + 1 (base page) + 5 (objects, serial requests over the reused connection) = 8 RTT. This sits between the fully serial non-persistent case (13 RTT) and the pipelined persistent case (4 RTT), isolating exactly how much benefit pipelining alone contributes once the connection-reuse benefit is already accounted for."
+  },
+  {
+    id: "cn-application-p5",
+    pyqStyle: true,
+    q: "A client's local DNS server has an empty cache (no records for root, TLD, or authoritative servers) and must resolve a domain name using iterative queries: it queries the root server, then the appropriate TLD server, then the authoritative server for that domain, one after another. Assuming every query-response round trip (client-to-local-server, and each of the local server's three iterative queries) takes exactly 1 RTT, how many total RTTs elapse before the client receives the final resolved IP address?",
+    options: [],
+    kind: "nat",
+    answer: 4,
+    marks: 2,
+    difficulty: "medium",
+    type: "pyq-style",
+    explanation: "The client sends its query to the local (recursive) DNS server and waits for a reply — but that single client-observed round trip actually encompasses everything the local server does internally first. With an empty cache, the local server must itself perform three sequential iterative queries: first to a root server (1 RTT), then to the TLD server the root pointed it to (1 RTT), then to the authoritative server the TLD server pointed it to (1 RTT) — 3 RTT total just for the local server's own resolution work. Only after obtaining the final answer does the local server reply to the client, which is the 4th RTT from the client's perspective (client-to-local-server and back). So the total elapsed time, as experienced by the client, is 1 + 3 = 4 RTT, even though the client itself only ever sent one query."
+  },
+  {
+    id: "cn-application-p6",
+    pyqStyle: true,
+    q: "In the DNS hierarchy, what is the key difference between a recursive query and an iterative query, as used between a client, its local DNS server, and the root/TLD/authoritative servers?",
+    options: ["A recursive query means the server receiving it takes full responsibility for obtaining the complete final answer (possibly by issuing further queries of its own) before replying; an iterative query means the server receiving it may simply reply with a referral to another server that might know better, rather than the final answer itself", "A recursive query always takes exactly one RTT while an iterative query always takes multiple RTTs, regardless of caching", "Iterative queries are used only for IPv6 addresses, recursive queries only for IPv4", "There is no functional difference; the terms are interchangeable synonyms for the same query mechanism"],
+    answer: 0,
+    marks: 1,
+    difficulty: "easy",
+    type: "concept",
+    explanation: "In a recursive query, the queried server is obligated to fully resolve the request on the client's behalf, chasing down whatever further queries are needed itself, and only sends back the final, complete answer (this is what a client typically sends to its local DNS server). In an iterative query, the queried server is allowed to respond immediately with 'I don't know the final answer, but here is a referral to a server that might' — it does not do the follow-up work itself (this is what a local DNS server typically sends to root and TLD servers). This asymmetry is why the local DNS server bears the burden of walking down the DNS hierarchy step by step on the client's behalf, while the client itself only ever issues one recursive-style request and waits for the fully resolved answer."
+  },
+  {
+    id: "cn-application-p7",
+    pyqStyle: true,
+    q: "FTP (File Transfer Protocol) is unusual among common application-layer protocols in that it uses two separate TCP connections for a single file-transfer session. What is each connection used for?",
+    options: ["One connection carries only usernames/passwords; the other carries only file data, with no other information", "A control connection (typically port 21) stays open for the entire session carrying commands and status replies (like login, directory listing, file requests); a separate data connection (typically port 20 in active mode, or a negotiated port in passive mode) is opened only when actual file data needs to be transferred, and is closed after each transfer", "Both connections carry identical duplicate data for redundancy against packet loss", "One connection is TCP and the other is UDP, used interchangeably depending on file size"],
+    answer: 1,
+    marks: 1,
+    difficulty: "easy",
+    type: "concept",
+    explanation: "FTP's dual-connection design separates control information from bulk data. The control connection, conventionally on port 21, remains open for the entire duration of an FTP session, carrying commands the client sends (like USER, PASS, LIST, RETR) and the server's textual status replies. A separate data connection is opened specifically whenever an actual file transfer or directory listing needs to happen; in active mode the server initiates this from port 20 back to the client, while in passive mode (more firewall/NAT-friendly) the client initiates it to a port the server specifies. This data connection is typically closed once that particular transfer completes, while the control connection persists, allowing multiple file transfers to occur in sequence within one login session without needing to re-authenticate each time."
+  },
+  {
+    id: "cn-application-p8",
+    pyqStyle: true,
+    q: "Why can SMTP (Simple Mail Transfer Protocol) not be used by an email client to retrieve (download) new messages waiting in a user's mailbox on their mail server, requiring a separate protocol like POP3 or IMAP instead?",
+    options: ["SMTP is a push protocol, designed for a client (or relaying server) to push/send mail toward a destination mail server; it has no mechanism for a client to pull or query for mail waiting in a mailbox, which is exactly the pull-oriented job POP3 and IMAP are designed for", "SMTP cannot run over TCP, only UDP, making mailbox retrieval technically impossible", "SMTP is only used for encrypting emails, not for any actual transfer", "POP3 and IMAP are simply older, deprecated names for SMTP itself"],
+    answer: 0,
+    marks: 1,
+    difficulty: "easy",
+    type: "concept",
+    explanation: "SMTP was designed purely as a push protocol: a sending mail client or relaying mail server actively pushes an outgoing message to the next mail server in the delivery chain, ending at the recipient's mail server, where the message is deposited into that recipient's mailbox for storage. SMTP has no defined operations for a client to later come along and ask 'is there any new mail waiting for me?' or to download and manage messages sitting in that mailbox — that pull-style interaction (checking, downloading, marking as read, deleting, organizing into folders) is exactly what POP3 and IMAP were separately designed to provide. This push/pull split is why a complete email system always needs SMTP for outgoing/relay delivery alongside POP3 or IMAP for the recipient's actual retrieval from their mailbox."
+  },
+  {
+    id: "cn-application-p9",
+    pyqStyle: true,
+    q: "A browser has a locally cached copy of an image and sends a conditional GET request to the origin server using an If-Modified-Since header. If the image has NOT changed since that cached timestamp, what does the server send back, and what benefit does this provide over an unconditional GET?",
+    options: ["The server sends a fresh full copy of the image regardless, since conditional GET has no effect on the response body", "The server sends back a 304 Not Modified response with no image body, telling the browser its cached copy is still valid; this saves the bandwidth of re-transferring the unchanged image data, even though a round trip to the server is still required", "The server automatically deletes the cached copy from the browser to force a fresh download next time", "Conditional GET always uses UDP instead of TCP to reduce overhead"],
+    answer: 1,
+    marks: 2,
+    difficulty: "medium",
+    type: "concept",
+    explanation: "Conditional GET is a caching-validation mechanism: the browser tells the server the timestamp of the version it already has cached, via If-Modified-Since. If the resource has not changed since then, the server responds with HTTP status 304 Not Modified and an empty (or near-empty) response body, rather than re-sending the entire image data the browser already possesses. This still costs one full round trip (the request must go out and a response must come back), so it does not eliminate RTT-based latency, but it saves substantial bandwidth by avoiding retransmission of unchanged, potentially large, resource bodies. Only if the resource actually changed would the server instead respond with a normal 200 OK and the fresh content."
+  },
+  {
+    id: "cn-application-p10",
+    pyqStyle: true,
+    q: "HTTP/1.1 persistent connections use a keep-alive mechanism where an idle TCP connection is left open for some time after a response is sent, in case the client sends further requests soon. What is the primary trade-off a server must balance when choosing how long to keep such idle connections open?",
+    options: ["There is no trade-off; connections should always be kept open indefinitely with no downside", "Keeping connections open longer avoids the overhead of repeated TCP handshakes for closely-spaced future requests, but ties up server resources (memory, file descriptors, connection-table entries) on connections that may end up going unused, limiting how many total clients the server can serve simultaneously", "Longer keep-alive times always increase security vulnerabilities but have no effect on performance at all", "Keep-alive timeouts only matter for UDP-based protocols, not TCP-based HTTP"],
+    answer: 1,
+    marks: 1,
+    difficulty: "easy",
+    type: "concept",
+    explanation: "Persistent connections avoid the cost of a fresh TCP handshake (and, for HTTPS, a fresh TLS handshake) for every subsequent request from the same client, which is a substantial round-trip and CPU savings when requests are closely spaced, such as loading a page's many embedded objects. However, every open connection consumes real server-side resources, such as memory buffers and an entry in the operating system's connection table, whether or not the client actually sends another request soon. If a server sets its keep-alive timeout too long, many idle connections accumulate and can exhaust these resources, reducing the total number of clients the server can serve concurrently; too short a timeout, conversely, forfeits much of persistent HTTP's round-trip-saving benefit. Servers must tune this timeout to balance these competing costs."
+  },
+  {
+    id: "cn-application-p11",
+    pyqStyle: true,
+    q: "A local DNS server already has the TLD server's address cached from a previous lookup, but does not have the authoritative server's address cached (and does not need to query the root server at all, since the TLD server's address is already known). Using iterative queries for the remaining unresolved steps, how many total RTTs elapse from the client's query until it receives the resolved IP address?",
+    options: [],
+    kind: "nat",
+    answer: 3,
+    marks: 2,
+    difficulty: "medium",
+    type: "pyq-style",
+    explanation: "Because the TLD server's address is already cached, the local DNS server can skip querying the root server entirely and go straight to the TLD server, then on to the authoritative server. This means the local server itself only needs 2 RTT of iterative querying: one RTT to the (already-known) TLD server, and one more RTT to the authoritative server it points to. Adding the client's own round trip to and from the local DNS server (1 RTT, which encompasses this internal work), the total elapsed time is 1 + 2 = 3 RTT — one fewer than the fully uncached case (which needed 4 RTT, including a root-server query). This illustrates precisely why DNS caching, even partial caching of just the TLD-level record, meaningfully speeds up subsequent resolutions."
+  },
+  {
+    id: "cn-application-p12",
+    pyqStyle: true,
+    q: "HTTP is fundamentally a stateless protocol, meaning the server does not automatically retain any memory of previous requests from the same client across separate connections. Which mechanism is most commonly used to let a web server maintain state (such as recognizing a logged-in user) across multiple otherwise-stateless HTTP requests?",
+    options: ["The server tracks state entirely using the client's source TCP port number, which never changes across requests", "HTTP cookies: the server sends a Set-Cookie header containing an identifying token, which the browser then automatically includes in the Cookie header of every subsequent request to that same server, letting the server look up the associated stored session state", "HTTP automatically upgrades to a stateful protocol like TCP whenever login is required", "State is maintained purely by the DNS server, which remembers which IP addresses have previously logged in"],
+    answer: 1,
+    marks: 1,
+    difficulty: "easy",
+    type: "concept",
+    explanation: "Since plain HTTP requests carry no inherent memory of prior interactions (each request-response exchange is handled independently by the server), cookies were introduced specifically to bridge this gap. When a server wants to remember something about a client (such as its logged-in identity or shopping-cart contents), it issues a Set-Cookie header in a response, containing a token, typically an opaque session identifier the server can look up in its own server-side session store. The browser stores this cookie and automatically re-attaches it via a Cookie header on every subsequent request to that same server (or matching domain/path), letting the server recognize returning requests as belonging to the same client session and retrieve the associated stored state, all despite HTTP itself never natively tracking connections across requests."
+  },
+  {
+    id: "cn-application-p13",
+    pyqStyle: true,
+    q: "A client requests a web object through a caching web proxy server. If the proxy already has a valid, unexpired cached copy of the object, how many round trips (RTTs) are needed between the client and the proxy to deliver it, compared to how many RTTs would be needed if the client instead contacted the distant origin server directly (assuming the origin server RTT is much larger than the client-proxy RTT)?",
+    options: ["Both cases require exactly the same number of RTTs, since caching provides no time benefit", "Using the cache requires only 1 RTT (client-to-proxy), while going to the origin server directly would require the (typically much larger) client-to-origin-server RTT — potentially several times larger — making the proxy noticeably faster for cached content", "Using the cache always requires more RTTs than going to the origin server, because the proxy must still separately verify the cached copy with the origin server every time", "Neither scenario requires any RTTs, since caching eliminates all network communication"],
+    answer: 1,
+    marks: 1,
+    difficulty: "easy",
+    type: "concept",
+    explanation: "When a web proxy holds a valid cached copy of the requested object, it can respond directly to the client using just the client-to-proxy round trip, typically 1 RTT, without needing to contact the origin server at all. By contrast, fetching the same object directly from a distant origin server requires the client-to-origin RTT, which is frequently much larger (crossing more network hops, larger physical distance, and possibly a slower or more congested path) than the client-to-nearby-proxy RTT. This RTT reduction, combined with reduced load on the origin server and reduced traffic on the wider network path, is the core performance rationale for deploying web caching proxies (and, at larger scale, Content Delivery Networks) close to end users."
+  },
+  {
+    id: "cn-application-p14",
+    pyqStyle: true,
+    q: "Which of the following are valid application-layer protocols that primarily use UDP rather than TCP as their transport? (Select all that apply.)",
+    options: ["DNS (for typical short queries)", "DHCP (Dynamic Host Configuration Protocol)", "HTTP (standard web browsing, HTTP/1.1 and HTTP/2)", "SNMP (Simple Network Management Protocol)"],
+    answers: [0, 1, 3],
+    marks: 2,
+    difficulty: "medium",
+    type: "concept",
+    explanation: "DNS typically uses UDP for its usual short query/response exchanges (falling back to TCP only for larger responses like zone transfers or responses exceeding UDP's size limits), since the simplicity and low overhead of UDP suits DNS's typically small, single-round-trip request/response pattern well. DHCP also uses UDP (ports 67/68), since a client obtaining an IP address has no existing IP/TCP connection to use yet, and broadcast-based UDP messaging fits the discovery process needed. SNMP similarly uses UDP for its typically small, periodic management queries and traps, prioritizing low overhead over guaranteed delivery. HTTP, by contrast, is built on TCP (both HTTP/1.1 and HTTP/2 use TCP; only the newer HTTP/3 uses UDP-based QUIC), since reliable, ordered, in-sequence delivery of potentially large web content is essential to HTTP's design, making it the one protocol in this list that is NOT UDP-based."
+  }
+);
+
+window.GATE_DATA.questions['cn'].topics.find(function(t){return t.id==='cn-basics';}).questions.push(
+  {
+    id: "cn-basics-p1",
+    pyqStyle: true,
+    q: "A noiseless channel has a bandwidth of 4 kHz. Using a signal with 8 distinct levels, what is the maximum achievable bit rate according to the Nyquist formula?",
+    options: ["8 kbps", "12 kbps", "16 kbps", "24 kbps"],
+    answer: 3,
+    marks: 1,
+    difficulty: "easy",
+    type: "pyq-style",
+    explanation: "The Nyquist formula for a noiseless channel gives the maximum bit rate as C = 2 x B x log2(L), where B is the bandwidth and L is the number of discrete signal levels used. Here B = 4000 Hz and L = 8, so log2(8) = 3. Substituting: C = 2 x 4000 x 3 = 24,000 bits per second, i.e. 24 kbps. This formula assumes a completely noiseless channel, where the only fundamental limit on data rate is the sampling requirement (twice the bandwidth) combined with how many distinct amplitude/phase levels each sample can distinguish between — more levels per symbol packs more bits per sample, at the cost of requiring the receiver to reliably distinguish finer differences, which is precisely why real noisy channels (governed instead by the Shannon formula) cannot push L arbitrarily high without errors."
+  },
+  {
+    id: "cn-basics-p2",
+    pyqStyle: true,
+    q: "A noisy telephone-line channel has a bandwidth of 3 kHz and a signal-to-noise ratio of 30 dB. Using Shannon's capacity formula, what is the approximate maximum channel capacity?",
+    options: ["Approximately 9 kbps", "Approximately 20 kbps", "Approximately 30 kbps", "Approximately 60 kbps"],
+    answer: 2,
+    marks: 2,
+    difficulty: "medium",
+    type: "pyq-style",
+    explanation: "First convert the SNR from decibels to a plain ratio: SNR(dB) = 10 x log10(SNR), so 30 = 10 x log10(SNR) gives SNR = 10^3 = 1000. Shannon's capacity formula is C = B x log2(1 + SNR). Substituting B = 3000 Hz and SNR = 1000: C = 3000 x log2(1001). Since log2(1001) is very close to log2(1024) = 10, but slightly less (approximately 9.97), C is approximately 3000 x 9.97 = 29,900 bps, i.e. approximately 30 kbps. This is the classic textbook result explaining why a standard analog telephone line, despite its modest 3 kHz bandwidth, was historically capable of supporting dial-up modem speeds in the vicinity of 30 kbps under good line conditions — any additional bandwidth-vs-noise tradeoff beyond this is fundamentally impossible, per Shannon's theorem, regardless of how clever the modulation scheme is."
+  },
+  {
+    id: "cn-basics-p3",
+    pyqStyle: true,
+    q: "A 1 Mbps link connects two hosts 2000 km apart, with a signal propagation speed of 2 x 10^8 m/s. A single packet of 8000 bits is sent from one host to the other. What is the total one-way delay (transmission delay plus propagation delay) experienced by this packet, ignoring processing and queuing delay?",
+    options: ["8 ms", "10 ms", "18 ms", "26 ms"],
+    answer: 2,
+    marks: 2,
+    difficulty: "medium",
+    type: "pyq-style",
+    explanation: "Transmission delay is the time to push all the packet's bits onto the link: 8000 bits / 1,000,000 bps = 0.008 s = 8 ms. Propagation delay is the time for a signal to physically travel the distance: 2,000,000 m / (2 x 10^8 m/s) = 0.010 s = 10 ms. These two delays are independent and additive for a single point-to-point hop (transmission delay depends only on packet size and bandwidth; propagation delay depends only on distance and signal speed), so the total one-way delay is 8 ms + 10 ms = 18 ms. Confusing these two delays, or assuming one dominates without computing both, is exactly the kind of error GATE numerical questions on this topic are designed to catch."
+  },
+  {
+    id: "cn-basics-p4",
+    pyqStyle: true,
+    q: "A message is sent as a single 5000-bit packet from a source to a destination across a path with 2 intermediate routers (so 3 links total), each link having a bandwidth of 10 Mbps. Assuming pure store-and-forward switching (each router fully receives the entire packet before starting to forward it) and negligible propagation and processing delay, what is the total end-to-end delay?",
+    options: ["0.5 ms", "1.0 ms", "1.5 ms", "2.0 ms"],
+    answer: 2,
+    marks: 2,
+    difficulty: "medium",
+    type: "pyq-style",
+    explanation: "In store-and-forward switching, each link along the path independently needs its own full transmission time for the packet, since a router must completely receive the packet before it can begin re-transmitting it onward. The transmission time per link is 5000 bits / 10,000,000 bps = 0.0005 s = 0.5 ms. With 3 links total (source-to-router1, router1-to-router2, router2-to-destination) and negligible propagation/processing delay, the total end-to-end delay is simply the sum across all 3 links: 3 x 0.5 ms = 1.5 ms. This linear scaling of store-and-forward delay with the number of hops is why reducing hop count (or fragmenting large messages into smaller packets that can pipeline across hops) both directly reduce end-to-end latency in packet-switched networks."
+  },
+  {
+    id: "cn-basics-p5",
+    pyqStyle: true,
+    q: "An analog voice signal has a maximum frequency component of 4 kHz. It is sampled at the Nyquist rate and each sample is quantized into 256 distinct levels (using Pulse Code Modulation). What is the resulting digital bit rate?",
+    options: ["32 kbps", "64 kbps", "128 kbps", "256 kbps"],
+    answer: 1,
+    marks: 2,
+    difficulty: "medium",
+    type: "pyq-style",
+    explanation: "The Nyquist sampling theorem requires sampling at a rate at least twice the highest frequency component present, to allow perfect reconstruction of the original analog signal. With a maximum frequency of 4 kHz, the Nyquist sampling rate is 2 x 4000 = 8000 samples per second. Each sample is then quantized into one of 256 levels; since 256 = 2^8, representing each sample requires exactly 8 bits. The resulting digital bit rate is therefore 8000 samples/second x 8 bits/sample = 64,000 bits per second, i.e. 64 kbps. This is precisely the standard PCM (Pulse Code Modulation) bit rate used for a single digitized voice channel in traditional telephone systems (the well-known '64 kbps DS0 channel'), making this one of the most frequently recurring numeric patterns in GATE's physical-layer questions."
+  },
+  {
+    id: "cn-basics-p6",
+    pyqStyle: true,
+    q: "A modem uses QPSK (Quadrature Phase Shift Keying) modulation, which encodes 2 bits per transmitted symbol, at a symbol (baud) rate of 1200 symbols per second. What is the resulting bit rate?",
+    options: ["600 bps", "1200 bps", "2400 bps", "4800 bps"],
+    answer: 2,
+    marks: 1,
+    difficulty: "easy",
+    type: "pyq-style",
+    explanation: "Bit rate and baud (symbol) rate are related by Bit rate = Baud rate x (bits encoded per symbol). QPSK uses 4 distinct phase states to represent 2^2 = 4 possible symbol values, so each transmitted symbol carries log2(4) = 2 bits of information. With a baud rate of 1200 symbols/second, the resulting bit rate is 1200 x 2 = 2400 bits per second. This bit-rate-vs-baud-rate distinction (baud measures how many distinct signal changes occur per second on the physical medium, while bit rate measures actual information throughput) is a classic GATE trap when higher-order modulation schemes like QPSK, 8-PSK, or various QAM constellations pack multiple bits into each transmitted symbol, making bit rate a multiple, not necessarily equal to, the baud rate."
+  },
+  {
+    id: "cn-basics-p7",
+    pyqStyle: true,
+    q: "Manchester encoding represents each data bit using a transition in the middle of the bit interval (low-to-high for one binary value, high-to-low for the other), making it self-clocking but requiring more raw signal bandwidth than the underlying data rate. If a link uses Manchester encoding to send data at 10 Mbps, what minimum signal transition (baud) rate is required on the physical medium?",
+    options: ["5 million transitions/second", "10 million transitions/second", "20 million transitions/second", "40 million transitions/second"],
+    answer: 2,
+    marks: 1,
+    difficulty: "easy",
+    type: "concept",
+    explanation: "Manchester encoding guarantees exactly one signal transition in the middle of every bit period (used to encode the bit value itself, and incidentally providing built-in clock recovery for the receiver), which means the underlying physical signal must be able to change twice as fast as the actual data bit rate. For a 10 Mbps data rate, this means the physical layer must support 2 x 10,000,000 = 20,000,000 transitions per second, i.e. 20 million baud. This 2x bandwidth overhead is the well-known cost Manchester encoding pays in exchange for its self-clocking property (no separate clock signal or complex clock-recovery circuitry needed) and its resistance to baseline wander from long runs of identical bits — exactly the tradeoff that led classic 10 Mbps Ethernet (10BASE-T) to require 20 MHz-class analog bandwidth on its cabling."
+  },
+  {
+    id: "cn-basics-p8",
+    pyqStyle: true,
+    q: "Which of the following correctly matches a networking device to the OSI layer at which it primarily operates, and briefly why?",
+    options: ["A hub operates at the network layer because it forwards IP packets", "A switch (bridge) operates at the data link layer because it forwards frames using MAC address tables it learns by observing traffic", "A router operates at the physical layer because it only regenerates electrical signals", "A repeater operates at the transport layer because it manages end-to-end segment delivery"],
+    answer: 1,
+    marks: 1,
+    difficulty: "easy",
+    type: "concept",
+    explanation: "A switch (also called a learning bridge) inspects the data-link-layer header of each incoming frame to read its destination MAC address, and forwards that frame only out the specific port associated with that MAC address in a table the switch builds by observing source addresses on incoming traffic — this MAC-address-based forwarding decision is exactly what defines data-link-layer (Layer 2) operation. A hub, by contrast, is a purely physical-layer device that simply repeats/broadcasts incoming electrical signals out every other port with no awareness of addresses or frames at all. A router is a network-layer (Layer 3) device that forwards based on IP addresses using routing tables. A repeater is also a physical-layer device, regenerating and re-timing a weakened signal with no knowledge of frames, packets, or segments — describing any of these three the way the incorrect options do reverses their actual layer assignments."
+  },
+  {
+    id: "cn-basics-p9",
+    pyqStyle: true,
+    q: "A network path has a bandwidth of 2 Mbps and a round-trip time (RTT) of 40 ms. What is the bandwidth-delay product of this path, in bits, and what does it physically represent?",
+    options: ["40,000 bits; the amount of data the receiver can buffer", "80,000 bits; the maximum amount of data that can be 'in flight' (transmitted but not yet acknowledged) on the path at any instant", "2,000,000 bits; the total data the link can carry in one second", "800 bits; the size of a single optimal packet for this path"],
+    answer: 1,
+    marks: 2,
+    difficulty: "medium",
+    type: "pyq-style",
+    explanation: "The bandwidth-delay product is computed as Bandwidth x RTT (using round-trip time, since it represents the 'pipe' the sender must fill before receiving any acknowledgement back): 2,000,000 bps x 0.040 s = 80,000 bits. This value represents the maximum volume of data that can be transmitted onto the link and still be somewhere 'in flight' — either still travelling toward the receiver, or having arrived but with its acknowledgement not yet back at the sender — at any single instant in time, essentially the physical capacity of the link-plus-propagation-delay 'pipe' itself. A sender wishing to keep this pipe continuously full (achieving maximum possible throughput) must therefore have at least this many bits' worth of unacknowledged data outstanding at once, which is exactly the reasoning behind sizing sliding-window and TCP window parameters to match or exceed the bandwidth-delay product."
+  },
+  {
+    id: "cn-basics-p10",
+    pyqStyle: true,
+    q: "An 80-megabit (8 x 10^7 bit) file is transferred over a link with bandwidth 1 Mbps and one-way propagation delay 50 ms. Comparing the effect of (a) doubling the bandwidth to 2 Mbps versus (b) halving the propagation delay to 25 ms, which change reduces the total one-way transfer time more, and roughly by how much?",
+    options: ["Halving propagation delay helps far more, cutting total time roughly in half", "Doubling bandwidth helps far more, cutting total time roughly in half, while halving propagation delay barely changes it", "Both changes produce an identical, negligible reduction in total time", "Neither change has any effect since total time is fixed by file size alone"],
+    answer: 1,
+    marks: 2,
+    difficulty: "medium",
+    type: "concept",
+    explanation: "Total one-way transfer time is transmission delay plus propagation delay. Originally: transmission delay = 8x10^7 bits / 1,000,000 bps = 80 s, and propagation delay = 0.05 s, giving a total of 80.05 s — transmission delay overwhelmingly dominates since the file is large relative to the link's bandwidth. Doubling bandwidth to 2 Mbps halves the transmission delay to 40 s, giving a new total of 40.05 s — very close to half the original time. Halving the propagation delay to 25 ms instead only reduces the total to 80.025 s, a negligible 0.025 s improvement. This numerically illustrates a general principle: for large transfers where transmission delay dominates, increasing bandwidth yields far greater practical benefit than reducing propagation delay, which mainly matters for small messages or interactive/real-time traffic where transmission delay is already tiny."
+  },
+  {
+    id: "cn-basics-p11",
+    pyqStyle: true,
+    q: "Four data sources, each producing data at exactly 2 kbps, are combined using synchronous Time Division Multiplexing (TDM) onto a single shared link. Each TDM frame carries exactly 1 bit from each of the 4 sources, plus 1 additional framing/synchronization bit, giving 5 bits per frame. What is the resulting total bit rate required on the shared multiplexed link?",
+    options: ["8 kbps", "9 kbps", "10 kbps", "12 kbps"],
+    answer: 2,
+    marks: 2,
+    difficulty: "medium",
+    type: "pyq-style",
+    explanation: "Since each TDM frame carries exactly 1 bit from each source, and each source must supply 2000 bits every second to sustain its own 2 kbps data rate, the multiplexer must produce exactly 2000 frames per second (one frame per bit-slot needed by each source, all synchronized together). Each frame is 5 bits wide (4 data bits, one per source, plus 1 framing bit), so the total bit rate on the shared link is 2000 frames/second x 5 bits/frame = 10,000 bits per second, i.e. 10 kbps. Note this exceeds the simple sum of the four sources' raw data rates (4 x 2 kbps = 8 kbps) by exactly the overhead contributed by the framing bits (2000 bps here) — a recurring theme in multiplexing questions, where synchronization/framing overhead must always be added on top of the aggregated payload rate."
+  },
+  {
+    id: "cn-basics-p12",
+    pyqStyle: true,
+    q: "A 1,000,000-bit (1 Mb) message is sent along a path with 4 links (3 intermediate routers), each link having bandwidth 1 Mbps and one-way propagation delay 5 ms. Compare: (a) circuit switching, where a 10 ms setup delay reserves a dedicated end-to-end circuit and the message then flows continuously (transmission delay counted once, all 4 links' propagation delays summed once, experienced as one continuous stream), versus (b) pure packet (store-and-forward) switching sending the ENTIRE message as one single packet, where each of the 4 links independently needs its own full transmission time before forwarding onward. Which technique finishes faster here, and what is the approximate total delay for each?",
+    options: ["Circuit switching finishes faster: about 1030 ms, versus about 4020 ms for store-and-forward of the single large packet", "Store-and-forward finishes faster: about 1030 ms, versus about 4020 ms for circuit switching", "Both techniques take exactly the same total time, about 2000 ms each", "Circuit switching cannot be compared numerically to packet switching under any circumstances"],
+    answer: 0,
+    marks: 2,
+    difficulty: "hard",
+    type: "pyq-style",
+    explanation: "Circuit switching: total = setup delay + one transmission of the whole message + total end-to-end propagation (summed across all 4 links but experienced once, since the circuit is a continuous dedicated path) = 10 ms + (1,000,000 bits / 1,000,000 bps = 1000 ms) + (4 x 5 ms = 20 ms) = 1030 ms. Store-and-forward packet switching, when the ENTIRE message is sent as a single unfragmented packet, forces EVERY one of the 4 links to independently pay the full transmission time (1000 ms each) before that link can forward the (fully-received) packet onward, plus its own propagation delay: total = 4 x (1000 ms + 5 ms) = 4020 ms. So circuit switching is dramatically faster here, precisely because store-and-forward without any fragmentation into smaller packets forfeits all pipelining benefit — this specific 'one giant packet' worst case is exactly why real packet-switched networks always fragment large messages into many smaller packets, which can then be pipelined across links instead of being fully re-transmitted at every hop."
+  },
+  {
+    id: "cn-basics-p13",
+    pyqStyle: true,
+    q: "A channel with bandwidth 1 MHz needs to support a required data rate of at least 8 Mbps using Shannon's capacity formula (C = B x log2(1 + SNR)). What is the minimum signal-to-noise ratio (as a plain ratio, not dB) required to achieve this?",
+    options: ["7", "15", "255", "256"],
+    answer: 2,
+    marks: 2,
+    difficulty: "medium",
+    type: "pyq-style",
+    explanation: "Setting Shannon's formula equal to the required capacity: 8,000,000 = 1,000,000 x log2(1 + SNR). Dividing both sides by 1,000,000 gives log2(1 + SNR) = 8. Solving for SNR: 1 + SNR = 2^8 = 256, so SNR = 256 - 1 = 255. This means the channel needs a signal-to-noise ratio of at least 255 (equivalent to roughly 24 dB, since 10 x log10(255) is approximately 24.07) to theoretically sustain 8 Mbps over a 1 MHz channel — this is the maximum possible rate under Shannon's limit; no error-correction coding or modulation scheme cleverness can exceed it at a lower SNR, only approach it. This 'invert the Shannon formula to find required SNR' variant is a common alternate framing GATE uses instead of directly computing capacity from a given SNR."
+  },
+  {
+    id: "cn-basics-p14",
+    pyqStyle: true,
+    q: "Match the correct Protocol Data Unit (PDU) name used at each layer of the TCP/IP stack: at the transport layer, network layer, data link layer, and physical layer respectively.",
+    options: ["Segment (or datagram for UDP), Packet (or datagram), Frame, Bit(s)", "Packet, Segment, Bit(s), Frame", "Frame, Packet, Segment, Bit(s)", "Bit(s), Frame, Packet, Segment"],
+    answer: 0,
+    marks: 1,
+    difficulty: "easy",
+    type: "concept",
+    explanation: "Each layer of the networking stack wraps the layer above's data with its own header (and sometimes trailer), and conventionally gives the resulting unit a distinct name. At the transport layer, TCP's PDU is called a segment (UDP's equivalent is often just called a datagram or message). At the network layer, the PDU is called a packet (or, especially for IP specifically, a datagram). At the data link layer, the PDU is called a frame, since it adds framing (delimiting) information plus a MAC header/trailer for hop-to-hop delivery. At the physical layer, data is transmitted as a raw stream of bits (or symbols), with no further structured PDU name. Getting this naming sequence backwards or scrambled, as the incorrect options do, is a common careless mistake on layer-terminology questions."
+  }
+);
+
+window.GATE_DATA.questions['cn'].topics.find(function(t){return t.id==='cn-transport';}).questions.push(
+  {
+    id: 'cn-transport-h1',
+    q: "A TCP Reno sender starts a connection with cwnd = 1 MSS and ssthresh = 16 MSS, MSS = 512 bytes. cwnd doubles every RTT during slow start (capped at ssthresh, after which it switches to linear +1 MSS per RTT congestion avoidance). At the END of RTT 7 a retransmission timeout (RTO) occurs (no triple-dup-ack yet). The sender then restarts slow start from cwnd = 1 with a new ssthresh = (cwnd at the moment of timeout) / 2, rounded down, and again switches to congestion avoidance once cwnd reaches the new ssthresh. At the END of RTT 12 (while in congestion avoidance after the timeout) a triple-duplicate-ACK arrives; the sender halves cwnd (new ssthresh = floor(cwnd/2), cwnd is set to this new ssthresh via fast recovery) and resumes congestion avoidance (+1 MSS per RTT) from RTT 13 onward. What is the TOTAL number of data bytes transmitted by the sender across RTT 1 through RTT 14 inclusive (sum of cwnd, in MSS, over all 14 rounds, times MSS)? (Enter your numerical answer.)",
+    options: [],
+    answer: 35840,
+    kind: 'nat',
+    marks: 2,
+    difficulty: 'hard',
+    type: 'numerical',
+    explanation: "Trace cwnd (in MSS) round by round. Slow start doubles until it hits ssthresh = 16: RTT1=1, RTT2=2, RTT3=4, RTT4=8. RTT5 onward, slow start would give 16 which equals ssthresh, so RTT5=9, RTT6=10, RTT7=11 are already in congestion avoidance (once cwnd reaches ssthresh the increase becomes linear, +1 per RTT: 8 to 9, 9 to 10, 10 to 11). A timeout occurs at the end of RTT7 with cwnd = 11, so new ssthresh = floor(11/2) = 5 and cwnd resets to 1. RTT8=1, RTT9=2 (slow start doubling, capped at ssthresh 5), RTT10=4, RTT11=5 (would double to 8 but capped at ssthresh=5, so this is the round where it switches to CA). RTT12 = 5+1 = 6 (congestion avoidance). A triple-dup-ACK arrives at the end of RTT12 with cwnd=6, so new ssthresh = floor(6/2) = 3 and fast recovery sets cwnd = 3 for RTT13. RTT13=3, RTT14 = 3+1 = 4 (congestion avoidance resumes). The full 14-round trace is: 1,2,4,8,9,10,11,1,2,4,5,6,3,4. Summing gives 70 MSS. Total bytes = 70 x 512 = 35,840 bytes. The key traps are correctly identifying which round is the LAST slow-start round (the one that reaches, not exceeds, ssthresh) versus the first congestion-avoidance round, and applying the halving rule using the cwnd value AT the moment of loss detection, not one round before or after."
+  },
+  {
+    id: 'cn-transport-h2',
+    q: "A TCP connection uses a fixed window of 23 segments, each carrying an MSS of 1460 bytes of payload, over a path with RTT = 80 ms. In every window (cycle) sent, exactly 1 of the 23 segments is lost and must be retransmitted; the retransmission is detected and resent only after a full RTT has elapsed (i.e., the lost segment's retransmission consumes one additional, separate RTT beyond the RTT used to send the original window), and that retransmission always succeeds. All 23 segments are eventually delivered once per 2-RTT cycle. What is the connection's long-run effective throughput, in kbps (kilobits per second, where 1 kbps = 1000 bits/s)? (Enter your numerical answer; a small tolerance is allowed.)",
+    options: [],
+    answer: 1679,
+    kind: 'nat',
+    marks: 2,
+    difficulty: 'hard',
+    type: 'numerical',
+    tolerance: 5,
+    explanation: "Every cycle delivers all 23 segments' worth of payload but costs 2 RTTs of wall-clock time: 1 RTT to send the window (during which 22 of 23 arrive correctly) and 1 more RTT before the single lost segment is retransmitted and arrives. Bits delivered per cycle = 23 x 1460 x 8 = 268,640 bits. Time per cycle = 2 x 0.08 s = 0.16 s. Effective throughput = 268,640 / 0.16 = 1,679,000 bits/s = 1679 kbps (using 1 kbps = 1000 bps, not 1024). The trap is treating this as a simple window/RTT throughput (23 x 1460 x 8 / 0.08 = 3358 kbps) which ignores that the loss forces an entire extra RTT of dead time before the cycle can be considered complete and the next window sent -- effectively halving the naive throughput here, since exactly one extra RTT is spent per cycle regardless of how small the lost segment is."
+  },
+  {
+    id: 'cn-transport-h3',
+    q: "A path has bandwidth 10 Mbps (10 x 10^6 bps) and RTT 40 ms. Each TCP segment carries 1000 bytes of application payload plus 40 bytes of combined TCP+IP header overhead (so 1040 bytes actually cross the wire per segment). The sender's window size, in segments, must be chosen large enough that the total bytes placed on the wire per RTT (payload + headers together) is at least the path's bandwidth-delay product, so the pipe never runs dry. What is the minimum window size, in whole segments, that achieves this?",
+    options: ["47 segments", "48 segments", "49 segments", "50 segments"],
+    answer: 2,
+    marks: 2,
+    difficulty: 'hard',
+    type: 'numerical',
+    explanation: "The bandwidth-delay product sets the target in bits actually carried on the wire: BDP = 10 x 10^6 bps x 0.04 s = 400,000 bits = 50,000 bytes. Critically, this 50,000-byte target must be met by the TOTAL bytes on the wire, which includes the 40-byte header on every segment, not just payload -- a common trap is to divide 50,000 by the 1000-byte payload alone (giving 50 segments) and stop there. Each segment actually occupies 1000 + 40 = 1040 bytes of wire time. Dividing: 50,000 / 1040 = 48.08, so 48 segments would only place 48 x 1040 = 49,920 bytes on the wire, just short of the 50,000-byte target, leaving the pipe briefly idle. Rounding up to 49 segments places 49 x 1040 = 50,960 bytes on the wire per RTT, which is at least the 50,000-byte BDP, so 49 is the minimum window size (in segments) that keeps the pipe continuously full once header overhead is correctly counted."
+  },
+  {
+    id: 'cn-transport-h4',
+    q: "A file-transfer protocol numbers every byte it sends using a 32-bit sequence number field (so sequence numbers range over 2^32 distinct values before wrapping back to the starting value). It sends continuously at a steady rate of 1 Gbps (1 x 10^9 bits per second) with no idle time. Approximately how long, in seconds, does it take for the sequence number space to wrap around completely (i.e., for the byte counter to cycle through all 2^32 values and return to its starting value)? (Enter your numerical answer, to 2 decimal places; a small tolerance is allowed.)",
+    options: [],
+    answer: 34.36,
+    kind: 'nat',
+    marks: 2,
+    difficulty: 'hard',
+    type: 'numerical',
+    tolerance: 0.2,
+    explanation: "The sequence number field counts individual bytes (this is how TCP's 32-bit sequence numbers work), so the space wraps after exactly 2^32 = 4,294,967,296 bytes have been sent. At 1 Gbps, converting bytes to bits: 4,294,967,296 bytes x 8 bits/byte = 34,359,738,368 bits must be transmitted before wraparound. Time = bits / rate = 34,359,738,368 / (1 x 10^9) = 34.36 seconds (approximately). The traps here are, first, remembering that 1 Gbps means 10^9 bits/s (not 2^30), and second, that the sequence space is measured in BYTES while the transmission rate is given in BITS per second, so a byte-to-bit conversion is mandatory before dividing. This wraparound time is exactly why high-speed long-fat networks need protections like PAWS (Protection Against Wrapped Sequence numbers) -- at gigabit-and-above speeds, 32-bit TCP sequence numbers wrap in well under a minute, fast enough that an old, delayed duplicate segment from a previous wrap could plausibly still be in flight and collide with new data carrying the same sequence number."
+  },
+  {
+    id: 'cn-transport-h5',
+    q: "A TCP Reno sender starts with cwnd = 1 MSS, ssthresh = 6 MSS. Slow start doubles cwnd each RTT (capped at ssthresh, then switching to +1 MSS/RTT congestion avoidance). At the END of RTT 6 a timeout occurs; new ssthresh = floor(cwnd at timeout / 2), cwnd resets to 1, and slow start resumes (again switching to congestion avoidance once cwnd reaches the new ssthresh). Which of the following statements about this trace are TRUE? (Select all that apply.)",
+    options: [
+      "cwnd during RTT 4 is 6 MSS",
+      "The ssthresh in effect immediately after the RTT-6 timeout is 4 MSS",
+      "cwnd during RTT 9 is 4 MSS",
+      "cwnd during RTT 10 is 6 MSS"
+    ],
+    answers: [0, 1, 2],
+    marks: 2,
+    difficulty: 'hard',
+    type: 'msq',
+    kind: 'msq',
+    explanation: "Trace it: RTT1=1, RTT2=2, RTT3=4 (slow start doubling). RTT4 would double to 8, but this exceeds ssthresh=6, so it is capped at exactly 6 -- making option A true and marking RTT4 as the last slow-start round. RTT5 = 6+1 = 7, RTT6 = 7+1 = 8 (congestion avoidance, +1 per RTT). A timeout at the end of RTT6 with cwnd=8 sets new ssthresh = floor(8/2) = 4, confirming option B is true, and resets cwnd to 1. RTT7=1, RTT8=2 (slow start doubling, capped at new ssthresh=4), RTT9 would double to 4, which exactly equals ssthresh=4, so RTT9=4 -- confirming option C is true, and this is again the last slow-start round. RTT10 switches to congestion avoidance: 4+1 = 5, not 6, so option D is FALSE. The full trace is 1,2,4,6,7,8,1,2,4,5. Each option requires tracing to a different, specific round and correctly identifying whether that round is still doubling (slow start) or has already capped/switched to linear growth (congestion avoidance) -- getting the cap-then-switch boundary right for both the pre-timeout and post-timeout phases is what separates correct from incorrect answers here."
+  },
+  {
+    id: 'cn-transport-h6',
+    q: "A TCP sender's RTO estimator currently has EstimatedRTT = 100 ms and DevRTT = 50 ms. Using Jacobson's algorithm with alpha = 0.125 and beta = 0.25 (DevRTT_new = (1-beta) x DevRTT_old + beta x |SampleRTT - EstimatedRTT_old|, then EstimatedRTT_new = (1-alpha) x EstimatedRTT_old + alpha x SampleRTT), the sender observes three successive SampleRTT measurements, in order: 120 ms, 90 ms, 150 ms (updating both EstimatedRTT and DevRTT after each sample before processing the next). What is the resulting RTO (= EstimatedRTT + 4 x DevRTT) after all three samples have been processed, in ms? (Enter your numerical answer, to 1 decimal place; a small tolerance is allowed.)",
+    options: [],
+    answer: 261.1,
+    kind: 'nat',
+    marks: 2,
+    difficulty: 'hard',
+    type: 'numerical',
+    tolerance: 1.5,
+    explanation: "Apply the update in order, computing DevRTT before EstimatedRTT at each step (since DevRTT's formula uses the OLD EstimatedRTT). Sample 1 (120 ms): DevRTT = 0.75x50 + 0.25x|120-100| = 37.5+5 = 42.5; EstimatedRTT = 0.875x100 + 0.125x120 = 87.5+15 = 102.5. Sample 2 (90 ms): DevRTT = 0.75x42.5 + 0.25x|90-102.5| = 31.875+3.125 = 35.0; EstimatedRTT = 0.875x102.5 + 0.125x90 = 89.6875+11.25 = 100.9375. Sample 3 (150 ms): DevRTT = 0.75x35.0 + 0.25x|150-100.9375| = 26.25+12.2656 = 38.5156; EstimatedRTT = 0.875x100.9375 + 0.125x150 = 88.3203+18.75 = 107.0703. Final RTO = EstimatedRTT + 4xDevRTT = 107.0703 + 4x38.5156 = 107.0703+154.0625 = 261.13 ms. The trap is sequencing: each sample must fully update both quantities (DevRTT using the PREVIOUS round's EstimatedRTT, not the just-updated one) before the next sample is processed -- swapping the order or reusing a stale/updated value produces a different, wrong final RTO."
+  },
+  {
+    id: 'cn-transport-h7',
+    q: "A file of exactly 16,000,000 bits must be transferred over a connection using pure TCP slow start with no loss and no ssthresh cap (cwnd simply doubles every RTT, starting at cwnd=1 segment), MSS = 1400 bytes, RTT = 90 ms. The sender stops as soon as the cumulative number of segments sent (summed across completed RTTs) is enough to cover the whole file; assume the final, possibly partial, batch still completes within one RTT. How many total milliseconds does the transfer take (number of RTTs required, multiplied by RTT)? (Enter your numerical answer.)",
+    options: [],
+    answer: 990,
+    kind: 'nat',
+    marks: 2,
+    difficulty: 'hard',
+    type: 'numerical',
+    explanation: "First convert the file size from bits to bytes (a common trap): 16,000,000 bits / 8 = 2,000,000 bytes. At MSS = 1400 bytes, the number of segments needed is ceil(2,000,000 / 1400) = ceil(1428.57) = 1429 segments. With pure slow start (cwnd doubling from 1, no cap), the cumulative segments sent after n RTTs is 1+2+4+...+2^(n-1) = 2^n - 1. After 9 RTTs: 2^9-1 = 511 segments (not enough, since 511 < 1429). After 10 RTTs: 2^10-1 = 1023 segments (still short). After 11 RTTs: 2^11-1 = 2047 segments, which is >= 1429, so the file completes during the 11th RTT (the window of 1024 segments available in round 11 only needs to carry the remaining 1429-511 = 918 segments, well within its capacity, so it still finishes in that single RTT). Total time = 11 x 90 ms = 990 ms. The two traps stacked here are the bits-to-bytes conversion on the file size, and correctly finding the FIRST round whose cumulative total meets or exceeds the requirement rather than the round where cwnd itself first exceeds the segment count."
+  },
+  {
+    id: 'cn-transport-h8',
+    q: "A TCP connection running over Ethernet negotiates an MSS of 1448 bytes (1500-byte Ethernet MTU minus 20 bytes IP header, 20 bytes TCP header, and 12 bytes of TCP timestamp options). Each resulting Ethernet frame additionally carries 14 bytes of Ethernet header, a 4-byte CRC trailer, an 8-byte preamble/SFD, and a 12-byte inter-frame gap, none of which count as 'useful' application payload. If the physical link runs at a raw rate of 100 Mbps with segments sent back-to-back at full utilization, what is the resulting application-level goodput, in Mbps, to 2 decimal places? (Enter your numerical answer; a small tolerance is allowed.)",
+    options: [],
+    answer: 94.15,
+    kind: 'nat',
+    marks: 2,
+    difficulty: 'hard',
+    type: 'numerical',
+    tolerance: 0.3,
+    explanation: "Total overhead per frame, on top of the 1448-byte payload, comes from several layers that must all be added together: 20 (TCP header) + 20 (IP header) + 12 (TCP timestamp option) + 14 (Ethernet header) + 4 (CRC) + 8 (preamble+SFD) + 12 (inter-frame gap) = 90 bytes. So each frame actually occupies 1448 + 90 = 1538 bytes of wire time for only 1448 bytes of application payload. Goodput = raw rate x (payload / total frame size) = 100 Mbps x (1448/1538) = 100 x 0.94148... = 94.148 Mbps, i.e. approximately 94.15 Mbps. The trap is that most solvers remember TCP/IP header overhead (40 bytes) but forget that the physical and data-link layers ALSO consume real transmission time on the wire (preamble, inter-frame gap, CRC, Ethernet header) even though these bytes never appear in any 'segment size' the transport layer is aware of -- ignoring them overstates achievable goodput."
+  }
+);
+
+window.GATE_DATA.questions['cn'].topics.find(function(t){return t.id==='cn-network';}).questions.push(
+  {
+    id: 'cn-network-h1',
+    q: "An IP datagram of total length 4000 bytes (including a 20-byte IP header, so 3980 bytes of payload) must cross two links in sequence. Link 1 has an MTU of 1500 bytes; link 2 (further downstream) has a smaller MTU of 620 bytes. The datagram is first fragmented to fit link 1's MTU, and then EACH of those fragments is independently fragmented again (each still carries its own 20-byte IP header) to fit link 2's MTU, since fragments are never reassembled at intermediate routers. All fragment data sizes are rounded down to the nearest multiple of 8 bytes as required by the IP fragmentation rules. How many fragments in total finally arrive at the destination?",
+    options: [],
+    answer: 8,
+    kind: 'nat',
+    marks: 2,
+    difficulty: 'hard',
+    type: 'numerical',
+    explanation: "First fragmentation (MTU 1500): max data per fragment = 1500-20 = 1480 bytes, already a multiple of 8. Splitting 3980 bytes of payload: 1480+1480+1020 = 3 fragments (offsets in 8-byte units: 0, 185, 370). Second fragmentation (MTU 620): max data per fragment = 620-20 = 600 bytes (already a multiple of 8). Fragment 1 (1480 bytes of data) splits into ceil(1480/600) = 3 sub-fragments: 600+600+280. Fragment 2 (1480 bytes) likewise splits into 3 sub-fragments: 600+600+280. Fragment 3 (1020 bytes) splits into ceil(1020/600) = 2 sub-fragments: 600+420. Total final fragments = 3+3+2 = 8. The trap is remembering that each first-level fragment is a COMPLETE, independent IP datagram (with its own 20-byte header re-added), so the second MTU constraint applies to (header + that fragment's own data) all over again, not to the original 3980-byte payload as a whole -- and that fragment sizes must always be rounded down to a multiple of 8 at every stage, which is why 620-20=600 divides so conveniently here but would need rounding down in less friendly cases."
+  },
+  {
+    id: 'cn-network-h2',
+    q: "A router's forwarding table contains these four entries (network/prefix -> next hop): 192.168.0.0/16 -> A, 192.168.20.0/23 -> B, 192.168.21.0/24 -> C, 192.168.16.0/22 -> D. A packet arrives destined for 192.168.21.130. Applying longest-prefix-match routing, which next hop is selected?",
+    options: ["Next hop D (via 192.168.16.0/22)", "Next hop A (via 192.168.0.0/16)", "Next hop B (via 192.168.20.0/23)", "Next hop C (via 192.168.21.0/24)"],
+    answer: 3,
+    marks: 2,
+    difficulty: 'hard',
+    type: 'concept',
+    explanation: "Check each entry against 192.168.21.130 in binary. 192.168.16.0/22 covers the range 192.168.16.0 to 192.168.19.255 (the /22 mask fixes the third octet's top 6 bits, giving third-octet values 16-19) -- 21 falls OUTSIDE this range, so entry D does NOT match at all. 192.168.0.0/16 matches everything starting 192.168.x.x, so it DOES match. 192.168.20.0/23 covers third-octet values 20-21 (the /23 mask spans two consecutive /24s), so it DOES match 192.168.21.130. 192.168.21.0/24 matches only third-octet value exactly 21, so it also matches. Among the matching entries (/16, /23, /24), longest-prefix-match always prefers the entry with the MOST specific (longest) prefix length, which is the /24 entry, 192.168.21.0/24 -> next hop C. The trap is assuming the more 'obviously close' /22 entry (D) is relevant at all -- it must first be checked and rejected because 21 lies outside its actual covered range -- and then correctly picking the longest of the remaining matches rather than the first one found or the broadest one."
+  },
+  {
+    id: 'cn-network-h3',
+    q: "Three routers form a line: X -- Y -- Z, with link cost 1 on each link, running a distance-vector protocol (RIP-style, infinity = 16 hops, NO split-horizon/poison-reverse is used). Before any failure, X's distance to Z (via Y) is 2, and Y's distance to Z (direct link) is 1. The direct Y-Z link now fails. Y no longer has a working direct route, so it falls back to using its last-known information about X's distance to Z (which was 2) to compute a new route via X; X and Y then continue exchanging distance-vector updates in alternating rounds (Y updates using X's latest advertised distance, then X updates using Y's latest advertised distance, and so on), each new distance being 1 + (neighbor's last advertised distance to Z). How many total distance-vector update rounds (starting with Y's very first post-failure update) does it take before one of the routers' distance to Z first reaches or exceeds infinity (16)?",
+    options: [],
+    answer: 14,
+    kind: 'nat',
+    marks: 2,
+    difficulty: 'hard',
+    type: 'numerical',
+    explanation: "This is the classic distance-vector 'count-to-infinity' problem caused by a two-node routing loop with no split-horizon/poison-reverse protection. Round 1: Y updates its distance to Z as 1 + (X's last known distance, 2) = 3. Round 2: X updates as 1 + (Y's new distance, 3) = 4. Round 3: Y updates as 1 + 4 = 5. Round 4: X = 1+5 = 6. This ping-pongs, with each round's value being exactly (round number) + 2: round 1 gives 3, round 2 gives 4, ..., round n gives n+2. Setting n+2 >= 16 gives n >= 14, so round 14 (X's update, giving 1+15=16) is the first round where the count-to-infinity value reaches the defined infinity threshold of 16, at which point RIP declares the destination unreachable and the routers stop incrementing. This slow, hop-by-hop climb to infinity (rather than immediate failure detection) is precisely the pathology that split-horizon with poison-reverse is designed to eliminate for exactly this two-node loop shape."
+  },
+  {
+    id: 'cn-network-h4',
+    q: "A company is allocated the network 172.16.0.0/16 and must create exactly three subnets using VLSM: Sales needs at least 600 usable host addresses, Engineering needs at least 300, and IT needs at least 100. Each subnet must use the smallest power-of-2-sized block that can accommodate its host requirement (with the usual 2 addresses per block reserved for network and broadcast). What is the TOTAL number of addresses across all three subnet blocks that are NOT usable as host addresses (i.e., total addresses allocated minus total host requirement actually needed: (Sales block size - 600) + (Engineering block size - 300) + (IT block size - 100))?",
+    options: [],
+    answer: 664,
+    kind: 'nat',
+    marks: 2,
+    difficulty: 'hard',
+    type: 'numerical',
+    explanation: "For each subnet, find the smallest block size 2^k such that 2^k - 2 >= required hosts. Sales needs 600: 2^9-2=510 (too small), 2^10-2=1022 (enough), so Sales gets a 1024-address block (/22). Engineering needs 300: 2^8-2=254 (too small), 2^9-2=510 (enough), so Engineering gets a 512-address block (/23). IT needs 100: 2^6-2=62 (too small), 2^7-2=126 (enough), so IT gets a 128-address block (/25). The 'unused for hosts' figure per subnet is block size minus the STATED requirement (not minus the block's own usable-host count, since the question asks specifically for addresses beyond what was actually needed): Sales = 1024-600 = 424; Engineering = 512-300 = 212; IT = 128-100 = 28. Total = 424+212+28 = 664 addresses. The trap is picking the wrong block size by forgetting to reserve 2 addresses (network + broadcast) per block when checking whether a candidate power of 2 is 'big enough' -- e.g. assuming 512 addresses suffice for 510 exactly is fine for Engineering, but naively using 2^9=512 for Sales (600 hosts) without checking 512-2=510 < 600 would wrongly under-allocate."
+  },
+  {
+    id: 'cn-network-h5',
+    q: "An IP datagram carries a total payload of 3180 bytes (after the 20-byte IP header) and must be fragmented for a link with MTU 576 bytes (fragment data sizes rounded down to a multiple of 8). The fragments are numbered in order starting from fragment 1. In which fragment number does payload byte number 2900 (using 0-based byte numbering within the original payload, so bytes are numbered 0 through 3179) end up, and what is that fragment's Fragment Offset field value (in 8-byte units, as it would appear in the IP header)?",
+    options: ["Fragment 5, offset field 276", "Fragment 6, offset field 345", "Fragment 6, offset field 350", "Fragment 5, offset field 345"],
+    answer: 1,
+    marks: 2,
+    difficulty: 'hard',
+    type: 'numerical',
+    explanation: "Max data per fragment = 576-20 = 556, rounded down to a multiple of 8 gives 552 bytes per fragment. Splitting 3180 bytes of payload into 552-byte chunks: fragment 1 covers bytes 0-551 (offset field 0/8=0), fragment 2 covers 552-1103 (offset 552/8=69), fragment 3 covers 1104-1655 (offset 138), fragment 4 covers 1656-2207 (offset 207), fragment 5 covers 2208-2759 (offset 276), and fragment 6 covers the remaining 2760-3179, a final short fragment of only 420 bytes (offset 2760/8=345). Byte 2900 falls between 2760 and 3179, so it lands in fragment 6, whose Fragment Offset field value is 345 (in 8-byte units, since the offset field always measures in units of 8 bytes, not raw bytes). The trap is off-by-one errors in the boundary check (byte 2760 belongs to fragment 6, not fragment 5, since fragment 5 ends at byte 2759) and forgetting that the offset field itself is expressed in 8-byte units, not the raw byte position (2760/8=345, not 2760)."
+  },
+  {
+    id: 'cn-network-h6',
+    q: "A network administrator advertises four owned /24 blocks: 203.0.16.0/24, 203.0.17.0/24, 203.0.18.0/24, and 203.0.19.0/24, plus one unrelated block 203.0.24.0/24. The administrator wants to replace the four contiguous /24 announcements with the single smallest correct aggregate (supernet) route. Which statement correctly describes the valid aggregation and its consequence?",
+    options: [
+      "203.0.16.0/22 correctly aggregates exactly the four owned contiguous blocks (16-19); aggregating further to 203.0.16.0/21 would be INCORRECT because it would also claim reachability for 203.0.20.0/22 (addresses 20-23), which is not owned",
+      "203.0.16.0/21 is the correct aggregate since it is smaller in prefix-length notation and therefore more efficient",
+      "203.0.16.0/23 correctly aggregates all four blocks since /23 already spans multiple /24s",
+      "No valid aggregation exists because 203.0.24.0/24 is not contiguous with the other four blocks"
+    ],
+    answer: 0,
+    marks: 2,
+    difficulty: 'hard',
+    type: 'concept',
+    explanation: "A CIDR aggregate is only valid if it exactly covers the set of addresses actually owned, no more and no less (over-claiming can black-hole traffic for addresses that belong to someone else). 203.0.16.0/22 fixes the top 22 bits, which fixes the third octet to exactly 16 through 19 (since 16 in binary is a multiple of 4, i.e. correctly aligned on a /22 boundary) -- this exactly matches the four owned /24 blocks with nothing extra. Extending one bit further to /21 would fix the third octet to 16 through 23 (an 8-wide range), which would incorrectly include 203.0.20.0/24 through 203.0.23.0/24 -- addresses the administrator does not own (203.0.24.0/24 is a separate, non-contiguous block entirely outside even this wider range, and does not fix the alignment problem). /23 only spans a 2-wide range (either 16-17 or 18-19 depending on alignment), so it cannot cover all four blocks in one entry. The unrelated 203.0.24.0/24 block simply must continue to be advertised as its own separate route; it cannot be merged with the others since it is not adjacent to them and doing so would fail to reduce the advertisement to the minimal correct set."
+  },
+  {
+    id: 'cn-network-h7',
+    q: "Repeat the X -- Y -- Z line topology (link cost 1 each) and the Y-Z link failure scenario, but this time the routers use split-horizon WITH poison reverse: since X's only route to Z is via Y, X advertises to Y a distance of infinity for Z (poisoning the route in the direction it came from), even though X's own internal table shows a finite distance. When the direct Y-Z link fails, how many distance-vector update ROUNDS does it take before Y correctly determines that Z is unreachable (compare this to the 14 rounds needed without poison reverse)?",
+    options: ["1 round -- Y already knows, from X's poisoned advertisement, that X cannot help reach Z, so it marks Z unreachable immediately with no count-up", "14 rounds -- poison reverse only helps in larger topologies, not this one", "7 rounds -- poison reverse halves the count-to-infinity time but does not eliminate it", "It never converges -- poison reverse only prevents loops, it cannot detect unreachability"],
+    answer: 0,
+    marks: 2,
+    difficulty: 'hard',
+    type: 'concept',
+    explanation: "With poison reverse, X (which reaches Z only through Y) has ALREADY told Y, even before the failure, that its own distance to Z is infinity (this is the 'poison' -- a router always advertises infinity, not its real distance, back toward the neighbor it uses as its next hop for that destination, to prevent that neighbor from ever mistakenly using it as a fallback). So the moment Y's direct link to Z breaks, Y checks its other neighbor X's most recent advertisement for Z, finds it is already infinity, and immediately concludes Z is unreachable via X too -- no oscillating count-up is needed at all, converging in a single round. This is exactly why split-horizon with poison-reverse eliminates count-to-infinity for two-node loops. It is worth noting (though not needed to answer this question) that poison reverse does NOT fully solve count-to-infinity in larger loops (3 or more routers), where the poisoning information does not reach every router that needs it -- only for direct two-node back-and-forth loops like this one is the fix complete."
+  },
+  {
+    id: 'cn-network-h8',
+    q: "A 203.0.32.0/23 address block (512 total addresses) must be divided into the maximum possible number of equal-sized subnets using a single fixed subnet mask (FLSM), where every resulting subnet must support AT LEAST 25 usable host addresses. What is the maximum number of such equal-sized subnets that can be created from this block?",
+    options: [],
+    answer: 16,
+    kind: 'nat',
+    marks: 2,
+    difficulty: 'hard',
+    type: 'numerical',
+    explanation: "First find the smallest host-bit count h such that 2^h - 2 >= 25: with h=4, 2^4-2=14 (too small); with h=5, 2^5-2=30 (enough, since 30 >= 25). So each subnet must reserve 5 bits for hosts, meaning each subnet block is 2^5 = 32 addresses (30 usable hosts, comfortably meeting the 25-host requirement, since 25 is not itself a clean power-of-2-minus-2 value and forces rounding up to the next valid block size). The original /23 block has 512 total addresses. The maximum number of 32-address subnets that fit into 512 addresses is 512 / 32 = 16 subnets, each using a /27 mask (32-5=27). The trap is using 25 directly to size a 'perfect fit' subnet (which doesn't exist as a power of 2) instead of rounding UP to the next valid block size of 32 -- using an under-sized guess like 2^4=16 addresses (14 usable hosts) would fail to meet the 25-host requirement even though it would naively allow more (32) subnets."
+  }
+);
+
+window.GATE_DATA.questions['cn'].topics.find(function(t){return t.id==='cn-datalink';}).questions.push(
+  {
+    id: 'cn-datalink-h1',
+    q: "A sliding-window data link has a data rate of 1 Mbps in each direction, frame size 1000 bytes, ACK frame size 100 bits, one-way propagation delay 20 ms, and a fixed processing delay of 2 ms at EACH end (sender processing before sending, and receiver processing before it can emit the ACK). The window size is fixed at 5 frames. What is the resulting link utilization (efficiency), as a percentage, to 2 decimal places? (Enter your numerical answer; a small tolerance is allowed.)",
+    options: [],
+    answer: 76.78,
+    kind: 'nat',
+    marks: 2,
+    difficulty: 'hard',
+    type: 'numerical',
+    tolerance: 0.5,
+    explanation: "Frame transmission time Tf = (1000x8)/(1x10^6) = 8 ms. ACK transmission time Tack = 100/(1x10^6) = 0.1 ms (small, but NOT negligible here since the question explicitly asks for a precise percentage). One full cycle time (from starting to send the first frame of a window until its ACK is fully processed back) = Tf + propagation there + Tack + propagation back + processing delay at both ends = 8 + 20 + 0.1 + 20 + 2 + 2 = 52.1 ms. In that cycle, the sender can keep transmitting for W x Tf = 5 x 8 = 40 ms before it must stop and wait (since 40 ms of window-transmission is less than the 52.1 ms cycle time, the pipe is NOT kept continuously full). Efficiency = useful busy time / cycle time = 40/52.1 = 0.76775, i.e. 76.78%. The trap is including the small 0.1 ms ACK transmission time and the 4 ms of total processing delay, both of which are individually tiny but together shift the answer measurably from the 'ACK/processing negligible' textbook formula's 40/48=83.33% -- a difference of over 6 percentage points that a rushed solver would miss entirely."
+  },
+  {
+    id: 'cn-datalink-h2',
+    q: "A sender must transmit 12 frames, numbered 0 through 11, using a fixed window size of 4. Exactly two frames are lost in transmission: frame 2 and frame 8 (all other frames and all ACKs are delivered correctly). Assume that in both loss cases, by the time the loss is detected via timeout, the full window of 4 frames starting at the lost frame (i.e., the lost frame plus the next 3) has already been transmitted. Under Go-Back-N, ALL frames from the lost one onward that were already sent must be retransmitted; under Selective Repeat, only the actually-lost frame is retransmitted. How many MORE total frame transmissions (originals + retransmissions) does Go-Back-N require compared to Selective Repeat, for this entire 12-frame transfer?",
+    options: [],
+    answer: 6,
+    kind: 'nat',
+    marks: 2,
+    difficulty: 'hard',
+    type: 'numerical',
+    explanation: "Both protocols need 12 original transmissions regardless. For Go-Back-N: each of the two loss events forces retransmission of the full 4-frame window that was already in flight when the loss was detected (the lost frame plus the 3 that followed it, since the receiver discards all of those as out-of-order and the sender must resend everything from the lost frame onward) -- that is 4 extra transmissions per loss event, so 2 events x 4 = 8 extra transmissions, giving a GBN total of 12+8 = 20. For Selective Repeat: only the single actually-lost frame is retransmitted per event (the receiver buffers the correctly-received out-of-order frames instead of discarding them), so each loss event costs just 1 extra transmission, giving 2 extra total, for an SR total of 12+2 = 14. The difference is 20-14 = 6. The trap is forgetting that GBN's retransmission cost scales with the WINDOW SIZE at the moment of detection (here, 4 frames per event), not just with the number of actually-corrupted frames (which is only 2 events total) -- a larger window size would make GBN's penalty even worse relative to SR, which is exactly why SR is preferred on links with larger bandwidth-delay products despite its extra buffering complexity."
+  },
+  {
+    id: 'cn-datalink-h3',
+    q: "A CSMA/CD Ethernet-style network originally has a maximum cable length of 2000 m, signal propagation speed 2 x 10^8 m/s, and data rate 10 Mbps, giving some minimum frame size to guarantee collision detection. The network is then upgraded to BOTH a longer maximum cable length of 3500 m AND a higher data rate of 100 Mbps simultaneously. What is the new required minimum frame size, in bits, needed so that the sender can still always detect a collision before finishing transmission?",
+    options: [],
+    answer: 3500,
+    kind: 'nat',
+    marks: 2,
+    difficulty: 'hard',
+    type: 'numerical',
+    explanation: "The minimum frame size for reliable collision detection must satisfy: transmission time >= 2 x (one-way propagation delay), i.e. Fmin/R >= 2 x (d/v), so Fmin = 2 x d x R / v. Before the upgrade: Fmin = 2 x 2000 x (10x10^6) / (2x10^8) = 2 x 2000 x 0.05 = 200 bits. After the upgrade, BOTH d and R increase together: Fmin = 2 x 3500 x (100x10^6) / (2x10^8) = 2 x 3500 x 0.5 = 3500 bits. The trap is that increasing the data rate alone (10x) would already demand a 10x larger minimum frame just to keep pace, and increasing the cable length on top of that (1.75x) multiplies the requirement further (10 x 1.75 = 17.5x overall, taking 200 bits to 3500 bits) -- exactly the real-world engineering problem that forced Fast Ethernet (100 Mbps) standards to REDUCE maximum cable segment lengths rather than keep them the same as 10 Mbps Ethernet, since keeping both cable length and the higher rate simultaneously would demand an impractically large minimum frame size."
+  },
+  {
+    id: 'cn-datalink-h4',
+    q: "A sender wants to transmit the 10-bit data sequence 1101011011 using CRC error detection with the generator polynomial x^4 + x + 1 (which is the 5-bit pattern 10011). Using standard modulo-2 polynomial division (XOR-based long division, appending 4 zero bits to the data before dividing), what is the resulting 4-bit CRC remainder, expressed as a decimal integer (i.e., convert the 4-bit binary remainder to its decimal value)?",
+    options: [],
+    answer: 14,
+    kind: 'nat',
+    marks: 2,
+    difficulty: 'hard',
+    type: 'numerical',
+    explanation: "Append 4 zero bits (since the generator has degree 4) to the data, giving 11010110110000, then perform modulo-2 division (XOR at each step where the leading bit of the current remainder is 1) by the generator 10011. Carrying out the XOR-based long division bit by bit yields a final 4-bit remainder of 1110. Converting this binary remainder to decimal: 1110 in binary = 1x8 + 1x4 + 1x2 + 0x1 = 14. This remainder (1110) is what gets appended to the original data (giving the transmitted codeword 11010110111110) so that the receiver's division of the full received codeword by the same generator yields a zero remainder if no error occurred. The trap is that modulo-2 division uses XOR, not ordinary subtraction with borrowing -- a solver who performs standard binary long division (with borrows) instead of XOR-based division will get a completely different, incorrect remainder."
+  },
+  {
+    id: 'cn-datalink-h5',
+    q: "A link uses Selective Repeat ARQ with a 5-bit sequence number field (so sequence numbers range 0 to 31, 32 total values). Frame size is 1000 bits, data rate is 2 Mbps, and one-way propagation delay is 15 ms. The sender sets its window to the LARGEST value that is still safe for Selective Repeat (recall SR requires window size <= half the sequence number space, to avoid the receiver confusing a new frame with a retransmission of an old one). What is the resulting maximum achievable throughput, in bps, given this safe window size and no losses? (Enter your numerical answer; a small tolerance is allowed.)",
+    options: [],
+    answer: 524590,
+    kind: 'nat',
+    marks: 2,
+    difficulty: 'hard',
+    type: 'numerical',
+    tolerance: 2000,
+    explanation: "With a 5-bit sequence field, there are 2^5 = 32 total sequence numbers, and Selective Repeat's safety rule caps the window at half of that: 32/2 = 16 frames. Frame transmission time Tf = 1000/(2x10^6) = 0.5 ms. One full cycle (send frame, propagate, receive, ACK propagates back -- ignoring ACK transmission time and processing) = Tf + 2 x propagation = 0.5 + 2x15 = 30.5 ms. In that cycle the sender can push out W x Tf = 16 x 0.5 = 8 ms worth of frames before needing acknowledgement -- since 8 ms < 30.5 ms, the window is NOT large enough to keep the pipe continuously busy, so efficiency = 8/30.5 = 0.2623. Achievable throughput = efficiency x data rate = 0.2623 x 2,000,000 = 524,590 bps (approximately). The trap is assuming a larger window (e.g. using all 32 sequence numbers) would be allowed -- doing so would break Selective Repeat's correctness guarantee (the receiver could not distinguish a genuinely new frame from an old retransmitted duplicate), so the SAFE maximum of 16, not 32, must be used even though it leaves substantial bandwidth on the table here."
+  },
+  {
+    id: 'cn-datalink-h6',
+    q: "In a pure ALOHA network, 30 stations are active, and each station independently generates a new frame on average once every 50 frame-times (so each station's individual generation rate is 1/50 frames per frame-time, and G, the total average number of transmission attempts per frame-time including retransmissions, equals the sum across all stations). Frame size is 800 bits and the channel rate is 2 Mbps. Using pure ALOHA's throughput formula S = G x e^(-2G), what is the resulting successful throughput of the channel, in bps? (Enter your numerical answer, to the nearest 100; a small tolerance is allowed.)",
+    options: [],
+    answer: 361433,
+    kind: 'nat',
+    marks: 2,
+    difficulty: 'hard',
+    type: 'numerical',
+    tolerance: 2000,
+    explanation: "Total offered load G = 30 stations x (1/50 frame per frame-time each) = 30/50 = 0.6. Pure ALOHA's throughput fraction is S = G x e^(-2G) = 0.6 x e^(-1.2) = 0.6 x 0.301194 = 0.180716 (this represents the fraction of frame-times that carry a SUCCESSFUL transmission, out of all frame-times). One frame-time = frame size / rate = 800/(2x10^6) = 0.0004 s = 0.4 ms. The rate of successful frames per second = S / (frame-time in seconds) = 0.180716/0.0004 = 451.79 frames/sec. Converting to bits per second: 451.79 x 800 = 361,433 bps (approximately). The trap is applying the S = G x e^(-2G) formula (which gives a FRACTION, the utilization) and then forgetting to convert it into an actual bit rate by dividing by the frame-time and multiplying by frame size -- reporting 0.1807 or 18.07% alone is not a bps answer, and simply multiplying G x channel-rate (ignoring the exponential collision penalty entirely) would also be wrong."
+  },
+  {
+    id: 'cn-datalink-h7',
+    q: "A link uses Go-Back-N ARQ with a 4-bit sequence number field (sequence numbers 0 to 15, 16 total values; recall GBN's safe maximum window is (2^n - 1) where n is the number of sequence bits, since GBN's receiver only ever expects one specific next sequence number). Frame size is 2000 bits, data rate is 4 Mbps, and one-way propagation delay is 25 ms. Using the largest safe GBN window size for this sequence field, what is the resulting link efficiency, as a percentage, to 2 decimal places? (Enter your numerical answer; a small tolerance is allowed.)",
+    options: [],
+    answer: 14.85,
+    kind: 'nat',
+    marks: 2,
+    difficulty: 'hard',
+    type: 'numerical',
+    tolerance: 0.5,
+    explanation: "With a 4-bit sequence field, the safe maximum GBN window is 2^4 - 1 = 15 frames (one less than the full 16-value space, unlike Selective Repeat's half-the-space rule, because GBN's receiver has no buffering ambiguity to worry about beyond the one-off boundary case). Frame transmission time Tf = 2000/(4x10^6) = 0.5 ms. Cycle time = Tf + 2 x propagation delay = 0.5 + 2x25 = 50.5 ms. With window 15, the sender can push out W x Tf = 15 x 0.5 = 7.5 ms of frames per cycle -- since 7.5 ms is much less than the 50.5 ms cycle, efficiency = 7.5/50.5 = 0.14851, i.e. 14.85%. The trap is confusing GBN's safe-window rule (2^n - 1 = 15) with Selective Repeat's rule (2^(n-1) = 8) for the same sequence field size -- using SR's smaller window formula here, or a naively 'full' window of 16, both give a different, incorrect efficiency; getting the correct protocol-specific window-size ceiling right is the crux of the question."
+  },
+  {
+    id: 'cn-datalink-h8',
+    q: "A 14-bit data sequence 11010011101100 is protected using CRC-8 with generator polynomial x^8 + x^2 + x + 1 (the 9-bit pattern 100000111). The sender computes the correct 8-bit CRC remainder and appends it, forming a 22-bit codeword. During transmission, exactly two bits of this transmitted codeword are corrupted (flipped) by noise: the bit at position 3 and the bit at position 10 (using 0-based indexing from the left of the 22-bit codeword). The receiver divides the ENTIRE received (corrupted) 22-bit codeword by the same generator 100000111. What is the resulting 8-bit remainder, expressed as a decimal integer (a non-zero result means the receiver correctly detects that an error occurred)?",
+    options: [],
+    answer: 108,
+    kind: 'nat',
+    marks: 2,
+    difficulty: 'hard',
+    type: 'numerical',
+    explanation: "First compute the correct CRC-8 remainder for the original 14-bit data (appending 8 zero bits and dividing by 100000111 via XOR-based long division): this gives a remainder of 00100111, so the correctly transmitted 22-bit codeword is 1101001110110000100111. Now flip the bits at position 3 and position 10 of this codeword (0-indexed), producing the corrupted codeword 1100001110010000100111. The receiver performs the same modulo-2 division of this entire 22-bit corrupted string by the generator 100000111; carrying out the XOR-based long division yields a remainder of 01101100, which as a decimal integer is 64+32+8+4 = 108. Since this remainder is non-zero, the receiver correctly flags the frame as corrupted and discards it (or requests retransmission). The trap is realizing the receiver's check divides the WHOLE received codeword (data bits plus the appended CRC bits together), not just the original data portion re-computed fresh -- and that two independent bit flips at arbitrary positions will essentially always (though not with absolute mathematical certainty for every possible error pattern) produce a detectably non-zero remainder for a well-chosen generator polynomial like this one."
+  }
+);
+
+window.GATE_DATA.questions['cn'].topics.find(function(t){return t.id==='cn-basics';}).questions.push(
+  {
+    id: 'cn-basics-h1',
+    q: "A single 125,000-bit packet travels from source to destination through 2 intermediate routers (3 links total). Link 1: bandwidth 2 Mbps, propagation delay 10 ms, and the packet then waits 5 ms in a queue at the first router before being forwarded. Link 2: bandwidth 5 Mbps, propagation delay 8 ms, then waits 12 ms in a queue at the second router. Link 3: bandwidth 1 Mbps, propagation delay 15 ms (no further queueing, this is the last hop to the destination). What is the total end-to-end delay, in ms, for this packet (store-and-forward, one packet, not fragmented further)?",
+    options: [],
+    answer: 262.5,
+    kind: 'nat',
+    marks: 2,
+    difficulty: 'hard',
+    type: 'numerical',
+    explanation: "Each link contributes its own transmission delay (packet size / link bandwidth) plus its propagation delay, and each intermediate router adds whatever queueing delay the packet experiences there before being forwarded onward. Link 1: Tt = 125,000/(2x10^6) = 62.5 ms, plus propagation 10 ms, plus queueing 5 ms at router 1 = 77.5 ms. Link 2: Tt = 125,000/(5x10^6) = 25 ms, plus propagation 8 ms, plus queueing 12 ms at router 2 = 45 ms. Link 3: Tt = 125,000/(1x10^6) = 125 ms, plus propagation 15 ms, plus 0 queueing (final hop) = 140 ms. Total = 77.5+45+140 = 262.5 ms. The trap is that with three DIFFERENT bandwidths, the transmission delay must be recomputed fresh for each link using that link's own rate (the slowest link, Link 3 at 1 Mbps, dominates with 125 ms alone despite it having zero queueing) -- a solver who mistakenly reuses one link's transmission delay for all three, or forgets to add the router-specific queueing delays, will get the wrong total."
+  },
+  {
+    id: 'cn-basics-h2',
+    q: "A 2,000,000-bit message must cross a path with 6 links in series, each of bandwidth 4 Mbps and one-way propagation delay 4 ms. Compare (a) circuit switching, where a 25 ms setup delay reserves the whole path, after which the message flows as one continuous unit (its transmission delay counted once, plus the total end-to-end propagation delay summed once across all 6 links), versus (b) packet switching, where the message is split into 10 EQUAL packets and pipelined across the 6 links (total time = (links + packets - 1) x per-packet transmission time, plus the total end-to-end propagation delay, counted once, added on top). How many MORE milliseconds does the pipelined packet-switching approach take compared to circuit switching?",
+    options: [],
+    answer: 225,
+    kind: 'nat',
+    marks: 2,
+    difficulty: 'hard',
+    type: 'numerical',
+    explanation: "Circuit switching: whole-message transmission time = 2,000,000/(4x10^6) = 500 ms; total propagation = 6 x 4 = 24 ms; total = setup + transmission + propagation = 25+500+24 = 549 ms. Packet switching: each of the 10 packets carries 200,000 bits, so per-packet transmission time = 200,000/(4x10^6) = 50 ms; pipelining across 6 links with 10 packets takes (6+10-1) x 50 = 15 x 50 = 750 ms of transmission-related time, plus the same 24 ms of total propagation = 774 ms. Difference = 774-549 = 225 ms, meaning circuit switching is actually FASTER here despite its setup overhead. The trap is assuming packet switching, being 'modern' or 'pipelined', is automatically faster -- but circuit switching's one-time whole-message transmission (500 ms, paid only once regardless of hop count) can beat packet switching's per-hop-per-packet pipelining penalty ((links+packets-1) transmission slots) when the setup cost is small relative to the message size and the packet count is not large enough to amortize the (links-1) extra pipeline-fill slots."
+  },
+  {
+    id: 'cn-basics-h3',
+    q: "A noisy channel has bandwidth 3000 Hz and a signal-to-noise ratio of 25 dB. Using Shannon's capacity formula, what is the channel's maximum theoretical data rate, in bps? (Enter your numerical answer, to the nearest integer; a small tolerance is allowed since this involves converting dB and a logarithm.)",
+    options: [],
+    answer: 24928,
+    kind: 'nat',
+    marks: 2,
+    difficulty: 'hard',
+    type: 'numerical',
+    tolerance: 200,
+    explanation: "First convert the SNR from decibels to a plain linear ratio: SNR_dB = 10 log10(SNR), so 25 = 10 log10(SNR), giving SNR = 10^2.5 = 316.23 (NOT simply 25, and not a clean round number either -- this is the key trap, since many solvers either forget the conversion entirely and plug 25 straight into Shannon's formula, or round the dB-to-ratio conversion too aggressively). Shannon's capacity: C = B x log2(1+SNR) = 3000 x log2(317.23). Since log2(317.23) = ln(317.23)/ln(2) = 8.31 (approximately), C = 3000 x 8.31 = 24,928 bps (approximately). The two traps stacked here are: (1) SNR given in dB must be converted via 10^(dB/10) before use, never used directly as the linear ratio, and (2) the resulting linear SNR (316.23) is not a clean power of 2 minus 1, so log2(1+SNR) must be computed as a genuine (non-integer) logarithm rather than read off by inspection, making a calculator or log-table step unavoidable."
+  },
+  {
+    id: 'cn-basics-h4',
+    q: "A channel has bandwidth 4 kHz. It is first analyzed using Nyquist's noiseless-channel formula with 16 discrete signal levels, giving one candidate maximum data rate. Separately, the same channel is found to actually have a signal-to-noise ratio of 1000 (a plain ratio, not dB), giving a second candidate maximum data rate via Shannon's noisy-channel formula. What is the ACTUAL maximum achievable data rate on this real (noisy) channel, in bps -- i.e., whichever of the two candidate limits is the binding (smaller) constraint?",
+    options: [],
+    answer: 32000,
+    kind: 'nat',
+    marks: 2,
+    difficulty: 'hard',
+    type: 'numerical',
+    explanation: "Nyquist (noiseless) limit: C = 2B log2(M) = 2 x 4000 x log2(16) = 2 x 4000 x 4 = 32,000 bps. This is the maximum rate achievable purely from having 16 distinguishable signal levels, IGNORING any noise. Shannon (noisy) limit: C = B x log2(1+SNR) = 4000 x log2(1001) = 4000 x 9.968 = 39,872 bps (approximately). This is the absolute ceiling imposed by the channel's actual noise level, regardless of how many signal levels are used. Since a real, physical channel is subject to BOTH constraints simultaneously, the actually achievable rate is the SMALLER (more restrictive) of the two: min(32,000, 39,872) = 32,000 bps. The trap is computing only the Shannon limit (since the question mentions SNR) and reporting 39,872 bps as the answer -- but Nyquist's signal-level constraint (which depends on the actual modulation scheme in use, here just 16 levels) is here the binding, LOWER limit, and the true achievable rate can never exceed whichever of the two limits is smaller, since both represent hard physical/informational ceilings that must be simultaneously respected."
+  },
+  {
+    id: 'cn-basics-h5',
+    q: "A message of 800,000 bits is split into n equal-sized packets and sent, pipelined, across 5 store-and-forward links (all rate 2 Mbps, propagation ignored). Each packet, regardless of how small its data portion, carries a fixed 200-bit header overhead in addition to its share of the message data. Total time = (5 + n - 1) x [(800,000/n + 200) / (2x10^6)] seconds. As n increases, splitting into smaller packets first helps (better pipelining) but eventually hurts (header overhead dominates), so there is an optimal n that minimizes total time. What is the minimum achievable total transfer time, in milliseconds, at (or near) this optimal packetization? (Enter your numerical answer, to 1 decimal place; a small tolerance is allowed.)",
+    options: [],
+    answer: 425.7,
+    kind: 'nat',
+    marks: 2,
+    difficulty: 'hard',
+    type: 'numerical',
+    tolerance: 3,
+    explanation: "This is a genuine optimization: Total(n) = (5+n-1) x (800,000/n + 200) / (2x10^6) x 1000 ms. As n grows, each packet's transmission time falls (spreading the 800,000 bits thinner), which helps pipelining, but the fixed 200-bit header is paid n times over, so total header overhead grows linearly with n -- eventually swamping the benefit. Using calculus (or by evaluating the expression across a range of n and finding the minimum, since n must also be checked near the continuous optimum), the minimizing n works out to approximately n* = sqrt((links-1) x message_bits / header_bits) = sqrt(4 x 800,000/200) = sqrt(16,000) = 126.5, so checking n=126 or n=127 (both give essentially the same value since the function is very flat near its minimum) gives a minimum total time of approximately 425.7 ms. The trap is assuming 'more packets is always better for pipelining' and pushing n arbitrarily high -- but every additional packet also multiplies the fixed per-packet header overhead, so there is a genuine sweet spot, not a monotonic improvement, and finding it requires balancing the two competing effects rather than just applying the plain pipelining formula with an arbitrarily chosen n."
+  },
+  {
+    id: 'cn-basics-h6',
+    q: "A sender-receiver pair uses an ASYMMETRIC pair of links: the forward (data) link has bandwidth 10 Mbps and one-way propagation delay 30 ms, while the reverse (ACK) link has a much slower bandwidth of only 1 Mbps and the same 30 ms one-way propagation delay. A single data packet of 1500 bytes is sent forward, and its ACK is 400 bits, sent back on the slow reverse link. Accounting for the (non-negligible, given the slow reverse link) transmission time of BOTH the data packet and its ACK, what is the resulting round-trip-time-based bandwidth-delay product, in bytes, using the forward link's bandwidth as the 'pipe' capacity being measured (i.e., BDP = forward bandwidth x total measured RTT)?",
+    options: [],
+    answer: 77000,
+    kind: 'nat',
+    marks: 2,
+    difficulty: 'hard',
+    type: 'numerical',
+    explanation: "Total RTT = (forward transmission time) + (forward propagation) + (reverse ACK transmission time) + (reverse propagation). Forward transmission: 1500 bytes x 8 = 12,000 bits / (10x10^6 bps) = 1.2 ms. Forward propagation: 30 ms. Reverse ACK transmission: 400 bits / (1x10^6 bps) = 0.4 ms (this is the key non-negligible piece: on a fast, symmetric link this would be tiny, but the reverse link here is 10x slower, making even a 400-bit ACK take a noticeable 0.4 ms). Reverse propagation: 30 ms. Total RTT = 1.2+30+0.4+30 = 61.6 ms. BDP (using the forward link's bandwidth as the pipe capacity, and this RTT) = 10x10^6 bps x 0.0616 s = 616,000 bits = 77,000 bytes. The trap is assuming ACK transmission time is always negligible (a standard textbook simplification) -- it is NOT negligible here precisely because the ASYMMETRIC reverse link is far slower than the forward link, a realistic scenario (e.g. ADSL/cable uplinks) where ignoring the slow-link ACK time would understate the true RTT and therefore understate the BDP."
+  },
+  {
+    id: 'cn-basics-h7',
+    q: "A channel needs to sustain a target bit rate of 36 Mbps. Using Nyquist's formula, it is determined that using 64 discrete signal levels requires a minimum bandwidth of B = (target rate)/(2 x log2(64)). Once this minimum bandwidth is set, it turns out the channel's actual signal-to-noise ratio at that bandwidth is only 63 (a plain ratio, not dB). What is the MAXIMUM bit rate this channel can actually sustain once the noise limit (Shannon) is correctly checked against the Nyquist-derived bandwidth, in Mbps?",
+    options: [],
+    answer: 18,
+    kind: 'nat',
+    marks: 2,
+    difficulty: 'hard',
+    type: 'numerical',
+    explanation: "First find the Nyquist-required bandwidth for 36 Mbps using 64 levels (6 bits per symbol, since log2(64)=6): B = 36x10^6 / (2x6) = 3,000,000 Hz = 3 MHz. This is the bandwidth a noiseless channel would need to physically support 36 Mbps with 64-level signaling. But this same channel, at that 3 MHz bandwidth, has SNR = 63, so its actual Shannon (noise-limited) capacity is C = B x log2(1+SNR) = 3x10^6 x log2(64) = 3x10^6 x 6 = 18x10^6 = 18 Mbps. Since 18 Mbps (the noise ceiling) is LESS than the originally desired 36 Mbps, the channel physically CANNOT sustain the target rate no matter how the signaling is engineered -- the actual achievable maximum is 18 Mbps, half of what was hoped for. The trap is computing only the Nyquist bandwidth requirement (3 MHz) and stopping there, implicitly assuming the channel is noiseless and can therefore hit the full 36 Mbps target -- but Shannon's noise-imposed ceiling must always be separately checked, and whichever of the two limits (Nyquist's level-based bound or Shannon's noise-based bound) is SMALLER is the one that actually governs real achievable throughput."
+  },
+  {
+    id: 'cn-basics-h8',
+    q: "A 600,000-bit message is sent using pure message switching (NOT split into packets) across 3 heterogeneous store-and-forward links in series: link 1 at 3 Mbps, link 2 at 1.5 Mbps, link 3 at 6 Mbps. Each of the 2 intermediate switching nodes adds a fixed 2 ms nodal processing delay before forwarding the fully-received message onward (the final destination adds no such delay). Each link additionally has a 6 ms propagation delay. What is the total end-to-end delay, in ms, for this message to arrive?",
+    options: [],
+    answer: 722,
+    kind: 'nat',
+    marks: 2,
+    difficulty: 'hard',
+    type: 'numerical',
+    explanation: "Since the message is NOT split into packets (pure message switching), the entire 600,000 bits must be fully received at each intermediate node before any part of it can be forwarded onward -- so each link independently pays the FULL message's transmission time at that link's own (different) rate. Link 1: Tt = 600,000/(3x10^6) = 200 ms. Link 2: Tt = 600,000/(1.5x10^6) = 400 ms. Link 3: Tt = 600,000/(6x10^6) = 100 ms. Sum of transmission delays = 200+400+100 = 700 ms. Sum of propagation delays across 3 links = 3x6 = 18 ms. Sum of nodal processing delays at the 2 intermediate nodes (not the destination) = 2x2 = 4 ms. Total = 700+18+4 = 722 ms. The trap is that with three DIFFERENT link rates, the middle (slowest, 1.5 Mbps) link dominates the transmission-delay sum at 400 ms alone -- a solver who assumes all links share one 'representative' rate, or forgets that pure (unfragmented) message switching forces each hop to pay the FULL message transmission time rather than a pipelined fraction of it, will compute a substantially different, wrong total."
+  }
+);
+
+window.GATE_DATA.questions['cn'].topics.find(function(t){return t.id==='cn-application';}).questions.push(
+  {
+    id: 'cn-application-h1',
+    q: "A web page consists of 1 base HTML file plus 5 embedded objects (images), all served from the same server, all previously uncached (cold cache). DNS resolution for this server requires 2 sequential iterative lookups, each taking 20 ms (so 40 ms of DNS time total, paid once). RTT between client and server is 50 ms; transmission times are negligible. The client uses NON-PERSISTENT HTTP with NO parallel connections: every single object (including the base page) requires its own fresh TCP connection (1 RTT for the TCP handshake) followed by 1 RTT for the HTTP request/response, all done strictly one object at a time. What is the total page load time, in ms?",
+    options: [],
+    answer: 640,
+    kind: 'nat',
+    marks: 2,
+    difficulty: 'hard',
+    type: 'numerical',
+    explanation: "Total objects to fetch = 1 base page + 5 images = 6 objects. DNS resolution happens once, up front: 2 x 20 ms = 40 ms. Under non-persistent HTTP with no parallelism, EACH of the 6 objects requires its own new TCP connection: 1 RTT to complete the handshake, then 1 more RTT to send the HTTP GET and receive the response, for 2 RTT = 100 ms per object. With 6 objects done strictly serially: 6 x 100 = 600 ms. Total = DNS + serial object fetches = 40 + 600 = 640 ms. The trap is forgetting to count the BASE PAGE ITSELF as one of the objects requiring its own full connection setup (a common mistake is to count only the 5 images, giving a smaller and incorrect answer) -- non-persistent HTTP tears down the connection after every single response, including the very first one that fetches the HTML itself, so all 6 fetches pay the full 2-RTT connection-plus-request cost."
+  },
+  {
+    id: 'cn-application-h2',
+    q: "Using the identical setup as before (1 base page + 5 objects, DNS = 40 ms total, RTT = 50 ms, transmission times negligible), the client now uses PERSISTENT (non-pipelined) HTTP: a single TCP connection is opened once (1 RTT handshake) and reused for all 6 requests, but the client still waits for each response before sending the next request (no pipelining, so each of the 6 requests still costs its own separate RTT, just without repeating the handshake). What is the total page load time, in ms?",
+    options: [],
+    answer: 390,
+    kind: 'nat',
+    marks: 2,
+    difficulty: 'hard',
+    type: 'numerical',
+    explanation: "DNS = 40 ms (unchanged, paid once regardless of HTTP mode). The TCP handshake now happens only ONCE for the whole session: 1 RTT = 50 ms. Then, since there is no pipelining, each of the 6 objects (base page + 5 images) still requires its own separate request/response RTT, done one after another: 6 x 50 = 300 ms. Total = 40 + 50 + 300 = 390 ms. Compare this to the 640 ms non-persistent result: persistent connections save exactly 5 RTTs' worth of redundant handshakes (250 ms saved), since only 1 handshake is paid instead of 6, while the request/response RTTs themselves are unchanged in count. The trap is double-counting the handshake (adding it once for the connection AND again folding it into a '2 RTT per object' formula left over from the non-persistent case) or, conversely, forgetting to add it at all since it is easy to focus only on the 6 serial request RTTs and skip the initial connection-setup RTT entirely."
+  },
+  {
+    id: 'cn-application-h3',
+    q: "Using the same setup once more (1 base page + 5 objects, DNS = 40 ms total, RTT = 50 ms, transmission times negligible), the client now uses PERSISTENT PIPELINED HTTP: the single TCP connection is opened once (1 RTT), the base HTML page is fetched first (1 RTT, since the client must see the HTML to discover the URLs of the 5 embedded objects), and then all 5 embedded objects are requested together in a single pipelined burst, with their responses streaming back so that all 5 are received within 1 additional RTT total. What is the total page load time, in ms?",
+    options: [],
+    answer: 190,
+    kind: 'nat',
+    marks: 2,
+    difficulty: 'hard',
+    type: 'numerical',
+    explanation: "DNS = 40 ms (unchanged). TCP handshake = 1 RTT = 50 ms (paid once). Fetching the base HTML page requires its own RTT (50 ms), since the client cannot know what the 5 embedded object URLs even are until it has parsed the HTML -- this RTT cannot be pipelined away. Once the base page is known, however, the client can fire off all 5 remaining object requests back-to-back on the now-open, now-warm connection, and pipelining lets all 5 responses come back within a single additional RTT (50 ms), rather than 5 separate serial RTTs. Total = 40 + 50 + 50 + 50 = 190 ms. Comparing all three modes: non-persistent = 640 ms, persistent non-pipelined = 390 ms, persistent pipelined = 190 ms -- pipelining roughly halves the time again versus plain persistent connections, but the base-page RTT can never be eliminated or folded into the pipelined burst, since the object URLs are genuinely unknown before that first response arrives; this is the trap most likely to be missed (treating ALL 6 objects, including the base page itself, as pipelinable into one RTT, which would incorrectly give 140 ms)."
+  },
+  {
+    id: 'cn-application-h4',
+    q: "A web page load involves resolving a domain name that is NOT cached anywhere, requiring a full DNS resolution chain of 3 sequential lookups (client to local resolver to root server, then TLD server, then authoritative server), each taking 15 ms (total DNS time = 45 ms, paid once, up front). The browser then uses NON-PERSISTENT HTTP but opens up to 3 PARALLEL connections at a time. It must first fetch the base HTML page alone (1 connection, 2 RTT: handshake + request/response, since the base page's own URL is already known and can start immediately after DNS), THEN, once the base page reveals 8 embedded object URLs, it fetches those 8 objects in parallel batches of at most 3 connections at a time (each object still needs its own fresh 2-RTT connection: handshake + request/response; a new batch of up to 3 starts only once the previous batch of up to 3 fully completes). RTT = 40 ms throughout; transmission times are negligible. What is the total page load time, in ms?",
+    options: [],
+    answer: 365,
+    kind: 'nat',
+    marks: 2,
+    difficulty: 'hard',
+    type: 'numerical',
+    explanation: "DNS = 45 ms (3 x 15 ms, paid once up front). Base page fetch = 1 connection x 2 RTT = 2 x 40 = 80 ms (must happen before anything else, since the 8 object URLs are unknown until this response arrives). The 8 remaining objects, fetched in parallel batches of up to 3: ceil(8/3) = 3 batches (sizes 3, 3, 2 -- the last batch is smaller but still takes the SAME time as a full batch, since batch time is governed by the slowest connection in it, and all connections in a batch run the same 2-RTT process concurrently). Each batch takes 2 RTT = 80 ms, and batches run strictly one after another (a new batch cannot start until the previous one's connections are all free): 3 batches x 80 ms = 240 ms. Total = 45 + 80 + 240 = 365 ms. The trap is assuming all 8 objects can be fetched in a single wave just because there are 'only' 8 of them -- with a parallelism cap of 3 connections, they must be split into 3 sequential batches, and a partial final batch (only 2 objects) still costs a FULL batch's worth of time, not a discounted fraction."
+  },
+  {
+    id: 'cn-application-h5',
+    q: "Using RSA with small toy primes p = 5 and q = 11: compute n = p x q and phi(n) = (p-1)(q-1), choose public exponent e = 7 (which is coprime to phi(n)), then find the private exponent d as the modular inverse of e mod phi(n). Using this key pair, what is the RSA ciphertext c = m^e mod n for the plaintext message m = 8?",
+    options: [],
+    answer: 2,
+    kind: 'nat',
+    marks: 2,
+    difficulty: 'hard',
+    type: 'numerical',
+    explanation: "n = p x q = 5 x 11 = 55. phi(n) = (p-1)(q-1) = 4 x 10 = 40. e = 7 is coprime to 40 (gcd(7,40)=1), so it is a valid public exponent (d itself is not needed to compute the ciphertext here, only n and e are, though a full RSA setup would also find d = 23 via the extended Euclidean algorithm for later decryption). Encrypt: c = m^e mod n = 8^7 mod 55. Computing via repeated squaring: 8^2 = 64 mod 55 = 9; 8^4 = 9^2 = 81 mod 55 = 26; 8^7 = 8^4 x 8^2 x 8^1 = 26 x 9 x 8 mod 55. First 26 x 9 = 234 mod 55 = 234 - 220 = 14; then 14 x 8 = 112 mod 55 = 112 - 110 = 2. So c = 2. The trap is attempting to compute 8^7 = 2,097,152 directly and then reducing mod 55 in one shot (error-prone by hand for larger exponents) instead of using repeated squaring mod n at each step, which keeps every intermediate number small and manageable -- and also mistakenly using p or q individually as the modulus instead of the product n=55."
+  },
+  {
+    id: 'cn-application-h6',
+    q: "Using RSA with small toy primes p = 3 and q = 11: n = p x q = 33, phi(n) = (p-1)(q-1) = 2 x 10 = 20. Public exponent e = 3 (coprime to 20). Find the private exponent d (the modular inverse of e mod phi(n), i.e., the value satisfying e x d = 1 mod phi(n)), then use d to decrypt a received ciphertext c = 5. What is the resulting plaintext message m = c^d mod n?",
+    options: [],
+    answer: 14,
+    kind: 'nat',
+    marks: 2,
+    difficulty: 'hard',
+    type: 'numerical',
+    explanation: "First find d: we need 3d = 1 (mod 20). Testing small values (or using the extended Euclidean algorithm on 3 and 20): 3x7 = 21 = 1 (mod 20), so d = 7. Now decrypt: m = c^d mod n = 5^7 mod 33. Using repeated squaring: 5^2 = 25 mod 33 = 25; 5^4 = 25^2 = 625 mod 33 = 625 - 594 = 31 (since 33x18=594); 5^7 = 5^4 x 5^2 x 5^1 = 31 x 25 x 5 mod 33. First 31 x 25 = 775 mod 33: 33x23=759, 775-759=16. Then 16 x 5 = 80 mod 33 = 80-66=14. So m = 14. The trap is finding d via naive trial-and-error without a systematic method (the extended Euclidean algorithm) for larger, less friendly numbers, and separately, forgetting that decryption uses the SAME modulus n=33 as encryption (not phi(n)=20) -- confusing the two moduli is one of the most common RSA-toy-example errors."
+  },
+  {
+    id: 'cn-application-h7',
+    q: "A DNS record has a Time-To-Live (TTL) of 300 seconds. A client's FIRST request for this domain, with a completely cold local cache, requires a full recursive resolution chain of 3 RTTs (root, then TLD, then authoritative server), each RTT = 25 ms (so the first lookup costs 75 ms total); the result is then cached locally for exactly 300 seconds. The client goes on to make 11 total requests to this domain over the course of a session: requests 2 through 10 all occur well within the 300-second TTL window (so they incur 0 additional DNS delay, served entirely from cache), but request 11 occurs AFTER the cached entry's TTL has expired, forcing the FULL 3-RTT resolution chain to run again. What is the TOTAL DNS resolution overhead, in ms, summed across all 11 requests in this session?",
+    options: [],
+    answer: 150,
+    kind: 'nat',
+    marks: 2,
+    difficulty: 'hard',
+    type: 'numerical',
+    explanation: "Each full DNS resolution chain (whenever the cache is cold or has expired) costs 3 RTTs x 25 ms = 75 ms. This full chain runs exactly TWICE across the whole session: once for the very first request (cold cache), and once again for request 11 (after the 300-second TTL has expired, forcing a fresh lookup exactly as if the cache were cold again). Requests 2 through 10 (9 requests) each incur 0 ms of DNS overhead, since they all fall within the still-valid 300-second cache window. Total DNS overhead = 2 x 75 = 150 ms. The trap is assuming that because only ONE of the 11 requests (request 11) is 'late', its DNS cost is somehow smaller or partial -- a TTL expiry does not produce a cheaper, incremental re-lookup; it triggers the exact SAME full 3-RTT chain as the very first cold-cache lookup, since the cache entry is simply gone once its TTL elapses, with no partial credit for having been resolved before."
+  },
+  {
+    id: 'cn-application-h8',
+    q: "A client loads a page over HTTPS. RTT = 30 ms throughout, transmission times negligible. The sequence of round trips required, IN ORDER, is: (1) DNS resolution, 1 RTT; (2) TCP handshake, 1 RTT; (3) TLS 1.2 full handshake, 2 RTT (TLS 1.2, unlike the newer TLS 1.3's single-RTT handshake, requires 2 full round trips to complete its key exchange before any application data can flow); (4) HTTP request for the base HTML page, 1 RTT; (5) all 4 remaining embedded objects fetched together via a single pipelined HTTP request/response burst on the now-open, encrypted connection, 1 more RTT. What is the total page load time, in ms?",
+    options: [],
+    answer: 180,
+    kind: 'nat',
+    marks: 2,
+    difficulty: 'hard',
+    type: 'numerical',
+    explanation: "Add up every stage in sequence, each stage's RTT-count times 30 ms: DNS = 1 x 30 = 30 ms; TCP handshake = 1 x 30 = 30 ms; TLS 1.2 handshake = 2 x 30 = 60 ms; base HTML page request/response = 1 x 30 = 30 ms; pipelined fetch of the 4 remaining objects = 1 x 30 = 30 ms. Total = 30+30+60+30+30 = 180 ms. The trap is treating the TLS handshake as costing just 1 RTT the way the TCP handshake does -- TLS 1.2's full handshake genuinely requires 2 round trips (ClientHello/ServerHello-with-certificate, then the key-exchange-and-finished messages) before the first byte of encrypted application data can be sent, roughly doubling the 'connection setup tax' compared to plain unencrypted HTTP over the same network path; this extra RTT is exactly the overhead that TLS 1.3's redesigned single-round-trip (and 0-RTT resumption) handshake was created to eliminate."
+  }
+);

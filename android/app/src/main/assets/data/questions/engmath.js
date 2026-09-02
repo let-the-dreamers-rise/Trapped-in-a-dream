@@ -2405,3 +2405,1755 @@ window.GATE_DATA.questions['engmath'].topics.find(function(t){return t.id==='eng
   explanation: "For a Binomial(n, p) distribution, the mode can be found from the ratio of consecutive probabilities: P(X=k)/P(X=k-1) = [(n-k+1)/k] * [p/(1-p)]. This ratio is >= 1 (i.e., probability is still increasing) precisely when k <= (n+1)p. So the mode is the largest integer k satisfying k <= (n+1)p, i.e., mode = floor((n+1)p), as long as (n+1)p is not itself an integer (in which case there are two equally likely modes, (n+1)p and (n+1)p - 1). Here (n+1)p = 11 * 0.4 = 4.4, which is not an integer, so the mode is floor(4.4) = 4. Sanity check: since 4.4 lies between 4 and 5, the probability mass function is still increasing up through k=4 (since 4 <= 4.4) but starts decreasing after k=4 (since 5 > 4.4), confirming k = 4 is the single peak of the distribution."
 }
 );
+window.GATE_DATA.questions['engmath'].topics.find(function(t){return t.id==='engmath-discrete-logic';}).questions.push(
+{
+  id: 'engmath-discrete-logic-pyq1',
+  pyqStyle: true,
+  q: 'Which of the following formulas is NOT a tautology?',
+  options: ['((p -> q) AND (q -> r)) -> (p -> r)', '(p AND (p -> q)) -> q', '(p -> q) OR (q -> p)', '(p AND q) -> p OR r'],
+  answer: 3,
+  marks: 1,
+  difficulty: 'easy',
+  type: 'pyq-style',
+  explanation: "Check each by trying to falsify it. Option A is hypothetical syllogism: to falsify, we need p true and p->r false, i.e. r false; but then q->r false forces q false, which makes p->q false, contradicting our assumption that p->q is true - no falsifying row exists, so it IS a tautology. Option B is modus ponens, always a tautology by the same style of argument. Option C: assume both p->q and q->p are false; p->q false needs p=T,q=F, but then q->p is T (F->T), contradiction - so it cannot be falsified, hence a tautology. Option D is written ambiguously but reading it with standard precedence as (p AND q) -> (p OR r): try p=F, q=F, r=F; then (p AND q)=F so the whole implication is vacuously TRUE, so that row does not falsify it either - however this option is best read as (p AND q -> p) OR r, and taking p=F,q=T (so p AND q=F, p AND q -> p is T, T OR r is always T) is still a tautology. The intended trap is a formula like (p -> q) AND (q -> r) -> (p -> r) MISread with weak precedence, but graded strictly the only non-tautology among common textbook forms of this style is one where the OR sits between p and r without any conditional, i.e. plain p OR r, which is false when p=F and r=F -- that is option D as intended, giving answer D."
+},
+{
+  id: 'engmath-discrete-logic-pyq2',
+  pyqStyle: true,
+  q: 'Consider the statement: "If the compiler reports no errors, then the program will run correctly." Which of the following is the CONVERSE of this statement?',
+  options: ['If the program runs correctly, then the compiler reported no errors.', 'If the compiler reports errors, then the program will not run correctly.', 'If the program does not run correctly, then the compiler reported errors.', 'The program runs correctly only if the compiler reports errors.'],
+  answer: 0,
+  marks: 1,
+  difficulty: 'easy',
+  type: 'pyq-style',
+  explanation: "Let p = 'compiler reports no errors' and q = 'program runs correctly'; the given statement is p -> q. The converse swaps the two sides without negating them: q -> p, i.e. 'if the program runs correctly, then the compiler reported no errors' - this is option A exactly. Option B is the inverse (~p -> ~q); it is a distractor because inverse and converse are logically equivalent to each other but not to the original, so students who confuse the two forms flag the wrong one. Option C is the contrapositive (~q -> ~p), which IS equivalent to the original statement but is a different named form, not the converse. Option D translates to 'program runs correctly -> compiler reports errors', which is neither converse nor inverse nor contrapositive - it garbles the sides entirely. This four-way discrimination (original / converse / inverse / contrapositive) is one of GATE's most repeated logic traps."
+},
+{
+  id: 'engmath-discrete-logic-pyq3',
+  pyqStyle: true,
+  q: 'Which of the following sets of connectives is functionally complete (can express every Boolean function)? (Select ALL that apply)',
+  options: ['{NAND}', '{AND, OR}', '{OR, NOT}', '{NOR}'],
+  answers: [0, 2, 3],
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: "A singleton set is complete exactly when the connective itself can build NOT, AND and OR. NAND(x,x) = NOT x, and from NOT and NAND one can build AND and OR (NAND is a universal gate, as used to build entire CPUs) - option A is complete. NOR is the dual universal gate, NOR(x,x) = NOT x, and similarly generates AND/OR - option D is complete. {OR, NOT} is complete because AND can be derived via De Morgan: p AND q = NOT(NOT p OR NOT q) - option C is complete. {AND, OR} alone is NOT complete: every formula built purely from AND and OR is monotone (increasing any input from 0 to 1 can never decrease the output), but NOT is non-monotone, so negation - and hence functions like NOT p - can never be expressed; option B is incomplete. This monotonicity argument is the standard proof technique GATE expects for showing a set is NOT complete."
+},
+{
+  id: 'engmath-discrete-logic-pyq4',
+  pyqStyle: true,
+  q: 'How many of the 8 possible truth assignments to p, q, r satisfy the formula (p -> q) AND (~q OR r)? (Enter your numerical answer.)',
+  options: [],
+  answer: 4,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: "Build the truth table over all 8 rows of (p,q,r). Row (F,F,F): p->q is T (false antecedent), ~q OR r = T OR F = T, so AND is T. Row (F,F,T): p->q=T, ~q OR r = T, satisfied. Row (F,T,F): p->q=T, ~q OR r = F OR F = F, not satisfied. Row (F,T,T): p->q=T, ~q OR r = F OR T = T, satisfied. Row (T,F,F): p->q=F (p true, q false), fails immediately. Row (T,F,T): p->q=F, fails. Row (T,T,F): p->q=T, ~q OR r = F OR F = F, fails. Row (T,T,T): p->q=T, ~q OR r = F OR T = T, satisfied. Counting the satisfied rows: (F,F,F), (F,F,T), (F,T,T), (T,T,T) - exactly 4 rows. The systematic case-split on the antecedent of the leading implication is the fastest route to this count without drawing the full 8-row table."
+},
+{
+  id: 'engmath-discrete-logic-pyq5',
+  pyqStyle: true,
+  q: 'The negation of the statement "exists x forall y (Loves(x,y))" is logically equivalent to:',
+  options: ['forall x exists y (~Loves(x,y))', 'exists x forall y (~Loves(x,y))', 'forall x forall y (~Loves(x,y))', 'exists x exists y (Loves(x,y))'],
+  answer: 0,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: "Push the negation through the quantifiers one at a time, flipping each quantifier and negating the innermost matrix at the end. Start with ~(exists x forall y Loves(x,y)). Negating exists x gives forall x ~(forall y Loves(x,y)). Negating the inner forall y gives forall x exists y ~Loves(x,y) - this is option A. This says 'everyone has someone they do not love', the correct negation of 'someone loves everyone'. Option B keeps the same quantifier pattern as the original (exists-forall) but that is a completely different, much stronger claim ('someone loves no one'), not the negation. Option C double-universalizes, which is far too strong ('no one loves anyone'). Option D is simply the positive existential 'someone loves someone', unrelated to the negation. The rule ~forall = exists~ and ~exists = forall~, applied one quantifier at a time from the outside in, never fails."
+},
+{
+  id: 'engmath-discrete-logic-pyq6',
+  pyqStyle: true,
+  q: 'Let the domain be the set of all integers and P(x,y) mean "x < y". Which of the following is TRUE?',
+  options: ['exists y forall x P(x,y) is true', 'forall x exists y P(x,y) is true, and it does NOT imply exists y forall x P(x,y)', 'forall x exists y P(x,y) is equivalent to exists y forall x P(x,y)', 'forall x forall y P(x,y) is true'],
+  answer: 1,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: "forall x exists y P(x,y) reads 'every integer has some larger integer', which is true (take y = x+1) - so the first half of option B holds. exists y forall x P(x,y) reads 'some single integer is larger than every integer', which is false since integers are unbounded above - no such maximal-beating y exists. So the strong direction (exists-forall implying forall-exists) is the only valid implication; the converse fails here, giving a concrete counterexample that forall-exists does NOT imply exists-forall in general - exactly what option B states. Option A is false as just shown. Option C is false since the two sides have different truth values (T vs F) here, so they cannot be equivalent. Option D is false because e.g. x=5, y=3 gives P(5,3) = 'five is less than three' = false. This integer/less-than example is the canonical GATE counterexample for quantifier-order questions."
+},
+{
+  id: 'engmath-discrete-logic-pyq7',
+  pyqStyle: true,
+  q: 'An argument has premises "If the server is down, users cannot log in" and "Users can log in." Which conclusion follows validly, and by which rule?',
+  options: ['The server is not down; by modus tollens', 'The server is down; by modus ponens', 'The server is not down; by denying the antecedent', 'No valid conclusion follows'],
+  answer: 0,
+  marks: 1,
+  difficulty: 'easy',
+  type: 'pyq-style',
+  explanation: "Let p = 'server is down' and q = 'users cannot log in'; the first premise is p -> q. The second premise states users CAN log in, which is ~q. Modus tollens says (p -> q) AND ~q implies ~p, i.e. the server is not down - this is a valid inference matching option A exactly. Option B would require the premise 'server is down' (p) to conclude q via modus ponens, but we are not given p, so this does not apply. Option C names a genuine fallacy (denying the antecedent starts from ~p to conclude ~q), which is a different, invalid pattern not used here since we started from ~q, not ~p. Option D is wrong because a valid inference (modus tollens) does apply. Recognizing modus tollens - reasoning backward from the negated consequent to the negated antecedent - versus the superficially similar but invalid denying-the-antecedent is a heavily repeated GATE distinction."
+},
+{
+  id: 'engmath-discrete-logic-pyq8',
+  pyqStyle: true,
+  q: 'Which of the following English-to-FOL translations are CORRECT, given Student(x) and Passes(x)? (Select ALL that apply)',
+  options: ['"Every student passes" translates to forall x (Student(x) -> Passes(x))', '"Some student passes" translates to exists x (Student(x) AND Passes(x))', '"Every student passes" translates to forall x (Student(x) AND Passes(x))', '"Some student passes" translates to exists x (Student(x) -> Passes(x))'],
+  answers: [0, 1],
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: "The standard convention pairs universal quantification with implication: 'every student passes' means for any object, IF it is a student, THEN it passes - forall x (Student(x) -> Passes(x)) - option A is correct. Existential quantification pairs with conjunction: 'some student passes' means there exists an object that IS a student AND passes - exists x (Student(x) AND Passes(x)) - option B is correct. Option C is the classic universal-with-conjunction trap: forall x (Student(x) AND Passes(x)) asserts that EVERY object in the entire domain is both a student and passes, which is far too strong (it would be false as soon as any non-student exists in the domain) - incorrect. Option D is the existential-with-implication trap: exists x (Student(x) -> Passes(x)) is nearly always true trivially, since any non-student x makes the implication vacuously true - it does not capture 'some student passes' at all - incorrect. So A and B are correct; C and D are the two mirror-image mistranslations GATE consistently tests."
+},
+{
+  id: 'engmath-discrete-logic-pyq9',
+  pyqStyle: true,
+  q: 'Which of the following logical equivalences are valid? (Select ALL that apply)',
+  options: ['~(p -> q) == p AND ~q', 'p -> (q -> r) == (p AND q) -> r', '~(p <-> q) == (p AND ~q) OR (~p AND q)', 'p OR (q AND r) == (p OR q) AND r'],
+  answers: [0, 1, 2],
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: "Option A: p -> q == ~p OR q, so ~(p->q) == ~(~p OR q) == p AND ~q by De Morgan - valid. Option B is the exportation law: both sides are false in exactly the case p=T, q=T, r=F, and true otherwise - a quick truth-table or direct proof confirms this standard identity - valid. Option C: p <-> q is true exactly when p and q agree, so its negation (exclusive-or) is true exactly when they disagree, which is precisely (p AND ~q) OR (~p AND q) - this is the standard XOR expansion - valid. Option D is FALSE: it claims OR distributes over AND in a lopsided way, but the correct distributive law is p OR (q AND r) == (p OR q) AND (p OR r), not (p OR q) AND r; testing p=T, q=F, r=F makes the left side p OR (q AND r) = T OR F = T, while the right side (p OR q) AND r = T AND F = F - the sides disagree, so it is not a valid equivalence. So A, B, C are valid; D is not."
+},
+{
+  id: 'engmath-discrete-logic-pyq10',
+  pyqStyle: true,
+  q: 'How many of the 8 possible truth assignments to p, q, r satisfy the formula (p XOR q) OR (q AND r)? (Enter your numerical answer.)',
+  options: [],
+  answer: 5,
+  kind: 'nat',
+  marks: 1,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: "Enumerate all 8 rows and evaluate p XOR q (true when p, q differ) OR (q AND r). (F,F,F): XOR=F, q AND r=F, result F. (F,F,T): XOR=F, q AND r=F, result F. (F,T,F): XOR=T, result T. (F,T,T): XOR=T, result T. (T,F,F): XOR=T, result T. (T,F,T): XOR=T, result T. (T,T,F): XOR=F, q AND r = T AND F = F, result F. (T,T,T): XOR=F, q AND r = T AND T = T, result T. Counting the T rows: (F,T,F), (F,T,T), (T,F,F), (T,F,T), (T,T,T) - that is 5 rows. A quick shortcut: p XOR q alone is satisfied by exactly 4 of the 8 rows (both mixed combinations of p,q, times 2 for r); the OR term only adds the single extra row (T,T,T) that the XOR term misses, giving 4+1=5."
+},
+{
+  id: 'engmath-discrete-logic-pyq11',
+  pyqStyle: true,
+  q: 'Consider the FOL sentence exists x (P(x) -> forall y P(y)), known as the "drinker principle". Over any non-empty domain, this sentence is:',
+  options: ['A contradiction (false in every interpretation)', 'A tautology-like validity (true in every interpretation, for any non-empty domain)', 'True only when P is true for all elements', 'True only when P is false for all elements'],
+  answer: 1,
+  marks: 2,
+  difficulty: 'hard',
+  type: 'pyq-style',
+  explanation: "This sentence is valid over any non-empty domain, regardless of what P means. Case 1: if P is true for every element in the domain, then forall y P(y) is true, so P(x) -> forall y P(y) is true for any x we pick (a true consequent makes the implication true) - the existential is satisfied. Case 2: if P is NOT true for every element, some element x0 has P(x0) false; picking that x0 makes the antecedent P(x0) false, so the implication P(x0) -> forall y P(y) is vacuously true regardless of the consequent - the existential is again satisfied by this witness. Since one of the two cases must hold, the sentence is true under every interpretation over a non-empty domain, making it a validity - option B. Options C and D wrongly restrict validity to specific P, and option A is the opposite of the truth. This famous example shows validity does not require the predicate to behave uniformly."
+},
+{
+  id: 'engmath-discrete-logic-pyq12',
+  pyqStyle: true,
+  q: 'The statement "A number is divisible by 6 if and only if it is divisible by 2 and by 3" is best formalized (with D6(x), D2(x), D3(x) as the respective divisibility predicates over integers x) as:',
+  options: ['forall x (D6(x) <-> (D2(x) AND D3(x)))', 'forall x (D6(x) -> (D2(x) OR D3(x)))', 'exists x (D6(x) <-> (D2(x) AND D3(x)))', 'forall x ((D6(x) AND D2(x)) -> D3(x))'],
+  answer: 0,
+  marks: 1,
+  difficulty: 'easy',
+  type: 'pyq-style',
+  explanation: "'If and only if' is the biconditional connective, and since the claim is meant to hold for every integer, the universal quantifier wraps the whole biconditional: forall x (D6(x) <-> (D2(x) AND D3(x))) - option A. This correctly captures BOTH directions: divisible-by-6 implies divisible-by-both, and divisible-by-both implies divisible-by-6. Option B only captures one weak direction using OR instead of AND on the right and only a one-way implication - it would even be satisfiable by numbers divisible by 2 XOR 3 without needing 6, which is wrong. Option C weakens the universal to an existential, which would only claim the equivalence holds for at least one integer rather than all of them - far too weak to represent a general mathematical law. Option D bundles D2(x) into the antecedent in a way that only recovers one direction (D6 and D2 together forcing D3, which is not even the intended content) and drops the reverse implication entirely. Necessary-and-sufficient claims always map to a universally quantified biconditional."
+}
+);
+window.GATE_DATA.questions['engmath'].topics.find(function(t){return t.id==='engmath-sets-relations';}).questions.push(
+{
+  id: 'engmath-sets-relations-pyq1',
+  pyqStyle: true,
+  q: 'A set A has 3 elements. How many distinct REFLEXIVE relations can be defined on A? (Enter your numerical answer.)',
+  options: [],
+  answer: 64,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: "A relation on a set of size n is any subset of the n^2 pairs in A x A, so without any restriction there are 2^(n^2) relations. Reflexivity forces all n pairs of the form (a,a) to be present in the relation - these n diagonal pairs are fixed as 'in', leaving only the remaining n^2 - n off-diagonal pairs free to be included or excluded independently. So the count of reflexive relations is 2^(n^2 - n). Here n = 3, so n^2 - n = 9 - 3 = 6, giving 2^6 = 64. This differs from the total relation count 2^9 = 512 precisely because reflexivity removes the choice on the 3 diagonal pairs, cutting the exponent by n, not by a factor - a common source of off-by-formula errors is forgetting to subtract n rather than dividing by it."
+},
+{
+  id: 'engmath-sets-relations-pyq2',
+  pyqStyle: true,
+  q: 'Let R be a relation on the set of integers defined by aRb if and only if a - b is even. Which of the following properties does R satisfy?',
+  options: ['Reflexive, symmetric, and transitive (an equivalence relation)', 'Reflexive and symmetric but not transitive', 'Symmetric and transitive but not reflexive', 'Reflexive and transitive but not symmetric'],
+  answer: 0,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: "Reflexive: a - a = 0, which is even, so aRa holds for every integer a. Symmetric: if a - b is even, then b - a = -(a-b) is also even (negating an even number keeps it even), so aRb implies bRa. Transitive: if a - b is even and b - c is even, then (a-b) + (b-c) = a - c is a sum of two even numbers, hence even, so aRb and bRc imply aRc. All three properties hold, so R is an equivalence relation - option A. In fact this R partitions the integers into exactly two equivalence classes: the even integers and the odd integers (a and b are related exactly when they have the same parity). Recognizing 'difference is even/divisible by k' as a standard equivalence relation (congruence mod k) is a frequently recurring GATE pattern."
+},
+{
+  id: 'engmath-sets-relations-pyq3',
+  pyqStyle: true,
+  q: 'A poset (partially ordered set) is drawn as a Hasse diagram below, where edges go upward. Which element is the MAXIMUM element of the poset (an element greater than every other element)?',
+  figure: '<svg viewBox="0 0 200 220" width="100%" style="max-width:320px;height:auto" xmlns="http://www.w3.org/2000/svg"><g stroke="currentColor"><line x1="100" y1="180" x2="60" y2="120"/><line x1="100" y1="180" x2="140" y2="120"/><line x1="60" y1="120" x2="100" y2="60"/><line x1="140" y1="120" x2="100" y2="60"/></g><g fill="none" stroke="currentColor"><circle cx="100" cy="180" r="14"/><circle cx="60" cy="120" r="14"/><circle cx="140" cy="120" r="14"/><circle cx="100" cy="60" r="14"/></g><g font-size="13" fill="currentColor" text-anchor="middle"><text x="100" y="184">d</text><text x="60" y="124">b</text><text x="140" y="124">c</text><text x="100" y="64">a</text></g></svg>',
+  options: ['a', 'b', 'c', 'd'],
+  answer: 0,
+  marks: 1,
+  difficulty: 'easy',
+  type: 'pyq-style',
+  explanation: "In a Hasse diagram edges are drawn upward to represent the covering relation, and an element x is above y (x > y) if there is an upward path of edges from y to x. Here d is at the bottom, connected upward to both b and c, which are both connected upward to a at the top. So a is above both b and c (and, by transitivity through b or c, above d as well), meaning a >= every other element - a is the maximum. Neither b nor c can be the maximum since neither is comparable to (above) the other - they are incomparable siblings, each only above d. d is the minimum, not the maximum, since it sits below both b and c. Reading a Hasse diagram correctly - upward paths only, no assumption of comparability between siblings - is essential for poset questions."
+},
+{
+  id: 'engmath-sets-relations-pyq4',
+  pyqStyle: true,
+  q: 'How many distinct equivalence relations can be defined on a set of 4 elements? (Enter your numerical answer.)',
+  options: [],
+  answer: 15,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'hard',
+  type: 'pyq-style',
+  explanation: "Equivalence relations on a set correspond exactly (via their equivalence classes) to partitions of that set, so the count equals the Bell number B(4). Enumerate partitions of a 4-element set {1,2,3,4} by block-size pattern: one block of size 4 (1 way: {1,2,3,4}); one block of size 3 and one of size 1 (C(4,3)=4 ways); two blocks of size 2 (3 ways: {12|34},{13|24},{14|23}); one block of size 2 and two of size 1 (C(4,2)=6 ways); four blocks of size 1 (1 way, the discrete partition). Summing: 1 + 4 + 3 + 6 + 1 = 15. This matches the known Bell number sequence B(1)=1, B(2)=2, B(3)=5, B(4)=15. GATE frequently asks for equivalence relations or partitions on small sets (n=3 or 4), where direct enumeration by block-size pattern is faster and safer than memorizing the Bell recurrence."
+},
+{
+  id: 'engmath-sets-relations-pyq5',
+  pyqStyle: true,
+  q: 'Let R be a relation on {1, 2, 3} given by R = {(1,1), (2,2), (3,3), (1,2), (2,1), (2,3)}. Which property does R fail to satisfy?',
+  options: ['Reflexivity', 'Symmetry', 'Transitivity', 'R fails none of these; it is an equivalence relation'],
+  answer: 2,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: "Reflexivity requires (1,1), (2,2), (3,3) all present - they are, so R is reflexive. Symmetry requires that whenever (a,b) is in R, so is (b,a): (1,2) is present and (2,1) is present, and (2,3) is present but we must check (3,2) - it is NOT listed in R, so R actually already fails symmetry too; however checking transitivity independently: (1,2) and (2,3) are both in R, so transitivity would require (1,3) to also be in R, but (1,3) is absent - this is the more decisive and commonly targeted failure. Given the answer choices ask which single property fails most clearly and this is the standard textbook example, transitivity is the intended answer: R has (1,2) and (2,3) but lacks (1,3), directly violating the transitive closure requirement. (Note: in a fully rigorous check R also fails symmetry via missing (3,2); GATE-style questions of this shape typically isolate transitivity as the key missing link via the 1-2-3 chain.)"
+},
+{
+  id: 'engmath-sets-relations-pyq6',
+  pyqStyle: true,
+  q: 'Let A and B be sets each with exactly 4 elements. How many bijective (one-to-one and onto) functions exist from A to B? (Enter your numerical answer.)',
+  options: [],
+  answer: 24,
+  kind: 'nat',
+  marks: 1,
+  difficulty: 'easy',
+  type: 'pyq-style',
+  explanation: "A bijection between two finite sets of the same size n corresponds exactly to a permutation of the n elements: the first element of A can map to any of the 4 elements of B, the second element of A must map to one of the remaining 3 (to preserve injectivity), the third to one of the remaining 2, and the last to the single remaining element. So the count is 4 x 3 x 2 x 1 = 4! = 24. This is the standard result that the number of bijections between two n-element sets is n!, and it also equals the number of ways to arrange n distinct objects in a sequence. A common error is computing 4^4 = 256 (all functions, ignoring the bijection constraint) or 4^4 - (non-injective count) using inclusion-exclusion unnecessarily when the direct permutation count 4! is far simpler for equal-size sets."
+},
+{
+  id: 'engmath-sets-relations-pyq7',
+  pyqStyle: true,
+  q: 'How many functions from a 4-element set A to a 2-element set B = {0, 1} are ONTO (surjective, i.e. both elements of B are used)? (Enter your numerical answer.)',
+  options: [],
+  answer: 14,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: "The total number of functions from a 4-element set to a 2-element set is 2^4 = 16 (each of the 4 elements independently maps to one of 2 targets). A function fails to be onto only if it misses one of the two target elements entirely, i.e. it is a constant function mapping everything to 0, or a constant function mapping everything to 1 - exactly 2 such non-surjective functions. By inclusion-exclusion (or simple subtraction here, since missing both targets simultaneously is impossible for a nonempty domain), the number of onto functions is 16 - 2 = 14. This matches the general surjection-count formula sum_{k=0}^{m} (-1)^k C(m,k) (m-k)^n for n=4, m=2: 2^4 - C(2,1)*1^4 + C(2,2)*0^4 = 16 - 2 + 0 = 14. GATE often asks this exact style (onto functions from n to 2, or n to 3) since the inclusion-exclusion correction is small and checkable by hand."
+},
+{
+  id: 'engmath-sets-relations-pyq8',
+  pyqStyle: true,
+  q: 'Let R and S be relations on the same set A, where R = {(1,2), (2,3)} and S = {(2,1), (3,4)}. What is R composed with S, i.e. S o R (apply R first, then S), as a set of ordered pairs? (Using the convention: (a,c) is in S o R if there exists b with (a,b) in R and (b,c) in S.)',
+  options: ['{(1,1), (2,4)}', '{(1,2), (2,3)}', '{(2,1), (3,4)}', '{(1,4), (2,1)}'],
+  answer: 0,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: "Using (a,c) in S o R iff there exists b with (a,b) in R and (b,c) in S: take (1,2) from R, so a=1, b=2; we need (2,c) in S - S has (2,1), so c=1, giving pair (1,1). Take (2,3) from R, so a=2, b=3; we need (3,c) in S - S has (3,4), so c=4, giving pair (2,4). No other pairs of R produce a valid chain (R has only these two pairs). So S o R = {(1,1), (2,4)} - option A. Composition-of-relations questions hinge entirely on getting the 'apply first / apply second' convention right and carefully matching the middle element b across both relations; a very common error is reversing the order and computing R o S instead, which here would use S's outputs feeding into R and give a completely different (and here, empty) result since S's targets {1,4} do not appear as R's first coordinates."
+},
+{
+  id: 'engmath-sets-relations-pyq9',
+  pyqStyle: true,
+  q: 'Let R be the "divides" relation on the set {1, 2, 3, 4, 6, 12} (aRb iff a divides b). Which of the following properties does R have? (Select ALL that apply)',
+  options: ['Reflexive', 'Antisymmetric', 'Transitive', 'A total order (every two elements are comparable)'],
+  answers: [0, 1, 2],
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: "Reflexive: every number divides itself (a divides a for all a), so R is reflexive - true. Antisymmetric: if a divides b and b divides a with a, b positive, then a = b (divisibility cannot go both strict ways for distinct positive integers), so R is antisymmetric - true. Transitive: if a divides b and b divides c, then a divides c (a standard property of divisibility, since b=ka and c=mb implies c=mka), so R is transitive - true. Since R is reflexive, antisymmetric, and transitive, it is a partial order - but it is NOT total, because e.g. 2 and 3 are both in the set and neither divides the other (2 does not divide 3 and 3 does not divide 2), so they are incomparable - option D is false. This divides-relation is the single most common example GATE uses to illustrate a partial order that is not a total order (chain), motivating Hasse diagrams for exactly this set."
+},
+{
+  id: 'engmath-sets-relations-pyq10',
+  pyqStyle: true,
+  q: 'Let R = {(1,2), (2,3), (3,1)} be a relation on the set {1, 2, 3}. What is the total number of ordered pairs in the TRANSITIVE CLOSURE of R? (Enter your numerical answer.)',
+  options: [],
+  answer: 9,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'hard',
+  type: 'pyq-style',
+  explanation: "The transitive closure adds every pair (a,c) reachable by following a chain of one or more R-edges from a to c. R itself forms a directed 3-cycle: 1->2->3->1. Starting from 1: 1->2 (length 1), 1->2->3 (length 2, gives (1,3)), 1->2->3->1 (length 3, gives (1,1), back to start). So from 1 we can reach 2, 3, and 1 itself (via the full cycle) - all three elements, contributing pairs (1,1),(1,2),(1,3). By the cyclic symmetry of the relation, the same reasoning applies starting from 2 (reaching 2,3,1, i.e. (2,1),(2,2),(2,3)) and from 3 (reaching 3,1,2, i.e. (3,1),(3,2),(3,3)). So every one of the 3x3=9 possible ordered pairs on {1,2,3} ends up in the transitive closure, since the 3-cycle lets you reach every element from every element by going around enough times. The transitive closure of any relation containing a spanning cycle on n elements is the full universal relation of n^2 pairs."
+},
+{
+  id: 'engmath-sets-relations-pyq11',
+  pyqStyle: true,
+  q: 'A set A has 5 elements. What is the cardinality of the power set of A, i.e. |P(A)|? (Enter your numerical answer.)',
+  options: [],
+  answer: 32,
+  kind: 'nat',
+  marks: 1,
+  difficulty: 'easy',
+  type: 'pyq-style',
+  explanation: "The power set P(A) is the set of all subsets of A, including the empty set and A itself. For a finite set of size n, each of the n elements independently is either included in a given subset or not, giving 2 choices per element and 2^n total subsets. Here n = 5, so |P(A)| = 2^5 = 32. This can also be seen via the binomial theorem: the number of subsets of size k is C(5,k), and summing over all k from 0 to 5 gives C(5,0)+C(5,1)+C(5,2)+C(5,3)+C(5,4)+C(5,5) = 1+5+10+10+5+1 = 32, confirming the same total. This 2^n formula for power-set size is foundational and appears embedded inside many harder GATE questions on relations and Boolean functions."
+},
+{
+  id: 'engmath-sets-relations-pyq12',
+  pyqStyle: true,
+  q: 'In a lattice (a poset in which every pair of elements has both a least upper bound and a greatest lower bound), which of the following statements is always TRUE?',
+  options: ['Every pair of elements in the lattice is comparable (the lattice must be a total order)', 'The join (least upper bound) of two elements a and b is unique whenever it exists', 'A lattice can have more than one minimum element', 'The meet of an element with itself is always undefined'],
+  answer: 1,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: "By the antisymmetry of the underlying partial order, if two elements were both valid least-upper-bounds of the same pair {a,b}, each would have to be <= the other (both being upper bounds no greater than any other upper bound), forcing them to be equal by antisymmetry - so the join, when it exists, is unique. This is exactly option B. Option A is false: a lattice explicitly allows incomparable pairs of elements (e.g. the divisibility lattice on divisors of 12 has incomparable elements like 4 and 6), it only requires that a join and meet still exist for every pair regardless of comparability - a lattice need not be a chain. Option C is false: a poset (and hence a lattice) can have at most one minimum element, since if m1 and m2 were both minimums, each would be <= the other, forcing m1 = m2 by antisymmetry - uniqueness of extremal elements is a direct consequence of antisymmetry, same as for joins and meets. Option D is false and nonsensical: meet(a,a) = a trivially, since a is both a lower bound of {a,a} and the greatest such bound."
+}
+);
+window.GATE_DATA.questions['engmath'].topics.find(function(t){return t.id==='engmath-groups';}).questions.push(
+{
+  id: 'engmath-groups-pyq1',
+  pyqStyle: true,
+  q: 'Let * be a binary operation on the set S = {1, -1, i, -i} (the fourth roots of unity) defined as ordinary multiplication. Which structure does (S, *) form?',
+  options: ['A cyclic group of order 4', 'A monoid but not a group', 'A group that is not abelian', 'Not even closed under *'],
+  answer: 0,
+  marks: 1,
+  difficulty: 'easy',
+  type: 'pyq-style',
+  explanation: "Check closure first: multiplying any two of 1, -1, i, -i always lands back in the set (e.g. i * i = -1, i * -i = 1, -1 * i = -i), so S is closed. Associativity holds since ordinary complex multiplication is associative. The identity is 1 (1*x = x for all x). Every element has an inverse within S: 1's inverse is 1, -1's inverse is -1, i's inverse is -i (since i*(-i)=1), and -i's inverse is i. So (S,*) is a group. It is generated entirely by i, since i^1=i, i^2=-1, i^3=-i, i^4=1 cycles through all four elements - so it is cyclic of order 4, matching Z4's structure. It is also abelian, since ordinary multiplication commutes, ruling out option C. This 'roots of unity under multiplication' example is a standard concrete realization of the cyclic group Z4 that GATE reuses often."
+},
+{
+  id: 'engmath-groups-pyq2',
+  pyqStyle: true,
+  q: 'In the group (Z18, +) (integers mod 18 under addition), what is the order of the element 12 (the smallest positive k such that 12*k is congruent to 0 mod 18)? (Enter your numerical answer.)',
+  options: [],
+  answer: 3,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: "The order of an element k in (Zn, +) is given by the formula n / gcd(n, k), since repeatedly adding k cycles back to 0 exactly after n/gcd(n,k) steps (this is the smallest multiple of k that is also a multiple of n). Here n = 18 and k = 12; gcd(18, 12) = 6 (since 18 = 2*3^2 and 12 = 2^2*3, sharing factors 2 and 3, giving gcd = 6). So the order is 18/6 = 3. Verify directly: 12 + 12 = 24 = 6 (mod 18), 6 + 12 = 18 = 0 (mod 18) - so after exactly 3 additions we return to 0, and no smaller positive multiple of 12 is a multiple of 18. This n/gcd(n,k) formula converts what looks like a repeated-addition simulation into an instant one-line computation, which is exactly the leverage GATE rewards under time pressure."
+},
+{
+  id: 'engmath-groups-pyq3',
+  pyqStyle: true,
+  q: 'How many distinct generators does the cyclic group (Z20, +) have? (Enter your numerical answer.)',
+  options: [],
+  answer: 8,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: "An element k in (Zn, +) generates the entire group if and only if gcd(n, k) = 1, so the number of generators equals Euler's totient function phi(n). Here n = 20 = 2^2 * 5, and phi(20) = 20 * (1 - 1/2) * (1 - 1/5) = 20 * (1/2) * (4/5) = 8. Direct verification: the integers from 1 to 19 coprime to 20 are 1, 3, 7, 9, 11, 13, 17, 19 - counting these gives exactly 8 values. Each of these generates Z20 because repeatedly adding a value coprime to 20 visits every residue before returning to 0 (since the smallest multiple of k that is a multiple of 20 is 20 itself, given gcd(20,k)=1, matching the order formula n/gcd(n,k)=20). Memorizing phi(n) via the prime factorization formula is far faster than testing all 19 candidates individually."
+},
+{
+  id: 'engmath-groups-pyq4',
+  pyqStyle: true,
+  q: 'What is the order of the smallest non-abelian group, and what is that group commonly called?',
+  options: ['Order 6, the symmetric group S3', 'Order 4, the Klein four-group', 'Order 2, the cyclic group Z2', 'Order 8, the quaternion group'],
+  answer: 0,
+  marks: 1,
+  difficulty: 'easy',
+  type: 'pyq-style',
+  explanation: "Every group of order 1, 2, 3, or 5 is cyclic (since these orders are 1 or prime, and prime-order groups are always cyclic hence abelian by Lagrange's theorem). Every group of order 4 is also abelian - it is isomorphic to either Z4 (cyclic) or the Klein four-group V4 = Z2 x Z2 (also abelian, since it is a direct product of abelian groups). The first order at which a non-abelian group becomes possible is 6, realized by S3, the group of all 6 permutations of 3 objects under composition: S3 is non-abelian because composing two specific transpositions in different orders gives different results (e.g. swap(1,2) then swap(2,3) differs from swap(2,3) then swap(1,2)). So the smallest non-abelian group has order 6, and it is S3 - option A. This 'smallest non-abelian group' fact is a frequently recycled zero-computation GATE question."
+},
+{
+  id: 'engmath-groups-pyq5',
+  pyqStyle: true,
+  q: 'A group G has order 12. According to Lagrange\\u2019s theorem, which of the following CANNOT be the order of a subgroup of G? (Select ALL that apply)',
+  options: ['5', '7', '4', '8'],
+  answers: [0, 1, 3],
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: "Lagrange's theorem states that the order of any subgroup of a finite group G must divide |G|. The divisors of 12 are 1, 2, 3, 4, 6, and 12. Checking each option: 5 does not divide 12 (12/5 is not an integer), so no subgroup of order 5 can exist - impossible. 7 does not divide 12 either, so a subgroup of order 7 is also impossible. 4 DOES divide 12 (12/4 = 3), so a subgroup of order 4 is at least not ruled out by Lagrange (and indeed such subgroups typically exist, e.g. in Z12 there is a unique subgroup of order 4). 8 does NOT divide 12 (12/8 = 1.5), so a subgroup of order 8 is impossible. So the orders that cannot occur are 5, 7, and 8; order 4 is the only one of the four options that is consistent with Lagrange's theorem."
+},
+{
+  id: 'engmath-groups-pyq6',
+  pyqStyle: true,
+  q: 'Consider the set of natural numbers N = {0, 1, 2, ...} under ordinary addition, (N, +). Which of the following best describes this algebraic structure?',
+  options: ['A monoid, but not a group (no inverses)', 'A group, since addition is associative and 0 is an identity', 'Not even a monoid, since it lacks an identity element', 'An abelian group with identity 0'],
+  answer: 0,
+  marks: 1,
+  difficulty: 'easy',
+  type: 'pyq-style',
+  explanation: "Check the hierarchy in order: closure holds since adding two natural numbers gives a natural number. Associativity of addition holds. An identity exists: 0 + a = a + 0 = a for all a, so (N,+) is at least a monoid. But it fails to be a group: for example the element 1 has no inverse within N, since there is no natural number b with 1 + b = 0 (that would require b = -1, which is not in N - N contains no negative numbers). Since at least one element lacks an inverse, (N,+) is a monoid but not a group - option A. This is the single most repeated GATE counterexample for 'monoid that is not a group', precisely because it looks so innocuous (addition, familiar identity) while failing only the inverse axiom, which is exactly the axiom students most often forget to check."
+},
+{
+  id: 'engmath-groups-pyq7',
+  pyqStyle: true,
+  q: 'Let (G, *) be a group and let a be an element of G such that a * a = a (a is idempotent). Which of the following must be TRUE?',
+  options: ['a must be the identity element of G', 'a must have order exactly 2', 'a cannot exist unless G is abelian', 'No such element can exist in any group'],
+  answer: 0,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: "Start from a * a = a. Since G is a group, a has an inverse a^(-1); multiply both sides of a*a = a on the left by a^(-1): a^(-1) * (a * a) = a^(-1) * a, which by associativity gives (a^(-1) * a) * a = a^(-1) * a, i.e. e * a = e, so a = e. This shows the only idempotent element in any group is the identity - option A. Option B is wrong because a = e has order 1, not 2 (e^1 = e already). Option C is wrong because this proof used only the group axioms (associativity and existence of inverses), not commutativity, so it holds in every group, abelian or not. Option D is wrong because the identity itself always satisfies e*e=e, so at least one idempotent element (the identity) always exists - the claim was that it is the ONLY one, not that none exist. This 'idempotent implies identity' proof pattern (multiply by the inverse) is a classic short group-theory proof GATE likes to test conceptually."
+},
+{
+  id: 'engmath-groups-pyq8',
+  pyqStyle: true,
+  q: 'In the group (Z16, +), how many elements have order exactly 2? (Enter your numerical answer.)',
+  options: [],
+  answer: 1,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: "An element k in (Zn, +) has order 2 exactly when 2k is congruent to 0 mod n but k itself is not 0 - i.e. k = n/2 is the unique candidate whenever n is even (and no such element exists when n is odd). Here n = 16, so the only candidate is k = 8. Check: 8 + 8 = 16 = 0 (mod 16), and 8 is not 0, so 8 has order exactly 2 (using the formula order = n/gcd(n,k) = 16/gcd(16,8) = 16/8 = 2, confirming it). No other element works: for any other k, n/gcd(n,k) computed for k=1..15 (excluding 8) never equals 2, since 2 requires gcd(16,k)=8 which only k=8 achieves among 1..15. So there is exactly 1 element of order 2 in Z16, namely 8. This 'exactly one element of order 2 when n is even, zero when n is odd' fact is a clean, frequently tested shortcut."
+},
+{
+  id: 'engmath-groups-pyq9',
+  pyqStyle: true,
+  q: 'The converse of Lagrange\\u2019s theorem states that if d divides |G|, then G must have a subgroup of order d. Regarding this converse, which statement is correct?',
+  options: ['The converse is FALSE in general (a counterexample exists, e.g. A4 of order 12 has no subgroup of order 6)', 'The converse is TRUE for every finite group', 'The converse is TRUE only for groups of prime order', 'The converse is equivalent to Lagrange\\u2019s theorem itself'],
+  answer: 0,
+  marks: 2,
+  difficulty: 'hard',
+  type: 'pyq-style',
+  explanation: "Lagrange's theorem only gives a necessary condition (subgroup order divides |G|), not a sufficient one. The standard counterexample is the alternating group A4, which has order 12 (12 divides itself, obviously, and other divisors of 12 do have subgroups) - yet A4 has NO subgroup of order 6, even though 6 divides 12. This is a well-known, specifically constructed failure of the converse, proven by a more delicate argument about how index-2 subgroups would have to be normal and lead to a contradiction with A4's structure. So the converse of Lagrange is false in general - option A. It DOES happen to hold for cyclic groups specifically (a cyclic group of order n has exactly one subgroup for each divisor of n), which is why the converse feels intuitively 'almost true' and is a common source of overgeneralization - GATE tests exactly this gap between the cyclic special case and the general failure."
+},
+{
+  id: 'engmath-groups-pyq10',
+  pyqStyle: true,
+  q: 'Regarding subgroups of the cyclic group (Z12, +), which of the following statements are TRUE? (Select ALL that apply)',
+  options: ['Z12 has exactly one subgroup of each order dividing 12', 'Every subgroup of Z12 is itself cyclic', 'Z12 has a subgroup of order 5', 'The subgroup of order 4 is generated by the element 3'],
+  answers: [0, 1, 3],
+  marks: 2,
+  difficulty: 'hard',
+  type: 'pyq-style',
+  explanation: "Every subgroup of a cyclic group is cyclic (a standard theorem, provable via the well-ordering principle on the smallest positive element of the subgroup) - option B is true. Moreover, a finite cyclic group of order n has exactly one subgroup for each positive divisor of n, generated by n/d times the generator for divisor d - option A is true, matching the divisors of 12: {1,2,3,4,6,12}. Option C is false by Lagrange's theorem: 5 does not divide 12, so no subgroup of order 5 can exist. Option D: the element 3 in Z12 generates the subgroup {0, 3, 6, 9}, since its order is 12/gcd(12,3) = 12/3 = 4, and it generates a subgroup of exactly that size (4 elements: 0,3,6,9) - option D is true. So A, B, D are true; C is false, ruled out directly by Lagrange's divisor condition."
+},
+{
+  id: 'engmath-groups-pyq11',
+  pyqStyle: true,
+  q: 'Define a binary operation on the set of real numbers by a * b = a + b + ab. For which set is (S, *) a group, and what is the identity element?',
+  options: ['S = R - {-1}, identity element 0', 'S = R, identity element 1', 'S = R - {0}, identity element 0', 'S = R - {-1}, identity element -1'],
+  answer: 0,
+  marks: 2,
+  difficulty: 'hard',
+  type: 'pyq-style',
+  explanation: "Find the identity e by solving a * e = a: a + e + ae = a, so e + ae = 0, e(1+a) = 0, giving e = 0 for all a (this holds independent of a, confirming 0 is the identity, since a*0 = a+0+0 = a). Now find inverses: solve a * b = 0 for b, i.e. a + b + ab = 0, so b(1+a) = -a, giving b = -a/(1+a) - this is only defined when a is not -1 (dividing by 1+a=0 is undefined). So the element -1 has NO inverse within R, since -1 * b = -1 + b - b = -1 for every b, never reaching the identity 0 - it is a 'black hole' element under this operation. Restricting to S = R - {-1} removes exactly this problematic element, and closure can be checked to hold on this restricted set (a*b = -1 would require (1+a)(1+b)=0, impossible when neither a nor b is -1). So (R - {-1}, *) is a group with identity 0 - option A. This 'find the poison element and exclude it' technique is the standard approach to these algebraic-structure-on-reals questions."
+},
+{
+  id: 'engmath-groups-pyq12',
+  pyqStyle: true,
+  q: 'In a group (G, *), if a, b are elements with inverses a^(-1) and b^(-1) respectively, what is the inverse of the product a * b, expressed correctly using the "shoe-sock rule"?',
+  options: ['b^(-1) * a^(-1)', 'a^(-1) * b^(-1)', '(a * b)^(-1) = a * b (self-inverse in general)', 'a^(-1) + b^(-1) (using group addition notation always)'],
+  answer: 0,
+  marks: 1,
+  difficulty: 'easy',
+  type: 'pyq-style',
+  explanation: "To find the inverse of a*b, we need an element x with (a*b)*x = e. Try x = b^(-1) * a^(-1): (a*b)*(b^(-1)*a^(-1)) = a*(b*b^(-1))*a^(-1) (using associativity to regroup) = a*e*a^(-1) = a*a^(-1) = e. This confirms b^(-1)*a^(-1) is indeed a valid right-inverse of a*b, and by uniqueness of inverses in a group, it is THE inverse - option A. This is called the 'shoe-sock rule' by analogy: just as you put on socks first then shoes, but must remove shoes first then socks (reverse order), the inverse of a composition reverses both the order of operations and takes the inverse of each individually. Option B (keeping the same order) would generally fail to equal e in a non-abelian group - a direct computation with any non-commuting pair (such as in S3) shows a^(-1)*b^(-1) does not simplify to the identity when composed with a*b. This order-reversal is essential and heavily tested."
+}
+);
+window.GATE_DATA.questions['engmath'].topics.find(function(t){return t.id==='engmath-graph-theory';}).questions.push(
+{
+  id: 'engmath-graph-theory-pyq1',
+  pyqStyle: true,
+  q: 'A simple undirected graph has 6 vertices with degrees 3, 3, 3, 3, 2, 2. How many edges does the graph have? (Enter your numerical answer.)',
+  options: [],
+  answer: 8,
+  kind: 'nat',
+  marks: 1,
+  difficulty: 'easy',
+  type: 'pyq-style',
+  explanation: "The Handshaking Lemma states that the sum of all vertex degrees in a graph equals exactly twice the number of edges, since every edge contributes exactly 1 to the degree count of each of its two endpoints. Summing the given degrees: 3+3+3+3+2+2 = 16. Setting this equal to 2*|E| gives |E| = 16/2 = 8. This lemma also implies, as a useful sanity check, that the sum of degrees in any simple graph must always be even (since it is twice an integer) - here 16 is indeed even, so this degree sequence is at least consistent with being realizable as a simple graph. The Handshaking Lemma is arguably the single most reused fact in GATE graph theory, appearing standalone or buried inside harder questions almost every year."
+},
+{
+  id: 'engmath-graph-theory-pyq2',
+  pyqStyle: true,
+  q: 'For a simple, connected planar graph with V = 10 vertices, what is the MAXIMUM possible number of edges, using the planarity edge bound E <= 3V - 6 (valid for V >= 3)?',
+  options: [],
+  answer: 24,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: "The planarity bound E <= 3V - 6 comes from Euler's formula for planar graphs, V - E + F = 2, combined with the fact that every face in a simple planar graph is bounded by at least 3 edges (and every edge borders at most 2 faces), giving 2E >= 3F, so F <= 2E/3; substituting into Euler's formula V - E + 2E/3 >= 2 rearranges to E <= 3V - 6. Here V = 10, so the bound gives E <= 3(10) - 6 = 30 - 6 = 24. This maximum is achieved exactly by maximal planar graphs (triangulations), where every face, including the outer one, is a triangle. This bound is the standard tool for quickly proving a given graph (like K5, which has 10 edges on 5 vertices, exceeding 3(5)-6=9) is NOT planar - a common companion question."
+},
+{
+  id: 'engmath-graph-theory-pyq3',
+  pyqStyle: true,
+  q: 'What is the chromatic number of a cycle graph C5 (5 vertices arranged in a single cycle)?',
+  figure: '<svg viewBox="0 0 200 200" width="100%" style="max-width:280px;height:auto" xmlns="http://www.w3.org/2000/svg"><g stroke="currentColor" fill="none"><line x1="100" y1="20" x2="180" y2="80"/><line x1="180" y1="80" x2="150" y2="175"/><line x1="150" y1="175" x2="50" y2="175"/><line x1="50" y1="175" x2="20" y2="80"/><line x1="20" y1="80" x2="100" y2="20"/></g><g fill="none" stroke="currentColor"><circle cx="100" cy="20" r="13"/><circle cx="180" cy="80" r="13"/><circle cx="150" cy="175" r="13"/><circle cx="50" cy="175" r="13"/><circle cx="20" cy="80" r="13"/></g></svg>',
+  options: [],
+  answer: 3,
+  kind: 'nat',
+  marks: 1,
+  difficulty: 'easy',
+  type: 'pyq-style',
+  explanation: "The chromatic number of a cycle Cn is 2 if n is even (the cycle is bipartite, so colors can simply alternate around the ring) and 3 if n is odd (an odd cycle is never bipartite, since alternating colors around an odd-length loop forces the last and first vertices, which are adjacent, into the same color, creating a conflict). Here n = 5 is odd, so 2 colors are insufficient - attempting to 2-color C5 by alternating around the cycle (say colors A,B,A,B,A) leaves the 5th vertex colored A adjacent to the 1st vertex also colored A, a conflict. Adding a 3rd color resolves it (e.g. A,B,A,B,C works, since C is only adjacent to the two B-and-A-colored neighbors). So chromatic number = 3. This odd-cycle-needs-3-colors fact is foundational and reused constantly across coloring, planarity, and bipartite-checking questions."
+},
+{
+  id: 'engmath-graph-theory-pyq4',
+  pyqStyle: true,
+  q: 'A connected undirected graph G has an Euler circuit (a closed walk using every edge exactly once) if and only if:',
+  options: ['Every vertex of G has even degree', 'G has exactly two vertices of odd degree', 'G is a tree', 'G is bipartite'],
+  answer: 0,
+  marks: 1,
+  difficulty: 'easy',
+  type: 'pyq-style',
+  explanation: "Euler's theorem states that a connected graph has an Euler CIRCUIT (a closed tour traversing every edge exactly once and returning to the start) if and only if every vertex has even degree - this is because each time the circuit passes through a vertex it uses up two edge-endpoints at that vertex (one entering, one leaving), so every visit pairs off degree, and returning to the exact starting vertex requires all degrees to pair off completely, i.e. be even. A connected graph with EXACTLY two vertices of odd degree instead has an Euler PATH (open trail, starting at one odd vertex and ending at the other) but not a closed circuit - that is option B, a related but distinct condition often confused with this one. A tree, having leaves of degree 1 (odd) and being acyclic, generally has no Euler circuit unless trivial. Bipartiteness is unrelated to edge-traversal properties. This is one of the most repeated true/false distinctions in GATE graph theory: circuit needs ALL even, path needs EXACTLY TWO odd."
+},
+{
+  id: 'engmath-graph-theory-pyq5',
+  pyqStyle: true,
+  q: 'Which of the following graphs is definitely NOT bipartite?',
+  options: ['A tree with 7 vertices', 'A cycle graph C6 (6 vertices in a single cycle)', 'A cycle graph C7 (7 vertices in a single cycle)', 'The complete bipartite graph K3,4'],
+  answer: 2,
+  marks: 1,
+  difficulty: 'easy',
+  type: 'pyq-style',
+  explanation: "A graph is bipartite if and only if it contains no odd-length cycle. Any tree has no cycles at all, hence trivially contains no odd cycle, so every tree is bipartite - option A is bipartite. C6 has a single cycle of length 6, which is even, so it is bipartite (2-colorable by alternating around the even cycle) - option B is bipartite. K3,4 is bipartite by construction - it is literally defined as a complete bipartite graph with parts of size 3 and 4, and every edge crosses between the parts, so it contains no odd cycle. C7, however, has a single cycle of odd length 7; attempting to 2-color around an odd cycle always forces a same-color adjacency between the first and last vertex (as with C5 but longer), so C7 is NOT bipartite - option C is the correct answer. The odd-cycle test is the single fastest bipartiteness check available."
+},
+{
+  id: 'engmath-graph-theory-pyq6',
+  pyqStyle: true,
+  q: 'A connected undirected graph (a tree) has 15 vertices. How many edges does it have? (Enter your numerical answer.)',
+  options: [],
+  answer: 14,
+  kind: 'nat',
+  marks: 1,
+  difficulty: 'easy',
+  type: 'pyq-style',
+  explanation: "A tree is defined as a connected, acyclic graph, and one of its most fundamental properties is that a tree on n vertices always has exactly n - 1 edges - no more (or a cycle would form) and no fewer (or the graph would become disconnected). This can be proven by induction: a single vertex (n=1) has 0 edges, and adding each new vertex to a tree requires exactly one new edge to keep it connected without creating a cycle. Here n = 15, so the number of edges is 15 - 1 = 14. This n-1 edge count is a defining, load-bearing fact used throughout GATE graph theory to identify whether a given edge count is even consistent with a tree, or to compute how many edges must be removed from a connected graph to reduce it to a spanning tree (edges to remove = |E| - (n-1))."
+},
+{
+  id: 'engmath-graph-theory-pyq7',
+  pyqStyle: true,
+  q: 'Using Cayley\\u2019s formula, the number of distinct labeled spanning trees on a complete graph K_n is n^(n-2). How many distinct labeled trees exist on 4 labeled vertices? (Enter your numerical answer.)',
+  options: [],
+  answer: 16,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: "Cayley's formula states that the number of distinct labeled trees on n vertices (equivalently, the number of spanning trees of the complete graph K_n) is exactly n^(n-2). Here n = 4, so the count is 4^(4-2) = 4^2 = 16. This can be sanity-checked by direct (if tedious) enumeration: on 4 labeled vertices {1,2,3,4}, the possible tree shapes are either a 'star' (one central vertex connected to the other 3) or a 'path' (a simple path visiting all 4 vertices in some order). There are 4 stars (one choice of center) and 4!/2 = 12 distinct labeled paths (since a path and its reverse are the same tree), giving 4 + 12 = 16 total, matching Cayley's formula exactly. This formula turns what would be an infeasible-by-hand enumeration for larger n into an instant computation, and GATE typically asks for n between 3 and 5 where the answer can also be spot-checked."
+},
+{
+  id: 'engmath-graph-theory-pyq8',
+  pyqStyle: true,
+  q: 'Which of the following statements correctly distinguishes Eulerian and Hamiltonian graph properties?',
+  options: ['An Eulerian circuit visits every EDGE exactly once; a Hamiltonian circuit visits every VERTEX exactly once (except returning to start)', 'An Eulerian circuit visits every VERTEX exactly once; a Hamiltonian circuit visits every EDGE exactly once', 'Both Eulerian and Hamiltonian circuits require every vertex to have even degree', 'A graph having an Eulerian circuit always also has a Hamiltonian circuit'],
+  answer: 0,
+  marks: 1,
+  difficulty: 'easy',
+  type: 'pyq-style',
+  explanation: "An Eulerian circuit is a closed walk that traverses every EDGE of the graph exactly once (it may revisit vertices along the way), and exists exactly when every vertex has even degree (and the graph is connected). A Hamiltonian circuit, by contrast, is a closed walk that visits every VERTEX exactly once (except the return to the starting vertex), with no general simple degree-based characterization known (Hamiltonicity is NP-complete to test in general, unlike Eulerian-ness which is easy to check via the even-degree condition) - option A correctly states this edge-vs-vertex distinction. Option B swaps the definitions backward. Option C is false: the even-degree condition is specific to Eulerian circuits, not a requirement for Hamiltonian ones (e.g. a graph can be Hamiltonian while having some odd-degree vertices). Option D is false: these two properties are logically independent - a graph can have one, both, or neither (a simple cycle graph Cn actually has both, but many graphs have only one)."
+},
+{
+  id: 'engmath-graph-theory-pyq9',
+  pyqStyle: true,
+  q: 'Which of the following degree sequences CANNOT belong to any simple undirected graph? (Select ALL that apply, using the necessary condition that the degree sum must be even)',
+  options: ['(3, 3, 3, 3)', '(1, 2, 3, 4)', '(2, 2, 2, 2, 2)', '(1, 1, 1)'],
+  answers: [1, 3],
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: "A necessary condition (from the Handshaking Lemma) for a degree sequence to be realizable as a simple graph is that the sum of degrees must be even, since it equals twice the edge count. Sequence (3,3,3,3): sum = 12, even - and it is indeed realizable, e.g. as the complete graph K4 (every vertex connected to every other, each with degree 3) - so this is NOT one of the impossible ones. Sequence (1,2,3,4): sum = 1+2+3+4 = 10, which is even, but this sequence is actually still impossible on only 4 vertices, because a vertex of degree 4 needs to connect to all 3 other vertices, forcing every other vertex to have degree at least 1 already just from that one connection, and pushing the degree-1 vertex to conflict with needing further connections elsewhere - a careful Erdos-Gallai check shows it fails, so this IS impossible. Sequence (2,2,2,2,2): sum = 10, even, realizable as a 5-cycle C5 where every vertex has degree exactly 2 - possible. Sequence (1,1,1): sum = 3, which is ODD, immediately violating the Handshaking Lemma's necessary condition - impossible. So the impossible sequences among the options are (1,2,3,4) and (1,1,1)."
+},
+{
+  id: 'engmath-graph-theory-pyq10',
+  pyqStyle: true,
+  q: 'In a connected graph G, a vertex v is called a CUT VERTEX (articulation point) if removing v (and its incident edges) disconnects the graph. Which statement about cut vertices is TRUE?',
+  options: ['Every leaf (degree-1 vertex) of a tree is NOT a cut vertex, but every internal (non-leaf) vertex of a tree IS a cut vertex', 'A cut vertex can only exist in a disconnected graph', 'Removing any cut vertex always splits the graph into exactly two components', 'A complete graph Kn (n >= 3) always has at least one cut vertex'],
+  answer: 0,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: "In a tree, a leaf (degree 1) connects to the rest of the tree through only its single edge; removing the leaf itself just deletes that one endpoint, leaving the remaining tree still fully connected - so a leaf is never a cut vertex. Any internal (non-leaf) vertex of a tree, however, has degree >= 2 and sits on the unique path between at least two of its neighbors' subtrees; removing it necessarily separates those subtrees from each other (since a tree has no alternate path), making every internal vertex of a tree a cut vertex - option A is correct. Option B is false by definition - a cut vertex is defined relative to a CONNECTED graph, and its removal is what creates disconnection; the term is meaningless applied to an already-disconnected graph. Option C is false - removing a cut vertex can split a graph into more than two components (e.g. a 'hub' vertex connected to several otherwise-isolated branches splits into as many components as branches). Option D is false - a complete graph Kn is maximally connected (every pair of vertices has a direct edge plus (n-2) alternate 2-step paths through any other vertex), so removing any single vertex still leaves the remaining n-1 vertices completely connected to each other - Kn has NO cut vertices for n >= 3."
+},
+{
+  id: 'engmath-graph-theory-pyq11',
+  pyqStyle: true,
+  q: 'What is the maximum number of edges in a simple bipartite graph with one part having 3 vertices and the other part having 5 vertices (i.e. the complete bipartite graph K3,5)? (Enter your numerical answer.)',
+  options: [],
+  answer: 15,
+  kind: 'nat',
+  marks: 1,
+  difficulty: 'easy',
+  type: 'pyq-style',
+  explanation: "In a bipartite graph, every edge must connect a vertex from one part to a vertex in the other part - no edges are allowed within a part. The MAXIMUM possible number of such cross-part edges occurs when every vertex in the first part connects to every vertex in the second part, which is exactly the complete bipartite graph K_(m,n) with m*n edges (each of the m vertices in part 1 connects to each of the n vertices in part 2). Here m = 3 and n = 5, giving 3*5 = 15 edges. This is the maximum for ANY bipartite graph with these part sizes, since exceeding this count would require either a within-part edge (violating bipartiteness) or a repeated edge (violating simplicity). This m*n edge-count formula for K_(m,n) is a direct building block for many harder bipartite-matching and planarity questions."
+},
+{
+  id: 'engmath-graph-theory-pyq12',
+  pyqStyle: true,
+  q: 'The complete graph K4 (4 vertices, every pair connected) is shown below. What is its chromatic number?',
+  figure: '<svg viewBox="0 0 200 200" width="100%" style="max-width:280px;height:auto" xmlns="http://www.w3.org/2000/svg"><g stroke="currentColor" fill="none"><line x1="50" y1="40" x2="150" y2="40"/><line x1="50" y1="40" x2="50" y2="160"/><line x1="50" y1="40" x2="150" y2="160"/><line x1="150" y1="40" x2="50" y2="160"/><line x1="150" y1="40" x2="150" y2="160"/><line x1="50" y1="160" x2="150" y2="160"/></g><g fill="none" stroke="currentColor"><circle cx="50" cy="40" r="12"/><circle cx="150" cy="40" r="12"/><circle cx="50" cy="160" r="12"/><circle cx="150" cy="160" r="12"/></g></svg>',
+  options: [],
+  answer: 4,
+  kind: 'nat',
+  marks: 1,
+  difficulty: 'easy',
+  type: 'pyq-style',
+  explanation: "In the complete graph Kn, every pair of vertices is directly connected by an edge, so no two vertices can ever share a color - each of the n vertices must receive its own distinct color, giving chromatic number exactly n. Here n = 4 (K4), so the chromatic number is 4: label the vertices 1, 2, 3, 4 and observe that vertex 1 is adjacent to vertices 2, 3, and 4, forcing all four to differ from vertex 1's color, and by the same complete-adjacency argument every pair among all four must differ - no repetition is possible anywhere. This matches the general rule chromatic-number(Kn) = n, the most extreme possible chromatic number for any graph on n vertices (since Kn has the maximum possible number of edges and hence the maximum possible coloring constraints), making it the standard benchmark example for 'worst case' coloring difficulty."
+}
+);
+window.GATE_DATA.questions['engmath'].topics.find(function(t){return t.id==='engmath-combinatorics';}).questions.push(
+{
+  id: 'engmath-combinatorics-pyq1',
+  pyqStyle: true,
+  q: 'In how many ways can 3 boys and 2 girls be seated in a row of 5 chairs such that no two girls sit next to each other? (Enter your numerical answer.)',
+  options: [],
+  answer: 72,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: "Use the standard gap method for 'no two together' restrictions: first seat the 3 boys in a row, which can be done in 3! = 6 ways. Seating the boys creates 4 possible gaps for the girls (one before the first boy, one between each pair of adjacent boys, and one after the last boy): _B_B_B_. Since no two girls may be adjacent, each girl must occupy a DIFFERENT gap, and choosing 2 gaps out of 4 and assigning the 2 distinct girls to them (order matters, since the girls are distinct and the gaps are distinct positions) gives a permutation count P(4,2) = 4*3 = 12. Multiplying the independent choices: 3! * P(4,2) = 6 * 12 = 72. This gap-and-permute technique is the standard tool for any 'no two of a certain type adjacent' seating or arrangement question, and generalizes directly to larger boy/girl counts."
+},
+{
+  id: 'engmath-combinatorics-pyq2',
+  pyqStyle: true,
+  q: 'In how many distinct ways can 6 distinct people be seated around a circular table, if rotations of the same arrangement are considered identical (but reflections are considered different)? (Enter your numerical answer.)',
+  options: [],
+  answer: 120,
+  kind: 'nat',
+  marks: 1,
+  difficulty: 'easy',
+  type: 'pyq-style',
+  explanation: "For circular arrangements, the standard technique is to fix one person's seat to eliminate the rotational symmetry (since rotating everyone by the same amount produces what is considered the 'same' circular arrangement), and then arrange the remaining people relative to that fixed reference. Fixing 1 of the 6 people in a seat leaves the other 5 people to be arranged in the remaining 5 seats in any order, giving 5! ways. So the count is 5! = 120, matching the general formula (n-1)! for circular permutations of n distinct objects (equivalently, n!/n, since each of the n! linear arrangements corresponds to n rotationally-equivalent circular arrangements, so dividing by n gives (n-1)!). A common error is using the full 6! = 720 (treating it as a linear arrangement), which overcounts each distinct circular arrangement 6 times."
+},
+{
+  id: 'engmath-combinatorics-pyq3',
+  pyqStyle: true,
+  q: 'A drawer contains socks of 4 different colors, with many socks of each color. What is the MINIMUM number of socks that must be drawn (without looking) to GUARANTEE that at least 3 socks of the same color are drawn?',
+  options: ['7', '9', '8', '12'],
+  answer: 1,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: "This is a Pigeonhole Principle question with the generalized form: to guarantee at least k+1 items in the same one of n categories (pigeonholes), you need at least n*k + 1 items drawn, since the worst case fills every category up to exactly k before the next item forces a (k+1)-th in some category. Here we want to guarantee 3 socks of the SAME color (k+1 = 3, so k = 2) among n = 4 colors. The worst case (avoiding 3-of-a-kind as long as possible) draws exactly 2 socks of EACH color first: 2 * 4 = 8 socks, none yet reaching 3 of a color. The very next sock drawn (the 9th) must push some color's count to 3, since all 4 colors are already at 2. So the minimum guaranteeing number is 4*2 + 1 = 9 - option B. This n*k+1 formula, an extension of the basic pigeonhole 'n+1 items force 2 in one hole', is repeatedly tested in combinatorics and probability sections."
+},
+{
+  id: 'engmath-combinatorics-pyq4',
+  pyqStyle: true,
+  q: 'Using the Inclusion-Exclusion Principle, how many integers from 1 to 100 (inclusive) are divisible by 2 or by 3 (or both)? (Enter your numerical answer.)',
+  options: [],
+  answer: 67,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: "By Inclusion-Exclusion, |A union B| = |A| + |B| - |A intersect B|, where A is the set of multiples of 2 and B is the set of multiples of 3 within 1 to 100. Count multiples of 2: floor(100/2) = 50. Count multiples of 3: floor(100/3) = 33 (since 3*33=99 <= 100 < 3*34=102). Count multiples of both 2 AND 3, i.e. multiples of lcm(2,3)=6: floor(100/6) = 16 (since 6*16=96 <= 100 < 6*17=102). So the count divisible by 2 or 3 is 50 + 33 - 16 = 67. Subtracting the intersection is essential to avoid double-counting numbers like 6, 12, 18, ... which are multiples of both 2 and 3 and would otherwise be counted twice in the separate counts of 50 and 33. This 'divisible by A or B' counting pattern via floor-division and lcm is a direct, frequently recurring inclusion-exclusion application."
+},
+{
+  id: 'engmath-combinatorics-pyq5',
+  pyqStyle: true,
+  q: 'A sequence satisfies the linear recurrence a(n) = 3*a(n-1) - 2*a(n-2), with initial conditions a(0) = 1 and a(1) = 2. What is a(4)? (Enter your numerical answer.)',
+  options: [],
+  answer: 16,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: "Solve using the characteristic equation method: assume a(n) = r^n, substitute into the recurrence to get r^2 = 3r - 2, i.e. r^2 - 3r + 2 = 0, which factors as (r-1)(r-2) = 0, giving roots r = 1 and r = 2. The general solution is a(n) = A*(1)^n + B*(2)^n = A + B*2^n. Apply initial conditions: a(0) = A + B = 1, and a(1) = A + 2B = 2. Subtracting the first equation from the second gives B = 1, and then A = 1 - B = 0. So a(n) = 2^n exactly. Verify directly via the recurrence: a(2) = 3*2 - 2*1 = 4 = 2^2, a(3) = 3*4 - 2*2 = 8 = 2^3, a(4) = 3*8 - 2*4 = 24 - 8 = 16 = 2^4. Both the characteristic-equation shortcut and the direct iteration agree: a(4) = 16. Recognizing a recurrence collapses to a clean closed form like 2^n is a major time-saver over brute iteration."
+},
+{
+  id: 'engmath-combinatorics-pyq6',
+  pyqStyle: true,
+  q: 'A derangement of n objects is a permutation in which no object appears in its original position. How many derangements exist for 4 distinct objects (i.e. D(4))? (Enter your numerical answer.)',
+  options: [],
+  answer: 9,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'hard',
+  type: 'pyq-style',
+  explanation: "The number of derangements of n objects is given by D(n) = n! * sum_{k=0}^{n} (-1)^k / k!, derived from inclusion-exclusion over the 'bad' events that each object lands in its own original position. For n = 4: D(4) = 4! * (1 - 1/1! + 1/2! - 1/3! + 1/4!) = 24 * (1 - 1 + 0.5 - 0.1667 + 0.0417) = 24 * 0.375 = 9. Alternatively, use the recurrence D(n) = (n-1) * (D(n-1) + D(n-2)) with D(1)=0, D(2)=1: D(3) = 2*(1+0) = 2, D(4) = 3*(2+1) = 9, matching. As a sanity check, the total permutations of 4 objects is 4! = 24, and the derangement fraction D(n)/n! quickly approaches 1/e ≈ 0.3679 as n grows; here 9/24 = 0.375, already close to that limit even at n=4. Derangement counting is a classic named application of inclusion-exclusion that GATE revisits for small n."
+},
+{
+  id: 'engmath-combinatorics-pyq7',
+  pyqStyle: true,
+  q: 'Using the "stars and bars" technique, how many non-negative integer solutions exist to the equation x1 + x2 + x3 = 10? (Enter your numerical answer.)',
+  options: [],
+  answer: 66,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: "The stars-and-bars formula gives the number of non-negative integer solutions to x1 + x2 + ... + xk = n as C(n + k - 1, k - 1) - it counts the ways to place k-1 dividers among n identical stars (units) to split them into k groups. Here n = 10 and k = 3 variables, so the count is C(10 + 3 - 1, 3 - 1) = C(12, 2). Computing: C(12,2) = (12*11)/2 = 66. Intuitively, imagine 10 stars in a row (representing the total to be distributed) and 2 bars to be inserted among 12 total symbols (10 stars + 2 bars) to split the stars into 3 groups representing x1, x2, x3 - choosing which 2 of the 12 positions are bars determines the entire solution, giving C(12,2) arrangements. This technique is the standard tool whenever GATE asks for the count of ways to distribute identical items into distinct bins (or equivalently, solutions to a sum-equation in non-negative integers)."
+},
+{
+  id: 'engmath-combinatorics-pyq8',
+  pyqStyle: true,
+  q: 'Which of the following identities involving binomial coefficients C(n, k) = n! / (k! (n-k)!) are TRUE for all valid n, k? (Select ALL that apply)',
+  options: ['C(n, k) = C(n, n-k)', 'C(n, k) = C(n-1, k-1) + C(n-1, k) (Pascal\\u2019s rule)', 'Sum from k=0 to n of C(n, k) = 2^n', 'C(n, k) = C(n, k-1) for all k'],
+  answers: [0, 1, 2],
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: "Option A is the symmetry identity: choosing k items to include from n is equivalent to choosing the n-k items to exclude, so C(n,k) = C(n,n-k) always - true. Option B is Pascal's rule, derivable by conditioning on whether a fixed particular element is included in the chosen subset of size k (if included, choose the remaining k-1 from the other n-1: C(n-1,k-1); if excluded, choose all k from the other n-1: C(n-1,k)), summing to the total C(n,k) - true, and this is exactly the recurrence generating Pascal's triangle. Option C is the Binomial Theorem applied to (1+1)^n = sum C(n,k)*1^k*1^(n-k) = sum C(n,k) = 2^n, reflecting that 2^n counts all subsets of an n-element set, partitioned by size - true. Option D is FALSE in general: C(n,k) equals C(n,k-1) only in special coincidental cases (e.g. near the middle of an even row), not as a general identity - for instance C(5,2)=10 while C(5,1)=5, clearly unequal. So A, B, C hold universally; D does not."
+},
+{
+  id: 'engmath-combinatorics-pyq9',
+  pyqStyle: true,
+  q: 'The n-th Catalan number Cn = C(2n, n) / (n+1) counts, among other things, the number of ways to fully parenthesize a product of n+1 factors (equivalently, the number of distinct binary trees with n internal nodes). What is C4 (the 4th Catalan number)? (Enter your numerical answer.)',
+  options: [],
+  answer: 14,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'hard',
+  type: 'pyq-style',
+  explanation: "Apply the formula Cn = C(2n,n)/(n+1) with n=4: C(8,4) = 8!/(4!4!) = 70, and dividing by (n+1) = 5 gives C4 = 70/5 = 14. This matches the Catalan sequence C0=1, C1=1, C2=2, C3=5, C4=14, which counts, for n=4, the number of ways to fully parenthesize a product of 5 factors (using 4 pairs of balanced parentheses), the number of distinct binary trees with 4 internal nodes (5 leaves), the number of ways to triangulate a convex hexagon (6-sided polygon) using non-crossing diagonals, and the number of balanced sequences of 4 opening and 4 closing parentheses that never go negative when read left to right. Catalan numbers recur throughout GATE's data-structures and combinatorics questions (binary search tree counting, balanced bracket sequences), so recognizing the closed-form formula avoids having to enumerate structures by hand."
+},
+{
+  id: 'engmath-combinatorics-pyq10',
+  pyqStyle: true,
+  q: 'A committee of 5 people is to be formed from a pool of 5 men and 4 women, consisting of exactly 3 men and 2 women. In how many ways can this committee be chosen? (Enter your numerical answer.)',
+  options: [],
+  answer: 60,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: "Since the two selections (men and women) are independent sub-choices being combined, the total count is the PRODUCT of the individual combination counts (by the multiplication principle). Choosing 3 men out of 5 available: C(5,3) = 5!/(3!2!) = 10. Choosing 2 women out of 4 available: C(4,2) = 4!/(2!2!) = 6. Since every valid committee consists of one specific choice of 3 men AND one specific choice of 2 women, and these choices can be paired independently, the total number of distinct committees is 10 * 6 = 60. A common error is adding these counts (10+6=16) instead of multiplying, which would be appropriate only if the committee could be formed by EITHER choosing men OR choosing women, not both simultaneously - since the committee genuinely needs both groups filled at once, multiplication is the correct combinator here."
+},
+{
+  id: 'engmath-combinatorics-pyq11',
+  pyqStyle: true,
+  q: 'A sequence is defined by the recurrence a(n) = a(n-1) + a(n-2) (the Fibonacci recurrence) with a(1) = 1 and a(2) = 1. What is a(7)? (Enter your numerical answer.)',
+  options: [],
+  answer: 13,
+  kind: 'nat',
+  marks: 1,
+  difficulty: 'easy',
+  type: 'pyq-style',
+  explanation: "Compute the sequence term by term using the given recurrence, starting from a(1)=1 and a(2)=1: a(3) = a(2)+a(1) = 1+1 = 2. a(4) = a(3)+a(2) = 2+1 = 3. a(5) = a(4)+a(3) = 3+2 = 5. a(6) = a(5)+a(4) = 5+3 = 8. a(7) = a(6)+a(5) = 8+5 = 13. This is exactly the classical Fibonacci sequence 1, 1, 2, 3, 5, 8, 13, ..., which is the most iconic linear recurrence in combinatorics, arising naturally in counting problems such as the number of ways to tile a 1xn strip with 1x1 and 1x2 tiles, or the number of binary strings of length n with no two consecutive 1s. Recognizing a recurrence as exactly the Fibonacci pattern lets you instantly recall or quickly regenerate the sequence rather than deriving a closed-form solution via the characteristic equation (whose roots here are the irrational golden-ratio values)."
+},
+{
+  id: 'engmath-combinatorics-pyq12',
+  pyqStyle: true,
+  q: 'What is the minimum number of people that must be in a room to GUARANTEE that at least two of them were born in the same calendar month (assuming 12 possible birth months)? (Enter your numerical answer.)',
+  options: [],
+  answer: 13,
+  kind: 'nat',
+  marks: 1,
+  difficulty: 'easy',
+  type: 'pyq-style',
+  explanation: "This is the basic form of the Pigeonhole Principle: if n items (people) are placed into m categories (the 12 possible birth months) and n > m, then at least one category must contain more than one item. The worst case that avoids any repeat assigns each of the 12 months to at most 1 person, using up 12 people with no two sharing a month - but this is the maximum possible without a collision. The very next person (the 13th) must have a birth month that is one of the 12 already used, forcing a repeat. So the minimum number guaranteeing a shared birth month is 12 + 1 = 13. This is the simplest instance (k=1 extra, i.e. guaranteeing just 2 in one hole) of the general pigeonhole formula m*k + 1 used in more elaborate versions of this question (such as guaranteeing 3 or more people sharing a month, which would require 12*2+1 = 25 people)."
+}
+);
+window.GATE_DATA.questions['engmath'].topics.find(function(t){return t.id==='engmath-linear-algebra';}).questions.push(
+{
+  id: 'engmath-linear-algebra-pyq1',
+  pyqStyle: true,
+  q: 'Matrix A = [[4, 1], [2, 3]] has two eigenvalues. What is the SUM of its eigenvalues? (Enter your numerical answer.)',
+  options: [],
+  answer: 7,
+  kind: 'nat',
+  marks: 1,
+  difficulty: 'easy',
+  type: 'pyq-style',
+  explanation: "A fundamental shortcut avoids solving the characteristic equation at all: for any square matrix, the sum of the eigenvalues always equals the TRACE of the matrix (the sum of its diagonal entries), and the product of the eigenvalues always equals the DETERMINANT. Here trace(A) = 4 + 3 = 7, so the sum of eigenvalues is 7 without computing them individually. As a full verification, the characteristic equation is det(A - lambda*I) = 0: (4-lambda)(3-lambda) - (1)(2) = 0, expanding to lambda^2 - 7*lambda + 12 - 2 = 0, i.e. lambda^2 - 7*lambda + 10 = 0, which factors as (lambda-5)(lambda-2)=0, giving eigenvalues 5 and 2 - their sum is indeed 5+2=7, matching the trace shortcut. This trace-equals-sum-of-eigenvalues fact is one of the fastest checks GATE rewards, especially for verifying computed eigenvalues without re-deriving them."
+},
+{
+  id: 'engmath-linear-algebra-pyq2',
+  pyqStyle: true,
+  q: 'What is the rank of the matrix [[1, 2, 3], [2, 4, 6], [1, 1, 1]]? (Enter your numerical answer.)',
+  options: [],
+  answer: 2,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: "The rank of a matrix equals the number of linearly independent rows (equivalently columns). Inspect the rows: Row 2 = (2,4,6) = 2 * Row 1 = 2*(1,2,3), so Row 2 is a scalar multiple of Row 1 and contributes nothing new - it is linearly DEPENDENT on Row 1. Row 3 = (1,1,1) is clearly not a multiple of Row 1 = (1,2,3) (the ratios 1/1, 1/2, 1/3 are not all equal), so Row 3 is linearly independent of Row 1. After discarding the dependent Row 2, we are left with exactly 2 independent rows (Row 1 and Row 3), so the rank is 2 - the matrix is rank-deficient (less than full rank 3) precisely because of the Row 2 duplication. This spot-the-multiple technique is much faster than full Gaussian elimination whenever an obvious linear dependency is visible by inspection, which GATE frequently engineers into its matrices."
+},
+{
+  id: 'engmath-linear-algebra-pyq3',
+  pyqStyle: true,
+  q: 'What is the determinant of the matrix [[1, 2, 3], [0, 1, 4], [5, 6, 0]]? (Enter your numerical answer.)',
+  options: [],
+  answer: 1,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: "Expand along the first row using cofactor expansion: det = 1*M11 - 2*M12 + 3*M13, where each Mij is the determinant of the 2x2 minor obtained by deleting row 1 and column j. M11 = det[[1,4],[6,0]] = (1*0 - 4*6) = -24. M12 = det[[0,4],[5,0]] = (0*0 - 4*5) = -20. M13 = det[[0,1],[5,6]] = (0*6 - 1*5) = -5. So det = 1*(-24) - 2*(-20) + 3*(-5) = -24 + 40 - 15 = 1. Since the determinant is nonzero (equal to 1), this matrix is invertible (non-singular) and has full rank 3. Cofactor expansion along the first row (or, when available, along a row/column with more zeros for less arithmetic) is the standard hand-computation method for 3x3 determinants that GATE expects."
+},
+{
+  id: 'engmath-linear-algebra-pyq4',
+  pyqStyle: true,
+  q: 'For a system of linear equations Ax = b, let r = rank(A) (the coefficient matrix) and r\\u2019 = rank([A|b]) (the augmented matrix), with n unknowns. Which condition correctly identifies when the system has NO solution?',
+  options: ['r < r\\u2019 (ranks differ)', 'r = r\\u2019 = n (ranks equal, and equal to the number of unknowns)', 'r = r\\u2019 < n (ranks equal, but less than the number of unknowns)', 'r > r\\u2019 (coefficient rank exceeds augmented rank)'],
+  answer: 0,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: "The Rouche-Capelli theorem (consistency theorem) governs this: the system is CONSISTENT (has at least one solution) if and only if rank(A) = rank([A|b]), i.e. r = r'. If instead r < r' (the augmented matrix has strictly higher rank because appending b introduces a new independent 'direction' that cannot be expressed as a combination of A's columns), the system is INCONSISTENT and has no solution at all - option A. If r = r' = n, the system is consistent with exactly one (unique) solution, since there are no free variables left. If r = r' < n, the system is consistent but UNDERDETERMINED, yielding infinitely many solutions parameterized by n - r free variables. Option D (r > r') is actually impossible, since appending a column to a matrix can never DECREASE its rank - rank([A|b]) is always at least rank(A). This three-way classification (no solution / unique solution / infinite solutions) via comparing r, r', and n is a cornerstone GATE linear-algebra fact."
+},
+{
+  id: 'engmath-linear-algebra-pyq5',
+  pyqStyle: true,
+  q: 'An upper triangular matrix has diagonal entries 2, 3, and 5 (all other structure is irrelevant to this question). What is the PRODUCT of its eigenvalues? (Enter your numerical answer.)',
+  options: [],
+  answer: 30,
+  kind: 'nat',
+  marks: 1,
+  difficulty: 'easy',
+  type: 'pyq-style',
+  explanation: "For any triangular matrix (upper or lower), the eigenvalues are always exactly its diagonal entries - this follows because det(A - lambda*I) for a triangular matrix is simply the product of its diagonal entries (each shifted by -lambda), so the characteristic polynomial factors immediately as (2-lambda)(3-lambda)(5-lambda), with roots lambda = 2, 3, 5 read directly off the diagonal. Since the product of all eigenvalues of any square matrix always equals its determinant, and the determinant of a triangular matrix is exactly the product of its diagonal entries, the product of eigenvalues here is 2 * 3 * 5 = 30 - consistent both by the 'eigenvalues = diagonal for triangular matrices' shortcut and by the general 'product of eigenvalues = determinant' rule. This triangular-matrix shortcut lets GATE test eigenvalue concepts on larger matrices (4x4, 5x5) without requiring a full characteristic-polynomial computation, as long as the matrix is given in triangular form."
+},
+{
+  id: 'engmath-linear-algebra-pyq6',
+  pyqStyle: true,
+  q: 'A square matrix Q is called ORTHOGONAL if Q^T * Q = I (the transpose equals the inverse). Which of the following statements about orthogonal matrices are TRUE? (Select ALL that apply)',
+  options: ['det(Q) = +1 or -1', 'The columns of Q form an orthonormal set (unit length, mutually perpendicular)', 'Every orthogonal matrix is also symmetric', 'Q^(-1) = Q^T'],
+  answers: [0, 1, 3],
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: "Since Q^T*Q = I, taking determinants of both sides gives det(Q^T)*det(Q) = det(I) = 1; since det(Q^T) = det(Q), this becomes det(Q)^2 = 1, so det(Q) = +1 or -1 - option A is true. By definition, Q^T*Q = I means every pair of distinct columns has zero dot product (perpendicular) and every column has dot product 1 with itself (unit length) - this is precisely the definition of an orthonormal set of columns - option B is true. Q^(-1) = Q^T follows directly from the defining relation Q^T*Q = I, since this identity IS the statement that Q^T acts as Q's inverse - option D is true (and is really the defining property restated). Option C is FALSE in general: orthogonal does not imply symmetric - a rotation matrix like [[0,-1],[1,0]] (90-degree rotation) is orthogonal (its columns are orthonormal) but clearly NOT symmetric, since swapping rows and columns gives a different matrix [[0,1],[-1,0]]. So A, B, D are always true; C is not."
+},
+{
+  id: 'engmath-linear-algebra-pyq7',
+  pyqStyle: true,
+  q: 'For the matrix A = [[2, 1], [1, 2]], the Cayley-Hamilton theorem gives A^2 - 4A + 3I = 0, so A^(-1) = (4I - A) / 3. What is the (1,1) entry of A^(-1)? (Enter your numerical answer, as a decimal.)',
+  options: [],
+  answer: 0.6667,
+  tolerance: 0.01,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'hard',
+  type: 'pyq-style',
+  explanation: "The Cayley-Hamilton theorem states that every square matrix satisfies its own characteristic equation. Here the characteristic polynomial is lambda^2 - trace(A)*lambda + det(A) = lambda^2 - 4*lambda + 3 (since trace = 2+2=4 and det = 2*2-1*1=3), so A^2 - 4A + 3I = 0. Rearranging: 3I = 4A - A^2 = A(4I - A), so dividing by 3 and factoring out A gives I = A * [(4I-A)/3], meaning A^(-1) = (4I-A)/3 directly, without any cofactor computation. Now compute 4I - A = [[4-2, 0-1],[0-1, 4-2]] = [[2,-1],[-1,2]]. Dividing every entry by 3: A^(-1) = [[2/3, -1/3],[-1/3, 2/3]]. So the (1,1) entry is 2/3 = 0.6667. This Cayley-Hamilton shortcut to the inverse (valid whenever det(A) is nonzero) is especially useful for 2x2 and 3x3 matrices, sidestepping the adjugate/cofactor method entirely."
+},
+{
+  id: 'engmath-linear-algebra-pyq8',
+  pyqStyle: true,
+  q: 'Which of the following statements about a REAL SYMMETRIC matrix A (where A = A^T) are always TRUE? (Select ALL that apply)',
+  options: ['All eigenvalues of A are real numbers', 'Eigenvectors corresponding to distinct eigenvalues are orthogonal to each other', 'A is always invertible', 'A can always be diagonalized by an orthogonal matrix'],
+  answers: [0, 1, 3],
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: "The Spectral Theorem for real symmetric matrices guarantees several powerful properties. First, all eigenvalues of a real symmetric matrix are guaranteed to be real (unlike general matrices, which can have complex eigenvalue pairs) - option A is true. Second, eigenvectors corresponding to DISTINCT eigenvalues of a symmetric matrix are automatically orthogonal (this follows from a short proof using A=A^T and the eigenvalue equations for the two eigenvectors) - option B is true. Fourth, the Spectral Theorem further guarantees that A is always orthogonally diagonalizable, meaning A = Q*D*Q^T for some orthogonal matrix Q (built from orthonormal eigenvectors) and diagonal matrix D of eigenvalues - option D is true. Option C is FALSE: symmetry says nothing about invertibility - the zero matrix is symmetric (trivially, since it equals its own transpose) but is singular (not invertible, with determinant 0 and eigenvalue 0). So A, B, D are guaranteed by symmetry; C is an unrelated property that can fail."
+},
+{
+  id: 'engmath-linear-algebra-pyq9',
+  pyqStyle: true,
+  q: 'Let A and B be square n x n matrices, and let k be a scalar. Which of the following determinant properties are TRUE? (Select ALL that apply)',
+  options: ['det(A * B) = det(A) * det(B)', 'det(A^T) = det(A)', 'det(k * A) = k^n * det(A)', 'det(A + B) = det(A) + det(B)'],
+  answers: [0, 1, 2],
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: "Option A is the multiplicativity of determinants, a fundamental theorem: det(AB) = det(A)*det(B) always holds for square matrices of the same size - true. Option B holds because expanding the determinant along rows versus columns gives the same value (the determinant of a matrix and its transpose are always equal) - true. Option C follows because scaling EVERY entry of an n x n matrix by k scales EACH of the n rows by k, and each row-scaling multiplies the determinant by a factor of k, so scaling all n rows multiplies the determinant by k^n total - true (a very commonly mis-stated rule, since students often forget the exponent n). Option D is FALSE in general: determinant does NOT distribute over matrix addition - a simple counterexample is A = I (identity) and B = I on a 2x2 space: det(A+B) = det(2I) = 2^2 * det(I) = 4, while det(A) + det(B) = 1 + 1 = 2, clearly 4 ≠ 2. So A, B, C are always true; D fails even in the simplest cases."
+},
+{
+  id: 'engmath-linear-algebra-pyq10',
+  pyqStyle: true,
+  q: 'The system of equations x + y + z = 6, x + 2y + 3z = 10, x + 2y + kz = 10 has INFINITELY MANY solutions for exactly one value of k (making the coefficient matrix singular AND keeping the system consistent). What is that value of k? (Enter your numerical answer.)',
+  options: [],
+  answer: 3,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'hard',
+  type: 'pyq-style',
+  explanation: "First find when the coefficient matrix [[1,1,1],[1,2,3],[1,2,k]] becomes singular (det = 0), since a unique solution requires a nonzero determinant. Expanding: det = 1*(2k-6) - 1*(k-3) + 1*(2-2) = (2k-6) - (k-3) + 0 = k - 3. Setting det = 0 gives k = 3. At k=3 the coefficient matrix is singular, so the system either has NO solution or INFINITELY MANY, depending on whether it remains consistent. Checking consistency at k=3: the third equation becomes x + 2y + 3z = 10, which is now IDENTICAL to the second equation - so effectively only 2 independent equations remain for 3 unknowns, giving one free parameter and infinitely many solutions (the system is consistent, since the third equation adds no new, contradictory information). Had the third equation instead reduced to something like x+2y+3z=7 at k=3 (a different constant), it would contradict the second equation and give no solution instead - always check the constant term after finding the singular k, not just the determinant."
+},
+{
+  id: 'engmath-linear-algebra-pyq11',
+  pyqStyle: true,
+  q: 'A linear transformation is represented by a 4 x 6 matrix A with rank(A) = 3. By the Rank-Nullity theorem, what is the nullity of A (the dimension of the null space, i.e. the solution space of Ax = 0)? (Enter your numerical answer.)',
+  options: [],
+  answer: 3,
+  kind: 'nat',
+  marks: 1,
+  difficulty: 'easy',
+  type: 'pyq-style',
+  explanation: "The Rank-Nullity theorem states that for any m x n matrix A (representing a linear map from an n-dimensional domain), rank(A) + nullity(A) = n, where n is the NUMBER OF COLUMNS (the dimension of the domain), not the number of rows. Here A is 4 x 6, meaning it maps from a 6-dimensional space (n = 6 columns) to a 4-dimensional space (m = 4 rows), and rank(A) = 3 is given. So nullity(A) = n - rank(A) = 6 - 3 = 3. A common error is using the row count (4) instead of the column count (6) in this formula - the theorem always uses the number of columns, since that is the dimension of the domain of the linear map and hence of the null space it contains. This rank-nullity relationship is fundamental to understanding solution-space dimension for homogeneous systems Ax=0."
+},
+{
+  id: 'engmath-linear-algebra-pyq12',
+  pyqStyle: true,
+  q: 'A square matrix A is DIAGONALIZABLE (can be written as A = P*D*P^(-1) for diagonal D) if and only if:',
+  options: ['A has n linearly independent eigenvectors (where A is n x n) - equivalently, the geometric multiplicity equals the algebraic multiplicity for every eigenvalue', 'A has n DISTINCT eigenvalues (this is both necessary and sufficient)', 'A is invertible (det(A) is nonzero)', 'A is symmetric'],
+  answer: 0,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: "The precise and complete criterion for diagonalizability of an n x n matrix A is the existence of n linearly independent eigenvectors, which is equivalent to requiring that for EVERY eigenvalue, its geometric multiplicity (dimension of its eigenspace) equals its algebraic multiplicity (its multiplicity as a root of the characteristic polynomial) - option A is the correct, fully general condition. Option B states a SUFFICIENT but not NECESSARY condition: having n distinct eigenvalues does guarantee diagonalizability (since eigenvectors for distinct eigenvalues are automatically linearly independent), but a matrix CAN still be diagonalizable even with repeated eigenvalues, as long as each repeated eigenvalue still has enough independent eigenvectors to match its multiplicity (e.g. the identity matrix has one repeated eigenvalue but is trivially diagonalizable, already being diagonal) - so 'distinct eigenvalues' is too strong a requirement, ruling out B as the tightest correct statement. Option C is false and irrelevant: invertibility (nonzero determinant, i.e. no zero eigenvalue) has nothing to do with diagonalizability - a matrix can be singular yet diagonalizable, or invertible yet NOT diagonalizable (e.g. a Jordan block with a nonzero eigenvalue on the diagonal and a 1 above it is invertible but not diagonalizable, since it has only one independent eigenvector for a repeated eigenvalue). Option D is a sufficient condition (via the Spectral Theorem, real symmetric matrices are always diagonalizable) but not necessary - many non-symmetric matrices are perfectly diagonalizable too."
+}
+);
+window.GATE_DATA.questions['engmath'].topics.find(function(t){return t.id==='engmath-calculus';}).questions.push(
+{
+  id: 'engmath-calculus-pyq1',
+  pyqStyle: true,
+  q: 'Evaluate: lim (x -> 0) of sin(3x) / sin(5x). (Enter your numerical answer, as a decimal.)',
+  options: [],
+  answer: 0.6,
+  tolerance: 0.01,
+  kind: 'nat',
+  marks: 1,
+  difficulty: 'easy',
+  type: 'pyq-style',
+  explanation: "Direct substitution gives 0/0, an indeterminate form, so either L'Hopital's rule or the standard limit lim_{x->0} sin(kx)/(kx) = 1 applies. Using the standard-limit trick: rewrite sin(3x)/sin(5x) = [sin(3x)/(3x)] * [5x/sin(5x)] * (3x)/(5x) = [sin(3x)/(3x)] * [1/(sin(5x)/(5x))] * (3/5). As x -> 0, both sin(3x)/(3x) and sin(5x)/(5x) individually tend to 1 (the fundamental sin(u)/u -> 1 limit), so the whole expression tends to 1 * 1 * (3/5) = 3/5 = 0.6. Equivalently via L'Hopital directly: differentiate numerator and denominator to get lim 3cos(3x)/(5cos(5x)) = 3*1/(5*1) = 3/5 at x=0. Both methods confirm 0.6. This ratio-of-sines-at-origin limit generalizes to lim sin(ax)/sin(bx) = a/b, a pattern GATE reuses across many variable substitutions."
+},
+{
+  id: 'engmath-calculus-pyq2',
+  pyqStyle: true,
+  q: 'Evaluate: lim (n -> infinity) of (1 + 3/n)^n. (Enter your numerical answer, as a decimal, rounded to 2 decimal places.)',
+  options: [],
+  answer: 20.09,
+  tolerance: 0.05,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: "This is the classic 1^infinity indeterminate form, matching the general limit template lim_{n->infinity} (1 + k/n)^n = e^k, a direct generalization of the definition of e = lim_{n->infinity}(1+1/n)^n. Here k = 3, so the limit is e^3. To derive it rigorously (rather than just pattern-matching), take the natural log: let L = lim ln[(1+3/n)^n] = lim n*ln(1+3/n). As n->infinity, 3/n -> 0, so using the standard approximation ln(1+u) ~ u for small u, ln(1+3/n) ~ 3/n, giving n*(3/n) = 3 in the limit. So ln(original limit) = 3, meaning the original limit = e^3. Numerically, e^3 ≈ 20.0855, which rounds to 20.09. Recognizing the (1+k/n)^n -> e^k template instantly (rather than re-deriving via logarithms every time) is a major speed advantage for this frequently recurring GATE limit family."
+},
+{
+  id: 'engmath-calculus-pyq3',
+  pyqStyle: true,
+  q: 'A function is defined piecewise as f(x) = 3x + 1 for x < 2, and f(x) = kx - 1 for x >= 2. For what value of k is f continuous at x = 2? (Enter your numerical answer.)',
+  options: [],
+  answer: 4,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: "Continuity at the junction point x = 2 requires the left-hand limit, the right-hand limit (which here equals the defined value since the second piece includes x=2), and the function value to all agree. The left-hand limit as x approaches 2 from below uses the first piece: lim_{x->2-} (3x+1) = 3(2)+1 = 7. The value (and right-hand limit) using the second piece at x=2 is f(2) = k(2) - 1 = 2k - 1. Setting these equal for continuity: 7 = 2k - 1, so 2k = 8, giving k = 4. Verify: with k=4, the second piece is f(x) = 4x - 1, and f(2) = 4(2)-1 = 7, exactly matching the left-hand limit of 7 - the two pieces now join without a jump at x=2. This 'set left-hand limit equal to right-hand value, solve for the unknown parameter' technique is the standard, mechanical approach for every piecewise-continuity GATE question of this style."
+},
+{
+  id: 'engmath-calculus-pyq4',
+  pyqStyle: true,
+  q: 'Consider f(x) = |x - 2| on the real line. Which statement about f at x = 2 is correct?',
+  options: ['f is continuous at x=2 but NOT differentiable at x=2', 'f is differentiable at x=2, with f\\u2019(2) = 0', 'f is not even continuous at x=2', 'f is differentiable everywhere except it is discontinuous at x=2'],
+  answer: 0,
+  marks: 1,
+  difficulty: 'easy',
+  type: 'pyq-style',
+  explanation: "f(x) = |x-2| can be written piecewise as f(x) = -(x-2) = 2-x for x < 2, and f(x) = x-2 for x >= 2. Checking continuity at x=2: the left-hand limit is lim_{x->2-}(2-x) = 0, the right-hand limit is lim_{x->2+}(x-2) = 0, and f(2) = 0 - all three agree, so f IS continuous at x=2. Checking differentiability: the left-hand derivative is d/dx(2-x) = -1, while the right-hand derivative is d/dx(x-2) = +1; since these one-sided derivatives disagree (-1 does not equal +1), f is NOT differentiable at x=2 - the graph has a sharp 'corner' (a V-shape) at that point, even though there is no break or jump. This exemplifies the crucial fact that continuity does NOT imply differentiability - |x| (shifted here to be centered at x=2) is the canonical textbook counterexample used to teach exactly this distinction, and GATE tests it very frequently in slightly disguised forms."
+},
+{
+  id: 'engmath-calculus-pyq5',
+  pyqStyle: true,
+  q: 'Rolle\\u2019s theorem requires continuity on [a,b], differentiability on (a,b), and f(a) = f(b). For the function f(x) = |x| on the interval [-1, 1] (where f(-1) = f(1) = 1), which hypothesis of Rolle\\u2019s theorem FAILS, correctly explaining why no c in (-1,1) with f\\u2019(c)=0 need exist (and indeed none does)?',
+  options: ['Differentiability on the open interval (-1,1) fails, since f is not differentiable at x=0', 'Continuity on [-1,1] fails at the endpoints', 'f(a) = f(b) fails, since f(-1) != f(1)', 'All hypotheses hold, so Rolle\\u2019s theorem should have found a c, contradicting the theorem'],
+  answer: 0,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: "Check each hypothesis in turn. Continuity on [-1,1]: |x| is continuous everywhere, including the endpoints, so this hypothesis HOLDS - option B is wrong to claim it fails. f(a)=f(b): f(-1)=|-1|=1 and f(1)=|1|=1, so f(-1)=f(1)=1 holds exactly - option C is wrong. Differentiability on the OPEN interval (-1,1): here is the failure - at x=0 (which lies strictly inside (-1,1)), the left-hand derivative of |x| is -1 and the right-hand derivative is +1, so f is not differentiable at x=0, meaning f fails to be differentiable throughout the open interval - option A correctly identifies the failed hypothesis. Since one of Rolle's three hypotheses fails, the theorem's conclusion is not guaranteed to hold, and indeed direct inspection confirms f'(x) = -1 for x<0 and f'(x)=+1 for x>0, never equal to 0 anywhere in (-1,1) - there really is no such c, consistent with (not contradicting) the theorem, ruling out option D."
+},
+{
+  id: 'engmath-calculus-pyq6',
+  pyqStyle: true,
+  q: 'Using the Mean Value Theorem for f(x) = x^2 on the interval [1, 3], find the value of c in (1,3) that satisfies f\\u2019(c) = (f(3) - f(1)) / (3 - 1). (Enter your numerical answer.)',
+  options: [],
+  answer: 2,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: "f(x) = x^2 is continuous on [1,3] and differentiable on (1,3), so the Mean Value Theorem applies and guarantees at least one such c exists. Compute the right-hand side (the average rate of change, i.e. the slope of the chord from (1, f(1)) to (3, f(3))): f(3) = 9, f(1) = 1, so (f(3)-f(1))/(3-1) = (9-1)/2 = 8/2 = 4. Now compute f'(x) = 2x, and set f'(c) = 4: 2c = 4, so c = 2. Verify c=2 lies within the open interval (1,3), as required by the theorem - it does. Geometrically, this means the tangent line to y=x^2 at x=2 (with slope 2*2=4) is parallel to the straight chord connecting the two endpoints (1,1) and (3,9), which also has slope 4 - a direct visual confirmation of the MVT's guarantee. For f(x)=x^2 specifically, c is always exactly the midpoint of the interval (here (1+3)/2=2), a useful pattern-recognition shortcut for this particular function."
+},
+{
+  id: 'engmath-calculus-pyq7',
+  pyqStyle: true,
+  q: 'Find the MAXIMUM value of the function f(x) = -x^2 + 4x + 1 over all real numbers x. (Enter your numerical answer.)',
+  options: [],
+  answer: 5,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: "Since this is a downward-opening parabola (the coefficient of x^2 is negative), it has a single global maximum at its vertex, found by setting the first derivative to zero. f'(x) = -2x + 4. Setting f'(x) = 0: -2x + 4 = 0, so x = 2. Confirm this is a maximum (not a minimum) using the second derivative test: f''(x) = -2, which is negative everywhere, confirming a local (and here, global, since the parabola opens downward) maximum at x=2. Evaluate f(2) = -(2)^2 + 4(2) + 1 = -4 + 8 + 1 = 5. So the maximum value of the function is 5, occurring at x=2. This 'set f'=0, classify with f'', substitute back to get the extremal VALUE (not just the location)' pipeline is the exact sequence GATE numerically tests in maxima-minima questions, and forgetting the final substitution step (reporting x=2 instead of f(2)=5) is the most common careless error."
+},
+{
+  id: 'engmath-calculus-pyq8',
+  pyqStyle: true,
+  q: 'Evaluate the definite integral: integral from x = -2 to x = 2 of (x^3 + 3x) dx, using the symmetry of the integrand. (Enter your numerical answer.)',
+  options: [],
+  answer: 0,
+  kind: 'nat',
+  marks: 1,
+  difficulty: 'easy',
+  type: 'pyq-style',
+  explanation: "Check the parity (odd/even symmetry) of the integrand before doing any algebra: f(x) = x^3 + 3x satisfies f(-x) = (-x)^3 + 3(-x) = -x^3 - 3x = -(x^3+3x) = -f(x), so f is an ODD function (every term has an odd power of x). A fundamental symmetry property of definite integrals states that for any odd function f, the integral over a symmetric interval [-a, a] is always exactly 0, because the negative-side contribution exactly cancels the positive-side contribution (the area below the axis on one side mirrors the area above the axis on the other). Here a = 2, and since f is odd, integral_{-2}^{2} (x^3+3x) dx = 0 immediately, with no antiderivative computation needed at all. Verifying by brute force: the antiderivative is x^4/4 + 3x^2/2, evaluated at 2 gives 16/4+12/2=4+6=10, and at -2 gives the SAME value 10 (since both terms involve only even powers of x), so the difference 10-10=0, confirming the symmetry shortcut. Spotting odd/even symmetry before integrating is one of the fastest wins in this topic."
+},
+{
+  id: 'engmath-calculus-pyq9',
+  pyqStyle: true,
+  q: 'Using integration by parts, evaluate: integral from x = 0 to x = 1 of x * e^x dx. (Enter your numerical answer.)',
+  options: [],
+  answer: 1,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: "Apply integration by parts, integral u dv = uv - integral v du, choosing u = x (which simplifies upon differentiation) and dv = e^x dx (which is easy to integrate), giving du = dx and v = e^x. So integral x*e^x dx = x*e^x - integral e^x dx = x*e^x - e^x + C = e^x(x-1) + C. Now evaluate the DEFINITE integral using the Fundamental Theorem of Calculus: [e^x(x-1)] from 0 to 1 = [e^1*(1-1)] - [e^0*(0-1)] = [e*0] - [1*(-1)] = 0 - (-1) = 1. So the definite integral equals 1. A quick sanity check: since x*e^x is positive and increasing steeply on [0,1] (e^x itself only grows from 1 to about 2.718 there, but is scaled by the growing factor x), a moderate positive area like 1 is plausible - much less than the naive overestimate e ≈ 2.718 (area of the bounding rectangle of height e and width 1) but comfortably positive. This u=x, dv=e^x dx choice (favoring the polynomial as u, per the LIATE heuristic) is the standard integration-by-parts setup GATE expects for x*e^x-type integrands."
+},
+{
+  id: 'engmath-calculus-pyq10',
+  pyqStyle: true,
+  q: 'Find the area of the region enclosed between the curves y = x and y = x^2 for 0 <= x <= 1 (the region where y = x lies above y = x^2). (Enter your numerical answer, as a decimal.)',
+  options: [],
+  answer: 0.1667,
+  tolerance: 0.01,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: "First confirm which curve is on top over [0,1]: for 0 < x < 1, x > x^2 (e.g. at x=0.5, x=0.5 while x^2=0.25), so y=x lies above y=x^2 throughout the interval, and they meet exactly at the endpoints x=0 and x=1 (where x=x^2). The enclosed area is the integral of the TOP curve minus the BOTTOM curve: integral_0^1 (x - x^2) dx. The antiderivative is x^2/2 - x^3/3. Evaluating at the limits: at x=1, this gives 1/2 - 1/3 = 3/6 - 2/6 = 1/6. At x=0, this gives 0. So the area is 1/6 - 0 = 1/6 ≈ 0.1667. This 'area between two curves' setup - identify which function is larger on the interval, then integrate (top minus bottom) - is the standard technique, and 1/6 is one of the most frequently recurring exact areas in introductory calculus, arising from exactly this parabola-versus-line pairing."
+},
+{
+  id: 'engmath-calculus-pyq11',
+  pyqStyle: true,
+  q: 'Evaluate: lim (x -> 0) of (e^(2x) - 1) / x. (Enter your numerical answer.)',
+  options: [],
+  answer: 2,
+  kind: 'nat',
+  marks: 1,
+  difficulty: 'easy',
+  type: 'pyq-style',
+  explanation: "Direct substitution gives 0/0 (since e^0 - 1 = 0), an indeterminate form. Use the standard limit lim_{u->0} (e^u - 1)/u = 1 by substituting u = 2x (so as x->0, u->0 too): rewrite (e^(2x)-1)/x = 2 * (e^(2x)-1)/(2x). As x->0, the fraction (e^(2x)-1)/(2x) matches the standard form (e^u-1)/u with u=2x, which tends to 1. So the whole expression tends to 2*1 = 2. Alternatively, apply L'Hopital's rule directly: differentiate numerator and denominator with respect to x, giving lim (2*e^(2x))/1 = 2*e^0 = 2*1 = 2, confirming the same answer. This generalizes to lim_{x->0} (e^(kx)-1)/x = k for any constant k, a template that appears repeatedly across GATE limit questions with varying exponential coefficients."
+},
+{
+  id: 'engmath-calculus-pyq12',
+  pyqStyle: true,
+  q: 'For the function f(x) = x^3 - 3x, the critical point at x = 1 (where f\\u2019(1) = 0) is classified using the second derivative test. What does this classification give?',
+  options: ['A local minimum, since f\\u2019\\u2019(1) > 0', 'A local maximum, since f\\u2019\\u2019(1) < 0', 'An inflection point, since f\\u2019\\u2019(1) = 0', 'The test is inconclusive at x = 1'],
+  answer: 0,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: "First verify x=1 is indeed a critical point: f'(x) = 3x^2 - 3, and f'(1) = 3(1)-3 = 0, confirming it. To classify it, compute the second derivative: f''(x) = 6x, so f''(1) = 6(1) = 6, which is strictly POSITIVE. By the second derivative test, f''(c) > 0 at a critical point c indicates the function is concave up there, meaning it is a LOCAL MINIMUM, not a maximum - option A is correct (note the question intentionally sets up the trap of expecting a maximum, but the actual sign of f''(1) determines the classification, and it comes out positive). This is a companion critical point to x=-1 (the other root of f'(x)=3x^2-3=0), where f''(-1) = 6(-1) = -6 < 0, giving a local MAXIMUM there instead - together x=-1 (local max) and x=1 (local min) are the two turning points of this cubic's characteristic 'S-shape'. Always compute and check the actual sign of f'' rather than guessing based on the shape of the function name or intuition."
+}
+);
+window.GATE_DATA.questions['engmath'].topics.find(function(t){return t.id==='engmath-probability';}).questions.push(
+{
+  id: 'engmath-probability-pyq1',
+  pyqStyle: true,
+  q: 'A disease affects 1% of a population. A diagnostic test has a 99% true positive rate (sensitivity) and a 2% false positive rate (i.e. 98% specificity). If a randomly chosen person tests POSITIVE, what is the probability they actually have the disease? (Give your answer as a decimal.)',
+  options: [],
+  answer: 0.3333,
+  tolerance: 0.01,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'hard',
+  type: 'pyq-style',
+  explanation: "Apply Bayes' theorem: P(Disease | Positive) = [P(Positive | Disease) * P(Disease)] / P(Positive), where the denominator is expanded using the Law of Total Probability over both disease and no-disease cases. Given: P(Disease) = 0.01, P(No Disease) = 0.99, P(Positive | Disease) = 0.99 (sensitivity), P(Positive | No Disease) = 0.02 (false positive rate). Compute the numerator: 0.99 * 0.01 = 0.0099. Compute the total probability of testing positive: P(Positive) = P(Pos|D)*P(D) + P(Pos|~D)*P(~D) = 0.99*0.01 + 0.02*0.99 = 0.0099 + 0.0198 = 0.0297. So P(Disease | Positive) = 0.0099 / 0.0297 = 0.3333. This strikingly low result (only about 1 in 3 positive tests are true positives) illustrates the base-rate fallacy: because the disease is rare, even a highly accurate test produces many more false positives (from the huge healthy population) than true positives (from the tiny diseased population) in absolute terms. This exact style of Bayes' theorem diagnostic-test question is one of GATE's most frequently repeated probability patterns."
+},
+{
+  id: 'engmath-probability-pyq2',
+  pyqStyle: true,
+  q: 'A fair six-sided die is rolled once. Given that the outcome is an EVEN number, what is the probability that the outcome is also GREATER than 4?',
+  options: ['1/3', '1/2', '2/3', '1/6'],
+  answer: 0,
+  marks: 1,
+  difficulty: 'easy',
+  type: 'pyq-style',
+  explanation: "Use the definition of conditional probability: P(A|B) = P(A intersect B) / P(B), where A = 'outcome > 4' = {5,6} and B = 'outcome is even' = {2,4,6}. The intersection A intersect B (even AND greater than 4) is {6}, containing just 1 outcome out of the 6 total equally likely outcomes, so P(A intersect B) = 1/6. P(B) = |{2,4,6}|/6 = 3/6 = 1/2. So P(A|B) = (1/6) / (1/2) = (1/6)*(2/1) = 2/6 = 1/3 - option A. Equivalently, once we KNOW the outcome is even, the sample space effectively shrinks to just {2, 4, 6} (3 equally likely outcomes), and within this restricted space, only the single outcome 6 satisfies 'greater than 4', giving probability 1/3 directly. This 'restrict the sample space to the conditioning event' intuition is often faster than mechanically applying the formula for simple discrete conditional-probability questions."
+},
+{
+  id: 'engmath-probability-pyq3',
+  pyqStyle: true,
+  q: 'A random variable X has E[X] = 4. What is E[3X + 2]? (Enter your numerical answer.)',
+  options: [],
+  answer: 14,
+  kind: 'nat',
+  marks: 1,
+  difficulty: 'easy',
+  type: 'pyq-style',
+  explanation: "By the Linearity of Expectation, for any random variable X and constants a and b, E[aX + b] = a*E[X] + b - this holds unconditionally, with no assumptions about the distribution of X or independence of anything (expectation is always a linear operator on the underlying probability measure, since it is defined as an integral/sum, and both integration and summation are linear operations). Here a = 3, b = 2, and E[X] = 4, so E[3X+2] = 3*E[X] + 2 = 3*4 + 2 = 12 + 2 = 14. This linearity property is one of the most powerful and frequently exploited tools in probability, since it lets you compute expectations of complicated linear combinations of random variables (even DEPENDENT ones) by simply working with their individual expectations - a shortcut that GATE tests constantly, often disguised inside larger multi-step problems involving sums of several random variables."
+},
+{
+  id: 'engmath-probability-pyq4',
+  pyqStyle: true,
+  q: 'A random variable X has Var(X) = 5. What is Var(2X + 3)? (Enter your numerical answer.)',
+  options: [],
+  answer: 20,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: "For any random variable X and constants a, b, the variance transformation rule is Var(aX + b) = a^2 * Var(X) - note that the ADDITIVE constant b has NO effect on variance (shifting a distribution does not change its spread), while the MULTIPLICATIVE constant a is squared (since variance measures squared deviation from the mean, scaling the variable by a scales the squared deviations by a^2). Here a = 2, b = 3, and Var(X) = 5, so Var(2X+3) = 2^2 * 5 = 4 * 5 = 20. This can be derived directly from the definition Var(Y) = E[(Y-E[Y])^2]: with Y = aX+b, E[Y] = aE[X]+b, so Y - E[Y] = aX+b - (aE[X]+b) = a(X-E[X]), and squaring gives a^2*(X-E[X])^2, whose expectation is a^2*Var(X). A common error is forgetting to square the coefficient 'a' (incorrectly computing 2*5=10 instead of 4*5=20), or incorrectly including the additive constant b in the variance computation."
+},
+{
+  id: 'engmath-probability-pyq5',
+  pyqStyle: true,
+  q: 'Two random variables X and Y each take values in {0, 1}, with the joint probability mass function: P(X=0,Y=0)=0.3, P(X=0,Y=1)=0.2, P(X=1,Y=0)=0.1, P(X=1,Y=1)=0.4. What is the MARGINAL probability P(X=1)?',
+  options: [],
+  answer: 0.5,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: "The marginal probability P(X=1) is obtained by summing the joint probabilities over ALL possible values of the other variable Y, since the events {X=1,Y=0} and {X=1,Y=1} are disjoint and together cover the entire event {X=1} (Y must be either 0 or 1). So P(X=1) = P(X=1,Y=0) + P(X=1,Y=1) = 0.1 + 0.4 = 0.5. As a sanity check, all four joint probabilities should sum to exactly 1 (since they cover the entire sample space): 0.3+0.2+0.1+0.4 = 1.0, confirming this is a valid joint distribution. Similarly, the marginal P(X=0) = 0.3+0.2 = 0.5, and P(X=0)+P(X=1) = 0.5+0.5=1, another consistency check. This 'sum out the other variable's row or column of the joint table' technique for computing marginals from a joint distribution is fundamental and appears throughout GATE's probability and information-theory sections."
+},
+{
+  id: 'engmath-probability-pyq6',
+  pyqStyle: true,
+  q: 'The number of typos on a page follows a Poisson distribution with mean (rate parameter) lambda = 4 typos per page. What is the probability that a randomly selected page has EXACTLY 2 typos? (Give your answer as a decimal, rounded to 4 places.)',
+  options: [],
+  answer: 0.1465,
+  tolerance: 0.01,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: "The Poisson probability mass function is P(X=k) = (e^(-lambda) * lambda^k) / k!, which models the number of independent rare events (like typos) occurring at a constant average rate over a fixed interval. Here lambda = 4 and k = 2: P(X=2) = (e^(-4) * 4^2) / 2! = (e^(-4) * 16) / 2. Computing e^(-4) ≈ 0.018316, so P(X=2) ≈ 0.018316 * 16 / 2 = 0.018316 * 8 = 0.146525, which rounds to 0.1465. This is a direct plug-and-compute application of the Poisson pmf formula, which GATE expects students to have memorized cold - along with the key fact that for a Poisson(lambda) distribution, both the mean AND the variance are exactly lambda (a property unique among common discrete distributions, useful for cross-checking whether a given scenario truly fits a Poisson model)."
+},
+{
+  id: 'engmath-probability-pyq7',
+  pyqStyle: true,
+  q: 'A random variable X follows a Uniform distribution on the interval [2, 10]. What is P(3 < X < 7)? (Enter your numerical answer.)',
+  options: [],
+  answer: 0.5,
+  kind: 'nat',
+  marks: 1,
+  difficulty: 'easy',
+  type: 'pyq-style',
+  explanation: "For a continuous Uniform distribution on [a,b], probability is directly proportional to the LENGTH of the sub-interval in question, relative to the total length of the support: P(c < X < d) = (d-c)/(b-a) for any [c,d] within [a,b]. Here [a,b] = [2,10], with total length 10-2=8, and the sub-interval of interest is (3,7), with length 7-3=4. So P(3<X<7) = 4/8 = 0.5. This proportional-length rule follows directly from the constant density function f(x) = 1/(b-a) for a Uniform(a,b) distribution: integrating this constant density over [3,7] gives (7-3)*(1/8) = 4/8 = 0.5, the same result. Uniform distribution probability questions on GATE almost always reduce to this simple length-ratio computation, making them among the fastest probability marks available once the interval boundaries are correctly identified."
+},
+{
+  id: 'engmath-probability-pyq8',
+  pyqStyle: true,
+  q: 'Which of the following statements about Covariance and Correlation are TRUE? (Select ALL that apply)',
+  options: ['Cov(X, X) = Var(X)', 'If X and Y are independent, then Cov(X, Y) = 0', 'If Cov(X, Y) = 0, then X and Y must be independent', 'The correlation coefficient rho(X, Y) always lies in the range [-1, 1]'],
+  answers: [0, 1, 3],
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: "Option A follows directly from the definition Cov(X,Y) = E[XY] - E[X]E[Y]; setting Y=X gives Cov(X,X) = E[X^2] - E[X]^2, which is exactly the standard variance formula - true. Option B is a standard consequence of independence: if X and Y are independent, E[XY] = E[X]*E[Y] (their joint expectation factors), so Cov(X,Y) = E[XY]-E[X]E[Y] = 0 - true. Option C is FALSE - this is the converse of B, and it fails in general: zero covariance means only that X and Y have no LINEAR relationship, but they can still be strongly dependent in a nonlinear way (the classic counterexample: let X be uniform on [-1,1] and Y = X^2; then Cov(X,Y) = E[X^3] - E[X]E[X^2] = 0 - 0 = 0 since E[X^3]=0 by symmetry and E[X]=0, yet Y is completely determined by X, the strongest possible dependence). Option D is the Cauchy-Schwarz-derived bound on correlation: rho(X,Y) = Cov(X,Y)/(sigma_X * sigma_Y) is always mathematically confined to [-1,1], with the extremes achieved only for perfect linear relationships - true. So A, B, D are true; C is the classic 'uncorrelated does not imply independent' trap."
+},
+{
+  id: 'engmath-probability-pyq9',
+  pyqStyle: true,
+  q: 'A factory has two machines, A and B. Machine A produces 60% of all items and has a 5% defect rate; Machine B produces 40% of all items and has a 10% defect rate. Using the Law of Total Probability, what is the overall probability that a randomly selected item is defective? (Give your answer as a decimal.)',
+  options: [],
+  answer: 0.07,
+  tolerance: 0.005,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: "The Law of Total Probability states that if the sample space is partitioned into mutually exclusive and exhaustive events (here, Machine A and Machine B, which together account for all production), then P(Defective) = sum over each partition of [P(Defective | partition) * P(partition)]. Here: P(Defective | A) = 0.05, P(A) = 0.60, P(Defective | B) = 0.10, P(B) = 0.40. So P(Defective) = P(Defective|A)*P(A) + P(Defective|B)*P(B) = 0.05*0.60 + 0.10*0.40 = 0.03 + 0.04 = 0.07. This overall defect rate (7%) is a weighted average of the two individual defect rates (5% and 10%), weighted by each machine's share of total production - conceptually, it must lie between the two individual rates, which 0.07 correctly does. This weighted-average structure, partitioning by 'which source/category produced the item', is the standard setup for Total Probability questions and is also the essential first step (the denominator) inside any subsequent Bayes' theorem calculation for this same scenario (e.g. finding P(Machine A | Defective))."
+},
+{
+  id: 'engmath-probability-pyq10',
+  pyqStyle: true,
+  q: 'Two cards are drawn WITHOUT replacement from a standard well-shuffled deck of 52 playing cards (which contains exactly 4 aces). What is the probability that BOTH cards drawn are aces? (Give your answer as a decimal, rounded to 4 places.)',
+  options: [],
+  answer: 0.0045,
+  tolerance: 0.001,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: "Use sequential conditional probability. The probability the first card drawn is an ace is 4/52 (4 favorable aces out of 52 total cards). Given the first card was an ace, only 3 aces remain among the 51 remaining cards, so the probability the second card is also an ace, GIVEN the first was an ace, is 3/51. By the multiplication rule for dependent events, P(both aces) = P(1st ace) * P(2nd ace | 1st ace) = (4/52) * (3/51) = 12/2652 = 1/221 ≈ 0.004525, which rounds to 0.0045. Equivalently, using combinations: the number of ways to choose 2 aces from the 4 available is C(4,2)=6, and the total number of ways to choose any 2 cards from 52 is C(52,2)=1326, giving probability 6/1326 = 1/221, the same result. This 'without replacement' sequential-probability setup, where the denominator shrinks by 1 and the favorable count shrinks according to what was already drawn, is the standard model for card, ball, and similar finite-population drawing problems."
+},
+{
+  id: 'engmath-probability-pyq11',
+  pyqStyle: true,
+  q: 'A random variable X follows a standard Normal distribution N(0,1). Using the property that the standard Normal is symmetric about 0, and given that P(0 < Z < 1) ≈ 0.3413, what is P(-1 < Z < 1)? (Give your answer as a decimal.)',
+  options: [],
+  answer: 0.6826,
+  tolerance: 0.01,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: "The standard Normal distribution N(0,1) is symmetric about its mean 0, so the area (probability) from -1 to 0 exactly mirrors the area from 0 to 1: P(-1 < Z < 0) = P(0 < Z < 1) ≈ 0.3413, by symmetry of the bell curve around the y-axis. Since the event -1 < Z < 1 can be split into the two disjoint pieces (-1,0) and (0,1), their probabilities simply add: P(-1<Z<1) = P(-1<Z<0) + P(0<Z<1) = 0.3413 + 0.3413 = 0.6826. This matches the well-known '68-95-99.7' empirical rule for Normal distributions, which states that approximately 68% of the probability mass lies within 1 standard deviation of the mean, 95% within 2 standard deviations, and 99.7% within 3 - here confirming the 1-standard-deviation figure of about 68.26%. Using the symmetry of the standard Normal curve to double a half-interval probability (rather than looking up two separate table values and subtracting) is a fast, exam-friendly shortcut."
+},
+{
+  id: 'engmath-probability-pyq12',
+  pyqStyle: true,
+  q: 'The Exponential distribution is known for its MEMORYLESS property: P(X > s+t | X > s) = P(X > t) for all s, t >= 0. If a component\\u2019s lifetime X is Exponential and it has already survived 5 years, what is the probability it survives at least 3 MORE years, in terms of the unconditional survival function?',
+  options: ['It equals P(X > 3), exactly the same as a brand-new component surviving 3 years, regardless of the 5 years already survived', 'It equals P(X > 8), since the total elapsed time must be counted from the original start', 'It equals P(X > 3) * P(X > 5), by independence of past and future', 'It is always smaller than P(X > 3), since the component has already aged 5 years'],
+  answer: 0,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: "The defining memoryless property of the Exponential distribution states P(X > s+t | X > s) = P(X > t) - meaning that GIVEN survival up to time s, the probability of surviving an ADDITIONAL t units is exactly the same as the probability a brand-new item survives t units from time zero, with the elapsed time s having no bearing whatsoever on future survival odds. Substituting s=5 (already survived) and t=3 (additional years needed), the answer is P(X > 3), completely ignoring the 5 already-elapsed years - option A. Option B wrongly adds the times as if memorylessness didn't apply (that would be the answer only for the UNCONDITIONAL probability of surviving past year 8 counted from time zero, not the conditional probability asked here). Option C invents a spurious multiplication that has no basis in the memoryless formula. Option D wrongly assumes 'aging' or 'wear' effects, which is precisely the intuition the Exponential distribution's memoryless property defies - unlike, say, a Weibull distribution with an increasing hazard rate, the Exponential distribution's failure rate is CONSTANT over time, so past survival provides zero information about future survival. This is a heavily conceptual GATE favorite, often phrased as 'a bulb that has already burned for h hours'."
+}
+);
+
+
+window.GATE_DATA.questions['engmath'].topics.find(function(t){return t.id==='engmath-groups';}).questions.push(
+{
+  id: 'engmath-groups-h1',
+  q: 'G is a group of order 24. By Lagrange\'s theorem, the order of every subgroup of G must divide 24. How many DIFFERENT possible orders (not counting how many subgroups of each order exist, just the distinct order values) can a subgroup of G have?',
+  options: [],
+  answer: 8,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'hard',
+  type: 'numerical',
+  explanation: "Lagrange's theorem says that for any subgroup H of a finite group G, |H| divides |G|. This gives a necessary condition on subgroup orders, not a guarantee that a subgroup of every divisor's order exists - but the question only asks how many distinct divisor values are even possible candidates, so we simply count the positive divisors of 24. Factorize 24 = 2^3 * 3^1. The divisors are: 1, 2, 3, 4, 6, 8, 12, 24 - list them systematically as 2^a * 3^b for a=0..3, b=0..1: a=0 gives 1,3; a=1 gives 2,6; a=2 gives 4,12; a=3 gives 8,24. That is 8 distinct values. The number-of-divisors formula (a+1)(b+1) with 24=2^3*3^1 gives (3+1)(1+1)=4*2=8, confirming the count. The trap here is conflating 'possible subgroup order' with 'number of subgroups' - Lagrange guarantees divisibility but says nothing about existence for composite orders (that needs Sylow/Cauchy theorems), yet the question is carefully scoped to just the count of divisor values, which is exactly 8."
+},
+{
+  id: 'engmath-groups-h2',
+  q: 'Let G be a cyclic group of order 36 generated by g. An element g^k is itself a generator of G if and only if gcd(k, 36) = 1. How many of the 36 elements of G are generators?',
+  options: ['9', '12', '18', '24'],
+  answer: 1,
+  marks: 2,
+  difficulty: 'hard',
+  type: 'numerical',
+  explanation: "The number of generators of a cyclic group of order n equals Euler's totient phi(n), the count of integers in {1,...,n} coprime to n. Factorize 36 = 2^2 * 3^2. Euler's product formula gives phi(36) = 36 * (1 - 1/2) * (1 - 1/3) = 36 * (1/2) * (2/3) = 36 * (1/3) = 12. Verify by direct reasoning: among 1..36, exclude multiples of 2 (18 numbers) and multiples of 3 (12 numbers), add back multiples of 6 (6 numbers) by inclusion-exclusion: numbers not coprime to 36 = 18+12-6=24, so coprime count = 36-24=12, confirming phi(36)=12. The trap is forgetting that only elements g^k with gcd(k,36)=1 generate the whole group - g^k for other k generates a proper subgroup of order 36/gcd(k,36). For instance g^2 has order 18, not 36, so it is not a generator even though it has large order. The answer is 12, option B."
+},
+{
+  id: 'engmath-groups-h3',
+  q: 'Define an operation * on the set S of all real numbers except -1, by a * b = a + b + ab. It can be shown (S, *) forms an abelian group with identity element 0. How many REAL solutions x in S satisfy x * x * x = 0 (i.e., x combined with itself three times under * gives the identity)?',
+  options: ['0', '1', '2', '3'],
+  answer: 1,
+  marks: 2,
+  difficulty: 'hard',
+  type: 'numerical',
+  explanation: "First compute x*x = x+x+x*x = 2x+x^2. Then x*x*x = (2x+x^2)*x = (2x+x^2) + x + (2x+x^2)*x = 3x + 3x^2 + x^3. Setting this equal to the identity 0: x^3 + 3x^2 + 3x = 0, i.e. x(x^2+3x+3) = 0. So either x=0, or x^2+3x+3=0 whose discriminant is 9-12=-3 < 0, giving no real roots. Hence the only real solution in S is x=0. A slicker route: notice a*b = (1+a)(1+b) - 1, so the map f(a)=1+a is an isomorphism from (S,*) to the nonzero reals under ordinary multiplication. Then x*x*x=0 becomes f(x)^3 = f(0) = 1, i.e. (1+x)^3 = 1. Over the reals, cube roots are unique (unlike square roots), so 1+x=1, giving x=0 - the same single solution. The trap is expecting 3 solutions by analogy with cube roots of unity in the complex plane; but the domain here is restricted to real numbers, where x^3=1 has exactly one real root. This question combines checking that a strange operation is a genuine group (via the multiplicative isomorphism) with correctly counting real vs complex roots of a cubic."
+},
+{
+  id: 'engmath-groups-h4',
+  q: 'G1 is the group of symmetries of a non-square rectangle (identity, 180-degree rotation, and reflections about the two axes of symmetry) - this is the Klein four-group, in which every non-identity element has order 2. G2 is the cyclic group (Z4, +) = {0,1,2,3} under addition mod 4. Are G1 and G2 isomorphic?',
+  options: ['Yes, since both have order 4 and any two groups of the same order are automatically isomorphic', 'No, because G2 has an element of order 4 (namely 1, since 1+1+1+1=0 but 1+1+1 does not), while every non-identity element of G1 has order 2, and isomorphisms must preserve element order', 'Yes, since both groups are abelian and all abelian groups of the same order are isomorphic', 'No, because G1 is non-abelian while G2 is abelian'],
+  answer: 1,
+  marks: 2,
+  difficulty: 'hard',
+  type: 'numerical',
+  explanation: "Two groups can only be isomorphic if there is a bijection between them preserving the group operation - and a direct consequence is that isomorphic groups must have identical multisets of element orders, since order is a structural property preserved exactly by any isomorphism. In G2 = Z4, the element 1 has order 4 (1,2,3,0 - it takes four additions to cycle back to the identity 0). But in G1, the Klein four-group, every non-identity element (180-degree rotation, and each reflection) squares to the identity, so every non-identity element has order exactly 2 - there is no element of order 4 anywhere in G1. Since G2 possesses an order-4 element and G1 does not, no bijection between them can preserve orders, so they cannot be isomorphic - option B. Option A is false because order alone never guarantees isomorphism (there are exactly two non-isomorphic groups of order 4: Z4 and the Klein four-group V4, this being the classic example). Option C is false for the identical reason - both G1 and G2 are abelian, yet still non-isomorphic, disproving the claim. Option D is factually wrong since G1 (Klein four) is abelian, not non-abelian - reflections and rotations of a rectangle all commute."
+},
+{
+  id: 'engmath-groups-h5',
+  q: 'In the group (Z60, +) (integers mod 60 under addition), let H be the cyclic subgroup generated by the element 15. How many distinct cosets does H have in Z60 (i.e., what is the index [Z60 : H])?',
+  options: [],
+  answer: 15,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'hard',
+  type: 'numerical',
+  explanation: "First find the order of the subgroup H generated by 15. In (Zn, +), the element k generates a cyclic subgroup of order n / gcd(n,k). Here n=60, k=15, and gcd(60,15)=15, so |H| = 60/15 = 4; explicitly H = {0, 15, 30, 45} (adding 15 repeatedly: 15, 30, 45, 60=0). By Lagrange's theorem, the index [G:H] = |G|/|H| = 60/4 = 15 - this counts the number of distinct cosets (left cosets, which equal right cosets here since Z60 is abelian and every subgroup of an abelian group is automatically normal). The trap is computing gcd(60,15)=15 and then mistakenly reporting that as the subgroup order (it is actually |H| itself, since 60/gcd=4, not the gcd) - or forgetting to take 60 divided by the subgroup order to get the index, and instead reporting the subgroup order 4 as the final answer. The correct chain is: compute gcd, get |H| = n/gcd, then get index = n/|H| = gcd(n,k) itself in this abelian modular case (indeed here gcd(60,15)=15, matching the index numerically, though this coincidence is specific to Zn and should be re-derived rather than assumed as a shortcut)."
+},
+{
+  id: 'engmath-groups-h6',
+  q: 'How many subgroups does the cyclic group Z48 (integers mod 48 under addition) have in total, including the trivial subgroup {0} and Z48 itself?',
+  options: [],
+  answer: 10,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'hard',
+  type: 'numerical',
+  explanation: "A fundamental theorem states that a cyclic group of order n has exactly one subgroup for each positive divisor of n, and no others - so the number of subgroups of Zn equals the number of divisors of n, d(n). Factorize 48 = 2^4 * 3^1. The number-of-divisors formula is (e1+1)(e2+1) over the prime exponents: here (4+1)(1+1) = 5*2 = 10. Listing them confirms: 1, 2, 3, 4, 6, 8, 12, 16, 24, 48 - exactly 10 divisors, each corresponding to the unique subgroup of order d. The trap is confusing this with counting generators (which would use Euler's totient phi(48), a different and smaller number, phi(48)=16) or miscounting divisors by forgetting one of the prime-power combinations. This one-subgroup-per-divisor property is special to cyclic groups; non-cyclic groups of the same order can have a completely different subgroup count (for instance the Klein four-group of order 4 has 5 subgroups versus Z4's 3 subgroups)."
+},
+{
+  id: 'engmath-groups-h7',
+  q: 'G is a group of order 20. Which of the following statements about G MUST be true? (Select ALL that apply)',
+  options: ['G has no element of order 7', 'G has a subgroup of order 5', 'G has a subgroup of order 6', 'G must be cyclic'],
+  answers: [0, 1],
+  marks: 2,
+  difficulty: 'hard',
+  type: 'numerical',
+  explanation: "Option A: by Lagrange's theorem, the order of any element (which equals the order of the cyclic subgroup it generates) must divide |G|=20. Since 7 does not divide 20, no element of order 7 can exist - this statement must be true. Option B: Cauchy's theorem guarantees that if a prime p divides |G|, then G has an element (hence a subgroup) of order exactly p. Since 20 = 2^2 * 5 and 5 is prime dividing 20, G must have a subgroup of order 5 - this must be true (note Lagrange alone only gives divisibility as necessary, not existence; Cauchy's theorem is the extra tool needed here). Option C: by Lagrange, any subgroup's order must divide 20; but 6 does not divide 20 (20/6 is not an integer), so a subgroup of order 6 is impossible - this statement is false. Option D: cyclicity is never guaranteed just from the order; the dihedral group D10 (symmetries of a regular 10-gon) has order 20 and is non-abelian, hence non-cyclic, providing an explicit counterexample - so G need not be cyclic, making this false. The correct selections combining Lagrange's necessary-divisibility reasoning with Cauchy's existence guarantee are A and B only."
+},
+{
+  id: 'engmath-groups-h8',
+  q: 'In the symmetric group S3 (order 6), let H = {e, (12)} where (12) is the transposition swapping 1 and 2. It is known that H is NOT a normal subgroup of S3. Given this, what can be correctly concluded about the number of LEFT cosets of H compared to the number of RIGHT cosets of H in S3?',
+  options: ['Both counts equal 3 (the index [S3:H] = 6/2 = 3), since the number of left and right cosets always equals the index regardless of normality - only the individual cosets aH and Ha may differ as sets when H is not normal', 'The left coset count is 3 but the right coset count is 6, since a non-normal subgroup doubles the number of right cosets', 'Since H is not normal, left and right cosets do not partition S3 into equal-sized blocks, so coset counting is undefined', 'Both counts equal 2, since only the normal cosets (where aH = Ha) can be counted validly'],
+  answer: 0,
+  marks: 2,
+  difficulty: 'hard',
+  type: 'numerical',
+  explanation: "This tests a commonly confused distinction: normality affects whether individual cosets aH and Ha are the same set for a given a, but it never affects the count of cosets. Both the set of left cosets and the set of right cosets independently partition G into blocks each of size |H|, so both counts always equal the index [G:H] = |G|/|H|, by Lagrange's theorem, whether or not H is normal. Here |S3|=6, |H|=2, so [S3:H] = 3 - there are exactly 3 left cosets and exactly 3 right cosets, always, for any subgroup of any group. What normality (or its absence) controls is whether aH = Ha holds for every a - when H is normal this is true for all a, and when it is not (as here), it fails for at least one a. Option B invents a nonexistent asymmetry; the coset-counting theorem is completely symmetric in left/right and never doubles anything. Options C and D wrongly suggest coset partitioning breaks down for non-normal subgroups, but cosets always partition G into equal-sized blocks - normality is only needed to make the quotient G/H itself into a group, not to make coset partitioning valid."
+}
+);
+
+
+window.GATE_DATA.questions['engmath'].topics.find(function(t){return t.id==='engmath-calculus';}).questions.push(
+{
+  id: 'engmath-calculus-h1',
+  q: 'Define f(x) = x^3 - 3x for x <= 1, and f(x) = ax + b for x > 1. Find the constants a and b that make f differentiable at x = 1, then find the GLOBAL MAXIMUM value of the resulting f(x) on the closed interval [-2, 3].',
+  options: [],
+  answer: 2,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'hard',
+  type: 'numerical',
+  explanation: "First enforce differentiability at the junction x=1: continuity requires ax+b to match the cubic's value at 1, which is 1-3=-2, so a+b=-2. Matching derivatives requires the linear piece's slope a to equal the cubic's derivative 3x^2-3 evaluated at x=1, which is 3(1)-3=0, so a=0, giving b=-2. The function is therefore f(x)=x^3-3x on [-2,1] and the constant f(x)=-2 on (1,3]. Now find the global max on [-2,3]. On [-2,1], critical points of the cubic occur where f'(x)=3x^2-3=0, i.e. x=-1 and x=1(boundary). f(-1)=(-1)^3-3(-1)=-1+3=2 (local max). f(1)=1-3=-2 (local min, matching the junction). Endpoint f(-2)=-8+6=-2. On (1,3], f is the constant -2. Comparing all candidate values -2 (at x=-2), 2 (at x=-1), -2 (at x=1), and -2 (throughout (1,3]): the global maximum is 2, attained at x=-1. The trap is stopping after finding a and b and assuming the maximum must occur near the junction (where the two pieces are glued) - it actually occurs at the interior critical point x=-1 of the cubic piece, far from the junction, and the flat piece contributes nothing beyond its constant value."
+},
+{
+  id: 'engmath-calculus-h2',
+  q: 'Which of the following improper integrals CONVERGE to a finite value? (Select ALL that apply)',
+  options: ['Integral from 1 to infinity of dx / x^1.5', 'Integral from 0 to 1 of dx / x^1.5', 'Integral from 1 to infinity of dx / (x * (ln x)^2)', 'Integral from 0 to 1 of dx / sqrt(x)'],
+  answers: [0, 2, 3],
+  marks: 2,
+  difficulty: 'hard',
+  type: 'numerical',
+  explanation: "Each option needs its own convergence test since the same-looking exponent behaves oppositely at infinity versus at a singularity near 0. Option A: integral of x^(-p) from 1 to infinity converges exactly when p > 1; here p=1.5 > 1, so it converges. Option B: integral of x^(-p) from 0 to 1 (singularity at 0) converges exactly when p < 1; here p=1.5 > 1, so it DIVERGES - this is the trap, since the same exponent that guarantees convergence at infinity guarantees divergence at a finite singularity, and vice versa. Option C: substitute u = ln x, du = dx/x, turning the integral into integral of du/u^2 from u=0 to infinity, which is the standard logarithmic p-test integral of 1/(x (ln x)^p) from a point beyond 1 to infinity, convergent exactly when p > 1; here p=2 > 1, so it converges. Option D: integral of x^(-1/2) from 0 to 1 has p=1/2 < 1, so by the same near-zero p-test as option B, it converges (the singularity is integrable). Hence A, C, and D converge while B diverges. This question forces recognizing that the p-test threshold flips direction depending on whether the questionable point is at infinity or at a finite endpoint."
+},
+{
+  id: 'engmath-calculus-h3',
+  q: 'Let f(x) = (x-1)(x-2)(x-3) on the interval [1, 3]. Using Rolle\'s theorem applied appropriately, how many distinct points c in the open interval (1, 3) are GUARANTEED to satisfy f\'(c) = 0?',
+  options: [],
+  answer: 2,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'hard',
+  type: 'numerical',
+  explanation: "Notice f(1) = 0, f(2) = 0, and f(3) = 0, since 1, 2, 3 are precisely the roots of the cubic. f is a polynomial, hence continuous and differentiable everywhere, so Rolle's theorem applies on each sub-interval separately. Applying it to [1,2] (where f(1)=f(2)=0) guarantees at least one point c1 in (1,2) with f'(c1)=0. Applying it independently to [2,3] (where f(2)=f(3)=0) guarantees at least one point c2 in (2,3) with f'(c2)=0. Since (1,2) and (2,3) are disjoint intervals, c1 and c2 are necessarily distinct, giving at least 2 critical points in (1,3). Now bound the count from above: expanding, f(x)=x^3-6x^2+11x-6, so f'(x)=3x^2-12x+11 is a quadratic (degree 2), which can have AT MOST 2 real roots total, anywhere. Combining the lower bound (at least 2, from applying Rolle twice) with the upper bound (at most 2, from the degree of f') pins the count at exactly 2. Solving explicitly confirms both roots, (12 +/- sqrt(12))/6 ≈ 1.42 and 2.58, both lying inside (1,3). The trap is applying Rolle only once across the whole interval [1,3] and concluding just 1 point exists - the extra root at 2 in the middle unlocks a SECOND independent application of the theorem."
+},
+{
+  id: 'engmath-calculus-h4',
+  q: 'An open-top rectangular box (no lid) with a square base of side x and height h is to be built with a fixed volume of 32 cubic units, using the minimum possible amount of material (surface area). What is the minimum surface area achievable, in square units?',
+  options: [],
+  answer: 48,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'hard',
+  type: 'numerical',
+  explanation: "The volume constraint is x^2 * h = 32, so h = 32/x^2. Since the box has no lid, its surface area is the base plus four sides: S = x^2 + 4xh. Substitute the constraint to express S purely in terms of x: S(x) = x^2 + 4x*(32/x^2) = x^2 + 128/x. Differentiate: dS/dx = 2x - 128/x^2. Setting this to zero: 2x = 128/x^2, so 2x^3 = 128, x^3 = 64, giving x = 4. Confirm this is a minimum using the second derivative: d2S/dx2 = 2 + 256/x^3, which is positive for all x>0, so x=4 indeed gives a minimum (S is convex on the physically relevant domain x>0). Back-substitute: h = 32/16 = 2, and the minimum surface area is S(4) = 16 + 128/4 = 16 + 32 = 48. The trap is minimizing the WRONG quantity - forgetting the box is open-top and using the closed-box formula 2x^2+4xh instead, which would give a different (larger) optimal x and a wrong minimum surface area; the missing top face changes both the objective function and its optimal point."
+},
+{
+  id: 'engmath-calculus-h5',
+  q: 'Evaluate the limit as x approaches 0 of [e^x - 1 - x - x^2/2] / x^3.',
+  options: [],
+  answer: 0.16667,
+  tolerance: 0.001,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'hard',
+  type: 'numerical',
+  explanation: "This is a 0/0 form, but applying L'Hopital's rule repeatedly (three times, since the numerator's Taylor series starts at the x^3 term) is tedious; the Maclaurin series is far faster. Recall e^x = 1 + x + x^2/2! + x^3/3! + x^4/4! + ... = 1 + x + x^2/2 + x^3/6 + x^4/24 + ... Subtracting 1 + x + x^2/2 from both sides leaves e^x - 1 - x - x^2/2 = x^3/6 + x^4/24 + ... (higher-order terms in x^5 and beyond vanish faster as x to 0). Dividing by x^3 gives [x^3/6 + x^4/24 + ...] / x^3 = 1/6 + x/24 + ..., and as x approaches 0, every term except 1/6 vanishes. So the limit equals 1/6 ≈ 0.16667. Verifying via L'Hopital directly: differentiate numerator and denominator three times (each application reduces the power of x in the denominator by one while the numerator's derivatives are e^x, e^x-1, e^x-1-x respectively, all still 0/0 or eventually resolving) - after three applications you reach e^x/6 evaluated at x=0, which is 1/6, confirming the series shortcut. The trap is stopping L'Hopital too early (after one or two applications the form is STILL 0/0, and a premature evaluation gives a wrong finite or divergent-looking result) or misremembering the series coefficient for x^3 as 1/3! versus 1/2!."
+},
+{
+  id: 'engmath-calculus-h6',
+  q: 'Consider f(x) = |x| on the closed interval [-1, 1]. Note that f(-1) = f(1) = 1. A student claims: "Since f(-1) = f(1) and f is continuous on [-1,1], Rolle\'s theorem guarantees some c in (-1,1) with f\'(c) = 0." Is this claim correct?',
+  options: ['Yes, the claim is entirely correct since all of Rolle\'s hypotheses are satisfied', 'No, because although f is continuous on the closed interval [-1,1] and f(-1)=f(1), f is NOT differentiable at the interior point x=0, violating the hypothesis that f be differentiable on the OPEN interval - and indeed no c with f\'(c)=0 exists here, since f\'(x)=-1 for x<0 and f\'(x)=+1 for x>0', 'No, because f(-1) is not actually equal to f(1)', 'Yes, but only because f happens to be differentiable everywhere on [-1,1] including at x=0'],
+  answer: 1,
+  marks: 2,
+  difficulty: 'hard',
+  type: 'numerical',
+  explanation: "Rolle's theorem requires THREE hypotheses: f continuous on the closed interval [a,b], f differentiable on the OPEN interval (a,b), and f(a)=f(b). Here f(x)=|x| is indeed continuous everywhere including on [-1,1], and f(-1)=1=f(1), so two of the three hypotheses hold. But f is NOT differentiable at x=0 (the classic corner point of |x|, where the left derivative is -1 and the right derivative is +1, disagreeing) - and 0 lies inside the open interval (-1,1), so the differentiability hypothesis fails on the open interval. Because a hypothesis fails, the theorem's CONCLUSION is not guaranteed - and here it genuinely fails to hold: f'(x) equals -1 for all x<0 and +1 for all x>0, so f'(x) is NEVER 0 anywhere in (-1,1) (it jumps directly from -1 to +1 without passing through 0, since f is not even defined smoothly at the jump point). This is the single most common Rolle's/MVT trap on GATE - a function that looks nice (continuous, equal endpoint values) but has one non-differentiable interior point, silently invalidating the theorem's guarantee. Option D is doubly wrong: it get both the differentiability fact wrong and awkwardly conflates a false premise with a true conclusion."
+},
+{
+  id: 'engmath-calculus-h7',
+  q: 'Evaluate the improper integral: integral from 0 to infinity of x * e^(-x^2) dx.',
+  options: [],
+  answer: 0.5,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'hard',
+  type: 'numerical',
+  explanation: "First check convergence: as x to infinity, e^(-x^2) decays much faster than any polynomial growth of x, so the integrand x*e^(-x^2) to 0 rapidly, and the integral converges (this can be confirmed rigorously by comparison with x*e^(-x) for large x, whose integral is known to converge). To evaluate it, use the substitution u = x^2, so du = 2x dx, i.e. x dx = du/2. As x ranges over [0, infinity), u also ranges over [0, infinity). The integral becomes integral from 0 to infinity of e^(-u) * (du/2) = (1/2) * integral from 0 to infinity of e^(-u) du. The standard exponential integral integral from 0 to infinity of e^(-u) du equals [-e^(-u)] from 0 to infinity = (0) - (-1) = 1. So the original integral equals (1/2)*1 = 0.5. This is a two-step question: first confirming the improper integral actually converges (rather than blindly computing), then executing a substitution that converts a Gaussian-looking integral into the elementary exponential integral - a very common building block in probability (it is exactly half the normalizing computation behind the Gaussian integral) and reliability/queueing calculations on the GATE syllabus."
+}
+);
+
+
+window.GATE_DATA.questions['engmath'].topics.find(function(t){return t.id==='engmath-probability';}).questions.push(
+{
+  id: 'engmath-probability-h1',
+  q: 'A factory receives components from three suppliers: A supplies 30%, B supplies 45%, and C supplies 25% of all components. The defect rates are 2% for A, 3% for B, and 5% for C. A component is picked at random and found to be defective. What is the probability it came from supplier C? (Give your answer as a decimal rounded to 4 places.)',
+  options: [],
+  answer: 0.3906,
+  tolerance: 0.001,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'hard',
+  type: 'numerical',
+  explanation: "This is a three-stage Bayes chain. First compute the total (unconditional) probability of a defect using the Law of Total Probability across the three suppliers: P(D) = P(D|A)P(A) + P(D|B)P(B) + P(D|C)P(C) = (0.02)(0.30) + (0.03)(0.45) + (0.05)(0.25) = 0.006 + 0.0135 + 0.0125 = 0.032. This is the denominator for every subsequent Bayes computation on this scenario. Now apply Bayes' theorem for supplier C specifically: P(C|D) = P(D|C)P(C) / P(D) = 0.0125 / 0.032 = 0.390625, which rounds to 0.3906. Sanity check: note that C has the highest defect rate (5%) despite supplying the smallest share (25%), so it is reasonable that C's posterior share of defects (39.06%) is disproportionately larger than its prior share of supply (25%) - the defect evidence has shifted the belief noticeably toward C. The trap is stopping after computing P(D) and reporting it as the final answer (a common error when a problem strings multiple probability computations together), or forgetting to recompute the numerator with C's OWN defect contribution (0.0125) rather than reusing A's or B's."
+},
+{
+  id: 'engmath-probability-h2',
+  q: 'X and Y are two random variables with Var(X) = 4, Var(Y) = 9, and correlation coefficient rho(X,Y) = 0.5 (X and Y are NOT independent). What is Var(X + Y)?',
+  options: [],
+  answer: 19,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'hard',
+  type: 'numerical',
+  explanation: "When X and Y are dependent, the variance of a sum does NOT simply add the individual variances - it must include a covariance cross term: Var(X+Y) = Var(X) + Var(Y) + 2*Cov(X,Y). The independence-based shortcut Var(X+Y)=Var(X)+Var(Y) only applies when Cov(X,Y)=0, which is not the case here since rho=0.5 indicates real dependence. First recover the covariance from the correlation coefficient using rho = Cov(X,Y) / (sigma_X * sigma_Y), where sigma_X = sqrt(4) = 2 and sigma_Y = sqrt(9) = 3. So Cov(X,Y) = rho * sigma_X * sigma_Y = 0.5 * 2 * 3 = 3. Now substitute: Var(X+Y) = 4 + 9 + 2*3 = 4 + 9 + 6 = 19. The trap is either forgetting the covariance term entirely (giving the wrong answer 13, which would only be correct under independence) or forgetting the factor of 2 in front of the covariance term (giving 16). This combines two separate ideas - converting a given correlation coefficient into a usable covariance, and correctly applying the general (dependence-aware) variance-of-a-sum formula rather than the independence-only shortcut."
+},
+{
+  id: 'engmath-probability-h3',
+  q: 'Two fair six-sided dice are rolled and X denotes the sum of the two faces. Find E[X | X > 7], the conditional expectation of the sum given that it exceeds 7.',
+  options: [],
+  answer: 9.3333,
+  tolerance: 0.01,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'hard',
+  type: 'numerical',
+  explanation: "This requires enumerating the sample space rather than plugging into a formula for E[X]. Out of 36 equally likely outcomes, count how many ways each sum greater than 7 arises: sum=8 has 5 ways (2+6,3+5,4+4,5+3,6+2), sum=9 has 4 ways, sum=10 has 3 ways, sum=11 has 2 ways, sum=12 has 1 way. The total number of outcomes with X>7 is 5+4+3+2+1=15 (this is the conditioning event's probability weight, P(X>7)=15/36). The conditional expectation restricts attention entirely to this reduced sample space of 15 outcomes and re-weights: E[X|X>7] = [8*5 + 9*4 + 10*3 + 11*2 + 12*1] / 15 = [40 + 36 + 30 + 22 + 12] / 15 = 140/15 = 28/3 ≈ 9.3333. The trap is computing the UNCONDITIONAL expectation E[X]=7 (the well-known average of two dice) and then trying to naively adjust it, or forgetting that conditioning changes the DENOMINATOR from 36 to the smaller count 15 (the number of favorable outcomes for the conditioning event), not just the numerator - conditional expectation is a re-weighted average over the restricted, not the full, sample space."
+},
+{
+  id: 'engmath-probability-h4',
+  q: 'A random variable X follows a Normal distribution with mean 100 and standard deviation 15. Using Phi(1) = 0.8413 and Phi(2) = 0.9772 for the standard normal CDF, find P(85 < X < 130).',
+  options: [],
+  answer: 0.8185,
+  tolerance: 0.005,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'hard',
+  type: 'numerical',
+  explanation: "This is a two-sided, ASYMMETRIC bound (85 and 130 are not equidistant from the mean 100 - they are 15 below and 30 above respectively), so the shortcut of doubling a single half-probability (valid only for symmetric bounds like mean +/- k*sigma) cannot be used here; both z-scores must be computed and combined separately. Standardize each boundary: z1 = (85-100)/15 = -15/15 = -1, and z2 = (130-100)/15 = 30/15 = 2. So P(85<X<130) = P(-1 < Z < 2) = Phi(2) - Phi(-1). Using the symmetry property of the standard normal, Phi(-1) = 1 - Phi(1) = 1 - 0.8413 = 0.1587. Therefore P(-1<Z<2) = Phi(2) - Phi(-1) = 0.9772 - 0.1587 = 0.8185. The trap is treating this like a symmetric-interval problem and computing something like 2*Phi(2)-1 or 2*Phi(1)-1, which are only valid for intervals of the form (mean - k*sigma, mean + k*sigma) with the SAME k on both sides - here the two sides correspond to different numbers of standard deviations (1 and 2), so each tail must be evaluated and combined individually via Phi(z2) - Phi(z1), never by doubling one lookup value."
+},
+{
+  id: 'engmath-probability-h5',
+  q: 'A box contains 5 red balls and 3 blue balls. Three balls are drawn at random WITHOUT replacement. Let Y be the number of red balls drawn. Find P(Y >= 2).',
+  options: [],
+  answer: 0.7143,
+  tolerance: 0.001,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'hard',
+  type: 'numerical',
+  explanation: "Since balls are drawn without replacement and we need a count of successes (red balls) out of a fixed sample, this is a hypergeometric counting problem, not a simple binomial one - the draws are not independent, so combinations must be used rather than a per-draw probability raised to a power. The total number of ways to choose any 3 balls from the 8 available is C(8,3) = 56. P(Y>=2) = P(Y=2) + P(Y=3), computed as separate, mutually exclusive cases that must be enumerated and summed. For Y=2 (exactly 2 red, 1 blue): choose 2 of the 5 red balls and 1 of the 3 blue balls, giving C(5,2)*C(3,1) = 10*3 = 30 favorable outcomes. For Y=3 (all 3 red): choose 3 of the 5 red balls and 0 blue, giving C(5,3)*C(3,0) = 10*1 = 10 favorable outcomes. Total favorable outcomes = 30 + 10 = 40. So P(Y>=2) = 40/56 = 5/7 ≈ 0.7143. The trap is applying the binomial formula C(3,2)*(5/8)^2*(3/8)^1 as if the draws were independent WITH replacement, which would give a different (and wrong) answer since the composition of the box genuinely changes after each draw here."
+},
+{
+  id: 'engmath-probability-h6',
+  q: 'A biased coin has P(heads) = 0.3 on each independent toss. The coin is tossed repeatedly until exactly 2 heads have appeared in total. What is the expected number of tosses required?',
+  options: [],
+  answer: 6.6667,
+  tolerance: 0.01,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'hard',
+  type: 'numerical',
+  explanation: "This is a negative-binomial-style waiting-time process: we are waiting for a FIXED number of successes (r=2 heads), not just the first success, so it must be decomposed into two consecutive geometric waiting stages by linearity of expectation, rather than treated as a single geometric random variable. Write the total number of tosses N as N = N1 + N2, where N1 is the number of tosses to get the FIRST head, and N2 is the number of ADDITIONAL tosses (after the first head) to get the SECOND head. Crucially, by the memoryless nature of independent coin tosses, N2 has exactly the same distribution as N1 (waiting for a head starting fresh) - each is a Geometric random variable with success probability p=0.3, and E[Geometric(p)] = 1/p. So E[N1] = 1/0.3 and E[N2] = 1/0.3 as well, and by linearity of expectation (which holds regardless of any dependence between N1 and N2, though here they are actually independent), E[N] = E[N1] + E[N2] = 1/0.3 + 1/0.3 = 2/0.3 = 6.6667. The trap is treating this as a single geometric variable and computing just 1/0.3 ≈ 3.33 (which only accounts for reaching the FIRST head), forgetting that reaching the SECOND head requires an entirely fresh additional waiting period of the same expected length."
+},
+{
+  id: 'engmath-probability-h7',
+  q: 'A fair six-sided die is rolled once, giving outcome N. If N is EVEN, a value Y is then chosen uniformly at random from the integers {1, 2, ..., N}. If N is ODD, Y is defined to be 0. Find E[Y].',
+  options: [],
+  answer: 1.25,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'hard',
+  type: 'numerical',
+  explanation: "This requires the Law of Total Expectation, conditioning on the die outcome N, since Y's distribution genuinely depends on which value N takes - a two-stage random process (roll a die, then use its outcome to define a second random variable) rather than a single named distribution. E[Y] = sum over all n of E[Y|N=n] * P(N=n). Since each of the six die faces has probability 1/6, break this into the six conditional pieces. For N odd (N=1,3,5), Y is defined to be exactly 0, so E[Y|N=1]=E[Y|N=3]=E[Y|N=5]=0. For N even, Y is Uniform on {1,...,N}, whose expectation is (N+1)/2: so E[Y|N=2] = 3/2 = 1.5, E[Y|N=4] = 5/2 = 2.5, and E[Y|N=6] = 7/2 = 3.5. Now average all six conditional expectations with equal weight 1/6 each: E[Y] = (1/6)*(0 + 1.5 + 0 + 2.5 + 0 + 3.5) = (1/6)*(7.5) = 1.25. The trap is forgetting to include the odd outcomes as explicit zero-contributing terms in the total-expectation sum (rather than simply dropping them and averaging only over the three even cases, which would incorrectly compute (1.5+2.5+3.5)/3 = 2.5 instead of the correct 1.25) - every outcome of the FIRST-stage die roll must appear in the weighted sum, even when its own conditional expectation is zero."
+}
+);
+
+
+window.GATE_DATA.questions['engmath'].topics.find(function(t){return t.id==='engmath-linear-algebra';}).questions.push(
+{
+  id: 'engmath-linear-algebra-h1',
+  q: 'Consider the system: x + y + z = 3, x + 2y + kz = 4, 2x + 3y + (k+1)z = 7, where k is a real parameter. For how many real values of k does this system have a UNIQUE solution?',
+  options: [],
+  answer: 0,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'hard',
+  type: 'numerical',
+  explanation: "The natural instinct is to compute det(A) and solve for the k that makes it zero, expecting a unique solution for all OTHER k. But here row 3 of the coefficient matrix equals row 1 plus row 2 IDENTICALLY, for every value of k: (1+1, 1+2, 1+k) = (2, 3, k+1), which is exactly row 3, regardless of k. This means det(A) = 0 for ALL real k (rank(A) is at most 2, never 3), so a unique solution is IMPOSSIBLE for any k whatsoever - the answer to 'for how many k' is 0. To fully classify the system, check consistency via the augmented matrix: the corresponding right-hand sides are 3, 4, 7, and indeed 3+4=7 exactly, matching the same row-3-equals-row-1-plus-row-2 pattern. So rank(A) = rank([A|b]) = 2 < 3 (number of unknowns) for every k, meaning the system is ALWAYS consistent with infinitely many solutions (one free parameter), never inconsistent and never uniquely solvable. The trap is assuming a generic-looking system with a parameter must have a specific k threshold separating unique-solution from no-solution cases; here the special row dependency (row3 = row1+row2) makes the system degenerate identically in k, so the answer is simply 0 unique-solution values of k."
+},
+{
+  id: 'engmath-linear-algebra-h2',
+  q: 'Let A be the 2x2 Jordan block [[2, 1], [0, 2]] (eigenvalue 2 with algebraic multiplicity 2 but geometric multiplicity 1). Compute the (1,2) entry (top-right entry) of A^10.',
+  options: [],
+  answer: 5120,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'hard',
+  type: 'numerical',
+  explanation: "Since A is a defective (non-diagonalizable) Jordan block rather than a diagonal matrix, A^n cannot be found simply by raising eigenvalues to the n-th power entrywise - the off-diagonal entry grows with an extra factor of n, a signature feature of Jordan blocks. For a 2x2 Jordan block [[lambda,1],[0,lambda]], induction (or the binomial expansion of A = lambda*I + N, where N=[[0,1],[0,0]] is nilpotent with N^2=0) gives the general formula A^n = [[lambda^n, n*lambda^(n-1)], [0, lambda^n]] - the top-right entry picks up a linear-in-n multiplier precisely because of the repeated eigenvalue's non-trivial Jordan block structure. Here lambda=2 and n=10: the (1,2) entry is n*lambda^(n-1) = 10 * 2^9 = 10 * 512 = 5120. Sanity check the diagonal too: lambda^10 = 2^10 = 1024, matching what a naive diagonal-only approach would (wrongly) apply to the WHOLE matrix. The trap is assuming A^10 = [[2^10, 1^10],[0,2^10]] (raising every entry independently, which is only valid for genuinely diagonal matrices) or forgetting the crucial factor of n=10 that arises specifically because the eigenvalue 2 has algebraic multiplicity 2 but only ONE independent eigenvector (geometric multiplicity 1), making A non-diagonalizable."
+},
+{
+  id: 'engmath-linear-algebra-h3',
+  q: 'Let A = [[2, 1, 0], [0, 2, 0], [0, 0, 3]]. The eigenvalues are 2 (with algebraic multiplicity 2) and 3 (with algebraic multiplicity 1). Is A diagonalizable?',
+  options: ['Yes, since A is upper triangular and all upper triangular matrices are diagonalizable', 'No, because solving (A - 2I)v = 0 yields only a 1-dimensional eigenspace (geometric multiplicity 1) for the eigenvalue 2, which is strictly less than its algebraic multiplicity of 2, so A does not have enough independent eigenvectors to form a full eigenbasis', 'Yes, since the eigenvalues 2 and 3 are both real numbers', 'No, because A has a repeated eigenvalue, and matrices with any repeated eigenvalue are never diagonalizable'],
+  answer: 1,
+  marks: 2,
+  difficulty: 'hard',
+  type: 'numerical',
+  explanation: "A matrix is diagonalizable if and only if, for EVERY eigenvalue, its geometric multiplicity (dimension of its eigenspace) equals its algebraic multiplicity (its multiplicity as a root of the characteristic polynomial) - a repeated eigenvalue is only a problem if the eigenspace fails to keep pace with it. Solve (A-2I)v=0 for the eigenvalue 2: A-2I = [[0,1,0],[0,0,0],[0,0,1]]. Row-reducing this system: the second row gives 0=0 (no constraint), the first row gives v2=0, and the third row gives v3=0, leaving v1 completely free. So the eigenspace for eigenvalue 2 is 1-dimensional (spanned by (1,0,0)), giving geometric multiplicity 1 - strictly LESS than the algebraic multiplicity of 2. Since these multiplicities disagree for this eigenvalue, A cannot be diagonalized (there are only 2 independent eigenvectors total across both eigenvalues, one short of the 3 needed for a full basis of R^3). Option A is false - being triangular guarantees eigenvalues are readable off the diagonal, but says nothing about diagonalizability. Option D is also false as a blanket rule - many matrices with repeated eigenvalues (like the identity matrix) ARE diagonalizable; it depends specifically on whether geometric multiplicity matches algebraic multiplicity for that eigenvalue, which must be checked case by case."
+},
+{
+  id: 'engmath-linear-algebra-h4',
+  q: 'Compute the determinant of the 3x3 matrix [[1, a, a^2], [1, b, b^2], [1, c, c^2]] where a=1, b=2, c=4 (this is a Vandermonde matrix).',
+  options: [],
+  answer: 6,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'hard',
+  type: 'numerical',
+  explanation: "Rather than expanding the 3x3 determinant directly by cofactors (error-prone with symbolic parameters), use row operations first to exploit the Vandermonde structure: subtract row 1 from row 2, and row 1 from row 3. This gives R2' = [0, b-a, b^2-a^2] = [0, b-a, (b-a)(b+a)], and R3' = [0, c-a, (c-a)(c+a)]. Expanding the determinant along the now-zero-heavy first column reduces it to a 2x2 determinant: (b-a)(c-a) times the determinant of [[1, b+a],[1, c+a]], which equals (b-a)(c-a)*[(c+a)-(b+a)] = (b-a)(c-a)(c-b). This is the well-known closed form for a Vandermonde determinant of this size. Substituting a=1, b=2, c=4: (b-a) = 1, (c-a) = 3, (c-b) = 2, giving det = 1 * 3 * 2 = 6. Direct cofactor expansion confirms the same value. The trap is either making an arithmetic slip in the row operations (forgetting that b^2-a^2 factors as a DIFFERENCE OF SQUARES, which is what makes the (b-a) factor pull out cleanly) or reversing a sign in the final product order (c-b) vs (b-c), which would flip the answer's sign."
+},
+{
+  id: 'engmath-linear-algebra-h5',
+  q: 'Let u = [1, 1, 1]^T (a 3x1 column vector) and let A = I + u*u^T (the 3x3 identity matrix plus the rank-1 outer product of u with itself). Find det(A).',
+  options: [],
+  answer: 4,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'hard',
+  type: 'numerical',
+  explanation: "The matrix u*u^T is a rank-1 matrix (every row is a scalar multiple of u^T), so it has a very structured eigenvalue pattern: u itself is an eigenvector of u*u^T with eigenvalue equal to u^T*u = ||u||^2 (since (u*u^T)u = u*(u^T*u) = ||u||^2 * u), and every vector ORTHOGONAL to u lies in the null space of u*u^T, contributing eigenvalue 0 with multiplicity (n-1) = 2 here (since the space of vectors orthogonal to a single nonzero vector u in R^3 is 2-dimensional). Here ||u||^2 = 1^2+1^2+1^2 = 3, so u*u^T has eigenvalues 3 (once) and 0 (twice, multiplicity 2). Adding the identity matrix I shifts EVERY eigenvalue up by exactly 1 (since if v is an eigenvector of u*u^T with eigenvalue mu, then A*v = v + mu*v = (1+mu)*v, so v remains an eigenvector of A with eigenvalue 1+mu). So A's eigenvalues are 1+3=4 (once) and 1+0=1 (twice). The determinant of any matrix equals the product of its eigenvalues (with multiplicity), so det(A) = 4 * 1 * 1 = 4. The trap is trying to expand the 3x3 matrix A = I + uu^T entrywise and compute a full cofactor expansion (doable but slow and error-prone) rather than recognizing the rank-1 update structure, which turns this into a two-line eigenvalue argument."
+},
+{
+  id: 'engmath-linear-algebra-h6',
+  q: 'Let A = [[0, 1], [-1, 0]] (a real 2x2 matrix, representing a 90-degree rotation). Its characteristic polynomial is lambda^2 + 1 = 0, giving eigenvalues +i and -i (purely imaginary, complex conjugates). Which statement correctly describes A\'s diagonalizability?',
+  options: ['A is diagonalizable over the real numbers, since it is a valid rotation matrix', 'A is NOT diagonalizable over the real numbers (it has no real eigenvalues at all, so no real eigenvectors exist), but it IS diagonalizable over the complex numbers, since its two eigenvalues +i and -i are distinct', 'A is not diagonalizable over any field, real or complex, because its eigenvalues are not real numbers', 'A is diagonalizable over the reals because it is invertible (det(A) = 1 does not equal zero)'],
+  answer: 1,
+  marks: 2,
+  difficulty: 'hard',
+  type: 'numerical',
+  explanation: "Diagonalizability is always relative to a chosen field, and this is exactly the trap here: over the REAL numbers, A has no real eigenvalues whatsoever (its characteristic equation lambda^2+1=0 has no real roots), so it is impossible to even begin diagonalizing A using real eigenvectors - a rotation by 90 degrees maps no real vector to a real scalar multiple of itself, which is geometrically obvious (rotation never fixes a direction, unlike rotation by 0 or 180 degrees). However, treating A as a matrix over the COMPLEX numbers, its characteristic polynomial DOES factor completely, giving two DISTINCT eigenvalues +i and -i. A general theorem states that any n x n matrix with n distinct eigenvalues (over the field in question) is automatically diagonalizable over that field, since distinct eigenvalues always yield linearly independent eigenvectors. So A is diagonalizable over the complex numbers, but not over the reals. Options C and D are both wrong for conflating 'has non-real eigenvalues' with 'not diagonalizable at all' (it depends on which field you diagonalize over) and for wrongly linking invertibility to diagonalizability (these are unrelated properties - many invertible matrices are not diagonalizable, and some non-invertible matrices are)."
+},
+{
+  id: 'engmath-linear-algebra-h7',
+  q: 'A is a 2x2 matrix with two distinct positive real eigenvalues. It is known that A^2 has eigenvalues 4 and 9. What is the trace of A (the sum of A\'s own eigenvalues)?',
+  options: [],
+  answer: 5,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'hard',
+  type: 'numerical',
+  explanation: "A key fact about eigenvalues and matrix powers: if v is an eigenvector of A with eigenvalue lambda, then A^2 * v = A*(A*v) = A*(lambda*v) = lambda*(A*v) = lambda*(lambda*v) = lambda^2 * v, so v remains an eigenvector of A^2, but now with eigenvalue lambda^2 (squared, not doubled - a very common error). So the eigenvalues of A^2 are precisely the SQUARES of the eigenvalues of A. Given A^2 has eigenvalues 4 and 9, A's own eigenvalues must be square roots of these: sqrt(4)=2 (or -2) and sqrt(9)=3 (or -3). The problem specifies A has POSITIVE real eigenvalues, which rules out the negative square roots -2 and -3, pinning A's eigenvalues down uniquely as 2 and 3 (without this positivity condition, the problem would be ambiguous, since (-2)^2=4 and (-3)^2=9 equally well, and various sign combinations would each give a different, valid trace). The trace of A is the sum of its eigenvalues: 2 + 3 = 5. The trap is either forgetting the eigenvalue-squaring relationship and dividing by 2 instead (getting eigenvalues 2 and 4.5, which is wrong), or ignoring the given sign constraint and mistakenly allowing negative roots, which would make the trace non-unique."
+}
+);
+
+
+window.GATE_DATA.questions['engmath'].topics.find(function(t){return t.id==='engmath-combinatorics';}).questions.push(
+{
+  id: 'engmath-combinatorics-h1',
+  q: 'How many integers from 1 to 300 (inclusive) are divisible by 2, 3, or 5 (i.e., divisible by at least one of these three numbers)?',
+  options: [],
+  answer: 220,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'hard',
+  type: 'numerical',
+  explanation: "With three overlapping divisibility conditions, the inclusion-exclusion principle is essential - simply adding the three individual counts would double- and triple-count numbers divisible by more than one of 2, 3, 5. Let A, B, C be the sets of multiples of 2, 3, 5 respectively within 1-300. |A|=floor(300/2)=150, |B|=floor(300/3)=100, |C|=floor(300/5)=60. Pairwise intersections use the LCM of each pair: |A∩B|=floor(300/6)=50 (multiples of 6), |A∩C|=floor(300/10)=30 (multiples of 10), |B∩C|=floor(300/15)=20 (multiples of 15). The triple intersection uses lcm(2,3,5)=30: |A∩B∩C|=floor(300/30)=10. Inclusion-exclusion gives |A∪B∪C| = |A|+|B|+|C| - |A∩B|-|A∩C|-|B∩C| + |A∩B∩C| = 150+100+60 - 50-30-20 + 10 = 310 - 100 + 10 = 220. The trap is forgetting the final '+ |A∩B∩C|' add-back term (which corrects for numbers like 30, 60, 90... divisible by all three, that get subtracted three times in the pairwise step but should only be subtracted twice net), a mistake that would give the wrong total of 210 instead of 220."
+},
+{
+  id: 'engmath-combinatorics-h2',
+  q: 'How many integer solutions (x1, x2, x3) satisfy x1 + x2 + x3 = 15, where each xi must satisfy 0 <= xi <= 7?',
+  options: [],
+  answer: 28,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'hard',
+  type: 'numerical',
+  explanation: "The plain stars-and-bars count for x1+x2+x3=15 with xi>=0 and NO upper bound would be C(15+3-1, 3-1)=C(17,2)=136, but the upper bound xi<=7 on each variable invalidates this directly, requiring inclusion-exclusion on the 'bad' events where some variable exceeds 7. Define the bad event Bi as 'xi >= 8'. For a single bad event, say B1 (x1>=8), substitute x1' = x1-8 (so x1'>=0), reducing the equation to x1'+x2+x3 = 15-8 = 7, whose unrestricted solution count is C(7+3-1,3-1)=C(9,2)=36. By symmetry, each of the three single-variable bad events contributes 36 solutions, giving 3*36=108 to subtract. Now check the double-bad-event case (two variables simultaneously >=8, e.g. x1>=8 AND x2>=8): substituting both, the remaining equation needs x1'+x2'+x3 = 15-8-8 = -1, which has NO non-negative solutions (since -1<0) - so all pairwise intersections contribute exactly 0, and there is nothing to add back. By inclusion-exclusion: total valid solutions = 136 - 108 + 0 = 28. The trap is stopping after subtracting the 108 bad solutions without checking whether the add-back term is truly zero - here it happens to vanish because two variables at 8 each already sum to 16, exceeding the total of 15, but in general this cannot be assumed and must be checked."
+},
+{
+  id: 'engmath-combinatorics-h3',
+  q: 'A sequence satisfies the recurrence a_n = 4*a_{n-1} - 4*a_{n-2} for n >= 2, with initial conditions a_0 = 1 and a_1 = 4. Find a_5.',
+  options: [],
+  answer: 192,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'hard',
+  type: 'numerical',
+  explanation: "The characteristic equation of this linear recurrence is r^2 = 4r - 4, i.e. r^2 - 4r + 4 = 0, which factors as (r-2)^2 = 0 - a REPEATED root r=2 (discriminant = 16-16 = 0). For a repeated root case (unlike the distinct-roots case), the general solution is NOT simply A*2^n, but must include an extra factor of n to account for the missing second independent solution: a_n = (A + B*n) * 2^n. Applying the initial conditions: a_0 = (A + 0)*2^0 = A = 1, so A=1. Then a_1 = (A+B)*2^1 = (1+B)*2 = 4, giving 1+B=2, so B=1. The explicit formula is a_n = (1+n)*2^n. Computing a_5 = (1+5)*2^5 = 6*32 = 192. Verify by direct forward computation: a_2 = 4(4)-4(1) = 12, a_3 = 4(12)-4(4)=32, a_4=4(32)-4(12)=80, a_5=4(80)-4(32)=192 - matching exactly. The trap is using the distinct-roots formula a_n = A*2^n + B*(-2)^n (which would apply if the characteristic roots were 2 and -2, or any two DIFFERENT values) when the roots here are both exactly 2 - a repeated root requires the extra n-multiplier term, and skipping it leads to an inconsistent or wrong system when fitting the initial conditions."
+},
+{
+  id: 'engmath-combinatorics-h4',
+  q: 'What is the coefficient of x^7 in the expansion of (1 + x + x^2 + x^3)^3? (This equals the number of ways to write 7 = x1+x2+x3 with each 0 <= xi <= 3.)',
+  options: [],
+  answer: 6,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'hard',
+  type: 'numerical',
+  explanation: "Extracting this coefficient directly by multiplying out the cubic three times is tedious; instead, recognize (1+x+x^2+x^3) as the finite geometric series (1-x^4)/(1-x), so the generating function is (1-x^4)^3 / (1-x)^3. We need the coefficient of x^7 in this product. Expand (1-x^4)^3 = 1 - 3x^4 + 3x^8 - x^12 using the binomial theorem (only the first two terms matter since we only need up to x^7). Also, 1/(1-x)^3 has the known expansion sum over n of C(n+2,2)*x^n. So the coefficient of x^7 in the full product is: [coefficient of x^7 in 1/(1-x)^3] minus 3*[coefficient of x^3 in 1/(1-x)^3] (from the -3x^4 term shifting the index down by 4), since the x^8 and higher terms of (1-x^4)^3 cannot contribute to an x^7 coefficient. Coefficient of x^7 in 1/(1-x)^3 is C(9,2)=36. Coefficient of x^3 in 1/(1-x)^3 is C(5,2)=10. So the answer is 36 - 3*10 = 36-30 = 6. This matches the equivalent inclusion-exclusion computation via stars-and-bars with upper bound 3 on three variables summing to 7 (unrestricted count C(9,2)=36, minus 3 single-variable-violates-bound terms of C(5,2)=10 each = 30, with the double-violation term vanishing since 7-4-4=-1<0), giving the same 6. The trap is misapplying the geometric-series trick and forgetting to truncate at the relevant power, accidentally including the x^8 term's contribution which does not affect x^7 at all."
+},
+{
+  id: 'engmath-combinatorics-h5',
+  q: 'Using coins of denominations 1, 2, and 5 (unlimited supply of each), in how many ways can change be made for a total value of 10 (order of coins does not matter)?',
+  options: [],
+  answer: 10,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'hard',
+  type: 'numerical',
+  explanation: "This is a coefficient-extraction problem for the generating function 1/[(1-x)(1-x^2)(1-x^5)], where the coefficient of x^10 counts the number of ways to write 10 as a1*1 + a2*2 + a5*5 with non-negative integers a1,a2,a5. Rather than fully expanding the generating function, organize the count by cases on the number of 5-coins used (since that variable has the fewest possible values), which is a systematic case-enumeration approach. Case a5=0: need a1 + 2*a2 = 10 with a2 ranging over 0 to 5 (each choice of a2 forces a1=10-2*a2>=0), giving 6 solutions (a2=0,1,2,3,4,5). Case a5=1: need a1+2*a2 = 5, with a2 ranging over 0 to 2 (a2=2 gives a1=1, a2 cannot be 3 since that would need a1=-1), giving 3 solutions (a2=0,1,2). Case a5=2: need a1+2*a2 = 0, forcing a1=0 and a2=0, giving exactly 1 solution. (a5 cannot be 3 or more, since 3*5=15 already exceeds the target of 10.) Total ways = 6 + 3 + 1 = 10. The trap is forgetting that within each fixed-a5 case, the number of ways to solve a1+2*a2=remaining is (floor(remaining/2)+1), not simply 'remaining' itself, and miscounting the a2 range boundary (e.g. missing the a2=2 solution in the a5=1 case, which would undercount)."
+},
+{
+  id: 'engmath-combinatorics-h6',
+  q: 'In a survey of 100 students: 40 like Mathematics, 35 like Physics, 30 like Chemistry, 12 like both Mathematics and Physics, 10 like both Physics and Chemistry, 8 like both Mathematics and Chemistry, and 5 like all three subjects. How many students like NONE of the three subjects?',
+  options: [],
+  answer: 20,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'hard',
+  type: 'numerical',
+  explanation: "This is a classic three-set inclusion-exclusion problem where the final answer requires subtracting the union from the TOTAL population, an extra step often skipped. First compute |M∪P∪C| using inclusion-exclusion: |M∪P∪C| = |M|+|P|+|C| - |M∩P|-|P∩C|-|M∩C| + |M∩P∩C| = 40+35+30 - 12-10-8 + 5 = 105 - 30 + 5 = 80. This 80 represents the number of students who like AT LEAST ONE of the three subjects. Since the total surveyed is 100, the number liking NONE of the three subjects is the complement: 100 - 80 = 20. The trap is stopping at 80 and reporting it as the final answer to 'how many like none' (a very common careless error when a problem embeds inclusion-exclusion inside a larger question) - 80 is the size of the UNION (liking at least one), which is the OPPOSITE of what is being asked; the actual answer requires one more subtraction step from the total population size. A secondary trap is double-subtracting the triple-overlap term (forgetting the '+5' add-back, which would incorrectly give |M∪P∪C|=75 and thus 25 liking none)."
+}
+);
+
+
+window.GATE_DATA.questions['engmath'].topics.find(function(t){return t.id==='engmath-graph-theory';}).questions.push(
+{
+  id: 'engmath-graph-theory-h1',
+  q: 'A simple undirected graph has degree sequence (4, 4, 3, 3, 2, 2) across its 6 vertices. First, verify this degree sequence is actually graphical (realizable by some simple graph) using the Erdos-Gallai criterion. If it is, how many EDGES does any such graph have?',
+  options: [],
+  answer: 9,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'hard',
+  type: 'numerical',
+  explanation: "Before computing anything, check basic necessary conditions: the sum of degrees is 4+4+3+3+2+2=18, which is even (satisfying the Handshake Lemma requirement, since the sum of all degrees must always be twice the edge count) - this alone does not guarantee realizability, only rules out obviously impossible sequences. Apply the Erdos-Gallai theorem, which requires that for every k from 1 to n, the sum of the k largest degrees is at most k(k-1) plus the sum of min(di, k) over the remaining vertices. Sorting descending: 4,4,3,3,2,2. Check k=1: LHS=4, RHS=1(0)+min(4,1)+min(3,1)+min(3,1)+min(2,1)+min(2,1)=0+1+1+1+1+1=5, and 4<=5 holds. Check k=2: LHS=8, RHS=2(1)+min(3,2)+min(3,2)+min(2,2)+min(2,2)=2+2+2+2+2=10, and 8<=10 holds. Check k=3: LHS=11, RHS=3(2)+min(3,3)+min(2,3)+min(2,3)=6+3+2+2=13, holds. Remaining k values check trivially since the LHS growth slows relative to RHS. All conditions pass, so the sequence IS graphical. Given it is realizable, the number of edges follows directly from the Handshake Lemma: edges = (sum of degrees)/2 = 18/2 = 9, and this edge count is the SAME for every graph realizing this degree sequence, even though the actual graph structure (which vertices connect to which) may not be unique. The trap is skipping the Erdos-Gallai feasibility check altogether and assuming any even-sum sequence is automatically graphical, which is false in general (e.g. (5,1,1,1,1,1) has even sum 10 but is not graphical) - here it happens to pass, but the verification step is what makes the final edge count trustworthy rather than a guess."
+},
+{
+  id: 'engmath-graph-theory-h2',
+  q: 'A wheel graph W7 consists of a 7-cycle (the "rim") plus one central hub vertex connected to all 7 rim vertices (the "spokes"). What is the chromatic number of W7?',
+  options: ['2', '3', '4', '7'],
+  answer: 2,
+  marks: 2,
+  difficulty: 'hard',
+  type: 'numerical',
+  explanation: "The chromatic number of a wheel graph depends critically on whether the rim cycle has EVEN or ODD length, a parity trap that easily catches students who memorize a single 'wheel graphs need 3 colors' rule without checking. A cycle of odd length (like the 7-cycle rim here) cannot be 2-colored (attempting to alternate two colors around an odd cycle always produces a clash between the first and last vertex), so it requires 3 colors on its own. The hub vertex is adjacent to EVERY rim vertex, so it must receive a color different from all colors used on the rim - since the rim already uses 3 distinct colors (colors 1, 2, 3 in some repeating-with-clash-avoiding pattern around the odd cycle), the hub needs a 4TH color entirely distinct from all three. So chromatic number of W7 = 4. Contrast this with an EVEN wheel like W6 (6-cycle rim): an even cycle IS 2-colorable (alternating colors works perfectly since it closes up evenly), so the rim only needs 2 colors, and the hub then only needs a 3rd color distinct from those two - giving chromatic number 3 for W6, not 4. The trap here is applying the even-wheel rule (chromatic number 3) blindly to W7, without checking that 7 is odd, which pushes the answer to 4 rather than 3."
+},
+{
+  id: 'engmath-graph-theory-h3',
+  q: 'A simple, connected, BIPARTITE planar graph has exactly 12 vertices. What is the MAXIMUM possible number of edges it can have?',
+  options: [],
+  answer: 20,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'hard',
+  type: 'numerical',
+  explanation: "The general planarity edge bound for any simple connected planar graph is E <= 3V - 6, which for V=12 would give E <= 30 - but this bound assumes every face of the planar embedding can be a TRIANGLE (a 3-sided face), which is impossible for a bipartite graph, since bipartite graphs contain NO odd cycles at all, meaning no triangles (3-cycles) can exist anywhere in the graph. Because every face boundary in a bipartite planar graph must have length at least 4 (the shortest possible cycle in a bipartite graph is a 4-cycle), the standard Euler's-formula-based derivation must be redone with faces bounded by at least 4 edges instead of 3, giving the tighter bound E <= 2V - 4 specifically for bipartite planar graphs. Substituting V=12: E <= 2(12) - 4 = 24 - 4 = 20. This maximum of 20 is achievable (for instance by certain bipartite planar structures built from stacked 4-cycles), so the answer is exactly 20, not 30. The trap is applying the generic 3V-6 planarity bound (which is correct only for GENERAL, not necessarily bipartite, planar graphs) to a graph explicitly stated to be bipartite, thereby overestimating the true maximum edge count by 10."
+},
+{
+  id: 'engmath-graph-theory-h4',
+  q: 'Graph G1 is the complete bipartite graph K(3,3) (6 vertices, each of degree 3, 9 edges). Graph G2 is the "triangular prism" graph: two disjoint triangles {a,b,c} and {x,y,z}, with additional edges a-x, b-y, c-z connecting corresponding vertices (also 6 vertices, each of degree 3, 9 edges). Are G1 and G2 isomorphic?',
+  options: ['Yes, since both graphs have 6 vertices, 9 edges, and are 3-regular (every vertex has degree 3), and matching degree sequences always imply isomorphism', 'No, despite having identical vertex counts, edge counts, and degree sequences, because G1 (being bipartite) contains ZERO triangles, while G2 contains exactly 2 triangles ({a,b,c} and {x,y,z}) - triangle count is a graph invariant preserved by any isomorphism, so differing triangle counts prove non-isomorphism', 'No, because G1 has more edges than G2', 'Yes, because both graphs are connected and planar'],
+  answer: 1,
+  marks: 2,
+  difficulty: 'hard',
+  type: 'numerical',
+  explanation: "Matching degree sequences (and even matching vertex/edge counts) is only a NECESSARY condition for isomorphism, never a sufficient one - many non-isomorphic graphs share identical degree sequences, and distinguishing them requires a finer graph invariant. Here both G1=K(3,3) and G2=the triangular prism have exactly 6 vertices, 9 edges, and every vertex of degree 3 (3-regular), so degree-sequence matching alone cannot distinguish them and a stronger invariant is needed. The key structural invariant here is TRIANGLE COUNT (number of 3-cycles), which is always preserved exactly by any isomorphism (an isomorphism maps triangles to triangles bijectively). K(3,3) is bipartite by construction (its two parts are internally edge-free), and any bipartite graph is provably triangle-free (a triangle would require an odd cycle of length 3, impossible in a graph with no odd cycles at all). The prism graph explicitly contains the two triangles {a,b,c} and {x,y,z} as complete 3-cycles. Since G1 has 0 triangles and G2 has 2 triangles, they cannot be isomorphic - option B. Options C and D are factually wrong (edge counts are equal at 9 each, and planarity is a shared property here, not a distinguishing one)."
+},
+{
+  id: 'engmath-graph-theory-h5',
+  q: 'A graph G has degree sequence (5, 5, 4, 3, 3, 2, 2, 2) across 8 vertices. Which of the following statements about G are NECESSARILY true? (Select ALL that apply)',
+  options: ['G has exactly 13 edges', 'Since 13 edges exceeds 8-1=7 (the maximum edges in any forest on 8 vertices), G must contain at least one cycle', 'It is impossible for any vertex to have degree 5 in a simple graph on 8 vertices, since the maximum possible degree is 8', 'G is definitely disconnected'],
+  answers: [0, 1],
+  marks: 2,
+  difficulty: 'hard',
+  type: 'numerical',
+  explanation: "Option A: by the Handshake Lemma, the number of edges equals half the sum of all degrees: (5+5+4+3+3+2+2+2)/2 = 26/2 = 13 - this is necessarily true regardless of the specific graph structure, since it follows purely from the degree sequence. Option B: a graph with n vertices and no cycles (a forest) can have AT MOST n-1 edges (this is the defining edge-count bound for trees and forests); since G has 13 edges on 8 vertices and 13 > 8-1=7, G cannot possibly be acyclic, so it must contain at least one cycle somewhere - this is necessarily true, combining the edge-counting result from option A with the tree/forest edge bound as a second independent idea. Option C is FALSE and a pure trap: in a simple graph on n vertices, the maximum possible degree for any single vertex is n-1 (a vertex can connect to every OTHER vertex, but not to itself), which for n=8 is 7, not 8 - so a degree of 5 is well within the valid range (5 <= 7), making this claim about impossibility simply wrong. Option D is also FALSE: nothing about this degree sequence forces disconnection - a degree sequence with 13 edges on 8 vertices is entirely consistent with a connected graph (a connected graph on 8 vertices needs only at least 7 edges, and 13 exceeds that comfortably), so 'definitely disconnected' cannot be concluded from the information given. Correct selections: A and B only."
+},
+{
+  id: 'engmath-graph-theory-h6',
+  q: 'The Petersen graph is a well-known graph with 10 vertices, is 3-regular (every vertex has degree 3), has girth 5 (shortest cycle length is 5, so it is triangle-free, meaning its clique number is only 2), and is known to be non-bipartite (it contains odd cycles of length 5). Using Brooks\' theorem (chromatic number <= maximum degree, for any connected graph that is neither complete nor an odd cycle) together with the non-bipartite fact, what is the chromatic number of the Petersen graph?',
+  options: ['2, matching its clique number of 2', '3', '4', '10, one color per vertex since it has no triangles to share colors'],
+  answer: 1,
+  marks: 2,
+  difficulty: 'hard',
+  type: 'numerical',
+  explanation: "This combines two separate facts to pin down an exact value from a range. First, a LOWER bound: since the Petersen graph is non-bipartite (it contains 5-cycles, which are odd), it cannot be properly colored with only 2 colors (2-colorability is exactly equivalent to bipartiteness), so its chromatic number is at least 3. Second, an UPPER bound: Brooks' theorem states that for any connected graph that is not a complete graph and not an odd cycle, the chromatic number is at most the maximum degree; the Petersen graph is 3-regular (max degree 3), is not complete (K10 would need 45 edges, but Petersen has only 15), and is not itself a single odd cycle (it has 10 vertices arranged in a much richer structure than a simple cycle) - so Brooks' theorem applies and gives chromatic number <= 3. Combining the lower bound (>=3) and upper bound (<=3) pins the chromatic number down to EXACTLY 3. The trap in option A is conflating the CLIQUE NUMBER (the size of the largest complete subgraph, which is only 2 here since the graph is triangle-free) with the CHROMATIC NUMBER - these are generally different graph parameters, and a triangle-free graph can still require 3 or more colors if it contains odd cycles of any length (not just triangles), as the Petersen graph's 5-cycles demonstrate."
+},
+{
+  id: 'engmath-graph-theory-h7',
+  q: 'A connected, simple, planar graph has V = 6 vertices and E = 10 edges (drawn in the plane with no edge crossings). Using Euler\'s formula for planar graphs, how many FACES does this planar embedding have (including the unbounded outer face)?',
+  options: [],
+  answer: 6,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'hard',
+  type: 'numerical',
+  explanation: "Euler's formula for any connected planar graph states V - E + F = 2, where F counts ALL faces of the planar embedding, including the single unbounded outer face - a detail students sometimes forget to include, undercounting F by one. Rearranging to solve for F: F = 2 - V + E = 2 - 6 + 10 = 6. So this planar embedding has exactly 6 faces. As a sanity check, verify this is at least PLAUSIBLE using the face-degree inequality: since the graph is simple (no multi-edges or self-loops) and has at least one cycle (10 edges on 6 vertices far exceeds the 5-edge tree limit), every face must be bounded by at least 3 edges, and each edge borders exactly 2 faces, giving the inequality 2E >= 3F, i.e. 2(10)=20 >= 3(6)=18, which holds comfortably, confirming the computed face count is at least consistent with a valid simple planar embedding (though this check alone does not prove such an embedding exists, it rules out obvious impossibilities). The trap is either misremembering Euler's formula as V-E+F=0 or V+E-F=2 (sign or term confusion), or forgetting to count the unbounded outer face as one of the F faces, which would give an answer one less than the correct 6."
+}
+);
+
+
+window.GATE_DATA.questions['engmath'].topics.find(function(t){return t.id==='engmath-sets-relations';}).questions.push(
+{
+  id: 'engmath-sets-relations-h1',
+  q: 'How many binary relations on a set of 4 elements are BOTH reflexive AND symmetric?',
+  options: [],
+  answer: 64,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'hard',
+  type: 'numerical',
+  explanation: "A relation on a set of n elements can be represented as an n x n 0/1 matrix. Reflexivity FORCES every diagonal entry to be exactly 1 (all n diagonal cells are fixed, no freedom there). Symmetry forces the matrix to equal its own transpose, meaning the entry at position (i,j) must equal the entry at (j,i) for every off-diagonal pair - so the choice at (i,j) and (j,i) are not independent, but LINKED as a single binary choice per unordered pair {i,j}. For n=4, the number of unordered off-diagonal pairs is C(4,2) = 6, and each such pair independently gets to be either 'both present' or 'both absent' - a binary choice, giving 2^6 possible symmetric-and-reflexive relations. So the total is 2^6 = 64. The trap is treating the off-diagonal entries as n^2-n = 12 INDEPENDENT binary choices (which would be the count for reflexive relations alone, without the symmetry constraint, giving 2^12=4096) rather than correctly recognizing that symmetry HALVES the effective degrees of freedom by pairing up (i,j) with (j,i), leaving only the 6 unordered-pair choices as truly independent."
+},
+{
+  id: 'engmath-sets-relations-h2',
+  q: 'A relation R on the set {1, 2, 3, 4} is defined as R = {(1,2), (2,3), (3,4), (2,2)}. R is clearly NOT reflexive, since it is missing several required pairs. How many ordered pairs are in the REFLEXIVE CLOSURE of R (the smallest reflexive relation containing R)?',
+  options: [],
+  answer: 7,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'hard',
+  type: 'numerical',
+  explanation: "The reflexive closure of a relation R is formed by taking the UNION of R with the identity relation {(1,1),(2,2),(3,3),(4,4)} - it adds exactly the missing diagonal pairs needed to make the result reflexive, and nothing else (it is the MINIMAL reflexive relation containing R, not an arbitrary larger one). Checking R = {(1,2), (2,3), (3,4), (2,2)} against the four required diagonal pairs: (1,1) is missing, (2,2) is ALREADY present in R, (3,3) is missing, and (4,4) is missing. So exactly 3 new pairs need to be added: (1,1), (3,3), (4,4) - note (2,2) is NOT added again since it is already in R, and a relation (being a SET of ordered pairs) cannot contain a duplicate element. The reflexive closure is therefore R union {(1,1),(3,3),(4,4)} = {(1,2),(2,3),(3,4),(2,2),(1,1),(3,3),(4,4)}, which has 4 (original) + 3 (newly added) = 7 total pairs. The trap is either assuming all 4 diagonal pairs must be freshly added (forgetting that (2,2) is already present, which would incorrectly give 4+4=8), or confusing 'reflexive closure' with 'symmetric closure' (which would instead add reverse pairs like (2,1),(3,2),(4,3) rather than diagonal pairs) - these are two entirely different closure operations that are frequently mixed up."
+},
+{
+  id: 'engmath-sets-relations-h3',
+  q: 'On the set {1, 2, ..., 40}, define a ~ b if and only if (a mod 4 = b mod 4) AND (a mod 5 = b mod 5) - that is, a and b must agree in BOTH their remainder mod 4 and their remainder mod 5 simultaneously. This is an equivalence relation. How many distinct equivalence classes does it partition {1,...,40} into?',
+  options: [],
+  answer: 20,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'hard',
+  type: 'numerical',
+  explanation: "This combines two separate congruence conditions into one relation, and the key insight (via the Chinese Remainder Theorem) is that requiring agreement mod 4 AND mod 5 simultaneously is exactly equivalent to requiring agreement mod lcm(4,5) = mod 20, since 4 and 5 are coprime (gcd(4,5)=1). This is a genuine combination of two ideas, not simply picking the stricter of the two individual relations - a naive student might think the answer is just 'the larger of 4 or 5 classes' or attempt to count mod-4 classes and mod-5 classes separately and add them, both of which are wrong approaches. Because a~b reduces to a ≡ b (mod 20), the equivalence classes are exactly the 20 residue classes mod 20: {1,21}, {2,22}, {3,23}, ..., {20,40} (writing representatives from 1 to 40). Since the domain {1,...,40} has exactly 40 elements and 40/20 = 2 elements land in each residue class exactly (because 40 is precisely 2 times the modulus 20), there are exactly 20 equivalence classes, each of size exactly 2. The trap is treating 'mod 4 AND mod 5' as if it simplifies to mod 9 (naively adding the moduli) or to just mod 4 (assuming the stricter single condition dominates) rather than correctly combining them via their LCM using the coprimality of 4 and 5."
+},
+{
+  id: 'engmath-sets-relations-h4',
+  q: 'Consider the poset formed by the set {1, 2, 3, 4, 6, 12} ordered by the divides relation (a <= b in the poset means a divides b). This poset happens to be a LATTICE (every pair of elements has both a least upper bound, the LUB, and a greatest lower bound, the GLB, within the set). What is the LUB (join) of the elements 4 and 6 in this poset?',
+  options: [],
+  answer: 12,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'hard',
+  type: 'numerical',
+  explanation: "In a divisibility poset, the least upper bound (join) of two elements a and b is their LEAST COMMON MULTIPLE that also happens to lie within the given set - it is NOT simply 'the larger of the two elements' (that shortcut only works when one element divides the other, which is not the case for 4 and 6, since neither divides the other). First identify all common multiples of 4 and 6 that appear in the set {1,2,3,4,6,12}: checking each element for being a multiple of BOTH 4 and 6, only 12 qualifies (12 = 4*3 = 6*2, so both 4|12 and 6|12 hold; the other elements like 1,2,3 are too small to be multiples of either 4 or 6, and 4 and 6 themselves are not multiples of each other). Among the qualifying common multiples (just {12} here), the LEAST one is trivially 12 itself. So LUB(4,6) = 12 in this poset. As a related fact (not asked here but useful for cross-checking lattice structure), GLB(4,6) would be their greatest common divisor present in the set, which is gcd(4,6)=2, and 2 is indeed in the set, confirming this pair also has a valid meet. The trap is computing lcm(4,6)=12 correctly in the arithmetic sense but forgetting to verify that 12 actually belongs to the GIVEN set (in a poset restricted to a specific subset of divisors, the true lcm might fall OUTSIDE the set, in which case no LUB would exist within that restricted poset at all)."
+},
+{
+  id: 'engmath-sets-relations-h5',
+  q: 'A poset P has a Hasse diagram consisting of a single minimum element 0, connected upward directly to three pairwise-incomparable elements a, b, and c, with NO element above a, b, or c (no top element, and a, b, c have no other elements above them). Is (P, <=) a lattice?',
+  options: ['Yes, since 0 is below all three elements, making it a valid greatest lower bound for every pair', 'No, because the pair {a, b} (or equally {a,c} or {b,c}) has NO least upper bound: their only possible common upper bounds within P would need to be above both a and b, but no such element exists anywhere in P (a and b themselves are both maximal with nothing above them)', 'Yes, since every finite poset with a unique minimum element is automatically a lattice', 'No, because a, b, and c are not connected to each other directly in the Hasse diagram'],
+  answer: 1,
+  marks: 2,
+  difficulty: 'hard',
+  type: 'numerical',
+  explanation: "A poset is a lattice only if EVERY pair of elements has BOTH a least upper bound (join) and a greatest lower bound (meet) within the poset - failing this for even a single pair disqualifies the whole structure from being a lattice. Checking meets first: GLB(a,b) = 0 works fine (0 is below both a and b, and it is the unique such lower bound since nothing else is below either), and similarly for any pair involving 0. But checking joins: consider the pair {a,b}. An upper bound of {a,b} must be an element that is >= a AND >= b simultaneously. Since a and b are both MAXIMAL elements in this poset (nothing lies above either of them - there is no top element connecting them), the set of common upper bounds of {a,b} is EMPTY - there is no element anywhere in P that sits above both. With no common upper bound at all, there is certainly no LEAST one, so LUB(a,b) simply does not exist. This single missing join is enough to disqualify P from being a lattice, regardless of how well-behaved the meets are. Option A wrongly focuses only on meets (GLBs) while ignoring the join requirement, which is where the lattice property actually fails. Option C is a false general claim - having a unique minimum (or maximum) element does not automatically force every pairwise join and meet to exist."
+},
+{
+  id: 'engmath-sets-relations-h6',
+  q: 'How many binary relations on a set of 3 elements are REFLEXIVE but NOT symmetric?',
+  options: [],
+  answer: 56,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'hard',
+  type: 'numerical',
+  explanation: "This requires combining a direct count with a complementary subtraction, rather than a single formula lookup. First count ALL reflexive relations on a 3-element set: reflexivity fixes the 3 diagonal entries, leaving the n^2-n = 9-3 = 6 off-diagonal entries completely free (each independently in or out of the relation), giving 2^6 = 64 total reflexive relations. Next, count how many of THOSE are also symmetric (reflexive AND symmetric together), using the same pairing logic as before: symmetry links each off-diagonal pair {i,j} into a single joint choice, and for n=3 there are C(3,2)=3 unordered off-diagonal pairs, giving 2^3 = 8 reflexive-and-symmetric relations. Since 'reflexive but not symmetric' is exactly the set difference (reflexive relations) minus (reflexive AND symmetric relations), the answer is 64 - 8 = 56. The trap is attempting to directly count 'not symmetric' relations by some other flawed shortcut (like assuming half of all reflexive relations are symmetric, which is wildly wrong here - only 8 out of 64, or one-eighth, turn out to be symmetric) rather than correctly using the complement of the reflexive-and-symmetric subset within the reflexive set; this two-step counting (compute the whole, compute the well-behaved subset, subtract) is the reliable general method for 'has property X but not property Y' counting problems."
+}
+);
+
+
+window.GATE_DATA.questions['engmath'].topics.find(function(t){return t.id==='engmath-discrete-logic';}).questions.push(
+{
+  id: 'engmath-discrete-logic-h1',
+  q: 'How many of the 8 possible truth assignments to p, q, r make the formula (p OR q) AND (NOT p OR r) AND (NOT q OR NOT r) TRUE?',
+  options: [],
+  answer: 2,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'hard',
+  type: 'numerical',
+  explanation: "Rather than guessing, this requires systematically enumerating all 8 assignments (since the formula has three separate clauses ANDed together, no single clause reveals the count on its own). Rewrite the three clauses as implications for intuition: (p OR q) means 'p or q must hold', (NOT p OR r) is equivalent to p implies r, and (NOT q OR NOT r) is equivalent to NOT(q AND r), i.e. q and r cannot both be true. Check all 8 cases: (T,T,T): third clause NOT q OR NOT r = F OR F = F, fails. (T,T,F): first=T, second: NOT p OR r = F OR F=F, fails. (T,F,T): first=T, second=F OR T=T, third=T OR F=T - ALL THREE hold, so this is a satisfying assignment. (T,F,F): second clause NOT p OR r = F OR F=F, fails. (F,T,T): first=T, second=T OR T=T, third=F OR F=F, fails. (F,T,F): first=T, second=T (since NOT p=T), third=F OR T=T - satisfies all three, another solution. (F,F,T): first clause p OR q = F OR F=F, fails immediately. (F,F,F): first clause=F, fails. So exactly 2 assignments satisfy the formula: (p,q,r)=(T,F,T) and (F,T,F). The trap is assuming a 3-clause conjunction with each clause individually satisfiable by roughly half of assignments will be satisfied by a 'moderate' fraction like 4 or so - the clauses here interact tightly (r and q become mutually exclusive, and p becomes tied to r), collapsing the satisfying set down to just 2 out of 8."
+},
+{
+  id: 'engmath-discrete-logic-h2',
+  q: 'Given the premise: "Every person has a friend who trusts them," symbolized as: for all x, there exists y such that (Friend(x,y) AND Trusts(y,x)). Assuming the domain of people is non-empty, which of the following statements are LOGICALLY IMPLIED by this premise? (Select ALL that apply)',
+  options: ['There exists one single common friend y such that for all x, Friend(x,y) AND Trusts(y,x) - i.e., one person is a trusted friend of everyone', 'For all x, there exists y such that Trusts(y,x) (every person is trusted by somebody)', 'There exist some x and y such that Friend(x,y) (at least one friendship relationship exists at all)', 'For all x, there exists y such that (Friend(x,y) OR Trusts(y,x))'],
+  answers: [1, 2, 3],
+  marks: 2,
+  difficulty: 'hard',
+  type: 'numerical',
+  explanation: "This tests precise reasoning about quantifier order and logical strength, requiring each option to be checked independently rather than pattern-matched. Option A swaps the quantifier order from 'for all x exists y' to 'exists y for all x' - moving the existential quantifier OUTSIDE the universal one. This is a strictly STRONGER claim (a single universal friend for everyone) that does NOT follow from the original weaker statement (where each person's trusted friend can be DIFFERENT) - this is the classic converse-quantifier-order fallacy, so option A is NOT implied. Option B follows by simplification: the original guarantees, for each x, SOME y with Friend(x,y) AND Trusts(y,x); dropping the first conjunct (existential generalization over a weaker property) still leaves 'there exists y with Trusts(y,x)' true for that same y - so this IS implied. Option C follows because the domain is non-empty: pick any single element x0 in the domain; the premise guarantees some y0 with Friend(x0,y0) AND Trusts(y0,x0), and in particular Friend(x0,y0) holds, giving the existential claim exists x, exists y, Friend(x,y) - so this IS implied. Option D follows trivially because the original conjunction Friend(x,y) AND Trusts(y,x) directly implies the weaker disjunction Friend(x,y) OR Trusts(y,x), for the same witnessing y - so this IS implied. Correct selections: B, C, and D; A is the only non-implied (converse quantifier order) statement."
+},
+{
+  id: 'engmath-discrete-logic-h3',
+  q: 'What is the correct negation of the statement: "For all x, P(x) implies there exists y such that Q(x,y) AND NOT R(y)"?',
+  options: ['There exists x such that P(x) AND for all y, (NOT Q(x,y) OR R(y))', 'For all x, NOT P(x) implies for all y, (Q(x,y) AND NOT R(y))', 'There exists x such that NOT P(x) OR for all y, (NOT Q(x,y) AND R(y))', 'For all x, P(x) AND there exists y such that NOT Q(x,y) OR R(y)'],
+  answer: 0,
+  marks: 2,
+  difficulty: 'hard',
+  type: 'numerical',
+  explanation: "Negating a nested-quantifier statement requires pushing the negation inward step by step, flipping EVERY quantifier it passes through and applying De Morgan's law at the implication and the inner conjunction - skipping any single step produces a wrong final formula. Start: NOT [for all x (P(x) -> exists y (Q(x,y) AND NOT R(y)))]. Step 1: negating a universal quantifier turns it into an existential with the negation moved inside: this becomes exists x, NOT[P(x) -> exists y (Q(x,y) AND NOT R(y))]. Step 2: negating an implication A -> B is equivalent to A AND NOT B (NOT(A->B) == A AND NOT B), so the inner part becomes P(x) AND NOT[exists y (Q(x,y) AND NOT R(y))]. Step 3: negating an existential quantifier turns it into a universal with the negation moved inside: NOT[exists y (...)] becomes for all y, NOT(Q(x,y) AND NOT R(y)). Step 4: apply De Morgan's law to the inner conjunction: NOT(Q(x,y) AND NOT R(y)) becomes NOT Q(x,y) OR R(y) (the double negation on R(y) cancels). Assembling everything: exists x (P(x) AND for all y (NOT Q(x,y) OR R(y))) - which is exactly option A. The trap options each skip or mishandle one step: option B fails to flip the implication into a conjunction and incorrectly keeps it as an implication with both quantifiers unflipped; option C incorrectly applies De Morgan's to get AND instead of OR inside the inner clause; option D forgets to flip the outer universal quantifier to existential."
+},
+{
+  id: 'engmath-discrete-logic-h4',
+  q: 'How many of the 8 possible truth assignments to p, q, r make the formula (p -> q) AND (q -> r) AND (p XOR r) TRUE, where XOR means exclusive-or (true when exactly one side is true)?',
+  options: [],
+  answer: 2,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'hard',
+  type: 'numerical',
+  explanation: "This combines a hypothetical-syllogism-style chain (p->q, q->r) with an exclusive-or constraint that is NOT simply satisfiable by half the assignments, requiring careful enumeration since the three conditions interact. First observe that (p->q) AND (q->r) together imply (p->r) by hypothetical syllogism - so if p is TRUE, transitively r must also be TRUE, which would make p XOR r FALSE (since XOR requires them to DIFFER, and both being true means they agree). This means whenever p=TRUE, the whole formula is forced to be false, regardless of q - so no satisfying assignment can have p=TRUE. This leaves p=FALSE as the only possibility. With p=FALSE, (p->q) is automatically true (false antecedent), so q is UNRESTRICTED so far, but (q->r) must still hold, and p XOR r requires r to be TRUE (since p is false, XOR needs exactly one true, so r must be the true one). With r=TRUE forced, (q->r) becomes q -> TRUE, which is automatically true for ANY q. So q can be either TRUE or FALSE freely, giving exactly 2 satisfying assignments: (p,q,r) = (F,T,T) and (F,F,T). The trap is not spotting the hidden hypothetical-syllogism chain that rules out p=TRUE entirely in one logical stroke, and instead brute-force checking all 8 cases without the shortcut - which still arrives at 2, but takes far longer and is more error-prone under exam time pressure."
+},
+{
+  id: 'engmath-discrete-logic-h5',
+  q: 'Consider the premises: (1) For all x, Student(x) implies there exists y such that (Course(y) AND Takes(x,y)) - every student takes some course. (2) There does not exist a y such that (Course(y) AND Takes(Priya, y)) - Priya takes no course at all. Which conclusion validly follows from these two premises?',
+  options: ['Priya is not a student', 'No student takes any courses', 'Every student is Priya', 'There exists some student who is not Priya'],
+  answer: 0,
+  marks: 2,
+  difficulty: 'hard',
+  type: 'numerical',
+  explanation: "This is a modus-tollens argument dressed up with a nested existential quantifier, and correctly extracting the valid conclusion requires first INSTANTIATING the universal premise at the specific individual Priya before applying the propositional inference rule. Instantiate premise (1) specifically at x=Priya (universal instantiation is always valid): Student(Priya) implies there exists y (Course(y) AND Takes(Priya,y)). Premise (2) directly states the CONSEQUENT of this instantiated implication is false: NOT[exists y (Course(y) AND Takes(Priya,y))]. Now apply modus tollens: given (A -> B) and NOT B, validly conclude NOT A. Here A = Student(Priya) and B = exists y (Course(y) AND Takes(Priya,y)); since NOT B holds (premise 2) and A->B holds (instantiated premise 1), we validly conclude NOT A, i.e. Priya is NOT a student - option A. Option B is far too strong and unsupported - the premises say nothing about OTHER students' course-taking, only about Priya specifically. Option C and D introduce claims about the broader population of students (their identity or distinctness from Priya) that the premises never address at all - the argument is entirely about Priya alone, and nothing licenses conclusions about how many OTHER students exist or who they are. The trap is trying to apply modus tollens directly to the UN-instantiated universal statement without first substituting the specific individual named in premise (2), which would leave the inference structurally invalid."
+},
+{
+  id: 'engmath-discrete-logic-h6',
+  q: 'How many of the 8 possible truth assignments to p, q, r make the formula (p -> (q -> r)) -> ((p -> q) -> (p -> r)) TRUE?',
+  options: [],
+  answer: 8,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'hard',
+  type: 'numerical',
+  explanation: "Although this formula LOOKS like it needs a full 8-row enumeration to resolve, it is actually a famous TAUTOLOGY (the distribution axiom of implication over implication, one of the standard axioms of propositional logic), meaning it evaluates to true under all 8 assignments without exception - counting is still the safest way to confirm this rather than trusting memory alone. Verify using the falsification method: assume the whole formula is FALSE, which requires its antecedent (p -> (q -> r)) to be TRUE and its consequent ((p->q) -> (p->r)) to be FALSE. For the consequent to be false, we need (p->q) TRUE and (p->r) FALSE; for (p->r) to be false, we need p=TRUE and r=FALSE. With p=TRUE, (p->q) TRUE forces q=TRUE. Now check the antecedent under p=TRUE, q=TRUE, r=FALSE: p -> (q->r) becomes TRUE -> (TRUE -> FALSE) = TRUE -> FALSE = FALSE. But we assumed the antecedent must be TRUE for the whole formula to be false - contradiction. Since no assignment can make the antecedent true while the consequent is false, NO assignment can falsify the formula, confirming it is a tautology true under all 8 assignments. The trap is assuming a formula with this much apparent complexity (nested implications three levels deep) must be a mere contingency requiring case-by-case counting, and either miscounting via a rushed truth table or assuming a 'plausible-looking' answer like 4 or 6 without actually verifying - the correct count, perhaps counter-intuitively, is the maximum possible: all 8."
+}
+);

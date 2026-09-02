@@ -2338,3 +2338,1502 @@ window.GATE_DATA.questions['compiler'].topics.find(function(t){return t.id==='co
     explanation: 'S1 (t1 = a + b) is the first computation of a + b using the original value of a, so it is kept as-is. S2 (t2 = a + b) uses the SAME still-valid values of a and b (a has not yet been reassigned at this point), so it is an exact duplicate of S1 and can be eliminated entirely, with S2\'s temporary t2 simply becoming an alias for t1 wherever it might have been used later (here it is not used again, so it is just dropped). S3 (t3 = t1 - c) is a distinct computation and is kept. S4 (a = t3) reassigns a, which invalidates the earlier a + b node for any FUTURE use of a, so it is kept (it is not redundant, and it also matters for correctness). S5 (t4 = a + b) now uses the NEW value of a (post-reassignment), so it is a genuinely different computation from S1\'s a + b and must be kept as its own instruction. Counting the surviving statements: S1, S3, S4, S5 -- that is 4 statements remaining out of the original 5, with only the truly redundant S2 removed.'
   }
 );
+
+window.GATE_DATA.questions['compiler'].topics.find(function(t){return t.id==='compiler-lexical';}).questions.push(
+  {
+    id: 'compiler-lexical-p1',
+    pyqStyle: true,
+    q: 'How many lexical tokens does a standard C tokenizer produce for the statement `int x = a + b * (c - 1);` (count each keyword, identifier, constant, operator and punctuation symbol as one token; do not count whitespace)?',
+    options: ['11', '12', '13', '14'],
+    answer: 2,
+    marks: 1,
+    difficulty: 'easy',
+    type: 'pyq-style',
+    explanation: 'Scanning left to right the tokens are: int, x, =, a, +, b, *, (, c, -, 1, ), ; . That is: int(1) x(2) =(3) a(4) +(5) b(6) *(7) ((8) c(9) -(10) 1(11) )(12) ;(13) -- 13 tokens in total. Each identifier and keyword is one token regardless of length, each operator symbol (=, +, *, -) is a separate token, each parenthesis is its own token, the numeric literal 1 is one constant token, and the terminating semicolon is one punctuation token, giving 13 tokens overall, matching option 3.'
+  },
+  {
+    id: 'compiler-lexical-p2',
+    pyqStyle: true,
+    q: 'How many tokens are produced when a C lexer scans the statement `for(i=0;i<n;i++) sum=sum+i;` (count keywords, identifiers, constants, operators and punctuation individually; ++ and < are each single tokens)?',
+    options: ['17', '18', '19', '20'],
+    answer: 2,
+    marks: 2,
+    difficulty: 'medium',
+    type: 'pyq-style',
+    explanation: 'Token by token: for, (, i, =, 0, ;, i, <, n, ;, i, ++, ), sum, =, sum, +, i, ; . Counting: for(1) ((2) i(3) =(4) 0(5) ;(6) i(7) <(8) n(9) ;(10) i(11) ++(12) )(13) sum(14) =(15) sum(16) +(17) i(18) ;(19). The increment operator ++ is scanned as a single maximal-munch token rather than two separate + tokens, and each semicolon inside the for-header is its own token. The total comes to 19 tokens, option 3.'
+  },
+  {
+    id: 'compiler-lexical-p3',
+    pyqStyle: true,
+    q: 'Count the tokens in the C statement `if(a>b&&b>c) max=a; else max=c;` (&& is one token; each identifier/keyword/operator/punctuation counts once).',
+    options: ['17', '18', '19', '20'],
+    answer: 2,
+    marks: 2,
+    difficulty: 'medium',
+    type: 'pyq-style',
+    explanation: 'Tokenizing left to right: if, (, a, >, b, &&, b, >, c, ), max, =, a, ;, else, max, =, c, ; . Numbering them: if(1) ((2) a(3) >(4) b(5) &&(6) b(7) >(8) c(9) )(10) max(11) =(12) a(13) ;(14) else(15) max(16) =(17) c(18) ;(19). By maximal munch, && is scanned as one logical-AND token rather than two & tokens. The keyword else is one token even though it starts a new clause. Total = 19 tokens, option 3.'
+  },
+  {
+    id: 'compiler-lexical-p4',
+    pyqStyle: true,
+    q: 'How many tokens does a C lexer generate for the expression statement `x = (a+b)*(c-d)/e;`?',
+    options: ['13', '14', '15', '16'],
+    answer: 3,
+    marks: 1,
+    difficulty: 'easy',
+    type: 'pyq-style',
+    explanation: 'Scanning: x, =, (, a, +, b, ), *, (, c, -, d, ), /, e, ; . That gives x(1) =(2) ((3) a(4) +(5) b(6) )(7) *(8) ((9) c(10) -(11) d(12) )(13) /(14) e(15) ;(16). Each parenthesis is a distinct punctuation token and each arithmetic operator (+, -, *, /) is its own token, so the statement tokenizes into 16 tokens total, option 4.'
+  },
+  {
+    id: 'compiler-lexical-p5',
+    pyqStyle: true,
+    q: 'How many tokens are produced by a C lexer for the statement `while(*p!=\'\\0\') p++;` (treat the character constant \'\\0\' as a single token, and != as a single relational-operator token)?',
+    options: ['8', '9', '10', '11'],
+    answer: 2,
+    marks: 2,
+    difficulty: 'medium',
+    type: 'pyq-style',
+    explanation: 'Tokens: while, (, *, p, !=, \'\\0\', ), p, ++, ; giving while(1) ((2) *(3) p(4) !=(5) \'\\0\'(6) )(7) p(8) ++(9) ;(10). The dereference operator * is one token distinct from the identifier p, the escaped character literal \'\\0\' is scanned by the lexer as a single character-constant token (the backslash-zero is consumed together with the surrounding quotes as one lexeme), and != is recognized as one relational operator by maximal munch rather than as ! followed by =. Total = 10 tokens, option 3.'
+  },
+  {
+    id: 'compiler-lexical-p6',
+    pyqStyle: true,
+    q: 'How many tokens does the C declaration `struct node *next;` tokenize into?',
+    options: ['3', '4', '5', '6'],
+    answer: 2,
+    marks: 1,
+    difficulty: 'easy',
+    type: 'pyq-style',
+    explanation: 'The tokens are: struct (keyword), node (identifier), * (operator/punctuator marking a pointer), next (identifier), ; (punctuation) -- struct(1) node(2) *(3) next(4) ;(5), for a total of 5 tokens, option 3. Even though "struct node *" conceptually names one pointer type, the lexer has no notion of types; it simply emits one token per lexeme it recognizes, and the asterisk is scanned as a standalone operator token regardless of its later syntactic role as a pointer declarator.'
+  },
+  {
+    id: 'compiler-lexical-p7',
+    pyqStyle: true,
+    q: 'How many tokens are produced when tokenizing the C statement `a[i]=a[i]+a[j]-1;`?',
+    options: ['14', '15', '16', '17'],
+    answer: 3,
+    marks: 2,
+    difficulty: 'medium',
+    type: 'pyq-style',
+    explanation: 'Tokens: a, [, i, ], =, a, [, i, ], +, a, [, j, ], -, 1, ; . Numbering: a(1) [(2) i(3) ](4) =(5) a(6) [(7) i(8) ](9) +(10) a(11) [(12) j(13) ](14) -(15) 1(16) ;(17). Every occurrence of the identifier a is a separate token even though it is lexically the same lexeme each time, and each square bracket is its own punctuation token, since the lexer classifies by lexeme occurrence, not by uniqueness. Total = 17 tokens, option 3.'
+  },
+  {
+    id: 'compiler-lexical-p8',
+    pyqStyle: true,
+    q: 'How many tokens does the C statement `printf("sum=%d\\n",sum);` tokenize into (treat the entire double-quoted string literal as a single token)?',
+    options: ['5', '6', '7', '8'],
+    answer: 2,
+    marks: 1,
+    difficulty: 'easy',
+    type: 'pyq-style',
+    explanation: 'Tokens: printf, (, "sum=%d\\n", , (comma), sum, ), ; . That is printf(1) ((2) "sum=%d\\n"(3) ,(4) sum(5) )(6) ;(7), for 7 tokens total, option 3. The entire string literal "sum=%d\\n" -- including its embedded format specifier and escape sequence -- is scanned by the lexer as ONE string-constant token, since the lexer treats everything between the matching double quotes (respecting escapes) as a single lexeme, not as separate tokens for its internal characters.'
+  },
+  {
+    id: 'compiler-lexical-p9',
+    pyqStyle: true,
+    q: 'How many tokens does the C declaration statement `int arr[10],i,sum=0;` tokenize into? (Enter your numerical answer.)',
+    options: [],
+    answer: 12,
+    kind: 'nat',
+    marks: 2,
+    difficulty: 'medium',
+    type: 'pyq-style',
+    explanation: 'Tokens: int, arr, [, 10, ], ,, i, ,, sum, =, 0, ; . Numbering them: int(1) arr(2) [(3) 10(4) ](5) ,(6) i(7) ,(8) sum(9) =(10) 0(11) ;(12). Each comma separating declarators is its own punctuation token, the array size 10 is a single numeric-constant token, and the initializer "=0" contributes an operator token and a constant token. Total = 12 tokens.'
+  },
+  {
+    id: 'compiler-lexical-p10',
+    pyqStyle: true,
+    q: 'How many tokens does the C statement `return (x>0)?x:-x;` tokenize into? (Enter your numerical answer.)',
+    options: [],
+    answer: 12,
+    kind: 'nat',
+    marks: 2,
+    difficulty: 'medium',
+    type: 'pyq-style',
+    explanation: 'Tokens: return, (, x, >, 0, ), ?, x, :, -, x, ; . Numbering: return(1) ((2) x(3) >(4) 0(5) )(6) ?(7) x(8) :(9) -(10) x(11) ;(12). The ternary operator contributes two separate single-character tokens, ? and :, and the unary minus before the final x is its own operator token distinct from the identifier that follows it. Total = 12 tokens.'
+  },
+  {
+    id: 'compiler-lexical-p11',
+    pyqStyle: true,
+    q: 'A lexical analyzer uses the maximal-munch (longest-match) rule. Applying this rule, how is the input `a=b<=c` correctly split into tokens?',
+    options: [
+      'a  ,  =  ,  b  ,  <=  ,  c   (identifier, assign, identifier, relop, identifier -- 5 tokens)',
+      'a  ,  =  ,  b  ,  <  ,  =  ,  c   (identifier, assign, identifier, less-than, assign, identifier -- 6 tokens)',
+      'a=b  ,  <=  ,  c   (treating "a=b" as one identifier-like lexeme, then <=, then c -- 3 tokens)',
+      'a  ,  =b<=c   (identifier, then everything else fused into one token -- 2 tokens)'
+    ],
+    answer: 0,
+    marks: 2,
+    difficulty: 'medium',
+    type: 'pyq-style',
+    explanation: 'Maximal munch means that at each position the lexer consumes the LONGEST prefix of the remaining input that still matches some valid token pattern. Scanning left to right: "a" is a maximal identifier (the next character = cannot extend it), so it is emitted as an identifier token; "=" alone does not extend into "==" (next character is b), so it is emitted as the assignment operator; "b" is emitted as an identifier (cannot extend into "b<" since < is not an identifier character); then at "<=c", the lexer greedily tries to extend "<" and finds that "<=" is also a valid token (the relational operator), which is longer than "<" alone, so by maximal munch it emits "<=" as a single token rather than "<" followed by "="; finally "c" is emitted as an identifier. The correct tokenization is therefore a / = / b / <= / c, exactly 5 tokens, matching option 1; option 2 wrongly splits <= into two tokens, violating maximal munch.'
+  },
+  {
+    id: 'compiler-lexical-p12',
+    pyqStyle: true,
+    q: 'How many tokens does the C statement `do{ i=i+1; }while(i<10);` tokenize into? (Enter your numerical answer.)',
+    options: [],
+    answer: 16,
+    kind: 'nat',
+    marks: 2,
+    difficulty: 'medium',
+    type: 'pyq-style',
+    explanation: 'Tokens: do, {, i, =, i, +, 1, ;, }, while, (, i, <, 10, ), ; . Numbering: do(1) {(2) i(3) =(4) i(5) +(6) 1(7) ;(8) }(9) while(10) ((11) i(12) <(13) 10(14) )(15) ;(16). Both braces of the do-while body are separate punctuation tokens, the keyword while introducing the loop condition is its own token distinct from the body, and the trailing semicolon that terminates a do-while statement (required in C, unlike a plain while loop) is counted as the final token. Total = 16 tokens.'
+  }
+);
+
+window.GATE_DATA.questions['compiler'].topics.find(function(t){return t.id==='compiler-parsing';}).questions.push(
+  {
+    id: 'compiler-parsing-p1',
+    pyqStyle: true,
+    q: 'Consider the grammar S -> A B c, A -> a | epsilon, B -> b | epsilon. What is FIRST(S)?',
+    options: ['{a, b, c}', '{a, b}', '{a}', '{a, b, c, epsilon}'],
+    answer: 0,
+    marks: 2,
+    difficulty: 'medium',
+    type: 'pyq-style',
+    explanation: 'FIRST(A) = {a, epsilon} and FIRST(B) = {b, epsilon}. To compute FIRST(S) for S -> A B c: start with FIRST(A) - {epsilon} = {a}. Since A can derive epsilon, also include FIRST(B) - {epsilon} = {b}. Since B can also derive epsilon, continue to the next symbol c and include FIRST(c) = {c} (since A and B can both vanish, S can start directly with c, as in the derivation S => AB c => Bc => c). So FIRST(S) = {a} U {b} U {c} = {a, b, c}, matching option 1. Epsilon itself is not included in FIRST(S) because S can never derive the empty string (the terminal c always remains).'
+  },
+  {
+    id: 'compiler-parsing-p2',
+    pyqStyle: true,
+    q: 'Grammar: S -> A | B, A -> aA | a, B -> ab | b. Filling in the LL(1) parsing table entry M[S, a], what do you find?',
+    options: [
+      'M[S,a] contains only S -> A, so the grammar is LL(1) on this cell',
+      'M[S,a] contains both S -> A and S -> B, a multiply-defined entry, so the grammar is NOT LL(1)',
+      'M[S,a] is empty (a parse error), since neither A nor B can start with a',
+      'M[S,a] contains only S -> B, so the grammar is LL(1) on this cell'
+    ],
+    answer: 1,
+    marks: 2,
+    difficulty: 'medium',
+    type: 'pyq-style',
+    explanation: 'FIRST(A) = {a} (from A -> aA | a, both alternatives start with a). FIRST(B) = {a, b} (from B -> ab, which starts with a, and B -> b). Since a is in FIRST(A) we place S -> A into M[S,a]; since a is also in FIRST(B) we place S -> B into the SAME cell M[S,a]. This gives two competing productions in one table cell, a classic multiply-defined entry, which means the top-down predictive parser cannot decide which production to use on seeing lookahead a, so the grammar is not LL(1), matching option 2.'
+  },
+  {
+    id: 'compiler-parsing-p3',
+    pyqStyle: true,
+    q: 'For the augmented grammar S\' -> S, S -> aS | b, how many states are there in the canonical collection of LR(0) items (including the initial state)?',
+    options: ['3', '4', '5', '6'],
+    answer: 2,
+    marks: 2,
+    difficulty: 'hard',
+    type: 'pyq-style',
+    explanation: 'Build the LR(0) automaton. I0 = closure{S\'->.S} = {S\'->.S, S->.aS, S->.b}. goto(I0,S)=I1={S\'->S.}. goto(I0,a)=I2=closure{S->a.S}={S->a.S, S->.aS, S->.b}. goto(I0,b)=I3={S->b.}. From I2: goto(I2,S)=I4={S->aS.}; goto(I2,a) returns to the same item set as I2 (self-loop, so no new state); goto(I2,b)=I3 (same as before). No new states arise from I3 or I4 (both are complete "reduce" items with no outgoing transitions). So the full collection is {I0, I1, I2, I3, I4} -- exactly 5 states, matching option 3.'
+  },
+  {
+    id: 'compiler-parsing-p4',
+    pyqStyle: true,
+    q: 'Grammar: S -> A a A b | C b C a, with A -> epsilon and C -> epsilon. In the SLR(1) construction, the state containing both items A -> . and C -> . has a reduce-reduce conflict because FOLLOW(A) and FOLLOW(C) overlap. What is FOLLOW(A) intersect FOLLOW(C)?',
+    options: ['{a}', '{b}', '{a, b}', 'the empty set (no actual conflict)'],
+    answer: 2,
+    marks: 2,
+    difficulty: 'hard',
+    type: 'pyq-style',
+    explanation: 'From S -> A a A b, the first A is immediately followed by terminal a, and the second A is immediately followed by terminal b, so FOLLOW(A) superset {a, b}. From S -> C b C a, the first C is followed by b and the second C is followed by a, so FOLLOW(C) superset {a, b}. Hence FOLLOW(A) = FOLLOW(C) = {a, b}, and their intersection is {a, b}. This means in the SLR state where both A -> . and C -> . are valid items (reached after deriving the empty prefix at the very start), the SLR reduce action would try to reduce by A -> epsilon on lookaheads {a,b} AND by C -> epsilon on the same lookaheads {a,b} -- a genuine reduce-reduce conflict, so this grammar is not SLR(1) even though it is unambiguous and in fact LR(1) (a canonical example showing SLR\'s lookahead sets are sometimes too coarse). Option 3 is correct.'
+  },
+  {
+    id: 'compiler-parsing-p5',
+    pyqStyle: true,
+    q: 'A grammar generates the language L = { aⁿbⁿcⁿ : n >= 1 } using productions S -> aSBC | abc, CB -> BC, bB -> bb, bC -> bc, cC -> cc. Since L is well known NOT to be a context-free language, what is the minimal Chomsky classification of this grammar?',
+    options: ['Type 3 (regular)', 'Type 2 (context-free)', 'Type 1 (context-sensitive, non-context-free)', 'Type 0 (unrestricted / recursively enumerable only)'],
+    answer: 2,
+    marks: 2,
+    difficulty: 'hard',
+    type: 'pyq-style',
+    explanation: 'Since L = {aⁿbⁿcⁿ} cannot be generated by any context-free grammar (this is a standard pumping-lemma-for-CFLs result), the grammar generating it cannot be Type 2 or Type 3 (both of those hierarchy levels only generate context-free or regular languages, a strict subset of context-sensitive languages). Examining the given rules -- CB->BC, bB->bb, bC->bc, cC->cc -- every right-hand side has length greater than or equal to the corresponding left-hand side (none of them shrink the sentential form), which is exactly the defining property of a Type 1 (context-sensitive / noncontracting) grammar. Since the grammar is noncontracting and generates a genuinely non-context-free language, it sits precisely at Type 1 in the Chomsky hierarchy, matching option 3 -- it need not be classified as unrestricted (Type 0) since it obeys the noncontracting length restriction.'
+  },
+  {
+    id: 'compiler-parsing-p6',
+    pyqStyle: true,
+    q: 'Using the classically ambiguous dangling-else grammar (stmt -> if expr then stmt | if expr then stmt else stmt | other), how many distinct parse trees exist for the string "if E1 then if E2 then S1 else S2"?',
+    options: ['1', '2', '3', '4'],
+    answer: 1,
+    marks: 2,
+    difficulty: 'medium',
+    type: 'pyq-style',
+    explanation: 'There are exactly two ways the grammar can attach the single "else S2" clause: (i) match it with the NEARER unmatched "then" (the inner "if E2 then"), giving if E1 then (if E2 then S1 else S2); or (ii) match it with the FARTHER "then" (the outer "if E1 then"), giving if E1 then (if E2 then S1) else S2 -- which requires reading the inner if-then as a complete stmt on its own and treating the else as belonging to the outer if. Both are syntactically valid derivations under this ambiguous grammar (the grammar itself does not disambiguate), so there are exactly 2 distinct parse trees, matching option 2. Real parsers avoid this by convention (match else to the nearest unmatched then), effectively picking interpretation (i) and discarding (ii), but the raw grammar is genuinely ambiguous with 2 parses for this string.'
+  },
+  {
+    id: 'compiler-parsing-p7',
+    pyqStyle: true,
+    q: 'Standard expression grammar: E -> T E\', E\' -> + T E\' | epsilon, T -> F T\', T\' -> * F T\' | epsilon, F -> ( E ) | id. What is FOLLOW(T\')?',
+    options: ['{+, *, ), $}', '{+, ), $}', '{*, +, id, (}', '{$}'],
+    answer: 1,
+    marks: 2,
+    difficulty: 'medium',
+    type: 'pyq-style',
+    explanation: 'T\' occurs only at the end of production T -> F T\', so FOLLOW(T\') = FOLLOW(T). To get FOLLOW(T): T occurs only in E -> T E\', so FOLLOW(T) = (FIRST(E\') - {epsilon}) U FOLLOW(E) (the second part included because E\' can derive epsilon, meaning T can effectively be immediately followed by whatever follows E). FIRST(E\') = {+, epsilon}, so its non-epsilon part contributes {+}. FOLLOW(E): E occurs inside F -> ( E ), so FOLLOW(E) includes {)}, and since E is also the grammar\'s start symbol, FOLLOW(E) includes {$}; so FOLLOW(E) = {), $}. Combining, FOLLOW(T) = {+} U {), $} = {+, ), $}. Since FOLLOW(T\') = FOLLOW(T), FOLLOW(T\') = {+, ), $}, matching option 2.'
+  },
+  {
+    id: 'compiler-parsing-p8',
+    pyqStyle: true,
+    q: 'When an LR(1) canonical parsing table is reduced to an LALR(1) table by merging states, which condition determines that two LR(1) states get merged into a single LALR(1) state?',
+    options: [
+      'The two states have the same CORE (identical set of LR(0) items, ignoring lookahead symbols), regardless of what their lookaheads are',
+      'The two states have the same lookahead sets on every item, regardless of the underlying LR(0) items',
+      'The two states are reached from the start state by the same number of grammar symbols',
+      'The two states both contain at least one reduce item, regardless of their cores or lookaheads'
+    ],
+    answer: 0,
+    marks: 1,
+    difficulty: 'medium',
+    type: 'pyq-style',
+    explanation: 'LALR(1) construction takes the full canonical LR(1) collection and merges together every group of LR(1) states that share the same CORE -- that is, the same underlying set of LR(0) items obtained by stripping away the lookahead component from every LR(1) item -- into one combined state whose lookahead sets are the UNION of the corresponding lookaheads from each merged state. States with different cores are never merged, since merging them would conflate genuinely different parsing configurations (different possible item sets), which is exactly what distinguishes LALR(1) (fewer states than canonical LR(1), same core-based automaton shape as LR(0)/SLR(1)) from full LR(1) (which keeps every lookahead-distinguished state separate). Option 1 correctly identifies "same core" as the merge criterion.'
+  },
+  {
+    id: 'compiler-parsing-p9',
+    pyqStyle: true,
+    q: 'Grammar: S -> aA | b, A -> cA | epsilon. Building the LL(1) parsing table for nonterminals {S, A} against terminal columns {a, b, c, $}, how many of the 8 table cells are BLANK (error) entries? (Enter your numerical answer.)',
+    options: [],
+    answer: 4,
+    kind: 'nat',
+    marks: 2,
+    difficulty: 'medium',
+    type: 'pyq-style',
+    explanation: 'FIRST(S) = {a, b}. FIRST(A) = {c, epsilon}. FOLLOW(A) = FOLLOW(S) = {$} (A occurs only at the very end of S -> aA, and S is the start symbol with nothing following it). Table entries: M[S,a] = S->aA (from a in FIRST(S)); M[S,b] = S->b (from b in FIRST(S)); M[S,c] = blank; M[S,$] = blank. M[A,c] = A->cA (from c in FIRST(A)); M[A,a] = blank; M[A,b] = blank; M[A,$] = A->epsilon (since epsilon is in FIRST(A), place the epsilon-production under every terminal in FOLLOW(A) = {$}). So filled cells are (S,a), (S,b), (A,c), (A,$) -- 4 filled cells out of 8 total, leaving exactly 4 blank (error) cells: (S,c), (S,$), (A,a), (A,b).'
+  },
+  {
+    id: 'compiler-parsing-p10',
+    pyqStyle: true,
+    q: 'Grammar: S -> A B, A -> a | epsilon, B -> b A | c. What is |FOLLOW(A)|, the number of terminals in FOLLOW(A)? (Enter your numerical answer.)',
+    options: [],
+    answer: 3,
+    kind: 'nat',
+    marks: 2,
+    difficulty: 'hard',
+    type: 'pyq-style',
+    explanation: 'A occurs in two places: (i) in S -> A B, where A is immediately followed by B, contributing FIRST(B) - {epsilon} to FOLLOW(A); and (ii) in B -> b A, where A is at the very END of the production, contributing all of FOLLOW(B) to FOLLOW(A). FIRST(B) = {b, c} (no epsilon, since both alternatives of B start with a terminal). So from (i): FOLLOW(A) superset {b, c}. FOLLOW(B): B occurs only at the end of S -> A B, so FOLLOW(B) = FOLLOW(S) = {$} (S is the start symbol). So from (ii): FOLLOW(A) superset {$}. Combining both contributions, FOLLOW(A) = {b, c} U {$} = {b, c, $}, which has |FOLLOW(A)| = 3 elements.'
+  },
+  {
+    id: 'compiler-parsing-p11',
+    pyqStyle: true,
+    q: 'For the string "if E1 then if E2 then if E3 then S1 else S2" parsed with the standard ambiguous dangling-else grammar, how many distinct parse trees exist (i.e., to how many different unmatched "then" clauses could the single "else" be attached)? (Enter your numerical answer.)',
+    options: [],
+    answer: 3,
+    kind: 'nat',
+    marks: 2,
+    difficulty: 'hard',
+    type: 'pyq-style',
+    explanation: 'There are three nested if-then constructs (headed by E1, E2, E3 respectively) and only one "else" clause in the string. Since none of the three "if...then" clauses has yet been given its own else at the point the "else S2" appears, the ambiguous grammar allows this single else to be grammatically attached to ANY of the three enclosing unmatched thens: attaching it to the innermost (if E3 then), to the middle one (if E2 then), or to the outermost (if E1 then) -- in each case the remaining if-then clauses simply become a nested stmt with no else of their own, which the grammar permits. Each of these 3 attachments yields a syntactically valid, structurally distinct parse tree, so the count is 3 (the usual "match nearest unmatched then" disambiguation rule picks just one of these three, but the raw ambiguous grammar admits all three).'
+  },
+  {
+    id: 'compiler-parsing-p12',
+    pyqStyle: true,
+    q: 'Which of the following statements about the standard grammar-class hierarchy used in parser construction are TRUE? (Select ALL that apply)',
+    options: [
+      'Every regular language can be generated by some context-free grammar',
+      'Every LL(1) grammar is unambiguous',
+      'Every SLR(1) grammar is also LALR(1) (the class of SLR(1) grammars is a subset of the class of LALR(1) grammars)',
+      'Every LALR(1) grammar is also SLR(1) (the two classes are identical)'
+    ],
+    answers: [0, 1, 2],
+    marks: 2,
+    difficulty: 'hard',
+    type: 'pyq-style',
+    explanation: 'Option 1 is true: the regular languages are a strict subset of the context-free languages, so any regular language (recognizable by a finite automaton) can also be described by some context-free grammar (e.g., by directly encoding the automaton\'s transitions as productions). Option 2 is true: an LL(1) parsing table has, by definition, at most one production in every cell, meaning at each point in a leftmost derivation exactly one expansion is chosen by the parser -- this determinism is precisely what forces every LL(1) grammar to be unambiguous. Option 3 is true: the accepted grammar-class containment is LR(0) subset SLR(1) subset LALR(1) subset LR(1) -- SLR(1)\'s FOLLOW-set-based lookaheads are always at least as coarse (or equal) as LALR(1)\'s more precise, context-specific lookaheads, so anything decidable with SLR(1) lookaheads remains decidable with LALR(1)\'s at-least-as-fine lookaheads, making every SLR(1) grammar also LALR(1). Option 4 is FALSE: the containment is one-directional -- there exist grammars that are LALR(1) but not SLR(1) (i.e., resolvable with LALR(1)\'s per-state lookaheads but causing reduce-reduce or shift-reduce conflicts under SLR(1)\'s coarser FOLLOW-based lookaheads), so the two classes are not identical.'
+  }
+);
+
+window.GATE_DATA.questions['compiler'].topics.find(function(t){return t.id==='compiler-sdt';}).questions.push(
+  {
+    id: 'compiler-sdt-p1',
+    pyqStyle: true,
+    q: 'A synthesized-attribute SDD for arithmetic expressions is: E -> E1 + T {E.val = E1.val + T.val} | T {E.val = T.val}; T -> T1 * F {T.val = T1.val * F.val} | F {T.val = F.val}; F -> digit {F.val = digit.lexval}. Using this SDD, what value is computed for E.val on input "2+3*4"? (Enter your numerical answer.)',
+    options: [],
+    answer: 14,
+    kind: 'nat',
+    marks: 1,
+    difficulty: 'easy',
+    type: 'pyq-style',
+    explanation: 'The grammar enforces the usual precedence of * over + through its structure (T handles multiplication, E handles addition of T terms), so "2+3*4" parses as 2 + (3*4). Evaluating bottom-up via the synthesized attributes: F.val=3, F.val=4 combine as T.val = 3*4 = 12 (via T -> T1*F); separately F.val=2 gives T.val=2 (via T->F); finally E.val = E1.val + T.val = 2 + 12 = 14. So the computed E.val is 14, matching standard operator precedence.'
+  },
+  {
+    id: 'compiler-sdt-p2',
+    pyqStyle: true,
+    q: 'Consider the SDD: D -> T L {L.in = T.type}; T -> int {T.type = integer} | real {T.type = real}; L -> L1 , id {L1.in = L.in; addtype(id.entry, L.in)} | id {addtype(id.entry, L.in)}. Here L.in is an INHERITED attribute passed down from D to L and then leftward from L to L1. How should this SDD be classified?',
+    options: [
+      'S-attributed only (uses only synthesized attributes)',
+      'L-attributed but NOT S-attributed (it uses an inherited attribute, but every inherited attribute depends only on the parent or symbols to its left)',
+      'Neither S-attributed nor L-attributed (it violates the left-to-right dependency restriction)',
+      'Not a valid SDD at all, since inherited attributes cannot be used in any evaluation order'
+    ],
+    answer: 1,
+    marks: 2,
+    difficulty: 'medium',
+    type: 'pyq-style',
+    explanation: 'This SDD is not S-attributed because L.in is an INHERITED attribute (it is not computed bottom-up purely from children; it is passed down from the parent D and then further down from L to its left child L1). However, it IS L-attributed: L.in in D -> T L depends only on T.type, a symbol to the LEFT of L in that production; and L1.in in L -> L1, id depends only on L.in, an inherited attribute of the PARENT L (which is allowed under the L-attributed rule -- an inherited attribute of Xi may depend on inherited attributes of the left-hand-side nonterminal and on attributes of symbols X1..X(i-1) to its left). Since every inherited-attribute dependency here respects this left-to-right, parent-or-left-sibling restriction, the SDD is L-attributed but not S-attributed, matching option 2. This is precisely the classic "distribute the declared type across a list of identifiers" pattern.'
+  },
+  {
+    id: 'compiler-sdt-p3',
+    pyqStyle: true,
+    q: 'Using the same type-distribution SDD as before (D -> T L {L.in=T.type}; L -> L1,id {L1.in=L.in; addtype(id.entry,L.in)} | id {addtype(id.entry,L.in)}), how many times is addtype() invoked while processing the declaration "real x, y, z"? (Enter your numerical answer.)',
+    options: [],
+    answer: 3,
+    kind: 'nat',
+    marks: 1,
+    difficulty: 'easy',
+    type: 'pyq-style',
+    explanation: 'The identifier list "x, y, z" is parsed via the left-recursive L production, unwinding as L -> L1,id where L1 itself further expands until reaching the base case L -> id. There are exactly 3 identifiers in the list (x, y, z), and the SDT calls addtype() exactly once per identifier -- once at the base-case reduction for the first identifier x, and once at each subsequent L -> L1,id reduction for y and then z. Since T.type = real is propagated down as L.in = real to every one of these calls, addtype() is invoked exactly 3 times, once for each of x, y, and z, all recording type real.'
+  },
+  {
+    id: 'compiler-sdt-p4',
+    pyqStyle: true,
+    q: 'An S-attributed SDD evaluates left-associative subtraction and addition: E -> E1 - T {E.val=E1.val-T.val} | E1 + T {E.val=E1.val+T.val} | T {E.val=T.val}; T -> digit {T.val=digit.lexval}. What value does E.val evaluate to for the input "9-5+2"? (Enter your numerical answer.)',
+    options: [],
+    answer: 6,
+    kind: 'nat',
+    marks: 1,
+    difficulty: 'easy',
+    type: 'pyq-style',
+    explanation: 'Because - and + have equal precedence and the grammar is left-recursive (E -> E1 op T), the expression is forced to associate strictly left-to-right, exactly like ordinary left-associative evaluation: "9-5+2" is grouped as (9-5)+2. Evaluating bottom-up: first E.val = 9-5 = 4 (from the E1-T alternative), then the outer E.val = 4+2 = 6 (from the E1+T alternative). So the SDT computes E.val = 6, confirming that this S-attributed grammar correctly encodes left-to-right associativity for operators of equal precedence.'
+  },
+  {
+    id: 'compiler-sdt-p5',
+    pyqStyle: true,
+    q: 'Consider the SDD rule A -> B C {B.in = C.val}, where B.in is an inherited attribute assigned from C.val, and C.val is a synthesized attribute of C computed independently. Is this SDD L-attributed?',
+    options: [
+      'Yes, because B.in is still an inherited attribute, and any inherited attribute assignment automatically satisfies the L-attributed condition',
+      'No, this violates the L-attributed restriction, because B is to the LEFT of C in the production, yet B\'s inherited attribute depends on C, which is to its RIGHT',
+      'Yes, because C.val is synthesized, and inherited attributes are always allowed to depend on synthesized attributes regardless of position',
+      'It cannot be determined without knowing the grammar rules for B and C individually'
+    ],
+    answer: 1,
+    marks: 2,
+    difficulty: 'medium',
+    type: 'pyq-style',
+    explanation: 'The L-attributed restriction requires that an inherited attribute of a right-hand-side symbol Xi may depend ONLY on: (a) inherited attributes of the left-hand-side nonterminal (here A), and (b) attributes (of any kind) of symbols X1, ..., X(i-1) that appear strictly to the LEFT of Xi in the same production. Here, B is X1 (leftmost) and C is X2 (to its right); the rule assigns B.in (an inherited attribute of the LEFT symbol B) using C.val, an attribute of C, which is to B\'s RIGHT. This dependency runs backward against the required left-to-right order, so it directly violates the L-attributed condition -- this SDD is neither S-attributed (it uses an inherited attribute at all) nor L-attributed (the dependency direction is wrong), matching option 2.'
+  },
+  {
+    id: 'compiler-sdt-p6',
+    pyqStyle: true,
+    q: 'An SDT assigns storage offsets using inherited attributes: D -> D1 ; D2, with a running "offset" counter, where each declaration "id : T" gets addtype(id.entry, T.type, offset) and then offset is incremented by T.width (int has width 4, real has width 8). Processing the declarations "a:int; b:real; c:int" left to right, starting offset = 0, what offset is assigned to c? (Enter your numerical answer.)',
+    options: [],
+    answer: 12,
+    kind: 'nat',
+    marks: 2,
+    difficulty: 'medium',
+    type: 'pyq-style',
+    explanation: 'Processing declarations strictly left to right, tracking the running offset: a is declared at offset 0 (int, width 4), so after processing a, offset becomes 0+4=4. Next, b is declared at offset 4 (real, width 8), so after processing b, offset becomes 4+8=12. Finally, c is declared at the now-current offset, which is 12 (int, width 4; after c, offset would become 16, but that is not asked). So the offset assigned to c is 12, reflecting the cumulative storage consumed by a (4 bytes) and b (8 bytes) before it.'
+  },
+  {
+    id: 'compiler-sdt-p7',
+    pyqStyle: true,
+    q: 'An S-attributed SDD for expressions with unary minus is: E -> E1+E2 {E.val=E1.val+E2.val} | E1*E2 {E.val=E1.val*E2.val} | -E1 {E.val = -E1.val} | digit {E.val=digit.lexval}, with the grammar structured so that * binds tighter than + and unary minus binds tighter than both. What value does E.val evaluate to for "-3+4*2"? (Enter your numerical answer.)',
+    options: [],
+    answer: 5,
+    kind: 'nat',
+    marks: 2,
+    difficulty: 'medium',
+    type: 'pyq-style',
+    explanation: 'By the stated precedence (unary minus tightest, then *, then + loosest), "-3+4*2" parses as (-3) + (4*2). Evaluating bottom-up: the unary-minus production gives E.val = -(3) = -3 for the first term; the multiplication production gives E.val = 4*2 = 8 for the second term; the addition production then combines them as E.val = -3 + 8 = 5. So the SDT evaluates the whole expression to 5.'
+  },
+  {
+    id: 'compiler-sdt-p8',
+    pyqStyle: true,
+    q: 'Which of the following syntax-directed definitions are S-ATTRIBUTED (use only synthesized attributes, with every semantic action computable after all of a production\'s children have been parsed)? (Select ALL that apply)',
+    options: [
+      'Every semantic action in the SDD sits at the end of the production\'s right-hand side and computes the LHS attribute purely from the SYNTHESIZED attributes of the RHS symbols',
+      'A semantic action assigns an INHERITED attribute of a right-sibling symbol using a synthesized attribute of a left-sibling symbol that appears earlier in the same production',
+      'The SDT is a pure "postfix" translation scheme, where every action appears only after all the grammar symbols of the production, computing new attributes strictly from already-available children attributes',
+      'A semantic action assigns an inherited attribute of the LHS nonterminal using a synthesized attribute of a RIGHT sibling that appears later in the same production'
+    ],
+    answers: [0, 2],
+    marks: 2,
+    difficulty: 'hard',
+    type: 'pyq-style',
+    explanation: 'Option 1 describes exactly the definition of S-attributed: every attribute computed is synthesized, built bottom-up solely from the RHS symbols\' own synthesized attributes -- this is S-attributed. Option 3 describes a "postfix SDT", which is simply the syntax-directed TRANSLATION SCHEME realization of an S-attributed SDD (actions placed at the very end, after every symbol, computing purely synthesized values) -- also S-attributed. Option 2 is FALSE for S-attributed: it explicitly uses an INHERITED attribute (of the right sibling), so by definition it cannot be S-attributed, even though it happens to still respect L-attributed left-to-right ordering. Option 4 is FALSE for S-attributed for the same reason (it computes an inherited attribute of the LHS) and is additionally NOT even L-attributed, since it depends on a symbol to its right rather than to its left.'
+  },
+  {
+    id: 'compiler-sdt-p9',
+    pyqStyle: true,
+    q: 'Using a postfix (S-attributed) SDT that evaluates * before + according to standard precedence, what value does the expression "3*4+5*2" evaluate to? (Enter your numerical answer.)',
+    options: [],
+    answer: 22,
+    kind: 'nat',
+    marks: 1,
+    difficulty: 'easy',
+    type: 'pyq-style',
+    explanation: 'By standard operator precedence enforced by the layered expression grammar (multiplication binds tighter than addition), "3*4+5*2" evaluates as (3*4) + (5*2) = 12 + 10 = 22. The postfix SDT computes the multiplications first (as they occur at a lower level of the parse tree, in the T/F nonterminals), producing the synthesized values 12 and 10, which are then combined by the addition action at the E level to give the final synthesized value 22.'
+  },
+  {
+    id: 'compiler-sdt-p10',
+    pyqStyle: true,
+    q: 'In a proper L-attributed SDD, for a production A -> X1 X2 ... Xn, an INHERITED attribute of the symbol Xi (for some i) is allowed to depend only on:',
+    options: [
+      'inherited attributes of A, and attributes (synthesized or inherited) of X1, X2, ..., X(i-1), i.e., only symbols to the LEFT of Xi plus the parent',
+      'synthesized attributes of X(i+1), ..., Xn, i.e., only symbols to the RIGHT of Xi',
+      'any attribute of any symbol anywhere in the entire parse tree, with no positional restriction',
+      'only the synthesized attributes of Xi\'s own children, never attributes from outside the subtree rooted at Xi'
+    ],
+    answer: 0,
+    marks: 1,
+    difficulty: 'easy',
+    type: 'pyq-style',
+    explanation: 'This is precisely the defining restriction of an L-attributed SDD: an inherited attribute of a right-hand-side symbol Xi may depend only on (a) the inherited attributes of the production\'s left-hand-side nonterminal A (i.e., what was passed down from above), and (b) any attribute -- synthesized or inherited -- of the symbols X1 through X(i-1) that appear strictly to Xi\'s LEFT within the same production. This "left-to-right, parent-or-left-sibling-only" rule is exactly what permits attributes to be evaluated in a single left-to-right depth-first traversal of the parse tree, which is why L-attributed SDDs can be implemented efficiently with predictive (top-down, e.g., recursive-descent) parsers. Option 1 states this correctly; the other options either reverse the direction (option 2) or remove the restriction entirely (option 3), or describe pure synthesis with no inheritance at all (option 4).'
+  },
+  {
+    id: 'compiler-sdt-p11',
+    pyqStyle: true,
+    q: 'A type-checking SDD promotes an arithmetic expression\'s type to "real" if ANY operand involved is real, and keeps it "int" only if EVERY operand is int, following the rule E -> E1 + E2 {E.type = if (E1.type==real or E2.type==real) then real else int}. Given the expression id1 + id2 + id3 where id1 is int, id2 is real, and id3 is int (left-associative, i.e. parsed as (id1+id2)+id3), what is the resulting E.type for the whole expression?',
+    options: ['int', 'real', 'undefined / type error', 'depends on evaluation order, cannot be determined'],
+    answer: 1,
+    marks: 1,
+    difficulty: 'easy',
+    type: 'pyq-style',
+    explanation: 'Evaluating bottom-up following the left-associative parse (id1+id2)+id3: first, the inner subexpression id1+id2 has id1.type=int and id2.type=real, so since at least one operand (id2) is real, this subexpression\'s type becomes real. Next, the outer expression combines this real-typed result with id3 (int): since at least one operand (the inner sum, now typed real) is real, the overall expression\'s type is also real. So the SDT computes E.type = real for the whole expression -- once any operand anywhere in the expression is real, type promotion propagates upward through every enclosing addition, regardless of how many int operands are also present.'
+  },
+  {
+    id: 'compiler-sdt-p12',
+    pyqStyle: true,
+    q: 'Using a postfix SDT that respects standard precedence and left-to-right associativity for equal-precedence operators, evaluate the expression "6/2+3*2-1". (Enter your numerical answer.)',
+    options: [],
+    answer: 8,
+    kind: 'nat',
+    marks: 2,
+    difficulty: 'medium',
+    type: 'pyq-style',
+    explanation: 'By standard precedence (/ and * bind tighter than + and -, and +/- of equal precedence associate left to right), "6/2+3*2-1" parses as ((6/2) + (3*2)) - 1. Evaluating bottom-up: 6/2=3 and 3*2=6 are computed first at the lower (T) level of the grammar; these combine via addition to give 3+6=9 at the E level; finally the trailing "-1" is applied left-to-right, giving 9-1=8. So the SDT evaluates the full expression to 8.'
+  }
+);
+
+window.GATE_DATA.questions['compiler'].topics.find(function(t){return t.id==='compiler-icg';}).questions.push(
+  {
+    id: 'compiler-icg-p1',
+    pyqStyle: true,
+    q: 'Using the standard naive three-address-code translation (one TAC instruction per operator application, no common-subexpression sharing), how many three-address statements are generated for "a = b*c + b*c - d;"? (Enter your numerical answer.)',
+    options: [],
+    answer: 5,
+    kind: 'nat',
+    marks: 1,
+    difficulty: 'easy',
+    type: 'pyq-style',
+    explanation: 'Without any optimization, each operator becomes its own three-address instruction, in evaluation order: t1 = b*c; t2 = b*c; t3 = t1+t2; t4 = t3-d; a = t4. That is 5 separate TAC statements -- one for each of the two multiplications, one for the addition, one for the subtraction, and one for the final assignment to a. Naive translation does not notice that the two "b*c" computations are identical; that recognition only happens under common-subexpression elimination.'
+  },
+  {
+    id: 'compiler-icg-p2',
+    pyqStyle: true,
+    q: 'Building a DAG (directed acyclic graph) for the expression "a = b*c + b*c - d" (which automatically shares identical subexpressions as a single node), how many total DAG nodes are there, counting both leaf (identifier/constant) nodes and interior (operator) nodes?',
+    options: ['4', '5', '6', '7'],
+    answer: 2,
+    marks: 2,
+    difficulty: 'medium',
+    type: 'pyq-style',
+    explanation: 'Leaves: b, c, and d are three distinct leaf nodes. Interior nodes: since both occurrences of "b*c" use the identical operands b and c, the DAG construction algorithm recognizes them as the SAME node -- a DAG never duplicates a node for an already-existing identical computation -- so there is only ONE "*" node representing b*c (shared, used twice as input to the "+" node below). Then there is one "+" node computing (b*c)+(b*c) using that single shared multiply node as BOTH of its operands, and one "-" node computing that sum minus d, which is labeled with a (the final assigned variable). Total nodes = 3 leaves (b,c,d) + 3 interior nodes (*, +, -) = 6 nodes, matching option 3.'
+  },
+  {
+    id: 'compiler-icg-p3',
+    pyqStyle: true,
+    q: 'Using standard TAC translation for the statement "if (a<b) x=1; else x=2;" (with labels not counted as separate instructions), how many three-address instructions are generated? (Enter your numerical answer.)',
+    options: [],
+    answer: 4,
+    kind: 'nat',
+    marks: 1,
+    difficulty: 'easy',
+    type: 'pyq-style',
+    explanation: 'The standard translation is: (1) ifFalse a<b goto L1; (2) x=1; (3) goto L2; L1: (4) x=2; L2: (nothing after, just the label marking the join point). Labels themselves (L1, L2) mark positions in the code but are not counted as separate executable instructions. Counting only the actual instructions: the conditional test, the then-branch assignment, the unconditional jump over the else-branch, and the else-branch assignment -- that is exactly 4 three-address instructions.'
+  },
+  {
+    id: 'compiler-icg-p4',
+    pyqStyle: true,
+    q: 'How many total DAG nodes (leaves plus interior operator nodes) are needed to represent the expression "(a+b)*(a+b-c)", exploiting the shared common subexpression "a+b"?',
+    options: ['5', '6', '7', '8'],
+    answer: 1,
+    marks: 2,
+    difficulty: 'medium',
+    type: 'pyq-style',
+    explanation: 'Leaves: a, b, c are three distinct leaves. The subexpression "a+b" appears identically in both the left factor and inside the right factor, so the DAG represents it with a SINGLE shared "+" node rather than computing it twice. That shared "+" node then feeds into a "-" node (computing (a+b)-c, using the shared node and leaf c), and separately feeds into the outer "*" node (computing (a+b)*((a+b)-c), using the SAME shared "+" node as its left operand and the "-" node as its right operand). Total nodes = 3 leaves + 3 interior nodes (the shared +, the -, and the outer *) = 6 nodes, matching option 2.'
+  },
+  {
+    id: 'compiler-icg-p5',
+    pyqStyle: true,
+    q: 'How many three-address instructions (excluding labels) are generated by the standard translation of "while(i<n) { i=i+1; }"? (Enter your numerical answer.)',
+    options: [],
+    answer: 3,
+    kind: 'nat',
+    marks: 1,
+    difficulty: 'easy',
+    type: 'pyq-style',
+    explanation: 'Standard while-loop translation: L1: (1) ifFalse i<n goto L2; (2) i=i+1; (3) goto L1; L2: (end, no instruction). The label L1 marks the loop-test entry point and L2 marks the exit point, but neither label is itself an executable instruction. Counting only the real instructions -- the loop-condition test, the increment assignment inside the body, and the unconditional jump back to re-test the condition -- gives exactly 3 three-address instructions.'
+  },
+  {
+    id: 'compiler-icg-p6',
+    pyqStyle: true,
+    q: 'Using standard indexed-addressing TAC translation (4 bytes per array element, requiring an explicit offset-multiply temporary for each array access) for the statement "a[i] = b[j] + c[k];", how many three-address instructions are generated? (Enter your numerical answer.)',
+    options: [],
+    answer: 7,
+    kind: 'nat',
+    marks: 2,
+    difficulty: 'medium',
+    type: 'pyq-style',
+    explanation: 'Each array reference needs its own byte-offset computed via a multiply by the element size (4), then an indexed load; the final indexed store needs its own offset computed too. The full translation is: (1) t1=j*4; (2) t2=b[t1]; (3) t3=k*4; (4) t4=c[t3]; (5) t5=t2+t4; (6) t6=i*4; (7) a[t6]=t5. That totals 7 three-address instructions: two offset-multiplies and one indexed load for each of the two source array reads (4 instructions), one addition combining them, and one more offset-multiply plus one indexed store for the destination array write (2 more instructions).'
+  },
+  {
+    id: 'compiler-icg-p7',
+    pyqStyle: true,
+    q: 'How many total DAG nodes represent the expression "-(a+b)*(a+b)+c", where the two occurrences of "(a+b)" are recognized as the same subexpression?',
+    options: ['5', '6', '7', '8'],
+    answer: 2,
+    marks: 2,
+    difficulty: 'hard',
+    type: 'pyq-style',
+    explanation: 'Leaves: a, b, c are 3 distinct leaves. Interior nodes: one shared "+" node for "a+b" (used identically in both places it appears); one unary "-" node applied to that shared "+" node (giving -(a+b)); one "*" node multiplying the unary-minus result by the SAME shared "+" node again (giving -(a+b)*(a+b)); and finally one outer "+" node adding leaf c to that product. That is 4 interior nodes (shared +, unary -, *, outer +) plus 3 leaves = 7 total DAG nodes, matching option 3.'
+  },
+  {
+    id: 'compiler-icg-p8',
+    pyqStyle: true,
+    q: 'Using standard TAC translation for the chained conditional "if(a==1) x=10; else if(a==2) x=20; else x=30;" (labels not counted as instructions), how many three-address instructions are generated? (Enter your numerical answer.)',
+    options: [],
+    answer: 7,
+    kind: 'nat',
+    marks: 2,
+    difficulty: 'medium',
+    type: 'pyq-style',
+    explanation: 'The standard cascading translation is: (1) ifFalse a==1 goto L1; (2) x=10; (3) goto L3; L1: (4) ifFalse a==2 goto L2; (5) x=20; (6) goto L3; L2: (7) x=30; L3: (end). Counting only actual instructions (not the labels L1, L2, L3, which just mark jump targets): two conditional tests, two branch-taken assignments (x=10 and x=20), two jumps to the common exit label L3, and the final else-branch assignment x=30. That totals 7 three-address instructions.'
+  },
+  {
+    id: 'compiler-icg-p9',
+    pyqStyle: true,
+    q: 'How many total DAG nodes represent the boolean expression "(a<b) && (c<d) || (a<b)", where the two identical occurrences of "(a<b)" are recognized as the same subexpression?',
+    options: ['6', '7', '8', '9'],
+    answer: 2,
+    marks: 2,
+    difficulty: 'hard',
+    type: 'pyq-style',
+    explanation: 'Leaves: a, b, c, d are 4 distinct leaves. Interior nodes: one shared "<" node for "a<b" (used in both the && and the ||, since both occurrences are textually and semantically identical, so the DAG reuses the same node rather than creating a duplicate); one separate "<" node for "c<d" (a different comparison, using different operands, so it cannot be merged with the a<b node); one "&&" node combining the shared a<b node with the c<d node; and one outer "||" node combining the "&&" result with the SAME shared a<b node again. That gives 4 interior nodes (shared <, second <, &&, ||) plus 4 leaves = 8 total DAG nodes, matching option 3.'
+  },
+  {
+    id: 'compiler-icg-p10',
+    pyqStyle: true,
+    q: 'Using standard naive TAC translation respecting operator precedence (no CSE), how many three-address instructions (including the final assignment to x) are generated for "x = a+b*c-d/e+f;", given the expression associates as (((a+(b*c))-(d/e))+f)?',
+    options: [],
+    answer: 5,
+    kind: 'nat',
+    marks: 2,
+    difficulty: 'medium',
+    type: 'pyq-style',
+    explanation: 'Following the given associativity (((a+(b*c))-(d/e))+f), the naive translation is: (1) t1=b*c; (2) t2=a+t1; (3) t3=d/e; (4) t4=t2-t3; (5) x=t4+f. Each of the 5 binary operators in the expression (*, +, /, -, and the final +) becomes exactly one three-address instruction, with the very last one directly assigning the result to x rather than to a fresh temporary. So the total is 5 three-address instructions.'
+  },
+  {
+    id: 'compiler-icg-p11',
+    pyqStyle: true,
+    q: 'How many total DAG nodes are needed for the block of statements "t1=a+b; t2=a+b; t3=t1*t2; t4=a+b;" (recognizing that all three occurrences of "a+b" use the same unchanged operands a and b)?',
+    options: ['3', '4', '5', '6'],
+    answer: 1,
+    marks: 2,
+    difficulty: 'medium',
+    type: 'pyq-style',
+    explanation: 'Leaves: a and b are the only 2 distinct leaves (a and b are never reassigned in this block). Since all three statements t1=a+b, t2=a+b, and t4=a+b compute the identical expression on identical, unchanged operands, the DAG merges them into a SINGLE "+" node -- t1, t2, and t4 all become labels attached to (or simple copies referencing) that one shared node. Then t3=t1*t2 becomes a "*" node whose BOTH operands point to that same single shared "+" node (since t1 and t2 both refer to it). Total distinct nodes = 2 leaves (a, b) + 2 interior nodes (the shared + node, and the * node) = 4 nodes, matching option 2.'
+  },
+  {
+    id: 'compiler-icg-p12',
+    pyqStyle: true,
+    q: 'Using standard TAC translation with 4-byte array elements for "for(i=0;i<n;i++) sum=sum+a[i];" (labels not counted as instructions), how many three-address instructions are generated? (Enter your numerical answer.)',
+    options: [],
+    answer: 7,
+    kind: 'nat',
+    marks: 2,
+    difficulty: 'hard',
+    type: 'pyq-style',
+    explanation: 'Standard translation: (1) i=0; L1: (2) ifFalse i<n goto L2; (3) t1=i*4; (4) t2=a[t1]; (5) sum=sum+t2; (6) i=i+1; (7) goto L1; L2: (end). Counting only real instructions (not the L1/L2 labels): the loop initialization, the condition test, the array-offset computation and indexed load (2 instructions), the running-sum update, the increment, and the jump back to re-test -- that totals 7 three-address instructions for the full loop translation.'
+  }
+);
+
+window.GATE_DATA.questions['compiler'].topics.find(function(t){return t.id==='compiler-runtime';}).questions.push(
+  {
+    id: 'compiler-runtime-p1',
+    pyqStyle: true,
+    q: 'Consider: int x=1; void p(){ print(x); } void q(){ int x=2; p(); } void main(){ q(); }. What does this program print under STATIC scoping and under DYNAMIC scoping, respectively?',
+    options: ['1 and 2', '2 and 1', '1 and 1', '2 and 2'],
+    answer: 0,
+    marks: 2,
+    difficulty: 'medium',
+    type: 'pyq-style',
+    explanation: 'Under STATIC (lexical) scoping, the free variable x inside p() is resolved according to where p is textually DEFINED, not where it is called from. Since p() is defined at the top level (not nested inside q), its free reference to x binds to the global x=1, regardless of who calls p -- so it prints 1. Under DYNAMIC scoping, the free variable x inside p() is resolved by searching the CALL chain (activation records currently on the stack) from most recent to least recent: main called q, q called p, so p looks for the nearest enclosing active x, which is q\'s local x=2 -- so it prints 2. Hence the outputs are 1 (static) and 2 (dynamic), matching option 1.'
+  },
+  {
+    id: 'compiler-runtime-p2',
+    pyqStyle: true,
+    q: 'void swap(int a, int b){ int t=a; a=b; b=t; } void main(){ int x=5,y=10; swap(x,y); print(x,y); }. What is printed under call-by-value versus call-by-reference respectively?',
+    options: ['"5 10" and "5 10"', '"5 10" and "10 5"', '"10 5" and "5 10"', '"10 5" and "10 5"'],
+    answer: 1,
+    marks: 1,
+    difficulty: 'easy',
+    type: 'pyq-style',
+    explanation: 'Under call-by-value, the parameters a and b receive independent COPIES of x and y\'s values; swap() only rearranges its own local copies, and this has no effect on the caller\'s actual variables x and y, so print(x,y) still shows the original "5 10". Under call-by-reference, a and b are ALIASES for x and y themselves (bound to their addresses), so assigning to a and b inside swap() directly modifies x and y in the caller, correctly swapping them; print(x,y) now shows "10 5". This is the canonical example distinguishing the two parameter-passing mechanisms.'
+  },
+  {
+    id: 'compiler-runtime-p3',
+    pyqStyle: true,
+    q: 'int a[3]={1,2,3}; void f(int x, int y){ x=x+1; y=y+2; } void main(){ f(a[0], a[1]); print(a[0]+a[1]); }. Under call-by-VALUE parameter passing, what value does this print? (Enter your numerical answer.)',
+    options: [],
+    answer: 3,
+    kind: 'nat',
+    marks: 1,
+    difficulty: 'easy',
+    type: 'pyq-style',
+    explanation: 'Under call-by-value, f receives copies of a[0] (=1) and a[1] (=2) in its local parameters x and y. The modifications x=x+1 and y=y+2 inside f only change these local copies and have absolutely no effect on the original array elements a[0] and a[1], since no address or reference back to the array was ever passed. So after the call returns, a[0] is still 1 and a[1] is still 2, and print(a[0]+a[1]) computes 1+2 = 3.'
+  },
+  {
+    id: 'compiler-runtime-p4',
+    pyqStyle: true,
+    q: 'int x=4; void A(){ int x=1; B(); } void B(){ print(x); } void main(){ x=9; A(); }. What does this print under static scoping and dynamic scoping respectively?',
+    options: ['9 and 1', '1 and 9', '4 and 1', '9 and 9'],
+    answer: 0,
+    marks: 2,
+    difficulty: 'hard',
+    type: 'pyq-style',
+    explanation: 'B() is defined at the TOP LEVEL, not nested inside A, so under STATIC scoping its free reference to x always binds to the global x, regardless of the call chain. main() sets the global x to 9 before calling A (which calls B), so under static scoping B() prints 9. Under DYNAMIC scoping, B()\'s reference to x is resolved by searching the live call chain main -> A -> B for the most recently established x: A has just declared its own local x=1 before calling B, so B finds and prints A\'s local x, which is 1. Hence static scoping gives 9 and dynamic scoping gives 1, matching option 1.'
+  },
+  {
+    id: 'compiler-runtime-p5',
+    pyqStyle: true,
+    q: 'void p(int i){ i=i+1; print(i); } void main(){ int a=5; p(a); print(a); }. Under call-by-VALUE, what two values are printed, in order (first the print inside p, then the print after p returns)?',
+    options: ['5, 5', '6, 5', '6, 6', '5, 6'],
+    answer: 1,
+    marks: 1,
+    difficulty: 'easy',
+    type: 'pyq-style',
+    explanation: 'Under call-by-value, p\'s parameter i receives a COPY of a\'s value (5). Inside p, i=i+1 makes the local copy 6, and print(i) inside p shows 6. Since i is only a local copy with no connection back to a, the caller\'s variable a remains completely unaffected (still 5) after p returns, so the second print(a) shows 5. The sequence of printed values is therefore 6, then 5, matching option 2.'
+  },
+  {
+    id: 'compiler-runtime-p6',
+    pyqStyle: true,
+    q: 'int x=1; void f(){ print(x); } void g(){ int x=2; f(); } void h(){ int x=3; g(); } void main(){ h(); }. What does this print under static scoping, and under dynamic scoping, respectively?',
+    options: ['1 and 2', '1 and 3', '3 and 1', '2 and 1'],
+    answer: 0,
+    marks: 2,
+    difficulty: 'hard',
+    type: 'pyq-style',
+    explanation: 'f() is defined at the TOP LEVEL, so under STATIC scoping its free reference to x always resolves to the global x=1, no matter how deeply it is called from within h() and g() -- so static scoping prints 1. Under DYNAMIC scoping, f()\'s reference is resolved by walking the current call chain (main -> h -> g -> f) from the point of call backward, looking for the nearest active declaration of x: g\'s local x=2 was declared most recently before calling f (h\'s local x=3 is further back in the chain and is shadowed by g\'s own x within g\'s scope), so dynamic scoping finds g\'s x=2 first and prints 2. Hence the outputs are 1 (static) and 2 (dynamic), matching option 1.'
+  },
+  {
+    id: 'compiler-runtime-p7',
+    pyqStyle: true,
+    q: 'int a=2; void f(int x){ x=x*2; a=a+3; } void main(){ f(a); print(a); }. (Here f\'s body directly references the global variable a as well as its own parameter x.) What does print(a) show under call-by-value, call-by-reference, and call-by-value-result respectively?',
+    options: ['5, 7, 4', '4, 7, 5', '7, 5, 4', '5, 4, 7'],
+    answer: 0,
+    marks: 2,
+    difficulty: 'hard',
+    type: 'pyq-style',
+    explanation: 'Call-by-VALUE: x is an independent local copy of a\'s value 2; "x=x*2" makes x=4 locally, with no effect on the global a. Then "a=a+3" refers directly to the global a (still 2), making it 2+3=5. Final print(a)=5. Call-by-REFERENCE: x is an alias for a itself; "x=x*2" directly doubles a to 4; then "a=a+3" adds 3 to that same storage, giving 4+3=7. Final print(a)=7. Call-by-VALUE-RESULT (copy-restore): x starts as a local copy of a=2; "x=x*2" makes the local x=4 (global a still untouched, =2, at this point); "a=a+3" then operates on the STILL-UNCHANGED global a=2, setting it to 2+3=5; but at RETURN time, value-result copies x\'s final local value (4) back into a, OVERWRITING the interim 5 with 4. Final print(a)=4. So the three outputs in order are 5, 7, 4, matching option 1.'
+  },
+  {
+    id: 'compiler-runtime-p8',
+    pyqStyle: true,
+    q: 'In a block-structured language with static scoping, procedures are nested three levels deep: A (outermost) statically contains B, which statically contains C. From within C\'s activation record, how many static links must be traversed to reach A\'s activation record and access a variable declared in A? (Enter your numerical answer.)',
+    options: [],
+    answer: 2,
+    kind: 'nat',
+    marks: 2,
+    difficulty: 'medium',
+    type: 'pyq-style',
+    explanation: 'Each activation record\'s static link points to the activation record of the LEXICALLY (statically) ENCLOSING procedure\'s most recent activation, not the caller. Starting at C\'s activation, following ONE static link reaches B\'s activation (since C is nested directly inside B), and following a SECOND static link from there reaches A\'s activation (since B is nested directly inside A). So exactly 2 static-link traversals are needed to get from C all the way up to A, matching the nesting depth difference of 2 between C (level 3) and A (level 1).'
+  },
+  {
+    id: 'compiler-runtime-p9',
+    pyqStyle: true,
+    q: 'int i=1; int a[3]={2,4,6}; (0-indexed: a[0]=2, a[1]=4, a[2]=6) void f(int x){ i=2; x=0; } void main(){ i=1; f(a[i]); print(a[1], a[2]); }. What does print(a[1], a[2]) show under call-by-REFERENCE and under call-by-NAME respectively?',
+    options: ['(0, 6) and (4, 0)', '(4, 0) and (0, 6)', '(0, 0) and (4, 6)', '(4, 6) and (0, 0)'],
+    answer: 0,
+    marks: 2,
+    difficulty: 'hard',
+    type: 'pyq-style',
+    explanation: 'CALL-BY-REFERENCE: the actual argument "a[i]" is evaluated ONCE at call time to determine which storage location x aliases; since i=1 at the moment of the call, x is bound to the ADDRESS of a[1] for the entire call, regardless of any later change to i. Inside f, "i=2" changes i but does not change what x refers to (already fixed to a[1]); "x=0" then sets a[1]=0. Final array: a[1]=0 (changed), a[2]=6 (untouched) -> prints (0, 6). CALL-BY-NAME: the argument "a[i]" is NOT evaluated once; instead, x is textually substituted by "a[i]" and RE-EVALUATED at every use inside f, using i\'s CURRENT value at that point. The only use of x is in the statement "x=0", which textually becomes "a[i]=0" -- but by the time this line executes, "i=2" has already run, so i is now 2, meaning this sets a[2]=0. Final array: a[1]=4 (untouched, its original value), a[2]=0 (changed) -> prints (4, 0). So the two results are (0,6) for reference and (4,0) for name, matching option 1 -- illustrating exactly why call-by-name can produce results that differ sharply from call-by-reference when the argument expression itself has side-effect-dependent components.'
+  },
+  {
+    id: 'compiler-runtime-p10',
+    pyqStyle: true,
+    q: 'int x=5; void f(int x){ print(x); } void g(){ int x=10; f(20); } void main(){ g(); }. What does f print, under static scoping and under dynamic scoping respectively?',
+    options: ['20 under both scoping disciplines', '5 (static) and 10 (dynamic)', '10 (static) and 20 (dynamic)', '5 under both scoping disciplines'],
+    answer: 0,
+    marks: 2,
+    difficulty: 'hard',
+    type: 'pyq-style',
+    explanation: 'This question tests whether static-vs-dynamic scoping is understood correctly: the scoping RULE only matters for resolving a FREE variable reference (one not declared locally in the current procedure). Here, x inside f\'s print(x) statement is NOT a free variable at all -- it directly refers to f\'s OWN formal parameter x (which shadows any outer x by ordinary, scoping-rule-independent local binding, exactly like any local variable declaration). Since f is called as f(20), its parameter x is bound to 20 regardless of what static or dynamic scoping would otherwise dictate for a free variable -- parameter binding always takes precedence within its own procedure body. So print(x) prints 20 under BOTH static and dynamic scoping, matching option 1; the global x=5 and g\'s local x=10 are simply irrelevant here since f never has an unbound (free) reference to x that would need scope resolution.'
+  },
+  {
+    id: 'compiler-runtime-p11',
+    pyqStyle: true,
+    q: 'In a statically scoped, block-structured language, procedure D is nested directly inside C, which is nested directly inside B, which is nested directly inside A (so the static nesting depth order, outermost first, is A, B, C, D). From D\'s activation record, how many access (static) links must be traversed to reach the activation record of B, in order to access a variable declared in B? (Enter your numerical answer.)',
+    options: [],
+    answer: 2,
+    kind: 'nat',
+    marks: 2,
+    difficulty: 'medium',
+    type: 'pyq-style',
+    explanation: 'D is nested 2 lexical levels below B (the nesting chain from D upward is D -> C -> B, i.e., D\'s immediate static parent is C, and C\'s immediate static parent is B). Each static (access) link points exactly one level up to the immediately statically enclosing procedure\'s current activation. So from D, ONE static-link traversal reaches C\'s activation, and a SECOND static-link traversal from there reaches B\'s activation. Therefore exactly 2 static links must be followed to get from D up to B, matching the difference in nesting depth (D is at depth 4, B is at depth 2, difference = 2).'
+  },
+  {
+    id: 'compiler-runtime-p12',
+    pyqStyle: true,
+    q: 'int x=0; void inc(){ x=x+1; } void f(){ int x=100; inc(); print(x); } void main(){ f(); }. What does print(x) inside f show under static scoping and under dynamic scoping respectively?',
+    options: ['100 and 101', '101 and 100', '100 and 100', '101 and 101'],
+    answer: 0,
+    marks: 2,
+    difficulty: 'hard',
+    type: 'pyq-style',
+    explanation: 'The final print(x) is inside f, referring to f\'s OWN locally declared variable x -- this is not a free-variable lookup at all, so its value is printed exactly as f\'s local x currently stands, under EITHER scoping rule; the scoping discipline only affects how inc()\'s free reference to x (inc has no local x of its own) gets resolved. Under STATIC scoping, inc() is defined at the top level, so its free x always binds to the GLOBAL x (0), completely independent of f\'s local x; inc() increments the global x from 0 to 1, but f\'s own local x=100 is never touched, so f\'s later print(x) shows 100. Under DYNAMIC scoping, inc()\'s free reference to x is resolved by searching the live call chain main->f->inc for the nearest active x: f\'s local x=100 is the nearest one found, so inc() increments THIS variable instead, changing it from 100 to 101; f\'s subsequent print(x) then shows 101 (since it is the very same local x that inc() just modified). So the outputs are 100 (static) and 101 (dynamic), matching option 1.'
+  }
+);
+
+window.GATE_DATA.questions['compiler'].topics.find(function(t){return t.id==='compiler-optimization';}).questions.push(
+  {
+    id: 'compiler-optimization-p1',
+    pyqStyle: true,
+    q: 'Given the three-address code (line numbers shown): 1: i=0; 2: t1=i<n; 3: ifFalse t1 goto 9; 4: t2=i*4; 5: t3=a[t2]; 6: sum=sum+t3; 7: i=i+1; 8: goto 2; 9: print sum. Using the standard leader-identification rules, how many basic blocks does this code split into? (Enter your numerical answer.)',
+    options: [],
+    answer: 4,
+    kind: 'nat',
+    marks: 2,
+    difficulty: 'medium',
+    type: 'pyq-style',
+    explanation: 'Leaders are: (a) the first statement, line 1; (b) any statement that is the TARGET of a conditional or unconditional jump: line 9 (target of the ifFalse at line 3) and line 2 (target of the goto at line 8); (c) any statement immediately following a conditional or unconditional jump: line 4 (follows the ifFalse at line 3; line 9 is already a leader from rule b). Collecting all leaders: {1, 2, 4, 9} -- exactly 4 leaders. Each leader begins a new basic block that extends up to (but not including) the next leader, giving the blocks {1}, {2,3}, {4,5,6,7,8}, {9}. So there are 4 basic blocks.'
+  },
+  {
+    id: 'compiler-optimization-p2',
+    pyqStyle: true,
+    q: 'A basic block computes: S1: x=a+b; S2: y=x*c; S3: a=y-d; S4: z=a+b. Only z is live on exit (LiveOut(S4)={z}). Using backward live-variable analysis (LiveIn(S)=use(S) U (LiveOut(S)-def(S))), how many distinct variables are in LiveIn(S1)? (Enter your numerical answer.)',
+    options: [],
+    answer: 4,
+    kind: 'nat',
+    marks: 2,
+    difficulty: 'hard',
+    type: 'pyq-style',
+    explanation: 'Working backward: LiveOut(S4)={z}. LiveIn(S4)=use(S4) U (LiveOut(S4)-def(S4)) = {a,b} U ({z}-{z}) = {a,b}, so LiveOut(S3)={a,b}. LiveIn(S3)=use(S3) U (LiveOut(S3)-def(S3)) = {y,d} U ({a,b}-{a}) = {y,d,b}, so LiveOut(S2)={y,d,b}. LiveIn(S2)=use(S2) U (LiveOut(S2)-def(S2)) = {x,c} U ({y,d,b}-{y}) = {x,c,d,b}, so LiveOut(S1)={x,c,d,b}. LiveIn(S1)=use(S1) U (LiveOut(S1)-def(S1)) = {a,b} U ({x,c,d,b}-{x}) = {a,b,c,d}. This set has exactly 4 distinct variables (a, b, c, d), while all of x, y, z are purely internal temporaries fully produced and consumed within the block.'
+  },
+  {
+    id: 'compiler-optimization-p3',
+    pyqStyle: true,
+    q: 'Given the code: 1: x=5; 2: y=x+3; 3: z=y*2; 4: w=z+a; (a is not a compile-time constant). After forward constant propagation followed by constant folding, which of the following resulting statements are CORRECT? (Select ALL that apply)',
+    options: [
+      'Statement 2 folds to: y=8',
+      'Statement 3 folds to: z=16',
+      'Statement 4 folds to: w=20+a',
+      'Statement 4 can be fully folded into a single constant, eliminating variable a entirely'
+    ],
+    answers: [0, 1],
+    marks: 2,
+    difficulty: 'medium',
+    type: 'pyq-style',
+    explanation: 'Since x=5 is a compile-time constant, propagating it into statement 2 gives y=5+3, which constant-folds to y=8 -- option 1 is correct. Propagating this new constant y=8 into statement 3 gives z=8*2, which folds to z=16 -- option 2 is correct. Propagating z=16 into statement 4 gives w=16+a, NOT w=20+a as option 3 incorrectly claims (20 does not arise from any correct computation here), so option 3 is false. Since a is not a compile-time constant, w=16+a cannot be folded any further into a single constant -- a must remain a run-time addition, so option 4 is also false. Only options 1 and 2 are correct.'
+  },
+  {
+    id: 'compiler-optimization-p4',
+    pyqStyle: true,
+    q: 'Inside a loop, the statement "t = i*4;" recomputes a multiple of the loop index i every iteration, where i increases by exactly 1 each pass. Which classic compiler optimization directly replaces this per-iteration multiplication with successive additions of the constant 4 to an accumulator, exploiting the fact that i changes by a fixed amount each iteration?',
+    options: ['Constant folding', 'Strength reduction', 'Dead-code elimination', 'Loop unrolling'],
+    answer: 1,
+    marks: 1,
+    difficulty: 'easy',
+    type: 'pyq-style',
+    explanation: 'This is the textbook definition of STRENGTH REDUCTION applied to an induction variable: because i increases by a fixed constant (1) on every iteration, the derived value i*4 also increases by a fixed constant (4) on every iteration, so instead of recomputing the multiplication i*4 from scratch each time, the compiler introduces a new variable that starts at the initial value of i*4 and is simply INCREMENTED by 4 each iteration -- replacing an expensive multiplication with a cheaper addition. Constant folding (option 1) only applies to expressions with purely compile-time-constant operands, which i*4 is not since i varies; dead-code elimination (option 3) removes computations whose results are never used, which does not apply here since t is presumably used; loop unrolling (option 4) replicates the loop body to reduce branch overhead, an unrelated transformation.'
+  },
+  {
+    id: 'compiler-optimization-p5',
+    pyqStyle: true,
+    q: 'Inside the loop body "for(i=0;i<n;i++){ x=a*b; sum=sum+x+i; }", assuming a and b are never modified anywhere inside the loop, which statement is LOOP-INVARIANT and can be safely hoisted out of the loop (computed once before the loop starts)?',
+    options: ['x=a*b', 'sum=sum+x+i', 'the loop condition i<n', 'i=i+1 (the increment)'],
+    answer: 0,
+    marks: 1,
+    difficulty: 'easy',
+    type: 'pyq-style',
+    explanation: 'A statement is loop-invariant if the value it computes does not change across iterations of the loop -- typically because all of its operands are either constants or variables not modified anywhere within the loop body. Since a and b are never reassigned inside this loop, the expression a*b always yields the same result on every iteration, so "x=a*b" is loop-invariant and can be computed just once before the loop and reused every iteration (code motion). By contrast, "sum=sum+x+i" depends on sum and i, both of which change every iteration, so it is NOT invariant; the loop condition i<n depends on the changing i, so it must be re-evaluated each pass; and the increment i=i+1 obviously changes i itself every time and cannot be hoisted.'
+  },
+  {
+    id: 'compiler-optimization-p6',
+    pyqStyle: true,
+    q: 'A basic block contains: 1: x=a+b; 2: y=a-b; 3: x=c+d; 4: print(x); Assume y is never used anywhere else in the program. Which of the following statements are DEAD CODE that can be safely eliminated from this block? (Select ALL that apply)',
+    options: [
+      'Statement 1 (x=a+b)',
+      'Statement 2 (y=a-b)',
+      'Statement 3 (x=c+d)',
+      'Statement 4 (print(x))'
+    ],
+    answers: [0, 1],
+    marks: 2,
+    difficulty: 'medium',
+    type: 'pyq-style',
+    explanation: 'Statement 1 assigns a+b to x, but x is REASSIGNED at statement 3 (x=c+d) before that first value is ever read anywhere in between -- so the value computed by statement 1 is never used by anyone, making statement 1 dead code that can be safely deleted. Statement 2 assigns a value to y, but the problem states y is never used anywhere else in the program at all -- an assignment whose result is never subsequently read is by definition dead code, so statement 2 can also be safely deleted. Statement 3 assigns to x, and this value IS used at statement 4 (print(x)), so it is live and must be kept. Statement 4 is the print itself, a statement with an observable side effect (I/O), so it can never be treated as dead code. Only statements 1 and 2 qualify as dead code.'
+  },
+  {
+    id: 'compiler-optimization-p7',
+    pyqStyle: true,
+    q: 'Local common-subexpression elimination, applied within a single basic block, can detect and eliminate a redundant recomputation of "a+b" occurring twice in the SAME block. Why might it fail to eliminate a redundant recomputation of "a+b" that instead occurs in a DIFFERENT (later) basic block, one that is reached along every possible control-flow path from the block where "a+b" was first computed?',
+    options: [
+      'Because local CSE only examines expressions strictly within a single basic block and has no mechanism to track which expressions remain available across block boundaries; catching such cases requires a global, data-flow-based "available expressions" analysis over the whole control-flow graph',
+      'Because "a+b" computed in two different basic blocks is never actually the same expression, regardless of any data-flow reasoning',
+      'Because CSE can only ever be applied to array-indexing expressions, never to simple arithmetic like a+b',
+      'Because local CSE always automatically extends its analysis across every basic block in the entire procedure with no extra work needed'
+    ],
+    answer: 0,
+    marks: 2,
+    difficulty: 'medium',
+    type: 'pyq-style',
+    explanation: 'Local (basic-block-level) common-subexpression elimination works purely by scanning statements within one block, using a simple table of already-computed expressions valid only for that block\'s duration; it has no visibility into what was computed in a DIFFERENT block, since its analysis never crosses block boundaries. To recognize that "a+b" computed in an earlier block is STILL available (i.e., a and b have not been reassigned along any path reaching the later block) requires a GLOBAL, control-flow-graph-wide data-flow analysis known as "available expressions" -- which explicitly tracks, for every point in the program, the set of expressions guaranteed to have already been computed and not since invalidated along every incoming path. Without this global analysis, purely local CSE genuinely cannot catch such cross-block redundancy, matching option 1.'
+  },
+  {
+    id: 'compiler-optimization-p8',
+    pyqStyle: true,
+    q: 'Given the three-address code: 1: a=1; 2: b=2; 3: if a<b goto 6; 4: c=3; 5: goto 7; 6: c=4; 7: print c. Using standard leader-identification rules, how many basic blocks does this code split into? (Enter your numerical answer.)',
+    options: [],
+    answer: 4,
+    kind: 'nat',
+    marks: 2,
+    difficulty: 'medium',
+    type: 'pyq-style',
+    explanation: 'Leaders: (a) line 1 (first statement); (b) targets of jumps: line 6 (target of the conditional goto at line 3) and line 7 (target of the unconditional goto at line 5); (c) statements immediately following a jump: line 4 (follows the conditional at line 3) and line 6 (follows the goto at line 5, but it is already a leader from rule b). Collecting: {1, 4, 6, 7} -- exactly 4 leaders, giving 4 basic blocks: {1,2,3}, {4,5}, {6}, {7}.'
+  },
+  {
+    id: 'compiler-optimization-p9',
+    pyqStyle: true,
+    q: 'A basic block computes: S1: t=a*b; S2: c=t+d; S3: e=c-a; with LiveOut(S3)={e} (e is the only variable live on exit). How many distinct variables are in LiveOut(S2)? (Enter your numerical answer.)',
+    options: [],
+    answer: 2,
+    kind: 'nat',
+    marks: 2,
+    difficulty: 'medium',
+    type: 'pyq-style',
+    explanation: 'LiveOut(S3)={e} (given). LiveIn(S3)=use(S3) U (LiveOut(S3)-def(S3)) = {c,a} U ({e}-{e}) = {c,a}. Since S3 is the only (and immediate) successor of S2 in this straight-line block, LiveOut(S2) = LiveIn(S3) = {c,a}, which contains exactly 2 distinct variables: c and a. This makes intuitive sense: right after S2 computes c, that value is still needed by S3 (to compute e), and a is also still needed by S3 for the subtraction, while t (defined and fully consumed within S1-S2) is not needed again afterward.'
+  },
+  {
+    id: 'compiler-optimization-p10',
+    pyqStyle: true,
+    q: 'Consider the loop "for(i=1;i<=n;i++){ y=i*i; z=b*c; arr[i]=y+z; }", where b and c are never modified inside the loop. Which of the following statements about optimizing this loop are TRUE? (Select ALL that apply)',
+    options: [
+      'z=b*c is loop-invariant and can be hoisted out of the loop, computed just once before it starts',
+      'y=i*i is loop-invariant in exactly the same way as z=b*c, and can likewise be hoisted out of the loop entirely',
+      'y=i*i is a natural candidate for induction-variable strength reduction: since i changes by a fixed amount each iteration, y can instead be maintained by cheaper incremental updates rather than being recomputed via multiplication every iteration',
+      'Because z=b*c is textually written inside the loop body, it can never be classified as loop-invariant regardless of what the actual data flow shows'
+    ],
+    answers: [0, 2],
+    marks: 2,
+    difficulty: 'hard',
+    type: 'pyq-style',
+    explanation: 'Option 1 is true: since b and c are never modified anywhere inside the loop, the value of b*c is the same on every iteration, making z=b*c a textbook loop-invariant computation eligible for hoisting (code motion) to just before the loop. Option 2 is FALSE: y=i*i depends directly on the loop-control variable i, which changes on every iteration, so its value is genuinely different each time around the loop -- it cannot be treated as loop-invariant or hoisted out. Option 3 is true: this is exactly the classic induction-variable optimization -- since i increases by a constant 1 each iteration, i*i can be tracked by cheaper incremental updates (its own induction-variable recurrence) rather than paying for a fresh multiplication every single iteration, which is a form of strength reduction applied via induction-variable analysis. Option 4 is false: whether a statement is loop-invariant depends entirely on the DATA-FLOW facts (whether its operands are ever modified inside the loop along any executed path), not on where it happens to be written textually within the loop body.'
+  },
+  {
+    id: 'compiler-optimization-p11',
+    pyqStyle: true,
+    q: 'A statement d: "x = y op z" inside a basic block can be safely deleted as dead code if and only if which condition holds?',
+    options: [
+      'x is not live immediately after d (i.e., x is not in LiveOut(d)), AND the operation has no other observable side effect (such as I/O or memory write through a pointer)',
+      'y is not live immediately before d, regardless of whether x is used afterward',
+      'z is a compile-time constant, regardless of whether x is ever subsequently used',
+      'd is the very last statement physically written in the source program\'s basic block'
+    ],
+    answer: 0,
+    marks: 1,
+    difficulty: 'medium',
+    type: 'pyq-style',
+    explanation: 'The defining condition for dead-code elimination of an assignment is precisely liveness of its DEFINED variable: statement d defines x, so d can be safely removed exactly when x is NOT live immediately after d -- meaning no later use of x can be reached along any control-flow path without x being redefined first -- AND the statement produces no other externally observable effect (a call with I/O, a write through a pointer/array that might alias other live storage, etc., must always be kept regardless of whether its "result" variable is later used). The liveness of the OPERANDS y and z (options 2 and 3) is irrelevant to whether d itself is dead; those operands\' own liveness only matters for deciding whether THEIR defining statements, further up, are dead. Option 4 (textual position) has no bearing on dead-code analysis, which is a data-flow property, not a textual one.'
+  },
+  {
+    id: 'compiler-optimization-p12',
+    pyqStyle: true,
+    q: 'Given the three-address code: 1: i=0; 2: j=0; 3: if i>=n goto 11; 4: if j>=m goto 9; 5: t=i*m+j; 6: a[t]=0; 7: j=j+1; 8: goto 4; 9: i=i+1; 10: goto 2; 11: print done. Using standard leader-identification rules, how many basic blocks does this code split into? (Enter your numerical answer.)',
+    options: [],
+    answer: 6,
+    kind: 'nat',
+    marks: 2,
+    difficulty: 'hard',
+    type: 'pyq-style',
+    explanation: 'Leaders: (a) line 1 (first statement); (b) targets of any jump: line 11 (target of the conditional at line 3), line 9 (target of the conditional at line 4), line 4 (target of the goto at line 8), line 2 (target of the goto at line 10); (c) statements immediately following a jump: line 4 (follows line 3, already a leader), line 5 (follows the conditional at line 4), line 9 (follows the goto at line 8, already a leader), line 11 (follows the goto at line 10, already a leader). Collecting all distinct leaders: {1, 2, 4, 5, 9, 11} -- exactly 6 leaders, giving 6 basic blocks: {1}, {2,3}, {4}, {5,6,7,8}, {9,10}, {11}.'
+  }
+);
+
+window.GATE_DATA.questions['compiler'].topics.find(function(t){return t.id==='compiler-parsing';}).questions.push(
+{
+  id: 'compiler-parsing-h1',
+  q: 'Which of the following grammars are SLR(1)? (Select ALL that apply)',
+  options: [
+    "E -> E + T | T ; T -> T * F | F ; F -> ( E ) | id",
+    "S -> L = R | R ; L -> * R | id ; R -> L",
+    "S -> a S b S | b S a S | epsilon",
+    "S -> ( S ) S | epsilon"
+  ],
+  answers: [0, 3],
+  marks: 2,
+  difficulty: 'hard',
+  type: 'concept',
+  explanation: "Each grammar needs its own item-set/table check. Option A is the canonical unambiguous expression grammar with precedence built in via the E/T/F nonterminal layering; its LR(0) automaton has no state where a shift and a reduce (or two reduces) compete under SLR's FOLLOW-set lookaheads, so it is SLR(1) (and consequently also LALR(1) and LR(1), since SLR(1) grammars are always LALR(1) and LR(1) too). Option B is the classic Dragon-book example that is NOT SLR(1): in the state reached after parsing L, containing items S -> L . = R and R -> L ., SLR must decide whether to shift on '=' or reduce R -> L . using FOLLOW(R); computing FOLLOW(R) reveals it includes '=' (because of the mutual dependency FOLLOW(R) contains FOLLOW(L), and FOLLOW(L) contains '=' from S -> L.=R), so SLR sees a shift/reduce conflict on '=' - this grammar IS LALR(1) and LR(1), just not SLR(1), because those stronger methods track more precise, state-specific lookaheads that correctly rule out '=' for the reduce in this particular context. Option C is a genuinely ambiguous grammar (multiple parse trees exist for strings like 'abab'), and ambiguous grammars are never SLR(1), LALR(1), or LR(k) for any k, since genuine ambiguity produces unavoidable conflicts no fixed amount of lookahead can resolve. Option D is the standard balanced-parentheses grammar, which is not only SLR(1) but even LL(1) (FIRST/FOLLOW sets cleanly separate the '(' -continuing production from the epsilon-production on any other lookahead), and by the parser-power hierarchy LL(1) subset-of SLR(1), so it is automatically SLR(1) too."
+},
+{
+  id: 'compiler-parsing-h2',
+  q: 'In the SLR(1) parsing table for the grammar S -> L = R | R ; L -> * R | id ; R -> L, a genuine conflict arises in one particular state. Which of the following correctly identifies the conflicting item set and the exact nature of the conflict?',
+  options: [
+    "Shift-reduce conflict in the state containing items S -> L . = R and R -> L ., on lookahead '=': SLR's table uses FOLLOW(R) = {=, $}, causing a spurious reduce-on-'=' action that conflicts with the shift action demanded by S -> L.=R; LALR(1) instead computes a context-specific lookahead of just {$} for the item R -> L . in this exact state, which removes the conflict.",
+    "Reduce-reduce conflict in the state containing items L -> id . and R -> L ., since both are complete items whose FOLLOW sets happen to overlap on '='.",
+    "Shift-reduce conflict in the initial state I0, between shifting on the terminal 'id' and reducing via S -> R ., triggered by the lookahead 'id'.",
+    "Reduce-reduce conflict between the completed items S -> R . and R -> L . occurring together in the same state after reading a single 'id' token."
+  ],
+  answer: 0,
+  marks: 2,
+  difficulty: 'hard',
+  type: 'concept',
+  explanation: "Building the canonical LR(0) item sets for this grammar, the state reached by taking the goto on L from the initial state contains exactly the two items S -> L . = R and R -> L . (this is the state you reach after the parser has recognized an L and must decide what comes next). SLR resolves the completed item R -> L . by reducing whenever the lookahead lies in FOLLOW(R). Computing FOLLOW(R) requires resolving a mutual dependency: R appears in S -> L=R and S -> R, contributing FOLLOW(S) = {$}; L appears in R -> L, contributing FOLLOW(R) to FOLLOW(L); and L appears in S -> L=R, contributing '=' to FOLLOW(L). Chasing this cycle to its fixed point puts '=' into BOTH FOLLOW(L) and FOLLOW(R). So in the state described, SLR's table says: shift on '=' (from the item S -> L . = R) AND reduce R -> L . on lookahead '=' (since '=' is in FOLLOW(R)) - a genuine shift-reduce conflict, exactly as option A states. LALR(1), by contrast, computes lookaheads specific to each numbered state rather than using the grammar-wide FOLLOW set, and in this particular state the item R -> L . only ever needs to be reduced when the actual next symbol is end-of-input ($), never '=' (because whenever '=' truly follows, the parser is instead in the process of matching S -> L.=R, not needing this reduction at all) - so LALR(1)'s more precise lookahead set for this item is just {$}, and the conflict disappears. The other three options describe item sets or conflicts that do not actually arise in this grammar's canonical construction."
+},
+{
+  id: 'compiler-parsing-h3',
+  q: 'Which of the following statements about converting grammars toward LL(1) form are TRUE? (Select ALL that apply)',
+  options: [
+    "S -> S a | b, after eliminating left recursion, becomes S -> b S', S' -> a S' | epsilon, and this transformed grammar is LL(1).",
+    "The dangling-else grammar stmt -> if expr then stmt | if expr then stmt else stmt | other cannot be made LL(1) (or even unambiguous) by any amount of left-factoring, because the ambiguity is inherent to the grammar's structure, not a mere FIRST/FIRST prefix-overlap issue.",
+    "Left-factoring alone is always sufficient to convert any unambiguous, non-left-recursive context-free grammar into an equivalent LL(1) grammar.",
+    "A grammar with no left recursion and no common prefixes among the alternative productions of any single nonterminal is automatically guaranteed to be LL(1)."
+  ],
+  answers: [0, 1],
+  marks: 2,
+  difficulty: 'hard',
+  type: 'concept',
+  explanation: "A is TRUE: this is the textbook left-recursion-elimination transformation, and the result is LL(1) - FIRST(S) = {b}, and S' cleanly separates on FIRST(aS')={a} versus FOLLOW(S') for the epsilon-alternative, with no overlap, giving a conflict-free predictive parsing table. B is TRUE: the dangling-else ambiguity is a structural/semantic ambiguity (a given 'if-then-else' sequence can be parsed by associating the else with either enclosing unmatched if), not a superficial common-prefix issue that left-factoring is designed to fix; left-factoring only merges alternatives that share an initial symbol sequence, and cannot invent a way to disambiguate two genuinely different, equally valid parse structures for the same token sequence - real compilers instead resolve it by an external convention (match each else to the nearest unmatched if) enforced procedurally, outside the raw ambiguous grammar. C is FALSE: left-factoring only removes FIRST/FIRST conflicts caused by common prefixes; it does nothing about other LL(1) obstructions such as left recursion (a different transformation entirely) or FIRST/FOLLOW conflicts on nullable nonterminals, and there exist unambiguous, non-left-recursive CFGs that are inherently not LL(k) for any k due to structural reasons no amount of left-factoring can repair, so the blanket 'always sufficient' claim is false. D is FALSE and is a classic incomplete-checklist trap: absence of left recursion and absence of common prefixes are NECESSARY conditions for LL(1) but not SUFFICIENT - a nullable nonterminal also needs FIRST and FOLLOW to be disjoint (e.g. A -> a | epsilon fails LL(1) if FOLLOW(A) also contains 'a', even though there is no left recursion or shared prefix among A's own two alternatives)."
+},
+{
+  id: 'compiler-parsing-h4',
+  q: 'Which of the following grammars is LR(1) (i.e., parseable by the canonical/CLR method) but NOT LALR(1), due to a reduce-reduce conflict introduced specifically by merging LR(1) states that share the same core?',
+  options: [
+    "S -> a A d | b B d | a B e | b A e ; A -> c ; B -> c",
+    "S -> L = R | R ; L -> * R | id ; R -> L",
+    "E -> E + T | T ; T -> T * F | F ; F -> ( E ) | id",
+    "S -> a S b S | b S a S | epsilon"
+  ],
+  answer: 0,
+  marks: 2,
+  difficulty: 'hard',
+  type: 'concept',
+  explanation: "Option A is the standard textbook example distinguishing LALR(1) from full canonical LR(1). In the canonical LR(1) automaton, the item 'A -> c .' appears in one state carrying only the lookahead 'd' (reached via the a...c... path), while the item 'B -> c .' appears in a DIFFERENT state carrying only the lookahead 'e' (reached via the b...c... path) - these two states have the same underlying LR(0) core (both just contain a completed '. -> c .' item after seeing 'c') but different, non-overlapping lookahead sets, so canonical LR(1) keeps them separate and conflict-free. LALR(1) construction merges any states sharing the same core to save space, which here forces 'A -> c .' and 'B -> c .' into a single merged state carrying the UNION of both lookaheads, {d, e}; since this merged state must decide between reducing to A or reducing to B while both 'd' and 'e' now look like valid lookaheads for either reduction, a reduce-reduce conflict appears that did not exist before merging - so this grammar is LR(1) but not LALR(1). Option B is the different, more commonly cited SLR-vs-LALR (not LALR-vs-CLR) example: it fails SLR(1) but succeeds at LALR(1) and CLR(1) equally, so it is not a valid answer to this specific question. Option C is fully SLR(1) already (and hence also LALR(1) and LR(1)) with no conflicts anywhere in its tables. Option D is genuinely ambiguous and therefore fails every deterministic parsing method, including full canonical LR(1), so it cannot be the LR(1)-but-not-LALR(1) example being asked for."
+},
+{
+  id: 'compiler-parsing-h5',
+  q: 'Consider the classic dangling-else grammar S -> i S e S | i S | a (where i stands for "if", e for "else", a for any other statement), used to illustrate the dangling-else ambiguity in a parser generator. Constructing its SLR(1) parsing table reveals exactly how many shift-reduce conflict CELLS? Enter your numerical answer.',
+  options: [],
+  answer: 1,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'hard',
+  type: 'numerical',
+  explanation: "Building the canonical LR(0) automaton for this grammar produces exactly one problematic state: the state reached after recognizing 'i S' (i.e., containing the item S -> i S . e S alongside the completed item S -> i S .). At this point, the parser must decide, upon seeing the next input token, whether to shift a pending 'e' (continuing to match S -> iS.eS, i.e., attaching the else to THIS if) or to reduce via the completed S -> iS. (closing off this if without an else, letting the else, if any, attach to some OUTER enclosing if instead). Since FOLLOW(S) includes 'e' (because e can indeed follow an S inside the iSeS production), the SLR table's reduce action for S -> iS. is triggered by lookahead 'e', exactly the same lookahead that also triggers the shift action for S -> iS.eS - this produces exactly one shift-reduce conflict cell, at the row for this state and the column for terminal 'e'. No other state in this small grammar's automaton has any competing actions. Real parser generators such as yacc/bison resolve this specific, well-understood conflict by a documented default rule: prefer shift over reduce, which has the effect of always attaching a dangling else to the nearest unmatched if - exactly the conventional disambiguation rule used by essentially every real programming language, so the 'conflict' is intentionally left in place and silently resolved rather than treated as a grammar error."
+},
+{
+  id: 'compiler-parsing-h6',
+  q: 'Which of the following nonterminal definitions, taken in isolation together with the stated FOLLOW set, would cause a table-construction conflict that prevents the grammar from being LL(1)? (Select ALL that apply)',
+  options: [
+    "A -> a | epsilon, with FOLLOW(A) = { a, $ }",
+    "B -> b | epsilon, with FOLLOW(B) = { c, $ }",
+    "C -> d C | e, with FOLLOW(C) = { $ }",
+    "D -> f | f g, with FOLLOW(D) = { $ }"
+  ],
+  answers: [0, 3],
+  marks: 2,
+  difficulty: 'hard',
+  type: 'concept',
+  explanation: "A is a VIOLATION: since A can derive epsilon, LL(1) requires FIRST(A) minus {epsilon} = {a} to be disjoint from FOLLOW(A); here FOLLOW(A) = {a, $} contains 'a', so on lookahead 'a' the parser cannot decide whether to expand A -> a (matching the 'a' directly) or A -> epsilon (skipping A and letting the following context consume the 'a') - a genuine FIRST/FOLLOW conflict that blocks LL(1). B is NOT a violation: FIRST(B) minus {epsilon} = {b}, and FOLLOW(B) = {c, $}, which share no common element, so there is no ambiguity about when to pick B -> b versus B -> epsilon. C is NOT a violation: the two alternatives dC and e have disjoint FIRST sets ({d} versus {e}), there is no left recursion (the recursion is on the right, in dC, which is fine for LL(1)), and C is not nullable, so no FIRST/FOLLOW check is even needed - this nonterminal causes no conflict. D IS a violation: both alternatives f and fg begin with the same terminal 'f' (a genuine FIRST/FIRST common-prefix conflict, the kind left-factoring is designed to fix), so on seeing lookahead 'f' the parser cannot tell which alternative to commit to without additional lookahead - this nonterminal, as given, is not LL(1) and needs left-factoring into D -> f D', D' -> g | epsilon before it can be used in a predictive parser."
+},
+{
+  id: 'compiler-parsing-h7',
+  q: 'Which of the following statements about the relative power of parsing methods are TRUE? (Select ALL that apply)',
+  options: [
+    "Every grammar that is LL(1) is also SLR(1).",
+    "Every grammar that is SLR(1) is also LALR(1).",
+    "Every grammar that is LALR(1) is also LR(1) (parseable by the canonical/CLR method).",
+    "Every grammar that is LR(1) (CLR) is also LALR(1)."
+  ],
+  answers: [0, 1, 2],
+  marks: 2,
+  difficulty: 'hard',
+  type: 'concept',
+  explanation: "These four options trace the standard strict hierarchy of deterministic bottom-up-friendly grammar classes: LL(1) subset-of SLR(1) subset-of LALR(1) subset-of LR(1), with each containment proper (there exist grammars in each stronger class that fail the weaker one, though none are needed to answer this particular true/false battery). A is TRUE: it is a standard theorem that every LL(1) grammar is also SLR(1) - roughly, LL(1)'s FIRST/FOLLOW-based predictive determinism is strong enough to guarantee the weaker set of conditions SLR(1) parsing needs at the state level. B is TRUE: LALR(1) tables are built by taking the same canonical automaton structure SLR(1) implicitly relies on but resolving reduce actions with strictly more precise, state-specific lookahead sets rather than the coarser grammar-wide FOLLOW sets, so any state that was conflict-free under SLR's coarser lookahead remains conflict-free (or becomes even more clearly resolvable) under LALR's finer-grained lookahead - hence SLR(1) grammars are always LALR(1). C is TRUE: LALR(1) is built by merging states of the full canonical LR(1) automaton that share the same core; merging can only ever CREATE new conflicts (by unioning together lookahead sets that were previously kept safely separate), never remove a conflict that was already there - so if the merged (LALR) automaton is conflict-free, the unmerged (canonical LR(1)) automaton, having strictly more separated states and hence at least as much discriminating power, must also have been conflict-free, meaning every LALR(1) grammar is also LR(1). D is FALSE: this is the converse of C and is exactly the false direction - the LALR-vs-CLR example S -> aAd|bBd|aBe|bAe;A->c;B->c is LR(1) precisely because canonical LR(1) keeps two same-core states separate, yet it is NOT LALR(1) precisely because merging those same two states creates a reduce-reduce conflict, directly disproving this option."
+}
+);
+
+window.GATE_DATA.questions['compiler'].topics.find(function(t){return t.id==='compiler-optimization';}).questions.push(
+{
+  id: 'compiler-optimization-h1',
+  q: 'Consider the code fragment:\n1: t1 = a + b\n2: t2 = a + b\n3: c = t1 * t2\n4: d = a + b\nAssume a and b are never reassigned between lines 1 and 4. Which of the following optimizations are VALID? (Select ALL that apply)',
+  options: [
+    "Common subexpression elimination can replace line 2 (t2 = a + b) with t2 = t1, since a+b was already computed at line 1 and neither a nor b changes in between.",
+    "Line 4 (d = a + b) can also be rewritten as d = t1 via common subexpression elimination, for the same reason.",
+    "Dead code elimination can remove line 2 entirely, on the grounds that t2 is never used anywhere later in the fragment.",
+    "Constant folding can fold line 1 into a single computed value at compile time, PROVIDED a and b are both known compile-time constants; if they are ordinary runtime variables, constant folding does not apply here at all."
+  ],
+  answers: [0, 1, 3],
+  marks: 2,
+  difficulty: 'hard',
+  type: 'concept',
+  explanation: "A is TRUE: this is the textbook definition of common subexpression elimination - since a and b are unchanged between lines 1 and 2, the expression a+b is guaranteed to evaluate identically both times, so the second computation can simply reuse the already-computed value t1 instead of recomputing. B is TRUE for the identical reason, extended across a longer unchanged interval: as long as neither a nor b is reassigned anywhere between line 1 and line 4 (as stated), line 4's a+b is still the same expression with the same operand values, so it too can safely reuse t1. C is FALSE and is a deliberate trap: t2 is NOT dead - it is read on line 3 as an operand of c = t1 * t2, so removing its computation would silently break the program by leaving c computed from an undefined or stale t2; dead code elimination only applies to computations whose results are provably never used along any path, and checking that requires actually tracing uses, not assuming a variable is unused. D is TRUE as a carefully qualified statement: constant folding specifically refers to evaluating an expression made entirely of compile-time-known constants during compilation rather than at runtime; since the question does not establish a and b as constants (they are treated as ordinary variables whose values are not known until runtime), constant folding simply does not apply to line 1 as given, and the option correctly states this conditional scope rather than overclaiming."
+},
+{
+  id: 'compiler-optimization-h2',
+  q: 'Consider the loop:\nfor (i = 0; i < n; i++) {\n  x = a * b;\n  arr[i] = x + i;\n}\nAssume a and b are never modified inside the loop body. Which of the following are VALID observations? (Select ALL that apply)',
+  options: [
+    "x = a * b is loop-invariant and can be hoisted above the loop, computing it just once instead of on every iteration.",
+    "arr[i] = x + i cannot be hoisted out of the loop, because i changes on every iteration.",
+    "Strength reduction can replace the repeated address computation for arr[i] (typically base + i * elementSize) with an incrementally updated pointer that is advanced by elementSize each iteration, avoiding a multiplication every time.",
+    "Since x is computed identically on every iteration, the correct optimization to apply here is dead code elimination, not loop-invariant code motion."
+  ],
+  answers: [0, 1, 2],
+  marks: 2,
+  difficulty: 'hard',
+  type: 'concept',
+  explanation: "A is TRUE: because a and b never change inside the loop, a*b evaluates to the same value on every pass, making it the standard textbook case for loop-invariant code motion - hoist the single computation into a preheader block executed once before the loop begins. B is TRUE: i is precisely the induction variable that changes every iteration, so an expression depending on it (x + i) cannot be treated as loop-invariant and must remain inside the loop body, recomputed each time i's new value is available. C is TRUE: this is the classic induction-variable strength-reduction optimization applied to array indexing inside loops - instead of recomputing base + i*elementSize (a multiplication) fresh on every iteration, the compiler introduces a new variable that starts at 'base' and is simply incremented by 'elementSize' (an addition) each iteration, replacing a multiply with a cheaper add. D is FALSE and is a conceptual mislabeling: x is NOT dead - it is used immediately afterward on the very same iteration (arr[i] = x + i reads x), so simply deleting its computation (which is what dead code elimination would do) would break correctness; the applicable optimization is precisely loop-invariant code motion, which computes x once and reuses that single stored value across iterations, rather than eliminating the computation of x altogether."
+},
+{
+  id: 'compiler-optimization-h3',
+  q: 'Consider the following control-flow graph with a loop:\nB1 (entry): a = 1; b = 2;\nB2 (loop header): if (a < 10) goto B3 else goto B4\nB3: c = a + b; a = a + 1; goto B2\nB4 (exit): print(c)\nUsing backward, iterative live-variable analysis (computed to a fixed point over the loop), which of the following are TRUE? (Select ALL that apply)',
+  options: [
+    "OUT(B2) = { a, b, c }",
+    "IN(B3) = { a, b }",
+    "b is a member of OUT(B3)",
+    "c is a member of IN(B3)"
+  ],
+  answers: [0, 1, 2],
+  marks: 2,
+  difficulty: 'hard',
+  type: 'concept',
+  explanation: "Set use(B3) = {a,b} (both a and b are read by c=a+b before B3 redefines a) and def(B3) = {a,c}; use(B2) = {a} (the condition reads a) and def(B2) = {}; use(B4) = {c}, def(B4) = {}. Applying the standard equations IN(B) = use(B) union (OUT(B) minus def(B)) and OUT(B) = union of IN(successors), iterated to a fixed point (needed because of the B3-to-B2 back edge): IN(B4) = {c}. OUT(B3) = IN(B2) (its only successor). OUT(B2) = IN(B3) union IN(B4). Iterating: first pass gives IN(B3) = {a,b} union (OUT(B3) - {a,c}); starting OUT(B3) = {} gives IN(B3) = {a,b}, then OUT(B2) = {a,b} union {c} = {a,b,c}, then IN(B2) = {a} union {a,b,c} = {a,b,c}; second pass: OUT(B3) = IN(B2) = {a,b,c}, so IN(B3) = {a,b} union ({a,b,c} - {a,c}) = {a,b} union {b} = {a,b} - unchanged, so the fixed point has converged. This confirms OUT(B2) = {a,b,c} (statement A, TRUE), IN(B3) = {a,b} (statement B, TRUE), and since OUT(B3) = IN(B2) = {a,b,c}, b IS a member of OUT(B3) (statement C, TRUE). Statement D is FALSE: c is explicitly REMOVED from IN(B3) precisely because B3 itself DEFINES c (via def(B3) containing c) before any use of the incoming c value could matter - the live-variable equation subtracts def(B) from OUT(B) before adding use(B), so a variable that is always overwritten before being read within a block never propagates backward into that block's IN set, regardless of whether it is live on exit."
+},
+{
+  id: 'compiler-optimization-h4',
+  q: 'Using the same control-flow graph as above (B1: a=1;b=2; B2 loop header: if(a<10) goto B3 else goto B4; B3: c=a+b; a=a+1; goto B2; B4: print(c)), compute IN(B1) via iterative live-variable analysis run to a fixed point. How many variables are in IN(B1)? Enter your numerical answer.',
+  options: [],
+  answer: 1,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'hard',
+  type: 'numerical',
+  explanation: "From the fixed-point computation (see the companion question on this same CFG), OUT(B2) = {a,b,c}, so OUT(B1) = IN(B2) = {a,b,c} (B1's only successor is B2). Since use(B1) = {} (B1 only performs assignments, reading no variables) and def(B1) = {a,b} (both a and b are assigned in B1), IN(B1) = use(B1) union (OUT(B1) - def(B1)) = {} union ({a,b,c} - {a,b}) = {c}. So IN(B1) contains exactly one variable, c. This result, while it may look surprising at first (c is 'live' before the program has even started), is a completely faithful and correct output of the dataflow equations applied to this exact CFG: it reflects the fact that along the path B1 -> B2 -> B4 (loop condition false immediately, so B3 - the only place that ever defines c - never executes), the print(c) statement in B4 would read c without it ever having been assigned anywhere on that path, so an analyzer correctly reports c as 'live on entry' to B1, flagging a genuine potential use-before-definition hazard that a real compiler's live-variable analysis is specifically designed to surface (this is exactly the kind of insight this analysis is used for in practice: catching possibly-uninitialized variable warnings), independent of whether the source program's author intended a bug."
+},
+{
+  id: 'compiler-optimization-h5',
+  q: 'Consider the code fragment (p and q are pointers):\n1: x = *p;\n2: y = x + 1;\n3: *q = 5;\n4: z = *p;\nWhich of the following optimizations are VALID? (Select ALL that apply)',
+  options: [
+    "If it is known (via alias analysis) that p and q never point to the same location, line 4 (z = *p) can be safely replaced with z = x, reusing the value loaded at line 1.",
+    "Even without any aliasing information, the compiler can always safely replace z = *p at line 4 with z = x.",
+    "Common subexpression elimination is, in general, unsafe to apply across an intervening call to a function whose side effects are unknown to the compiler, unless the compiler can prove the function does not modify any memory the expression depends on.",
+    "Dead code elimination can always remove line 3 (*q = 5) on the grounds that the variable q itself is never read again after that line."
+  ],
+  answers: [0, 2],
+  marks: 2,
+  difficulty: 'hard',
+  type: 'concept',
+  explanation: "A is TRUE: this is precisely why alias analysis matters for optimization - once the compiler has PROVEN p and q cannot alias, the write through q on line 3 is guaranteed not to affect the memory p points to, so *p's value at line 4 is guaranteed identical to its value at line 1, making the reuse of x fully safe. B is FALSE: without that aliasing guarantee, this optimization is UNSAFE in general - if p and q could point to the same location, then *q = 5 on line 3 would change the value *p refers to, so blindly reusing the stale value x at line 4 would silently compute the wrong result; this is exactly the classic pointer-aliasing correctness hazard that compilers must be conservative about absent proof otherwise. C is TRUE: an opaque function call with unknown effects could, for all the compiler knows, modify global state or memory that the 'same' expression's operands depend on, so re-executing after such a call may legitimately produce a different value; common subexpression elimination is therefore correctly restricted to spans of code where the compiler can prove no relevant state has changed, treating unanalyzed calls conservatively as potential barriers. D is FALSE: a store THROUGH a pointer (*q = 5) writes to whatever memory location q currently refers to, which may well be observed elsewhere in the program (through p, through a global, through the caller after this function returns, and so on) even though the pointer VARIABLE q itself is never read again by name - dead code elimination cannot, in general, remove a memory write just because the pointer holding the address is not subsequently referenced, since the write's observable effect lives in memory, not in q."
+},
+{
+  id: 'compiler-optimization-h6',
+  q: 'Which of the following algebraic-simplification-based optimizations are VALID in general (i.e., correct for all inputs of the stated numeric type, including any special values)? (Select ALL that apply)',
+  options: [
+    "x = y * 1 (integer multiplication) can always be safely simplified to x = y.",
+    "x = y * 0 can always be safely replaced with x = 0, for any numeric type, including IEEE 754 floating point.",
+    "x = y - y can always be safely replaced with x = 0, for any numeric type, including IEEE 754 floating point.",
+    "x = 2 * y (integer multiplication) can be strength-reduced to x = y + y, or equivalently x = y << 1."
+  ],
+  answers: [0, 3],
+  marks: 2,
+  difficulty: 'hard',
+  type: 'concept',
+  explanation: "A is TRUE: for integer arithmetic, multiplying by 1 is always exactly the identity operation with no exceptions or special cases, so this simplification is always safe. B is FALSE for the general case stated (which explicitly includes IEEE 754 floating point): under IEEE 754 rules, if y is NaN (Not-a-Number), then y * 0 evaluates to NaN, not 0 (any arithmetic operation involving NaN propagates NaN); and if y is positive or negative Infinity, Infinity * 0 is defined to be NaN as well, not 0 - so 'x = y*0 can always be replaced with x = 0' is simply false once NaN or Infinity operands are possible, which is exactly why real compilers do NOT apply this simplification unconditionally to floating-point code unless they can prove y is a normal finite value (or the language/flags explicitly permit ignoring NaN semantics, e.g. with fast-math options). C is FALSE for the identical reason: under IEEE 754, NaN - NaN evaluates to NaN, not 0 (since NaN is never considered equal to, or cancels with, anything including itself), so 'y - y is always 0' fails whenever y could be NaN, making this simplification unsafe for floating point in general, even though it is perfectly safe for plain integers. D is TRUE: multiplying an integer by the small constant 2 is a standard, always-correct strength reduction to either an addition (y+y) or a single left-shift (y<<1), both typically cheaper than a general multiply instruction, and integers have no NaN-like special values to worry about, so this simplification carries no such caveat."
+},
+{
+  id: 'compiler-optimization-h7',
+  q: 'How many of the following 5 statements about compiler optimizations are TRUE?\n1. Loop-invariant code motion is always semantically safe to apply with no preconditions whatsoever.\n2. Common subexpression elimination requires that no assignment to any operand of the expression occurs between the two occurrences being merged.\n3. Dead code elimination can remove an assignment to a variable that is never subsequently used and has no other observable side effect.\n4. Constant propagation followed by constant folding can expose further dead-code-elimination opportunities that were not visible beforehand.\n5. Strength reduction always decreases the asymptotic (big-O) time complexity of the program it is applied to.\nEnter your numerical answer.',
+  options: [],
+  answer: 3,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'hard',
+  type: 'numerical',
+  explanation: "Statement 1 is FALSE: hoisting a loop-invariant computation above the loop is unsafe without precondition if the loop might execute zero times and the computation could raise an exception, trap, or otherwise have an observable effect that would not occur in the original zero-iteration execution (for example, hoisting a division that might divide by zero, when the original loop body guarding it would never actually have executed) - real compilers guard such hoists with a check, or restrict hoisting to provably-safe computations. Statement 2 is TRUE: this is precisely the correctness precondition for common subexpression elimination - if any operand were reassigned between the two occurrences, the second occurrence might compute a genuinely different value, so reusing the first result would be incorrect; the whole optimization hinges on proving no such intervening assignment exists. Statement 3 is TRUE: this is exactly the standard, textbook correctness condition for dead code elimination - a computation whose result is never used again and which has no other externally visible effect (no I/O, no volatile memory access, no exception it could raise that matters) can be removed with no change in observable program behavior. Statement 4 is TRUE: this is a well-known synergy between optimization passes - once a variable's value is known to be a specific constant everywhere it is used (constant propagation) and expressions involving only constants are pre-evaluated (constant folding), branches or computations that turn out to be provably unreachable or unused become visible and can then be eliminated by a subsequent dead-code-elimination pass, which is exactly why compilers iterate these passes together. Statement 5 is FALSE: strength reduction (such as replacing a multiply with repeated addition inside a loop, or a multiply with a shift) typically reduces the constant-factor COST per operation, not the algorithm's fundamental asymptotic complexity class - a loop that was O(n) before strength reduction is generally still O(n) afterward, just with cheaper per-iteration instructions. Counting the true statements: 2, 3, and 4 are true, giving a total of 3."
+}
+);
+
+window.GATE_DATA.questions['compiler'].topics.find(function(t){return t.id==='compiler-sdt';}).questions.push(
+{
+  id: 'compiler-sdt-h1',
+  q: "Using the synthesized-attribute SDD E -> E1 + T {E.val=E1.val+T.val} | T {E.val=T.val}; T -> T1 * F {T.val=T1.val*F.val} | F {T.val=F.val}; F -> ( E ) {F.val=E.val} | digit {F.val=digit.lexval}, evaluate E.val for the nested input 2*(3+4*5). Enter your numerical answer.",
+  options: [],
+  answer: 46,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'hard',
+  type: 'numerical',
+  explanation: "Evaluate bottom-up following the SDD's synthesized-attribute rules, respecting the grammar's built-in precedence (T handles multiplication tightly, E handles addition loosely) and the parenthesized nesting. Innermost first: inside the parentheses, 4*5 is parsed as a T (T1.val=4, F.val=5, so T.val=4*5=20); this T combines with 3 at the E level inside the parentheses (E1.val=3, T.val=20, so E.val=3+20=23), and F -> (E) copies this up as F.val=23. At the outer level, T -> T1 * F combines T1.val=2 (from the leading digit 2, via F->digit->T->F chain) with F.val=23 from the parenthesized group, giving T.val=2*23=46. Since this T is the only term at the top E level (no outer + present), E.val=T.val=46. This exercise specifically tests SDT evaluation on NESTED input: the F -> (E) {F.val=E.val} rule is what lets an inner, fully-evaluated E.val 'escape' the parenthesis and re-enter the outer expression's evaluation as an ordinary factor value, and correctly tracking which E/T/F level you are inside at each point in the nested parse tree is the main source of error in this kind of problem - answer 46."
+},
+{
+  id: 'compiler-sdt-h2',
+  q: "Consider the classic declaration SDD: D -> T L {L.in = T.type} ; T -> int {T.type=integer} | float {T.type=float} ; L -> L1 , id {L1.in=L.in; addtype(id.entry, L.in)} | id {addtype(id.entry, L.in)}. Which of the following statements about this SDD are TRUE? (Select ALL that apply)",
+  options: [
+    "L.in is an inherited attribute, since its value comes from context outside the L-production itself (ultimately from T.type) and is passed DOWN into L's own children.",
+    "T.type is a synthesized attribute, since it is computed purely from T's own production (T -> int or T -> float) without depending on anything outside T.",
+    "This SDD, as given, is S-attributed (i.e., every attribute used is synthesized, with no inherited attributes at all).",
+    "This SDD is L-attributed: every inherited attribute (here, L.in for the recursive L1) depends only on attributes of the parent D or on attributes of symbols strictly to the LEFT of it in the same production, consistent with a standard left-to-right, depth-first evaluation order."
+  ],
+  answers: [0, 1, 3],
+  marks: 2,
+  difficulty: 'hard',
+  type: 'concept',
+  explanation: "A is TRUE: L.in is set once, at the top, from D's rule L.in = T.type, and then propagated DOWNWARD through the recursive chain of L's (each L1.in is copied from its parent L.in) - this top-down flow of information from an enclosing context into a nonterminal's own attribute is exactly the definition of an inherited attribute. B is TRUE: T.type is fixed entirely by which alternative production of T is used (int or float) and needs no information from T's surroundings, making it a straightforward synthesized attribute. C is FALSE: an SDD is S-attributed only if it uses EXCLUSIVELY synthesized attributes everywhere, but this SDD explicitly uses the inherited attribute L.in (identified correctly in option A), so it cannot be S-attributed - it is a different, broader category. D is TRUE: this SDD is L-attributed (a strictly larger class than S-attributed) because its one inherited attribute, L1.in, is defined purely in terms of L.in, an attribute of its own PARENT in the same production (L -> L1, id), which is allowed under the L-attributed rule (inherited attributes may depend on the parent's attributes or on siblings strictly to the left, never on siblings to the right or on later context) - this dependency shape is exactly why such declaration-list SDDs can be evaluated in a single left-to-right, depth-first pass during ordinary top-down (or suitably adapted bottom-up) parsing, without needing to build and revisit a full parse tree multiple times."
+},
+{
+  id: 'compiler-sdt-h3',
+  q: 'Which of the following SDT evaluation results are computed CORRECTLY? (Select ALL that apply)',
+  options: [
+    "Using the right-associative grammar E -> F ^ E {E.val=F.val^E.val} | F {E.val=F.val}; F -> ( E ) {F.val=E.val} | digit, evaluating the nested input 2^(3^2) gives E.val = 64, as if the expression were left-associative and computed as (2^3)^2.",
+    "Using List -> List1 Bit {List.val=2*List1.val+Bit.val} | Bit {List.val=Bit.val}; Bit -> 0 {Bit.val=0} | 1 {Bit.val=1}, evaluating the binary input 1011 gives List.val = 11.",
+    "Using E -> E1 + T {E.val=E1.val+T.val} | T; T -> T1 * F {T.val=T1.val*F.val} | F; F -> ( E ) {F.val=E.val} | digit, evaluating (2+3)*(4+(5*6)) gives E.val = 170.",
+    "Using the same grammar as in the previous option, evaluating (2+3)*(4+(5*6)) instead gives E.val = 145, from a naive left-to-right evaluation that ignores the grammar's built-in operator precedence."
+  ],
+  answers: [1, 2],
+  marks: 2,
+  difficulty: 'hard',
+  type: 'concept',
+  explanation: "A is FALSE: the grammar E -> F^E|F is explicitly RIGHT-associative (the recursive E sits on the right of the ^), so 2^(3^2) must be evaluated with the innermost/rightmost exponentiation first, exactly matching the parenthesization already given: 3^2=9, then 2^9=512 - the claimed value of 64 corresponds instead to the WRONG, left-associative reading (2^3)^2=8^2=64, which this particular grammar's synthesized-attribute rule does not produce, since E.val=F.val^E.val always computes F's own base raised to whatever the (recursively, right-side) inner E evaluates to first. B is TRUE: reading the binary digits of 1011 via the doubling-and-adding synthesized rule gives, digit by digit from left to right, running value 1, then 1*2+0=2, then 2*2+1=5, then 5*2+1=11 - matching the direct interpretation of binary 1011 as the decimal value 11. C is TRUE: evaluate the innermost group first (5*6=30), then 4+30=34; separately, 2+3=5; finally the outer multiplication gives 5*34=170, correctly respecting the grammar's built-in precedence (T handles the tightly-binding multiplication, E the loosely-binding addition) regardless of the explicit parenthesization already present. D is FALSE: 145 does not correspond to any correct evaluation of this expression under this grammar's structural precedence rules or under the explicit parenthesization shown - it is simply an incorrect distractor value."
+},
+{
+  id: 'compiler-sdt-h4',
+  q: 'Which of the following statements about the evaluation order of syntax-directed definitions (SDDs) are TRUE? (Select ALL that apply)',
+  options: [
+    "Synthesized attributes can always be evaluated during a single bottom-up (postorder) traversal of the parse tree.",
+    "In an S-attributed SDD, all semantic actions can be safely executed directly during bottom-up (LR) parsing, using a value stack running in parallel with the parsing stack, without ever constructing an explicit parse tree.",
+    "L-attributed SDDs (whose inherited attributes flow strictly left-to-right) can be evaluated during ordinary top-down predictive parsing, but can NEVER be evaluated during any form of bottom-up parsing, under any circumstances.",
+    "An SDD whose attribute-dependency graph (for a given parse tree) contains a genuine cycle cannot be evaluated by any fixed evaluation order at all, since no order of computing the attributes can be found that respects every dependency."
+  ],
+  answers: [0, 1, 3],
+  marks: 2,
+  difficulty: 'hard',
+  type: 'concept',
+  explanation: "A is TRUE: by definition, a synthesized attribute at any node depends only on attributes of that node's own children (and possibly its own production's terminals), so computing children before parents - exactly a postorder, bottom-up traversal - always respects every dependency and correctly evaluates every synthesized attribute, for any SDD that uses only synthesized attributes. B is TRUE: this is precisely why S-attributed SDDs are so convenient for practical yacc/bison-style tools - since every action only ever needs the already-computed values sitting on top of the parsing stack (for the symbols just reduced), a parallel value stack can carry attribute values alongside the LR parser's state stack, with no need to ever materialize the parse tree as an explicit data structure in memory. C is FALSE: the claim's absolute 'NEVER, under any circumstances' overreaches - L-attributed SDDs are naturally suited to top-down (LL) parsing, but with additional engineering (such as restructuring the grammar, introducing marker/action nonterminals, or delaying certain actions until enough of the right context has been shifted), many L-attributed SDDs CAN also be implemented during bottom-up (LR-style) parsing; L-attributedness is not an exclusively top-down-only property, even though it aligns most naturally with top-down evaluation. D is TRUE: a cycle in the dependency graph means some attribute would need its own value (possibly transitively, through other attributes) to already be known before it can be computed - a fundamental contradiction that makes the SDD ill-formed and uncomputable by any evaluation order whatsoever; every valid, well-formed SDD must have an ACYCLIC dependency graph for every possible parse tree."
+},
+{
+  id: 'compiler-sdt-h5',
+  q: "Using the synthesized-attribute SDD List -> List1 , id {List.count = List1.count + 1} | id {List.count = 1}, what is List.count for the input 'a,b,c,d,e' (five identifiers)? Enter your numerical answer.",
+  options: [],
+  answer: 5,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'hard',
+  type: 'numerical',
+  explanation: "The grammar builds the identifier list left-recursively, so the parse tree nests as ((((a),b),c),d),e reading the comma-separated list from left to right, one identifier added per level of recursion. Evaluating bottom-up (innermost/leftmost first): the base case List -> id (just 'a') gives List.count = 1. Each subsequent level applies List -> List1,id {List.count = List1.count+1}, adding exactly 1 to the running count for every additional identifier appended: after adding 'b', count=2; after 'c', count=3; after 'd', count=4; after 'e', count=5. So the final synthesized List.count at the root of the parse tree correctly equals the total number of identifiers in the comma-separated list, which is 5 - matching a simple, direct count of the input tokens 'a', 'b', 'c', 'd', 'e'. This kind of counting SDD is the natural generalization of the classic declaration-list SDD used for propagating a shared type to every identifier in a list, illustrating that a purely synthesized (bottom-up, postorder-evaluable) attribute can track cumulative information (like a running count) across an arbitrarily long recursive chain just as naturally as it computes an arithmetic value."
+},
+{
+  id: 'compiler-sdt-h6',
+  q: 'For each of the following small sets of semantic rules attached to a single production X -> Y Z, which define a WELL-FORMED (acyclic, evaluable) set of attribute equations? (Select ALL that apply)',
+  options: [
+    "X.s = Y.s + Z.s ; Y.i = X.i ; Z.i = X.i  (assume X.i is itself supplied from outside this production, e.g. inherited from X's own parent)",
+    "Y.i = Z.s ; Z.i = Y.s  (assume, as is typical, that each side's own synthesized attribute, Y.s and Z.s, in turn depends on that same side's inherited attribute, Y.i and Z.i respectively)",
+    "X.s = Y.s ; Y.s = Z.s ; Z.s = (some fixed value computed independently of any other attribute in this production)",
+    "X.i = Y.i ; Y.i = X.i  (with no other rule anywhere providing an independent starting value for either)"
+  ],
+  answers: [0, 2],
+  marks: 2,
+  difficulty: 'hard',
+  type: 'concept',
+  explanation: "A is WELL-FORMED: assuming X.i arrives already computed from outside (X's own inherited attribute, supplied by X's parent), the dependency order is simply X.i (given) leads to Y.i and Z.i (both copied directly from X.i), which in turn allow Y.s and Z.s to be computed within their own subtrees, which finally allow X.s to be computed as their sum - a clean, acyclic top-down-then-bottom-up order exists. B is CIRCULAR and NOT well-formed: Y.i depends on Z.s, but (by the stated typical assumption) Z.s itself depends on Z.i, which in turn depends on Y.s, which itself depends on Y.i, which depends on Z.s again - chasing this chain leads directly back to where it started, with no independent starting point anywhere in the cycle, so no valid evaluation order exists; this is exactly the shape of a genuinely circular SDD. C is WELL-FORMED: this is a simple, non-circular chain of purely synthesized attributes with an independent base case (Z.s is fixed with no dependency on anything else in the production), so the order Z.s, then Y.s, then X.s cleanly resolves every dependency with no cycles anywhere. D is CIRCULAR and NOT well-formed: X.i is defined purely in terms of Y.i, and Y.i is defined purely in terms of X.i, with no independent value ever supplied for either from any other rule - neither attribute can ever be computed first, since each strictly waits on the other, a textbook minimal example of a circular (invalid) attribute definition."
+},
+{
+  id: 'compiler-sdt-h7',
+  q: 'Which of the following SDDs can be correctly evaluated using actions embedded directly during a SINGLE-PASS parse (using only a synchronized attribute-value stack, with no separate tree-traversal pass)? (Select ALL that apply)',
+  options: [
+    "An S-attributed SDD, where every semantic action appears at the very end of its production (purely synthesized attributes only).",
+    "An SDD in which an inherited attribute of some right-hand-side symbol depends on the SYNTHESIZED attributes of symbols to its RIGHT within the same production.",
+    "A truly L-attributed SDD, in which every inherited attribute of each right-hand-side symbol depends only on the inherited attribute of the left-hand side and/or the (inherited or synthesized) attributes of right-hand-side symbols strictly to its LEFT.",
+    "Any SDD whatsoever, regardless of the shape of its attribute dependencies, since a parser is fundamentally just a finite automaton equipped with a stack."
+  ],
+  answers: [0, 2],
+  marks: 2,
+  difficulty: 'hard',
+  type: 'concept',
+  explanation: "A is TRUE: this is exactly the S-attributed case discussed earlier - since every attribute needed by an action is already fully computed and sitting on the value stack for the symbols just reduced, a single bottom-up pass with a synchronized stack suffices, with no need to look ahead or revisit earlier stack entries. B is FALSE: an inherited attribute depending on synthesized attributes of symbols to its RIGHT violates the very definition of L-attributedness (which restricts dependencies to the left context only), and such a right-ward dependency generally cannot be resolved in a single left-to-right pass, because the needed information (the synthesized attribute of a symbol not yet parsed/reduced) simply does not exist yet at the point it would be needed - handling this shape typically requires either restructuring the grammar, deferring evaluation, or making multiple passes over a materialized tree. C is TRUE: this is the textbook L-attributed condition, and it is specifically designed to be evaluable in one left-to-right, depth-first pass - an LL parser augmented with an attribute stack (or an LR parser with suitable restructuring) can compute every inherited attribute at the moment it is needed, since by definition it only ever depends on already-available left-context information. D is FALSE: this significantly overclaims - having a stack does not magically resolve arbitrary dependency shapes; SDDs whose dependencies genuinely require information from the right (as in option B) or that are otherwise not L-attributed may require full parse-tree construction and multiple traversal passes rather than a single left-to-right stack-based pass, so the blanket claim that 'any SDD whatsoever' works this way is false."
+}
+);
+
+window.GATE_DATA.questions['compiler'].topics.find(function(t){return t.id==='compiler-icg';}).questions.push(
+{
+  id: 'compiler-icg-h1',
+  q: "For the expression a + a * (b - c) + (b - c) * d, construct the DAG (sharing every repeated subexpression as a single node). How many DISTINCT nodes does the DAG have in total (leaves plus interior operation nodes)? Enter your numerical answer.",
+  options: [],
+  answer: 9,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'hard',
+  type: 'numerical',
+  explanation: "Build the DAG bottom-up, creating a new node only for each DISTINCT subexpression (identical operator with identical operand nodes reuses the existing node instead of duplicating it). Leaves: a, b, c, d - four distinct leaf nodes (the two textual occurrences of 'a' share the SAME leaf node, since a DAG for identifiers always shares the identifier's node). Interior nodes, built bottom-up: (1) b - c, a single subtraction node (this exact subexpression appears twice in the source text but is built only once and then reused); (2) a * (b-c), a multiplication node taking the 'a' leaf and the shared (b-c) node as its two children; (3) (b-c) * d, a second, DIFFERENT multiplication node, taking the same shared (b-c) node together with the 'd' leaf (this is a distinct node from (2), since its operands differ - one has 'a' as the other operand, the other has 'd'); (4) a + [a*(b-c)], an addition node combining the 'a' leaf with node (2); (5) [a+a*(b-c)] + [(b-c)*d], the final, top-level addition node combining node (4) with node (3). Counting: 4 leaves + 5 interior nodes = 9 distinct nodes total. The key idea being tested is that only the (b-c) subexpression is literally repeated with identical operator AND identical operands, so it alone collapses to a single shared node used by two different parents, while the two multiplication nodes, despite both involving (b-c), are NOT the same node, since their OTHER operand (a vs d) differs."
+},
+{
+  id: 'compiler-icg-h2',
+  q: 'For the expression ((a+b) * (a+b)) - (a+b), which of the following are TRUE? (Select ALL that apply)',
+  options: [
+    "The DAG for this expression contains exactly 5 distinct nodes: leaves a and b, one shared node for (a+b), one node for the multiplication, and one node for the subtraction.",
+    "The (a+b) node is referenced (used as a child) exactly 3 times in this DAG - twice by the multiplication node (as both its left and right operand) and once by the subtraction node.",
+    "If a parse TREE were built instead of a DAG for this same expression (with no sharing of repeated subexpressions), it would also require only 5 nodes total, exactly the same as the DAG, since all three occurrences of a+b use identical operands.",
+    "Building this expression as a DAG rather than a tree directly enables common-subexpression elimination by construction, since every repeated computation is automatically represented as a single node that need only be evaluated once."
+  ],
+  answers: [0, 1, 3],
+  marks: 2,
+  difficulty: 'hard',
+  type: 'concept',
+  explanation: "A is TRUE: with sharing, there are exactly 2 leaves (a, b), 1 node for the shared subexpression (a+b), 1 node for the multiplication (whose two children both point to the SAME (a+b) node), and 1 node for the final subtraction (whose two children are the multiplication node and, again, the same shared (a+b) node) - a total of 5 distinct nodes. B is TRUE: counting every edge that points INTO the (a+b) node - the multiplication node uses it as both its left child AND its right child (2 edges), and the subtraction node uses it as its right child (1 more edge) - gives an in-degree of exactly 3 for that single shared node, illustrating how one DAG node can be referenced by multiple parents (and even by the same parent more than once). C is FALSE: this is exactly the property a DAG is designed to avoid - a plain parse TREE, by definition, never shares nodes, so it would build THREE separate, textually-identical (a+b) subtrees (each with its own '+' node and its own pair of a and b leaf nodes duplicated across all three), giving roughly 3*(1 plus 2) = 9 nodes just for the three additions, plus the multiplication and subtraction nodes, for around 11 total - far more than the DAG's 5, directly contradicting the claim that both representations need the same node count. D is TRUE: because a DAG automatically merges any subexpression that is textually and structurally identical into one shared node the first time it is built, any later occurrence of that same subexpression is represented purely as an extra edge pointing to the already-existing node rather than a fresh computation - this is precisely the mechanism by which common subexpression elimination naturally falls out of DAG-based intermediate code generation, with no separate optimization pass needed to discover the sharing."
+},
+{
+  id: 'compiler-icg-h3',
+  q: "Using the same DAG as constructed for a + a * (b - c) + (b - c) * d (with the shared (b-c) subexpression computed only once), what is the MINIMUM number of three-address code instructions needed to evaluate this expression? Enter your numerical answer.",
+  options: [],
+  answer: 5,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'hard',
+  type: 'numerical',
+  explanation: "Since three-address code generation from a DAG emits exactly one instruction per INTERIOR (operation) node, and never re-emits an instruction for a node that has already been computed and stored in a temporary (each interior node is visited and translated only once, regardless of how many parents reference it), the minimum instruction count equals the number of interior DAG nodes, which was established as 5 in the companion DAG-node-counting question: t1 = b - c (computed once, for the shared subexpression); t2 = a * t1; t3 = t1 * d (reusing t1 rather than recomputing b-c); t4 = a + t2; t5 = t4 + t3. This 5-instruction sequence correctly reuses t1 in both the second and third instructions, exactly reflecting the DAG's single shared node for (b-c), and it computes the fully correct value of the original expression in the final temporary t5. A NAIVE, non-DAG-based (tree-based) code generator, by contrast, would emit a separate pair of instructions to recompute b-c every time it appears textually, needing 6 or more instructions instead of 5 - so this question also illustrates concretely how DAG-based generation directly reduces the minimal instruction count compared to naive generation, purely by exploiting the exact same subexpression-sharing already identified when building the DAG."
+},
+{
+  id: 'compiler-icg-h4',
+  q: 'Which of the following statements about three-address code (TAC) generation are TRUE? (Select ALL that apply)',
+  options: [
+    "Naive (non-DAG-based) TAC generation for an expression containing a subexpression that is textually repeated k times will generate k separate copies of the code computing that subexpression, whereas DAG-based generation produces only 1 copy, reused via a shared temporary.",
+    "For an expression tree with n operator (interior) nodes and NO repeated subexpressions, exactly n three-address instructions are needed, regardless of whether tree-based or DAG-based code generation is used.",
+    "Three-address code requires every instruction to have exactly three explicit addresses (operands), so a simple copy instruction such as x = y (which has only two addresses) is not considered valid three-address code.",
+    "Generating TAC from a DAG (rather than from the corresponding tree) can never require MORE distinct temporaries than tree-based generation of the same expression - it can only require the same number or fewer."
+  ],
+  answers: [0, 1, 3],
+  marks: 2,
+  difficulty: 'hard',
+  type: 'concept',
+  explanation: "A is TRUE: without DAG-based sharing, a naive generator walks the expression exactly as written and emits code for every textual occurrence of a subexpression independently, so a subexpression appearing k times textually gets recomputed (and re-emitted as code) k separate times, while a DAG-aware generator computes it once into a temporary and simply reuses that temporary's name everywhere else it is needed. B is TRUE: when there is no sharing to exploit (no subexpression repeats), a DAG for such an expression is structurally identical to its parse tree (every node has exactly one parent), so both approaches necessarily emit exactly one instruction per operator node, with no difference between them in this special case. C is FALSE: despite its name, three-address code is understood to permit certain instructions with fewer than three explicit addresses as standard, common forms - a plain copy x=y (two addresses) and a unary operation like x=-y (two addresses plus an implicit operator) are both completely standard, valid TAC instruction shapes in every textbook treatment; the 'three-address' name refers to the general design principle of at most one operator per instruction (so at most three addresses are ever needed in the worst case), not a strict requirement that every single instruction use exactly three. D is TRUE: because DAG-based generation reuses an already-computed temporary for any repeated subexpression instead of recomputing it into a brand new temporary, the total number of distinct value-producing temporaries/instructions needed can only stay the same as (when there is no sharing) or decrease below (when there is sharing) the naive tree-based count - sharing can never force MORE temporaries to be introduced than the naive approach would have used."
+},
+{
+  id: 'compiler-icg-h5',
+  q: "Consider the expression -(a+b) * (a+b) + c, where the (a+b) subexpression is shared as a single DAG node and reused by both the unary-minus node and the multiplication node. Which of the following are TRUE? (Select ALL that apply)",
+  options: [
+    "The DAG for this expression has exactly 7 distinct nodes in total: 3 leaves (a, b, c) plus 4 interior nodes (the shared (a+b) node, the unary-minus node, the multiplication node, and the final addition node).",
+    "The minimum number of three-address instructions needed to evaluate this expression is 4, one per interior DAG node: t1=a+b; t2=-t1; t3=t2*t1; t4=t3+c.",
+    "The (a+b) node has an in-degree of 2 in this DAG, since it is referenced as a child by both the unary-minus node and the multiplication node.",
+    "This expression cannot actually benefit from DAG-based sharing, because the two occurrences of (a+b) sit under different surrounding operators (one under unary minus, one under multiplication), so they are not truly 'the same' subexpression and cannot share a single node."
+  ],
+  answers: [0, 1, 2],
+  marks: 2,
+  difficulty: 'hard',
+  type: 'concept',
+  explanation: "A is TRUE: leaves a, b, c give 3 nodes; interior nodes are the shared (a+b) node (1), the unary minus applied to it (1), the multiplication of the unary-minus result with the SAME (a+b) node (1), and the final addition with c (1) - that is 4 interior nodes, for 7 total. B is TRUE: since there are exactly 4 interior nodes, DAG-based TAC generation emits exactly 4 instructions, one per interior node, correctly reusing t1 (the value of a+b) as an operand in the third instruction rather than recomputing a+b a second time. C is TRUE: counting edges into the (a+b) node specifically - the unary-minus node uses it as its one child (1 edge), and the multiplication node uses it as its second operand (1 more edge) - gives an in-degree of exactly 2, one less than the previous question's example only because here neither individual parent uses it TWICE. D is FALSE and is an important conceptual trap: DAG sharing is determined entirely by whether a subexpression is structurally identical in itself (same operator, same operands) - it does NOT matter what operator or context sits ABOVE that subexpression afterward; (a+b) is exactly the same subexpression both times regardless of whether its result subsequently feeds into a unary minus or into a multiplication, so it is fully eligible for, and does in fact receive, sharing as a single DAG node with two different parents of different kinds."
+},
+{
+  id: 'compiler-icg-h6',
+  q: 'Using the Sethi-Ullman labeling algorithm (label(leaf)=1; label(node)=left.label+1 if left.label equals right.label, else max(left.label,right.label)) to determine the minimum number of registers needed to evaluate an expression tree with no repeated subexpressions and no spilling, which of the following are TRUE? (Select ALL that apply)',
+  options: [
+    "For the tree (a+b)*(c+d), the Sethi-Ullman label of the root (i.e., the minimum registers needed) is 3.",
+    "For the tree (a+b)+c, the Sethi-Ullman label of the root is 2.",
+    "For a fully left-skewed chain a+b+c+d+e (parsed left-associatively as ((((a+b)+c)+d)+e), the register requirement GROWS without bound as more terms are appended, eventually needing as many registers as there are terms.",
+    "For expression trees with no shared subexpressions, the Sethi-Ullman algorithm is known to produce code using the theoretically minimum possible number of registers, assuming unlimited spill-to-memory is allowed whenever more registers are needed than are physically available."
+  ],
+  answers: [0, 1, 3],
+  marks: 2,
+  difficulty: 'hard',
+  type: 'concept',
+  explanation: "A is TRUE: leaves a,b,c,d each get label 1; the left subtree (a+b) has two equal-label-1 children, so its label is 1+1=2, and by symmetry (c+d) also gets label 2; the root's two children now both have label 2 (equal), so the root's label is 2+1=3 - three registers are needed. B is TRUE: leaves a,b,c each get label 1; the inner (a+b) has two equal-label-1 children, giving it label 2; at the root, the left child (a+b) has label 2 while the right child c has label 1 - since these are UNEQUAL, the root's label is simply max(2,1)=2, not 2+1. C is FALSE and is the most instructive claim here: applying the same unequal-labels rule repeatedly, a left-skewed chain of additions keeps the register requirement PERMANENTLY capped at 2, no matter how many terms are appended - each successive '+' combines a left subtree of label 2 with a fresh leaf of label 1, and since these labels are always unequal, the result is always max(2,1)=2 forever, never growing; this reflects the general principle that evaluating the heavier (higher-label) subtree FIRST and holding its result in one register while sequentially folding in cheap single-leaf terms with a second register is always sufficient for a skewed chain. D is TRUE: this is the well-established optimality guarantee of the Sethi-Ullman algorithm for ordinary expression trees (no common-subexpression sharing) - by always evaluating the higher-label (more register-hungry) subtree of each node first and freeing its result's register only after combining with the other operand, it provably achieves the true minimum register count for straight-line evaluation of any such tree, spilling to memory only when a subtree's own inherent label exceeds the number of physically available registers."
+},
+{
+  id: 'compiler-icg-h7',
+  q: 'For the expression (a*b) + (a*b) - (a*b) (the identical product a*b appearing three times), built as a DAG with the a*b subexpression shared as a single node, which of the following are TRUE? (Select ALL that apply)',
+  options: [
+    "The DAG has exactly 5 distinct nodes in total: 2 leaves (a, b) plus 3 interior nodes (the shared multiplication, the addition, and the subtraction).",
+    "Minimal three-address code generated from this DAG requires exactly 3 instructions: t1 = a*b; t2 = t1+t1; t3 = t2-t1.",
+    "Naive, tree-based (non-shared) TAC generation for this same expression would also require only 3 instructions, since all three occurrences use the same operator (multiplication) on the same operands.",
+    "In this DAG, the shared a*b node has an in-degree (number of incoming references from parent nodes) of exactly 3."
+  ],
+  answers: [0, 1, 3],
+  marks: 2,
+  difficulty: 'hard',
+  type: 'concept',
+  explanation: "A is TRUE: leaves a and b give 2 nodes; the single shared a*b node is 1 interior node (built once and reused for all three textual occurrences); the addition node (whose both operands point to this same a*b node) is 1 more; the subtraction node (combining the addition's result with the SAME a*b node yet again) is 1 more - totaling 2+3=5 distinct nodes. B is TRUE: DAG-based generation emits exactly one instruction per interior node - t1=a*b computes the shared product once, t2=t1+t1 reuses t1 for both operands of the addition, and t3=t2-t1 reuses t1 a third time for the subtraction - correctly evaluating the expression in exactly 3 instructions. C is FALSE: without sharing, a naive tree-based generator would recompute a*b independently for EACH of its three textual occurrences (3 separate multiply instructions), then 1 addition and 1 subtraction, for 5 instructions total - not 3; only the DAG-based approach, by exploiting the identical repeated subexpression, achieves the smaller count of 3. D is TRUE: count every edge pointing into the shared a*b node - the addition node references it twice (as both its left AND right operand, since it is literally (a*b)+(a*b)), contributing 2 edges, and the subtraction node references it once more (as its right operand), contributing 1 more edge - for a total in-degree of 2+1=3, illustrating that a single DAG node can accumulate in-degree from being reused multiple times even within a single parent as well as across different parents."
+}
+);
+
+window.GATE_DATA.questions['compiler'].topics.find(function(t){return t.id==='compiler-runtime';}).questions.push(
+{
+  id: 'compiler-runtime-h1',
+  q: 'Consider the following program:\nint x = 1;\nvoid f() { print(x); }\nvoid g() { int x = 2; f(); }\nvoid main() { int x = 3; g(); }\nmain() calls g(), which calls f(). Which of the following are TRUE? (Select ALL that apply)',
+  options: [
+    "Under static (lexical) scoping, f() prints 1.",
+    "Under dynamic scoping, f() prints 2.",
+    "Under dynamic scoping, f() prints 3, because main is the ultimate top-level caller in the call chain.",
+    "Static scoping resolves a variable's binding based on WHERE the referencing function is textually/lexically DEFINED in the source, while dynamic scoping resolves it based on WHO is CALLING at runtime (the current call chain)."
+  ],
+  answers: [0, 1, 3],
+  marks: 2,
+  difficulty: 'hard',
+  type: 'concept',
+  explanation: "A is TRUE: under static scoping, f's free variable x is resolved by looking at where f is textually DEFINED - at the top level, alongside the global x=1 - completely independent of who happens to call f or what local x variables exist in the caller's scope; so f() always prints 1, no matter whether it is called from g, from main, or anywhere else. B is TRUE: under dynamic scoping, resolving x inside f() means searching the ACTIVE CALL CHAIN at the moment f executes, from the innermost currently-running frame outward; since g() (which has its own local x=2) is the frame that directly called f(), g's x=2 is the NEAREST binding on the call stack, so f() prints 2. C is FALSE and is a common misconception about dynamic scoping: dynamic scoping does not simply jump to the OUTERMOST or 'original' caller - it always uses the NEAREST (innermost) enclosing call frame that provides a binding for the variable being looked up; since g() is closer to f() on the call stack than main() is, g's x=2 wins over main's x=3, so f() does NOT print 3 under dynamic scoping (it would only print 3 if g() itself had no local x of its own, forcing the search to continue further out to main's frame). D is TRUE: this is exactly the correct, precise conceptual distinction between the two scoping disciplines - static scoping is a purely textual/compile-time notion tied to the program's written structure, while dynamic scoping is a purely runtime notion tied to the sequence of actual function calls in effect at the moment of the reference."
+},
+{
+  id: 'compiler-runtime-h2',
+  q: 'Consider the following pseudocode using proper lexical closures:\nfunction makeCounter() {\n  var n = 0;\n  function increment() { n = n + 1; return n; }\n  return increment;\n}\nvar c1 = makeCounter();\nvar c2 = makeCounter();\nprint(c1()); // prints 1\nprint(c1()); // prints 2\nWhat does c2() print, called for the first time here? Enter the numerical value.',
+  options: [],
+  answer: 1,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'hard',
+  type: 'numerical',
+  explanation: "Each SEPARATE call to makeCounter() creates a brand-new, independent activation of its body, including a fresh local variable n initialized to 0, and returns a closure (the inner increment function) that captures a reference to THAT SPECIFIC activation's environment - not to makeCounter's code in the abstract, but to the exact instance of n created during that one particular call. Since c1 and c2 come from two SEPARATE calls to makeCounter(), they close over two entirely independent copies of n, each starting at 0 and mutated only by calls through that same closure. Calling c1() twice increments c1's own private n from 0 to 1 (printing 1) and then from 1 to 2 (printing 2), exactly as shown - but this has absolutely no effect on c2's completely separate n, which is still sitting at its own untouched initial value of 0 (from c2's own, distinct call to makeCounter()). So the first call to c2() increments c2's private n from 0 to 1 and returns/prints 1, completely independent of whatever c1 has done. This is the defining behavior of proper closures under static scoping: each closure captures its own defining ENVIRONMENT INSTANCE, not a single shared, global copy of the variable."
+},
+{
+  id: 'compiler-runtime-h3',
+  q: 'Continuing the same counters example (c1 and c2 are independent closures from two separate calls to makeCounter(), each with its own private n), which of the following are TRUE? (Select ALL that apply)',
+  options: [
+    "Calling c1() twice in succession returns 1 and then 2.",
+    "c1 and c2 share the exact same variable n, since both closures were created by calling the exact same function, makeCounter.",
+    "This independent-counters behavior fundamentally relies on the language using static scoping together with proper support for closures that capture their defining environment - it is not something dynamic scoping alone would naturally provide.",
+    "If n were instead declared as a single GLOBAL variable (shared by all calls to makeCounter, rather than a fresh local each time), then the sequence c1(), c1(), c2() would print 1, 2, 3 - an accumulating shared count - instead of 1, 2, 1."
+  ],
+  answers: [0, 2, 3],
+  marks: 2,
+  difficulty: 'hard',
+  type: 'concept',
+  explanation: "A is TRUE, matching the given example directly: each call through c1 mutates c1's own private n by 1 and returns the new value, so successive calls give 1 then 2. B is FALSE and is exactly the misconception this example is designed to correct: makeCounter being the SAME function does not mean every INVOCATION of it shares state - each call creates its own fresh activation record with its own independent local n, and it is that per-call instance, not the function's source code, that the returned closure remembers; c1 and c2 are closures over two different instances of n, which is precisely why they count independently. C is TRUE: this closure behavior depends on the language's evaluation model retaining access to a specific, already-returned-from function call's local environment for as long as a closure referencing it still exists - this is a hallmark of static (lexical) scoping combined with proper closures; a naive dynamic-scoping implementation would instead look up n via whatever is CURRENTLY on the call stack at the time increment() is invoked, which, once makeCounter() has already returned, would generally no longer include makeCounter's own now-popped frame at all, breaking this pattern entirely. D is TRUE: if n is a single shared global instead of a fresh per-call local, then every closure created by any call to makeCounter reads and writes the SAME underlying storage, so calls interleave on one running total regardless of which closure invokes them - c1(),c1(),c2() would then increment the single shared n from 0 to 1, 1 to 2, and 2 to 3 respectively, printing 1, 2, 3."
+},
+{
+  id: 'compiler-runtime-h4',
+  q: "Consider:\nx = 1\ndef A():\n    x = 2\n    def B():\n        print(x)\n    return B\ndef C():\n    x = 3\n    b = A()\n    b()\nC() is called (A() runs to completion and returns its inner function B, which C then stores in b and calls afterward). Which of the following are TRUE? (Select ALL that apply)",
+  options: [
+    "Under static (lexical) scoping, calling b() from within C prints 2, because B's free variable x resolves to A's x, fixed by where B is textually DEFINED (nested inside A).",
+    "Under dynamic scoping, calling b() prints 3, because by the time b() actually executes, A's own activation record has already been popped off the call stack (A already returned), so the search for x continues up the currently ACTIVE call chain and finds C's x=3 instead.",
+    "Under dynamic scoping, calling b() would print 2, the same as under static scoping, because B 'remembers' the x that was active during A's execution.",
+    "This example illustrates that closures (functions returned from an enclosing scope, called later) are naturally well-defined under static scoping, but behave inconsistently - or break entirely - under pure dynamic scoping, since the enclosing activation that defined the free variable may no longer exist on the call stack by the time the returned function is actually invoked."
+  ],
+  answers: [0, 1, 3],
+  marks: 2,
+  difficulty: 'hard',
+  type: 'concept',
+  explanation: "A is TRUE: under static scoping, B's free variable x is resolved purely by where B sits in the program's TEXT - nested directly inside A's definition - so it always refers to A's x (value 2), completely independent of who eventually calls the returned function or when. B is TRUE and is the crux of this example: under PURE dynamic scoping (with no closure-style environment capture), a variable reference is resolved by searching the call chain that is CURRENTLY active at the exact moment of the reference; since C() first calls A() (which runs to completion, printing nothing, and returns the function B) and A's activation record is popped off the stack once A returns, by the time C() subsequently calls b(), A's frame - and its x=2 - is simply gone from the active call chain, so the dynamic-scoping search continues outward to C's own frame, finding C's x=3 instead. C is FALSE: this conflates dynamic scoping with closures - the 'remembering' behavior described is exactly what STATIC scoping with proper closures provides (by capturing a reference to the defining environment that persists even after that function returns), but plain dynamic scoping has no such persistent memory of a since-exited call frame; it only ever looks at whichever frames are CURRENTLY on the stack, so it cannot reproduce this behavior. D is TRUE: this scenario is exactly why closures are considered a fundamentally static-scoping-oriented language feature - they rely on being able to retain access to a specific, already-returned-from lexical environment, which meshes naturally with static scoping's environment-capture model but is undefined or behaves inconsistently under a pure dynamic-scoping discipline, where the relevant activation may simply no longer exist by call time."
+},
+{
+  id: 'compiler-runtime-h5',
+  q: 'Consider:\nx = 5\ndef p(): print(x)\ndef q():\n    x = 6\n    p()\nq() is called. Under DYNAMIC scoping, what value does p() print? Enter the numerical answer.',
+  options: [],
+  answer: 6,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'hard',
+  type: 'numerical',
+  explanation: "Under dynamic scoping, resolving the free variable x referenced inside p() requires searching the CURRENTLY ACTIVE call chain at the exact moment p() executes, starting from the innermost (most recently entered) frame and working outward, rather than looking at where p is textually defined. Since q() is the function that directly calls p(), and q() has already established its OWN local binding x=6 before making that call, q's frame - with x=6 - is the innermost frame on the active call stack at the moment p() runs and looks up x; p() itself defines no local x of its own, so the dynamic-scoping lookup immediately finds and uses q's x=6, printing 6. This is in direct contrast to what STATIC (lexical) scoping would do with the exact same program: since p() is textually defined at the top level (not nested inside q at all), a static-scoping resolution would instead bind p's free variable x to the top-level global x=5, completely ignoring q's local x=6 regardless of the fact that q happens to be the caller - giving a different printed value (5) under static scoping than under dynamic scoping (6) for this identical piece of code, which is exactly the kind of discrepancy that motivates careful study of the two disciplines."
+},
+{
+  id: 'compiler-runtime-h6',
+  q: 'Which of the following statements about the runtime implementation of static and dynamic scoping are TRUE? (Select ALL that apply)',
+  options: [
+    "Static scoping is typically implemented using access links (also called static links) stored in each activation record, each pointing to the activation record of the most recent invocation of the lexically ENCLOSING procedure.",
+    "Dynamic scoping is typically implemented using dynamic links (control links) that reflect the actual CALL chain, or via a central reference table pushed and popped as procedures are called and return, rather than reflecting lexical nesting.",
+    "A 'display' is a data structure used specifically to speed up ACCESS-LINK traversal (i.e., static-scope variable lookups) in deeply/statically-nested procedures, by keeping a direct array of pointers indexed by lexical nesting depth, avoiding walking a long chain of access links one hop at a time.",
+    "Access links (static links) and control links (dynamic links) always point to the exact same activation record for every procedure call in every language, since a procedure's caller is always identical to its lexically enclosing procedure."
+  ],
+  answers: [0, 1, 2],
+  marks: 2,
+  difficulty: 'hard',
+  type: 'concept',
+  explanation: "A is TRUE: this is the standard mechanism for implementing static scoping at runtime - each activation record carries an access (static) link pointing to the activation record of the textually enclosing procedure's current invocation, letting a nested procedure walk outward through the LEXICAL structure (not the call history) to resolve non-local variable references. B is TRUE: dynamic scoping is instead implemented by following the CALL chain itself - typically via the control (dynamic) links that every activation record already carries for the purpose of returning control to the caller, or via a runtime central reference table (association list / deep-binding stack) that pushes a new binding for a variable name on entry to a scope defining it and pops it on exit, always reflecting who actually called whom rather than how the program is textually nested. C is TRUE: in deeply nested lexical scopes, walking the access-link chain hop by hop to reach a variable declared several levels out can be slow; a display keeps one array, indexed directly by nesting depth, holding a pointer to the correct enclosing activation record at each depth, letting any nested procedure jump straight to the right ancestor's frame in one step rather than traversing the chain - this is purely an optimization of static-link-based (static-scoping) lookups, not something used for dynamic scoping's call-chain-based search. D is FALSE: access links and control links coincide only in the special case where a procedure happens to be called directly from within its own lexically enclosing procedure; in general, a procedure (especially a globally visible utility procedure) can be CALLED from many different places that have nothing to do with where it is LEXICALLY nested, so its access link (fixed by lexical structure) and its control link (determined by the actual, possibly very different, calling location on this particular invocation) typically point to entirely different activation records."
+},
+{
+  id: 'compiler-runtime-h7',
+  q: 'Consider this pseudocode, run in a language where the loop variable is a single, shared, mutable binding across all iterations of the loop (closures capture the variable itself, by reference, not a snapshot of its value):\nfuncs = []\nfor i in range(3):\n    def f(): return i\n    funcs.append(f)\nAfter the loop, calling funcs[0](), funcs[1](), funcs[2]() in turn. Which of the following are TRUE? (Select ALL that apply)',
+  options: [
+    "All three calls print the SAME value, 2, corresponding to i's final value once the loop has finished.",
+    "This behavior occurs because closures under static (lexical) scoping capture a live reference/link to the variable's storage location (its environment slot), not a frozen snapshot of its value at the moment the closure was created.",
+    "If the loop instead created a FRESH, independent binding of i for each individual iteration (as some languages support, e.g. via a per-iteration block-scoped variable), the three functions would instead print 0, 1, 2 respectively.",
+    "The difference between printing 2,2,2 (shared binding) versus 0,1,2 (fresh binding per iteration) is fundamentally a difference between DYNAMIC scoping (shared binding) and STATIC scoping (fresh binding per iteration)."
+  ],
+  answers: [0, 1, 2],
+  marks: 2,
+  difficulty: 'hard',
+  type: 'concept',
+  explanation: "A is TRUE: as stated, the loop variable i in this language is a single, shared mutable storage location reused across every iteration; all three closures created inside the loop capture a reference to that SAME location rather than its value at creation time, so by the time any of them is actually called (after the loop has fully finished and i has been left at its final value, 2), all three read the same final value and all three print 2. B is TRUE: this is exactly the correct mechanistic explanation - static (lexical) scoping with closures works by binding a free variable reference to the STORAGE LOCATION (environment slot) it refers to in the defining scope, and if that scope only ever creates one such slot for i across the whole loop, every closure captures a reference to that one slot, so later mutations of i (by the loop's own increment) are visible through every closure that captured it. C is TRUE: this is the well-known fix used by languages that provide per-iteration (rather than per-loop) variable scoping - if each pass through the loop body instead creates a brand NEW, independent binding of i (initialized to that iteration's value and never touched again), then each closure captures a DIFFERENT storage location frozen at its own iteration's value, correctly yielding 0, 1, 2 for funcs[0], funcs[1], funcs[2] respectively. D is FALSE and is an important conflation to avoid: BOTH behaviors described here (shared-binding-across-iterations and fresh-binding-per-iteration) occur entirely within STATIC (lexical) scoping - the distinction is purely about how many separate variable BINDINGS/storage locations the loop construct creates (one shared slot reused every iteration, versus one fresh slot created each iteration), not about static versus dynamic scoping at all; dynamic scoping is not involved in, and does not explain, this particular difference."
+}
+);
+
+window.GATE_DATA.questions['compiler'].topics.find(function(t){return t.id==='compiler-lexical';}).questions.push(
+{
+  id: 'compiler-lexical-h1',
+  q: "Using maximal munch, how many tokens does the lexical analyzer produce for the input a=b++ -c; ? Enter your numerical answer.",
+  options: [],
+  answer: 7,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'hard',
+  type: 'numerical',
+  explanation: "Scan strictly left to right, at each point taking the LONGEST prefix of the remaining input that matches some valid token pattern (maximal munch). 'a' matches the identifier pattern and cannot be extended further (next char is '='), giving token 1: id(a). '=' is a single-character assignment operator, and the next character 'b' cannot extend it into any valid compound operator, giving token 2: '='. 'b' is an identifier, giving token 3: id(b). Next, '++' - the scanner greedily tries to extend past the first '+': the two characters '++' together DO form a valid compound token (the increment operator), and the character after that is a space (which cannot extend the match further), so maximal munch takes both '+' characters as one token, token 4: '++'. The following whitespace is skipped, contributing no token. Then '-' is next: the scanner checks whether it can extend '-' into '--' or '-=' by peeking at the next character, which is 'c' (a letter), so no compound operator applies, and '-' stands alone as a single minus token, token 5: '-'. 'c' is an identifier, token 6: id(c). Finally ';' is a single punctuation token, token 7: ';'. Total: a, =, b, ++, -, c, ; - exactly 7 tokens. This problem specifically tests the interaction between maximal munch (greedily combining '+' '+' into '++') and its LIMIT (refusing to also glue the following, unrelated '-' onto anything, since a lone '-' followed by a letter has no longer valid match)."
+},
+{
+  id: 'compiler-lexical-h2',
+  q: 'Which of the following claimed token counts are CORRECT? (Select ALL that apply)',
+  options: [
+    'Tokenizing x = "hello, world!"; // print greeting  gives exactly 4 tokens: x, =, the entire string literal, and ; (everything from // to the end of the line is a comment, contributing zero tokens).',
+    'Tokenizing a>>=b<<=c; gives exactly 8 tokens, because >>= and <<= are each split into two separate tokens rather than treated as single compound operators.',
+    'Tokenizing int *p=&x[10]; gives exactly 10 tokens.',
+    'Tokenizing a---b; gives exactly 5 tokens: a, --, -, b, and the trailing semicolon.'
+  ],
+  answers: [0, 2, 3],
+  marks: 2,
+  difficulty: 'hard',
+  type: 'concept',
+  explanation: "A is TRUE: x(1), =(2), the ENTIRE quoted string \"hello, world!\" as a single string-literal token regardless of the comma, space, and exclamation mark inside it (3), and ;(4) - after the semicolon, everything from // through the end of the line is a single-line comment and is discarded entirely by the scanner before any tokens are produced from it, contributing nothing. B is FALSE: by maximal munch, '>>=' is recognized as ONE single compound assignment-operator token (the longest valid match starting at that position), and likewise '<<=' is one token - so the correct count is a(1), >>=(2), b(3), <<=(4), c(5), ;(6), a total of 6 tokens, not 8; splitting these compound operators into separate pieces is exactly the mistake maximal munch is designed to prevent. C is TRUE: int(1), *(2, a standalone symbol token, since '*' followed by an identifier character does not combine into any single compound-token pattern), p(3), =(4), &(5), x(6), [(7), 10(8), ](9), ;(10) - 10 tokens total. D is TRUE: scanning a---b; left to right, 'a' is an identifier (1); at '---b', maximal munch first greedily matches the two-character decrement operator '--' (2) rather than stopping at a single '-', since '--' is a longer valid match; this leaves '-b', where the remaining single '-' cannot combine with anything further (next character is a letter), giving a lone minus token (3); then 'b' is an identifier (4); and finally ';' (5) - five tokens total, exactly matching the classic C lexer gotcha where a---b tokenizes as a, --, -, b."
+},
+{
+  id: 'compiler-lexical-h3',
+  q: "How many tokens does the lexical analyzer produce for the input if(x!=-1&&y>=0){z+=1;}// end check ? Enter your numerical answer.",
+  options: [],
+  answer: 17,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'hard',
+  type: 'numerical',
+  explanation: "Scan left to right with maximal munch, remembering that the trailing // comment contributes nothing. Tokens in order: 'if' (keyword, 1), '(' (2), 'x' (identifier, 3), '!=' (a single compound not-equal-to operator, since '!' alone followed by '=' extends to the longer valid match '!=', 4), '-' (a standalone minus - it is NOT glued to the following digit '1' into a single lexeme, because unary versus binary interpretation of a minus sign is a PARSING/semantic decision, not a lexical one; the scanner simply emits '-' as an operator token whenever it sees a bare minus sign not part of a longer compound like '--' or '-=', 5), '1' (a separate number token, 6), '&&' (a single compound logical-AND token, 7), 'y' (identifier, 8), '>=' (a single compound greater-or-equal token, 9), '0' (number, 10), ')' (11), '{' (12), 'z' (identifier, 13), '+=' (a single compound compound-assignment token, 14), '1' (number, 15), ';' (16), '}' (17). After the closing brace, the trailing '// end check' is a comment and is discarded, contributing zero further tokens. Total count: 17 tokens. This problem deliberately stacks several classic traps together: a compound relational operator (!=), a bare unary-looking minus that stays a SEPARATE token from the number that follows it (never glued into a single '-1' lexeme), a compound logical operator (&&), a compound comparison (>=), a compound assignment (+=), and a trailing comment that must be correctly excluded from the count."
+},
+{
+  id: 'compiler-lexical-h4',
+  q: 'Which of the following statements about maximal munch and keyword-vs-identifier disambiguation are TRUE? (Select ALL that apply)',
+  options: [
+    "For the input 'inta' (no space), maximal munch combined with the 'longest match wins; prefer a keyword only on a length TIE' rule produces a single identifier token 'inta', NOT the keyword 'int' followed by a separate identifier 'a'.",
+    "For the input '--a', maximal munch first matches the two-character decrement operator '--' as one token, leaving 'a' as a separate identifier token - 2 tokens total.",
+    "For the input 'a---b', maximal munch tokenizes it as: a, --, -, b (4 tokens), exactly as in the classic C lexer example.",
+    "For the input 'a>=b', maximal munch fails to combine '>' and '=' into a single token, since relational-comparison and assignment operator characters can never be combined into a single token in any language's lexical specification."
+  ],
+  answers: [0, 1, 2],
+  marks: 2,
+  difficulty: 'hard',
+  type: 'concept',
+  explanation: "A is TRUE: maximal munch always tries to match the LONGEST possible lexeme starting at the current position first; since 'inta' (4 characters) matches the identifier pattern as a single longer lexeme, that longer match wins outright, and the 'prefer keyword over identifier' tie-breaking rule is only ever invoked when two patterns match lexemes of the EXACT SAME length (here, the keyword pattern for 'int' only matches the first 3 characters, a strictly shorter match, so it is never even in contention). B is TRUE: at the start of '--a', the scanner checks whether the single character '-' can be extended - it can, into the compound decrement operator '--' (2 characters) - so maximal munch takes both dashes as one token; the following 'a' cannot extend that match further (it is not part of any valid operator continuation), so it becomes its own separate identifier token, for 2 tokens total. C is TRUE: this is exactly the classic worked example - 'a' is matched as an identifier, then from the remaining '---b' the scanner greedily matches the longest available operator prefix, '--' (2 characters, the decrement operator), leaving '-b'; the remaining lone '-' cannot combine with the following letter 'b' into anything, so it stands alone, and 'b' is then its own identifier - giving exactly 4 tokens: a, --, -, b. D is FALSE and states a sweeping, incorrect blanket rule: combining a comparison character with '=' into a single compound token (like '>=', '<=', '==', '!=') is in fact the STANDARD, near-universal behavior in essentially every C-like lexical specification, and is precisely the sort of case maximal munch exists to handle correctly - claiming this combination 'can never' happen in any language directly contradicts standard, everyday lexical analysis practice."
+},
+{
+  id: 'compiler-lexical-h5',
+  q: "How many tokens does the lexical analyzer produce for the declaration int *p=&x[10]; ? Enter your numerical answer.",
+  options: [],
+  answer: 10,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'hard',
+  type: 'numerical',
+  explanation: "Scan left to right: 'int' is a keyword token (1). '*' is a standalone punctuation/operator symbol - it cannot combine with the following identifier character 'p' into a single lexeme, since a symbol and a letter belong to entirely different, non-overlapping token pattern classes, so it forms its own token (2). 'p' is an identifier (3). '=' is a standalone assignment operator; the following character '&' cannot extend it into any valid compound operator, so it stands alone (4). '&' is likewise a standalone symbol token, not combinable with the following identifier 'x' (5). 'x' is an identifier (6). '[' is a punctuation token (7). '10' is a single number token (the two digits '1' and '0' combine into one maximal-munch numeric lexeme, not two separate single-digit tokens) (8). ']' is a punctuation token (9). ';' is a punctuation token (10). Total: int, *, p, =, &, x, [, 10, ], ; - exactly 10 tokens. The key traps here are recognizing that '*p' and '&x' are each TWO separate tokens (a symbol can never fuse with a following letter/digit lexeme under standard maximal munch, since they belong to disjoint pattern categories), while '10' is correctly kept as a SINGLE number token rather than being miscounted as two separate single-digit tokens."
+},
+{
+  id: 'compiler-lexical-h6',
+  q: 'Which of the following statements about lexical analysis are TRUE? (Select ALL that apply)',
+  options: [
+    "The lexer encountering the character '@' (which is not part of any valid token pattern in a typical C-like language) reports this as a LEXICAL error.",
+    "The lexer encountering the input '123abc' (digits immediately followed directly by letters, no separator) will still produce tokens via maximal munch - typically matching '123' as the longest valid NUMBER pattern first, then continuing to scan 'abc' as a separate identifier token - rather than immediately declaring a lexical error simply because the two characters classes are adjacent.",
+    "Detecting that a variable was used before it was declared is a job of the lexical analysis phase.",
+    "Detecting an unbalanced or mismatched count of parentheses in the source code is a job of the lexical analysis phase."
+  ],
+  answers: [0, 1],
+  marks: 2,
+  difficulty: 'hard',
+  type: 'concept',
+  explanation: "A is TRUE: a character (or character sequence) that matches NO token pattern whatsoever in the language's lexical specification is exactly the definition of a lexical error - the scanner has no valid way to classify '@' into any token class, so it reports an error at that point rather than silently skipping or guessing. B is TRUE: maximal munch operates purely by matching the LONGEST prefix of the remaining input against ANY single valid token pattern at each step, without requiring the entire contiguous run of alphanumeric characters to form one single token; so at '123abc', the scanner matches '123' as the longest valid NUMBER-pattern prefix, emits that as one token, and then resumes scanning from 'abc', matching it as a separate IDENTIFIER token - two tokens are produced with no lexical error triggered merely by their direct adjacency in the source text (whether the language's SYNTAX or semantics later considers 'a number immediately followed by an identifier with no operator between them' to be a valid construct is a separate, later question, not a lexical-analysis concern). C is FALSE: checking whether a variable has been declared before use requires cross-referencing the symbol table against the point of use, which is a SEMANTIC analysis task, performed after parsing has built structure around the tokens - a scanner working purely via pattern matching, one lexeme at a time, has no notion of declarations or usage order at all. D is FALSE: verifying that parentheses (or other bracket-like symbols) are correctly balanced and properly nested requires unbounded counting/matching across arbitrarily long spans of the token stream, which is exactly the kind of task a finite-state, regular-pattern-based scanner cannot perform (this is precisely why parenthesis languages are not regular) - it is a SYNTAX analysis (parsing) task, handled by the context-free grammar and its stack-based recognition machinery, not by the lexer."
+},
+{
+  id: 'compiler-lexical-h7',
+  q: "How many tokens does the lexical analyzer produce for the input while(i<10)i=i+1; ? Enter your numerical answer.",
+  options: [],
+  answer: 12,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'hard',
+  type: 'numerical',
+  explanation: "Scan left to right: 'while' is a keyword token (1). '(' is a punctuation token (2). 'i' is an identifier (3). '<' is a standalone relational operator - the following character '1' (a digit) does not extend it into any valid compound operator (there is no '<1' pattern), so it stands alone as a single '<' token (4). '10' is a single maximal-munch number token, combining both digits (5). ')' is a punctuation token (6). 'i' is an identifier (7). '=' is a standalone assignment operator, since the following character 'i' cannot extend it into any compound form (8). 'i' is an identifier (9). '+' is a standalone operator, since the following character '1' does not extend it into any compound operator like '++' or '+=' (10). '1' is a number token (11). ';' is a punctuation token (12). Total: while, (, i, <, 10, ), i, =, i, +, 1, ; - exactly 12 tokens. This example reinforces that a comparison/arithmetic operator immediately followed by a digit (as in '<10' or '+1') does NOT get glued to that digit into one combined lexeme - the operator and the following number are always two entirely separate tokens, since operator-symbol patterns and number patterns never overlap or merge under standard maximal munch."
+}
+);

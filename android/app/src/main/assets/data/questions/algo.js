@@ -2576,3 +2576,964 @@ window.GATE_DATA.questions['algo'].topics.find(function(t){return t.id==='algo-d
   explanation: 'Count every highlighted F(2) node in the tree. F(5) branches into F(4) and F(3). F(4) itself branches into F(3) and F(2) -- that F(2) is the first occurrence. The F(3) that is a child of F(4) branches into F(2) and F(1) -- that F(2) is the second occurrence. Separately, F(5)\'s other child F(3) (the right subtree) branches into F(2) and F(1) -- that F(2) is the third occurrence. So F(2) is recomputed 3 separate times from scratch, doing identical redundant work each time (each F(2) call itself re-expands into F(1) and F(0)). This exponential redundancy -- the same subproblem solved repeatedly -- is precisely the inefficiency that dynamic programming (via memoization or bottom-up tabulation) eliminates, computing each distinct F(k) exactly once and reducing the O(2^n) naive recursion to O(n) time.'
 }
 );
+window.GATE_DATA.questions['algo'].topics.find(function(t){return t.id==='algo-asymptotic';}).questions.push(
+{
+  id: 'algo-asymptotic-pyq1',
+  pyqStyle: true,
+  q: 'Which one of the following statements is TRUE for all sufficiently large values of n?',
+  options: ['n^3 = O(n^2)', '2^n = O(n!)', 'n log n = O(n)', 'n! = O(2^n)'],
+  answer: 1,
+  marks: 1,
+  difficulty: 'easy',
+  type: 'pyq-style',
+  explanation: 'For each option, check whether the left side is bounded above by a constant multiple of the right side for large n. n^3 = O(n^2) is FALSE since n^3/n^2 = n grows without bound. n! = O(2^n) is FALSE since n!/2^n grows without bound for n>4 (factorial eventually beats exponential of fixed base). n log n = O(n) is FALSE since (n log n)/n = log n grows without bound. That leaves 2^n = O(n!): since n! = n(n-1)(n-2)...(3)(2)(1) has n-1 factors each at least 2 once n>=2, n! >= 2^(n-1) = 2^n/2, so 2^n <= 2*n! for n>=2, meaning 2^n = O(n!). This reflects the standard growth-rate hierarchy: constants < logarithms < polynomials < exponentials < factorial < n^n, so a smaller-order function is always O() of a larger one further up the chain.'
+},
+{
+  id: 'algo-asymptotic-pyq2',
+  pyqStyle: true,
+  q: 'Arrange the following functions in increasing order of asymptotic growth rate: f1(n)=n^1.5, f2(n)=n log^2 n, f3(n)=2^(sqrt(n)), f4(n)=n^2/log n.',
+  options: ['f2 < f1 < f4 < f3', 'f1 < f2 < f4 < f3', 'f2 < f1 < f3 < f4', 'f1 < f4 < f2 < f3'],
+  answer: 0,
+  marks: 2,
+  difficulty: 'hard',
+  type: 'pyq-style',
+  explanation: 'Compare functions pairwise using limits of ratios (or by taking logs for exponential-looking terms). f2 = n log^2 n vs f1 = n^1.5: dividing by n gives log^2 n vs n^0.5 -- any positive power of n eventually beats any power of log n, so f2 = o(f1), i.e., f2 < f1. Compare f1 = n^1.5 vs f4 = n^2/log n: divide by n^1.5, giving 1 vs n^0.5/log n, and n^0.5/log n -> infinity, so f1 = o(f4), i.e., f1 < f4. Finally compare f4 = n^2/log n vs f3 = 2^sqrt(n): take logs, log(f4) ~ 2 log n, log(f3) = sqrt(n) log 2, and sqrt(n) grows strictly faster than log n, so f3 eventually dominates f4, giving f4 < f3. Chaining these: f2 < f1 < f4 < f3. This tests the standard growth hierarchy where sub-linear-in-exponent functions like 2^sqrt(n) beat every polylogarithmic-times-polynomial function, a recurring GATE trap.'
+},
+{
+  id: 'algo-asymptotic-pyq3',
+  pyqStyle: true,
+  q: 'The running time of an algorithm satisfies T(n) = T(n/2) + c for a constant c, with T(1) = c. What is the tight asymptotic bound on T(n)?',
+  options: ['Theta(log n)', 'Theta(n)', 'Theta(n log n)', 'Theta(sqrt(n))'],
+  answer: 0,
+  marks: 1,
+  difficulty: 'easy',
+  type: 'pyq-style',
+  explanation: 'Unroll the recurrence: T(n) = T(n/2) + c = T(n/4) + 2c = T(n/8) + 3c = ... = T(n/2^k) + kc. The recursion bottoms out when n/2^k = 1, i.e., k = log2(n), giving T(n) = T(1) + c*log2(n) = c + c*log2(n) = Theta(log n). This is exactly the recurrence governing binary search (halve the problem, constant extra work per level), and it is the standard example GATE uses to test whether a candidate can unroll a simple divide-with-constant-work recurrence instead of misapplying Master theorem, which also gives the same answer here: a=1, b=2, f(n)=c=Theta(n^0), n^(log_b a) = n^0, matching case 2 of Master theorem, so T(n) = Theta(n^0 log n) = Theta(log n).'
+},
+{
+  id: 'algo-asymptotic-pyq4',
+  pyqStyle: true,
+  q: 'Using the Master theorem, what is the tight asymptotic bound for the recurrence T(n) = 4T(n/2) + n^2, with T(1) = 1?',
+  options: ['Theta(n^2 log n)', 'Theta(n^2)', 'Theta(n^3)', 'Theta(n^2.5)'],
+  answer: 0,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: 'In Master theorem form T(n) = aT(n/b) + f(n), here a=4, b=2, f(n)=n^2. Compute the watershed function n^(log_b a) = n^(log_2 4) = n^2. Since f(n) = n^2 = Theta(n^(log_b a)) exactly (same polynomial degree), this is Master theorem CASE 2, which gives T(n) = Theta(n^(log_b a) * log n) = Theta(n^2 log n). A common mistake is to see f(n)=n^2 and a divide-by-2 recurrence and guess Theta(n^2) directly (ignoring the extra log n factor that case 2 always contributes) or to guess Theta(n^3) by confusing it with T(n)=8T(n/2)+n^2 (where n^(log_2 8)=n^3 dominates f(n)=n^2, a genuine case-1 recurrence giving Theta(n^3) instead).'
+},
+{
+  id: 'algo-asymptotic-pyq5',
+  pyqStyle: true,
+  q: 'Consider functions f(n) = n^2 and g(n) = n^2 * (2 + sin(n)). Which of the following statements is/are TRUE? (Multiple Select Question)',
+  options: ['f(n) = O(g(n))', 'f(n) = Omega(g(n))', 'g(n) = O(f(n))', 'f(n) = Theta(g(n))'],
+  answers: [0, 1, 3],
+  marks: 2,
+  difficulty: 'hard',
+  type: 'pyq-style',
+  explanation: 'Since -1 <= sin(n) <= 1, the factor (2 + sin(n)) is always between 1 and 3, so g(n) is sandwiched: n^2 <= g(n) <= 3n^2 for all n. From g(n) >= n^2, we get f(n) = O(g(n)) (TRUE) and also f(n) = Omega(g(n)) is about the reverse direction -- actually f(n)=Omega(g(n)) would require f(n) >= c*g(n), and since g(n) can be up to 3n^2 while f(n)=n^2, we need to check both bounds together: because g(n) is bounded both above and below by constant multiples of n^2 (1*n^2 <= g(n) <= 3*n^2), f and g are within constant factors of EACH OTHER in both directions, so f(n)=O(g(n)), f(n)=Omega(g(n)), and hence f(n)=Theta(g(n)) are all TRUE; consequently g(n)=O(f(n)) is also TRUE by symmetry of Theta. The only reason to hesitate is the oscillating sin(n) term, but because it is bounded (not growing/shrinking asymptotically), it never breaks the Theta relationship -- so options 0, 1, and 3 are true, and option 2 restated is also implied true, illustrating that oscillation within fixed bounds does not disturb tight asymptotic equivalence.'
+},
+{
+  id: 'algo-asymptotic-pyq6',
+  pyqStyle: true,
+  q: 'The recurrence T(n) = 2T(n/2) + n*log(n), with T(1) = 1, describes the running time of an algorithm. What is the tight asymptotic bound on T(n)?',
+  options: ['Theta(n * log^2 n)', 'Theta(n log n)', 'Theta(n^2)', 'Theta(n)'],
+  answer: 0,
+  marks: 2,
+  difficulty: 'hard',
+  type: 'pyq-style',
+  explanation: 'The standard Master theorem does not directly apply here because f(n) = n log n is NOT a polynomial gap away from n^(log_b a) = n^(log_2 2) = n^1 -- it is n^1 times an extra log n factor, which is the classic "boundary case" the plain Master theorem cannot resolve; it needs the extended (Akra-Bazzi-flavoured) version: when f(n) = n^(log_b a) * log^k(n) for k >= 0, the solution is T(n) = Theta(n^(log_b a) * log^(k+1) n). Here k=1 (since f(n) = n^1 * log^1 n), giving T(n) = Theta(n * log^2 n). Sanity check by unrolling the recursion tree: each of the log n levels contributes cost close to n*log n (since the total work per level stays roughly n log(n/2^i) which is still Theta(n log n) for most levels), and summing Theta(n log n) over Theta(log n) levels gives Theta(n log^2 n) -- this exact pattern (merge sort with an extra log-factor cost per merge) is a frequent GATE trap distinguishing it from plain merge sort\'s Theta(n log n).'
+},
+{
+  id: 'algo-asymptotic-pyq7',
+  pyqStyle: true,
+  q: 'Let f(n) = n^1.5 and g(n) = n * sqrt(n) * log(n). Which relationship holds between f(n) and g(n)?',
+  options: ['f(n) = o(g(n))', 'f(n) = omega(g(n))', 'f(n) = Theta(g(n))', 'f(n) and g(n) are incomparable'],
+  answer: 0,
+  marks: 1,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: 'Simplify g(n): n * sqrt(n) * log(n) = n^1.5 * log(n). So g(n) is exactly f(n) multiplied by log(n). The ratio f(n)/g(n) = n^1.5 / (n^1.5 * log n) = 1/log(n), which tends to 0 as n tends to infinity. By the definition of little-o, f(n) = o(g(n)) means this ratio tends to 0, which is exactly what happens here -- so f(n) = o(g(n)) is TRUE. It cannot be Theta(g(n)) because Theta requires the ratio to be bounded away from both 0 and infinity by constants, but 1/log(n) shrinks to 0 (not bounded below by a positive constant). This is a common way GATE tests whether a student confuses "same polynomial degree" with "asymptotically equal" -- an extra logarithmic factor is enough to break a Theta relationship into a strict o()/omega() one.'
+},
+{
+  id: 'algo-asymptotic-pyq8',
+  pyqStyle: true,
+  q: 'Which of the following orderings correctly lists the functions in strictly increasing order of asymptotic growth rate: log(n!), n log n, n^(log n), 2^n?',
+  options: ['log(n!) = Theta(n log n) < n^(log n) < 2^n', 'n log n < log(n!) < 2^n < n^(log n)', 'n^(log n) < log(n!) = Theta(n log n) < 2^n', 'log(n!) < n^(log n) = Theta(n log n) < 2^n'],
+  answer: 0,
+  marks: 2,
+  difficulty: 'hard',
+  type: 'pyq-style',
+  explanation: 'By Stirling\'s approximation, log(n!) = Theta(n log n) -- so log(n!) and n log n are asymptotically the SAME order, ruling out any option that separates them or claims one strictly exceeds the other. Next compare n log n against n^(log n): taking logarithms, log(n log n) = log n + log log n ~ log n, while log(n^(log n)) = (log n)^2, and (log n)^2 grows strictly faster than log n for large n, so n^(log n) strictly dominates n log n. Finally compare n^(log n) against 2^n: taking logs again, log(n^(log n)) = (log n)^2 while log(2^n) = n, and n grows strictly faster than (log n)^2 for large n, so 2^n strictly dominates n^(log n). Chaining: log(n!) = Theta(n log n) < n^(log n) < 2^n, matching the first option -- this tests both the Stirling identity and comparing "quasi-polynomial" n^(log n) against true exponentials, a distinction many candidates get backwards.'
+},
+{
+  id: 'algo-asymptotic-pyq9',
+  pyqStyle: true,
+  q: 'An algorithm processes an input of size n with running time governed by T(n) = T(n-1) + n, and T(0) = 0. What is the tight asymptotic bound on T(n)?',
+  options: ['Theta(n^2)', 'Theta(n log n)', 'Theta(n)', 'Theta(2^n)'],
+  answer: 0,
+  marks: 1,
+  difficulty: 'easy',
+  type: 'pyq-style',
+  explanation: 'Unroll the recurrence directly: T(n) = T(n-1) + n = T(n-2) + (n-1) + n = ... = T(0) + 1 + 2 + ... + (n-1) + n = 0 + n(n+1)/2. Since n(n+1)/2 = Theta(n^2), we get T(n) = Theta(n^2). This "linear decrease, linear extra work" pattern is exactly the recurrence for algorithms like selection sort or insertion sort in the worst case, where each of the n passes does work proportional to the remaining unsorted portion, summing to the well-known quadratic total. A common error is to see "T(n-1)" (decrease by 1, not divide by a factor) and instinctively reach for Master theorem, which does not apply to decrease-by-a-constant recurrences at all -- those must be solved by direct unrolling / summation as done here.'
+},
+{
+  id: 'algo-asymptotic-pyq10',
+  pyqStyle: true,
+  q: 'Which of the following statements about asymptotic notation are TRUE? (Multiple Select Question)',
+  options: [
+    'If f(n) = O(g(n)) and g(n) = O(h(n)), then f(n) = O(h(n))',
+    'If f(n) = Theta(g(n)), then g(n) = Theta(f(n))',
+    'f(n) = O(g(n)) implies g(n) = O(f(n))',
+    'If f(n) = o(g(n)), then f(n) = O(g(n)) but g(n) is not O(f(n))'
+  ],
+  answers: [0, 1, 3],
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: 'Option 1 (transitivity of O): if f(n) <= c1*g(n) and g(n) <= c2*h(n) eventually, then f(n) <= c1*c2*h(n) eventually, so f(n)=O(h(n)) -- TRUE, O is transitive. Option 2 (symmetry of Theta): Theta(g(n)) means f is sandwiched between constant multiples of g in both directions, and this relation is symmetric by definition -- TRUE. Option 3 is FALSE: f(n)=O(g(n)) only says f grows no faster than g; e.g., f(n)=n and g(n)=n^2 gives f(n)=O(g(n)) but g(n) is NOT O(f(n)) since n^2 is not bounded by any constant multiple of n -- so O is not symmetric in general. Option 4 (little-o excludes reverse big-O) is TRUE: f(n)=o(g(n)) means f(n)/g(n) -> 0, which certainly implies f(n)=O(g(n)) (bounded above), but it also means f grows STRICTLY slower, so g(n) cannot be O(f(n)) (g is not bounded above by any constant multiple of the strictly-smaller f). So statements 1, 2, and 4 are true; only 3 is false.'
+},
+{
+  id: 'algo-asymptotic-pyq11',
+  pyqStyle: true,
+  q: 'Using the Master theorem, the recurrence T(n) = 3T(n/4) + n log n (with T(1)=1) falls into which case, and what is T(n)?',
+  options: ['Case 3 (f(n) dominates): Theta(n log n)', 'Case 1 (recursive term dominates): Theta(n^(log_4 3))', 'Case 2 (balanced): Theta(n log^2 n)', 'Master theorem cannot be applied at all'],
+  answer: 0,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: 'Here a=3, b=4, f(n)=n log n. Compute the watershed n^(log_b a) = n^(log_4 3) ≈ n^0.79. Compare f(n) = n log n against n^0.79: since n log n grows polynomially faster than n^0.79 (the exponent 1 exceeds 0.79 by a fixed positive amount, and the log factor only helps further), f(n) = Omega(n^(log_4 3 + epsilon)) for some epsilon > 0, satisfying the polynomial-gap requirement of CASE 3. Case 3 also requires the regularity condition a*f(n/b) <= c*f(n) for some c<1: here 3*f(n/4) = 3*(n/4)*log(n/4) = (3n/4)*log(n/4), which for large n is indeed at most c*n log n for a suitable c<1 (roughly 3/4 plus lower-order terms), so the condition holds. Thus this is Master theorem CASE 3, giving T(n) = Theta(f(n)) = Theta(n log n) -- the recursive branching (3 subproblems of size n/4) contributes asymptotically less work than the n log n done outside the recursion at the top level.'
+},
+{
+  id: 'algo-asymptotic-pyq12',
+  pyqStyle: true,
+  q: 'An algorithm performs a sequence of n operations on an initially empty stack: each operation is either a single push, or a multipop(k) that pops min(k, current stack size) elements. What is the tight worst-case AMORTIZED cost per operation, using the aggregate method?',
+  options: ['O(1)', 'O(log n)', 'O(n)', 'O(n^2) total but O(1) is impossible'],
+  answer: 0,
+  marks: 1,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: 'Aggregate method: bound the TOTAL cost of any sequence of n operations, then divide by n. Each element can be pushed at most once per push operation, so across the whole sequence, the total number of pushes is at most n. Crucially, each element can be POPPED at most once in its lifetime (once popped, by any multipop, it is gone and can never be popped again without being pushed again, which would itself count as a separate push operation). So the total number of pop operations performed across ALL multipop calls combined, over the whole sequence, is at most the total number of pushes, which is at most n. Therefore the total work done by n operations (pushes plus all pops across all multipops) is O(n), even though a SINGLE multipop can individually cost O(n) in the worst case (popping the entire stack at once). Dividing total cost O(n) by n operations gives an amortized cost of O(1) per operation -- this is the classic example distinguishing worst-case-per-operation (which can be Theta(n) for one multipop) from amortized-cost-per-operation (which is O(1) over any sequence), a distinction GATE tests almost every year in some form.'
+}
+);
+window.GATE_DATA.questions['algo'].topics.find(function(t){return t.id==='algo-divide-conquer';}).questions.push(
+{
+  id: 'algo-divide-conquer-pyq1',
+  pyqStyle: true,
+  q: 'A divide-and-conquer algorithm splits a problem of size n into 2 subproblems of size n/2 each, does O(n) work to combine the results, and has base case T(1) = O(1). What is the tight asymptotic running time?',
+  options: ['Theta(n log n)', 'Theta(n)', 'Theta(n^2)', 'Theta(log n)'],
+  answer: 0,
+  marks: 1,
+  difficulty: 'easy',
+  type: 'pyq-style',
+  explanation: 'This describes the recurrence T(n) = 2T(n/2) + Theta(n), the textbook recurrence for merge sort. By Master theorem, a=2, b=2, f(n)=Theta(n), and n^(log_b a) = n^(log_2 2) = n^1, which matches f(n) exactly, so this is CASE 2, giving T(n) = Theta(n^1 * log n) = Theta(n log n). Intuitively, the recursion tree has log2(n) levels (since the problem size halves each time until reaching 1), and each level does a total of Theta(n) combine work summed across all subproblems at that level (n/2 subproblems of size 2 doing O(2) work each at the bottom, 2 subproblems of size n/2 doing O(n/2) work each near the top -- every level sums to Theta(n)), so total work is Theta(n) per level times Theta(log n) levels = Theta(n log n).'
+},
+{
+  id: 'algo-divide-conquer-pyq2',
+  pyqStyle: true,
+  q: 'A closest-pair-of-points style algorithm splits n points into two halves of size n/2, recursively solves each half, and does O(n) work to merge/check the boundary strip. What recurrence governs its running time, and what is the solution?',
+  options: ['T(n) = 2T(n/2) + O(n), giving Theta(n log n)', 'T(n) = 2T(n/2) + O(n^2), giving Theta(n^2)', 'T(n) = 2T(n/2) + O(1), giving Theta(n)', 'T(n) = T(n/2) + O(n), giving Theta(n)'],
+  answer: 0,
+  marks: 1,
+  difficulty: 'easy',
+  type: 'pyq-style',
+  explanation: 'The description directly states: 2 recursive calls on half-sized subproblems (T(n/2) each, so 2T(n/2)), plus O(n) work for the merge/boundary-strip step. That is exactly T(n) = 2T(n/2) + O(n). Applying Master theorem with a=2, b=2, f(n)=O(n): n^(log_2 2) = n^1 matches f(n), triggering CASE 2, so T(n) = Theta(n log n). This is precisely the real algorithmic structure of the classic closest-pair-of-points divide-and-conquer algorithm, which improves upon the naive Theta(n^2) all-pairs comparison by achieving Theta(n log n) through this exact recurrence -- a frequently tested example of how a smart O(n) merge/combine step, rather than an O(n^2) one, is what makes divide-and-conquer worthwhile here.'
+},
+{
+  id: 'algo-divide-conquer-pyq3',
+  pyqStyle: true,
+  q: 'Using the Master theorem, what is the tight bound for T(n) = 8T(n/2) + n^2, T(1) = 1 (the recurrence for the naive divide-and-conquer matrix multiplication algorithm)?',
+  options: ['Theta(n^3)', 'Theta(n^2 log n)', 'Theta(n^2)', 'Theta(n^2.81)'],
+  answer: 0,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: 'Here a=8, b=2, f(n)=n^2. The watershed exponent is log_b a = log_2 8 = 3, so n^(log_b a) = n^3. Compare f(n)=n^2 against n^3: since n^2 = O(n^(3-epsilon)) for epsilon=1 (a genuine polynomial gap, n^2 is polynomially SMALLER than n^3), this is Master theorem CASE 1, giving T(n) = Theta(n^(log_b a)) = Theta(n^3), independent of f(n) entirely (the recursive branching dominates, not the combine step). This is exactly the recurrence for the standard (non-Strassen) divide-and-conquer matrix multiplication algorithm, which splits an n x n matrix multiply into 8 multiplications of (n/2) x (n/2) submatrices plus O(n^2) additions -- yielding no asymptotic improvement over the naive Theta(n^3) algorithm. Strassen\'s algorithm improves this precisely by reducing the branching factor from 8 to 7 (T(n)=7T(n/2)+O(n^2)), giving Theta(n^log2(7)) ~ Theta(n^2.807) instead.'
+},
+{
+  id: 'algo-divide-conquer-pyq4',
+  pyqStyle: true,
+  q: 'Strassen\'s algorithm for matrix multiplication satisfies T(n) = 7T(n/2) + O(n^2). What is the tight asymptotic running time, and how does it compare to the naive Theta(n^3) algorithm?',
+  options: ['Theta(n^2.81), which is asymptotically faster than Theta(n^3)', 'Theta(n^3), same as naive', 'Theta(n^2 log n), asymptotically faster', 'Theta(n^2), asymptotically faster'],
+  answer: 0,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: 'Apply Master theorem: a=7, b=2, f(n)=n^2. The watershed exponent is log_b a = log_2 7 ≈ 2.807. Since f(n) = n^2 is polynomially smaller than n^2.807 (the gap 2.807-2 ≈ 0.807 is a fixed positive constant), this is CASE 1, giving T(n) = Theta(n^(log_2 7)) ≈ Theta(n^2.807). Comparing exponents: 2.807 < 3, so Strassen\'s algorithm is asymptotically strictly faster than the naive Theta(n^3) matrix multiplication, even though it does MORE additions per level (Strassen cleverly reduces the number of recursive multiplications from 8 to 7 at the cost of extra additions/subtractions, and since multiplications are the recursively-branching operation, reducing their count from 8 to 7 lowers the watershed exponent from log_2(8)=3 down to log_2(7)≈2.807). This is the canonical GATE example testing whether a candidate understands that reducing the BRANCHING FACTOR (not the per-level combine cost) is what changes the dominant exponent under Master theorem case 1.'
+},
+{
+  id: 'algo-divide-conquer-pyq5',
+  pyqStyle: true,
+  q: 'The randomized QuickSelect algorithm for finding the k-th smallest element has expected-case recurrence T(n) = T(n/2) + O(n) (informally, the partition on average discards about half the elements). What is the tight bound on the EXPECTED running time?',
+  options: ['Theta(n)', 'Theta(n log n)', 'Theta(n^2)', 'Theta(log n)'],
+  answer: 0,
+  marks: 1,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: 'Apply Master theorem to T(n) = T(n/2) + O(n): here a=1, b=2, f(n)=O(n). The watershed exponent is log_b a = log_2 1 = 0, so n^(log_b a) = n^0 = 1. Since f(n) = n grows polynomially FASTER than n^0 (any positive power gap qualifies), this is CASE 3, requiring the regularity condition a*f(n/b) <= c*f(n) for some c<1: here 1*f(n/2) = n/2 <= (1/2)*f(n) = n/2, satisfied with c=1/2. So T(n) = Theta(f(n)) = Theta(n). Intuitively, unlike merge sort\'s balanced 2T(n/2) recurrence which sums Theta(n) work over Theta(log n) levels, this recurrence has only ONE recursive branch (a=1) each contributing O(n) work per level, and the sizes shrink geometrically (n, n/2, n/4, ...), so total work is a geometric series summing to Theta(n) -- explaining why QuickSelect achieves expected linear time, unlike sorting which needs Theta(n log n).'
+},
+{
+  id: 'algo-divide-conquer-pyq6',
+  pyqStyle: true,
+  q: 'An unbalanced divide-and-conquer algorithm splits a problem of size n into one subproblem of size n/3 and one of size 2n/3, doing O(n) work to combine, i.e., T(n) = T(n/3) + T(2n/3) + O(n). What is the tight asymptotic bound?',
+  options: ['Theta(n log n)', 'Theta(n)', 'Theta(n^1.5)', 'Theta(n log_3 n)'],
+  answer: 0,
+  marks: 2,
+  difficulty: 'hard',
+  type: 'pyq-style',
+  explanation: 'This recurrence has UNBALANCED subproblem sizes (n/3 and 2n/3, not equal), so the plain Master theorem (which requires all subproblems to be the same size n/b) does not directly apply -- this requires either the recursion-tree method or the more general Akra-Bazzi theorem. Using the recursion tree: even though the split is unequal, every root-to-leaf path has length between log_3(n) (the short path always taking the n/3 branch) and log_(3/2)(n) (the long path always taking the 2n/3 branch), both of which are Theta(log n). Crucially, at EVERY level of the tree, the sizes of all subproblems at that level sum to exactly n (since n/3 + 2n/3 = n, and this splitting property is preserved down each level), so the combine work at every level sums to Theta(n), regardless of level. Multiplying Theta(n) work per level by Theta(log n) levels (the tree depth, bounded above and below by constants times log n) gives Theta(n log n) total -- the same asymptotic bound as a perfectly BALANCED split, illustrating that Master-theorem-style n log n behavior is robust to unequal (but proportional) splits, as long as the pieces sum to n at each level.'
+},
+{
+  id: 'algo-divide-conquer-pyq7',
+  pyqStyle: true,
+  q: 'Binary search is applied to find an element in a sorted array of n = 200 elements. In the worst case, what is the MAXIMUM number of comparisons (element comparisons against the target) needed?',
+  options: [],
+  kind: 'nat',
+  answer: 8,
+  marks: 1,
+  difficulty: 'easy',
+  type: 'pyq-style',
+  explanation: 'Worst-case comparisons for binary search on n elements is floor(log2(n)) + 1. Compute log2(200): since 2^7 = 128 and 2^8 = 256, we have 128 <= 200 < 256, so floor(log2(200)) = 7, giving worst-case comparisons = 7 + 1 = 8. Intuitively, each comparison eliminates at most half the remaining candidates, so after k comparisons at most n/2^k elements remain uneliminated (or the element is found); the search terminates once at most 1 candidate remains, i.e., when 2^k >= n, the smallest such k being ceil(log2(n)) which for a non-power-of-2 n like 200 works out to the same value as floor(log2(n))+1 = 8. This NAT-style question tests the exact worst-case comparison COUNT formula, not just the asymptotic Theta(log n) bound.'
+},
+{
+  id: 'algo-divide-conquer-pyq8',
+  pyqStyle: true,
+  q: 'Which of the following recurrences, when solved, give a tight bound of Theta(n log n)? (Multiple Select Question)',
+  options: [
+    'T(n) = 2T(n/2) + n',
+    'T(n) = 2T(n/2) + n^2',
+    'T(n) = 4T(n/2) + n',
+    'T(n) = T(n/2) + n log n'
+  ],
+  answers: [0, 3],
+  marks: 2,
+  difficulty: 'hard',
+  type: 'pyq-style',
+  explanation: 'Check each via Master theorem. Option 1: T(n)=2T(n/2)+n has a=2,b=2,f(n)=n; n^(log_2 2)=n^1 matches f(n), CASE 2, giving Theta(n log n) -- TRUE. Option 2: T(n)=2T(n/2)+n^2 has n^(log_2 2)=n^1, but f(n)=n^2 dominates polynomially, so CASE 3 applies, giving Theta(n^2), NOT n log n -- FALSE. Option 3: T(n)=4T(n/2)+n has a=4,b=2, watershed n^(log_2 4)=n^2, which dominates f(n)=n polynomially, so CASE 1 applies, giving Theta(n^2), NOT n log n -- FALSE. Option 4: T(n)=T(n/2)+n log n has a=1,b=2,f(n)=n log n; watershed n^(log_2 1)=n^0=1, and f(n)=n log n dominates n^0 polynomially (any positive power beats a constant), so CASE 3 applies (regularity: 1*f(n/2)=(n/2)log(n/2) <= c*n log n for suitable c<1, holds), giving T(n)=Theta(f(n))=Theta(n log n) -- TRUE. So options 1 and 4 both yield Theta(n log n), for structurally different reasons (case 2 balanced vs case 3 dominant-f), which is exactly the kind of conceptual distinction this MSQ format is designed to probe.'
+},
+{
+  id: 'algo-divide-conquer-pyq9',
+  pyqStyle: true,
+  q: 'A divide-and-conquer algorithm for the maximum-subarray problem splits the array into two halves, recursively finds the best subarray fully within each half, and does O(n) extra work to find the best subarray CROSSING the midpoint. What recurrence and running time does this give?',
+  options: ['T(n) = 2T(n/2) + O(n), giving Theta(n log n)', 'T(n) = 2T(n/2) + O(n^2), giving Theta(n^2)', 'T(n) = 2T(n/2) + O(log n), giving Theta(n)', 'T(n) = 2T(n/2) + O(1), giving Theta(n)'],
+  answer: 0,
+  marks: 1,
+  difficulty: 'easy',
+  type: 'pyq-style',
+  explanation: 'The description gives exactly 2 recursive calls on halves (2T(n/2)) plus O(n) work to scan outward from the midpoint in both directions to find the best crossing subarray (this crossing-sum scan is inherently linear since it must consider every possible extension point on both sides of the midpoint once each). That is T(n) = 2T(n/2) + O(n), which by Master theorem (a=2,b=2,f(n)=n, watershed n^1 matches f(n), CASE 2) gives Theta(n log n). This is the classic divide-and-conquer maximum-subarray algorithm from CLRS, which improves on the naive Theta(n^2) (or Theta(n^3)) brute-force approach; it is itself asymptotically beaten by Kadane\'s simple linear-scan DP algorithm (Theta(n)), but is a standard example for testing whether a candidate correctly identifies the crossing-step cost as linear (not constant, not quadratic) when deriving the recurrence from a problem description.'
+},
+{
+  id: 'algo-divide-conquer-pyq10',
+  pyqStyle: true,
+  q: 'For the recurrence T(n) = 3T(n/3) + n/2, T(1) = 1, which Master theorem case applies, and what is T(n)?',
+  options: ['Case 2: Theta(n log n)', 'Case 1: Theta(n)', 'Case 3: Theta(n/2)', 'Master theorem does not apply'],
+  answer: 0,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: 'Here a=3, b=3, f(n)=n/2. The watershed exponent is log_b a = log_3 3 = 1, so n^(log_b a) = n^1 = n. Compare f(n) = n/2 against n: since n/2 = Theta(n) (they differ only by the constant factor 1/2, not by any polynomial gap), this matches CASE 2 exactly (f(n) = Theta(n^(log_b a))), giving T(n) = Theta(n^(log_b a) * log n) = Theta(n log n). A common trap is to see f(n)=n/2 and think "f(n) is smaller than n, so case 1 or case 3 must apply" -- but Master theorem cases are about ASYMPTOTIC (Theta) comparison, and n/2 is Theta(n) since constant factors are absorbed into Theta notation; only a genuine polynomial-degree gap (like n^(log_b a - epsilon) or n^(log_b a + epsilon)) triggers cases 1 or 3. This recurrence in fact matches the exact structure of merge sort with a combine step that is half the cost, still landing in case 2 with the identical Theta(n log n) result.'
+},
+{
+  id: 'algo-divide-conquer-pyq11',
+  pyqStyle: true,
+  q: 'A comparison-based algorithm to find both the MINIMUM and MAXIMUM of an unsorted array of n elements uses a divide-and-conquer approach: split into two halves, recursively find (min,max) of each half, then merge with 2 comparisons. What is the tight TOTAL number of comparisons in the worst case, expressed asymptotically?',
+  options: ['Theta(n) (specifically about 3n/2)', 'Theta(n log n)', 'Theta(2n)', 'Theta(n^2)'],
+  answer: 0,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: 'The recurrence is C(n) = 2*C(n/2) + 2, with base case C(2) = 1 (a single comparison suffices to order a pair into (min,max)). By Master theorem: a=2, b=2, f(n)=2=Theta(n^0). Watershed n^(log_2 2)=n^1 strictly dominates the constant f(n)=Theta(n^0) (a clear polynomial gap), so CASE 1 applies, giving C(n) = Theta(n^(log_b a)) = Theta(n^1) = Theta(n). Working out the exact constant (which this divide-and-conquer method is specifically famous for achieving): C(n) = (3n/2) - 2 for n a power of 2, which is provably OPTIMAL and strictly better than the naive approach of comparing for max separately (n-1 comparisons) and then for min separately (n-1 comparisons), totaling 2n-2 comparisons -- the divide-and-conquer pairing trick (comparing elements pairwise first, then only the "winners" against current max and "losers" against current min) cuts the total from about 2n down to about 1.5n, a classic algorithm-design lesson though the asymptotic class Theta(n) is unchanged.'
+},
+{
+  id: 'algo-divide-conquer-pyq12',
+  pyqStyle: true,
+  q: 'A divide-and-conquer algorithm makes 2 recursive calls on subproblems of size n/4 each, and does O(sqrt(n)) work to combine, i.e., T(n) = 2T(n/4) + O(sqrt(n)). What is the tight asymptotic running time?',
+  options: ['Theta(sqrt(n) log n)', 'Theta(n^0.5)', 'Theta(n^0.79)', 'Theta(n)'],
+  answer: 0,
+  marks: 2,
+  difficulty: 'hard',
+  type: 'pyq-style',
+  explanation: 'Apply Master theorem: a=2, b=4, f(n)=sqrt(n)=n^0.5. The watershed exponent is log_b a = log_4 2 = 0.5 (since 4^0.5 = 2). So n^(log_b a) = n^0.5 = sqrt(n), which EXACTLY matches f(n) = sqrt(n) (same order, Theta(n^0.5) = Theta(n^0.5)). This is CASE 2, giving T(n) = Theta(n^(log_b a) * log n) = Theta(sqrt(n) * log n). The trap in this question is computing log_4(2) correctly: since 4 = 2^2, log_4(2) = 1/2 exactly, so the watershed function is sqrt(n), not some other power -- and because it ties exactly with the given f(n)=sqrt(n), the extra log(n) factor from case 2 must be included, so the answer is Theta(sqrt(n) log n), not simply Theta(sqrt(n)) (which would be the case-1 or case-3 boundary answer without the log factor, applicable only when f(n) is polynomially smaller or larger than the watershed, not equal to it).'
+}
+);
+window.GATE_DATA.questions['algo'].topics.find(function(t){return t.id==='algo-greedy';}).questions.push(
+{
+  id: 'algo-greedy-pyq1',
+  pyqStyle: true,
+  q: 'For the Fractional Knapsack problem with items (value, weight) = (60,10), (100,20), (120,30) and knapsack capacity 50, what is the MAXIMUM total value achievable?',
+  options: [],
+  kind: 'nat',
+  answer: 240,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: 'The greedy strategy for fractional knapsack is to sort items by value-per-unit-weight ratio in decreasing order and take as much as possible of the highest-ratio item first. Ratios: item1 = 60/10 = 6, item2 = 100/20 = 5, item3 = 120/30 = 4. Sorted order: item1 (ratio 6), item2 (ratio 5), item3 (ratio 4). Take all of item1 (weight 10, value 60), capacity remaining 40. Take all of item2 (weight 20, value 100), capacity remaining 20. Only 20 of the 30 units of item3 remain capacity for: take 20/30 = 2/3 of item3, contributing (2/3)*120 = 80. Total value = 60 + 100 + 80 = 240. This greedy-by-ratio approach is PROVABLY optimal for the fractional (divisible) version because swapping any partial unit of a lower-ratio item for a higher-ratio item (whenever capacity permits) can only increase or maintain total value -- a classic exchange argument -- which is why fractional knapsack is solvable greedily while 0/1 knapsack (indivisible items) is not.'
+},
+{
+  id: 'algo-greedy-pyq2',
+  pyqStyle: true,
+  q: 'Which of the following statements about the standard greedy algorithm for Job Sequencing with Deadlines (maximize total profit, one unit-time job per slot, each job has a deadline) is/are TRUE? (Multiple Select Question)',
+  options: [
+    'Jobs should be considered in decreasing order of profit',
+    'A job should be scheduled in the LATEST available free slot at or before its deadline',
+    'The greedy choice is always optimal for this problem',
+    'Every job is guaranteed to be scheduled regardless of deadlines'
+  ],
+  answers: [0, 1, 2],
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: 'The standard job-sequencing-with-deadlines greedy algorithm: sort jobs by profit in DECREASING order (statement 1 TRUE, so the highest-value jobs get first pick of slots), then for each job in that order, place it in the LATEST available slot at or before its deadline (statement 2 TRUE -- placing it as late as possible, rather than as early as possible, preserves earlier slots for other jobs with tighter deadlines, which is the key insight making the greedy correct). This greedy strategy is provably optimal via an exchange argument (statement 3 TRUE): if an optimal solution differs from the greedy one, they can be shown to have equal profit by swapping job assignments without violating any deadline. Statement 4 is FALSE: jobs whose deadline has already been "used up" by higher-profit jobs (i.e., no free slot exists at or before their deadline when their turn comes) are simply left unscheduled -- not every job need be scheduled, and low-profit or late-arriving jobs are routinely dropped, which is the entire point of the profit-maximization objective.'
+},
+{
+  id: 'algo-greedy-pyq3',
+  pyqStyle: true,
+  q: 'Jobs with (profit, deadline) pairs are J1(100,2), J2(19,1), J3(27,2), J4(25,1), J5(15,3). Each job takes 1 unit of time and at most one job can run per time slot (slots 1, 2, 3). Using the standard greedy algorithm (highest profit first, placed in latest free slot at or before its deadline), what is the MAXIMUM total profit achievable?',
+  options: [],
+  kind: 'nat',
+  answer: 142,
+  marks: 2,
+  difficulty: 'hard',
+  type: 'pyq-style',
+  explanation: 'Sort jobs by profit descending: J1(100,d2), J3(27,d2), J4(25,d1), J5(15,d3), J2(19,d1) -- correctly ordered by profit: J1(100), J3(27), J4(25), J2(19), J5(15). Process J1(d2): latest free slot at or before 2 is slot 2 -- assign, profit=100. Process J3(d2): slot 2 taken, try slot 1 -- free, assign, profit=127. Process J4(d1): slot 1 taken, no earlier slot exists -- reject. Process J2(d1): slot 1 taken -- reject. Process J5(d3): slot 3 is free -- assign, profit=127+15=142. Final schedule: slot1=J3(27), slot2=J1(100), slot3=J5(15), total profit = 27+100+15 = 142. This demonstrates the greedy correctly sacrifices lower-profit jobs (J4=25, J2=19) whose deadlines collide with already-filled higher-profit slots, in favor of the low-conflict job J5 which fits in the otherwise-unused slot 3.'
+},
+{
+  id: 'algo-greedy-pyq4',
+  pyqStyle: true,
+  q: 'Consider a coin system with denominations {1, 3, 4}. To make change for the amount 6 using the standard GREEDY algorithm (always pick the largest denomination that does not exceed the remaining amount), how many coins are used, and is this the minimum possible?',
+  options: ['3 coins used (4+1+1); NOT minimum, since 3+3 uses only 2 coins', '2 coins used (4+... ); this IS minimum', '3 coins used; this IS minimum', '4 coins used; NOT minimum'],
+  answer: 0,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: 'Trace the greedy algorithm: remaining=6, largest coin <=6 is 4, take it (remaining=2, coins used=1). Largest coin <=2 is 1 (since 3 and 4 exceed 2), take it (remaining=1, coins used=2). Largest coin <=1 is 1, take it (remaining=0, coins used=3). Greedy uses coins {4,1,1} = 3 coins. However, the OPTIMAL solution uses {3,3} = 2 coins, which is strictly better. This is the classic counterexample showing that the greedy "always take the largest coin" strategy is NOT optimal for arbitrary coin denomination systems -- it only provably works for "canonical" coin systems (like standard currency denominations 1,2,5,10,...). For general coin systems, minimum coin change actually requires dynamic programming, not greedy, which is precisely the conceptual point GATE tests by contrasting this topic with the DP topic\'s coin-change formulation.'
+},
+{
+  id: 'algo-greedy-pyq5',
+  pyqStyle: true,
+  q: 'Which of the following statements correctly explains WHY Prim\'s and Kruskal\'s greedy algorithms for Minimum Spanning Tree are provably correct?',
+  options: [
+    'The cut property: for any cut (partition of vertices into two sets), the minimum-weight edge crossing the cut is safe to include in some MST',
+    'Because MST is always unique for any weighted graph',
+    'Because greedy algorithms are correct for every optimization problem',
+    'Because both algorithms happen to produce the same tree by coincidence'
+  ],
+  answer: 0,
+  marks: 1,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: 'The theoretical justification for greedy MST algorithms is the CUT PROPERTY: for any cut of the graph (any partition of vertices into two non-empty disjoint sets), the minimum-weight edge with one endpoint in each set is guaranteed to be part of SOME minimum spanning tree (it is "safe" to add). Kruskal\'s algorithm repeatedly picks the globally smallest untried edge that does not form a cycle -- which corresponds to the cut separating its two endpoints\' current components -- while Prim\'s algorithm grows a single tree by always adding the minimum-weight edge crossing the cut between the tree-so-far and the rest of the graph. Both are directly justified by the cut property. Option 2 is false: MST is unique only when all edge weights are DISTINCT; with tied weights, multiple MSTs of the same total weight can exist. Option 3 is false: greedy is NOT universally optimal (e.g., 0/1 knapsack, general coin change), so MST greedy correctness needs its own proof (the cut property / exchange argument), not a blanket greedy-always-works assumption.'
+},
+{
+  id: 'algo-greedy-pyq6',
+  pyqStyle: true,
+  q: 'A set of 6 activities have (start, finish) times: A(1,4), B(3,5), C(0,6), D(5,7), E(3,9), F(6,10), G(8,11). Using the greedy earliest-finish-time algorithm, how many mutually non-overlapping activities are selected in the maximum-size set?',
+  options: [],
+  kind: 'nat',
+  answer: 3,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: 'Sort by finish time: A(1,4), B(3,5), C(0,6), D(5,7), E(3,9), F(6,10), G(8,11). Greedily select the first (earliest finish), then repeatedly pick the next whose start >= last selected finish. Select A(1,4), lastFinish=4. B(3,5) starts at 3 < 4, reject. C(0,6) starts at 0 < 4, reject. D(5,7) starts at 5 >= 4, select, lastFinish=7. E(3,9) starts at 3 < 7, reject. F(6,10) starts at 6 < 7, reject. G(8,11) starts at 8 >= 7, select, lastFinish=11. Final selection: {A, D, G}, a set of 3 mutually non-overlapping activities. No selection of 4 or more pairwise-compatible activities exists among these 7 (verified because every other activity\'s interval overlaps with at least one of A, D, or the already-tight chain), confirming the greedy earliest-finish-time choice achieves the true maximum of 3.'
+},
+{
+  id: 'algo-greedy-pyq7',
+  pyqStyle: true,
+  q: 'Character frequencies are A:5, B:9, C:12, D:13, E:16, F:45 (same as a well-known example). Which of the following is/are TRUE about the Huffman code constructed for these frequencies? (Multiple Select Question)',
+  options: [
+    'The two least frequent symbols (A and B) are merged first',
+    'F, being the most frequent, always receives the shortest code among all symbols',
+    'The Huffman code is a prefix code (no codeword is a prefix of another)',
+    'All codewords in a Huffman code must have exactly the same length'
+  ],
+  answers: [0, 1, 2],
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: 'Huffman\'s algorithm repeatedly extracts the two currently-lowest-frequency nodes and merges them into a new node with their summed frequency; among A(5), B(9), C(12), D(13), E(16), F(45), the two smallest are A(5) and B(9), so they are merged first -- statement 1 TRUE. Because Huffman\'s tree-building always keeps the largest-frequency symbols closest to being merged LAST (i.e., they stay near the root, at shallow depth), and F(45) is by far the largest and single frequency, it ends up at the shallowest depth among leaves, giving it the shortest (or tied-shortest) code -- statement 2 TRUE (and in this exact classic example, F does get the unique shortest 1-bit code). Statement 3 is a fundamental property of ALL Huffman codes (indeed of any tree-based binary code where each symbol is a leaf): since no leaf is an ancestor of another leaf in a binary tree, no codeword can be a prefix of another -- TRUE. Statement 4 is FALSE: Huffman codes are specifically variable-length -- that is the entire point, giving shorter codes to frequent symbols and longer codes to rare ones, unlike fixed-length encoding.'
+},
+{
+  id: 'algo-greedy-pyq8',
+  pyqStyle: true,
+  q: 'A set of 5 symbols has frequencies 2, 3, 5, 7, 11 (total 28). Using Huffman\'s algorithm, what is the total number of bits needed to encode one occurrence of each symbol (the total weighted path length)?',
+  options: [],
+  kind: 'nat',
+  answer: 60,
+  marks: 2,
+  difficulty: 'hard',
+  type: 'pyq-style',
+  explanation: 'Repeatedly merge the two smallest frequencies using a min-heap, adding the merge cost (sum of the two merged values) to a running total each time -- this running total exactly equals the final total weighted path length, because every symbol\'s frequency is counted once for every tree level (bit) it sits beneath the root, and summing per-merge costs telescopes to that same total. Starting heap {2,3,5,7,11}: pop 2 and 3, merge to 5, add cost 5 to total (total=5); heap becomes {5,5,7,11}. Pop 5 and 5, merge to 10, add cost 10 (total=15); heap becomes {7,10,11}. Pop 7 and 10, merge to 17, add cost 17 (total=32); heap becomes {11,17}. Pop 11 and 17, merge to 28, add cost 28 (total=60); heap becomes {28}, done. So the total weighted path length is 60 bits -- confirmed by direct min-heap simulation.'
+},
+{
+  id: 'algo-greedy-pyq9',
+  pyqStyle: true,
+  q: 'Which of the following problems CANNOT be solved optimally by a simple greedy algorithm (i.e., requires dynamic programming or another technique for optimality)?',
+  options: ['0/1 Knapsack (items are indivisible, each item taken fully or not at all)', 'Minimum Spanning Tree', 'Activity Selection (maximize number of non-overlapping activities)', 'Huffman Coding (minimize total weighted code length)'],
+  answer: 0,
+  marks: 1,
+  difficulty: 'easy',
+  type: 'pyq-style',
+  explanation: '0/1 Knapsack, where each item must be taken entirely or not at all (no fractional pieces allowed), does NOT have the greedy-choice property in general: picking items by highest value-per-weight ratio first (the greedy strategy that works for the FRACTIONAL version) can produce a strictly suboptimal solution once items become indivisible, because a high-ratio item might not fit while a combination of lower-ratio items would fill the remaining capacity with higher total value. This is why 0/1 Knapsack is solved optimally via dynamic programming instead. In contrast, MST (via the cut property), Activity Selection (via an exchange argument on earliest finish time), and Huffman Coding (via the merge-the-two-smallest exchange argument) are all classic examples where a greedy strategy IS provably optimal, each with its own distinct correctness proof -- this question tests the ability to distinguish which problems have the greedy-choice + optimal-substructure properties needed for greedy correctness from those (like 0/1 knapsack) that only satisfy optimal substructure but not the greedy-choice property.'
+},
+{
+  id: 'algo-greedy-pyq10',
+  pyqStyle: true,
+  q: 'In a min-heap-based implementation of Huffman\'s algorithm processing n symbols, what is the tight asymptotic time complexity of building the complete Huffman tree?',
+  options: ['Theta(n log n)', 'Theta(n)', 'Theta(n^2)', 'Theta(log n)'],
+  answer: 0,
+  marks: 1,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: 'Huffman\'s algorithm performs exactly n-1 merge operations to combine n symbols into a single tree (each merge reduces the symbol/node count by 1, starting from n and ending at 1). Each merge operation requires: two EXTRACT-MIN operations from the min-heap (each O(log n)) and one INSERT of the newly merged node back into the heap (also O(log n)). So each of the n-1 merges costs O(log n), giving total time Theta((n-1) * log n) = Theta(n log n). Building the initial min-heap from n frequencies takes only O(n) (via the standard bottom-up build-heap procedure), which is dominated by the Theta(n log n) merging phase. This Theta(n log n) bound is why Huffman coding, despite being conceptually a simple greedy algorithm, has the same asymptotic complexity class as comparison-based sorting -- both are fundamentally limited by needing repeated priority-queue operations (or equivalently, both are lower-bounded related to sorting-like operations on n elements).'
+},
+{
+  id: 'algo-greedy-pyq11',
+  pyqStyle: true,
+  q: 'A greedy interval-point-covering algorithm is given n intervals on a line and must choose the minimum number of POINTS such that every interval contains at least one chosen point. The standard greedy strategy is:',
+  options: [
+    'Sort intervals by RIGHT endpoint; repeatedly pick the right endpoint of the earliest not-yet-covered interval as a point, then skip all intervals it covers',
+    'Sort intervals by LEFT endpoint; always pick the left endpoint of the first interval',
+    'Pick points at every integer coordinate that appears as any endpoint',
+    'This problem cannot be solved by any greedy algorithm'
+  ],
+  answer: 0,
+  marks: 1,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: 'This is the classic "minimum points to stab all intervals" (interval point cover) problem, structurally the dual of activity selection. The correct greedy strategy sorts intervals by their RIGHT endpoint (ascending), then processes intervals left to right: whenever an interval is not yet covered by any previously chosen point, it greedily places a NEW point exactly at that interval\'s right endpoint (the rightmost possible choice that still covers this interval), and this single point automatically covers every other interval that overlaps it going forward, which are then skipped. Choosing the RIGHTMOST feasible point (rather than the leftmost, as in option 2) is the key greedy insight: it maximizes the chance of also covering subsequent intervals that start before this point ends, minimizing the total point count -- this is provably optimal via an exchange argument nearly identical to activity selection\'s. Option 3 (picking every distinct endpoint) massively over-counts and is not optimal; option 4 is false since this problem is a textbook example of correct greedy design.'
+},
+{
+  id: 'algo-greedy-pyq12',
+  pyqStyle: true,
+  q: 'Consider the greedy algorithm for MST using Prim\'s method starting from an arbitrary vertex, versus Kruskal\'s method. Which of the following statements is/are TRUE? (Multiple Select Question)',
+  options: [
+    'If all edge weights in the graph are distinct, the MST is unique, and both Prim\'s and Kruskal\'s algorithms will find the same MST',
+    'If two edges have equal weight and both are candidates at some step, choosing either can still lead to a valid MST (possibly a different one, but of the same total weight)',
+    'Prim\'s algorithm requires the graph to be connected for its output to be a single spanning tree',
+    'Kruskal\'s algorithm sorts edges by weight in INCREASING order and adds an edge only if it does NOT create a cycle with previously added edges'
+  ],
+  answers: [0, 1, 2, 3],
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: 'Statement 1 is TRUE: a standard theorem states that if all edge weights are pairwise distinct, the MST is unique, and since both Prim\'s and Kruskal\'s are correct greedy algorithms (justified by the cut property), they must both converge to that same unique tree. Statement 2 is TRUE: when weights tie, different valid tie-breaking choices can lead to different spanning trees, but all such trees are guaranteed to have the SAME total minimum weight (multiple MSTs can co-exist, all optimal). Statement 3 is TRUE: Prim\'s algorithm grows one connected tree by always attaching the minimum-weight edge leaving the current tree to a new vertex; if the graph is disconnected, Prim\'s algorithm (run from a single start vertex) can only ever reach vertices in that vertex\'s connected component, and will fail to produce a SPANNING tree covering all vertices -- connectivity is a precondition. Statement 4 correctly describes Kruskal\'s algorithm: sort all edges by weight ascending, then greedily add each edge unless it would close a cycle (checked via union-find), continuing until n-1 edges are added -- TRUE. All four statements are correct.'
+}
+);
+window.GATE_DATA.questions['algo'].topics.find(function(t){return t.id==='algo-dp';}).questions.push(
+{
+  id: 'algo-dp-pyq1',
+  pyqStyle: true,
+  q: 'For the 0/1 Knapsack problem with items of (weight, value) = (1,1), (3,4), (4,5), (5,7) and knapsack capacity W = 7, what is the MAXIMUM total value achievable (each item taken at most once)?',
+  options: [],
+  kind: 'nat',
+  answer: 9,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: 'Build the DP table dp[i][w] = max value using the first i items with capacity w, using the recurrence dp[i][w] = dp[i-1][w] if weight[i] > w, else max(dp[i-1][w], dp[i-1][w-weight[i]] + value[i]). Filling the table for items (1,1),(3,4),(4,5),(5,7) up to capacity 7 gives dp[4][7] = 9, achieved by choosing items with weights {3,4} (values 4+5=9, total weight 3+4=7, exactly filling the capacity) -- this beats other combinations like {1,3} (weight 4, value 5), {1,3,... nothing else fits}, or taking the single item (5,7) alone (value 7). The 0/1 constraint (no fractional items) is why this needs the DP table rather than the simple greedy-by-ratio approach that works for fractional knapsack; greedy by ratio here would rank item (1,1) ratio=1, (3,4) ratio=1.33, (4,5) ratio=1.25, (5,7) ratio=1.4, and taking the top-ratio items greedily would not necessarily find this optimal combination.'
+},
+{
+  id: 'algo-dp-pyq2',
+  pyqStyle: true,
+  q: 'What is the minimum EDIT DISTANCE (using insert, delete, and substitute, each cost 1) between the strings "SUNDAY" and "SATURDAY"?',
+  options: [],
+  kind: 'nat',
+  answer: 3,
+  marks: 2,
+  difficulty: 'hard',
+  type: 'pyq-style',
+  explanation: 'Using the standard DP recurrence dp[i][j] = dp[i-1][j-1] if the characters match, else 1 + min(dp[i-1][j] (delete), dp[i][j-1] (insert), dp[i-1][j-1] (substitute)), with dp[i][0]=i and dp[0][j]=j as base cases, filling the full 7x9 table (for "SUNDAY" of length 6 against "SATURDAY" of length 8) gives dp[6][8] = 3. One optimal alignment achieving cost 3: insert "A" after S (SAUNDAY), substitute "N" with "R"... more directly, one valid edit sequence is: insert \'A\' (S->SA), insert \'T\' before U appropriately, and one substitution -- the DP guarantees the MINIMUM regardless of which specific sequence of 3 edits is found, and no sequence of fewer than 3 edits can transform "SUNDAY" into "SATURDAY". This exact string pair is a well-known benchmark example for edit distance / Levenshtein distance computation.'
+},
+{
+  id: 'algo-dp-pyq3',
+  pyqStyle: true,
+  q: 'What is the length of the Longest Common Subsequence (LCS) between "ABCBDAB" and "BDCABA"?',
+  options: [],
+  kind: 'nat',
+  answer: 4,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: 'Using the LCS recurrence dp[i][j] = dp[i-1][j-1]+1 if the i-th character of the first string equals the j-th character of the second, else dp[i][j] = max(dp[i-1][j], dp[i][j-1]), filling the DP table for "ABCBDAB" (length 7) against "BDCABA" (length 6) gives dp[7][6] = 4. Two subsequences achieving this length are "BCBA" and "BDAB", both of length 4, and both can be verified to appear (in order, not necessarily contiguous) within both original strings. No common subsequence of length 5 or more exists between these two strings. This is one of the most frequently reused GATE example string pairs for testing LCS table construction, precisely because it requires several genuine max() tie-breaks that expose whether a candidate correctly applies the recurrence rather than guessing.'
+},
+{
+  id: 'algo-dp-pyq4',
+  pyqStyle: true,
+  q: 'For matrix chain multiplication with matrices of dimensions 5x10, 10x3, 3x12, 12x5, 5x50, 50x6 (i.e., p = [5,10,3,12,5,50,6]), what is the MINIMUM number of scalar multiplications needed to compute the full product using optimal parenthesization?',
+  options: [],
+  kind: 'nat',
+  answer: 2010,
+  marks: 2,
+  difficulty: 'hard',
+  type: 'pyq-style',
+  explanation: 'Using the matrix-chain DP recurrence dp[i][j] = min over all split points k (i<=k<j) of dp[i][k] + dp[k+1][j] + p[i-1]*p[k]*p[j], filling the table bottom-up by increasing chain length for 6 matrices (dimensions given by p=[5,10,3,12,5,50,6]) gives dp[1][6] = 2010 as the minimum total scalar multiplications. This demonstrates the huge cost difference correct parenthesization can make: multiplying strictly left-to-right (((((M1*M2)*M3)*M4)*M5)*M6) would cost far more multiplications than the DP-found optimal grouping, since the DP explores all O(2^n / n) possible parenthesizations implicitly via the O(n^3) table-filling recurrence rather than enumerating them all directly (which would itself be exponential).'
+},
+{
+  id: 'algo-dp-pyq5',
+  pyqStyle: true,
+  q: 'What is the length of the Longest Increasing Subsequence (LIS) of the array [10, 9, 2, 5, 3, 7, 101, 18]?',
+  options: [],
+  kind: 'nat',
+  answer: 4,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: 'Using the O(n^2) LIS DP recurrence dp[i] = 1 + max(dp[j]) over all j<i with a[j]<a[i] (or dp[i]=1 if no such j exists), and taking the maximum over all dp[i]: for array [10,9,2,5,3,7,101,18], one longest increasing subsequence is [2,5,7,101] or equivalently [2,3,7,101] or [2,3,7,18], each of length 4. No increasing subsequence of length 5 exists in this array (verified by exhaustive DP table computation: dp values are [1,1,1,2,2,3,4,4], and the maximum is 4). This exact array is a standard textbook/interview example for LIS, and this question format tests whether a candidate can correctly trace the O(n^2) table-filling recurrence (as opposed to only knowing the existence of an O(n log n) patience-sorting-based algorithm without being able to hand-compute a small example).'
+},
+{
+  id: 'algo-dp-pyq6',
+  pyqStyle: true,
+  q: 'Using the coin denominations {1, 2, 5}, what is the MINIMUM number of coins needed to make change for the amount 11 (using standard DP, not greedy)?',
+  options: [],
+  kind: 'nat',
+  answer: 3,
+  marks: 1,
+  difficulty: 'easy',
+  type: 'pyq-style',
+  explanation: 'Using the DP recurrence dp[a] = 1 + min(dp[a-c]) over all coin denominations c<=a, with dp[0]=0, filling the table from amount 0 up to 11 gives dp[11] = 3, achieved by the combination {5, 5, 1} (5+5+1=11, using 3 coins). No combination of 2 coins can sum to exactly 11 using denominations from {1,2,5} (checking all pairs: 5+5=10, 5+2=7, 5+1=6, 2+2=4, etc., none reach 11), confirming 3 is indeed minimal. This coin system {1,2,5} happens to be "canonical" (greedy also gives the correct answer here, taking 5+5+1=3 coins by picking largest-first), but the DP formulation is what generalizes correctly to ANY coin system, including non-canonical ones like {1,3,4} where greedy can fail.'
+},
+{
+  id: 'algo-dp-pyq7',
+  pyqStyle: true,
+  q: 'Using coin denominations {1, 2, 5}, how many DISTINCT ways (order does not matter, i.e., counting combinations not permutations) are there to make change for the amount 5?',
+  options: [],
+  kind: 'nat',
+  answer: 4,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: 'Using the "counting combinations" DP recurrence (process coins one denomination at a time in the outer loop, amounts in the inner loop, dp[a] += dp[a-c]), with dp[0]=1 initially, the number of ways to make amount 5 using coins from {1,2,5} is dp[5] = 4. The 4 distinct combinations are: {5} (one 5-coin), {2,2,1} (two 2-coins and one 1-coin), {2,1,1,1} (one 2-coin and three 1-coins), and {1,1,1,1,1} (five 1-coins). Note that the ORDER of the outer (coin) and inner (amount) loops matters critically for this variant: iterating coins in the outer loop and amounts in the inner loop counts combinations (order-independent), while swapping the loop order would instead count PERMUTATIONS (order-dependent, treating {2,1,1,1} arranged differently as distinct), a subtle but frequently tested distinction in coin-change DP formulations.'
+},
+{
+  id: 'algo-dp-pyq8',
+  pyqStyle: true,
+  q: 'The Rod Cutting problem has rod length 8 and price table (for lengths 1 through 8): [1, 5, 8, 9, 10, 17, 17, 20]. What is the MAXIMUM total revenue obtainable by optimally cutting the rod?',
+  options: [],
+  kind: 'nat',
+  answer: 22,
+  marks: 2,
+  difficulty: 'hard',
+  type: 'pyq-style',
+  explanation: 'Using the rod-cutting DP recurrence dp[n] = max over all first-cut lengths i (1<=i<=n) of price[i] + dp[n-i], with dp[0]=0, filling the table from length 0 up to 8 gives dp[8] = 22, achieved by cutting the rod into two pieces of length 2 and 6 (price[2]+price[6] = 5+17 = 22), which beats selling the rod whole at price[8]=20, or other cuts like length 1+7 (1+17=18) or 4+4 (9+9=18). This is the classic CLRS rod-cutting example, and the optimal cut here (2+6, giving revenue 22) is a frequently-tested "surprising" result since it is NOT simply the single best per-unit-price cut repeated (price[2]/2 = 2.5/unit is the best per-unit rate, but cutting the whole rod into four length-2 pieces would give 4*5=20, LESS than the 22 achieved by the 2+6 split), showing DP correctly balances marginal prices rather than naively maximizing a per-unit ratio.'
+},
+{
+  id: 'algo-dp-pyq9',
+  pyqStyle: true,
+  q: 'A DP algorithm for the 0/1 Knapsack problem with n items and capacity W is implemented using the standard 2D table dp[i][w]. What are the TIGHT time and space complexities of this standard DP formulation?',
+  options: ['Time O(nW), Space O(nW)', 'Time O(n log W), Space O(n)', 'Time O(2^n), Space O(n)', 'Time O(nW), Space O(n) using a rolling array, but NEVER O(nW) time'],
+  answer: 0,
+  marks: 1,
+  difficulty: 'easy',
+  type: 'pyq-style',
+  explanation: 'The standard 0/1 knapsack DP fills a table of size (n+1) x (W+1), where n is the number of items and W is the knapsack capacity, and computing each cell dp[i][w] takes O(1) time given the previous row\'s values. So total time is O(n*W) and, using the full 2D table (needed if item-selection reconstruction via backtracking is required), space is also O(n*W). Note that this is PSEUDO-polynomial time -- it depends on the VALUE of W, not just the number of bits needed to represent W, meaning if W is exponentially large relative to n (e.g., W = 2^n), this algorithm becomes exponential in the input size; 0/1 Knapsack is NP-hard in general, and this pseudo-polynomial DP does not contradict that. A space optimization using a 1D rolling array (processing weights in decreasing order per item) can reduce space to O(W) while keeping time at O(n*W), but the question\'s stated 2D table formulation is O(nW) in both time and space as given.'
+},
+{
+  id: 'algo-dp-pyq10',
+  pyqStyle: true,
+  q: 'Which of the following statements about Dynamic Programming are TRUE? (Multiple Select Question)',
+  options: [
+    'DP is applicable when a problem has both optimal substructure and overlapping subproblems',
+    'Memoization (top-down) and tabulation (bottom-up) both compute the same set of DP values but differ in evaluation order',
+    'If subproblems do NOT overlap, DP typically offers no benefit over plain divide-and-conquer recursion',
+    'Every problem with optimal substructure can be solved by DP in polynomial time'
+  ],
+  answers: [0, 1, 2],
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: 'Statement 1 is TRUE: DP requires BOTH optimal substructure (an optimal solution can be built from optimal solutions to subproblems) AND overlapping subproblems (the same subproblems recur multiple times) -- both are needed to justify caching. Statement 2 is TRUE: memoization computes values on-demand via recursion, caching results the first time each subproblem is seen (top-down), while tabulation computes values in a fixed order (typically smallest subproblems first) filling a table iteratively (bottom-up) -- both explore the exact same dependency DAG of subproblems and produce identical final values, just via different traversal orders and different overhead (tabulation avoids recursion-call overhead but must compute a valid topological order in advance). Statement 3 is TRUE: divide-and-conquer algorithms like merge sort have optimal substructure but NON-overlapping subproblems (each recursive call works on a disjoint portion of the array), so caching offers no speedup -- this is precisely why merge sort is "just" divide-and-conquer, not DP. Statement 4 is FALSE: optimal substructure alone is not sufficient for a polynomial-time DP -- the NUMBER of distinct subproblems must also be polynomial (bounded); problems like the general Traveling Salesman Problem have optimal substructure but an exponential number of distinct subproblems (subsets of cities), so their DP formulation (e.g., Held-Karp) is still exponential, just less so than brute force.'
+},
+{
+  id: 'algo-dp-pyq11',
+  pyqStyle: true,
+  q: 'In the Longest Common Subsequence DP table for two strings of lengths m and n, if the two strings share NO characters in common at all, what value appears in every cell of the table (except the necessarily-zero base row/column, which are also zero)?',
+  options: ['0', '1', 'min(m,n)', 'It varies depending on string content even with no common characters'],
+  answer: 0,
+  marks: 1,
+  difficulty: 'easy',
+  type: 'pyq-style',
+  explanation: 'The LCS recurrence is dp[i][j] = dp[i-1][j-1]+1 if characters match, else dp[i][j] = max(dp[i-1][j], dp[i][j-1]). If the two strings share absolutely no character in common, the "characters match" branch (dp[i-1][j-1]+1) is NEVER taken anywhere in the table, so every cell falls back to max(dp[i-1][j], dp[i][j-1]). Since the base row (i=0) and base column (j=0) are initialized to 0 (an empty string has LCS length 0 with anything), and every subsequent cell only ever takes the max of already-zero neighbors (by induction, since the match branch never fires), EVERY cell in the entire table remains 0, including dp[m][n]. This makes intuitive sense: if the two strings have no character in common, their longest common SUBSEQUENCE must also be empty (length 0), since a subsequence is built entirely from characters that must appear in both strings.'
+},
+{
+  id: 'algo-dp-pyq12',
+  pyqStyle: true,
+  q: 'The Fibonacci-like recurrence f(n) = f(n-1) + f(n-2) + f(n-3) (a "tribonacci" sequence) with f(0)=0, f(1)=0, f(2)=1 is computed using BOTTOM-UP dynamic programming (tabulation) storing only the last 3 values at any time (not a full array). What are the TIME and SPACE complexities to compute f(n)?',
+  options: ['Time O(n), Space O(1)', 'Time O(n), Space O(n)', 'Time O(2^n), Space O(1)', 'Time O(n^2), Space O(1)'],
+  answer: 0,
+  marks: 1,
+  difficulty: 'easy',
+  type: 'pyq-style',
+  explanation: 'Computing f(3), f(4), ..., f(n) bottom-up, each requiring O(1) work given the previous three values already computed, takes a total of O(n) time across n-2 iterations. Because the recurrence only ever needs the most recent 3 values (a sliding window, not the entire history), maintaining just 3 variables (rather than a full array of size n) suffices, achieving O(1) auxiliary space -- this is the standard space-optimization trick for any DP recurrence whose dependency only reaches back a CONSTANT number of previous states (as opposed to something like LCS or knapsack, whose recurrences need an entire previous row and thus cannot be reduced below O(row size) space, or in special row-elimination cases like knapsack, reduced to O(W) via careful iteration order but not O(1)). This distinction -- constant-lookback recurrences reducible to O(1) space versus row-dependent recurrences needing O(row) space -- is a common space-complexity trap in DP questions.'
+}
+);
+window.GATE_DATA.questions['algo'].topics.find(function(t){return t.id==='algo-graph';}).questions.push(
+{
+  id: 'algo-graph-pyq1',
+  pyqStyle: true,
+  q: 'A weighted undirected graph has vertices A,B,C,D,E and edges A-B(2), A-C(3), B-C(1), B-D(5), C-D(4), C-E(6), D-E(2). Using Kruskal\'s algorithm, what is the TOTAL WEIGHT of the Minimum Spanning Tree?',
+  options: [],
+  kind: 'nat',
+  answer: 9,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: 'Sort edges by weight ascending: B-C(1), A-B(2), D-E(2), A-C(3), C-D(4), B-D(5), C-E(6). Apply Kruskal\'s (add an edge only if it does not form a cycle, using union-find): add B-C(1) [components: {B,C},{A},{D},{E}]. Add A-B(2) [components: {A,B,C},{D},{E}]. Add D-E(2) [components: {A,B,C},{D,E}]. Add A-C(3): both A and C already in the same component -- SKIP (would form a cycle). Add C-D(4): connects {A,B,C} and {D,E} -- add it, completing the spanning tree with 4 edges for 5 vertices. MST edges are {B-C, A-B, D-E, C-D}, total weight = 1+2+2+4 = 9. Note the weights are NOT all distinct here (two edges of weight 2), so multiple MSTs of the same total weight 9 could exist depending on tie-breaking, but the minimum total weight itself is a fixed, well-defined value of 9 regardless of which edge is chosen first among ties.'
+},
+{
+  id: 'algo-graph-pyq2',
+  pyqStyle: true,
+  q: 'For the directed weighted graph with vertices A(source),B,C,D,E and edges A-B(4), A-C(1), C-B(2), B-D(1), C-D(5), D-E(3), running Dijkstra\'s algorithm from A, what is the shortest distance from A to E?',
+  options: [],
+  kind: 'nat',
+  answer: 7,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: 'Initialize dist[A]=0, all others infinity. Finalize A(0), relax neighbors: dist[B]=min(inf,4)=4, dist[C]=min(inf,1)=1. Finalize C(1) (smallest tentative distance among unvisited). Relax from C: dist[B]=min(4, 1+2)=3, dist[D]=min(inf,1+5)=6. Finalize B(3). Relax from B: dist[D]=min(6, 3+1)=4. Finalize D(4). Relax from D: dist[E]=min(inf, 4+3)=7. Finalize E(7). So the shortest path A to E is A-C-B-D-E with total distance 1+2+1+3=7, which beats the alternative A-C-D-E (1+5+3=9) or A-B-D-E (4+1+3=8). This example specifically tests whether a candidate correctly re-relaxes B via the cheaper path through C rather than locking in the direct A-B(4) edge prematurely.'
+},
+{
+  id: 'algo-graph-pyq3',
+  pyqStyle: true,
+  q: 'A directed graph with vertices S,A,B,C,D has edges S-A(6), S-B(7), A-B(8), A-C(5), A-D(-4), B-C(-3), B-D(9), C-A(-2), D-C(7), D-S(2). This graph contains a NEGATIVE-weight edge. Using Bellman-Ford from S, what is the shortest distance from S to D?',
+  options: [],
+  kind: 'nat',
+  answer: -2,
+  marks: 2,
+  difficulty: 'hard',
+  type: 'pyq-style',
+  explanation: 'Since the graph has a negative edge (A-D = -4) but NO negative-weight CYCLE (verified by running one extra relaxation pass after n-1=4 iterations and confirming no distance improves further), Bellman-Ford is required (Dijkstra would give wrong answers here since it assumes non-negative weights). Running the standard Bellman-Ford relaxation for n-1=4 rounds over all edges converges to: dist[S]=0, dist[A]=2 (via S-B-C-A: 7-3-2=2, cheaper than direct S-A=6), dist[B]=7 (direct S-B), dist[C]=4 (via S-B-C: 7-3=4), dist[D]=-2 (via S-B-C-A-D: 7-3-2-4=-2, cheaper than S-A-D=6-4=2). So the shortest distance from S to D is -2. This exact graph is the classic CLRS Bellman-Ford textbook example, specifically constructed so that the shortest path to D requires traversing through the negative edge A-D after first reaching A via a roundabout cheaper route through B and C, rather than directly.'
+},
+{
+  id: 'algo-graph-pyq4',
+  pyqStyle: true,
+  q: 'A directed graph has a cycle 0->1(1), 1->2(-1), 2->0(-1). What happens when Bellman-Ford is run on this graph, and what happens if Dijkstra\'s algorithm is (incorrectly) applied to a graph with negative edges like this one?',
+  options: [
+    'Bellman-Ford correctly detects the negative-weight cycle (distances keep decreasing after n-1 iterations); Dijkstra can produce incorrect shortest-path distances since its greedy finalization assumes no negative edges',
+    'Both Bellman-Ford and Dijkstra fail identically and cannot be distinguished',
+    'Bellman-Ford cannot detect negative cycles; only Dijkstra can',
+    'Neither algorithm is affected by negative edge weights'
+  ],
+  answer: 0,
+  marks: 1,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: 'For this graph, the cycle 0->1->2->0 has total weight 1+(-1)+(-1) = -1, a genuine negative cycle, meaning distances along it can be made arbitrarily small by looping repeatedly, so no well-defined shortest path exists at all for vertices on/reachable-from this cycle. Bellman-Ford\'s standard detection mechanism runs exactly n-1 relaxation rounds (guaranteed sufficient for any negative-cycle-free graph with n vertices), then does ONE more pass: if any distance can still be improved, a negative cycle reachable from the source is confirmed to exist -- verified here, since further relaxation keeps reducing distances indefinitely. Dijkstra\'s algorithm, by contrast, greedily finalizes each vertex\'s distance the moment it is extracted as the current minimum, relying on the invariant that no unfinalized vertex could later offer a cheaper path -- an invariant that BREAKS with negative edges, since a not-yet-visited negative edge could retroactively improve an already-finalized vertex\'s distance, producing silently WRONG (not just undefined) results rather than an error or infinite loop.'
+},
+{
+  id: 'algo-graph-pyq5',
+  pyqStyle: true,
+  q: 'A weighted undirected graph has vertices A,B,C,D,E and edges A-B(2), A-C(3), B-C(4), B-D(5), C-D(1), C-E(6), D-E(7) -- note all edge weights here are DISTINCT. What can be concluded about its Minimum Spanning Tree, and what is its total weight?',
+  options: ['The MST is unique (since all weights are distinct); total weight = 12', 'Multiple MSTs may exist; total weight = 12', 'The MST is unique; total weight = 15', 'Cannot determine uniqueness without running both Prim\'s and Kruskal\'s'],
+  answer: 0,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: 'Since all 7 edge weights (2,3,4,5,1,6,7) are pairwise DISTINCT, a standard theorem guarantees the MST is UNIQUE -- no tie-breaking ambiguity can arise at any step of Kruskal\'s or Prim\'s algorithm. Running Kruskal\'s: sort edges C-D(1), A-B(2), A-C(3), B-C(4), B-D(5), C-E(6), D-E(7). Add C-D(1) [components: {C,D},{A},{B},{E}]. Add A-B(2) [components: {C,D},{A,B},{E}]. Add A-C(3): connects {A,B} and {C,D} -- add [components: {A,B,C,D},{E}]. Add B-C(4): both endpoints already in {A,B,C,D} -- skip (cycle). Add B-D(5): also both in same component -- skip. Add C-E(6): connects {A,B,C,D} and {E} -- add, completing the spanning tree with 4 edges. Total weight = 1+2+3+6 = 12. Since the MST is provably unique here, this is THE minimum spanning tree, not merely one of several equal-weight options.'
+},
+{
+  id: 'algo-graph-pyq6',
+  pyqStyle: true,
+  q: 'In an unweighted, undirected, connected graph with 7 vertices numbered 0-6 and edges forming a structure where vertex 0 connects to 1 and 2, vertices 1 and 2 both connect to 3, and vertex 3 connects to 4, which then connects to 5 and 6, a BFS starting from vertex 0 is performed. What is the shortest-path distance (in number of edges) from vertex 0 to vertex 5?',
+  options: [],
+  kind: 'nat',
+  answer: 4,
+  marks: 1,
+  difficulty: 'easy',
+  type: 'pyq-style',
+  explanation: 'BFS explores the graph level by level, guaranteeing that the first time a vertex is reached, it is via a SHORTEST path (in terms of edge count) from the source, since BFS exhausts all vertices at distance k before considering any vertex at distance k+1. Level 0: {0} (distance 0). Level 1: {1, 2} (distance 1, direct neighbors of 0). Level 2: {3} (distance 2, reached from both 1 and 2, but only counted once at its first-discovered distance). Level 3: {4} (distance 3, reached from 3, the only neighbor of 4 not yet visited). Level 4: {5, 6} (distance 4, both reached from 4). So the shortest-path distance from vertex 0 to vertex 5 is 4 edges, along the unique path 0-1-3-4-5 (or equivalently 0-2-3-4-5).'
+},
+{
+  id: 'algo-graph-pyq7',
+  pyqStyle: true,
+  q: 'A DAG has vertices 0,1,2,3,4 with edges 0->1, 0->2, 0->3, 1->4, 2->4, 3->4 (vertex 0 is the unique source with three independent "middle" vertices 1,2,3, all feeding into the unique sink 4). How MANY distinct topological orderings does this DAG have?',
+  options: [],
+  kind: 'nat',
+  answer: 6,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: 'Vertex 0 has in-degree 0 and every other vertex depends on it (directly or transitively), so it MUST come first in any valid topological order. Vertex 4 has out-degree 0 and depends on all of 1, 2, and 3, so it MUST come last. The three middle vertices 1, 2, and 3 have NO edges among themselves (no edge like 1->2 or 2->3 exists), meaning they are mutually independent in the partial order and can be arranged in ANY relative order among themselves without violating any dependency constraint. The number of ways to arrange 3 mutually-independent elements is 3! = 6. So the total number of distinct topological orderings is 1 (fixed first) x 6 (free middle permutations) x 1 (fixed last) = 6. This is a standard technique for counting topological orderings: identify forced positions (sources/sinks with unique dependency chains) versus free "antichains" of mutually incomparable vertices, and multiply by the factorial of each such free group\'s size.'
+},
+{
+  id: 'algo-graph-pyq8',
+  pyqStyle: true,
+  q: 'Which of the following statements about Depth-First Search (DFS) edge classification in a directed graph are TRUE? (Multiple Select Question)',
+  options: [
+    'A back edge connects a vertex to one of its ancestors in the DFS tree',
+    'A directed graph has a cycle if and only if a DFS of it produces at least one back edge',
+    'Forward and cross edges can both appear when DFS is run on a directed acyclic graph (DAG)',
+    'A cross edge always connects two vertices in the same DFS tree at the same depth'
+  ],
+  answers: [0, 1, 2],
+  marks: 2,
+  difficulty: 'hard',
+  type: 'pyq-style',
+  explanation: 'Statement 1 is TRUE by definition: a back edge in DFS goes from a vertex to one of its ANCESTORS in the current DFS tree (i.e., it points "backward" toward the root along the current recursion path). Statement 2 is TRUE and is a fundamental theorem: a directed graph contains a cycle if and only if a DFS traversal discovers at least one back edge -- this is precisely the mechanism used for cycle detection via DFS (checking for edges into "gray"/currently-on-stack vertices). Statement 3 is TRUE: forward edges (from an ancestor to a non-child descendant) and cross edges (connecting unrelated subtrees or different DFS trees, with no ancestor-descendant relationship) CAN both appear even in an acyclic graph -- a DAG can have zero back edges (consistent with being acyclic) while still having forward and cross edges depending on traversal order and edge structure. Statement 4 is FALSE: a cross edge can connect vertices at DIFFERENT depths, or even vertices in entirely DIFFERENT DFS trees (in a DFS forest, when the graph is disconnected or when directed edges point into an already-fully-explored subtree) -- there is no requirement that cross edges connect same-depth vertices.'
+},
+{
+  id: 'algo-graph-pyq9',
+  pyqStyle: true,
+  q: 'A weighted undirected graph has 6 vertices and 9 edges. If it is known to be connected, how many edges does its Minimum Spanning Tree contain, and how many edges are NOT part of the MST?',
+  options: [],
+  kind: 'nat',
+  answer: 5,
+  marks: 1,
+  difficulty: 'easy',
+  type: 'pyq-style',
+  explanation: 'A spanning tree on any connected graph with V vertices always has exactly V-1 edges (a fundamental tree property: a tree with V nodes has exactly V-1 edges, being minimally connected with no cycles). Here V=6, so the MST has exactly 6-1 = 5 edges. Since the graph has 9 total edges, the number of edges NOT in the MST is 9 - 5 = 4 (these are the edges that Kruskal\'s algorithm would reject during processing because they would form a cycle with already-included edges, or equivalently, the edges Prim\'s algorithm never needs to add since it stops once all vertices are connected). This NAT question tests the basic but essential tree-edge-count identity that underlies correctness arguments for both Kruskal\'s and Prim\'s algorithms (both are designed to add EXACTLY V-1 edges and then terminate).'
+},
+{
+  id: 'algo-graph-pyq10',
+  pyqStyle: true,
+  q: 'A connected undirected graph G has V vertices and E edges, and it is known that G contains at least one cycle. If T is a spanning tree of G, how many "non-tree" edges (edges of G not in T) does removing a spanning tree leave, and what is true about each such non-tree edge added back to T?',
+  options: [
+    'E - (V-1) non-tree edges remain; adding any single one back to T creates EXACTLY ONE cycle',
+    'E - V non-tree edges remain; adding any one back creates no cycle',
+    'V - E non-tree edges remain; adding any one back always creates two disjoint cycles',
+    'The number of non-tree edges cannot be determined without knowing the exact structure of G'
+  ],
+  answer: 0,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: 'Any spanning tree T of a connected graph with V vertices has exactly V-1 edges. So the number of non-tree edges is E - (V-1) = E - V + 1. Since G contains at least one cycle, E must be at least V (a connected graph is acyclic only when E = V-1, i.e., is itself already a tree), confirming E-(V-1) >= 1, i.e., at least one non-tree edge genuinely exists. For any single non-tree edge (u,v) added back into T: since T is a tree, there exists a UNIQUE path between u and v already within T, and adding the direct edge (u,v) creates exactly ONE additional cycle (the path in T from u to v, plus the new edge (u,v), forms exactly one simple cycle) -- no more, no fewer, because T itself has no other cycles to combine with. This "fundamental cycle" property (each non-tree edge, combined with the tree, induces exactly one unique cycle) underlies cycle-space arguments in graph theory and explains why Kruskal\'s algorithm correctly identifies "would create a cycle" via the union-find check.'
+},
+{
+  id: 'algo-graph-pyq11',
+  pyqStyle: true,
+  q: 'For a directed graph with V vertices and E edges represented using an ADJACENCY LIST, what are the tight time complexities of (a) BFS/DFS traversal and (b) checking whether a specific edge (u,v) exists?',
+  options: [
+    'BFS/DFS: O(V+E); Edge existence check: O(degree(u)) in the worst case, i.e., up to O(V)',
+    'BFS/DFS: O(V*E); Edge existence check: O(1) always',
+    'BFS/DFS: O(V^2); Edge existence check: O(log V)',
+    'BFS/DFS: O(E); Edge existence check: O(V+E)'
+  ],
+  answer: 0,
+  marks: 1,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: 'With an adjacency LIST representation, BFS and DFS both visit every vertex once (O(V) total across all vertex-visits) and, for each vertex, scan its entire adjacency list exactly once (summing to O(E) total across all vertices, since the sum of all list lengths equals the total edge count, or 2E for undirected graphs, still O(E)) -- giving the well-known O(V+E) tight bound for both traversals. Checking whether edge (u,v) exists requires linearly scanning vertex u\'s adjacency list to search for v, which takes O(degree(u)) time in the worst case -- and since degree(u) can be as large as V-1 (in a dense graph or specifically if u connects to nearly every other vertex), this is O(V) in the worst case. This contrasts with an ADJACENCY MATRIX representation, where edge existence check is O(1) (direct array lookup) but traversal and matrix storage cost O(V^2) regardless of how sparse the actual graph is -- the classic space/query-time tradeoff between the two graph representations that GATE frequently tests.'
+},
+{
+  id: 'algo-graph-pyq12',
+  pyqStyle: true,
+  q: 'Prim\'s algorithm for MST is implemented using a binary min-heap (priority queue) with decrease-key support, on a graph with V vertices and E edges. What is the tight time complexity?',
+  options: ['O(E log V)', 'O(V^2)', 'O(E + V log V)', 'O(V*E)'],
+  answer: 0,
+  marks: 2,
+  difficulty: 'hard',
+  type: 'pyq-style',
+  explanation: 'With a binary heap implementation, Prim\'s algorithm performs V EXTRACT-MIN operations (one per vertex added to the MST, each costing O(log V)) and, across the whole run, performs at most E DECREASE-KEY operations in total (each edge can trigger at most one decrease-key, when it offers a cheaper connection to a vertex not yet in the tree, and each decrease-key also costs O(log V) with a binary heap). Total time = O(V log V) for extractions + O(E log V) for decrease-keys = O((V+E) log V), which simplifies to O(E log V) for connected graphs where E >= V-1 (E dominates V asymptotically in this sum). This matches Kruskal\'s O(E log E) = O(E log V) (since E is at most V^2, log E = O(log V)) -- both classic MST algorithms land at the same O(E log V) tight bound with these standard data structures, though a FIBONACCI heap implementation of Prim\'s can improve decrease-key to O(1) amortized, achieving the better O(E + V log V) bound instead (a distinction sometimes tested at a more advanced level).'
+}
+);
+window.GATE_DATA.questions['algo'].topics.find(function(t){return t.id==='algo-sorting-searching';}).questions.push(
+{
+  id: 'algo-sorting-searching-pyq1',
+  pyqStyle: true,
+  q: 'Quicksort is run on the array [5, 3, 8, 4, 2, 7, 1, 6] using the FIRST element of each subarray as the pivot (elements less than pivot go left, others go right, then recurse on each side). What is the TOTAL number of element comparisons (pivot-to-element comparisons) performed?',
+  options: [],
+  kind: 'nat',
+  answer: 14,
+  marks: 2,
+  difficulty: 'hard',
+  type: 'pyq-style',
+  explanation: 'Trace the partitioning at each level. Level 1: pivot=5, compare against {3,8,4,2,7,1,6} = 7 comparisons; splits into left=[3,4,2,1] and right=[8,7,6]. Level 2 (left=[3,4,2,1]): pivot=3, compare against {4,2,1} = 3 comparisons; splits into left=[2,1] and right=[4]. Level 2 (right=[8,7,6]): pivot=8, compare against {7,6} = 2 comparisons; splits into left=[7,6] and right=[] (empty, since both are less than 8). Level 3 (left=[2,1]): pivot=2, compare against {1} = 1 comparison. Level 3 (right=[7,6] from the right branch): pivot=7, compare against {6} = 1 comparison. All remaining subarrays have size <=1, requiring no more comparisons. Total: 7+3+2+1+1 = 14 comparisons. This exercise (already sorted arrays or first-element-pivot on adversarial-ish input) tests careful hand-tracing of the partition recursion, a frequently examined skill distinct from just knowing Quicksort\'s O(n log n) average / O(n^2) worst case asymptotic bounds.'
+},
+{
+  id: 'algo-sorting-searching-pyq2',
+  pyqStyle: true,
+  q: 'Merge sort is run on the same array [5, 3, 8, 4, 2, 7, 1, 6] (split at the midpoint each time, standard two-pointer merge). What is the TOTAL number of element comparisons performed during all the merge steps combined?',
+  options: [],
+  kind: 'nat',
+  answer: 17,
+  marks: 2,
+  difficulty: 'hard',
+  type: 'pyq-style',
+  explanation: 'Merge sort first recursively splits [5,3,8,4,2,7,1,6] down to 8 singleton subarrays (no comparisons during pure splitting), then merges bottom-up. Merging pairs of singletons into sorted pairs: (5,3)->1 cmp, (8,4)->1 cmp, (2,7)->1 cmp, (1,6)->1 cmp = 4 comparisons total, producing [3,5],[4,8],[2,7],[1,6]. Merging pairs of sorted-2-lists into sorted-4-lists: merging [3,5] and [4,8] takes 3 comparisons (3 vs 4, 5 vs 4, 5 vs 8) giving [3,4,5,8]; merging [2,7] and [1,6] takes 3 comparisons (2 vs 1, 2 vs 6, 7 vs 6) giving [1,2,6,7] -- subtotal 6 comparisons. Merging the two sorted-4-lists [3,4,5,8] and [1,2,6,7] into the final sorted-8 list takes 7 comparisons (3v1,3v2,3v6,4v6,5v6,5v7,8v7 -- tracing the standard merge pointer walk) giving the fully sorted [1,2,3,4,5,6,7,8]. Total comparisons: 4 + 6 + 7 = 17. This differs from quicksort\'s comparison count (14) on the identical input, illustrating that even though both are Theta(n log n) on average, their EXACT comparison counts on a specific input can differ.'
+},
+{
+  id: 'algo-sorting-searching-pyq3',
+  pyqStyle: true,
+  q: 'Build-Max-Heap is applied to the array [4, 10, 3, 5, 1, 8, 9, 2, 6] using the standard bottom-up (Floyd\'s) heapify procedure. What is the array AFTER Build-Max-Heap completes?',
+  options: ['[10, 6, 9, 5, 1, 8, 3, 2, 4]', '[10, 9, 8, 6, 5, 4, 3, 2, 1]', '[4, 10, 9, 5, 1, 8, 3, 2, 6]', '[9, 10, 8, 6, 5, 4, 3, 2, 1]'],
+  answer: 0,
+  marks: 2,
+  difficulty: 'hard',
+  type: 'pyq-style',
+  explanation: 'Build-Max-Heap calls Max-Heapify on every non-leaf node, starting from index floor(n/2)-1 = 3 down to index 0 (0-indexed array of 9 elements). Heapify(3) on subtree rooted at a[3]=5 with children a[7]=2,a[8]=6: largest is 6 at index 8, swap -> array becomes [4,10,3,6,1,8,9,2,5]. Heapify(2) on a[2]=3 with children a[5]=8,a[6]=9: largest is 9 at index 6, swap -> [4,10,9,6,1,8,3,2,5]. Heapify(1) on a[1]=10 with children a[3]=6,a[4]=1: 10 already largest, no change. Heapify(0) on a[0]=4 with children a[1]=10,a[2]=9: largest is 10 at index 1, swap -> [10,4,9,6,1,8,3,2,5]; recurse into index 1 (value now 4) with children a[3]=6,a[4]=1: largest is 6 at index 3, swap -> [10,6,9,4,1,8,3,2,5]; recurse into index 3 (value now 4) with children a[7]=2 only (index 8 out of subtree range for this node, index 3\'s children are 7 and 8: a[7]=2, a[8]=5): largest between 4,2,5 is 5 at index 8, swap -> [10,6,9,5,1,8,3,2,4]. Final heap array: [10,6,9,5,1,8,3,2,4], matching option 1.'
+},
+{
+  id: 'algo-sorting-searching-pyq4',
+  pyqStyle: true,
+  q: 'Given the max-heap array [10, 6, 9, 5, 1, 8, 3, 2, 4], one EXTRACT-MAX operation is performed (remove the max, move the last element to the root, then sift down). What is the resulting heap array?',
+  options: ['[9, 6, 8, 5, 1, 4, 3, 2]', '[9, 6, 8, 5, 1, 2, 3, 4]', '[6, 9, 8, 5, 1, 4, 3, 2]', '[9, 5, 8, 6, 1, 4, 3, 2]'],
+  answer: 0,
+  marks: 2,
+  difficulty: 'hard',
+  type: 'pyq-style',
+  explanation: 'Extract-Max removes a[0]=10 (the max, to be returned), moves the LAST element (a[8]=4) to the root, and shrinks the heap size to 8: array becomes [4, 6, 9, 5, 1, 8, 3, 2]. Now sift-down (max-heapify) from index 0: children of index 0 are a[1]=6, a[2]=9; largest of {4,6,9} is 9 at index 2, swap -> [9,6,4,5,1,8,3,2]; recurse into index 2 (value now 4) with children a[5]=8, a[6]=3: largest of {4,8,3} is 8 at index 5, swap -> [9,6,8,5,1,4,3,2]; recurse into index 5 (value now 4), which is a leaf (no children within heap size 8, since 2*5+1=11 exceeds the array), so sifting stops. Final heap array after extraction: [9,6,8,5,1,4,3,2], matching option 1. This exact chain of two operations (Build-Max-Heap then one Extract-Max) is a very common two-part GATE-style question testing careful heap manipulation tracing.'
+},
+{
+  id: 'algo-sorting-searching-pyq5',
+  pyqStyle: true,
+  q: 'What is the MINIMUM possible number of comparisons needed, in the worst case, by ANY comparison-based sorting algorithm to sort 7 distinct elements (the information-theoretic lower bound)?',
+  options: [],
+  kind: 'nat',
+  answer: 13,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: 'Any comparison-based sorting algorithm must be able to distinguish between all n! possible orderings of n distinct elements, and each comparison has only 2 possible outcomes, so a decision tree modeling the algorithm must have at least n! leaves and hence height at least ceil(log2(n!)) (since a binary tree of height h has at most 2^h leaves). For n=7: 7! = 5040. log2(5040) ≈ 12.299, so ceil(log2(5040)) = 13. This means NO comparison-based sorting algorithm can sort 7 elements in fewer than 13 comparisons in the worst case, regardless of cleverness -- this is a fundamental INFORMATION-THEORETIC lower bound, not tied to any specific algorithm\'s implementation. Merge sort\'s actual worst-case comparison count for n=7 is close to but can exceed this bound slightly (merge sort is not always comparison-optimal for every n), while more specialized optimal sorting networks or algorithms can sometimes achieve exactly this bound for small n.'
+},
+{
+  id: 'algo-sorting-searching-pyq6',
+  pyqStyle: true,
+  q: 'Which of the following statements about comparison-based sorting lower bounds are TRUE? (Multiple Select Question)',
+  options: [
+    'Any comparison-based sorting algorithm requires Omega(n log n) comparisons in the worst case',
+    'Counting sort and Radix sort can sort in O(n) time because they are NOT comparison-based (they use key values directly, not pairwise comparisons)',
+    'The Omega(n log n) lower bound applies to ALL sorting algorithms, including non-comparison-based ones like Radix sort',
+    'Merge sort and Heap sort both achieve the Theta(n log n) worst-case bound, matching the lower bound asymptotically'
+  ],
+  answers: [0, 1, 3],
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: 'Statement 1 is TRUE: the decision-tree argument (a binary tree with at least n! leaves needs height >= log2(n!) = Omega(n log n) by Stirling\'s approximation) applies to ANY algorithm that only gains information via pairwise comparisons, establishing Omega(n log n) as a universal lower bound for that MODEL of computation. Statement 2 is TRUE: Counting sort and Radix sort achieve O(n) or O(n+k) time precisely because they sidestep the comparison model entirely -- they use the actual VALUES of keys (e.g., as array indices in counting sort, or digit-by-digit bucketing in radix sort) rather than comparing pairs of elements, so the comparison-based lower bound simply does not constrain them. Statement 3 is FALSE: this is exactly the common misconception the question tests -- the Omega(n log n) bound is specific to the COMPARISON-BASED model; algorithms that exploit extra structure (bounded integer keys, fixed digit counts) can and do beat it, achieving linear time under different (reasonable) assumptions about the input. Statement 4 is TRUE: both merge sort and heap sort are comparison-based and achieve Theta(n log n) in the WORST case (unlike quicksort, whose worst case is Theta(n^2) despite Theta(n log n) average case), making them asymptotically optimal comparison-based sorts.'
+},
+{
+  id: 'algo-sorting-searching-pyq7',
+  pyqStyle: true,
+  q: 'Quicksort is applied to an array that is ALREADY SORTED IN ASCENDING ORDER, using the LAST element as the pivot each time. What is the WORST-CASE time complexity for this specific scenario, and why?',
+  options: [
+    'Theta(n^2), because the pivot is always the maximum of its subarray, producing maximally unbalanced partitions (n-1 and 0)',
+    'Theta(n log n), because sorted input is always the best case for Quicksort',
+    'Theta(n), because no swaps are needed on already-sorted input',
+    'Theta(n^2), but only because the FIRST element is used as pivot, not the last'
+  ],
+  answer: 0,
+  marks: 1,
+  difficulty: 'easy',
+  type: 'pyq-style',
+  explanation: 'When the array is already sorted ascending and the LAST element is always chosen as the pivot, that pivot is always the LARGEST element in its current subarray (since everything before it, being sorted ascending, is smaller). Partitioning around the maximum element produces one side with all n-1 other elements and an empty other side -- the most UNBALANCED partition possible. This gives the recurrence T(n) = T(n-1) + T(0) + Theta(n) = T(n-1) + Theta(n), which unrolls to Theta(n^2) (the classic linear-decrease-with-linear-work pattern, same as insertion sort\'s worst case). This is precisely why naive Quicksort implementations that always pick a FIXED position (first or last element) as pivot are considered risky on nearly-sorted or adversarially-crafted input, motivating randomized pivot selection or median-of-three pivot strategies in practice, which make this specific worst-case scenario extremely unlikely.'
+},
+{
+  id: 'algo-sorting-searching-pyq8',
+  pyqStyle: true,
+  q: 'A sorting algorithm is described as STABLE. Which of the following statements correctly explains what this means, and which of the standard algorithms listed is/are stable? (Multiple Select Question)',
+  options: [
+    'A stable sort preserves the RELATIVE ORDER of elements that compare as equal',
+    'Merge sort (with a standard <= comparison in the merge step) is stable',
+    'Standard in-place Heap sort and standard Quicksort (Lomuto/Hoare partition) are typically NOT stable',
+    'Stability is only relevant when sorting arrays of primitive numbers with no associated data'
+  ],
+  answers: [0, 1, 2],
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: 'Statement 1 correctly defines stability: a sort is stable if, whenever two elements are considered EQUAL by the comparison used, their relative order in the output matches their relative order in the input (important when sorting records/objects by one field, wanting ties broken by original order). Statement 2 is TRUE: merge sort, when its merge step consistently takes from the LEFT sublist on ties (using <= rather than <), never reorders equal elements relative to each other, making it stable. Statement 3 is TRUE: heap sort\'s repeated extract-max/swap-with-last operations, and quicksort\'s partitioning (which swaps elements across large jumps based on pivot comparisons), both routinely move equal elements past each other in ways that do not preserve original relative order -- both are standardly considered NOT stable (though quicksort CAN be made stable with extra space/tricks, that is not the default implementation). Statement 4 is FALSE: stability matters most precisely when sorting composite records by a subset of fields (e.g., sorting employee records by department while wanting ties within a department to remain in original name order) -- it is irrelevant only for pure primitive values with no distinguishing "identity" beyond their value, which is the opposite of when stability actually matters.'
+},
+{
+  id: 'algo-sorting-searching-pyq9',
+  pyqStyle: true,
+  q: 'Counting Sort is used to sort an array of 20 elements, where each element is an integer in the range [0, 9]. What is the TIGHT time complexity, expressed in terms of n=20 (number of elements) and k=10 (range size)?',
+  options: ['Theta(n + k)', 'Theta(n log n)', 'Theta(n * k)', 'Theta(k log k)'],
+  answer: 0,
+  marks: 1,
+  difficulty: 'easy',
+  type: 'pyq-style',
+  explanation: 'Counting sort works by: (1) initializing a count array of size k (here k=10, for values 0 through 9) and counting occurrences of each value, taking Theta(n) to scan the input plus Theta(k) to initialize the count array; (2) computing prefix sums over the count array, taking Theta(k); (3) placing each of the n input elements into its correct output position using the (adjusted) counts, taking Theta(n). Summing all phases: Theta(n) + Theta(k) + Theta(k) + Theta(n) = Theta(n + k). For n=20 and k=10, this is Theta(30) = Theta(n) in this specific case since n and k are comparable in size, but the general tight bound in terms of both parameters is Theta(n+k) -- crucially NOT Theta(n*k) (which would be pessimistic) nor Theta(n log n) (that bound applies to comparison-based sorts; counting sort is not comparison-based and can beat that bound when k = O(n)).'
+},
+{
+  id: 'algo-sorting-searching-pyq10',
+  pyqStyle: true,
+  q: 'Radix Sort is used to sort n integers, each having d digits (in some fixed base), using Counting Sort as the stable subroutine for each digit position (base b, so each digit is in range [0, b-1]). What is the TIGHT overall time complexity?',
+  options: ['Theta(d * (n + b))', 'Theta(n log n)', 'Theta(d * n * b)', 'Theta(n^2)'],
+  answer: 0,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: 'Radix sort processes the d digit positions one at a time (typically from least significant to most significant), running a STABLE sort (counting sort) on each digit position. Each single counting-sort pass over n numbers, with each digit in range [0,b-1] (so b distinct digit values), costs Theta(n+b) as established for counting sort. Since there are d such passes (one per digit position), and each pass\'s stability is essential to guarantee overall correctness (preserving the sorted order established by less-significant digits when sorting by a more-significant digit), the total time is d * Theta(n+b) = Theta(d*(n+b)). This is why radix sort is advantageous specifically when d is small (few digits/passes needed) and b is not too large relative to n (each pass stays cheap) -- for example, sorting n numbers each with d=O(log_b(max value)) digits can beat Theta(n log n) comparison sorts when the maximum value is polynomially bounded in n, since d then becomes O(log n / log b), and choosing b=Theta(n) makes each pass Theta(n) and the number of passes Theta(log n / log n) = O(1), giving overall Theta(n) -- a classic "beating the comparison lower bound via structure" argument.'
+},
+{
+  id: 'algo-sorting-searching-pyq11',
+  pyqStyle: true,
+  q: 'A sorted array of 1000 distinct integers is searched using BINARY SEARCH for a value known to be present. What is the MAXIMUM number of iterations (comparisons against the target) the search can take?',
+  options: [],
+  kind: 'nat',
+  answer: 10,
+  marks: 1,
+  difficulty: 'easy',
+  type: 'pyq-style',
+  explanation: 'The worst-case number of comparisons for binary search on n elements is floor(log2(n)) + 1. For n=1000: since 2^9=512 and 2^10=1024, we have 512 <= 1000 < 1024, so floor(log2(1000)) = 9, giving worst-case comparisons = 9+1 = 10. Intuitively, each comparison discards (at least) half of the remaining candidate range, so after k comparisons, at most ceil(n/2^k) candidates remain (roughly); the search needs enough halvings to shrink the search space from 1000 down to a single element, requiring exactly ceil(log2(1000+1)) = 10 comparisons in the worst case (searching for the value at one of the extreme "hardest to find quickly" positions). This is a standard NAT-format question drilling the precise comparison-count formula, distinct from just knowing the Theta(log n) asymptotic class.'
+},
+{
+  id: 'algo-sorting-searching-pyq12',
+  pyqStyle: true,
+  q: 'Which of the following statements comparing Quicksort and Merge Sort are TRUE? (Multiple Select Question)',
+  options: [
+    'Merge sort has Theta(n log n) time complexity in ALL cases (best, average, worst), while Quicksort\'s worst case is Theta(n^2)',
+    'Merge sort typically requires Theta(n) additional (auxiliary) space, while a well-implemented in-place Quicksort needs only O(log n) additional space (for the recursion stack)',
+    'Quicksort is generally preferred in practice for in-memory array sorting due to better cache locality and lower constant factors, despite its worse worst-case bound',
+    'Merge sort cannot be used to sort linked lists efficiently, unlike Quicksort'
+  ],
+  answers: [0, 1, 2],
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: 'Statement 1 is TRUE: merge sort\'s divide-always-in-half-then-merge structure gives Theta(n log n) regardless of input arrangement (the recurrence T(n)=2T(n/2)+Theta(n) does not depend on data values at all), while quicksort\'s partition sizes DO depend on pivot choice relative to data, degrading to Theta(n^2) when partitions are maximally unbalanced (e.g., already-sorted input with naive pivot selection). Statement 2 is TRUE: merge sort\'s merge step conventionally needs an auxiliary array of size Theta(n) to merge two sorted halves without overwriting unread elements, while in-place quicksort partitions within the original array, needing only recursion-stack space, which is O(log n) on average (and can be bounded to O(log n) worst-case too, with the "recurse on smaller half first" tail-call optimization trick). Statement 3 is TRUE and reflects real-world practice: despite merge sort\'s better worst-case guarantee, quicksort\'s in-place operation (better cache behavior, less memory allocation/copying overhead) and smaller constant factors make it the more commonly used default in many standard library implementations for arrays (though many production sorts are hybrids, like Introsort, that fall back to heap sort to avoid quicksort\'s worst case). Statement 4 is FALSE: merge sort is actually PARTICULARLY well-suited to linked lists (merging two sorted linked lists needs only O(1) extra space via pointer rearrangement, unlike arrays), while quicksort\'s in-place partitioning advantage is specific to random-access arrays and is much less natural/efficient on linked lists (no O(1) random access for partitioning).'
+}
+);
+
+window.GATE_DATA.questions['algo'].topics.find(function(t){return t.id==='algo-graph';}).questions.push(
+{ id: 'algo-graph-h1', q: 'A weighted undirected graph on vertices {A,B,C,D} has edges A-B (weight 1), A-C (weight 1), B-C (weight 1), B-D (weight 2), C-D (weight 2). How many DISTINCT Minimum Spanning Trees does this graph have?', options: [], answer: 6, marks: 2, difficulty: 'hard', type: 'numerical', kind: 'nat', explanation: 'The minimum possible spanning tree weight is 4: any spanning tree needs exactly 3 edges (n-1 for n=4 vertices), and since {A,B,C} forms a triangle of weight-1 edges, choosing any 2 of those 3 edges keeps A,B,C connected using only weight-1 edges (total 2), then exactly one weight-2 edge (either B-D or C-D) is needed to bring in D, for a minimum total of 2+2=4. Any spanning tree using fewer weight-1 edges or a higher-weight combination costs strictly more. Counting the choices: there are C(3,2)=3 ways to choose 2 of the 3 triangle edges (each choice keeps {A,B,C} connected, since removing any ONE edge from a triangle still leaves it connected), and independently 2 ways to choose which weight-2 edge (B-D or C-D) attaches D -- by the multiplication principle, 3 * 2 = 6 distinct MSTs, all sharing the same minimum weight of 4 but differing in exact edge composition. This is a direct enumeration/counting exercise that a generic "run Kruskal\'s once" approach misses entirely, since Kruskal\'s (or Prim\'s) only ever returns ONE such tree per run, and counting how MANY equally-optimal trees exist requires reasoning about which tie-breaking choices are actually safe (i.e., which edges can be swapped without changing the total weight or breaking connectivity).' },
+{ id: 'algo-graph-h2', q: 'A directed graph has edges S->A (weight 1), A->B (weight 2), S->C (weight 4), C->B (weight -10). Running Dijkstra\'s algorithm from S (which permanently finalizes a vertex the moment it is popped as the current minimum-distance unfinalized vertex, and never revisits a finalized vertex even if a cheaper path is discovered later), what shortest-distance value does Dijkstra report for B, and what is the ACTUAL shortest distance from S to B?', options: ['Dijkstra reports 3; the actual shortest distance is -6', 'Dijkstra reports -6; the actual shortest distance is -6 (Dijkstra is correct here)', 'Dijkstra reports 3; the actual shortest distance is 3', 'Dijkstra reports -10; the actual shortest distance is -6'], answer: 0, marks: 2, difficulty: 'hard', type: 'trace', explanation: 'Trace Dijkstra exactly: dist[S]=0, finalize S; relax S->A giving dist[A]=1, and S->C giving dist[C]=4. The next vertex chosen is whichever UNFINALIZED vertex has the smallest tentative distance: A (1) is smaller than C (4), so A is finalized next. Relaxing A->B gives dist[B]=1+2=3. Now the smallest unfinalized distance is B (3), which is smaller than C (4) -- so Dijkstra finalizes B NEXT, permanently locking in dist[B]=3, even though C has not been explored yet. Only afterward does C get finalized (dist[C]=4), and relaxing C->B would give 4+(-10)=-6 -- but B is ALREADY finalized, so Dijkstra\'s algorithm, by design, never revisits it, and the reported answer for B remains the WRONG value 3. The true shortest path S->C->B costs 4 + (-10) = -6, strictly better than S->A->B\'s cost of 3. This is the canonical witness showing Dijkstra\'s greedy "finalize and never reconsider" strategy is provably INCORRECT in the presence of negative edge weights -- the fix requires Bellman-Ford (or a Dijkstra variant with re-insertion, which loses the efficiency guarantee), not just "using a min-heap version of Dijkstra", since the finalization logic itself is the flaw, not the data structure used to find the minimum.' },
+{ id: 'algo-graph-h3', q: 'An undirected graph has 8 vertices {1..8} and edges: 1-2, 2-3, 3-1 (a triangle), 3-4, 4-5, 5-6, 6-4 (another triangle), 4-7, 7-8. Which of the following vertices are ARTICULATION POINTS (cut vertices, whose removal increases the number of connected components)? Select all that apply.', options: ['Vertex 1', 'Vertex 3', 'Vertex 4', 'Vertex 7', 'Vertex 8'], answers: [1, 2, 3], marks: 2, difficulty: 'hard', type: 'trace', explanation: 'Check each candidate by mentally removing it and testing connectivity of what remains. Removing vertex 1: vertices 2 and 3 are still directly connected by edge 2-3, and the rest of the graph is untouched -- still ONE connected piece, so vertex 1 is NOT an articulation point (it sits on a triangle, which has redundant connectivity). Removing vertex 3: the only edges linking {1,2} to {4,5,6,7,8} passed through vertex 3 (via edges 3-1/3-2 on one side and 3-4 on the other) -- with vertex 3 gone, {1,2} becomes completely isolated from the rest, splitting the graph into 2 components: vertex 3 IS an articulation point. Removing vertex 4: it is the sole connector between THREE otherwise-independent pieces -- {1,2,3} (via the now-cut 3-4 edge), {5,6} (via the now-cut 4-5/4-6 edges), and {7,8} (via the now-cut 4-7 edge) -- removing it creates 3 separate components: vertex 4 IS an articulation point (and a particularly strong one, splitting into three pieces rather than just two). Removing vertex 7: it is the sole bridge between {1,2,3,4,5,6} and vertex 8 -- removing it isolates vertex 8 alone, splitting into 2 components: vertex 7 IS an articulation point. Removing vertex 8: it is a LEAF (degree 1), and removing any leaf can never disconnect the remaining graph, since a leaf by definition has nothing depending on it as a through-path: vertex 8 is NOT an articulation point. So the articulation points are 3, 4, and 7.' },
+{ id: 'algo-graph-h4', q: 'A directed graph has 4 vertices {S,A,B,C} and edges S->A (weight 1), A->B (weight 2), B->C (weight -4), C->A (weight 1) -- note A,B,C form a cycle with total weight 2-4+1 = -1, a NEGATIVE CYCLE. Bellman-Ford is run from S, performing the standard V-1=3 relaxation passes (scanning all 4 edges in the listed order each pass), after which dist = {S:0, A:-2, B:1, C:-3}. If a 4th (EXTRA) relaxation pass is performed, which edges still successfully relax (produce a strictly smaller distance)? Select all that apply.', options: ['S->A', 'A->B', 'B->C', 'C->A'], answers: [1, 2, 3], marks: 2, difficulty: 'hard', type: 'trace', explanation: 'After the standard V-1=3 passes, distances are S:0, A:-2, B:1, C:-3. On a 4th pass, check each edge using these values: S->A checks if dist[S]+1 < dist[A], i.e. 0+1=1 < -2? FALSE -- this edge does NOT relax further (the path S->A itself, not involving the cycle, has already fully converged since it is not part of the negative cycle). A->B checks dist[A]+2 < dist[B], i.e. -2+2=0 < 1? TRUE -- this edge DOES relax, updating dist[B] to 0. B->C checks dist[B]+(-4) < dist[C] using the JUST-UPDATED dist[B]=0: 0-4=-4 < -3? TRUE -- relaxes, updating dist[C] to -4. C->A checks dist[C]+1 < dist[A] using the JUST-UPDATED dist[C]=-4: -4+1=-3 < -2? TRUE -- relaxes, updating dist[A] to -3. So THREE of the four edges (A->B, B->C, C->A -- precisely the edges forming the negative cycle) continue to relax indefinitely on every subsequent pass, which is EXACTLY the diagnostic Bellman-Ford uses to detect a negative cycle: if ANY edge still relaxes on the Vth pass (after the V-1 passes that would suffice for a cycle-free graph), a negative-weight cycle reachable from the source must exist. S->A, not being part of the cycle, correctly stops relaxing after its one true update in pass 1.' },
+{ id: 'algo-graph-h5', q: 'A directed graph has 8 vertices {1..8} and edges: 1->2, 2->3, 3->1, 3->4, 4->5, 5->6, 6->4, 6->7, 7->8, 8->6. How many STRONGLY CONNECTED COMPONENTS does this graph have?', options: [], answer: 2, marks: 2, difficulty: 'hard', type: 'numerical', kind: 'nat', explanation: 'A strongly connected component (SCC) is a maximal set of vertices where every vertex can reach every other vertex via directed edges. First, {1,2,3} clearly forms one SCC via the cycle 1->2->3->1. Now examine {4,5,6,7,8}: there is a cycle 4->5->6->4, AND a separate cycle 6->7->8->6, and these two cycles SHARE vertex 6 -- this sharing is the crux of the question. Because they share vertex 6, mutual reachability extends across BOTH cycles: vertex 4 can reach vertex 8 (via 4->5->6->7->8), and vertex 8 can reach vertex 4 (via 8->6->4) -- so 4 and 8 (and everything in between) are mutually reachable, merging {4,5,6} and {6,7,8} into ONE single SCC {4,5,6,7,8}, not two separate ones. The one-way edge 3->4 connects the two SCCs but has no return path (nothing in {4,5,6,7,8} can reach back to {1,2,3}), so it does NOT merge them together. Final count: 2 SCCs -- {1,2,3} and {4,5,6,7,8}. The trap is assuming two cycles that only PARTIALLY overlap in vertices (like 4-5-6 and 6-7-8, sharing just vertex 6) remain separate SCCs -- shared-vertex cycles always merge into a single larger SCC, since mutual reachability is transitive through the shared vertex.' },
+{ id: 'algo-graph-h6', q: 'Kruskal\'s algorithm runs on 6 vertices {1..6} with edges processed in this exact order (already sorted by weight, ties broken by listed order): (1,2,w=1), (3,4,w=1), (5,6,w=1), (1,3,w=2), (2,4,w=2), (4,5,w=2), (1,6,w=3), (2,6,w=3), (3,6,w=4). Using union-find to detect cycles, which of these edges get REJECTED (skipped because both endpoints are already in the same component)? Select all that apply.', options: ['(2,4,w=2)', '(1,6,w=3)', '(2,6,w=3)', '(3,6,w=4)', '(4,5,w=2)'], answers: [0, 1, 2, 3], marks: 2, difficulty: 'hard', type: 'trace', explanation: 'Track components with union-find as edges process in order. (1,2,1): different components {1},{2} -> union, ACCEPT. (3,4,1): different components -> union, ACCEPT. (5,6,1): different -> union, ACCEPT. Now components are {1,2},{3,4},{5,6}. (1,3,2): different ({1,2} vs {3,4}) -> union, ACCEPT; now {1,2,3,4},{5,6}. (2,4,2): both 2 and 4 are ALREADY in the same component {1,2,3,4} -> REJECT (would form a cycle). (4,5,2): 4 is in {1,2,3,4}, 5 is in {5,6} -- DIFFERENT components -> union, ACCEPT; now everything merges into {1,2,3,4,5,6}, a full spanning tree with exactly 5 edges already accepted. (1,6,3): both now in the SAME single component -> REJECT. (2,6,3): same component -> REJECT. (3,6,4): same component -> REJECT. So the rejected edges are (2,4,2), (1,6,3), (2,6,3), and (3,6,4) -- four rejections total, while (4,5,2) is CORRECTLY ACCEPTED since it is the edge that finally connects the last two separate components together. The trap is assuming ALL weight-2-or-higher edges beyond the first few get rejected once a spanning tree "looks complete" -- (4,5,2) is essential and must be accepted despite arriving after other same-weight edges, because it alone bridges the two remaining components at that point.' }
+);
+
+window.GATE_DATA.questions['algo'].topics.find(function(t){return t.id==='algo-dp';}).questions.push(
+{ id: 'algo-dp-h1', q: 'For the Longest Increasing Subsequence DP on array [3, 1, 4, 1, 5, 9, 2, 6] (0-indexed), where dp[i] = length of the longest increasing subsequence ENDING exactly at index i, what is dp[6] (for the element 2), and what is the overall LIS length (max over all dp[i])?', options: ['dp[6] = 2, LIS length = 4', 'dp[6] = 3, LIS length = 4', 'dp[6] = 2, LIS length = 3', 'dp[6] = 1, LIS length = 4'], answer: 0, marks: 2, difficulty: 'hard', type: 'numerical', explanation: 'Compute the full dp array: dp[0]=1 (just "3"). dp[1]=1 ("1" alone, since 1 is not > 3). dp[2]=2 (3 then 4, since 3<4; 1 also <4 but only extends dp[1]=1 to 2 as well -- either way dp[2]=2). dp[3]=1 ("1" alone again, nothing before it is smaller). dp[4]=3 (best predecessor ending below 5 is dp[2]=2 for "3,4", extending to "3,4,5"). dp[5]=4 (best predecessor below 9 is dp[4]=3 for "3,4,5", extending to "3,4,5,9"). dp[6]: for the element 2 at index 6, we must scan ALL earlier indices j<6 with a[j]<2 -- only a[1]=1 and a[3]=1 qualify (both equal to 1, less than 2), each with dp[j]=1, so dp[6] = 1+1 = 2 (NOT influenced by 9 at index5, since 9 is not less than 2 -- a classic trap of only checking the IMMEDIATELY PRECEDING element instead of scanning every earlier smaller element). Finally dp[7]=4 (6 extends "3,4,5" since 5<6, giving dp[4]+1=4). The overall LIS length is max(dp) = 4 (e.g., "3,4,5,9" or "3,4,5,6" or "1,4,5,9"), unaffected by the small dp[6]=2 value.' },
+{ id: 'algo-dp-h2', q: 'For the edit-distance DP between "SUNDAY" and "SATURDAY" (dp[i][j] = edit distance between the first i characters of "SUNDAY" and the first j characters of "SATURDAY", with dp[i][0]=i and dp[0][j]=j as base cases), what is dp[3][5] (comparing "SUN" against "SATUR"), and which single edit operation\'s DP transition determines this value?', options: ['dp[3][5] = 3, determined by a SUBSTITUTION (the diagonal dp[2][4]+1, since the 3rd char of "SUN" (N) differs from the 5th char of "SATUR" (U))', 'dp[3][5] = 3, determined by an INSERTION (dp[3][4]+1)', 'dp[3][5] = 4, determined by a SUBSTITUTION (dp[2][4]+1)', 'dp[3][5] = 3, determined by a DELETION (dp[2][5]+1)'], answer: 0, marks: 2, difficulty: 'hard', type: 'numerical', explanation: 'dp[3][5] compares "SUN" (i=3, last char N) against "SATUR" (j=5, last char U). Since N != U, dp[3][5] = 1 + min(dp[2][5], dp[3][4], dp[2][4]) -- the three options correspond to deletion (drop N: dp[2][5]), insertion (insert U: dp[3][4]), and substitution (replace N with U: dp[2][4]). Building the table up to this point: dp[2][4]=2 ("SU" vs "SATU"), dp[2][5]=3 ("SU" vs "SATUR"), dp[3][4]=3 ("SUN" vs "SATU"). The minimum of {3, 3, 2} is 2 (from dp[2][4], the DIAGONAL/substitution option), so dp[3][5] = 1 + 2 = 3, and the operation that achieves this minimum is SUBSTITUTION, not insertion or deletion. The trap is twofold: computing the correct numeric value 3 is only half the question -- correctly identifying WHICH of the three predecessor cells achieved that minimum (here uniquely the diagonal, since 2 < 3) requires comparing all three explicitly rather than assuming insertion/deletion (the "off-diagonal" options) are always preferred, or assuming ties exist when they do not.' },
+{ id: 'algo-dp-h3', q: 'For 0/1 Knapsack with items (weight,value) = (2,3), (3,4), (4,5), (5,6) and capacity W=8, using the standard dp[i][w] = best value using the first i items with capacity w, what is dp[2][5] (using only the first 2 items, weight,value = (2,3) and (3,4), with capacity 5), and which items does this value actually include?', options: ['dp[2][5] = 7, including BOTH item 1 (weight 2, value 3) and item 2 (weight 3, value 4)', 'dp[2][5] = 7, including only item 2 (weight 3, value 4), since it has the higher value', 'dp[2][5] = 4, including only item 2', 'dp[2][5] = 3, including only item 1'], answer: 0, marks: 2, difficulty: 'hard', type: 'numerical', explanation: 'dp[2][5] = max(dp[1][5] [skip item 2], dp[1][5-3] + 4 [take item 2, weight 3, value 4]). dp[1][5] (only item 1, weight 2 value 3, capacity 5) = 3 (item 1 fits with room to spare, but there is no other item available yet to fill the rest). dp[1][2] (only item 1, capacity 2) = 3 (item 1 exactly fits). So dp[2][5] = max(3, dp[1][2] + 4) = max(3, 3 + 4) = max(3, 7) = 7. Crucially, the "take item 2" branch used dp[1][2] = 3, which itself already includes item 1 (weight 2 fits exactly within the remaining capacity of 2 after reserving 3 for item 2) -- so the value 7 = 3 (item 1) + 4 (item 2) genuinely comes from including BOTH items, whose combined weight 2+3=5 exactly fills the capacity. The trap is assuming the DP recurrence\'s "take item i" branch only ever contributes item i alone -- it actually recursively carries forward whatever OPTIMAL combination of earlier items fits in the remaining capacity, which here happens to be item 1 as well, not "nothing" or "just the higher-value single item".' },
+{ id: 'algo-dp-h4', q: 'For the Longest Common Subsequence DP between A="ABCBDAB" and B="BDCABA" (dp[i][j] using the first i characters of A and first j characters of B), what is dp[4][3] (comparing "ABCB" against "BDC"), and what is the LCS length of the FULL strings A and B?', options: ['dp[4][3] = 2, full LCS length = 4', 'dp[4][3] = 4, full LCS length = 4', 'dp[4][3] = 2, full LCS length = 2', 'dp[4][3] = 3, full LCS length = 4'], answer: 0, marks: 2, difficulty: 'hard', type: 'numerical', explanation: '"ABCB" (first 4 chars of A) and "BDC" (first 3 chars of B) share the common subsequence "BC" (B at position 1 of "ABCB", C at position 2; B at position 0 of "BDC", C at position 2 -- both in matching relative order), and no length-3 common subsequence exists between just these two short prefixes, so dp[4][3] = 2. This is a DIFFERENT quantity from the LCS of the FULL strings A="ABCBDAB" (7 chars) and B="BDCABA" (6 chars), which is dp[7][6] = 4 (a well-known worked example, with one valid LCS being "BCBA" or "BDAB", both length 4) -- computed by continuing the same recurrence all the way to the bottom-right corner of the table using the remaining, longer suffixes of both strings, which supply additional matching characters (A, B) beyond what the short "ABCB" vs "BDC" prefixes alone could capture. The trap is confusing an INTERMEDIATE dp cell (a subproblem on truncated prefixes) with the FINAL answer (the full-string LCS length) -- they are computed by the exact same recurrence but represent answers to genuinely different, smaller versus complete, subproblems.' },
+{ id: 'algo-dp-h5', q: 'Six matrices A1..A6 have dimensions given by the sequence [30, 35, 15, 5, 10, 20, 25] (Ai has dimensions dims[i-1] x dims[i]). The matrix-chain-multiplication DP finds the optimal parenthesization costs 15125 scalar multiplications (splitting the full product at k=3, i.e. as (A1A2A3)(A4A5A6)). What is the cost of the NAIVE strictly-left-to-right parenthesization ((((( A1A2 )A3 )A4 )A5 )A6), and by roughly what factor is the optimal parenthesization cheaper?', options: [], answer: 40500, marks: 2, difficulty: 'hard', type: 'numerical', kind: 'nat', explanation: 'Left-to-right multiplication computes ((((( A1A2 )A3 )A4 )A5 )A6) step by step, tracking the running result\'s dimensions and adding each step\'s scalar-multiplication cost (rows_of_left * cols_of_left * cols_of_right): A1A2 (30x35 times 35x15) costs 30*35*15=15750, giving a 30x15 result. Multiplying by A3 (30x15 times 15x5) costs 30*15*5=2250, giving 30x5. Multiplying by A4 (30x5 times 5x10) costs 30*5*10=1500, giving 30x10. Multiplying by A5 (30x10 times 10x20) costs 30*10*20=6000, giving 30x20. Multiplying by A6 (30x20 times 20x25) costs 30*20*25=15000, giving the final 30x25 result. Total naive cost: 15750+2250+1500+6000+15000 = 40500. Comparing to the DP-optimal cost of 15125, the naive left-to-right approach costs roughly 2.68 times MORE scalar multiplications purely due to parenthesization choice -- the matrices themselves and the final result are identical, but the INTERMEDIATE matrix sizes produced by different groupings vary enormously, which is exactly why matrix-chain DP matters even though multiplication is associative (the RESULT is the same regardless of parenthesization, but the COST is not).' },
+{ id: 'algo-dp-h6', q: 'A 4x4 grid has obstacles (impassable cells) at positions (1,1) and (2,3) (0-indexed, row, column), with start at (0,0) and destination (3,3). Movement is only RIGHT or DOWN at each step. Using dp[i][j] = number of paths to reach (i,j), with dp[i][j] = 0 whenever (i,j) is an obstacle (regardless of what dp[i-1][j] + dp[i][j-1] would otherwise compute), how many total distinct paths are there from (0,0) to (3,3)?', options: [], answer: 4, marks: 2, difficulty: 'hard', type: 'numerical', kind: 'nat', explanation: 'Build the dp grid row by row. Row 0: dp[0][0]=1 (start), dp[0][1]=1, dp[0][2]=1, dp[0][3]=1 (only one way to reach any cell in the top row: move right repeatedly). Row 1: dp[1][0]=1 (only from above); dp[1][1]=0 because it is an OBSTACLE -- this is the critical trap: the cell is FORCIBLY zeroed out regardless of the sum dp[0][1]+dp[1][0]=1+1=2 that the plain recurrence would otherwise compute, since no path may pass THROUGH an obstacle; dp[1][2]=dp[0][2]+dp[1][1]=1+0=1; dp[1][3]=dp[0][3]+dp[1][2]=1+1=2. Row 2: dp[2][0]=1; dp[2][1]=dp[1][1]+dp[2][0]=0+1=1; dp[2][2]=dp[1][2]+dp[2][1]=1+1=2; dp[2][3]=0 because it is ALSO an obstacle (again forced to 0, ignoring dp[1][3]+dp[2][2]=2+2=4). Row 3: dp[3][0]=1; dp[3][1]=dp[2][1]+dp[3][0]=1+1=2; dp[3][2]=dp[2][2]+dp[3][1]=2+2=4; dp[3][3]=dp[2][3]+dp[3][2]=0+4=4. Final answer: 4 distinct paths. The trap is forgetting to forcibly zero BOTH obstacle cells (a common slip is to zero only the first one encountered), which would otherwise let "phantom" paths silently pass straight through a blocked cell.' }
+);
+
+window.GATE_DATA.questions['algo'].topics.find(function(t){return t.id==='algo-asymptotic';}).questions.push(
+{ id: 'algo-asymptotic-h1', q: 'For n=8, consider:\n\ncount = 0;\nfor (i = 1; i <= n; i++)\n  for (j = 1; j <= n; j += i)\n    count++;\n\nWhat is the EXACT final value of count?', options: [], answer: 24, marks: 2, difficulty: 'hard', type: 'numerical', kind: 'nat', explanation: 'This is the classic HARMONIC-series loop pattern, where the inner loop for a given i runs floor((n-1)/i)+1 times (starting at j=1 and stepping by i until exceeding n). Compute each i individually for n=8: i=1: j=1,2,...,8 -- 8 iterations. i=2: j=1,3,5,7 -- 4 iterations (next would be 9>8). i=3: j=1,4,7 -- 3 iterations (next is 10>8). i=4: j=1,5 -- 2 iterations (next is 9>8). i=5: j=1,6 -- 2 iterations (next is 11>8). i=6: j=1,7 -- 2 iterations. i=7: j=1,8 -- 2 iterations. i=8: j=1 -- 1 iteration (next is 9>8). Summing: 8+4+3+2+2+2+2+1 = 24. The trap is reaching for the ASYMPTOTIC formula n*ln(n) (which gives only about 16.6 for n=8, since the true harmonic sum n*H_n uses H_n = 1+1/2+1/3+...+1/n = ln(n)+0.577... (Euler-Mascheroni constant), not the plain natural log alone) and mistaking that approximation for the EXACT count -- Theta(n log n) correctly describes the GROWTH RATE for large n, but is not a substitute for direct term-by-term counting when an EXACT small-n value is asked for.' },
+{ id: 'algo-asymptotic-h2', q: 'For n=1024, consider:\n\ncount = 0;\nfor (i = 2; i <= n; i *= 2)\n  for (j = 2; j <= i; j *= 2)\n    count++;\n\nWhat is the EXACT final value of count?', options: [], answer: 55, marks: 2, difficulty: 'hard', type: 'numerical', kind: 'nat', explanation: 'The outer loop runs with i taking the values 2, 4, 8, 16, ..., 1024 -- that is 2^1, 2^2, ..., 2^10, exactly 10 values (since 2*2^9=1024 <= 1024 and the next value 2048 exceeds n). For EACH such i = 2^k (k from 1 to 10), the inner loop runs with j = 2, 4, ..., up to i = 2^k, i.e. j takes values 2^1 through 2^k -- exactly k iterations. So the total count is the sum k=1 to 10 of k, i.e. 1+2+3+...+10 = 10*11/2 = 55. The trap is assuming this is simply "log(n) * log(n)" (giving 10*10=100, treating the inner loop as always running the FULL log(n) times) rather than recognizing the inner loop\'s length itself GROWS with the outer loop\'s current position, forming a TRIANGULAR sum of the log-log form rather than a flat rectangular product -- this halves the naive product-based estimate (100 vs the true 55, matching the familiar triangular-number pattern m(m+1)/2 applied to the number of outer iterations m=10).' },
+{ id: 'algo-asymptotic-h3', q: 'Consider the recurrence T(n) = 2T(n/2) + n/log(n), with T(1)=1. Why does the standard 3-case Master Theorem FAIL to directly resolve this recurrence, and what is its actual asymptotic solution (derivable via a recursion-tree argument)?', options: ['Master Theorem fails because f(n)=n/log(n) is not polynomially comparable to n^log_2(2)=n by any POSITIVE or NEGATIVE constant polynomial factor, nor does it match the required log^k(n) form for a non-negative INTEGER k; a recursion-tree sum gives T(n) = Theta(n log log n)', 'Master Theorem fails because a=2 is not a perfect power of b=2; the true answer is T(n) = Theta(n)', 'Master Theorem actually DOES directly apply here via Case 2, giving T(n) = Theta(n log n)', 'Master Theorem fails because n/log(n) is not defined for n=1; the recurrence has no valid asymptotic solution'], answer: 0, marks: 2, difficulty: 'hard', type: 'concept', explanation: 'Comparing f(n)=n/log(n) against n^(log_2 2) = n^1: Case 1 needs f(n) = O(n^(1-epsilon)) for some epsilon>0 (false, since n/log(n) is NOT polynomially smaller than n -- dividing by log(n) is too weak a reduction). Case 3 needs f(n) = Omega(n^(1+epsilon)) (also false, n/log(n) is smaller than n, not larger). Case 2 requires f(n) = Theta(n^1 * log^k(n)) for some INTEGER k >= 0 -- but n/log(n) = n * log^(-1)(n), a NEGATIVE exponent on the log factor, which falls outside the basic case-2 statement entirely. So none of the three basic cases apply -- the recurrence sits in a genuine "gap" the elementary theorem cannot close. Solving via a recursion tree instead: at recursion depth i, there are 2^i subproblems each of size n/2^i, each contributing (n/2^i)/log(n/2^i) work, and the total work at that level is 2^i * (n/2^i)/log(n/2^i) = n/log(n/2^i) = n/(log(n) - i). Summing this over i=0 to log(n)-1 gives n * sum_{k=1}^{log n} 1/k = n * H_{log n} = Theta(n log log n), using the harmonic-sum approximation H_m = Theta(log m) with m=log(n).' },
+{ id: 'algo-asymptotic-h4', q: 'Consider the recurrence T(n) = T(n/3) + T(2n/3) + n, with T(1)=1. Since the two recursive calls have DIFFERENT subproblem sizes (n/3 and 2n/3, not both n/b for a single common b), the standard Master Theorem does not apply in its basic form. What is the correct asymptotic solution, and why?', options: ['T(n) = Theta(n log n) -- because a recursion tree shows every level sums to exactly n regardless of how unevenly it splits, and the tree\'s depth is Theta(log n) (bounded between log_3(n) on the fastest-shrinking path and log_(3/2)(n) on the slowest-shrinking path, both Theta(log n))', 'T(n) = Theta(n) -- because the SMALLER subproblem (n/3) dominates the recursion and the larger one contributes negligibly', 'T(n) = Theta(n^2) -- unequal splits always degrade to quadratic behavior, similar to unbalanced Quicksort partitioning', 'The recurrence has no asymptotic solution since Master Theorem requires equal-sized subproblems'], answer: 0, marks: 2, difficulty: 'hard', type: 'concept', explanation: 'Even though the two branches shrink at different rates, the KEY recursion-tree observation is that the TOTAL work done at any single level of the tree is exactly n (each node\'s own "+n" term partitions into an n/3 piece and a 2n/3 piece at the next level down, and n/3 + 2n/3 = n is conserved level by level, mirroring how a single node\'s local work of size n splits without loss into its children\'s combined problem sizes). The tree is NOT balanced -- the leftmost path (always taking the n/3 branch) reaches a base case after log_3(n) levels, while the rightmost path (always taking the 2n/3 branch) takes log_(3/2)(n) levels, which is LONGER -- but both log_3(n) and log_(3/2)(n) are Theta(log n) (differing only by a constant factor, since log_b(n) = log(n)/log(b) for any constant base b). Since every level contributes exactly n and there are Theta(log n) levels (bounded above and below by Theta(log n) quantities), the total work is n * Theta(log n) = Theta(n log n) -- IDENTICAL to the balanced T(n)=2T(n/2)+n case, illustrating that Master-Theorem-style results can often survive even fairly extreme imbalance in the split, as long as EVERY level still sums to the same f(n).' },
+{ id: 'algo-asymptotic-h5', q: 'Consider the recurrence T(n) = T(sqrt(n)) + 1, with T(2)=1. The Master Theorem does not apply at all here, since the subproblem size is sqrt(n), not n/b for any constant b. What is the correct asymptotic solution, found via a substitution?', options: ['T(n) = Theta(log log n) -- substituting n = 2^m transforms the recurrence into S(m) = S(m/2) + 1 (where S(m)=T(2^m)), which resolves to S(m)=Theta(log m), i.e. T(n)=Theta(log(log_2 n)) = Theta(log log n)', 'T(n) = Theta(log n) -- since taking a square root is "half as much work" as halving, informally matching a single log factor', 'T(n) = Theta(sqrt(n)) -- the subproblem size directly determines the asymptotic answer', 'T(n) = Theta(1) -- the recursion always terminates in a constant number of steps regardless of n'], answer: 0, marks: 2, difficulty: 'hard', type: 'concept', explanation: 'Repeated square-rooting is exponentially FASTER at shrinking n than repeated halving, so a direct recursion-tree approach (which assumes geometrically shrinking subproblem sizes like n/2, n/4, ...) does not cleanly apply either -- the right move is a SUBSTITUTION of variables. Let n = 2^m, so m = log_2(n), and define S(m) = T(2^m) = T(n). Then T(sqrt(n)) = T(2^(m/2)) = S(m/2), so the original recurrence T(n)=T(sqrt(n))+1 becomes exactly S(m) = S(m/2) + 1 -- now a textbook recurrence solvable directly (informally, by the Master Theorem with a=1,b=2,f(m)=1=Theta(m^0), Case 2 applies since log_2(1)=0 matches the exponent of f(m)), giving S(m) = Theta(log m). Substituting back m = log_2(n): T(n) = S(log_2 n) = Theta(log(log_2 n)) = Theta(log log n). Direct numerical simulation confirms this: T(n) for n=16, 256, 65536, 2^32 requires exactly 2, 3, 4, 5 recursive halvings-of-the-exponent respectively -- precisely matching log_2(log_2(n)) at each of those values. The trap is assuming any nested-radical-style recurrence must reduce to a plain log(n) or sqrt(n) answer without actually performing the variable substitution.' },
+{ id: 'algo-asymptotic-h6', q: 'Which of the following recurrences CAN be resolved directly using the STANDARD 3-case Master Theorem (requiring a single constant number of subproblems a, a single constant division factor b, and f(n) polynomially comparable to n^(log_b a))? Select all that apply.', options: ['T(n) = 2T(n/2) + n', 'T(n) = T(n/3) + T(2n/3) + n', 'T(n) = T(sqrt(n)) + 1', 'T(n) = 3T(n/2) + n^2', 'T(n) = 2T(n/2) + n/log(n)'], answers: [0, 3], marks: 2, difficulty: 'hard', type: 'concept', explanation: 'Check each recurrence against the three structural requirements (constant a>=1 identical subproblems, constant b>1 dividing n, and f(n) polynomially comparable to n^(log_b a)). Option A, T(n)=2T(n/2)+n: a=2,b=2 constant and identical; n^(log_2 2)=n^1 matches f(n)=n exactly (Case 2, k=0) -- Master Theorem APPLIES directly, giving Theta(n log n). Option B, T(n)=T(n/3)+T(2n/3)+n: the two recursive calls have DIFFERENT subproblem sizes (n/3 and 2n/3), violating the "single constant b" requirement -- Master Theorem does NOT apply in its basic form (though the answer, Theta(n log n), can still be found via a recursion tree). Option C, T(n)=T(sqrt(n))+1: the subproblem size sqrt(n) is not of the form n/b for any constant b -- Master Theorem does NOT apply at all (requires a substitution method instead). Option D, T(n)=3T(n/2)+n^2: a=3,b=2 constant; n^(log_2 3) is approximately n^1.58, and f(n)=n^2 is polynomially LARGER (n^2 = Omega(n^(1.58+epsilon)) for suitable epsilon, and the regularity condition a*f(n/b)<=c*f(n) holds for f(n)=n^2), so Case 3 APPLIES directly, giving Theta(n^2). Option E, T(n)=2T(n/2)+n/log(n): a=2,b=2 are constant, but f(n)=n/log(n) fails to satisfy ANY of the three cases\' precise polynomial-or-exact-log-power comparisons (as detailed in a companion question) -- Master Theorem does NOT apply directly. So only A and D are directly solvable by the standard Master Theorem.' }
+);
+
+window.GATE_DATA.questions['algo'].topics.find(function(t){return t.id==='algo-divide-conquer';}).questions.push(
+{ id: 'algo-divide-conquer-h1', q: 'Merge sort is run on the array [8, 3, 5, 1, 9, 2, 7, 4] (standard top-down: split at the midpoint, recursively sort each half, then merge by comparing the fronts of the two sorted halves one comparison at a time until one half is exhausted). What is the EXACT total number of element-to-element comparisons performed during ALL merge steps combined?', options: [], answer: 17, marks: 2, difficulty: 'hard', type: 'numerical', kind: 'nat', explanation: 'Trace the recursion tree bottom-up. Level 3 (pairs of single elements merging into size-2 runs): [8],[3]->1 cmp; [5],[1]->1 cmp; [9],[2]->1 cmp; [7],[4]->1 cmp -- 4 comparisons total, giving runs [3,8],[1,5],[2,9],[4,7]. Level 2 (merging size-2 runs into size-4 runs): merging [3,8] and [1,5] -> compare 3vs1(take1), 3vs5(take3), 8vs5(take5), then 8 remains -- 3 comparisons, giving [1,3,5,8]. Merging [2,9] and [4,7] -> compare 2vs4(take2), 9vs4(take4), 9vs7(take7), then 9 remains -- 3 comparisons, giving [2,4,7,9]. Level 2 subtotal: 6 comparisons. Level 1 (final merge of the two size-4 runs [1,3,5,8] and [2,4,7,9]): compare 1vs2(take1),3vs2(take2),3vs4(take3),5vs4(take4),5vs7(take5),8vs7(take7),8vs9(take8), then 9 remains -- 7 comparisons. Grand total: 4+6+7 = 17 comparisons. The trap is using the ASYMPTOTIC formula n*log2(n) = 8*3=24 as if it were exact -- the true worst-case bound is n*log2(n) - n + 1 = 24-8+1=17 for this specific case (which happens to be achieved here), but the exact count must still come from tracing every merge, since not every input achieves the theoretical worst case and a "close enough" estimate is not the same as the precise value asked for.' },
+{ id: 'algo-divide-conquer-h2', q: 'To find BOTH the minimum and maximum of the 8-element array [8, 3, 5, 1, 9, 2, 7, 4] using the DIVIDE AND CONQUER approach (split into two halves, recursively find (min,max) of each half using 1 comparison per element-pair at the base case, then combine with exactly 2 more comparisons per merge to compare the two mins and the two maxs), what is the EXACT total number of comparisons used, and how does it compare to a naive approach that tracks both min and max in a SINGLE linear scan using 2 comparisons per remaining element (a common naive pattern)?', options: ['D&C uses 10 comparisons; the naive single-pass approach uses up to 14 comparisons (2 per each of the 7 remaining elements after initializing from the first)', 'D&C uses 10 comparisons; the naive approach also uses exactly 10 comparisons -- there is no real difference', 'D&C uses 14 comparisons; the naive approach uses 10 -- naive is actually better here', 'D&C uses 7 comparisons (same as finding just the max alone); minimum comes for free'], answer: 0, marks: 2, difficulty: 'hard', type: 'numerical', explanation: 'For n=8 elements, the D&C min-max algorithm recurses down to base cases of size 2 (each needing exactly 1 comparison to order the pair), giving 4 base-case comparisons at the bottom level for 8 elements paired into 4 pairs; then combining pairs into groups of 4 requires comparing (min-vs-min) and (max-vs-max) for 2 merges, costing 2*2=4 comparisons; then the final combine of the two size-4 results costs another 2 comparisons. Total: 4+4+2 = 10 comparisons -- matching the well-known exact formula ceil(3n/2)-2 for min-max D&C, which for n=8 gives ceil(12)-2 = 10. Contrast this with a naive single-pass scan that, for each of the remaining 7 elements (after initializing min=max=arr[0]), spends up to 2 comparisons (one to check against the current max, one to check against the current min, in the worst case where updates are needed asymmetrically) -- giving up to 2*7=14 comparisons in the worst case. The D&C approach performing FEWER total comparisons (10 vs up to 14) for the SAME task is a genuine, provable, asymptotic improvement (3n/2 vs 2n), not just a constant-factor coincidence, and it is a classic example of divide-and-conquer buying real comparison savings, not just cleaner code structure.' },
+{ id: 'algo-divide-conquer-h3', q: 'Strassen\'s algorithm multiplies two n x n matrices by recursively splitting each into four (n/2) x (n/2) submatrices and combining them using only 7 recursive multiplications (instead of the naive 8) plus O(n^2) additions. For two 8x8 matrices (so the recursion goes 8 -> 4 -> 2 -> base case, a depth-3 recursion since log2(8)=3), what is the EXACT total number of scalar-level multiplications Strassen\'s recursive scheme performs (i.e., 7^3), and how does it compare to the naive 8x8 matrix multiplication\'s exact multiplication count (8^3)?', options: ['Strassen: 343 multiplications; naive: 512 multiplications -- Strassen uses about 33% fewer', 'Strassen: 343 multiplications; naive: 343 multiplications -- they are identical for n=8', 'Strassen: 512 multiplications; naive: 343 multiplications -- naive is actually fewer here', 'Strassen: 49 multiplications; naive: 512 multiplications'], answer: 0, marks: 2, difficulty: 'hard', type: 'numerical', explanation: 'For a matrix of size n=2^k, Strassen\'s recursion multiplies at each level using 7 recursive calls of half the size, terminating after log2(n)=k levels at scalar (1x1) multiplications -- so the TOTAL number of base-level scalar multiplications performed is exactly 7^k. For n=8, k=log2(8)=3, so Strassen performs 7^3 = 343 scalar multiplications. The naive algorithm, by contrast, performs exactly n^3 = 8^3 = 512 scalar multiplications (the standard triple-nested-loop count: n^2 output entries, each needing n multiply-accumulate steps). So Strassen uses 343 multiplications versus the naive 512, a genuine reduction of about (512-343)/512 = 33%, matching the general asymptotic improvement from Theta(n^3) to Theta(n^log2(7)) = Theta(n^2.807) for large n -- though the CONSTANT-factor overhead of Strassen\'s extra additions/subtractions means this exact multiplication-count advantage does not always translate into a real wall-clock speedup for small n in practice, which is why most practical implementations only switch to Strassen above some size threshold and use the naive method for small base cases.' },
+{ id: 'algo-divide-conquer-h4', q: 'Binary search is run on the sorted 10-element array [2, 5, 8, 12, 16, 23, 38, 45, 56, 72] (0-indexed), using the standard mid = floor((lo+hi)/2) rule. How many comparisons (each check of arr[mid] against the target counts as one) does it take to (a) find 45, (b) determine that 4 is absent, and (c) find 72?', options: ['(a) 2 comparisons; (b) 3 comparisons; (c) 4 comparisons', '(a) 4 comparisons (worst case for n=10); (b) 4 comparisons; (c) 1 comparison (matches immediately at the midpoint)', '(a) 2 comparisons; (b) 4 comparisons; (c) 2 comparisons', '(a) 1 comparison; (b) 3 comparisons; (c) 1 comparison'], answer: 0, marks: 2, difficulty: 'hard', type: 'trace', explanation: 'Trace each search with mid = floor((lo+hi)/2). Searching for 45: lo=0,hi=9, mid=4 (value 16); 45>16, so lo=5. Now lo=5,hi=9, mid=7 (value 45) -- MATCH after just 2 comparisons. Searching for 4 (absent): lo=0,hi=9, mid=4 (value 16); 4<16, so hi=3. Now lo=0,hi=3, mid=1 (value 5); 4<5, so hi=0. Now lo=0,hi=0, mid=0 (value 2); 4>2, so lo=1; now lo>hi, loop ends -- 3 comparisons before concluding absence. Searching for 72: lo=0,hi=9, mid=4 (value16); 72>16, lo=5. lo=5,hi=9, mid=7(value45); 72>45, lo=8. lo=8,hi=9, mid=8(value56); 72>56, lo=9. lo=9,hi=9, mid=9(value72) -- MATCH, but only after 4 comparisons, since 72 is the LAST element and binary search must repeatedly narrow toward the very end of the range. The trap is assuming the WORST case always requires the maximum ceil(log2(n+1))=4 comparisons for EVERY search, or assuming a value near an array boundary is always "quick" to find -- here the boundary element 72 needed the theoretical worst case (4), while an interior element (45) needed far fewer (2), showing worst-case bounds are about specific unlucky POSITIONS relative to the midpoint sequence, not about "how deep" a value looks in the array.' },
+{ id: 'algo-divide-conquer-h5', q: 'Using the standard merge-sort-based inversion-counting algorithm (an inversion is a pair of indices i<j with arr[i]>arr[j]; during each merge step, whenever an element from the RIGHT half is taken before the LEFT half is exhausted, it forms an inversion with EVERY remaining element still left in the left half), how many total inversions does array [8, 3, 5, 1, 9, 2, 7, 4] have?', options: [], answer: 15, marks: 2, difficulty: 'hard', type: 'numerical', kind: 'nat', explanation: 'Run the merge-and-count algorithm exactly as merge sort proceeds. Merging [8] and [3]: taking 3 (from the right) while 8 remains in the left contributes 1 inversion. Merging [5] and [1]: taking 1 contributes 1 inversion. Merging [9] and [2]: taking 2 contributes 1 inversion. Merging [7] and [4]: taking 4 contributes 1 inversion. Subtotal so far: 4. Merging [3,8] with [1,5]: take 1 (right, left still has 3,8 remaining) -> +2 inversions; take 3 (left); take 5 (right, left still has 8 remaining) -> +1 inversion; take 8 (left). Subtotal: 3 inversions, running total 7. Merging [2,9] with [4,7]: take 2 (left); take 4 (right, left still has 9 remaining) -> +1; take 7 (right, left still has 9 remaining) -> +1; take 9 (left). Subtotal: 2 inversions, running total 9. Final merge of [1,3,5,8] with [2,4,7,9]: take 1(left); take 2 (right, left still has 3,5,8 remaining) -> +3; take 3(left); take 4 (right, left still has 5,8 remaining) -> +2; take 5(left); take 7 (right, left still has 8 remaining) -> +1; take 8(left); take 9(right, left now empty) -> +0. Subtotal: 3+2+1=6 inversions, final running total: 9+6=15. The trap is forgetting that a single "take from right" step can account for MULTIPLE inversions at once (one for every element still waiting in the left half), not just one inversion per merge step.' },
+{ id: 'algo-divide-conquer-h6', q: 'To find BOTH the largest and second-largest of an 8-element array using a single-elimination TOURNAMENT (pair up elements, compare, keep winners, repeat until one champion remains -- exactly n-1=7 comparisons to find the max), the second-largest MUST be one of the elements that lost DIRECTLY to the champion at some point in the tournament (never one that lost to a non-champion, since it could not have been beaten by anyone stronger than the champion itself without being compared to the champion at some round). For n=8, exactly ceil(log2(8))=3 elements lose directly to the champion across the tournament\'s 3 rounds. Finding the largest among these 3 candidates takes 2 more comparisons. What is the TOTAL comparison count for this tournament method, and how does that compare to a naive single-pass scan tracking both running max and running second-largest concurrently (which needs up to 2 comparisons per remaining element, i.e. up to 2*7=14 for n=8)?', options: [], answer: 9, marks: 2, difficulty: 'hard', type: 'numerical', kind: 'nat', explanation: 'The tournament to find just the maximum among 8 elements requires exactly n-1=7 comparisons (every element except the champion loses exactly once, and each comparison eliminates exactly one element, so 7 eliminations need 7 comparisons). Because the tournament tree has depth ceil(log2(8))=3, the champion plays exactly 3 matches on its path to the top, meaning exactly 3 distinct elements lost DIRECTLY to it (one per round) -- these 3 are the ONLY possible candidates for second-largest, since any element that never faced the champion cannot be proven to be smaller than everyone the champion beat via a shorter chain, but IS proven smaller than the champion itself only through a chain of comparisons, and the true second-largest must have lost ONLY to the eventual champion (if it had lost to anyone else, that other element would need to also be smaller than the champion, a contradiction unless that path also leads through the champion). Finding the max among these 3 candidates costs exactly 2 more comparisons (candidates-1). Total: 7+2 = 9 comparisons -- substantially fewer than the up-to-14 comparisons a naive concurrent single-pass scan might use, confirming the well-known exact worst-case bound of n + ceil(log2 n) - 2 = 8+3-2=9 for simultaneous max-and-second-max selection via tournament, a genuine, provable comparison-count improvement over the naive approach.' }
+);
+
+window.GATE_DATA.questions['algo'].topics.find(function(t){return t.id==='algo-greedy';}).questions.push(
+{ id: 'algo-greedy-h1', q: 'Six symbols have frequencies 5, 9, 12, 13, 16, 45. Using the standard Huffman algorithm (repeatedly merge the two smallest-frequency nodes, adding their combined frequency to a running total, until one tree remains), what is the total weighted path length (equivalently, the total number of bits in the encoded message per occurrence, summed as freq*depth over all leaves) of the resulting optimal prefix code?', options: [], answer: 224, marks: 2, difficulty: 'hard', type: 'numerical', kind: 'nat', explanation: 'Repeatedly merge the two smallest values, adding each merge\'s combined value to the running cost total (this running total IS the weighted path length, since each merge cost equals the sum of frequencies that must "pass through" one more level of depth). Merge 5+9=14 (cost 14). Remaining: {12,13,16,45,14}. Merge the two smallest, 12+13=25 (cost 25). Remaining: {16,45,14,25}. Merge the two smallest, 14+16=30 (cost 30). Remaining: {45,25,30}. Merge the two smallest, 25+30=55 (cost 55). Remaining: {45,55}. Final merge: 45+55=100 (cost 100). Total weighted path length: 14+25+30+55+100 = 224. Cross-checking via leaf depths in the resulting tree: 45 sits at depth 1 (contributing 45), 12 and 13 at depth 3 (contributing 36+39=75), 16 at depth 3 (contributing 48), and 5,9 at depth 4 (contributing 20+36=56); summing 45+75+48+56 = 224, confirming the running-total method. The trap is assuming the total cost equals just the SUM of frequencies times some single "average depth" estimate, or stopping the accumulation early -- every one of the 5 merge operations (for 6 symbols, exactly n-1=5 merges) contributes its own combined value to the total, and skipping any merge undercounts.' },
+{ id: 'algo-greedy-h2', q: 'For 0/1 KNAPSACK (items cannot be split) with items (weight,value) = (10,60), (20,100), (30,120) and capacity W=50, a GREEDY-BY-VALUE-PER-WEIGHT-RATIO strategy (ratios 6, 5, 4 respectively; take items in decreasing ratio order as long as they fit) achieves a certain total value. What does this greedy strategy achieve, and what is the TRUE OPTIMAL value (found by checking all feasible combinations), demonstrating that this greedy approach is INCORRECT for 0/1 knapsack?', options: ['Greedy achieves 160 (items 1 and 2, weight 30, leaving 20 capacity wasted since item 3 does not fit); the true optimum is 220 (items 2 and 3, weight exactly 50)', 'Greedy achieves 220; the true optimum is also 220 -- greedy is correct here', 'Greedy achieves 160; the true optimum is 180 (items 1 and 3)', 'Greedy achieves 280 (all three items); the true optimum is also 280'], answer: 0, marks: 2, difficulty: 'hard', type: 'concept', explanation: 'The greedy-by-ratio strategy takes item 1 (weight 10, value 60, ratio 6) first, leaving 40 capacity; then item 2 (weight 20, value 100, ratio 5), leaving 20 capacity; then it tries item 3 (weight 30, value 120, ratio 4), but 30 > 20 remaining capacity, so item 3 is SKIPPED entirely (0/1 knapsack forbids taking a fraction). Greedy total: 60+100=160, using only 30 of the 50 capacity, wasting the rest. But checking all feasible subsets exhaustively: items 1+2 (weight 30) give 160; items 2+3 (weight 50) give 100+120=220; items 1+3 (weight 40) give 60+120=180; all three (weight 60) exceed capacity, infeasible. The TRUE optimum is 220 (items 2 and 3), strictly better than greedy\'s 160. This is the canonical EXCHANGE-ARGUMENT COUNTEREXAMPLE showing that the value-per-weight-ratio greedy heuristic, while PROVABLY OPTIMAL for the FRACTIONAL knapsack problem (where items can be split), is NOT optimal for 0/1 knapsack -- the indivisibility constraint breaks the exchange argument that makes the greedy choice safe in the fractional version, since a locally-best ratio item can "waste" capacity that a worse-ratio-but-better-fitting combination would use more effectively.' },
+{ id: 'algo-greedy-h3', q: 'Four activities have (start,finish) times: X=(1,10), Y=(2,3), Z=(4,5), W=(6,7). A GREEDY-BY-EARLIEST-START-TIME strategy (always pick the remaining activity with the smallest start time that does not conflict with already-chosen activities) is used to select a maximum-size set of mutually non-overlapping activities. How many activities does this strategy select, and how many does the PROVABLY OPTIMAL greedy-by-earliest-FINISH-time strategy select?', options: ['Greedy-by-start selects only 1 activity (X, which then blocks everything else since it runs from 1 to 10); greedy-by-finish selects 3 activities (Y, Z, W)', 'Both strategies select the same 3 activities (Y, Z, W); greedy-by-start-time is also optimal here', 'Greedy-by-start selects 3 activities; greedy-by-finish selects only 1', 'Greedy-by-start selects 2 activities (X and W); greedy-by-finish selects 3'], answer: 0, marks: 2, difficulty: 'hard', type: 'concept', explanation: 'Greedy-by-earliest-START-TIME examines activities in order of start time: X starts at 1 (the earliest), so it is selected first -- but X occupies the ENTIRE interval [1,10], completely overlapping Y=(2,3), Z=(4,5), and W=(6,7), so none of them can be added afterward. Result: only 1 activity selected, a badly suboptimal outcome. Greedy-by-earliest-FINISH-TIME instead examines activities in order of finish time: Y finishes at 3 (earliest), selected first; next examine remaining activities that start at or after 3 -- Z=(4,5) qualifies (starts at 4 >= 3) and finishes at 5, selected; next, W=(6,7) starts at 6 >= 5, qualifies, selected. X=(1,10) starts at 1, before Y even finishes, so it is never eligible once Y is chosen. Result: 3 activities (Y, Z, W) selected -- strictly better. This is the textbook EXCHANGE-ARGUMENT COUNTEREXAMPLE demonstrating that "start time" is the WRONG greedy criterion for activity selection (a long early-starting activity can block many short ones), while "finish time" is PROVABLY optimal (choosing the activity that frees up the timeline soonest always leaves at least as much room for future choices as any other valid first choice).' },
+{ id: 'algo-greedy-h4', q: 'Four symbols have frequencies 2, 3, 3, 5 (note the TIE between the two frequency-3 symbols). Running Huffman\'s algorithm, a tie in "which two smallest nodes to merge first" can be broken in different ways once multiple nodes tie for smallest. Does breaking this tie differently ever change the TOTAL weighted path length of the resulting optimal Huffman code?', options: ['No -- regardless of how the tie is broken, the total weighted path length is always exactly 26 (though the resulting tree SHAPE, and hence individual codeword lengths per symbol, may differ between tie-breaking choices)', 'Yes -- one tie-breaking order gives weighted path length 24, while another gives 26; the choice matters for optimality', 'No -- but only because Huffman codes are always balanced binary trees for any input, making ties irrelevant by construction', 'Yes -- Huffman\'s algorithm is not well-defined at all when frequencies tie, and no consistent total cost exists'], answer: 0, marks: 2, difficulty: 'hard', type: 'concept', explanation: 'Path 1: merge the two 3\'s first: 3+3=6 (cost 6); remaining {2,5,6}; merge 2 smallest, 2+5=7 (cost 7); remaining {6,7}; merge 6+7=13 (cost 13); total = 6+7+13 = 26. Path 2: merge 2 with one of the 3\'s first: 2+3=5 (cost 5); remaining {3,5,5(new)} (the untouched original 3, the original 5, and the freshly merged 5); merge the two smallest among these -- there is now ANOTHER tie between 3 and one of the two 5\'s, but by symmetry any valid choice merges to 3+5=8 (cost 8); remaining {5,8}; merge 5+8=13 (cost 13); total = 5+8+13 = 26. Both tie-breaking paths give EXACTLY the same total weighted path length, 26, even though the actual codeword length assigned to each individual symbol can differ between the two resulting trees (e.g., which specific symbol ends up at depth 2 versus depth 3 can vary). This reflects a deeper fact: Huffman\'s algorithm can produce MULTIPLE distinct optimal trees when ties occur, but ALL such trees achieve the SAME (globally minimum) total weighted path length -- optimality of the total cost is guaranteed regardless of how internal ties are broken, even though the tree itself is not unique.' },
+{ id: 'algo-greedy-h5', q: 'Five jobs have (profit, deadline) pairs: J1=(100,2), J2=(19,1), J3=(27,2), J4=(25,1), J5=(15,3). Each job takes exactly 1 unit of time, and a job can only be scheduled in some time slot from 1 up to its deadline (each slot can hold at most one job). Using the standard greedy job-sequencing algorithm (process jobs in DECREASING profit order, and for each job, schedule it in the LATEST available slot that is still <= its deadline, skipping it entirely if no such slot is free), which jobs get scheduled and what is the total profit earned?', options: ['J1 in slot 2, J3 in slot 1, J5 in slot 3 (J2 and J4 rejected); total profit = 142', 'J1 in slot 1, J3 in slot 2, J4 in slot 3 (J2 and J5 rejected); total profit = 152', 'All 5 jobs get scheduled somehow; total profit = 186', 'J1, J2, J3 scheduled (highest 3 by some order); J4 and J5 rejected; total profit = 146'], answer: 0, marks: 2, difficulty: 'hard', type: 'trace', explanation: 'Sort jobs by DECREASING profit: J1(100,2), J3(27,2), J4(25,1), J2(19,1), J5(15,3). Process J1: try its latest slot, 2 -- free, schedule J1 in slot 2 (profit so far 100). Process J3: try its latest slot, 2 -- occupied (by J1); try slot 1 -- free, schedule J3 in slot 1 (profit so far 127). Process J4: its deadline is 1, so only slot 1 is even eligible -- but slot 1 is occupied (by J3); no earlier slot exists (slots start at 1); J4 is REJECTED. Process J2: deadline 1, only slot 1 eligible, already occupied; J2 is REJECTED. Process J5: deadline 3, try slot 3 -- free, schedule J5 in slot 3 (profit so far 127+15=142). Final: J1 (slot 2), J3 (slot 1), J5 (slot 3) scheduled; J2 and J4 rejected; total profit = 100+27+15 = 142. The trap is assuming the top-3-by-profit jobs (J1, J3, J4, all with profit >= 25) can simply all be scheduled -- J4 CANNOT be fit in, since both jobs with deadline <=1 (J2 and J4) compete for the SAME single slot 1, and J4, despite ranking 3rd by profit, loses that slot to J3 (which was processed earlier due to higher profit and also needed a slot no later than 2, greedily grabbing slot 1 after slot 2 was already taken).' },
+{ id: 'algo-greedy-h6', q: 'For FRACTIONAL knapsack with items A=(weight 10, value 60), B=(weight 20, value 120), and C=(weight 30, value 90), and capacity 25 -- note A and B have the SAME value-per-weight ratio (6), while C has a lower ratio (3) -- does the ORDER in which the tied-ratio items A and B are taken affect the final maximum achievable value?', options: ['No -- taking A fully then 3/4 of B, or taking B fully then 1/2 of A, both yield exactly 150; the tie between equal ratios means order genuinely does not matter', 'Yes -- taking A first yields 150, but taking B first yields only 138, so order matters even among tied ratios', 'No -- but only because fractional knapsack always ignores ratio ties and instead sorts by absolute value first', 'Yes -- ties must always be broken by preferring the SMALLER-weight item first, or the greedy algorithm produces a suboptimal (non-maximal) answer'], answer: 0, marks: 2, difficulty: 'hard', type: 'numerical', explanation: 'Since fractional knapsack greedily fills capacity using the highest value-per-weight ratio available, and A and B are TIED at ratio 6 (60/10=6, 120/20=6), any way of using exactly 25 units of capacity split between A and B (using none of C, since its ratio of 3 is strictly worse and no capacity remains for it anyway) yields the SAME total value, precisely because value = ratio * weight-used and the ratio is identical for both. Concretely: taking all of A (10 units, value 60) plus 15 of the remaining 20 units of B (3/4 of B, value 0.75*120=90) gives 60+90=150, using exactly 25 capacity. Alternatively, taking all of B (20 units, value 120) plus 5 of the remaining 10 units of A (1/2 of A, value 0.5*60=30) gives 120+30=150 -- IDENTICAL. This is a direct consequence of the exchange argument underlying fractional knapsack\'s greedy correctness: whenever two items share the same ratio, swapping fractional amounts between them at a fixed total weight preserves total value exactly (since value is linear in weight-at-a-fixed-ratio), so tie-breaking is provably irrelevant for the OPTIMAL value achieved (though it does affect which specific weights of each tied item end up chosen).' }
+);
+
+window.GATE_DATA.questions['algo'].topics.find(function(t){return t.id==='algo-sorting-searching';}).questions.push(
+{ id: 'algo-sorting-searching-h1', q: 'A file of 10,000 blocks must be externally sorted using B=11 available buffer pages. Phase 0 creates initial sorted runs by loading B=11 blocks into memory at a time, sorting them in place, and writing each run back out. The merge phase then repeatedly performs a (B-1)=10-way merge (1 buffer reserved for output) until only one run remains. What is the TOTAL number of passes over the entire data (counting Phase 0 as the first pass, plus every merge pass)?', options: [], answer: 4, marks: 2, difficulty: 'hard', type: 'numerical', kind: 'nat', explanation: 'Phase 0 (pass 1) creates ceil(10000/11) = 910 initial sorted runs (each run holding up to 11 blocks, all fitting in memory at once for in-memory sorting). Merge pass 1 combines these 10-way: ceil(910/10) = 91 runs remain. Merge pass 2: ceil(91/10) = 10 runs remain. Merge pass 3: ceil(10/10) = 1 run remains -- fully sorted, so merging stops here. That is 3 merge passes. Total passes = 1 (Phase 0) + 3 (merging) = 4. The trap is either forgetting to count Phase 0 as a pass (giving the wrong answer 3), or using a B-way merge instead of the correct (B-1)-way merge (since one of the B buffers MUST be reserved for the output block being written, leaving only B-1 buffers available to hold one input block from each of up to B-1 runs simultaneously during the merge) -- using all 11 buffers for merging instead of 10 would give a different (and incorrect, since that buffer allocation is not actually achievable) pass count.' },
+{ id: 'algo-sorting-searching-h2', q: 'Quickselect (using Lomuto partitioning with the LAST element as pivot) is used to find the 5th smallest element (0-indexed rank 4) of the array [4, 3, 9, 1, 8, 2, 5, 6, 7]. Counting every element-to-pivot comparison made during every partition call, how many total comparisons are performed, and how many partition calls does it take to locate the answer?', options: [], answer: 17, marks: 2, difficulty: 'hard', type: 'numerical', kind: 'nat', explanation: 'Partition call 1 on the full array [4,3,9,1,8,2,5,6,7] (indices 0-8) uses pivot=7 (the last element), comparing it against the other 8 elements: 8 comparisons. The partition places 7 at its correct sorted position, index 6 (since 6 elements -- 4,3,1,2,5,6 -- end up smaller than 7). Since the target rank 4 < 6, recurse into the LEFT sub-array (indices 0-5). Partition call 2 on this sub-array [4,3,1,2,5,6] uses pivot=6 (its last element), comparing against the other 5 elements: 5 comparisons, placing 6 at index 5 within this range. Since target rank 4 < 5, recurse left again (indices 0-4). Partition call 3 on [4,3,1,2,5] uses pivot=5, comparing against the other 4 elements: 4 comparisons, placing 5 exactly at index 4 -- which MATCHES the target rank 4, so the search stops here, returning 5. Total comparisons: 8+5+4 = 17, across exactly 3 partition calls. The trap is assuming quickselect always needs a comparison count close to a single partition\'s worth (an O(n) illusion from the AVERAGE case), when in fact MULTIPLE partition calls are frequently needed even in a fairly ordinary (non-adversarial) case like this one, and skipping the careful per-call comparison tally undercounts the true work done.' },
+{ id: 'algo-sorting-searching-h3', q: 'The top-3 largest elements of [7, 2, 9, 4, 11, 3, 8, 15, 6, 1] are found using a MIN-heap of size 3: the first 3 elements are inserted (with sift-up), and each subsequent element is compared against the heap\'s root -- if larger, it replaces the root and sift-down restores the heap property; if not, it is discarded with just that one comparison. Counting EVERY comparison (sift-up comparisons, sift-down comparisons, and root-comparisons for discarded elements), what is the total comparison count, and what are the final top-3 values in the heap?', options: [], answer: 17, marks: 2, difficulty: 'hard', type: 'numerical', kind: 'nat', explanation: 'Process each element in order, tracking the min-heap of size 3 (root = smallest of the 3 currently held). Insert 7: heap=[7], 0 comparisons (first element, no sift needed). Insert 2: heap=[2,7], 1 comparison (sift-up). Insert 9: heap=[2,7,9], 1 comparison (sift-up, no swap needed since 9 is not less than its parent 2). Heap now full at size 3. Process 4: compare to root 2 -- 4>2, so it should replace the root; after replacing, sift-down compares against both children (7 and 9) -- 2 comparisons for the two sift-down child-checks, giving heap=[4,7,9], for a subtotal of 1(root compare)+2(sift-down)=3 comparisons this step. Process 11: compare to root 4 -- 11>4, replace and sift-down (2 more comparisons) -> heap=[7,11,9], 3 comparisons this step. Process 3: compare to root 7 -- 3 is NOT > 7, discard immediately, just 1 comparison. Process 8: compare to root 7 -- 8>7, replace and sift-down (2 comparisons) -> heap=[8,11,9], 3 comparisons this step. Process 15: compare to root 8 -- 15>8, replace and sift-down (2 comparisons) -> heap=[9,11,15], 3 comparisons this step. Process 6: compare to root 9 -- not greater, discard, 1 comparison. Process 1: compare to root 9 -- not greater, discard, 1 comparison. Running total: 0+1+1+3+3+1+3+3+1+1 = 17 comparisons, final heap {9,11,15} (the true top-3 largest values). The trap is forgetting to count the "compare to root" step for elements that get DISCARDED -- those still cost exactly 1 comparison each, even though nothing else happens.' },
+{ id: 'algo-sorting-searching-h4', q: 'Counting sort is run on the key-label pairs [(3,a), (1,b), (3,c), (2,d), (1,e), (3,f), (2,g)] (sorting by the numeric key, keys ranging 1 to 3), using the standard STABLE procedure: build a count array, convert it to a CUMULATIVE count array, then place elements into the output array by scanning the INPUT from RIGHT TO LEFT, using (and decrementing) the cumulative count for each element\'s key to determine its output position. What is the resulting stably-sorted sequence of labels?', options: ['b, e, d, g, a, c, f', 'b, e, d, g, f, c, a', 'e, b, g, d, c, a, f', 'b, e, d, g, a, f, c'], answer: 0, marks: 2, difficulty: 'hard', type: 'trace', explanation: 'Count array (occurrences of each key 1,2,3): key1 appears 2 times (b,e), key2 appears 2 times (d,g), key3 appears 3 times (a,c,f) -- count=[2,2,3] for keys [1,2,3]. Cumulative count (prefix sums): [2, 4, 7] -- meaning "2 elements have key <=1, 4 have key<=2, 7 have key<=3", which also tells us the LAST (rightmost, 1-indexed) output slot for each key group: key1 occupies output positions 1-2, key2 occupies 3-4, key3 occupies 5-7. Scanning the INPUT array from RIGHT TO LEFT (this right-to-left order is CRUCIAL for stability): process f(key3) -- place at cumulative[3]=7th position, decrement cumulative[3] to 6. Process 3,f done; next g(key2) -- place at cumulative[2]=4th position, decrement to 3. Process e(key1) -- place at cumulative[1]=2nd position, decrement to 1. Process d(key2) -- place at cumulative[2]=3rd position, decrement to 2. Process c(key3) -- place at cumulative[3]=6th position, decrement to 5. Process b(key1) -- place at cumulative[1]=1st position, decrement to 0. Process a(key3) -- place at cumulative[3]=5th position. Reading off output positions 1 through 7: b(1), e(2), d(3), g(4), a(5), c(6), f(7) -- giving "b, e, d, g, a, c, f". Note this correctly preserves the ORIGINAL relative order among equal keys (b before e for key1, d before g for key2, a before c before f for key3) precisely because the scan direction was right-to-left; scanning left-to-right instead would REVERSE the relative order of equal-key elements, breaking stability (as in option B).' },
+{ id: 'algo-sorting-searching-h5', q: 'LSD (least-significant-digit-first) radix sort is applied to the 4-digit numbers [4321, 1234, 2143, 3412, 1111, 4444, 2222, 3333], processing one decimal digit position per pass (units digit first, then tens, then hundreds, then thousands), using a stable bucket-based sort at each pass. What is the array\'s order immediately after the SECOND pass (sorting by the TENS digit, using the array\'s order coming out of the first/units-digit pass)?', options: ['1111, 3412, 4321, 2222, 3333, 1234, 2143, 4444', '1111, 1234, 2143, 2222, 3333, 3412, 4321, 4444', '4321, 1111, 3412, 2222, 2143, 3333, 1234, 4444', '1111, 2143, 2222, 1234, 4321, 3333, 3412, 4444'], answer: 0, marks: 2, difficulty: 'hard', type: 'trace', explanation: 'Pass 1 (units digit): bucket by the last digit of each number -- 4321(1), 1234(4), 2143(3), 3412(2), 1111(1), 4444(4), 2222(2), 3333(3). Reading buckets 0-9 in order and WITHIN each bucket preserving original relative order (stability): bucket1 gets 4321,1111 (in original order); bucket2 gets 3412,2222; bucket3 gets 2143,3333; bucket4 gets 1234,4444. Concatenating buckets 0 through 9: "4321, 1111, 3412, 2222, 2143, 3333, 1234, 4444" -- this is the result after pass 1 (matches option C, NOT what is asked yet). Pass 2 (tens digit) operates on THIS pass-1 output, bucketing each number by its tens digit: 4321(tens=2), 1111(tens=1), 3412(tens=1), 2222(tens=2), 2143(tens=4), 3333(tens=3), 1234(tens=3), 4444(tens=4). Preserving the pass-1 relative order WITHIN each tens-digit bucket (stability again): bucket1 gets 1111,3412 (in that pass-1 order); bucket2 gets 4321,2222; bucket3 gets 3333,1234; bucket4 gets 2143,4444. Concatenating: "1111, 3412, 4321, 2222, 3333, 1234, 2143, 4444". The trap is forgetting that EACH pass must operate on the OUTPUT of the PREVIOUS pass (not the original array), and that stability within each bucket must respect the order coming INTO that pass, not the original input order.' },
+{ id: 'algo-sorting-searching-h6', q: 'For finding the top-k largest elements among n elements, consider n=1,000,000 and k=5. Which of the following statements are TRUE? Select all that apply.', options: ['Fully sorting all n elements and taking the top k costs Theta(n log n) comparisons -- far more work than necessary when k is this small relative to n', 'Maintaining a min-heap of size k while streaming through all n elements costs Theta(n log k) comparisons; since k=5 makes log2(k) a small constant (~2.3), this is effectively Theta(n) here, and much faster than full sorting for this n and k', 'A quickselect-based approach (partition around the kth largest) achieves Theta(n) EXPECTED time, but its worst case (consistently unlucky pivot choices) degrades to Theta(n^2)', 'If instead k were close to n (e.g., k = n - 5), it would be more efficient to find and exclude the (n-k)=5 SMALLEST elements using the same heap-of-size-(n-k) technique, rather than maintaining a heap of size k=n-5', 'All three approaches (full sort, min-heap of size k, quickselect) take exactly the same amount of time regardless of how k relates to n, so the choice between them never matters'], answers: [0, 1, 2, 3], marks: 2, difficulty: 'hard', type: 'concept', explanation: 'Statement 1 is TRUE: sorting the full 1,000,000 elements costs Theta(n log n) ~ 1,000,000 * 20 = 20,000,000 comparisons, drastically more than needed just to identify 5 elements. Statement 2 is TRUE: the min-heap approach costs Theta(n log k) = Theta(n * log2(5)) ~ n * 2.3, essentially linear in n for this tiny constant k -- a dramatic improvement over full sorting for small k. Statement 3 is TRUE: quickselect\'s EXPECTED running time is Theta(n) (each partition step eliminates a constant fraction of remaining elements on average), but with a bad (e.g., always-smallest-or-largest) pivot choice on adversarial or already-sorted input, it degrades to Theta(n^2), exactly mirroring quicksort\'s own worst-case vulnerability. Statement 4 is TRUE: by symmetry, finding the LARGEST k=999,995 elements is equivalent to EXCLUDING the smallest 5, and maintaining a heap sized by the SMALLER of k and n-k (here min(999995, 5)=5) is far cheaper than maintaining a heap of size 999,995 -- this "flip to the smaller side" optimization is a genuinely important practical trick. Statement 5 is FALSE: the whole point of comparing these methods is that their costs diverge sharply depending on the relationship between k and n, as statements 1-4 demonstrate concretely.' }
+);

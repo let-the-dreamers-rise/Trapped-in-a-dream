@@ -1968,3 +1968,677 @@ window.GATE_DATA.questions['digital'].topics.find(function(t){return t.id==='dig
   explanation: "A positive-edge-triggered D flip-flop copies whatever value D holds at the instant of each rising clock edge into Q, and Q then holds that value until the next rising edge. Reading the D waveform at each dashed vertical line: at edge 1 (x=70) D has already risen to 1, so Q becomes 1. At edge 2 (x=130) D has fallen back to 0, so Q becomes 0. At edge 3 (x=190) D has risen to 1 again (and stays 1 through edges 3 and 4), so Q becomes 1. At edge 4 (x=250) D is still 1, so Q remains 1. At edge 5 (x=310) D has fallen to 0, so Q becomes 0. The resulting Q sequence is therefore 1, 0, 1, 1, 0, written as 10110. This question tests the key distinction between a D flip-flop (which simply follows D at the clock edge, unlike a latch that would continue tracking D whenever CLK is high) — a transparent latch would instead produce glitches whenever D changed while CLK was high, which does not apply here since the flip-flop is edge-triggered."
 }
 );
+
+window.GATE_DATA.questions['digital'].topics.find(function(t){return t.id==='digital-boolean';}).questions.push(
+{
+  id: 'digital-boolean-p1',
+  pyqStyle: true,
+  q: "Simplify to a minimal sum-of-products form: f(A,B,C,D) = Σm(1,5,6,7,11,13,15) + d(3,9), where d denotes don't-care minterms.",
+  options: ["D + A'BC", "D + BC", "A'D + BC", "D + AB'C"],
+  answer: 0,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: "Plot the 1s at minterms 1, 5, 6, 7, 11, 13, 15 and mark 3 and 9 as don't-cares (X) on a 4-variable K-map. Every minterm with D=1 is {1,3,5,7,9,11,13,15}, and the ON-set plus don't-cares exactly fill this entire column (1,5,7,11,13,15 are 1s, and 3,9 are don't-cares treated as 1s to complete the group), so D by itself is a valid group of 8 covering all of them — a huge simplification using both don't-cares. The only 1 not yet covered is minterm 6 (0110), which is not in the D=1 column at all. Its only ON-set neighbour is minterm 7 (0111): both have A=0, B=1, C=1, differing only in D, so {6,7} forms a group giving the term A'BC (D is eliminated, and A, B, C stay fixed at 0,1,1). No larger group is possible for minterm 6, since minterm 4 (0100) and minterm 14 (1110) are neither 1s nor don't-cares. Hence the minimal SOP is D + A'BC — D handles every D=1 minterm and A'BC additionally covers minterm 6. Option 'D + BC' drops the A' literal, which would wrongly also claim to cover minterm 14 (1110, where BC=1 but the function is 0 there); check D+BC at minterm 14: D=0 and BC=1, giving 1, but f(14) is not in the ON-set, so this option is wrong. The other two options mis-assign a literal and fail to reproduce minterm 6 exactly."
+},
+{
+  id: 'digital-boolean-p2',
+  pyqStyle: true,
+  q: "The minimal product-of-sums (POS) form of f(A,B,C,D) = ΠM(0,2,4,6,9,11,13,15) is:",
+  options: ["(A+D)(A'+D')", "(A+D')(A'+D)", "(A+B)(C+D)", "(B+D)(B'+D')"],
+  answer: 0,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: "For a POS problem, plot the maxterms (zeros of f) on the K-map and group them exactly as you would group 1s, then read each group as a sum term using the opposite literal convention: a variable that is 0 across the group contributes its true form, and a variable that is 1 contributes its complemented form. The zeros are at 0,2,4,6,9,11,13,15. Splitting by A: for A=0, zeros are 0,2,4,6 — all four minterms where D=0 (0000,0010,0100,0110), giving the group A'D' contributing sum term (A+D). For A=1, zeros are 9,11,13,15 — all four minterms where D=1 (1001,1011,1101,1111), giving group AD contributing sum term (A'+D'). Multiplying the two sum terms gives f = (A+D)(A'+D'), which expands to AD' + A'D, confirming this is exactly the XOR of A and D — a recognizable pattern where POS and SOP are dual two-term expressions of equal size. Option (A+D')(A'+D) swaps the roles of D and D' and would represent XNOR(A,D) instead — check by testing A=0,D=0: the true f is 0 there (minterm 0 is a zero), but (A+D')(A'+D) evaluates to (0+1)(1+0)=1, so it fails. The other two options group the wrong variable pair entirely and do not match the zero set."
+},
+{
+  id: 'digital-boolean-p3',
+  pyqStyle: true,
+  q: "The number of distinct self-dual Boolean functions of 3 variables (functions f satisfying f(A,B,C) = [f(A',B',C')]' for every input) is ______.",
+  options: [],
+  answer: 16,
+  marks: 2,
+  difficulty: 'hard',
+  type: 'pyq-style',
+  kind: 'nat',
+  explanation: "Self-duality forces f(v) and f(complement of v) to always be different — the output at any input and the output at the bitwise-complemented input must be complementary. This pairs up the 2^3 = 8 input rows of a 3-variable truth table into 2^3/2 = 4 complementary pairs: {000,111}, {001,110}, {010,101}, {011,100}. Within each pair, once you decide the output at one member (0 or 1), the output at its partner is forced to be the opposite — so each pair contributes exactly 2 independent choices, and the 4 pairs are chosen independently of each other. This gives 2^4 = 16 self-dual functions of 3 variables. In general, for n variables there are 2^(n-1) such complementary pairs, giving 2^(2^(n-1)) self-dual functions — 4 for n=2, 16 for n=3, 256 for n=4. A useful sanity check: f = A (a single literal) is self-dual since A' complemented is A' as well... more directly, f=ABC+A'B'C' is NOT self-dual (check 000: f=1, complement input 111: f=1, so f and f' at 111 must differ, but f(111)=1 and its own complement would need to be 0 — actually verifying membership is easiest by the pairing rule above rather than by picking random examples)."
+},
+{
+  id: 'digital-boolean-p4',
+  pyqStyle: true,
+  q: "For f(A,B,C,D) = Σm(0,1,2,5,6,7,8,9,10,14), the total number of prime implicants (counting every prime implicant, not just those needed in a minimal cover) is:",
+  options: ["4", "5", "6", "7"],
+  answer: 2,
+  marks: 2,
+  difficulty: 'hard',
+  type: 'pyq-style',
+  explanation: "Plotting all ten minterms on a 4-variable K-map and finding every maximal group (one that cannot be enlarged) gives six prime implicants: B'C' (covers 0,1,8,9), B'D' (covers 0,2,8,10), CD' (covers 2,6,10,14), A'C'D (covers 1,5), A'BD (covers 5,7), and A'BC (covers 6,7). Testing coverage: minterm 9 is reached only by B'C' (no other maximal group includes it), so B'C' is essential; minterm 14 is reached only by CD' (paired with 2, 6, 10, since all four have C=1, D=0), so CD' is essential too. The remaining minterms (1,2,5,6,7,8,10) each have at least two competing prime implicants covering them — for instance minterm 5 is reachable via both A'C'D and A'BD — so no further term is forced to be essential. All six groups are nonetheless legitimate maximal rectangles and therefore all six count as prime implicants, even though a minimal SOP only needs to pick enough of them (the two essential ones, plus one more to finish covering 1,2,5,6,7,8,10 completely) to finish the cover. This is exactly the trap the question is testing: 'prime implicant' counts every maximal rectangle on the map, while 'essential prime implicant' counts only the ones that are the sole cover for at least one minterm."
+},
+{
+  id: 'digital-boolean-p5',
+  pyqStyle: true,
+  q: "For f(A,B,C,D) = Σm(0,2,3,4,5,7,8,10,11,15), the number of essential prime implicants is ______.",
+  options: [],
+  answer: 2,
+  marks: 2,
+  difficulty: 'hard',
+  type: 'pyq-style',
+  kind: 'nat',
+  explanation: "Grouping the ten ON-set minterms on a K-map yields six prime implicants in total, but only two of them are essential. The group B'D' covers {0,2,8,10} — all four minterms where B=0 and D=0 — and minterm 8 (1000) together with minterm 10 (1010) are reached by no other maximal group, so B'D' is essential. The group CD covers {3,7,11,15} — all four minterms where C=1 and D=1 — and minterm 15 (1111) is reached by no other maximal group, so CD is essential as well. The remaining ON-set minterms (2,3,4,5,7) are each covered by at least two competing prime implicants (such as A'C'D' for {4,5} or A'BD for {5,7}), so none of those groups is forced into every minimal cover — a minimal SOP can choose between them once B'D' and CD are already fixed. Hence exactly 2 prime implicants are essential, even though the total prime implicant count is larger. This distinction — total PIs versus essential PIs — is the single most repeated K-map subtlety in GATE Digital Logic."
+},
+{
+  id: 'digital-boolean-p6',
+  pyqStyle: true,
+  q: "Which of the following gate sets are functionally complete on their own, using only the variables given (no constant 0 or 1 input is available)? (Select all that apply.)",
+  options: ["{NAND}", "{XOR, AND}", "{OR, AND}", "{NOR}"],
+  answers: [0, 3],
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  kind: 'msq',
+  explanation: "{NAND} is complete alone: NAND(x,x) = x' gives NOT, then AND is NOT(NAND(x,y)), and OR follows by De Morgan from NOT and AND — so all three basic operations are reachable. By the exact same argument {NOR} is complete alone: NOR(x,x) = x' gives NOT, OR is NOT(NOR(x,y)), and AND follows by De Morgan. {OR, AND} fails because both operations are monotone — increasing any input can never decrease the output — so no combination can ever produce an inverter; every function built purely from OR and AND of the input variables preserves the all-0 and all-1 rows exactly as they start (0 stays 0, 1 stays 1), which NOT violates. {XOR, AND} fails for a subtler reason: both XOR and AND output 0 when all their inputs are 0, so any circuit built from only these two gates, fed only the variables (no constant 1), must output 0 whenever every input variable is 0 — this is the 'preserves zero' property, and NOT does not preserve zero (NOT(0)=1), so it can never be built. Adding a constant-1 input would fix {XOR, AND}, since x⊕1 = x', but that input is explicitly excluded here."
+},
+{
+  id: 'digital-boolean-p7',
+  pyqStyle: true,
+  q: "The minimum number of 2-input NAND gates required to implement F = A ⊕ B (XOR), using only A and B as available signals, is ______.",
+  options: [],
+  answer: 4,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  kind: 'nat',
+  explanation: "The standard 4-NAND XOR circuit is: gate 1 = NAND(A,B); gate 2 = NAND(A, gate1); gate 3 = NAND(B, gate1); gate 4 = NAND(gate2, gate3). Tracing all four input combinations confirms gate 4 equals A⊕B in every row. It is impossible to do it in 3 or fewer 2-input NAND gates — an exhaustive check of every way to wire at most 3 NAND gates fed only by A and B (allowing repeated use of a signal, which lets a gate act as an inverter) never reproduces the XOR truth table, because XOR is not expressible as a single level of NAND-NAND-NAND composition without an extra 'cross' term; the minimum provably needs the diamond structure shown above, and this exact gate-count result is one of the most frequently tested numbers in GATE Digital Logic. As a contrasting fact worth memorizing alongside this one: XNOR (A⊕B)' needs a 5th NAND gate (simply invert the 4-gate XOR output), while realizing XOR from NOR-only gates needs 5 gates and XNOR from NOR-only gates needs only 4 — NAND and NOR trade places between XOR and XNOR."
+},
+{
+  id: 'digital-boolean-p8',
+  pyqStyle: true,
+  q: "Simplify to a minimal sum-of-products form: f(A,B,C,D) = Σm(2,3,10,11,14,15) + d(8,9).",
+  options: ["AC + B'C", "AC + AB'", "B'C + CD", "AB + B'C"],
+  answer: 0,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: "Plot the ON-set {2,3,10,11,14,15} and don't-cares {8,9} on a 4-variable K-map. Minterms 2,3,10,11 all have C=1,D can be either, and B=0 throughout (0010,0011,1010,1011), forming the group B'C (eliminating A and D). Minterms 10,11,14,15 all have A=1,C=1 (1010,1011,1110,1111), forming the group AC (eliminating B and D). Together B'C and AC cover all six ON-set minterms: B'C handles 2,3,10,11 and AC handles 10,11,14,15, with the overlap at 10,11 harmless. Neither group needs the don't-cares 8 or 9 to complete itself (they were available to enlarge groups but weren't required here, since B'C and AC already reach maximal size on their own), so the minimal SOP is exactly AC + B'C — a clean 2-term, 4-literal answer. Option 'AC + AB'' fails because AB' includes minterm 9 (1001, a don't-care, harmless) but also minterm 8 without covering 2 or 3, missing part of the ON-set entirely. Option 'B'C + CD' misses minterm 10 (1010, C=1 but D=0) is actually covered by B'C, but CD alone would incorrectly add minterm 7 if it existed and doesn't help cover 14; checking 14 (1110): CD requires D=1 which fails, so this option under-covers. Option 'AB + B'C' fails since AB (1100,1101,1110,1111 minus checks) does not correctly cover minterm 11 (1011, B=0, so AB is false there)."
+},
+{
+  id: 'digital-boolean-p9',
+  pyqStyle: true,
+  q: "For the 3-variable function f(A,B,C) = Σm(0,3,5,6) (the XNOR/even-parity function), the total number of prime implicants is:",
+  options: ["2", "3", "4", "6"],
+  answer: 2,
+  marks: 1,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: "This function is the even-parity (XNOR-of-three) pattern: on a K-map it forms a checkerboard where every 1-cell is surrounded on all sides by 0-cells (000 borders 001,010,100 — all zeros; 011 borders 001,010,111 — all zeros; and so on for 101 and 110). Because no two ON-set minterms are ever adjacent, none of them can combine with each other into a group of size 2, so each individual minterm is itself a prime implicant — it is an implicant (trivially, a single cell is inside the ON-set) and it cannot be enlarged (every neighbour is a 0). With four ON-set minterms (0,3,5,6), there are exactly four prime implicants: A'B'C', A'BC, AB'C, ABC'. This is the general rule for any parity/XOR-type function of n variables: it has 2^(n-1) ON-set minterms, and because a checkerboard pattern never has two adjacent 1s, every one of those minterms is its own prime implicant, so the minimal SOP is simply the full sum of all 2^(n-1) minterms — parity functions never simplify below their canonical form, which is exactly why they are the worst-case input for K-map minimization exercises."
+},
+{
+  id: 'digital-boolean-p10',
+  pyqStyle: true,
+  q: "The number of distinct self-dual Boolean functions of 4 variables is ______.",
+  options: [],
+  answer: 256,
+  marks: 2,
+  difficulty: 'hard',
+  type: 'pyq-style',
+  kind: 'nat',
+  explanation: "Using the general result derived for self-dual functions: a function of n variables is self-dual exactly when its output at every input v is the complement of its output at the bitwise-complemented input v'. The 2^n rows of the truth table split into 2^(n-1) complementary pairs (v, v'), and within each pair, fixing the output at one member automatically fixes the output at the other to be its complement — giving 2 independent choices per pair. With n=4, there are 2^4 = 16 rows forming 2^3 = 8 complementary pairs, and since the pairs are chosen independently, the total count is 2^8 = 256. This matches the general formula 2^(2^(n-1)): for n=2 it gives 4, for n=3 it gives 16 (as in an earlier question), and for n=4 it gives 256 — the numbers grow doubly-exponentially, which is why GATE only ever asks this for n=3 or n=4 and never higher. A quick way to remember which functions are guaranteed self-dual: any single literal (like A) and its complement (A') are always self-dual, since inverting all inputs of A gives A', and the overall complement of A' is A — consistent with the definition."
+},
+{
+  id: 'digital-boolean-p11',
+  pyqStyle: true,
+  q: "The minimum number of 2-input NOR gates required to implement F = A ⊕ B (XOR), using only A and B as available signals, is ______.",
+  options: [],
+  answer: 5,
+  marks: 2,
+  difficulty: 'hard',
+  type: 'pyq-style',
+  kind: 'nat',
+  explanation: "Building XOR from NOR gates needs one more gate than building it from NAND gates, because NOR's natural two-level realization matches POS/AND-of-ORs while XOR's convenient decomposition (A B' + A' B) is naturally SOP-shaped and needs an extra inversion layer to convert. A working 5-gate NOR circuit is: gate1 = NOR(A,B); gate2 = NOR(A, gate1); gate3 = NOR(B, gate1); gate4 = NOR(gate2, gate3); gate5 = NOR(gate4, gate4) — the last gate simply inverts, since gate4 alone computes XNOR, and one more NOR-as-inverter flips it to XOR. An exhaustive search over all ways to wire up to 4 two-input NOR gates fed only by A and B (allowing a signal to feed both inputs of a gate, which realizes inversion) never reproduces the XOR truth table, confirming 5 is the true minimum. This is the mirror image of the earlier result that XOR needs only 4 NAND gates but XNOR needs 5 NAND gates: with NOR gates the roles swap, and XNOR is the one that only needs 4 while XOR needs 5. GATE has tested both the NAND-XOR (4) and NOR-XOR (5) counts, so memorize the pair together rather than just one number."
+},
+{
+  id: 'digital-boolean-p12',
+  pyqStyle: true,
+  q: "The minimal sum-of-products form of f(A,B,C) = Σm(0,1,2,3,6) is:",
+  options: ["A' + BC'", "A' + BC", "B' + AC'", "A' + B'C"],
+  answer: 0,
+  marks: 1,
+  difficulty: 'easy',
+  type: 'pyq-style',
+  explanation: "Minterms 0,1,2,3 are exactly the four rows where A=0 (000,001,010,011), forming the group A' by themselves — a group of 4 that eliminates both B and C. The remaining minterm, 6 (110), is not covered by A' (since A=1 there) and its only ON-set neighbour is minterm 2 (010) — both have B=1,C=0 with A differing — giving the group BC' (eliminating A). No larger group is available for minterm 6 because minterm 7 (111) and minterm 4 (100) are not in the ON-set. So the minimal SOP is A' + BC', a two-term expression using 3 literals total. Option 'A' + BC' with BC instead of BC' would incorrectly also claim to cover minterm 7 (111), which is not in the given ON-set — check: A'+BC evaluated at A=1,B=1,C=1 gives 0+1=1, but f(7) is not listed as 1, so this option is wrong. Option 'B' + AC'' fails at minterm 2 (010): B'=0 and AC'=0 (since A=0), giving 0, but f(2)=1. Option 'A' + B'C' fails at minterm 6: A'=0 (A=1) and B'C=0 (B=1), giving 0, but f(6)=1."
+},
+{
+  id: 'digital-boolean-p13',
+  pyqStyle: true,
+  q: "The Boolean expression PQ + P'R + QR simplifies to:",
+  options: ["PQ + P'R", "PQ + QR", "P'R + QR", "PQ + P'R + PR"],
+  answer: 0,
+  marks: 1,
+  difficulty: 'easy',
+  type: 'concept',
+  explanation: "This is a direct application of the consensus theorem: for terms XY + X'Z + YZ, the third term YZ is always redundant and can be dropped, because whenever Y=1 and Z=1, at least one of X or X' is 1, so one of the first two terms is already 1 there — YZ never contributes a row that isn't already covered. Here X=P, Y=Q, Z=R, so QR is the consensus term of PQ and P'R, and the expression reduces to PQ + P'R. Verify by truth table at the four rows where Q=1,R=1 (the rows QR would 'add'): if P=1, PQ=1 already covers it; if P=0, P'R=1 already covers it — so QR adds nothing new in any case. Option 'PQ + QR' incorrectly drops P'R instead of QR — check P=0,Q=0,R=1: original expression gives 0+1+0=1, but PQ+QR gives 0+0=0, so this option is wrong. Option 'P'R + QR' drops PQ and fails at P=1,Q=1,R=0. The last option adds a spurious extra term PR that changes nothing but is not the minimal form."
+},
+{
+  id: 'digital-boolean-p14',
+  pyqStyle: true,
+  q: "Given a constant logic-1 signal in addition to the variables, which of the following gate sets becomes functionally complete?",
+  options: ["{XOR, AND, constant 1}", "{OR, AND, constant 1}", "{AND, constant 1} only", "{OR, constant 1} only"],
+  answer: 0,
+  marks: 1,
+  difficulty: 'medium',
+  type: 'concept',
+  explanation: "With a constant 1 available, {XOR, AND} becomes complete: NOT is realized as x ⊕ 1 = x' (since XOR-ing any signal with 1 flips it), AND is given directly, and OR follows from NOT and AND via De Morgan's law, x + y = (x'·y')'. All three primitive operations (NOT, AND, OR) are therefore reachable, so {XOR, AND, 1} is complete — this is exactly the basis used in the algebraic normal form (Zhegalkin polynomial) representation of Boolean functions, where every function is written as a sum of AND-terms combined with XOR. The other three options all stay incomplete even with the constant, for the same underlying reason: OR and AND are monotone functions (increasing any input can never decrease the output), and appending a fixed constant input does not break monotonicity — the output, viewed as a function of the true variables, still never decreases when a variable rises. NOT is the one basic operation that is not monotone (raising the input from 0 to 1 lowers the output from 1 to 0), so no combination of only OR, only AND, or OR-and-AND together, however many constant-1 wires are fed in, can ever realize it. This is why the constant alone never rescues a purely monotone gate set, while it does rescue XOR-based sets, since XOR is not monotone."
+}
+);
+
+window.GATE_DATA.questions['digital'].topics.find(function(t){return t.id==='digital-combinational';}).questions.push(
+{
+  id: 'digital-combinational-p1',
+  pyqStyle: true,
+  q: "The function f(A,B,C) = Σm(0,2,4,5) is to be realized using a 4-to-1 multiplexer with A, B (A as MSB) as select lines and data inputs I0, I1, I2, I3. The correct assignment is:",
+  options: ["I0 = C', I1 = C', I2 = 1, I3 = 0", "I0 = C, I1 = C, I2 = 0, I3 = 1", "I0 = C', I1 = C, I2 = 1, I3 = 0", "I0 = 1, I1 = C', I2 = C', I3 = 0"],
+  answer: 0,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: "With select lines AB choosing which data input is routed, each group of two minterms sharing the same AB value determines one data input as a function of the leftover variable C. For AB=00 (minterms 0,1): only minterm 0 (C=0) is in the ON-set and minterm 1 (C=1) is not, so I0 must be 1 when C=0 and 0 when C=1 — that is I0 = C'. For AB=01 (minterms 2,3): only minterm 2 (C=0) is present, so I1 = C' as well. For AB=10 (minterms 4,5): both minterms 4 (C=0) and 5 (C=1) are in the ON-set, so the output must be 1 regardless of C — I2 = 1. For AB=11 (minterms 6,7): neither is in the ON-set, so I3 = 0. This residue method — for each select combination, compare the two candidate minterms against the ON-set to decide between 0, 1, C, or C' — is the standard technique for realizing any n-variable function on a 2^(n-1)-to-1 mux, and it is far faster than deriving the SOP first. Option (b) has every assignment complemented; option (c) mixes up C and C' for I1; option (d) shifts the whole pattern by one select combination."
+},
+{
+  id: 'digital-combinational-p2',
+  pyqStyle: true,
+  q: "The minimum number of 2-to-1 multiplexers required to build a 16-to-1 multiplexer, using only 2-to-1 muxes arranged in a tree, is:",
+  options: ["8", "15", "16", "31"],
+  answer: 1,
+  marks: 1,
+  difficulty: 'easy',
+  type: 'pyq-style',
+  explanation: "A tree built from 2-to-1 muxes halves the number of data lines at every level: level 1 needs 8 muxes to merge the 16 inputs down to 8 lines, level 2 needs 4 muxes to merge those down to 4, level 3 needs 2 muxes down to 2, and level 4 needs 1 final mux down to the single output. Total = 8 + 4 + 2 + 1 = 15. This matches the general formula for building a 2^n-to-1 mux entirely from 2-to-1 muxes: it always takes exactly 2^n − 1 of them, mirroring a complete binary tree with 2^n leaves and 2^n − 1 internal nodes (each internal node is one 2-to-1 mux). For 16 = 2^4 this gives 16 − 1 = 15. Option (a) 8 is only the first level's mux count, forgetting the remaining levels. Option (c) 16 matches the number of data inputs, not the mux count. Option (d) 31 is the classic off-by-one error of computing 2×16 − 1 instead of 16 − 1, or equivalently miscounting one extra level."
+},
+{
+  id: 'digital-combinational-p3',
+  pyqStyle: true,
+  q: "A 3-to-8 decoder (with outputs D0-D7) is used along with 2-input OR gates to realize f(A,B,C) = Σm(1,3,5,6). The minimum number of 2-input OR gates needed is:",
+  options: ["1", "2", "3", "4"],
+  answer: 2,
+  marks: 1,
+  difficulty: 'easy',
+  type: 'pyq-style',
+  explanation: "Every decoder output line D_i is exactly the minterm m_i of the inputs (one line goes high for each unique input combination), so realizing any SOP function reduces to ORing together the decoder outputs whose indices appear in the function's minterm list. Here we must OR four lines, D1, D3, D5 and D6. A tree of 2-input OR gates combining n signals always needs exactly n − 1 gates (each gate reduces the signal count by one, and you need to get from n down to 1): first OR D1 and D3 to get one signal, OR D5 and D6 to get a second signal, then OR those two partial results together — that is 3 gates total (2 first-level + 1 second-level). This generalizes the earlier mux-tree counting rule (n inputs need n−1 combining elements) to OR-gate trees combining decoder minterms. Option (a) 1 would only work if a single 4-input OR gate were allowed, but the question restricts to 2-input gates. Options (b) and (d) undercount or overcount the tree depth needed for exactly four signals."
+},
+{
+  id: 'digital-combinational-p4',
+  pyqStyle: true,
+  q: "A 2-bit unsigned magnitude comparator compares A = A1A0 against B = B1B0. For A = 10 (decimal 2) and B = 01 (decimal 1), the comparator's three outputs (A>B, A<B, A=B) are:",
+  options: ["(1, 0, 0)", "(0, 1, 0)", "(0, 0, 1)", "(1, 1, 0)"],
+  answer: 0,
+  marks: 1,
+  difficulty: 'easy',
+  type: 'pyq-style',
+  explanation: "Magnitude comparison always starts from the most significant bit: if the MSBs differ, that single bit already decides the outcome and no lower bit is examined. Here A1 = 1 and B1 = 0 — they differ, and since A1 = 1 > B1 = 0, A is greater than B regardless of what A0 and B0 are. So (A>B, A<B, A=B) = (1, 0, 0), consistent with the decimal check 2 > 1. This MSB-first cascading rule is exactly how a multi-bit comparator is built from 1-bit comparator modules: the equality output of a higher-order stage gates whether the lower-order stage's comparison is even allowed to matter, so a difference detected higher up immediately locks in the final answer and no combinational path needs to examine the remaining bits at all. Option (b) reverses the direction of the inequality; option (c) wrongly claims equality despite the differing MSBs; option (d) asserts both A>B and A<B simultaneously, which is logically impossible for any comparator design."
+},
+{
+  id: 'digital-combinational-p5',
+  pyqStyle: true,
+  q: "The 4-variable function f(A,B,C,D) = Σm(1,2,4,7,9,11,12,14) is realized on an 8-to-1 multiplexer using A, B, C (A as MSB) as select lines and D as the residual variable. The data input I5 (select ABC = 101) equals:",
+  options: ["0", "1", "D", "D'"],
+  answer: 2,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: "Select combination ABC = 101 corresponds to the minterm pair (m10, m11) — since D contributes the last bit, m10 = 1010 (D=0) and m11 = 1011 (D=1). Checking the ON-set {1,2,4,7,9,11,12,14}: minterm 10 is absent but minterm 11 is present. So the output must be 0 when D=0 and 1 when D=1 — that is exactly I5 = D. Working through the full mux this way for all eight select combinations gives I0=D, I1=D', I2=D', I3=D, I4=D, I5=D, I6=D', I7=D' — note I3, I4 and I5 all happen to equal D, while I1, I2, I6, I7 equal D', illustrating that a mux realization does not require each data input to be distinct. Option 'D'' would be the answer only if minterm 10 were present and minterm 11 absent, the opposite of the actual ON-set membership. Options 0 and 1 would require both or neither of {10, 11} to be present, which is not the case here."
+},
+{
+  id: 'digital-combinational-p6',
+  pyqStyle: true,
+  q: "A 4-to-16 decoder is built by combining 3-to-8 decoders, each with a single active-high enable input, plus any necessary inverters. The minimum number of 3-to-8 decoder modules required is:",
+  options: ["1", "2", "3", "4"],
+  answer: 1,
+  marks: 1,
+  difficulty: 'easy',
+  type: 'pyq-style',
+  explanation: "A 4-to-16 decoder must produce 16 distinct output lines from 4 address bits, but each 3-to-8 decoder can only decode 3 of those bits into 8 lines at a time. The standard trick is to use the 4th (most significant) address bit to select which of two 3-to-8 decoders is active: feed the lower 3 bits to both decoders' address inputs in parallel, feed the MSB directly to one decoder's enable and its complement (via one inverter) to the other decoder's enable. When the MSB is 0, the first decoder is enabled and produces outputs D0-D7; when the MSB is 1, the second decoder is enabled and produces D8-D15 on the very same eight physical output lines relabeled. This needs exactly 2 decoder modules (plus 1 inverter, which is not counted among 'decoder modules'). This enable-controlled doubling is a general pattern: two n-to-2^n decoders with complementary enables build one (n+1)-to-2^(n+1) decoder, and it can be applied recursively — four 3-to-8 decoders (with a 2-to-4 decoder driving their enables) would build a 5-to-32 decoder, needing one extra doubling stage."
+},
+{
+  id: 'digital-combinational-p7',
+  pyqStyle: true,
+  q: "A 4-bit magnitude comparator is built by cascading four 1-bit comparator stages, most-significant bit first, where each stage receives the (greater/less/equal) result of the more significant stage as an override. The correct cascading principle is:",
+  options: [
+    "A stage's own comparison is used only if every more-significant stage reported equality; otherwise the most-significant stage that found a difference determines the final result",
+    "Every stage's comparison result is simply ORed together regardless of position",
+    "Only the least significant bit's comparison matters; higher bits are ignored",
+    "Each stage overrides the next more significant stage's result if they disagree"
+  ],
+  answer: 0,
+  marks: 1,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: "Magnitude comparison is lexicographic from the most significant bit down: the first (most significant) bit position where A and B differ fully determines whether A is greater or less than B, and every less-significant bit becomes irrelevant once such a difference is found. So the correct cascade computes, for each bit position from MSB to LSB, 'is this the first position of disagreement, and if so which way does it go' — equivalently, a stage's own A>B or A<B verdict is only allowed to propagate to the final output if every stage above it (more significant) reported equality; the moment a more significant stage finds A≠B, that stage's verdict is final and cannot be overridden by any lower stage. This is exactly the opposite of option (d), which would incorrectly let less significant bits override more significant ones — that would make comparators nonsensical, since it would let a 1-bit difference in the ones place override a genuine difference in the highest bit. A plain OR of all stages (option b) cannot work either, since it does not respect precedence and could not correctly resolve conflicting less-significant signals."
+},
+{
+  id: 'digital-combinational-p8',
+  pyqStyle: true,
+  q: "The minimum number of 4-to-1 multiplexers needed to build a 64-to-1 multiplexer, arranged as a tree of 4-to-1 muxes, is:",
+  options: ["16", "20", "21", "63"],
+  answer: 2,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: "Each 4-to-1 mux stage reduces the number of signal lines by a factor of 4, since it has 2 select bits handling 4 inputs at a time; building a 4^k-to-1 mux this way needs k levels. Here 64 = 4^3, so three levels are needed: the first level takes the 64 original inputs and needs 64/4 = 16 muxes to produce 16 intermediate signals; the second level takes those 16 signals and needs 16/4 = 4 muxes to produce 4 signals; the third level takes those 4 signals and needs 4/4 = 1 mux to produce the final single output. Total = 16 + 4 + 1 = 21. This matches the general formula for building a 4^k-to-1 mux entirely from 4-to-1 muxes: (4^k − 1)/3, giving (64−1)/3 = 21. Option (a) 16 only counts the first level. Option (b) 20 is an easy arithmetic slip (16+4=20, forgetting the final combining mux). Option (d) 63 confuses this with the '2-to-1 muxes needed for an m-to-1 mux' formula (m−1), which does not apply when the building block is 4-to-1 rather than 2-to-1."
+},
+{
+  id: 'digital-combinational-p9',
+  pyqStyle: true,
+  q: "A single 3-to-8 decoder is shared to realize two functions: f1(A,B,C) = Σm(0,2,5) and f2(A,B,C) = Σm(1,3,6,7), each via its own tree of 2-input OR gates. The total number of 2-input OR gates required (summed over both functions) is:",
+  options: ["4", "5", "6", "7"],
+  answer: 1,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: "Each function needs an OR-gate tree combining as many decoder output lines as it has minterms, and combining n signals with 2-input OR gates always needs n − 1 gates. f1 has 3 minterms (0, 2, 5), so it needs 3 − 1 = 2 OR gates: OR two of the lines together, then OR that result with the third line. f2 has 4 minterms (1, 3, 6, 7), so it needs 4 − 1 = 3 OR gates, combined as a balanced tree (two first-level ORs feeding one second-level OR). The two functions do not share any OR gates since they depend on entirely disjoint sets of decoder lines (the decoder itself is the only shared resource). Total OR gates = 2 (for f1) + 3 (for f2) = 5. This question tests the same n−1 counting rule applied twice and then summed — a common way GATE combines two 'easy' sub-counts into one numerically trickier question. Option (a) 4 would result from miscounting f1 as needing only 1 gate; option (c) and (d) overcount by assuming an unbalanced or redundant tree structure."
+},
+{
+  id: 'digital-combinational-p10',
+  pyqStyle: true,
+  q: "The 4-variable function f(A,B,C,D) = Σm(1,3,4,6,7) is realized on an 8-to-1 multiplexer with A, B, C as select lines (A as MSB) and D as the residual data variable. The correct data-input assignment (I0 through I7) is:",
+  options: [
+    "I0=C, I1=C, I2=C', I3=1, I4=0,I5=0,I6=0,I7=0",
+    "I0=D, I1=D, I2=D', I3=1, I4=0, I5=0, I6=0, I7=0",
+    "I0=0, I1=D, I2=D', I3=1, I4=0, I5=0, I6=0, I7=0",
+    "I0=D, I1=D', I2=D, I3=1, I4=0, I5=0, I6=0, I7=0"
+  ],
+  answer: 1,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: "With select ABC choosing the minterm pair and D the residual variable, check each ABC group against the ON-set {1,3,4,6,7}: ABC=000 gives minterms 0 (absent) and 1 (present), so the output is 0 when D=0, 1 when D=1 → I0 = D. ABC=001 gives minterms 2 (absent) and 3 (present) → I1 = D. ABC=010 gives minterms 4 (present) and 5 (absent) → I2 = D'. ABC=011 gives minterms 6 and 7, both present → I3 = 1. ABC=100 through 111 give minterms 8-15, none of which are in the ON-set, so I4 through I7 are all 0. This matches option (b) exactly. Option (a) mistakenly uses C instead of D as the residual variable, which is inconsistent since C is already consumed as a select line. Option (c) wrongly sets I0 = 0, missing that minterm 1 is present. Option (d) swaps I1 and I2's residual literal, which would incorrectly cover minterm 2 instead of minterm 3."
+},
+{
+  id: 'digital-combinational-p11',
+  pyqStyle: true,
+  q: "An 8-to-3 priority encoder (inputs D0-D7, higher index = higher priority) has D1 = D3 = D5 = 1 and all other inputs 0. The 3-bit output code and the valid (V) flag are:",
+  options: ["101, V=1", "011, V=1", "111, V=1", "101, V=0"],
+  answer: 0,
+  marks: 1,
+  difficulty: 'easy',
+  type: 'pyq-style',
+  explanation: "A priority encoder ignores every active input except the highest-priority one — here, priority increases with index, so among the active lines D1, D3 and D5, only D5 (the highest index that is asserted) determines the output; D1 and D3 are simply overridden and have no further effect. The binary code for index 5 is 101, so the output lines are 1,0,1. Since at least one input is active, the valid flag V is asserted (V=1) to signal that the output code is meaningful — without V, a code of all-zero output would be ambiguous between 'no inputs active' and 'D0 is the only active input,' which is exactly why priority encoders always include a validity output. Option (b) 011 would be the code for index 3, wrongly treating D3 as the winner instead of the higher-priority D5. Option (c) 111 would be index 7, which is not active at all. Option (d) correctly identifies the code but wrongly reports V=0, which would falsely indicate no valid input despite three lines being active."
+},
+{
+  id: 'digital-combinational-p12',
+  pyqStyle: true,
+  q: "A 4-bit equality comparator is built as four bitwise XNOR gates followed by a single tree of 2-input AND gates combining their outputs into one overall equality signal. The total number of 2-input gates (XNOR plus AND) required is:",
+  options: ["4", "6", "7", "8"],
+  answer: 2,
+  marks: 1,
+  difficulty: 'easy',
+  type: 'pyq-style',
+  explanation: "Each of the 4 bit positions needs its own XNOR gate to test 'this pair of bits is equal,' contributing 4 XNOR gates in total (one per bit, since XNOR(x,y) = 1 exactly when x=y). The four XNOR outputs must then all be ANDed together to assert overall equality only when every bit position matches; combining n signals with 2-input AND gates always needs n − 1 gates, so combining 4 XNOR outputs needs 4 − 1 = 3 AND gates arranged as a small tree (two first-level ANDs feeding one final AND). Total gate count = 4 (XNOR) + 3 (AND) = 7. Option (a) 4 counts only the XNOR stage and forgets the combining logic entirely. Option (b) 6 undercounts the AND tree by one (perhaps assuming a 4-input AND counts as one gate, which contradicts the 2-input-gate restriction stated in the question). Option (d) 8 overcounts by adding an unnecessary extra AND gate."
+},
+{
+  id: 'digital-combinational-p13',
+  pyqStyle: true,
+  q: "Using the residue (mux realization) method, the minimum number of select lines required to realize any single Boolean function of 5 variables on one multiplexer is:",
+  options: ["2", "3", "4", "5"],
+  answer: 2,
+  marks: 1,
+  difficulty: 'easy',
+  type: 'pyq-style',
+  explanation: "The residue method realizes an n-variable function using a 2^(n-1)-to-1 multiplexer: n-1 of the variables drive the select lines (grouping the minterms into pairs), and the single remaining variable is folded into the data inputs as one of 0, 1, the variable itself, or its complement — since any pair of minterms differing only in that last variable can always be expressed this way. For n = 5 variables, this means n - 1 = 4 select lines are needed, driving a 2^4 = 16-to-1 multiplexer, with the 5th variable appearing across the sixteen data inputs. Using only 3 select lines would give an 8-to-1 mux with 2 residual variables per data input slot, which is not sufficient because a single data input (which can only be 0, 1, a variable, or its complement) cannot represent an arbitrary function of two leftover variables — some groupings would need I_k to equal something like C⊕D, which a plain mux data line cannot supply. So 4 is the minimum guaranteed to work for every possible 5-variable function, and it is also sufficient, since the residue method always succeeds with exactly n-1 selects."
+},
+{
+  id: 'digital-combinational-p14',
+  pyqStyle: true,
+  q: "A 3-to-8 decoder's outputs are grouped into two OR gates: Z1 = OR(D1, D2, D4, D7) and Z2 = OR(D0, D3, D5, D6), where D0-D7 correspond to input combinations ABC = 000 through 111. For input ABC = 101, the values of (Z1, Z2) are:",
+  options: ["(1, 0)", "(0, 1)", "(1, 1)", "(0, 0)"],
+  answer: 1,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: "ABC = 101 is minterm 5, so decoder output D5 is the single line that goes high; every other decoder output stays low. D5 appears in the Z2 group (D0, D3, D5, D6), so Z2 = 1, while D5 does not appear in the Z1 group (D1, D2, D4, D7), so Z1 = 0. Stepping back, this decoder wiring is actually a parity generator: Z1's group {1,2,4,7} are exactly the minterms with an odd number of 1-bits (001, 010, 100, 111), so Z1 computes the odd-parity (XOR) of A, B, C, while Z2's group {0,3,5,6} are exactly the minterms with an even number of 1-bits, so Z2 computes the even-parity (XNOR) of A, B, C. Since 101 has two 1-bits (even), Z2 = 1 and Z1 = 0 is exactly what parity theory predicts, confirming the decoder trace. This is a common GATE construction: any decoder plus a partition of its outputs into two OR gates realizes some function and its complement simultaneously."
+}
+);
+
+window.GATE_DATA.questions['digital'].topics.find(function(t){return t.id==='digital-sequential';}).questions.push(
+{
+  id: 'digital-sequential-p1',
+  pyqStyle: true,
+  q: "A JK flip-flop currently holds Q = 1 and must transition to Q = 0 on the next clock edge. The required (J, K) input combination is:",
+  options: ["J = 1, K = 0", "J = 0, K = 1", "J = X, K = 1", "J = 1, K = X"],
+  answer: 2,
+  marks: 1,
+  difficulty: 'easy',
+  type: 'pyq-style',
+  explanation: "Recall the JK characteristic equation Q+ = JQ' + K'Q. With current Q = 1, this simplifies to Q+ = J·0 + K'·1 = K'. We need Q+ = 0, so K' = 0, meaning K = 1 is required, and J can be anything since the J·Q' term is already forced to 0 by Q' = 0 regardless of J's value — hence J = X (don't care). This is the standard JK excitation table entry for a 1→0 transition. Checking directly: with K = 1, J = 0, the flip-flop resets to 0 as required; with K = 1, J = 1, it is the toggle condition but since Q is already 1, toggling also produces 0 — both choices of J are consistent, confirming J is indeed a don't-care. Option (a) J=1,K=0 keeps Q+=JQ'+K'Q=0+1=1, wrongly holding Q at 1. Option (b) J=0,K=1 is one valid specific case but wrongly excludes the equally valid J=1 case, so it understates the don't-care. Option (d) fixes K at don't-care instead of J, which is backwards — K must specifically be 1."
+},
+{
+  id: 'digital-sequential-p2',
+  pyqStyle: true,
+  q: "A T flip-flop is to be realized using a JK flip-flop (with T as the only external input, connected identically to both J and K inputs). Verify that this conversion is correct by checking the resulting characteristic equation. Which expression correctly describes the resulting flip-flop's behavior?",
+  options: ["Q+ = T", "Q+ = T ⊕ Q (toggles when T = 1)", "Q+ = T'Q", "Q+ = TQ (holds only when T=1 and Q=1)"],
+  answer: 1,
+  marks: 1,
+  difficulty: 'easy',
+  type: 'pyq-style',
+  explanation: "Substituting J = K = T into the JK characteristic equation Q+ = JQ' + K'Q gives Q+ = TQ' + T'Q, which is precisely the XOR expression T ⊕ Q. This confirms the conversion is correct: when T = 0, Q+ = 0·Q' + 1·Q = Q (hold, since both terms reduce so that only Q survives), and when T = 1, Q+ = Q' (toggle). This is exactly the defining behavior of a T flip-flop, so tying J and K together and driving them both with T is a valid and standard way to build a T flip-flop from a JK flip-flop — no other logic is needed. Option (a) Q+ = T would describe a D flip-flop's behavior, not a toggle. Option (c) and (d) do not match the derived expression T⊕Q at all — checking option (d) at T=1,Q=0: TQ = 0, but the true Q+ should be 1 (toggle from 0), so option (d) is wrong."
+},
+{
+  id: 'digital-sequential-p3',
+  pyqStyle: true,
+  q: "A counter built from 3 T flip-flops counts up in binary (000, 001, 010, ...) but has asynchronous reset logic that forces the counter back to 000 the instant it reaches state 110 (decimal 6). Starting from 000, the modulus of this counter (the number of distinct stable states in its repeating cycle) is:",
+  options: ["4", "5", "6", "7"],
+  answer: 2,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: "The counter counts normally through 000, 001, 010, 011, 100, 101 (decimal 0 through 5) — six stable states — and the instant it would advance to 110 (decimal 6), the reset logic detects that state and asynchronously forces it back to 000 before 110 can be observed as a stable output; 110 exists only as a transient glitch, not a state the counter settles into. So the counter cycles through exactly 6 stable states (0 through 5) before repeating, giving modulus 6, even though 3 flip-flops could in principle support up to 2^3 = 8 states. This is the standard technique for building a mod-N counter for any N that is not a power of 2: use enough flip-flops to cover at least N states (here ceil(log2 6) = 3), let it count normally, and add reset/preset logic that intercepts the counter at the unwanted state N and forces it back to 0. Option (d) 7 would be the modulus if the reset only triggered at 111 instead of 110. Options (a) and (b) undercount the number of states actually visited before the reset fires."
+},
+{
+  id: 'digital-sequential-p4',
+  pyqStyle: true,
+  q: "A 4-bit ripple (asynchronous) counter uses flip-flops each with propagation delay 25 ns, and its outputs are not fed into any decoder. The maximum clock frequency at which this counter can operate reliably is:",
+  options: ["40 MHz", "25 MHz", "10 MHz", "4 MHz"],
+  answer: 2,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: "In a ripple counter, each flip-flop is clocked by the output of the previous stage, so a change at the input clock must propagate through all 4 stages before the counter's output is valid — the worst case is when every stage must toggle (such as the transition from 0111 to 1000), and the total settling time is the sum of all 4 individual propagation delays: 4 × 25 ns = 100 ns. The clock period must be at least this long to guarantee the ripple has fully settled before the next clock edge arrives, so the minimum period is 100 ns, giving a maximum frequency of 1/100 ns = 10 MHz. This linear growth of delay with the number of stages (n × tpd) is the fundamental weakness of ripple counters compared to synchronous counters, whose maximum frequency does not depend on the number of stages at all. Option (a) 40 MHz would result from mistakenly using only 1 stage's delay (1/25ns = 40MHz). Option (b) 25 MHz halves the correct delay sum by mistake. Option (d) 4 MHz would result from an arithmetic slip treating the total delay as 250 ns instead of 100 ns."
+},
+{
+  id: 'digital-sequential-p5',
+  pyqStyle: true,
+  q: "A synchronous counter's flip-flops have clock-to-Q delay tcq = 5 ns, and the combinational next-state logic has worst-case delay tcomb = 10 ns; each flip-flop's setup time is tsu = 5 ns. The maximum operating frequency of this counter, regardless of how many flip-flop stages it has, is:",
+  options: ["100 MHz", "66.7 MHz", "50 MHz", "20 MHz"],
+  answer: 2,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: "In a synchronous counter, every flip-flop is clocked simultaneously, and the timing constraint is a single register-to-register path: the clock period must be at least tcq + tcomb + tsu, because a flip-flop's output must propagate through the combinational next-state logic and arrive at the next flip-flop's D (or J/K) input with enough margin (setup time) before the next active clock edge. Here that sum is 5 + 10 + 5 = 20 ns, giving a minimum period of 20 ns and a maximum frequency of 1/20 ns = 50 MHz. Crucially, this bound does not depend on the number of flip-flop stages in the counter — whether it has 4 bits or 16 bits, the same 20 ns period suffices, because all flip-flops update in one clock edge based on logic computed from the previous state, unlike a ripple counter where delays accumulate stage by stage. Option (a) 100 MHz would result from omitting tsu from the sum. Option (b) 66.7 MHz corresponds to a 15 ns period, an arithmetic slip. Option (d) 20 MHz corresponds to a 50 ns period, roughly 2.5× too large."
+},
+{
+  id: 'digital-sequential-p6',
+  pyqStyle: true,
+  q: "A Johnson (twisted-ring) counter is built using 4 D flip-flops, with the complement of the last stage's output fed back to the first stage's input. Starting from state 0000, the number of distinct states visited before the sequence repeats is:",
+  options: ["4", "6", "8", "16"],
+  answer: 2,
+  marks: 1,
+  difficulty: 'easy',
+  type: 'pyq-style',
+  explanation: "Simulating the shift: starting at 0000, each clock shifts all bits over by one position and inserts the complement of the last (rightmost) bit at the front. The sequence is 0000 → 1000 → 1100 → 1110 → 1111 → 0111 → 0011 → 0001 → back to 0000, visiting 8 distinct states before repeating. This matches the general rule for a Johnson counter built from n flip-flops: it always cycles through exactly 2n states, in contrast to a plain ring counter with n flip-flops, which cycles through only n states (one bit set at a time, circulating). The Johnson counter trades a slightly more complex feedback (complement instead of direct feedback) for double the state count from the same number of flip-flops, and its states can all be decoded using only 2-input gates (since consecutive states differ by exactly one bit, much like Gray code), which is a major advantage over binary counters of the same modulus. Option (a) 4 would be the modulus of a plain ring counter with 4 stages, not a Johnson counter. Option (d) 16 would be the full 2^4 state space of 4 unconstrained flip-flops, which the twisted-ring feedback never realizes."
+},
+{
+  id: 'digital-sequential-p7',
+  pyqStyle: true,
+  q: "A 5-stage ring counter (5 D flip-flops in a circular shift register, direct — not complemented — feedback) starts in state Q4Q3Q2Q1Q0 = 10000. After 3 clock pulses (shifting right, with the last bit wrapping to the front), the state is:",
+  options: ["01000", "00100", "00010", "00001"],
+  answer: 2,
+  marks: 1,
+  difficulty: 'easy',
+  type: 'pyq-style',
+  explanation: "A ring counter simply circulates its single active bit one position per clock pulse, with no inversion. Starting at 10000: after clock 1, the single 1 moves one position to give 01000; after clock 2, it moves again to give 00100; after clock 3, it moves once more to give 00010. Each of the 5 states in the cycle has exactly one flip-flop output high, so a ring counter is inherently self-decoding — no extra gates are needed to identify which state the counter is in, since each state corresponds one-to-one with a distinct flip-flop being high. This comes at the cost of needing n flip-flops for only n states (much less efficient than an n-flip-flop binary counter's 2^n states, or even a Johnson counter's 2n states from n flip-flops), which is why ring counters are used mainly when self-decoding matters more than flip-flop economy, such as in simple sequencers and traffic-light-style controllers. Option (a) 01000 is the state after only 1 clock, not 3. Option (d) 00001 would be the state after 4 clocks."
+},
+{
+  id: 'digital-sequential-p8',
+  pyqStyle: true,
+  q: "A 4-bit serial-in serial-out (SISO) shift register, shifting right and starting with contents Q3Q2Q1Q0 = 0000, has the serial bit stream 1, 0, 1, 1 applied to its serial input (Q3), one bit per clock, in that order. After the 4th clock pulse, the register contents Q3Q2Q1Q0 are:",
+  options: ["1011", "1101", "0111", "1110"],
+  answer: 1,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: "On each clock, the register shifts right (Q2 → Q1, Q1 → Q0, Q0's old value is lost out the far end) and the new serial bit enters at Q3. Tracing all four clocks: after clock 1 (bit 1 enters), Q3Q2Q1Q0 = 1000. After clock 2 (bit 0 enters), the previous 1 shifts right and the new 0 enters at Q3: Q3Q2Q1Q0 = 0100. After clock 3 (bit 1 enters): Q3Q2Q1Q0 = 1010. After clock 4 (bit 1 enters): Q3Q2Q1Q0 = 1101. So the final contents are 1101 — reading right to left, Q0 holds the first bit that entered (1), Q1 holds the second (0), Q2 holds the third (1), and Q3 holds the most recently entered fourth bit (1), i.e. Q0Q1Q2Q3 = 1011 which is the input sequence read left to right, and Q3Q2Q1Q0 (the conventional MSB-first reading) reverses that to 1101. Option (a) 1011 is exactly this same content but read in the opposite (Q0Q1Q2Q3) bit order — a classic labeling trap. Options (c) and (d) result from shifting left instead of right, or misordering which bit entered first."
+},
+{
+  id: 'digital-sequential-p9',
+  pyqStyle: true,
+  q: "A D flip-flop is to be realized using a JK flip-flop plus external combinational logic driving its J and K inputs from the D input. The correct logic is:",
+  options: ["J = D, K = D'", "J = D, K = D", "J = D', K = D", "J = 1, K = D"],
+  answer: 0,
+  marks: 1,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: "Substitute J = D and K = D' into the JK characteristic equation Q+ = JQ' + K'Q: this gives Q+ = D·Q' + (D')'·Q = DQ' + DQ = D(Q' + Q) = D, since Q' + Q = 1 for any Q. The next state equals D regardless of the current state Q, which is exactly the defining behavior of a D flip-flop — it simply copies its input to the output on every clock edge. Checking directly with the JK excitation table also confirms this: for a 0→0 or 1→1 transition (D holds its value, no change), we need J=0,K=X for 0→0 and J=X,K=0 for 1→1 — setting J=D=0,K=D'=1 satisfies the first (K=1 is a valid don't-care choice), and J=D=1,K=D'=0 satisfies the second. For a 0→1 transition, D=1 requires J=1,K=0 (a firm set), matching J=D=1,K=D'=0. Option (b) J=K=D would instead build a T flip-flop when D is renamed T (toggle behavior), not a D flip-flop. Options (c) and (d) do not reduce to Q+=D under substitution."
+},
+{
+  id: 'digital-sequential-p10',
+  pyqStyle: true,
+  q: "A mod-5 counter is built with 3 JK flip-flops Q2Q1Q0, counting 000, 001, 010, 011, 100, then back to 000. For the transition of the most significant flip-flop Q2 from state 4 (100) to state 0 (000) — i.e. Q2 goes from 1 to 0 — the required (J2, K2) inputs are:",
+  options: ["J2 = 1, K2 = 0", "J2 = 0, K2 = 1", "J2 = X, K2 = 1", "J2 = 1, K2 = X"],
+  answer: 2,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: "This is the same 1→0 excitation rule applied to the specific flip-flop Q2 in this counter design: since Q2 must go from 1 (in state 100) to 0 (in state 000), the JK characteristic equation Q+ = JQ' + K'Q with Q=1 reduces to Q+ = K', so we need K' = 0, i.e. K2 = 1, while J2 is unconstrained (don't-care) because the JQ' term is already zero when Q=1... more precisely, since Q=1 makes Q'=0, the J-controlled term vanishes regardless of J's value, so J2 = X. This is exactly the JK excitation table's 1→0 row applied here. Designing the full mod-5 counter requires deriving similar excitation equations for Q1 and Q0 across all five state transitions (000→001, 001→010, 010→011, 011→100, 100→000) and then minimizing each of J0,K0,J1,K1,J2,K2 as a function of the present state — but this single transition in isolation only needs the basic excitation table lookup, independent of the rest of the design. Options (a) and (b) wrongly fix J2 to a specific value instead of leaving it don't-care; option (d) incorrectly leaves K2, not J2, as the don't-care."
+},
+{
+  id: 'digital-sequential-p11',
+  pyqStyle: true,
+  q: "Which of the following correctly distinguishes the maximum operating frequency of a synchronous counter from that of a ripple counter with the same number of flip-flop stages?",
+  options: [
+    "A synchronous counter's maximum frequency is independent of the number of stages, while a ripple counter's maximum frequency decreases as more stages are added",
+    "A ripple counter's maximum frequency is independent of the number of stages, while a synchronous counter's decreases as more stages are added",
+    "Both counters' maximum frequencies decrease identically with the number of stages",
+    "Neither counter's maximum frequency depends on the number of stages"
+  ],
+  answer: 0,
+  marks: 1,
+  difficulty: 'easy',
+  type: 'pyq-style',
+  explanation: "A ripple counter's stages are triggered one after another (each flip-flop's clock comes from the previous stage's output), so a full ripple settling time grows linearly with the stage count: n × tpd. Adding more bits directly increases the worst-case settling delay and therefore directly lowers the maximum reliable clock frequency, fmax = 1/(n·tpd) (plus any decoding delay). A synchronous counter, in contrast, clocks every flip-flop from the same source simultaneously, and the timing constraint is a single register-to-register path of fixed depth: tcq + tcomb(max) + tsu. While tcomb can grow slightly with very wide counters (more inputs to the next-state logic can mean a few extra gate delays for carry propagation in the combinational logic), the dominant, textbook-level GATE answer treats this as constant, independent of the number of stages, which is the whole point of building synchronous rather than ripple counters for high-speed applications. Option (b) reverses the two counter types' actual scaling behavior. Options (c) and (d) both ignore the well-established asymmetry between the two architectures that this question is specifically testing."
+},
+{
+  id: 'digital-sequential-p12',
+  pyqStyle: true,
+  q: "A synchronous binary up-counter is built from 2 T flip-flops Q1Q0 with T0 = 1 and T1 = Q0 (the standard mod-4 counter wiring). Starting from state Q1Q0 = 00, the sequence of states over the next 4 clock pulses is:",
+  options: ["00, 01, 10, 11", "00, 10, 01, 11", "01, 10, 11, 00", "00, 11, 01, 10"],
+  answer: 0,
+  marks: 1,
+  difficulty: 'easy',
+  type: 'pyq-style',
+  explanation: "Apply the T flip-flop characteristic equation Q+ = T ⊕ Q to both bits at each step. Starting at Q1Q0 = 00: T0 = 1 always, so Q0 toggles every clock; T1 = Q0, so Q1 toggles only when Q0 was 1 before the clock (this is exactly how a ripple-style carry works even in this synchronous design, since T1 depends combinationally on the current Q0). Clock 1: Q0 was 0, so T1=0, Q1 stays 0; Q0 toggles to 1. New state 01. Clock 2: Q0 was 1, so T1=1, Q1 toggles to 1; Q0 toggles to 0. New state 10. Clock 3: Q0 was 0, so T1=0, Q1 stays 1; Q0 toggles to 1. New state 11. Clock 4: Q0 was 1, so T1=1, Q1 toggles to 0; Q0 toggles to 0. New state 00. So the sequence is 00, 01, 10, 11, back to 00 — the standard binary count-up sequence, confirming T0=1, T1=Q0 is indeed the correct synchronous mod-4 up-counter design (the general rule being T_i = AND of all lower-order bits, which for a single lower bit Q0 is simply Q0 itself). Option (b) and (d) scramble the natural binary order; option (c) merely starts the same correct cycle from a different point, but the question specifies starting from 00."
+},
+{
+  id: 'digital-sequential-p13',
+  pyqStyle: true,
+  q: "For a NOR-based SR flip-flop, the transition from Q = 0 to Q = 1 requires which (S, R) input combination at the clock edge?",
+  options: ["S = 1, R = 0", "S = 0, R = 1", "S = 0, R = 0", "S = 1, R = 1"],
+  answer: 0,
+  marks: 1,
+  difficulty: 'easy',
+  type: 'concept',
+  explanation: "The SR flip-flop's defining behavior is: S = 1, R = 0 sets Q to 1; S = 0, R = 1 resets Q to 0; S = R = 0 holds the previous value; and S = R = 1 is forbidden (both outputs would be forced to the same invalid combination, and releasing both inputs together causes a race to an unpredictable state). For Q to transition specifically from 0 to 1, the flip-flop must be actively set, which by definition requires S = 1 and R = 0 — there is no don't-care flexibility here as there is in the JK excitation table, since S = 1, R = 1 is forbidden outright and cannot be substituted as a don't-care option the way it can for J = K = 1 in a JK flip-flop (where it safely means toggle). This lack of a safe forbidden-state fallback is exactly why JK flip-flops evolved from SR flip-flops: JK removes the forbidden S=R=1 combination by redefining it as a toggle, giving one more usable degree of freedom in the excitation table. Option (b) would instead force Q to 0, the opposite of what's required. Option (c) holds Q at its previous value (0), never reaching 1. Option (d) is the forbidden state and must never be applied."
+},
+{
+  id: 'digital-sequential-p14',
+  pyqStyle: true,
+  q: "For a fixed number of flip-flops n, how do the number of distinct states in a ring counter and a Johnson (twisted-ring) counter compare?",
+  options: [
+    "Ring counter gives n states; Johnson counter gives 2n states",
+    "Ring counter gives 2n states; Johnson counter gives n states",
+    "Both give exactly n states",
+    "Both give exactly 2^n states"
+  ],
+  answer: 0,
+  marks: 1,
+  difficulty: 'easy',
+  type: 'concept',
+  explanation: "A ring counter circulates a single active bit through n flip-flops with direct (uninverted) feedback from the last stage to the first, so the single 1 simply visits each of the n flip-flop positions once before returning to the start, giving exactly n distinct states. A Johnson counter instead feeds back the COMPLEMENT of the last stage, which means the register fills up with 1s one bit at a time over n clocks, then empties back to all 0s one bit at a time over another n clocks, giving 2n distinct states from the same n flip-flops before the cycle repeats — double the ring counter's state count for the same hardware cost. Both designs share the major practical advantage of being easy to decode: ring counter states are already self-decoded (one flip-flop per state), and Johnson counter states, though not self-decoded, differ from their neighbors by only one bit (like Gray code) and so can be decoded from just two flip-flop outputs per state using simple 2-input gates. Neither achieves the full 2^n states of an unconstrained n-bit binary counter (option d), since the shift-register feedback structure heavily restricts which state sequences are reachable."
+}
+);
+
+window.GATE_DATA.questions['digital'].topics.find(function(t){return t.id==='digital-number-systems';}).questions.push(
+{
+  id: 'digital-number-systems-p1',
+  pyqStyle: true,
+  q: "If the equation 44 + 33 = 121 holds in some radix r (all numerals written in base r), the value of r is:",
+  options: ["5", "6", "7", "8"],
+  answer: 1,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: "Translate every numeral into its polynomial form in base r: 44_r = 4r + 4, 33_r = 3r + 3, and 121_r = r^2 + 2r + 1. Setting up the equation: (4r + 4) + (3r + 3) = r^2 + 2r + 1, which simplifies to 7r + 7 = r^2 + 2r + 1, or r^2 - 5r - 6 = 0. Factoring gives (r - 6)(r + 1) = 0, so r = 6 (the negative root r = -1 is not a valid radix). Always sanity-check by verifying every digit used is legal in the found radix: the digits appearing are 4, 3, 1, 2 — all strictly less than 6, so r = 6 is a valid radix for this equation (a digit equal to or exceeding the found radix would invalidate that root, a frequently planted trap in this exact question style). Direct verification: 44 base 6 = 4×6+4 = 28, 33 base 6 = 3×6+3 = 21, and 28+21 = 49; 121 base 6 = 1×36 + 2×6 + 1 = 49, confirming the equation holds exactly at r = 6."
+},
+{
+  id: 'digital-number-systems-p2',
+  pyqStyle: true,
+  q: "The range of values representable by a 6-bit 2's complement number is:",
+  options: ["-31 to +31", "-32 to +31", "-32 to +32", "-63 to +63"],
+  answer: 1,
+  marks: 1,
+  difficulty: 'easy',
+  type: 'pyq-style',
+  explanation: "For an n-bit 2's complement representation, the range is -2^(n-1) to +2^(n-1) - 1 — asymmetric, with one extra negative value compared to positive values. For n = 6: the minimum is -2^5 = -32 (represented as 100000, the sign bit alone contributing its full negative weight with all other bits 0) and the maximum is 2^5 - 1 = 31 (represented as 011111, the largest pattern with the sign bit clear). This asymmetry arises because the all-zero pattern is reserved for 0, using up one of the 64 total bit patterns that would otherwise represent +0, leaving only 31 positive nonzero values (000001 through 011111) but a full 32 negative values (100000 through 111111) since 2's complement has no separate negative zero. Option (a) -31 to +31 is the symmetric range of 1's complement or sign-magnitude representation for the same width, not 2's complement. Option (c) incorrectly makes the range symmetric on both ends. Option (d) mistakenly doubles the exponent, corresponding to 7 bits' worth of range instead of 6."
+},
+{
+  id: 'digital-number-systems-p3',
+  pyqStyle: true,
+  q: "Adding the 6-bit 2's complement numbers 011111 (31) and 000011 (3), the sum obtained is 100010. Regarding this addition:",
+  options: [
+    "The binary sum is correct and equals 34 in decimal, no overflow",
+    "Overflow has occurred: both operands are positive but the result 100010 has its sign bit set (appears negative)",
+    "Overflow cannot occur here since both operands are positive",
+    "The result is 100010, which is a valid representation of -30, and this is the correct sum"
+  ],
+  answer: 1,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: "Both operands here are positive (their sign bits, the leftmost bit, are 0 in 011111 and 000011), and the true decimal sum 31 + 3 = 34 exceeds the maximum representable positive value for 6-bit 2's complement, which is 31 (range -32 to +31). Adding the two bit patterns in binary gives 011111 + 000011 = 100010, and this result's sign bit is 1, making it appear to be a negative number (specifically, 100010 as a 2's complement pattern represents -30) — but two positive numbers can never legitimately sum to a negative result. This is exactly the classic 'same-sign operands, opposite-sign result' overflow signature: whenever both operands share a sign and the result's sign differs, the true mathematical sum has exceeded the representable range and overflow must be flagged. The equivalent carry-based test also confirms this: the carry into the sign bit position and the carry out of the sign bit position differ here, which is the hardware-level overflow detector. Option (a) wrongly accepts the corrupted result at face value; option (c) is simply false, since same-sign overflow is exactly the case that can occur (only mixed-sign addition is guaranteed overflow-free)."
+},
+{
+  id: 'digital-number-systems-p4',
+  pyqStyle: true,
+  q: "The 4-bit Gray code corresponding to the binary number 1011 is:",
+  options: ["1101", "1110", "1010", "0110"],
+  answer: 1,
+  marks: 1,
+  difficulty: 'easy',
+  type: 'pyq-style',
+  explanation: "Binary-to-Gray conversion copies the most significant bit unchanged, then each subsequent Gray bit is the XOR of the current binary bit and the binary bit immediately to its left: g_i = b_i ⊕ b_(i+1), with the MSB copied directly (g_3 = b_3). For binary b3b2b1b0 = 1011: g3 = b3 = 1. g2 = b3 ⊕ b2 = 1 ⊕ 0 = 1. g1 = b2 ⊕ b1 = 0 ⊕ 1 = 1. g0 = b1 ⊕ b0 = 1 ⊕ 1 = 0. So the Gray code is g3g2g1g0 = 1110. The defining property of Gray code — that consecutive values differ in exactly one bit — can be spot-checked here: binary 1010 (decimal 10) converts to Gray 1111, and binary 1011 (decimal 11) converts to Gray 1110; these two Gray codes differ in only the last bit, consistent with the two binary values being consecutive integers. Option (a) 1101 and option (c) 1010 do not follow the XOR-with-left-neighbor rule correctly. Option (d) 0110 wrongly flips the MSB, which should always be copied unchanged from the binary MSB."
+},
+{
+  id: 'digital-number-systems-p5',
+  pyqStyle: true,
+  q: "The Excess-3 code for the decimal digit 6 is:",
+  options: ["0110", "1001", "0011", "1100"],
+  answer: 1,
+  marks: 1,
+  difficulty: 'easy',
+  type: 'pyq-style',
+  explanation: "Excess-3 encodes each decimal digit d as the 4-bit binary representation of d + 3. For digit 6: 6 + 3 = 9, and 9 in 4-bit binary is 1001. So the Excess-3 code for 6 is 1001. Excess-3 is called 'self-complementing' because the code for the 9's complement of a digit (9 - d) is exactly the bitwise complement of the code for d — check here: the 9's complement of 6 is 3, and the Excess-3 code for 3 is (3+3=6) 0110, which is indeed the bitwise complement of 1001 (flip each bit of 1001 to get 0110). This self-complementing property made Excess-3 attractive in early decimal arithmetic hardware, since 9's-complement subtraction (a decimal analogue of 2's complement subtraction) could be performed by simply inverting bits, exactly as 1's complement does for binary subtraction. Option (a) 0110 is actually the Excess-3 code for digit 3, not 6 — a classic mix-up between a digit and its 9's complement partner. Option (c) 0011 is the plain binary code for 3, ignoring the +3 offset entirely. Option (d) 1100 does not correspond to any valid Excess-3 digit encoding in range."
+},
+{
+  id: 'digital-number-systems-p6',
+  pyqStyle: true,
+  q: "Adding the BCD digits 8 (1000) and 7 (0111) using a 4-bit binary adder followed by BCD correction logic, the final corrected BCD result (including the decimal carry-out bit) is:",
+  options: ["0 1111 (no correction needed)", "1 0101 (decimal carry = 1, digit = 5)", "0 0101 (digit = 5, no carry)", "1 1111 (decimal carry = 1, digit = 15)"],
+  answer: 1,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: "First, add the two 4-bit binary patterns directly: 1000 (8) + 0111 (7) = 1111 (15 in raw binary, with no carry out of the 4-bit adder). Since the raw sum 1111 (15) exceeds 9, it is not a valid single BCD digit, so BCD correction logic adds 0110 (6) to push the sum past the next multiple of 16 and force a carry: 1111 + 0110 = 1 0101. The result is a carry-out of 1 (representing the decimal tens digit) and a corrected nibble of 0101 (decimal 5) — together correctly representing 8 + 7 = 15 as the BCD digit pair 'carry=1, ones digit=5', i.e. 15 in BCD form. This +6 correction rule works because adding 6 accounts for exactly the 6 unused 4-bit codes (1010 through 1111) that binary counting passes through between each valid BCD digit but that a decimal digit sequence must skip; the correction realigns the raw binary sum with the BCD encoding, sacrificing 6 codes' worth of range per correction step. Option (a) fails to apply the needed correction at all, since 1111 is not a valid BCD digit. Option (d) misreads the corrected nibble as still equalling the raw uncorrected 1111."
+},
+{
+  id: 'digital-number-systems-p7',
+  pyqStyle: true,
+  q: "The total number of distinct values representable by a 5-bit 1's complement number is:",
+  options: ["32", "31", "16", "30"],
+  answer: 1,
+  marks: 1,
+  difficulty: 'easy',
+  type: 'pyq-style',
+  explanation: "An n-bit 1's complement representation has 2^n total bit patterns, but two of those patterns — all-0s and all-1s — both represent zero (positive zero and negative zero respectively), so only 2^n - 1 distinct numeric values are actually representable. For n = 5: 2^5 = 32 total bit patterns, but one is 'wasted' on the duplicate zero, leaving 2^5 - 1 = 31 distinct representable values, spanning -15 to +15 (with two codes both meaning 0). This is the key practical drawback of 1's complement compared to 2's complement: 2's complement has only a single representation of zero, so all 2^n bit patterns are distinct, giving n bits one extra usable value compared to 1's complement of the same width — for n=5 that is 32 distinct values in 2's complement (range -16 to +15) versus only 31 in 1's complement. Option (a) 32 wrongly assumes every bit pattern gives a distinct value, ignoring the double-zero. Option (c) 16 is a plain power-of-2 slip unrelated to the correct formula. Option (d) 30 undercounts by one, perhaps double-subtracting for the two zero codes instead of recognizing they still map to one distinct value (zero itself)."
+},
+{
+  id: 'digital-number-systems-p8',
+  pyqStyle: true,
+  q: "If the equation 51 - 26 = 23 holds in some radix r (all numerals in base r), the value of r is:",
+  options: ["7", "8", "9", "10"],
+  answer: 1,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: "Translate each numeral into its polynomial form in base r: 51_r = 5r + 1, 26_r = 2r + 6, and 23_r = 2r + 3. The equation becomes (5r + 1) - (2r + 6) = 2r + 3, which simplifies to 3r - 5 = 2r + 3, giving r = 8. Check that every digit used is legal in base 8: the digits appearing are 5, 1, 2, 6, 2, 3 — all strictly less than 8, so r = 8 is valid (note the digit 6 in particular must be less than r, ruling out r = 7 immediately even before solving algebraically, since 6 would not be a legal base-7 digit... actually 6 < 7 is legal, so this check alone doesn't eliminate r=7, but the algebra does). Direct verification: 51 base 8 = 5×8+1 = 41, 26 base 8 = 2×8+6 = 22, and 41 - 22 = 19; 23 base 8 = 2×8+3 = 19, confirming the equation holds exactly at r = 8. Option (a) r=7 fails the algebra (plugging in gives 3(7)-5=16 but 2(7)+3=17, a mismatch), even though all digits would be individually legal in base 7."
+},
+{
+  id: 'digital-number-systems-p9',
+  pyqStyle: true,
+  q: "A 4-bit Gray code value 1101 is to be converted back to its corresponding binary value. The correct binary value is:",
+  options: ["1001", "1011", "1101", "0110"],
+  answer: 0,
+  marks: 1,
+  difficulty: 'easy',
+  type: 'pyq-style',
+  explanation: "Gray-to-binary conversion works from the most significant bit down: the binary MSB equals the Gray MSB directly (b3 = g3), and each subsequent binary bit is the XOR of the previous binary bit (just computed) with the current Gray bit: b_i = b_(i+1) ⊕ g_i. For Gray g3g2g1g0 = 1101: b3 = g3 = 1. b2 = b3 ⊕ g2 = 1 ⊕ 1 = 0. b1 = b2 ⊕ g1 = 0 ⊕ 0 = 0. b0 = b1 ⊕ g0 = 0 ⊕ 1 = 1. So the binary value is b3b2b1b0 = 1001 (decimal 9). This XOR-chain (cascading from the MSB down, unlike the binary-to-Gray direction which only XORs adjacent bits independently) is necessary because each Gray bit only encodes a 'change' relative to the previous binary bit, so recovering the actual binary bit requires accumulating all the changes from the MSB downward. As a sanity check, converting 9 back to Gray using the standard formula gives g3=b3=1, g2=b3⊕b2=1⊕0=1, g1=b2⊕b1=0⊕0=0, g0=b1⊕b0=0⊕1=1, i.e. 1101 — exactly the original Gray code, confirming the round trip. Option (b) 1011 and option (d) 0110 do not survive this round-trip check."
+},
+{
+  id: 'digital-number-systems-p10',
+  pyqStyle: true,
+  q: "Adding the 5-bit 2's complement numbers 10011 (-13) and 10101 (-11), the raw binary sum is 01000, with a carry of 0 produced into the sign bit position and a carry of 1 produced out of the sign bit position. What can be concluded?",
+  options: [
+    "No overflow occurred; the result 01000 (+8) is correct",
+    "Overflow occurred, since the carry into the sign bit (0) differs from the carry out of the sign bit (1)",
+    "Overflow cannot be determined from carries alone; only the sign rule applies",
+    "The discarded carry-out of 1 by itself proves overflow, regardless of the carry into the sign bit"
+  ],
+  answer: 1,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: "The hardware-level overflow test compares the carry INTO the sign (most significant) bit position against the carry OUT of the sign bit position: if they differ, overflow has occurred; if they match, the addition is valid even if a carry was produced or discarded. Here the carry into the sign bit is 0 and the carry out of the sign bit is 1 — they differ, so overflow is correctly flagged. This matches the sign-based check too: -13 + -11 = -24 in true arithmetic, but the 5-bit 2's complement range is only -16 to +15, so -24 cannot be represented and the corrupted result 01000 (+8) is indeed wrong, consistent with the carry-based detection. This question specifically targets the most common misconception in the topic: the discarded carry-out of the whole addition (option d treats it as decisive on its own) is NOT by itself a valid overflow indicator — what matters is whether that carry-out disagrees with the carry into the same bit position. A same-sign 2's complement addition can produce a carry-out with no overflow (if the carry into the sign bit also occurred) or overflow with no discarded carry-out at all (if carry into the sign bit occurred but none out) — only the XOR of the two carries reliably detects it."
+},
+{
+  id: 'digital-number-systems-p11',
+  pyqStyle: true,
+  q: "In standard 8-4-2-1 BCD encoding, the number of 4-bit binary codes that are unused (invalid, not assigned to any decimal digit) is:",
+  options: ["4", "5", "6", "7"],
+  answer: 2,
+  marks: 1,
+  difficulty: 'easy',
+  type: 'pyq-style',
+  explanation: "BCD encodes each decimal digit 0-9 using its direct 4-bit binary equivalent, using 10 of the 16 possible 4-bit patterns (0000 through 1001). The remaining 6 patterns — 1010, 1011, 1100, 1101, 1110, and 1111 (decimal 10 through 15) — are never assigned to any decimal digit and are therefore invalid BCD codes. This is precisely the source of the +6 correction rule used in BCD adders: whenever a raw binary addition of two BCD digits lands on or passes through one of these 6 unused codes, adding 6 skips over them and realigns the result with a valid BCD digit (plus a carry into the next decimal position if needed). Detecting an invalid BCD code (for example, to catch corrupted data) typically checks for the pattern 1xx x with at least one of the lower combinations forming ≥10 — concretely, a code is invalid exactly when bit3=1 AND (bit2=1 OR bit1=1) is satisfied appropriately covering 1010-1111. Option (a) 4 undercounts; option (d) 7 overcounts by including 1001 (decimal 9), which is in fact a valid, commonly used BCD code."
+},
+{
+  id: 'digital-number-systems-p12',
+  pyqStyle: true,
+  q: "For an n-bit representation, how does the count of distinct representable values in 2's complement compare to the count in 1's complement?",
+  options: [
+    "2's complement always has exactly one more distinct representable value than 1's complement, for any n",
+    "2's complement always has exactly 2^(n-1) more distinct values than 1's complement",
+    "Both schemes always represent exactly the same number of distinct values",
+    "1's complement always has more distinct values, since it is symmetric around zero"
+  ],
+  answer: 0,
+  marks: 1,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: "Both 2's complement and 1's complement use all 2^n bit patterns of an n-bit word, but 1's complement wastes one pattern (the all-1s code) as a duplicate representation of zero alongside the all-0s code, giving only 2^n - 1 distinct numeric values. 2's complement has a single unique code for zero (all-0s only, since inverting and adding 1 to all-0s wraps back to all-0s), so every one of its 2^n bit patterns maps to a distinct value. The difference between the two counts is therefore always exactly (2^n) - (2^n - 1) = 1, regardless of n — 2's complement always has precisely one more representable value than 1's complement of the same width, which shows up as 2's complement's extra representable negative number (its range is asymmetric: -2^(n-1) to +2^(n-1)-1) compared to 1's complement's symmetric but value-poorer range (-(2^(n-1)-1) to +(2^(n-1)-1)). Option (b) proposes a difference that scales with n, which is not the case — the '+1' gap is constant. Option (d) is backwards: symmetry is exactly what costs 1's complement a distinct value, since it must sacrifice a code to negative zero."
+},
+{
+  id: 'digital-number-systems-p13',
+  pyqStyle: true,
+  q: "Excess-3 code is called 'self-complementing' because:",
+  options: [
+    "The Excess-3 code of a digit d and the Excess-3 code of its 9's complement (9-d) are bitwise complements of each other",
+    "The Excess-3 code of any digit equals its own bitwise complement",
+    "Excess-3 codes never require a carry when added to each other",
+    "Excess-3 and BCD codes are always identical for digits 0 through 6"
+  ],
+  answer: 0,
+  marks: 1,
+  difficulty: 'medium',
+  type: 'concept',
+  explanation: "Self-complementing means that inverting every bit of a digit's Excess-3 code automatically produces the Excess-3 code of that digit's 9's complement, without any further computation. Check with digit 3: Excess-3(3) = 3+3 = 6 = 0110. The 9's complement of 3 is 9-3 = 6, and Excess-3(6) = 6+3 = 9 = 1001. Bitwise complementing 0110 gives 1001 — exactly Excess-3(6), confirming the property. This works algebraically because Excess-3(d) + Excess-3(9-d) = (d+3) + (9-d+3) = 15, and any two 4-bit codes summing to 15 (1111) are automatically bitwise complements of each other, since each bit position must contribute 1 to that column's sum without any carry (0+1 or 1+0 in every position). This property made Excess-3 valuable in early decimal computers using 9's-complement (diminished radix) subtraction, since a full digit complement could be obtained by simple bit inversion, mirroring how 1's complement simplifies binary subtraction. Option (b) misdescribes self-complementing as a property of a single digit's own code, not a pairing between a digit and its 9's-complement partner. Option (c) and (d) describe unrelated (and false) properties."
+},
+{
+  id: 'digital-number-systems-p14',
+  pyqStyle: true,
+  q: "Which of the following decimal fractions has a terminating (finite) binary representation?",
+  options: ["0.3", "0.6", "0.125", "0.9"],
+  answer: 2,
+  marks: 1,
+  difficulty: 'easy',
+  type: 'pyq-style',
+  explanation: "A decimal fraction terminates in binary if and only if, written in lowest terms as a fraction p/q, the denominator q is a power of 2 (since binary place values are all powers of 2, only fractions expressible as a sum of such place values can terminate). Here, 0.125 = 1/8 = 1/2^3, so it terminates exactly: 0.125 = 0.001 in binary (2^-3 alone). By contrast, 0.3 = 3/10, 0.6 = 3/5, and 0.9 = 9/10 all have a factor of 5 in their denominator once reduced to lowest terms, and since 5 is not a power of 2, none of these can be expressed as a finite sum of binary place values — each produces an infinitely repeating binary fraction (analogous to how 1/3 repeats forever in decimal, since 3 is not a factor of 10's prime base either). This is a frequent source of real floating-point surprises: even a 'simple-looking' decimal like 0.1 (= 1/10) never terminates in binary and must be stored as a rounded approximation in any IEEE 754 format, which is why repeated additions of 0.1 in floating-point arithmetic can accumulate small but visible errors."
+}
+);
