@@ -96,17 +96,6 @@ window.GATE_DATA.pyq.push({
       explanation: "This tests spatial folding of a rectangle; per the official key the perimeter of the sheet after three successive symmetric folds works out to 18 cm."
     },
     {
-      id: "gate2024s1-ga-10",
-      n: 10,
-      section: "GA",
-      q: "The least number of squares to be added in the figure to make AB a line of symmetry is",
-      figure: "<svg viewBox=\"0 0 300 160\" width=\"100%\" style=\"max-width:420px;height:auto\" xmlns=\"http://www.w3.org/2000/svg\"><g fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.5\"><line x1=\"20\" y1=\"75\" x2=\"280\" y2=\"75\" stroke-dasharray=\"4,4\"/><rect x=\"130\" y=\"45\" width=\"30\" height=\"30\"/><rect x=\"100\" y=\"75\" width=\"30\" height=\"30\"/><rect x=\"130\" y=\"75\" width=\"30\" height=\"30\"/><rect x=\"130\" y=\"105\" width=\"30\" height=\"30\"/><rect x=\"190\" y=\"75\" width=\"30\" height=\"30\"/><rect x=\"220\" y=\"75\" width=\"30\" height=\"30\"/><rect x=\"220\" y=\"105\" width=\"30\" height=\"30\"/></g><g font-size=\"13\" fill=\"currentColor\" stroke=\"none\"><text x=\"5\" y=\"70\">A</text><text x=\"285\" y=\"70\">B</text></g></svg>",
-      options: ["6","4","5","7"],
-      answer: 0,
-      marks: 2,
-      explanation: "Reflecting every square of the figure across line AB and adding whichever mirror-image squares are absent makes AB an axis of symmetry; per the official key the minimum number of squares that must be added is 6."
-    },
-    {
       id: "gate2024s1-cs-11",
       n: 11,
       section: "CS",

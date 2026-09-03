@@ -44,6 +44,15 @@ so nobody "fixes" them back in:
   the first) and GATE 2025 Set 1 GA 9 (a paper-folding puzzle whose four options
   each carry eight small corner marks that are the entire content). An approximate
   redraw of either would misrepresent the question rather than illustrate it.
+- **GATE 2024 Set 1 GA 10** — the line-of-symmetry question. The printed figure
+  has one square above the line AB and six below it (four in the first row, two in
+  the second). Mirroring the six below needs three additions in the first row above
+  and two in the second: five. The official key says six. Two independent readings
+  and a check against the page at 6x magnification all give five, and the redrawn
+  figure reproduces the printed one exactly — so the disagreement is between the
+  published key and the published figure, not an error in transcription. Since the
+  app marks answers right or wrong, keeping it would mark a correct count as wrong.
+
 - **GATE 2014 Set 2 CS 25** — the TTL question. The diagram shows five router
   squares along the path from S to R, which gives 32 − 5 = 27, but the official key
   says 26. The count could not be reconciled against the scan at 4× magnification.
