@@ -1762,18 +1762,18 @@ window.GATE_DATA.questions['algo'].topics.find(function(t){return t.id==='algo-d
   options: [
     'Merge Sort',
     'Quicksort',
-    'Dijkstra\\u2019s shortest path algorithm',
+    'Dijkstra’s shortest path algorithm',
     'Binary Search'
   ],
   answers: [0, 1, 3],
   marks: 1,
   difficulty: 'easy',
   type: 'concept',
-  explanation: 'Merge Sort is a textbook divide-and-conquer algorithm: it divides the array into two halves, conquers each half recursively, and combines them with a merge step -- TRUE. Quicksort is also divide-and-conquer: it partitions the array around a pivot (divide) and recursively sorts each partition (conquer), with no combine step needed since the partition already places elements correctly -- TRUE. Dijkstra\\u2019s algorithm is a greedy algorithm that repeatedly extracts the minimum-distance vertex from a priority queue; it does not divide the problem into independent subproblems, so it is NOT divide-and-conquer -- FALSE. Binary Search is divide-and-conquer: it compares the target with the middle element and recurses into only one half, discarding the other -- TRUE.'
+  explanation: 'Merge Sort is a textbook divide-and-conquer algorithm: it divides the array into two halves, conquers each half recursively, and combines them with a merge step -- TRUE. Quicksort is also divide-and-conquer: it partitions the array around a pivot (divide) and recursively sorts each partition (conquer), with no combine step needed since the partition already places elements correctly -- TRUE. Dijkstra’s algorithm is a greedy algorithm that repeatedly extracts the minimum-distance vertex from a priority queue; it does not divide the problem into independent subproblems, so it is NOT divide-and-conquer -- FALSE. Binary Search is divide-and-conquer: it compares the target with the middle element and recurses into only one half, discarding the other -- TRUE.'
 },
 {
   id: 'algo-divide-conquer-y2',
-  q: 'Which of the following statements about Strassen\\u2019s matrix multiplication algorithm are TRUE? (Select ALL that apply)',
+  q: 'Which of the following statements about Strassen’s matrix multiplication algorithm are TRUE? (Select ALL that apply)',
   options: [
     'It multiplies two n x n matrices using 7 multiplications of (n/2) x (n/2) submatrices instead of the naive 8',
     'Its time complexity is Theta(n^(log2 7)), approximately Theta(n^2.81)',
@@ -1784,7 +1784,7 @@ window.GATE_DATA.questions['algo'].topics.find(function(t){return t.id==='algo-d
   marks: 2,
   difficulty: 'medium',
   type: 'concept',
-  explanation: 'Strassen\\u2019s key insight is reducing the 8 recursive multiplications of the naive divide-and-conquer approach to just 7, at the cost of extra additions -- TRUE. Solving T(n) = 7T(n/2) + Theta(n^2) via the Master theorem (Case 1, since n^2 = O(n^(log2 7 - e))) gives Theta(n^(log2 7)), and log2 7 is approximately 2.807 -- TRUE. It is asymptotically FASTER than Theta(n^3), not slower, since n^2.81 < n^3 for large n, so the statement claiming it is slower is FALSE. The reduction from 8 to 7 multiplications is only possible because Strassen introduces roughly 18 extra Theta(n^2) matrix additions and subtractions to combine the 7 products correctly -- TRUE.'
+  explanation: 'Strassen’s key insight is reducing the 8 recursive multiplications of the naive divide-and-conquer approach to just 7, at the cost of extra additions -- TRUE. Solving T(n) = 7T(n/2) + Theta(n^2) via the Master theorem (Case 1, since n^2 = O(n^(log2 7 - e))) gives Theta(n^(log2 7)), and log2 7 is approximately 2.807 -- TRUE. It is asymptotically FASTER than Theta(n^3), not slower, since n^2.81 < n^3 for large n, so the statement claiming it is slower is FALSE. The reduction from 8 to 7 multiplications is only possible because Strassen introduces roughly 18 extra Theta(n^2) matrix additions and subtractions to combine the 7 products correctly -- TRUE.'
 },
 {
   id: 'algo-divide-conquer-y3',
@@ -1793,13 +1793,13 @@ window.GATE_DATA.questions['algo'].topics.find(function(t){return t.id==='algo-d
     'Worst-case time complexity is Theta(n^2), which occurs for example on an already-sorted array when the pivot is always chosen as the first element',
     'Best-case and average-case time complexity is Theta(n log n)',
     'Quicksort is a stable sorting algorithm in its standard in-place implementation',
-    'Randomized pivot selection improves the expected-case time guarantee regardless of the input\\u2019s initial order'
+    'Randomized pivot selection improves the expected-case time guarantee regardless of the input’s initial order'
   ],
   answers: [0, 1, 3],
   marks: 2,
   difficulty: 'medium',
   type: 'concept',
-  explanation: 'When the pivot is always the smallest or largest remaining element (e.g. first-element pivot on sorted input), each partition splits n elements into sizes 0 and n-1, giving the recurrence T(n)=T(n-1)+Theta(n), which solves to Theta(n^2) -- TRUE. When partitions are reasonably balanced (best case exactly balanced, average case balanced enough in expectation), the recurrence resembles T(n)=2T(n/2)+Theta(n), giving Theta(n log n) -- TRUE. Quicksort\\u2019s standard in-place partitioning can swap equal elements past each other, changing their relative order, so it is NOT stable -- FALSE, making this option\\u2019s claim wrong. Randomized pivot selection (e.g. choosing a uniformly random element as pivot) makes the expected running time Theta(n log n) for ANY input, because the bad case now depends on random choices rather than a fixed adversarial input order -- TRUE.'
+  explanation: 'When the pivot is always the smallest or largest remaining element (e.g. first-element pivot on sorted input), each partition splits n elements into sizes 0 and n-1, giving the recurrence T(n)=T(n-1)+Theta(n), which solves to Theta(n^2) -- TRUE. When partitions are reasonably balanced (best case exactly balanced, average case balanced enough in expectation), the recurrence resembles T(n)=2T(n/2)+Theta(n), giving Theta(n log n) -- TRUE. Quicksort’s standard in-place partitioning can swap equal elements past each other, changing their relative order, so it is NOT stable -- FALSE, making this option’s claim wrong. Randomized pivot selection (e.g. choosing a uniformly random element as pivot) makes the expected running time Theta(n log n) for ANY input, because the bad case now depends on random choices rather than a fixed adversarial input order -- TRUE.'
 },
 {
   id: 'algo-divide-conquer-y4',
@@ -1843,14 +1843,14 @@ window.GATE_DATA.questions['algo'].topics.find(function(t){return t.id==='algo-g
   options: [
     'Fractional Knapsack',
     '0/1 Knapsack',
-    'Minimum Spanning Tree (via Prim\\u2019s or Kruskal\\u2019s algorithm)',
+    'Minimum Spanning Tree (via Prim’s or Kruskal’s algorithm)',
     'Activity Selection Problem'
   ],
   answers: [0, 2, 3],
   marks: 1,
   difficulty: 'easy',
   type: 'concept',
-  explanation: 'Fractional Knapsack is solved optimally by greedily taking items in decreasing order of value-to-weight ratio, since fractions of items are allowed and there is no combinatorial interaction to worry about -- TRUE. 0/1 Knapsack does NOT admit an optimal greedy solution because items must be taken whole; a locally best ratio choice can block a better combination later, so dynamic programming is required for optimality -- FALSE. Minimum Spanning Tree is a classic greedy success story: both Prim\\u2019s (grow one tree, always add the cheapest connecting edge) and Kruskal\\u2019s (always add the cheapest edge that does not form a cycle) are provably optimal by the cut property and cycle property -- TRUE. Activity Selection is optimally solved by greedily picking the activity with the earliest finish time at each step, which is a proven optimal greedy strategy -- TRUE.'
+  explanation: 'Fractional Knapsack is solved optimally by greedily taking items in decreasing order of value-to-weight ratio, since fractions of items are allowed and there is no combinatorial interaction to worry about -- TRUE. 0/1 Knapsack does NOT admit an optimal greedy solution because items must be taken whole; a locally best ratio choice can block a better combination later, so dynamic programming is required for optimality -- FALSE. Minimum Spanning Tree is a classic greedy success story: both Prim’s (grow one tree, always add the cheapest connecting edge) and Kruskal’s (always add the cheapest edge that does not form a cycle) are provably optimal by the cut property and cycle property -- TRUE. Activity Selection is optimally solved by greedily picking the activity with the earliest finish time at each step, which is a proven optimal greedy strategy -- TRUE.'
 },
 {
   id: 'algo-greedy-y2',
@@ -1865,14 +1865,14 @@ window.GATE_DATA.questions['algo'].topics.find(function(t){return t.id==='algo-g
   marks: 2,
   difficulty: 'medium',
   type: 'concept',
-  explanation: 'Huffman coding is proven optimal among all prefix-free (instantaneous) codes for a given frequency distribution, minimizing the expected number of bits -- TRUE. The core greedy step of Huffman\\u2019s algorithm is exactly to repeatedly extract the two least-frequent nodes and merge them into a parent node whose frequency is their sum -- TRUE. Huffman coding produces a VARIABLE-length code by design (that is its whole point -- frequent symbols get short codes, rare symbols get long codes), so calling it fixed-length is FALSE. It is a standard property/invariant of the Huffman construction that codeword length is non-increasing as frequency increases -- a higher-frequency symbol never ends up with a strictly longer code than a lower-frequency one -- TRUE.'
+  explanation: 'Huffman coding is proven optimal among all prefix-free (instantaneous) codes for a given frequency distribution, minimizing the expected number of bits -- TRUE. The core greedy step of Huffman’s algorithm is exactly to repeatedly extract the two least-frequent nodes and merge them into a parent node whose frequency is their sum -- TRUE. Huffman coding produces a VARIABLE-length code by design (that is its whole point -- frequent symbols get short codes, rare symbols get long codes), so calling it fixed-length is FALSE. It is a standard property/invariant of the Huffman construction that codeword length is non-increasing as frequency increases -- a higher-frequency symbol never ends up with a strictly longer code than a lower-frequency one -- TRUE.'
 },
 {
   id: 'algo-greedy-y3',
-  q: 'Which of the following statements about Kruskal\\u2019s and Prim\\u2019s MST algorithms are TRUE? (Select ALL that apply)',
+  q: 'Which of the following statements about Kruskal’s and Prim’s MST algorithms are TRUE? (Select ALL that apply)',
   options: [
-    'Kruskal\\u2019s algorithm processes edges in increasing order of weight and uses a Union-Find (disjoint set) structure to avoid forming cycles',
-    'Prim\\u2019s algorithm grows a single tree by repeatedly adding the minimum-weight edge that connects the current tree to a new, unvisited vertex',
+    'Kruskal’s algorithm processes edges in increasing order of weight and uses a Union-Find (disjoint set) structure to avoid forming cycles',
+    'Prim’s algorithm grows a single tree by repeatedly adding the minimum-weight edge that connects the current tree to a new, unvisited vertex',
     'Both algorithms always produce the exact same unique MST for any weighted connected graph',
     'If all edge weights in a connected graph are pairwise distinct, the MST of that graph is unique'
   ],
@@ -1880,11 +1880,11 @@ window.GATE_DATA.questions['algo'].topics.find(function(t){return t.id==='algo-g
   marks: 2,
   difficulty: 'medium',
   type: 'concept',
-  explanation: 'This is the standard description of Kruskal\\u2019s algorithm: sort edges by weight, and use Union-Find to add an edge only when its endpoints are in different components (avoiding cycles) -- TRUE. This is the standard description of Prim\\u2019s algorithm: maintain a growing tree and always attach the cheapest edge leaving the tree to a vertex not yet included -- TRUE. When edge weights include ties, there can be multiple distinct MSTs of the same total weight, and Kruskal\\u2019s and Prim\\u2019s can break ties differently and select different edge sets, so claiming they ALWAYS produce the identical MST is FALSE. When all weights are distinct, the cut property guarantees a unique minimum edge crossing every cut, which forces the MST to be unique -- TRUE.'
+  explanation: 'This is the standard description of Kruskal’s algorithm: sort edges by weight, and use Union-Find to add an edge only when its endpoints are in different components (avoiding cycles) -- TRUE. This is the standard description of Prim’s algorithm: maintain a growing tree and always attach the cheapest edge leaving the tree to a vertex not yet included -- TRUE. When edge weights include ties, there can be multiple distinct MSTs of the same total weight, and Kruskal’s and Prim’s can break ties differently and select different edge sets, so claiming they ALWAYS produce the identical MST is FALSE. When all weights are distinct, the cut property guarantees a unique minimum edge crossing every cut, which forces the MST to be unique -- TRUE.'
 },
 {
   id: 'algo-greedy-y4',
-  q: 'Run Kruskal\\u2019s algorithm on a graph with 5 vertices {A,B,C,D,E} and edges A-B(1), B-C(2), C-D(3), D-E(4), A-E(5), A-C(6). What is the total weight of the resulting Minimum Spanning Tree? (Enter your numerical answer.)',
+  q: 'Run Kruskal’s algorithm on a graph with 5 vertices {A,B,C,D,E} and edges A-B(1), B-C(2), C-D(3), D-E(4), A-E(5), A-C(6). What is the total weight of the resulting Minimum Spanning Tree? (Enter your numerical answer.)',
   options: [],
   answer: 10,
   kind: 'nat',
@@ -1938,7 +1938,7 @@ window.GATE_DATA.questions['algo'].topics.find(function(t){return t.id==='algo-d
   q: 'Which of the following statements about dynamic programming are TRUE? (Select ALL that apply)',
   options: [
     'Memoization (top-down) and tabulation (bottom-up) are two standard implementation strategies for DP',
-    'DP is applicable only when a problem\\u2019s subproblems do NOT overlap',
+    'DP is applicable only when a problem’s subproblems do NOT overlap',
     'The standard 0/1 Knapsack DP solution runs in pseudo-polynomial time O(nW), where W is the knapsack capacity',
     'Optimal substructure means an optimal solution to a problem can be constructed from optimal solutions to its subproblems'
   ],
@@ -1983,7 +1983,7 @@ window.GATE_DATA.questions['algo'].topics.find(function(t){return t.id==='algo-d
   marks: 2,
   difficulty: 'medium',
   type: 'numerical',
-  explanation: 'With only 4 items, all 16 subsets can be checked directly (as the DP table would implicitly do). The subset {(2,3), (3,4), (5,6)} has total weight 2+3+5=10 (fits exactly) and total value 3+4+6=13. Checking all other weight-feasible subsets: {(2,3),(3,4),(4,5)} has weight 9, value 12; {(3,4),(4,5)} has weight 7, value 9; {(2,3),(4,5)} has weight 6, value 8; {(4,5),(5,6)} has weight 9, value 11; no feasible subset exceeds value 13. So the DP table\\u2019s final answer, dp[4][10], equals 13.'
+  explanation: 'With only 4 items, all 16 subsets can be checked directly (as the DP table would implicitly do). The subset {(2,3), (3,4), (5,6)} has total weight 2+3+5=10 (fits exactly) and total value 3+4+6=13. Checking all other weight-feasible subsets: {(2,3),(3,4),(4,5)} has weight 9, value 12; {(3,4),(4,5)} has weight 7, value 9; {(2,3),(4,5)} has weight 6, value 8; {(4,5),(5,6)} has weight 9, value 11; no feasible subset exceeds value 13. So the DP table’s final answer, dp[4][10], equals 13.'
 },
 {
   id: 'algo-dp-y6',
@@ -2018,16 +2018,16 @@ window.GATE_DATA.questions['algo'].topics.find(function(t){return t.id==='algo-g
   id: 'algo-graph-y2',
   q: 'For a weighted directed graph that may contain negative edge weights but no negative-weight cycle, which of the following statements are TRUE? (Select ALL that apply)',
   options: [
-    'Dijkstra\\u2019s algorithm may give incorrect shortest-path results if negative edge weights are present',
+    'Dijkstra’s algorithm may give incorrect shortest-path results if negative edge weights are present',
     'The Bellman-Ford algorithm correctly computes shortest paths even with negative edge weights, provided there is no negative cycle',
     'Bellman-Ford runs in O(V*E) time',
-    'Dijkstra\\u2019s algorithm can be used, unmodified, to detect the presence of a negative-weight cycle'
+    'Dijkstra’s algorithm can be used, unmodified, to detect the presence of a negative-weight cycle'
   ],
   answers: [0, 1, 2],
   marks: 2,
   difficulty: 'medium',
   type: 'concept',
-  explanation: 'Dijkstra\\u2019s algorithm relies on the greedy assumption that once a vertex is finalized with its shortest distance, no later relaxation can improve it; negative edges can violate this assumption, producing incorrect results -- TRUE. Bellman-Ford relaxes all edges V-1 times, which is proven sufficient to compute correct shortest paths in a graph with negative edges as long as no negative cycle is reachable -- TRUE. Bellman-Ford performs V-1 rounds of relaxing all E edges, giving O(V*E) time -- TRUE. Dijkstra\\u2019s algorithm has no mechanism to detect negative cycles at all -- it simply may produce wrong (or non-terminating, in variants without proper finalization) results on such graphs; the standard cycle-detection tool is the extra V-th relaxation round in Bellman-Ford, not Dijkstra -- FALSE.'
+  explanation: 'Dijkstra’s algorithm relies on the greedy assumption that once a vertex is finalized with its shortest distance, no later relaxation can improve it; negative edges can violate this assumption, producing incorrect results -- TRUE. Bellman-Ford relaxes all edges V-1 times, which is proven sufficient to compute correct shortest paths in a graph with negative edges as long as no negative cycle is reachable -- TRUE. Bellman-Ford performs V-1 rounds of relaxing all E edges, giving O(V*E) time -- TRUE. Dijkstra’s algorithm has no mechanism to detect negative cycles at all -- it simply may produce wrong (or non-terminating, in variants without proper finalization) results on such graphs; the standard cycle-detection tool is the extra V-th relaxation round in Bellman-Ford, not Dijkstra -- FALSE.'
 },
 {
   id: 'algo-graph-y3',
@@ -2057,7 +2057,7 @@ window.GATE_DATA.questions['algo'].topics.find(function(t){return t.id==='algo-g
 },
 {
   id: 'algo-graph-y5',
-  q: 'Run Kruskal\\u2019s algorithm on a graph with 4 vertices {P,Q,R,S} and edges P-Q(4), Q-R(2), R-S(3), P-S(5), P-R(6), Q-S(7). What is the total weight of the resulting Minimum Spanning Tree? (Enter your numerical answer.)',
+  q: 'Run Kruskal’s algorithm on a graph with 4 vertices {P,Q,R,S} and edges P-Q(4), Q-R(2), R-S(3), P-S(5), P-R(6), Q-S(7). What is the total weight of the resulting Minimum Spanning Tree? (Enter your numerical answer.)',
   options: [],
   answer: 9,
   kind: 'nat',
@@ -2068,7 +2068,7 @@ window.GATE_DATA.questions['algo'].topics.find(function(t){return t.id==='algo-g
 },
 {
   id: 'algo-graph-y6',
-  q: 'Using Dijkstra\\u2019s algorithm starting from vertex A, find the shortest-path distance to vertex D in a graph with edges A-B(2), A-C(5), B-C(1), B-D(7), C-D(3) (all edges undirected with the given weights). (Enter your numerical answer.)',
+  q: 'Using Dijkstra’s algorithm starting from vertex A, find the shortest-path distance to vertex D in a graph with edges A-B(2), A-C(5), B-C(1), B-D(7), C-D(3) (all edges undirected with the given weights). (Enter your numerical answer.)',
   options: [],
   answer: 6,
   kind: 'nat',
@@ -2093,7 +2093,7 @@ window.GATE_DATA.questions['algo'].topics.find(function(t){return t.id==='algo-s
   marks: 2,
   difficulty: 'medium',
   type: 'concept',
-  explanation: 'The decision-tree argument shows any comparison sort must have at least n! leaves (one per permutation), and a binary tree with n! leaves has height Omega(log(n!)) = Omega(n log n), so every comparison-based sort needs Omega(n log n) comparisons in the worst case -- TRUE. Merge sort\\u2019s merge step, when it takes from the left subarray on ties, never reorders equal elements relative to each other, so it is stable -- TRUE. Standard in-place quicksort swaps elements across the pivot during partitioning, which can and generally does move an element past an equal-valued element, destroying their original relative order -- it is NOT stable in its typical in-place form -- FALSE. Counting sort achieves its O(n+k) bound precisely by AVOIDING comparisons between elements: it uses each element\\u2019s value as an index into a frequency/count array, which is why it can beat the Omega(n log n) comparison-sort lower bound -- FALSE.'
+  explanation: 'The decision-tree argument shows any comparison sort must have at least n! leaves (one per permutation), and a binary tree with n! leaves has height Omega(log(n!)) = Omega(n log n), so every comparison-based sort needs Omega(n log n) comparisons in the worst case -- TRUE. Merge sort’s merge step, when it takes from the left subarray on ties, never reorders equal elements relative to each other, so it is stable -- TRUE. Standard in-place quicksort swaps elements across the pivot during partitioning, which can and generally does move an element past an equal-valued element, destroying their original relative order -- it is NOT stable in its typical in-place form -- FALSE. Counting sort achieves its O(n+k) bound precisely by AVOIDING comparisons between elements: it uses each element’s value as an index into a frequency/count array, which is why it can beat the Omega(n log n) comparison-sort lower bound -- FALSE.'
 },
 {
   id: 'algo-sorting-searching-y2',
@@ -2220,7 +2220,7 @@ window.GATE_DATA.questions['algo'].topics.find(function(t){return t.id==='algo-g
   marks: 2,
   difficulty: 'hard',
   type: 'numerical',
-  explanation: 'After the change the edges are A-B(1), B-C(2), C-D(10), A-D(4), A-C(5). Run Kruskal\\u2019s algorithm on the sorted list A-B(1), B-C(2), A-D(4), A-C(5), C-D(10): add A-B(1) -> {A,B}; add B-C(2) -> {A,B,C}; A-D(4) connects D, giving {A,B,C,D} using exactly 3 edges (n-1=3 for 4 vertices), so the MST is complete without ever needing C-D. Total MST weight = 1+2+4 = 7. (For reference, before the change the MST used edges A-B(1), B-C(2), C-D(3) for weight 6; raising C-D\\u2019s weight above 4 forces Kruskal to substitute A-D(4) in its place, raising the MST weight from 6 to 7.)'
+  explanation: 'After the change the edges are A-B(1), B-C(2), C-D(10), A-D(4), A-C(5). Run Kruskal’s algorithm on the sorted list A-B(1), B-C(2), A-D(4), A-C(5), C-D(10): add A-B(1) -> {A,B}; add B-C(2) -> {A,B,C}; A-D(4) connects D, giving {A,B,C,D} using exactly 3 edges (n-1=3 for 4 vertices), so the MST is complete without ever needing C-D. Total MST weight = 1+2+4 = 7. (For reference, before the change the MST used edges A-B(1), B-C(2), C-D(3) for weight 6; raising C-D’s weight above 4 forces Kruskal to substitute A-D(4) in its place, raising the MST weight from 6 to 7.)'
 },
 {
   id: 'algo-greedy-z8',
@@ -2270,7 +2270,7 @@ window.GATE_DATA.questions['algo'].topics.find(function(t){return t.id==='algo-g
   marks: 2,
   difficulty: 'hard',
   type: 'numerical',
-  explanation: 'After the change the edges are W-X(10), X-Y(3), Y-Z(1), W-Z(6), W-Y(4), X-Z(5). Sort by weight: Y-Z(1), X-Y(3), W-Y(4), X-Z(5), W-Z(6), W-X(10). Run Kruskal\\u2019s algorithm: add Y-Z(1) -> {Y,Z}; add X-Y(3) -> {X,Y,Z}; add W-Y(4) connects W -> {W,X,Y,Z} using exactly 3 edges (n-1=3 for 4 vertices), MST complete. Total MST weight = 1+3+4 = 8. (Before the change, the original MST used Y-Z(1), W-X(2), X-Y(3) for weight 6; raising W-X above 4 forces Kruskal to substitute W-Y(4) in its place.)'
+  explanation: 'After the change the edges are W-X(10), X-Y(3), Y-Z(1), W-Z(6), W-Y(4), X-Z(5). Sort by weight: Y-Z(1), X-Y(3), W-Y(4), X-Z(5), W-Z(6), W-X(10). Run Kruskal’s algorithm: add Y-Z(1) -> {Y,Z}; add X-Y(3) -> {X,Y,Z}; add W-Y(4) connects W -> {W,X,Y,Z} using exactly 3 edges (n-1=3 for 4 vertices), MST complete. Total MST weight = 1+3+4 = 8. (Before the change, the original MST used Y-Z(1), W-X(2), X-Y(3) for weight 6; raising W-X above 4 forces Kruskal to substitute W-Y(4) in its place.)'
 },
 {
   id: 'algo-graph-z8',

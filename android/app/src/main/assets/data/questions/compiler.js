@@ -3837,3 +3837,288 @@ window.GATE_DATA.questions['compiler'].topics.find(function(t){return t.id==='co
   explanation: "Scan left to right: 'while' is a keyword token (1). '(' is a punctuation token (2). 'i' is an identifier (3). '<' is a standalone relational operator - the following character '1' (a digit) does not extend it into any valid compound operator (there is no '<1' pattern), so it stands alone as a single '<' token (4). '10' is a single maximal-munch number token, combining both digits (5). ')' is a punctuation token (6). 'i' is an identifier (7). '=' is a standalone assignment operator, since the following character 'i' cannot extend it into any compound form (8). 'i' is an identifier (9). '+' is a standalone operator, since the following character '1' does not extend it into any compound operator like '++' or '+=' (10). '1' is a number token (11). ';' is a punctuation token (12). Total: while, (, i, <, 10, ), i, =, i, +, 1, ; - exactly 12 tokens. This example reinforces that a comparison/arithmetic operator immediately followed by a digit (as in '<10' or '+1') does NOT get glued to that digit into one combined lexeme - the operator and the following number are always two entirely separate tokens, since operator-symbol patterns and number patterns never overlap or merge under standard maximal munch."
 }
 );
+
+(function(){ var t = window.GATE_DATA.questions['compiler'].topics.find(function(t){return t.id==='compiler-lexical';});
+  t.theory.deep = (t.theory.deep||'') + `
+
+FROM ZERO: FOUNDATIONS
+
+• Source program as characters. Before any compiler phase runs, a program is nothing but a raw sequence of characters (letters, digits, spaces, punctuation) - the lexer's entire job is to be the FIRST piece of code that imposes any structure on that raw character stream at all.
+• Token, lexeme, pattern - the three-layer idea. A pattern is a rule (usually a regular expression) describing a whole CLASS of acceptable spellings, e.g. the pattern for identifiers might be "a letter followed by any number of letters/digits". A lexeme is one actual matched piece of text pulled straight from the source, e.g. the specific text "count1". A token is the abstract category label handed to the parser, e.g. ID, paired with an attribute value (often a pointer into the symbol table) that remembers which lexeme it actually was.
+• Symbol table. A symbol table is simply a lookup data structure (often a hash table) mapping each identifier's spelling to information about it (its type, scope, memory location). The lexer typically inserts new identifiers into it as they are first seen.
+• Maximal munch (longest match rule). When several prefixes of the remaining input could all validly form a token, the lexer always takes the LONGEST one that still matches some pattern - e.g. seeing the characters < and = in a row, it forms the single token <= rather than the token < followed separately by =.
+
+EVERY EDGE CASE
+
+GATE TRAP: an operator symbol immediately followed by a digit or letter that could START a different token does NOT get glued onto that following token - e.g. in i<10, the < stands alone (there is no such compound token as "<1"), while in i<=10 the <= DOES combine because <= is itself a valid, longer token pattern. Maximal munch only combines characters into ONE token when a longer matching pattern actually exists for that exact combination.
+GATE TRAP: whitespace and comments are typically consumed and DISCARDED by the lexer - they generate NO tokens at all (not even a special "whitespace token" in most designs), though they do still serve as token separators (e.g. distinguishing "in t" as two tokens "in" and "t" versus "int" as one keyword token).
+GATE TRAP: identifying whether a bracket/parenthesis stream is correctly balanced and nested is NOT a lexical-analysis task, even though brackets are individual tokens - checking balance requires unbounded matching across the whole token stream, which is a parsing (syntax analysis) job handled by the context-free grammar and its stack, not something a finite-state, single-token-at-a-time scanner can do.
+KEY: a lexeme with LEADING zeros or unusual but still pattern-matching spelling is still one valid lexeme of its token class (e.g. "007" is still one NUM token) - the lexer does not judge semantic validity or "sensible" values, only pattern shape.
+KEY: keywords are typically recognised by first matching the general identifier pattern, and then doing a SEPARATE lookup in a fixed reserved-word table to reclassify matches like "while", "if", "int" as their own specific keyword tokens rather than as generic ID tokens - this order (match as identifier pattern first, then filter) is the standard implementation technique asked about conceptually.
+GATE TRAP: an unrecognised character sequence that matches NO valid pattern at all (a lexical error, e.g. a stray @ symbol where the language grammar never uses one) is reported and typically the lexer attempts error recovery by skipping characters and resuming, rather than the whole compilation immediately halting - lexical errors are usually the most localised and recoverable of all compiler error types.
+
+WORKED EXAMPLE 1 - full token count for a complete statement
+
+Input: if(x>=5)y=x*2;
+1. 'if' - matches the reserved keyword pattern exactly (not left as generic ID since 'if' is in the keyword table) -> KEYWORD token (1).
+2. '(' -> PUNCTUATION token (2).
+3. 'x' -> ID token (3).
+4. '>=' - maximal munch: '>' alone COULD be a token, but the next character '=' extends it into the longer valid pattern '>=', so the longer match wins -> RELOP token (4).
+5. '5' -> NUM token (5).
+6. ')' -> PUNCTUATION token (6).
+7. 'y' -> ID token (7).
+8. '=' - maximal munch check: the next character is 'x', which cannot extend '=' into any longer valid operator (there is no '=x' pattern), so '=' stands alone -> ASSIGN token (8).
+9. 'x' -> ID token (9).
+10. '*' - next character is '2', no compound '*2' pattern exists, so '*' stands alone -> OP token (10).
+11. '2' -> NUM token (11).
+12. ';' -> PUNCTUATION token (12).
+Total: 12 tokens. This step-by-step "check the very next character for a longer valid pattern before finalising each token" discipline is exactly how every GATE token-counting numerical should be worked.
+
+WORKED EXAMPLE 2 - designing a regular-expression-based scanner rule set
+
+Task: define patterns recognising identifiers, unsigned integers, and the three operators +, ++, +=.
+1. Identifier pattern: letter (letter | digit)* - one letter, followed by zero or more letters/digits. This single regular expression covers every valid identifier spelling in one rule.
+2. Unsigned integer pattern: digit digit* (equivalently digit+) - one or more digits, with no separate rule needed for "how many digits" since the Kleene star/plus already covers any length.
+3. Operator family +, ++, +=: because maximal munch always prefers the longest match, simply define all three as separate patterns ('+', '++', '+=') and let the scanner's tie-breaking rule (prefer longest match; if still tied, prefer the rule listed first / higher priority) pick correctly - seeing '+' followed by another '+' matches the two-character '++' pattern instead of two separate single '+' matches, because the scanner always looks ahead for a longer valid continuation before committing to the shorter token.
+4. This illustrates the general design principle: each token class gets its own independent regular expression, and the lexer generator combines them all into a single big NFA/DFA (via the same union + subset construction from the Regular Languages topic) that picks, at each position, the longest lexeme matching ANY of the combined patterns.
+
+WORKED EXAMPLE 3 - tracing keyword-vs-identifier disambiguation
+
+Input snippet: intx = integer + 1;
+1. Scan 'intx': the identifier pattern (letter, then letters/digits) matches all five characters 'i','n','t','x' greedily via maximal munch, producing the single lexeme "intx", five characters long - NOT the keyword "int" followed separately by "x", because maximal munch always grabs the longest matching identifier-pattern prefix before stopping, and "intx" as a whole matches the identifier pattern with no interruption (there's no space or symbol splitting the letters).
+2. Since the matched lexeme "intx" (five characters) does NOT exactly equal the reserved word "int" (three characters) in the keyword lookup table, it is classified as a plain ID token, not a keyword - the keyword check only reclassifies an EXACT, WHOLE lexeme match, never a mere prefix or substring match.
+3. Continuing: '=' (ASSIGN), 'integer' (again, checked against the keyword table as a WHOLE seven-character lexeme; assuming "integer" itself is not a listed keyword in this hypothetical language, it too is a plain ID), '+' (OP), '1' (NUM), ';' (PUNCTUATION). This example is the standard GATE trap illustrating that keyword recognition depends entirely on the FULL matched lexeme, never on merely containing a keyword as a substring or prefix.`; })();
+
+(function(){ var t = window.GATE_DATA.questions['compiler'].topics.find(function(t){return t.id==='compiler-parsing';});
+  t.theory.deep = (t.theory.deep||'') + `
+
+FROM ZERO: FOUNDATIONS
+
+• Parsing, plainly. Parsing takes the flat token stream from the lexer and figures out its GRAMMATICAL STRUCTURE according to the language's context-free grammar - the output is a parse tree (or an equivalent internal structure) showing how tokens group into expressions, statements, and larger constructs.
+• Top-down vs bottom-up. A top-down parser starts at the grammar's start symbol and tries to EXPAND it, guessing which production to apply, until the expansion matches the input tokens exactly (like starting from the tree root and growing down to the leaves). A bottom-up parser starts at the actual input tokens (the leaves) and repeatedly RECOGNISES and collapses matched pieces (reduces them) upward until it reaches the start symbol at the root.
+• Lookahead. Lookahead is simply how many upcoming, not-yet-consumed tokens the parser is allowed to peek at before deciding what to do next. LL(1) and LR(1) both mean "using exactly 1 token of lookahead" (the "1" in the name).
+• Item (for LR parsing). An LR item is a production with a dot placed somewhere in its right-hand side, marking how much of that production has been matched so far during a bottom-up scan, e.g. A -> alpha . beta means alpha has already been recognised and beta is still expected next.
+• Handle. A handle is the exact substring on the parsing stack that matches a complete production's right-hand side and is ready to be reduced back to its left-hand-side non-terminal, at exactly the right moment in a correct bottom-up parse.
+
+EVERY EDGE CASE
+
+GATE TRAP: an LL(1) grammar cannot have left recursion (direct or indirect) OR two alternatives sharing a common prefix (needing left factoring) - both must be eliminated first, and they are two DIFFERENT fixes for two DIFFERENT problems (see the CFL topic's worked example for both transformations side by side).
+KEY: SLR(1), LALR(1), and CLR(1) [also called canonical LR(1)] are three bottom-up parsing techniques with STRICTLY increasing parsing power in that order: every SLR(1) grammar is LALR(1), and every LALR(1) grammar is CLR(1), but not conversely - there exist grammars that are LALR(1) but not SLR(1), and grammars that are CLR(1) but not LALR(1).
+GATE TRAP: LALR(1) is built by MERGING CLR(1) states that have identical "core" (identical item sets ignoring lookahead sets) - this merging can occasionally introduce a NEW reduce-reduce conflict that was NOT present in the original CLR(1) table (because the merged state now combines lookahead sets from two formerly-separate states). A shift-reduce conflict, however, can never newly appear purely from this LALR merging step. So: "a conflict exists in the LALR table but not in the CLR table for the same grammar" can genuinely happen, and when it does, it is specifically a reduce-reduce conflict, not a shift-reduce one.
+GATE TRAP: dangling else - the grammar stmt -> if expr then stmt | if expr then stmt else stmt | other is classically AMBIGUOUS, because on seeing "if E1 then if E2 then S1 else S2", the else could attach to EITHER the inner or the outer if. The standard disambiguating convention (and what every real parser generator does by default) is: match each else with the NEAREST unmatched then/if - this is typically enforced not by rewriting the grammar cleanly but by a parser-generator PRECEDENCE DIRECTIVE that resolves the resulting shift-reduce conflict in favour of SHIFT (shifting the else to attach it to the innermost if) rather than reducing early.
+GATE TRAP: a shift-reduce conflict in an LR table is, by long-standing convention, ALWAYS resolved by preferring SHIFT (this is exactly what correctly handles dangling-else and operator-precedence situations by default) - a reduce-reduce conflict has no universal default and must be resolved by rule ordering or grammar redesign, since blindly always choosing "the first-listed rule" can silently produce a parser that accepts the wrong language.
+
+WORKED EXAMPLE 1 - full FIRST/FOLLOW for a grammar with a nullable non-terminal, then build the LL(1) table
+
+Grammar: S -> a A | epsilon is not used here; instead use S -> A B, A -> a | epsilon, B -> b.
+1. FIRST(A) = {a, epsilon} (A can produce terminal a, or vanish to epsilon).
+2. FIRST(B) = {b}.
+3. FIRST(S) = (FIRST(A) minus epsilon) union FIRST(B), since A is nullable = {a, b}.
+4. FOLLOW(S) = {$} (start symbol always gets end-marker).
+5. FOLLOW(A) = FIRST(B) = {b} (A is immediately followed by B in the only production containing it).
+6. FOLLOW(B) = FOLLOW(S) = {$} (B is at the very end of S's production, so it inherits S's own follow set).
+7. LL(1) table entries: M[S, a] = S->AB, M[S,b] = S->AB (since a and b both appear in FIRST(S)); M[A,a] = A->a; M[A,b] = A->epsilon (because b is in FOLLOW(A), and A is nullable, so on seeing a FOLLOW(A) token we apply the epsilon-production); M[B,b] = B->b. No cell has two competing entries, confirming this grammar IS LL(1).
+
+WORKED EXAMPLE 2 - full LR(0) item-set construction (canonical collection) for a tiny grammar
+
+Grammar (augmented): S' -> S, S -> a S | b.
+1. I0 = closure({S' -> .S}): adding S' -> .S forces closure to also add every production for S (since S appears right after a dot): S -> .aS, S -> .b. So I0 = {S'->.S, S->.aS, S->.b}.
+2. GOTO(I0, S) = {S'->S.} - this state, call it I1, has the dot at the very end of S'->S, meaning "accept" (this is the accepting item for the augmented start production).
+3. GOTO(I0, a) = closure({S->a.S}) - the dot follows a, and since a non-terminal S is right after the dot, closure re-adds S's own productions: {S->a.S, S->.aS, S->.b}. Call this I2.
+4. GOTO(I0, b) = closure({S->b.}) = {S->b.} (dot at the end, a pure reduce item). Call this I3.
+5. GOTO(I2, S) = {S->aS.} (dot at the end, reduce item) - call this I4. GOTO(I2, a) = I2 itself (self-loop, same closure as step 3 recomputed identically). GOTO(I2, b) = I3 (identical closure to step 4).
+6. Final states: I0 (start), I1 (accept on S), I2 (after reading one a, expects another S), I3 (reduce S->b), I4 (reduce S->aS). This five-state machine is the complete LR(0) automaton, and every entry in the SLR/LALR/CLR parsing table is read directly off which state you are in and which item(s) that state contains.
+
+WORKED EXAMPLE 3 - resolving the dangling-else shift-reduce conflict explicitly
+
+Grammar: stmt -> if expr then stmt else stmt | if expr then stmt | other. Consider the LR state reached after parsing "if E then S" with lookahead "else" available.
+1. In this state, the item if-expr-then-stmt-else-stmt-in-progress calls for a SHIFT of the else token (continuing to try to match the longer else-containing alternative).
+2. Simultaneously, the item if-expr-then-stmt (the shorter, already-complete alternative) calls for a REDUCE right here, since "if expr then stmt" is itself a complete, valid stmt production body once nothing else follows it.
+3. Both actions are legal in the same state with the same lookahead token else - this IS the shift-reduce conflict, occurring precisely at the else token. Standard parser generators resolve it by defaulting to SHIFT, which has the effect of extending the match to consume the else and attach it to the NEAREST enclosing if - exactly matching the universally expected dangling-else semantics, achieved without rewriting the ambiguous grammar at all, purely through this one default conflict-resolution rule.`; })();
+
+(function(){ var t = window.GATE_DATA.questions['compiler'].topics.find(function(t){return t.id==='compiler-sdt';});
+  t.theory.deep = (t.theory.deep||'') + `
+
+FROM ZERO: FOUNDATIONS
+
+• Syntax-directed definition (SDD), plainly. An SDD attaches ATTRIBUTES (extra pieces of information, like a computed value or a type) to grammar symbols, and attaches SEMANTIC RULES to each production telling how to compute one symbol's attributes from other symbols' attributes in that same production. It is a high-level specification, not tied to any particular evaluation order.
+• Synthesized attribute. A synthesized attribute at a non-terminal is computed purely from the attributes of its CHILDREN in the parse tree (information flows UP the tree, from leaves toward the root) - e.g. an expression node's computed numeric value, built from its sub-expressions' values.
+• Inherited attribute. An inherited attribute at a non-terminal is computed from the attributes of its PARENT and/or its SIBLINGS in the parse tree (information flows DOWN or SIDEWAYS) - e.g. passing a variable's declared type down into the specific place it is used, or passing a running left-to-right position down across sibling symbols.
+• Syntax-directed translation scheme (SDT). An SDT is the same idea as an SDD but made concrete for execution: semantic actions (bits of code, written in curly braces) are embedded directly INSIDE the production bodies at specific positions, specifying exactly WHEN during parsing each action runs.
+• Dependency graph. A dependency graph draws one node per attribute instance in a specific parse tree and one edge from attribute X to attribute Y whenever Y's computation rule directly needs X's value - this graph must have NO CYCLES for the attributes to be computable at all (a cycle would mean an attribute depends on itself, directly or indirectly).
+
+EVERY EDGE CASE
+
+GATE TRAP: S-attributed (only synthesized attributes, no inherited ones at all) SDDs can ALWAYS be evaluated during a purely bottom-up (LR) parse, attaching the semantic action at the END of each production (evaluated exactly when that production is reduced) - this is the easiest, most implementation-friendly case.
+GATE TRAP: L-attributed SDDs (a broader class allowing inherited attributes, but ONLY ones that depend on attributes from the LEFT: the parent, or LEFT siblings already processed, never a RIGHT sibling not yet seen) can be evaluated during a single left-to-right depth-first tree walk, and specifically fit cleanly into predictive top-down (LL) parsing, where semantic actions can be interspersed within the production body at the position matching what information is available at that point.
+GATE TRAP: NOT every SDD with inherited attributes is automatically L-attributed - an inherited attribute at a symbol that depends on a sibling appearing to its RIGHT in the same production body breaks the L-attributed restriction (that dependency would require information not yet available in a strict left-to-right pass), forcing a more general (and more complex) evaluation strategy, or a rewritten grammar/attribute scheme.
+GATE TRAP: a dependency graph with a CYCLE means the SDD, as written, is simply not evaluable at all on that parse tree - no evaluation order exists that could compute every attribute, since some attribute would need its own not-yet-computed value. This is a genuine design error in the SDD, not just an inconvenience, and GATE loves drawing a small dependency graph and asking you to spot the cycle.
+KEY: annotated parse tree = a parse tree with every attribute's actual COMPUTED VALUE written next to its node - the standard way GATE asks you to "evaluate" an SDD on a specific input string, working attribute-by-attribute according to the dependency graph's valid order.
+
+WORKED EXAMPLE 1 - full synthesized-attribute evaluation for arithmetic expression grammar
+
+Grammar with synthesized attribute val: E -> E1 + T { E.val = E1.val + T.val }, E -> T { E.val = T.val }, T -> T1 * F { T.val = T1.val * F.val }, T -> F { T.val = F.val }, F -> digit { F.val = digit.lexval }. Evaluate on input 2+3*4.
+1. Parse tree bottom level: F.val = 2 (from digit lexval 2), F.val = 3, F.val = 4 - three separate F nodes for the three digit occurrences.
+2. T -> F for the first F (value 2): T.val = 2. Separately, the second T is built from T1 -> F (value 3) times F (value 4) via T -> T1 * F: T.val = T1.val * F.val = 3 * 4 = 12.
+3. E -> E1 + T where E1 reduces down to T -> F (value 2, so E1.val = 2 via E->T), and the second T just computed has val 12: E.val = E1.val + T.val = 2 + 12 = 14.
+4. Final answer: E.val = 14 - correctly respecting operator precedence (multiplication grouped tighter than addition) purely because of how the GRAMMAR itself is structured (T handles * before E handles +), not because of any special-cased precedence logic in the semantic rules.
+
+WORKED EXAMPLE 2 - L-attributed inherited-attribute evaluation for declarations
+
+Grammar distributing a declared type across a list of identifiers: D -> T L, T -> int { T.type = int } | float { T.type = float }, L -> L1 , id { L1.inh = L.inh; addtype(id.entry, L.inh) } | id { addtype(id.entry, L.inh) }, with L.inh inherited from D -> T L via the rule { L.inh = T.type }. Evaluate on: float x , y , z.
+1. T reduces from 'float', giving T.type = float.
+2. D -> T L passes down L.inh = T.type = float to the top-level L (which spans "x , y , z").
+3. That L is built as L -> L1 , id (matching ", z" at the outermost level), so L1.inh = L.inh = float is passed down to the L1 covering "x , y", and addtype(z.entry, float) records z's type immediately.
+4. Recursing: L1 -> L2 , id (matching ", y"), so L2.inh = L1.inh = float, and addtype(y.entry, float) is called.
+5. Finally L2 -> id (just "x"), so addtype(x.entry, float) is called using L2.inh = float. All three identifiers x, y, z get type float recorded, and note the inherited attribute flows strictly LEFTWARD/DOWNWARD (parent-to-child, same value threaded through each recursive L level) - exactly the L-attributed pattern.
+
+WORKED EXAMPLE 3 - detecting a genuine dependency-graph cycle
+
+Suppose (as a deliberately broken SDD) a production A -> B C carries the rules: B.inh = C.syn (B's inherited attribute needs C's synthesized attribute) and C.inh = B.syn (C's inherited attribute needs B's synthesized attribute), while additionally B.syn depends on B.inh, and C.syn depends on C.inh.
+1. Draw the edges: B.inh <- C.syn, C.syn <- C.inh, C.inh <- B.syn, B.syn <- B.inh.
+2. Trace the cycle: start at B.inh, follow to C.syn, follow to C.inh, follow to B.syn, follow back to B.inh - this is a complete cycle of four dependency edges returning to the starting attribute.
+3. Conclusion: this SDD has NO valid evaluation order at all (every one of these four attributes transitively depends on itself), so it must be rejected/redesigned - this is exactly the kind of small four-node graph GATE draws and asks "can this SDD be evaluated on any parse tree", expecting the answer no, with a cycle identified as the reason.`; })();
+
+(function(){ var t = window.GATE_DATA.questions['compiler'].topics.find(function(t){return t.id==='compiler-icg';});
+  t.theory.deep = (t.theory.deep||'') + `
+
+FROM ZERO: FOUNDATIONS
+
+• Intermediate representation (IR), what it's actually FOR. After parsing produces a parse tree/AST, a compiler does not jump straight to machine code - it first translates into an IR: a simpler, machine-INDEPENDENT form that is easy to analyse and optimise. The point of an IR is to let ONE set of optimisation techniques work for MANY source languages and MANY target machines, instead of writing separate optimisers for every source-target pair.
+• Three-address code (TAC). TAC is a common IR where every instruction has AT MOST one operator on the right-hand side and at most three addresses/operands total (e.g. t1 = t2 + t3) - complex expressions get broken into a sequence of these simple steps, each computing one elementary operation.
+• Quadruple, triple. A quadruple represents one TAC instruction as four fields (operator, arg1, arg2, result) - the result gets an explicit name/temporary. A triple instead represents an instruction as three fields (operator, arg1, arg2) and refers to OTHER instructions' RESULTS by their position/index number in the triple list, rather than inventing an explicit named temporary for every intermediate result.
+• DAG (directed acyclic graph) for expressions. A DAG represents an expression so that if the SAME sub-expression appears more than once, it is represented by just ONE shared node (reused), instead of duplicating the computation - this is the standard tool for local common-subexpression elimination.
+• Backpatching. Backpatching is a technique for generating jump/branch instructions for control-flow constructs (if, while) BEFORE the target label/address is actually known yet - the jump instruction is emitted with its target left blank, and the blank is filled in ("patched") later once the true target position becomes known.
+
+EVERY EDGE CASE
+
+GATE TRAP: converting infix expressions with standard operator precedence to TAC must respect precedence and associativity EXACTLY as the grammar defines it (e.g. * before +, left-to-right for same precedence) - a numerical question asking "how many three-address statements are generated" is really testing whether you can correctly count each atomic OPERATION (not each operand or each parenthesis) in the fully precedence-resolved expression tree.
+GATE TRAP: short-circuit evaluation of boolean expressions (a && b, a || b) generates control-flow jumps DURING evaluation itself, rather than computing a full true/false value first and then branching - e.g. for a && b, if a evaluates to false, the code must jump directly to the "false" outcome WITHOUT ever evaluating b at all. Counting instructions or predicting execution paths without accounting for this early-exit jump is a frequent source of wrong numerical answers.
+KEY: DAG construction for an expression re-uses a node for a repeated sub-expression ONLY when that sub-expression is syntactically identical AND none of its operands have been reassigned/killed in between the two occurrences - if an intermediate variable gets overwritten by an assignment before its second use, the DAG must NOT merge the two occurrences (this is the classic "DAG vs available expressions with intervening assignment" trap).
+GATE TRAP: quadruples and triples differ specifically in how they REFER to intermediate results - quadruples name every temporary explicitly (position-independent, so REORDERING quadruples for optimisation is safe), while triples refer to earlier instructions BY POSITION NUMBER, meaning reordering or deleting a triple can silently invalidate every later triple's references to it (this fragility-under-reordering distinction is a common conceptual true/false target).
+KEY: for backpatching, three special lists are the standard tool - truelist (jump instructions still needing the "when true, go here" target filled in), falselist (same for the false case), and nextlist (unconditional jumps to "whatever comes right after this statement"); the whole technique is exactly: emit jumps with blanks now, remember their instruction numbers in these lists, and patch in the real target address once it becomes known (e.g. once the loop-body's start label or the statement-after-the-if's position is reached).
+
+WORKED EXAMPLE 1 - full three-address code and full DAG for a single expression
+
+Expression: (a + b) * (a + b) - c
+1. Three-address code, respecting precedence (parenthesised addition first, then multiplication, then subtraction): t1 = a + b; t2 = a + b; t3 = t1 * t2; t4 = t3 - c. Naively this is FOUR instructions if generated straight from a tree with no sharing.
+2. Now build the DAG: node1 = leaf 'a', node2 = leaf 'b', node3 = '+' with children node1,node2 (representing a+b) - crucially, since (a+b) appears TWICE in the source expression and neither a nor b is reassigned in between, BOTH occurrences point to the exact same node3, rather than creating a duplicate node.
+3. node4 = '*' with children node3, node3 (both operands of the multiply point to the SAME shared addition node) - representing (a+b)*(a+b) using only one underlying addition computation.
+4. node5 = '-' with children node4 (the multiply result) and leaf 'c' - representing the final subtraction.
+5. DAG-optimised TAC, reading off the DAG (only 3 instructions now, one per DISTINCT node, since the DAG has only one addition node not two): t1 = a + b; t2 = t1 * t1; t3 = t2 - c. This is the concrete mechanism of common-subexpression elimination: the DAG naturally exposes and eliminates the redundant second computation of a+b.
+
+WORKED EXAMPLE 2 - backpatching for an if-else statement
+
+Statement: if (a < b) then S1 else S2, using backpatching with truelist/falselist/nextlist.
+1. Generate code for the condition a < b as: code_cond; if a < b goto _ (target blank, add this instruction's number to truelist); goto _ (target blank, add to falselist).
+2. Emit the label for S1's code (this is exactly the address to backpatch into every entry of truelist - patch truelist now to point here). Generate S1's code, then emit an unconditional goto _ with its target blank, add this to nextlist (this jump exists to skip over S2 once S1 finishes).
+3. Emit the label for S2's code (this is exactly the address to backpatch into every entry of falselist - patch falselist now to point here). Generate S2's code.
+4. Emit the label for the statement immediately AFTER the whole if-else (this is exactly the address to backpatch into nextlist, so that S1's trailing goto correctly skips past S2 and lands right after the entire construct). All blanks are now filled with real, correct addresses - and crucially, ALL of this could be emitted in a SINGLE left-to-right pass, never needing to go back and re-scan the source, precisely because the actual patching (writing the real number into the blank field) happens after the target position is known, not the code generation position itself.
+
+WORKED EXAMPLE 3 - counting TAC statements for a boolean expression with short-circuiting
+
+Expression used as a condition: if (a < b && c > d) goto L.
+1. Because && short-circuits, the code must be: if a < b goto L2 (fall through/continue evaluating on true) else goto Lfalse (skip evaluating the second condition entirely) - this is already different from unconditionally computing both comparisons first.
+2. L2: if c > d goto L else goto Lfalse - the second comparison is only evaluated at all when the first one succeeded, and its own result decides the final jump directly.
+3. Total distinct conditional-jump instructions: exactly 2 (one per comparison), NOT computing two separate boolean temporary values and then a THIRD instruction ANDing them together - that "compute both fully, then combine" approach is what a naive non-short-circuit translation would do, and mistakenly assuming that style is the classic error this topic tests. Short-circuit code is generally MORE instructions in the worst case (multiple jump targets) but potentially FEWER actual operations executed at runtime (skips evaluating the second operand when the first already determines the outcome).`; })();
+
+(function(){ var t = window.GATE_DATA.questions['compiler'].topics.find(function(t){return t.id==='compiler-runtime';});
+  t.theory.deep = (t.theory.deep||'') + `
+
+FROM ZERO: FOUNDATIONS
+
+• Activation record (stack frame), plainly. Every time a procedure/function is CALLED (not just defined), the runtime system allocates a fresh block of memory called an activation record to hold that specific call's local variables, parameters, return address, and bookkeeping links - a recursive function running 5 levels deep has 5 SEPARATE activation records alive simultaneously, one per active call.
+• Static scoping vs. dynamic scoping. Static (lexical) scoping means a variable reference is resolved by looking at WHERE THE CODE IS WRITTEN/NESTED in the source text - fixed at compile time, regardless of the actual call sequence at runtime. Dynamic scoping instead resolves a variable by looking at the actual CHAIN OF CALLERS at runtime (whoever happens to have called whom), which can change from one execution to the next even for the exact same line of code.
+• Static link vs. dynamic link. A static link in an activation record points to the activation record of the LEXICALLY ENCLOSING procedure in the SOURCE CODE (used to find non-local variables under static scoping, by following static links outward exactly as many levels as the source nesting requires). A dynamic link instead points to the activation record of whoever actually CALLED this procedure at runtime (used to know where to return control, and to tear down the stack correctly) - these two links can point to completely different activation records when a function is called from somewhere other than its immediate lexical parent.
+• Scope. The scope of a variable declaration is simply the region of program TEXT within which that particular declaration is the one that applies - outside that region, either no such name exists, or a DIFFERENT declaration of the same name (in an enclosing or later scope) applies instead.
+
+EVERY EDGE CASE
+
+GATE TRAP: at a point where a variable is SHADOWED (an inner block declares a variable with the SAME NAME as an outer one), any reference to that name INSIDE the inner block's scope refers to the INNER (nearest enclosing) declaration ONLY - the outer variable becomes completely inaccessible by that name until the inner scope ends, even though the outer variable's storage still exists unchanged the whole time.
+GATE TRAP: counting static links to traverse is purely a function of LEXICAL NESTING DEPTH in the source code (how many levels of procedure-definition nesting separate the accessing procedure from the declaring procedure), completely independent of the actual call sequence/depth at runtime - a procedure nested 2 source-code levels inside another needs exactly 2 static-link hops regardless of how deep the actual call stack has grown through recursion or indirect calls.
+GATE TRAP: dynamic link traversal counts CALLER-CALLEE hops (actual runtime call chain), which is a completely different number from static-link hops whenever a procedure is called from somewhere other than its immediate lexical parent (e.g. a deeply recursive call, or a callback passed to and invoked by unrelated code) - confusing "how many calls deep are we" with "how many lexical levels are we nested" is the single most common error in this topic's numerical questions.
+KEY: heap allocation is required (rather than a simple stack) whenever a language allows data to OUTLIVE the procedure call that created it (e.g. an object returned by reference, or explicit dynamic allocation) - a pure stack discipline works only when strict last-in-first-out lifetime holds, i.e. a called procedure's activation record is always deallocated before its caller's, which fails for anything that must persist beyond its creating call's return.
+GATE TRAP: parameter passing mechanisms have GATE-tested distinct behaviours - call by value copies the argument's VALUE in, so changes inside the callee never affect the caller's variable; call by reference passes the actual memory ADDRESS, so changes inside the callee DO affect the caller's variable; call by value-result copies the value in AND copies the (possibly modified) value back out at return, differing from true call-by-reference specifically when ALIASING occurs (the same variable passed via two different parameters, or a global also passed as a parameter) - value-result and reference can give visibly DIFFERENT final results in exactly these aliasing cases, a favourite "compute the final value" numerical trap.
+
+WORKED EXAMPLE 1 - counting static links through three levels of nesting
+
+Setup: procedure A (outermost) statically/lexically contains procedure B, which statically contains procedure C. From within an activation of C, how many static links must be followed to reach A's activation record?
+1. C's own activation record's static link points to whichever activation is C's IMMEDIATE lexically enclosing procedure - that is B (one hop from C to B).
+2. B's activation record's static link, in turn, points to B's own immediate lexical parent - that is A (one more hop, from B to A).
+3. Total hops from C to A: 2 (C to B, then B to A) - exactly matching the lexical nesting depth difference (C is nested 2 levels inside A: A contains B contains C), regardless of how many times A, B, or C might currently be recursively active on the actual call stack.
+
+WORKED EXAMPLE 2 - dynamic link chain differs from static link chain under indirect calling
+
+Setup: A calls B directly; B, instead of calling C directly, passes C as a callback which some unrelated procedure D (lexically NOT nested inside A or B at all, e.g. a separate top-level procedure) eventually invokes. C is lexically nested directly inside A (not inside B or D).
+1. Static link chain for C: since C is lexically nested one level inside A, C's static link points directly to (the currently active) A's activation record in ONE hop, completely ignoring the fact that the actual calling chain went A -> B -> D -> C.
+2. Dynamic link chain for C: C's dynamic link points to D (whoever actually called it), D's dynamic link points to B (whoever called D), B's dynamic link points to A (whoever called B) - THREE hops via dynamic links to reach A's activation record.
+3. Conclusion: static-link distance (1 hop) and dynamic-link/call-depth distance (3 hops) are completely different numbers here, precisely because C was not called by its own lexical parent - this exact mismatch scenario is what GATE numerical questions on this subtopic are built to test.
+
+WORKED EXAMPLE 3 - aliasing under call-by-reference vs. call-by-value-result
+
+Procedure swap-like call: procedure P(x, y) does { x = x + 1; y = y + 1; }, called as P(g, g) where g is a single global variable currently holding value 10 (the SAME variable g passed as BOTH arguments - deliberate aliasing).
+1. Under call-by-reference: x and y both become ALIASES (references) to the same actual memory location g. x = x+1 sets g to 11 (both x and y now "see" 11, since they are literally the same location). Then y = y+1 sets g to 12. Final value of g: 12.
+2. Under call-by-value-result: x and y are each given their OWN separate local copies, both initialised to 10 (the value of g at call time). x = x+1 makes local x become 11 (g itself untouched so far). y = y+1 makes local y become 11 too (using ITS OWN separate copy, still starting from 10, unaware of x's change). At return, the copy-back happens in parameter order: x's final value (11) is copied back to g first, then y's final value (11) is copied back to g second, OVERWRITING the first copy-back. Final value of g: 11.
+3. This concrete numeric mismatch (12 under reference, 11 under value-result) for the exact same call is precisely why the two mechanisms are NOT interchangeable whenever aliasing (the same variable used more than once as an argument, or a global also aliased through a parameter) is present - a GATE numerical question naming both mechanisms is testing exactly this divergence.`; })();
+
+(function(){ var t = window.GATE_DATA.questions['compiler'].topics.find(function(t){return t.id==='compiler-optimization';});
+  t.theory.deep = (t.theory.deep||'') + `
+
+FROM ZERO: FOUNDATIONS
+
+• Basic block. A basic block is a maximal straight-line sequence of instructions with exactly ONE entry point (the first instruction, and control can only enter the block there, never in the middle) and exactly ONE exit point (the last instruction, typically a jump or branch, and control leaves only from there) - no jumps INTO the middle of a basic block are ever possible, and nothing inside jumps out early.
+• Control flow graph (CFG), plainly. A CFG is a graph where each NODE is one basic block, and a directed EDGE from block X to block Y means control can flow directly from the end of X to the start of Y (via a fall-through or an explicit jump) - it is simply a map of every possible execution path through the program at the block level.
+• Optimization, what it actually means here. A compiler optimization is any TRANSFORMATION of the code that preserves the program's observable MEANING (same output for every input) while improving some resource usage - typically running time, but sometimes code size or energy. "Preserves meaning" is the non-negotiable safety requirement; a transformation that is merely faster but occasionally changes behaviour is simply a bug, not an optimization.
+• Data flow analysis, plainly. Data flow analysis computes, for every point in the program, some FACT about what is definitely true there (e.g. "which variable definitions could still be live/reaching this point"), by propagating information along the CFG's edges according to fixed rules, iterating until the computed facts stop changing (reach a fixed point).
+• Loop-invariant computation. A computation inside a loop is loop-invariant if it produces the exact SAME result on every single iteration of that loop (its operands never change across iterations) - such a computation can safely be moved OUTSIDE the loop (computed once, before the loop starts) without changing the program's behaviour, since re-computing it every iteration was always redundant.
+
+EVERY EDGE CASE
+
+GATE TRAP: identifying basic block BOUNDARIES requires finding LEADERS first - a leader is the first instruction of the program, OR any instruction that is the TARGET of a jump/branch, OR any instruction immediately following a jump/branch instruction. Missing any one of these three leader rules (especially forgetting "the instruction right after a branch is always a new leader, even if nothing jumps there directly") is the most common basic-block-counting error.
+GATE TRAP: an expression is only a valid target for common subexpression elimination if it is computed identically at two points AND none of its operands have been reassigned in between - if a variable used in the expression is modified by an intervening statement, the two occurrences are NOT the same value anymore and must NOT be merged, even though they look textually identical.
+KEY: available expressions is a FORWARDS, MUST (intersection-based) data flow analysis - an expression is available at a program point only if it is computed along EVERY path reaching that point, and not invalidated (its operands not reassigned) along any of those paths since its last computation; used for global common subexpression elimination.
+KEY: live variable analysis is a BACKWARDS, MAY (union-based) data flow analysis - a variable is live at a point if there EXISTS at least one path from that point to some later use of the variable, with no reassignment of it in between; used for dead code elimination (a variable definition whose value is never live afterward is dead and can be safely removed) and for register allocation decisions.
+GATE TRAP: dead code elimination must be applied CAREFULLY around variables with side effects hidden in their computation (e.g. a function call that also writes to a global or performs I/O) - a variable assignment that LOOKS unused can still be unsafe to delete if computing its right-hand side has an externally visible side effect; pure "the assigned variable itself is never read again" reasoning is only safe when the right-hand side has no side effects.
+GATE TRAP: moving a computation out of a loop (loop-invariant code motion) is only safe if the computation is GUARANTEED to execute on every iteration reaching that point (or, more carefully, if moving it earlier cannot introduce a computation, exception, or side effect that would not have occurred in the original code, e.g. moving a possibly-dividing-by-zero computation out of a loop whose body might sometimes skip that computation via an early exit) - blindly hoisting anything "textually invariant-looking" without checking control-flow safety is the classic mistake.
+
+WORKED EXAMPLE 1 - finding leaders and basic blocks for a short numbered program
+
+Instructions numbered 1 to 7: (1) t1 = a+b; (2) if t1 > 0 goto (5); (3) t2 = a-b; (4) goto (6); (5) t2 = a*b; (6) print t2; (7) end.
+1. Instruction 1 is a leader by rule one (it's the very first instruction of the program).
+2. Instruction 2 is a branch, so instruction 3 (immediately following it) is a leader by the "right after a branch" rule.
+3. Instruction 2's branch TARGETS instruction 5, so instruction 5 is a leader by the "jump target" rule.
+4. Instruction 4 is also a branch (goto), so instruction 5... is already a leader (no new information), but instruction 4's target is instruction 6, making instruction 6 ALSO a leader by the "jump target" rule (it was going to be one anyway as the instruction right after instruction 4's unconditional jump, but this confirms it via the target rule too).
+5. Full leader set: {1, 3, 5, 6}. Basic blocks: B1={1,2} (ends right before leader 3), B2={3,4} (ends right before leader 5), B3={5} (ends right before leader 6, since 6 is a leader immediately), B4={6,7}. Four basic blocks total - each one entered only at its first instruction and exited only at its last.
+
+WORKED EXAMPLE 2 - live variable analysis backward pass on a tiny CFG
+
+Two connected blocks: B1: a = 1; b = 2; (falls through to B2). B2: c = a + b; print c; (exit).
+1. Start from the very end of B2 (the exit) with an EMPTY live set (nothing needed after the program ends).
+2. Walk B2 BACKWARDS: at 'print c', c is USED, so c becomes live going backward past this point (add c to the live set). At 'c = a + b', c is DEFINED here (so remove c from the live set going further backward past this def - its value going INTO this statement is not needed since it gets overwritten), and a, b are USED on the right-hand side, so add a and b to the live set. Live set entering B2 (i.e., live set at B1-to-B2 boundary): {a, b}.
+3. Walk B1 BACKWARDS starting from that boundary set {a,b}: at 'b = 2', b is DEFINED (remove b from the live set going further back - nothing on the right-hand side uses any variable, it's a constant). Live set becomes {a}. At 'a = 1', a is DEFINED (remove a too, again a constant right-hand side). Live set entering B1 (i.e., at the very start of the program): {} (empty).
+4. Interpretation: both a=1 and b=2 ARE necessary (their values ARE live immediately after each assignment, since they get used later in B2) - neither is dead code here. This full backward walk, block by block, def-kills-then-use-generates, is exactly the mechanical procedure to reuse on any live-variable GATE question.
+
+WORKED EXAMPLE 3 - loop-invariant code motion, done correctly and done incorrectly
+
+Loop: for (i = 0; i < n; i++) { x = a * b; y = arr[i] + x; }
+1. Check 'x = a * b': does it depend on the loop variable i, or on anything reassigned inside the loop body? a and b are never reassigned anywhere in the loop, and i never appears in this computation at all - x = a*b computes the exact SAME value on every single iteration. It is loop-invariant, safe to hoist.
+2. Correct transformation: x = a * b; (moved once, immediately BEFORE the loop starts) for (i = 0; i < n; i++) { y = arr[i] + x; } - the loop body now does strictly less repeated work, computing the multiplication once total instead of n times, while producing IDENTICAL output for every value of y across every iteration.
+3. Contrast with 'y = arr[i] + x': this expression depends on i (through arr[i]), which changes every iteration - it is NOT loop-invariant and must NOT be hoisted; incorrectly moving it outside the loop would freeze arr[i] at just its first-iteration value for the entire loop, silently changing the program's actual behaviour on later iterations - exactly the kind of "optimization" that fails the safety requirement from the FROM ZERO definition above and would be marked wrong on GATE as an invalid transformation.`; })();
+
+(function(){ var t = window.GATE_DATA.questions['compiler'].topics.find(function(t){return t.id==='compiler-lexical';});
+  t.theory.deep += '\n\nQUICK-RECALL CARDS\n\nKEY: maximal munch rule - always take the LONGEST prefix that matches some valid token pattern; an operator followed by a digit/letter that cannot extend it into a longer valid pattern stands alone as a separate token.\nKEY: keyword recognition checks the FULL matched lexeme against a reserved-word table, never a prefix or substring - "intx" is one ID token, not keyword "int" plus leftover "x".\nREMEMBER: whitespace and comments are consumed and discarded, producing zero tokens, but they still act as token separators.\nREMEMBER: bracket/parenthesis BALANCE checking is a parsing (syntax) task, not a lexical task - the lexer only emits bracket tokens one at a time, it never verifies nesting correctness.'; })();
+
+(function(){ var t = window.GATE_DATA.questions['compiler'].topics.find(function(t){return t.id==='compiler-parsing';});
+  t.theory.deep += '\n\nQUICK-RECALL CARDS\n\nKEY: parser power chain - SLR(1) subset LALR(1) subset CLR(1), strictly increasing; every SLR(1) grammar is LALR(1) and CLR(1), but not conversely.\nKEY: LALR merging (combining CLR states with identical cores) can introduce a NEW reduce-reduce conflict not present in CLR, but can never introduce a new shift-reduce conflict.\nKEY: shift-reduce conflicts are resolved by preferring SHIFT by default (this is exactly what correctly resolves dangling-else); reduce-reduce conflicts have no universal default and need explicit grammar/rule-ordering fixes.\nREMEMBER: left recursion breaks LL(1) parsing entirely (infinite loop with no input consumed); common prefixes across alternatives break LL(1) lookahead decisions and need left factoring - two separate diagnoses, two separate fixes.'; })();
+
+(function(){ var t = window.GATE_DATA.questions['compiler'].topics.find(function(t){return t.id==='compiler-sdt';});
+  t.theory.deep += '\n\nQUICK-RECALL CARDS\n\nKEY: S-attributed (synthesized only) SDDs always fit bottom-up (LR) parsing, action at end of production.\nKEY: L-attributed SDDs (inherited attributes depending only on parent or already-processed LEFT siblings, never a right sibling) fit top-down (LL) parsing in one left-to-right pass.\nKEY: a dependency-graph CYCLE means the SDD has no valid evaluation order at all on that parse tree - this is a design error, not a minor inconvenience.\nREMEMBER: not every SDD with inherited attributes is L-attributed - an inherited attribute depending on a RIGHT sibling breaks the L-attributed restriction immediately.'; })();
+
+(function(){ var t = window.GATE_DATA.questions['compiler'].topics.find(function(t){return t.id==='compiler-icg';});
+  t.theory.deep += '\n\nQUICK-RECALL CARDS\n\nKEY: quadruples name every result explicitly (safe to reorder for optimization); triples refer to earlier results by POSITION NUMBER (reordering/deleting can silently break later references).\nKEY: DAG sharing requires syntactically identical sub-expressions with NO intervening reassignment of any operand - an assignment between two occurrences blocks sharing even if the text looks identical.\nKEY: short-circuit boolean code emits jumps DURING evaluation, skipping the second operand entirely when the first already determines the outcome - never compute-both-then-AND for && / || in three-address code.\nREMEMBER: backpatching uses truelist/falselist/nextlist to fill in jump targets AFTER they become known, enabling single-pass code generation with no backward re-scanning of source.'; })();
+
+(function(){ var t = window.GATE_DATA.questions['compiler'].topics.find(function(t){return t.id==='compiler-runtime';});
+  t.theory.deep += '\n\nQUICK-RECALL CARDS\n\nKEY: static link hop count = lexical NESTING DEPTH in source code, completely independent of actual runtime call depth.\nKEY: dynamic link hop count = actual CALLER chain at runtime, which can diverge sharply from static link count under indirect/callback calls.\nKEY: call-by-value never affects the caller variable; call-by-reference always does; call-by-value-result matches reference EXCEPT under aliasing (same variable passed twice, or a global also aliased via a parameter), where the LAST copy-back wins.\nREMEMBER: heap allocation (not a pure stack) is required whenever data must outlive the procedure call that created it.'; })();
+
+(function(){ var t = window.GATE_DATA.questions['compiler'].topics.find(function(t){return t.id==='compiler-optimization';});
+  t.theory.deep += '\n\nQUICK-RECALL CARDS\n\nKEY: leader rules for basic blocks - first instruction of the program; every branch/jump TARGET; every instruction immediately AFTER a branch/jump - miss any one of these three and the block count comes out wrong.\nKEY: available expressions is a FORWARDS, MUST (intersection) analysis used for common subexpression elimination; live variables is a BACKWARDS, MAY (union) analysis used for dead code elimination and register allocation.\nKEY: loop-invariant code motion is only safe when the moved computation is guaranteed to execute every iteration reaching that point and cannot introduce a new exception/side effect earlier than the original code would have.\nREMEMBER: any optimization must preserve observable program behaviour for every input - a transformation that is merely faster but sometimes changes output is a compiler bug, not a valid optimization.'; })();

@@ -328,6 +328,67 @@
   // "• " bullets, "Term. explanation" lead-ins, and [[FIG:id]] markers that pull in
   // a diagram from the topic's theory.figs. Render it with real hierarchy so it
   // reads like a textbook page instead of a wall of grey text.
+  // Detects a paragraph that runs a numbered list inline — "(1) x, (2) y, (3) z" —
+  // and returns the lead-in, the steps, and any trailing prose. Returns null unless
+  // the markers really are a list: at least three of them, numbered 1,2,3… in order,
+  // in a paragraph long enough that reading it as one block is the problem.
+  // References like "as shown in (2) and (3)" never match, because they don't start at 1.
+  function splitInlineSteps(line) {
+    if (line.length < 200) return null;
+    var marks = [], re = /\((\d{1,2})\)\s+/g, m;
+    while ((m = re.exec(line))) marks.push({ n: +m[1], at: m.index, end: re.lastIndex });
+    if (marks.length < 3) return null;
+    for (var i = 0; i < marks.length; i++) if (marks[i].n !== i + 1) return null;
+
+    var lead = line.slice(0, marks[0].at).replace(/[\s,;]+$/, '');
+    if (lead && !/[:.!?]$/.test(lead)) lead += ':';
+    var steps = [];
+    for (var j = 0; j < marks.length; j++) {
+      var stop = (j + 1 < marks.length) ? marks[j + 1].at : line.length;
+      steps.push(line.slice(marks[j].end, stop).replace(/[\s,;]+$/, ''));
+    }
+    // Prose hung off the end of the last step with a dash belongs in its own paragraph.
+    var tail = '';
+    var last = steps[steps.length - 1];
+    var dash = last.search(/\s+(?:--|—|–)\s+/);
+    if (dash > 0 && last.length - dash > 60) {
+      tail = last.slice(dash).replace(/^\s*(?:--|—|–)\s*/, '');
+      // It was a mid-sentence continuation; as its own paragraph it needs a capital.
+      tail = tail.charAt(0).toUpperCase() + tail.slice(1);
+      steps[steps.length - 1] = last.slice(0, dash).replace(/[\s,;]+$/, '');
+    }
+    return { lead: lead, steps: steps, tail: tail };
+  }
+
+  // Breaks a very long paragraph into readable chunks at sentence boundaries.
+  // A 700-character block on a phone is where an ADHD reader loses the thread, so
+  // anything past the threshold is regrouped into paragraphs of roughly 300 chars.
+  // Splits only where a full stop is followed by a capital, and never after a known
+  // abbreviation ("e.g.", "i.e.", "Fig.") or a single initial, so sentences stay whole.
+  var ABBREV = /(?:^|\s)(?:e\.g|i\.e|etc|vs|approx|Fig|Eq|No|cf|w\.r\.t|[A-Z])\.$/;
+  function splitLongParagraph(line, limit) {
+    if (line.length <= limit) return null;
+    var parts = [], buf = '';
+    var pieces = line.split(/(?<=[.!?])\s+(?=[A-Z(])/);
+    // Re-join any split that landed straight after an abbreviation.
+    var merged = [];
+    pieces.forEach(function (p) {
+      if (merged.length && ABBREV.test(merged[merged.length - 1])) merged[merged.length - 1] += ' ' + p;
+      else merged.push(p);
+    });
+    if (merged.length < 2) return null;
+    merged.forEach(function (sentence) {
+      if (buf && (buf.length + sentence.length) > limit * 0.75) { parts.push(buf); buf = sentence; }
+      else buf = buf ? buf + ' ' + sentence : sentence;
+    });
+    if (buf) parts.push(buf);
+    // A trailing scrap reads worse than one long paragraph — fold it back in.
+    if (parts.length > 1 && parts[parts.length - 1].length < 80) {
+      parts[parts.length - 2] += ' ' + parts.pop();
+    }
+    return parts.length > 1 ? parts : null;
+  }
+
   function renderTheory(text, figs) {
     if (!text) return '<p class="muted">Theory coming soon.</p>';
     var figMap = {};
@@ -389,12 +450,33 @@
         out.push('<div class="th-step"><span class="th-num">' + step[1] + '</span><span>' + inlineTheory(step[2]) + '</span></div>');
         return;
       }
+      // A long paragraph that enumerates inline — "... the OS: (1) traps, (2) checks, (3) ..."
+      // — is a wall of text on a phone. Break it into the same step chips a
+      // line-per-step paragraph would have produced.
+      var inlineSteps = splitInlineSteps(line);
+      if (inlineSteps) {
+        if (inlineSteps.lead) out.push('<p>' + inlineTheory(inlineSteps.lead) + '</p>');
+        inlineSteps.steps.forEach(function (s, i) {
+          out.push('<div class="th-step"><span class="th-num">' + (i + 1) + '</span><span>' + inlineTheory(s) + '</span></div>');
+        });
+        if (inlineSteps.tail) out.push('<p>' + inlineTheory(inlineSteps.tail) + '</p>');
+        return;
+      }
+
       // "Lead-in term. Rest of the paragraph" — bold the lead-in.
       var lead = line.match(/^([A-Z][^.]{2,48})\.\s+(.*)$/);
+      var body = line, termHtml = '';
       if (lead && lead[2].length > 20) {
-        out.push('<p><b class="th-term">' + esc(lead[1]) + '.</b> ' + inlineTheory(lead[2]) + '</p>');
+        termHtml = '<b class="th-term">' + esc(lead[1]) + '.</b> ';
+        body = lead[2];
+      }
+      var chunks = splitLongParagraph(body, 420);
+      if (chunks) {
+        chunks.forEach(function (c, i) {
+          out.push('<p>' + (i === 0 ? termHtml : '') + inlineTheory(c) + '</p>');
+        });
       } else {
-        out.push('<p>' + inlineTheory(line) + '</p>');
+        out.push('<p>' + termHtml + inlineTheory(body) + '</p>');
       }
     });
     closeList();

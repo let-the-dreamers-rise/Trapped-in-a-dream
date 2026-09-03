@@ -21,6 +21,12 @@
   S.planChecks = S.planChecks || {}; // day -> {taskIdx: true}
   S.mocks = S.mocks || [];           // {dateISO, day, score, max, correct, wrong, skipped}
   S.streak = S.streak || { last: null, count: 0 };
+  S.xp = S.xp || 0;                  // every answered question earns XP; never decreases
+  S.best60 = S.best60 || 0;          // personal best in the 60-second sprint
+  S.combo = 0;                       // in-session correct streak (not persisted)
+  S.badges = S.badges || {};         // unlocked achievement ids
+  S.challenge = S.challenge || {};   // { dateKey: true } once the daily challenge is done
+  S.lastLevel = S.lastLevel || 1;    // to detect a level-up moment
 
   function localKey(d) { return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); }
   function todayKey() { return localKey(new Date()); }
@@ -55,6 +61,13 @@
       else { L.box = 0; L.wrong++; }
       S.leitner[qq.id] = L;
     }
+    // XP only ever goes up — a bad session must never feel like losing ground.
+    // ~8% of correct answers pay double: variable reward beats a fixed rate.
+    var bonus = (correct && Math.random() < 0.08);
+    S.xp += correct ? (bonus ? 20 : 10) : 3;
+    if (bonus) setTimeout(function () { celebrate('<b>Double XP</b><span>+20 on that one</span>'); }, 260);
+    S.combo = correct ? S.combo + 1 : 0;
+    try { if (navigator.vibrate) navigator.vibrate(correct ? 18 : [12, 40, 12]); } catch (e) {}
     var st = S.topicStats[topicId] || { attempts: 0, correct: 0 };
     st.attempts++; if (correct) st.correct++;
     S.topicStats[topicId] = st;
@@ -66,6 +79,13 @@
       S.streak.count = (S.streak.last === localKey(y)) ? S.streak.count + 1 : 1;
       S.streak.last = k;
     }
+    var lvl = levelFor(S.xp);
+    if (lvl > (S.lastLevel || 1)) {
+      S.lastLevel = lvl;
+      setTimeout(function () { celebrate('<b>Level ' + lvl + '</b><span>' + S.xp + ' XP total</span>'); }, 300);
+    }
+    var fresh = checkBadges();
+    if (fresh.length) setTimeout(function () { celebrate('<b>' + esc(fresh[0].name) + '</b><span>Achievement unlocked</span>'); }, 700);
     save(); renderChips();
   }
 
@@ -118,12 +138,18 @@
   function nav(name, arg, arg2) {
     if (mockTimer && name !== 'mock-run') { clearInterval(mockTimer); mockTimer = null; }
     window.scrollTo(0, 0);
-    setTab(name === 'topic' || name === 'quiz' ? 'subjects' : (name.indexOf('mock') === 0 ? 'test' : name));
+    setTab(name === 'topic' || name === 'quiz' ? 'subjects' : (name === 'one' || name === 'sprint' || name === 'challenge' ? 'home' : (name === 'badges' ? 'progress' : (name.indexOf('mock') === 0 || name.indexOf('pyq') === 0 ? 'test' : name))));
     if (name === 'home') return viewHome();
     if (name === 'subjects') return viewSubjects();
     if (name === 'subject') return viewSubject(arg);
     if (name === 'topic') return viewTopic(arg);
     if (name === 'quiz') return viewQuiz(arg, arg2);
+    if (name === 'one') return viewOneQuestion();
+    if (name === 'sprint') return viewSprint();
+    if (name === 'challenge') return viewChallenge();
+    if (name === 'badges') return viewBadges();
+    if (name === 'pyq') return viewPyqList();
+    if (name === 'pyqpaper') return viewPyqPaper(arg);
     if (name === 'test') return viewMockLanding();
     if (name === 'progress') return viewProgress();
     if (name === 'plan') return viewPlan();
@@ -172,9 +198,25 @@
       '<div class="card"><h3>' + esc(plan ? plan.title : 'Grind') +
       (plan && plan.mock ? ' · <span style="color:var(--accent)">Mock day — target ' + plan.target + '/100</span>' : '') + '</h3>' +
       '<div class="hero-day"><span class="hero-num" style="font-size:52px">' + answered + '</span>' +
-      '<span class="hero-of">/' + quota + ' Q</span>' +
-      '<span class="hero-right"><div class="eyebrow" style="margin:0">Phase ' + (plan ? plan.phase : '-') + '</div></span></div>' +
-      '<div class="progress-track"><div class="progress-fill" style="width:' + pct + '%"></div></div></div>';
+      '<span class="hero-of">solved today</span>' +
+      '<span class="hero-right"><span class="n" style="color:var(--accent2)">L' + levelFor(S.xp) + '</span>' +
+      '<div class="eyebrow" style="margin:2px 0 0">' + S.xp + ' XP</div></span></div>' +
+      '<div class="progress-track"><div class="progress-fill" style="width:' + pct + '%"></div></div>' +
+      '<div class="small muted">' + (answered === 0
+        ? 'Nothing yet today. One question is a win — start there.'
+        : (answered >= quota ? 'Full target hit. Anything more is bonus.'
+           : 'Target ' + quota + '. You are moving — keep going.')) + '</div></div>' +
+
+      // The two lowest-friction entry points, placed above everything that asks for effort.
+      (S.challenge[todayKey()]
+        ? '<div class="card"><h3>Daily challenge</h3><div class="small" style="color:var(--accent2)">Done today. Come back tomorrow for a new one.</div></div>'
+        : '<div class="card" style="border-left:4px solid var(--accent)"><h3>Daily challenge &middot; triple XP</h3>' +
+          '<div class="small muted" style="margin-bottom:10px">One hard question. New one every day. Takes two minutes.</div>' +
+          '<button class="btn block" id="go-challenge">Take today\'s challenge</button></div>') +
+      '<div class="card"><h3>Low fuel? Start here</h3>' +
+      '<div class="btn-row"><button class="btn good" id="go-one">One question</button>' +
+      '<button class="btn" id="go-sprint">60-second sprint</button></div>' +
+      '<div class="small muted" style="margin-top:8px">No setup, no subject to pick, no way to fail. Best sprint: ' + S.best60 + '.</div></div>';
 
     if (plan) {
       html += '<div class="card"><h3>Today\'s objectives</h3>';
@@ -225,6 +267,12 @@
         var c = S.planChecks[d] || {}; c[cb.getAttribute('data-task')] = cb.checked; S.planChecks[d] = c; save();
       });
     });
+    var gc = document.getElementById('go-challenge');
+    if (gc) gc.addEventListener('click', function () { nav('challenge'); });
+    var g1 = document.getElementById('go-one');
+    if (g1) g1.addEventListener('click', function () { nav('one'); });
+    var g2 = document.getElementById('go-sprint');
+    if (g2) g2.addEventListener('click', function () { nav('sprint'); });
     $view.querySelectorAll('[data-go-subject]').forEach(function (b) {
       b.addEventListener('click', function () { nav('subject', b.getAttribute('data-go-subject')); });
     });
@@ -276,6 +324,119 @@
     return (t.questions || []).filter(function (q) { return !!q.pyqStyle; }).length;
   }
 
+  // Theory is authored as plain text with conventions: ALL-CAPS section heads,
+  // "• " bullets, "Term. explanation" lead-ins, and [[FIG:id]] markers that pull in
+  // a diagram from the topic's theory.figs. Render it with real hierarchy so it
+  // reads like a textbook page instead of a wall of grey text.
+  function renderTheory(text, figs) {
+    if (!text) return '<p class="muted">Theory coming soon.</p>';
+    var figMap = {};
+    (figs || []).forEach(function (f) { figMap[f.id] = f; });
+    var used = {};
+    var lines = String(text).split('\n');
+    var out = [], inList = false;
+    function closeList() { if (inList) { out.push('</ul>'); inList = false; } }
+    lines.forEach(function (raw) {
+      var line = raw.trim();
+      if (!line) { closeList(); return; }
+
+      var figM = line.match(/^\[\[FIG:([a-zA-Z0-9_-]+)\]\]$/);
+      if (figM) {
+        closeList();
+        var f = figMap[figM[1]];
+        if (f) {
+          used[f.id] = true;
+          out.push('<figure class="th-fig">' + f.svg +
+            (f.caption ? '<figcaption>' + esc(f.caption) + '</figcaption>' : '') + '</figure>');
+        }
+        return;
+      }
+
+      // A short all-caps line is a section heading.
+      var letters = line.replace(/[^A-Za-z]/g, '');
+      if (letters.length > 2 && line === line.toUpperCase() && line.length < 70) {
+        closeList();
+        out.push('<h4 class="th-head">' + esc(line) + '</h4>');
+        return;
+      }
+
+      if (line.indexOf('•') === 0) {
+        if (!inList) { out.push('<ul class="th-list">'); inList = true; }
+        out.push('<li>' + inlineTheory(line.replace(/^•\s*/, '')) + '</li>');
+        return;
+      }
+
+      closeList();
+
+      // Traps / gotchas get a red warning card — these are the marks people lose.
+      if (/^(GATE TRAP|TRAP|WARNING|CAUTION|COMMON MISTAKE|PITFALL)S?\b[:.\-]/i.test(line)) {
+        out.push('<div class="th-trap">' + inlineTheory(line.replace(/^[^:.\-]*[:.\-]\s*/, '')) + '</div>');
+        return;
+      }
+      // Remember-this lines get a teal key card.
+      if (/^(KEY|REMEMBER|NOTE|SHORTCUT|EXAM TIP|RULE OF THUMB|FAST ROUTE)\b[:.\-]/i.test(line)) {
+        out.push('<div class="th-key">' + inlineTheory(line.replace(/^[^:.\-]*[:.\-]\s*/, '')) + '</div>');
+        return;
+      }
+      // A line that is essentially one formula becomes a display block.
+      if (line.length < 90 && /=/.test(line) && !/[.!?]\s/.test(line) && /[0-9()^*\/+\-]/.test(line)) {
+        out.push('<div class="th-formula">' + esc(line) + '</div>');
+        return;
+      }
+      // Numbered steps get a step chip.
+      var step = line.match(/^(\d{1,2})[.)]\s+(.*)$/);
+      if (step) {
+        out.push('<div class="th-step"><span class="th-num">' + step[1] + '</span><span>' + inlineTheory(step[2]) + '</span></div>');
+        return;
+      }
+      // "Lead-in term. Rest of the paragraph" — bold the lead-in.
+      var lead = line.match(/^([A-Z][^.]{2,48})\.\s+(.*)$/);
+      if (lead && lead[2].length > 20) {
+        out.push('<p><b class="th-term">' + esc(lead[1]) + '.</b> ' + inlineTheory(lead[2]) + '</p>');
+      } else {
+        out.push('<p>' + inlineTheory(line) + '</p>');
+      }
+    });
+    closeList();
+
+    // Any figures never placed by a marker go at the end so they are never lost.
+    (figs || []).forEach(function (f) {
+      if (!used[f.id]) {
+        out.push('<figure class="th-fig">' + f.svg +
+          (f.caption ? '<figcaption>' + esc(f.caption) + '</figcaption>' : '') + '</figure>');
+      }
+    });
+    return out.join('');
+  }
+
+  // Formula-ish fragments get monospace so they stand out mid-sentence.
+  function inlineTheory(s) {
+    var e = esc(s);
+    e = e.replace(/(^|[\s(])([A-Za-z0-9_]+\s*=\s*[^,.;:]{1,40})(?=[,.;:)]|$)/g,
+      function (m, pre, expr) { return pre + '<code>' + expr + '</code>'; });
+    return e;
+  }
+
+  // Pull one question from the whole bank. Used by the low-friction modes where
+  // choosing a subject is itself the barrier that stops a session starting.
+  function anyQuestion(maxDifficulty) {
+    var pool = [];
+    allTopics().forEach(function (e) {
+      (e.topic.questions || []).forEach(function (q) {
+        if (maxDifficulty === 'easy' && q.difficulty === 'hard') return;
+        pool.push({ q: q, topic: e.topic.id });
+      });
+    });
+    if (!pool.length) return null;
+    // bias toward questions previously answered wrong, then unseen
+    var due = pool.filter(function (r) { var L = S.leitner[r.q.id]; return L && L.box === 0; });
+    var unseen = pool.filter(function (r) { return !S.leitner[r.q.id]; });
+    var bag = (due.length && Math.random() < 0.4) ? due : (unseen.length ? unseen : pool);
+    return bag[Math.floor(Math.random() * bag.length)];
+  }
+
+  function levelFor(xp) { return Math.floor(Math.sqrt(xp / 40)) + 1; }
+
   // ---------- TOPIC (theory) ----------
   function viewTopic(tid) {
     var e = topicById(tid); if (!e) return viewSubjects();
@@ -293,7 +454,7 @@
     $view.innerHTML = html;
     var body = document.getElementById('tbody');
     function show(k) {
-      body.textContent = (t.theory && t.theory[k]) || 'Theory coming soon.';
+      body.innerHTML = renderTheory(t.theory && t.theory[k], t.theory && t.theory.figs);
       $view.querySelectorAll('[data-tt]').forEach(function (b) { b.classList.toggle('active', b.getAttribute('data-tt') === k); });
     }
     show('intro');
@@ -454,6 +615,234 @@
     ask();
   }
 
+  var BADGES = [
+    { id: 'first',    name: 'First blood',      test: function (st) { return st.answered >= 1; },    hint: 'Answer your first question' },
+    { id: 'ton',      name: 'Century',          test: function (st) { return st.answered >= 100; },  hint: 'Answer 100 questions' },
+    { id: 'fivehund', name: 'Five hundred',     test: function (st) { return st.answered >= 500; },  hint: 'Answer 500 questions' },
+    { id: 'grand',    name: 'Thousand club',    test: function (st) { return st.answered >= 1000; }, hint: 'Answer 1000 questions' },
+    { id: 'hard10',   name: 'Iron stomach',     test: function (st) { return st.hardRight >= 10; },  hint: 'Get 10 hard questions right' },
+    { id: 'hard50',   name: 'Hard mode',        test: function (st) { return st.hardRight >= 50; },  hint: 'Get 50 hard questions right' },
+    { id: 'streak3',  name: 'Three in a row',   test: function (st) { return st.streak >= 3; },      hint: '3-day streak' },
+    { id: 'streak7',  name: 'Full week',        test: function (st) { return st.streak >= 7; },      hint: '7-day streak' },
+    { id: 'streak30', name: 'Month of fire',    test: function (st) { return st.streak >= 30; },     hint: '30-day streak' },
+    { id: 'sprint10', name: 'Quick draw',       test: function (st) { return st.best60 >= 10; },     hint: '10 correct in one sprint' },
+    { id: 'sprint20', name: 'Lightning',        test: function (st) { return st.best60 >= 20; },     hint: '20 correct in one sprint' },
+    { id: 'mock1',    name: 'Battle tested',    test: function (st) { return st.mocks >= 1; },       hint: 'Finish a full mock' },
+    { id: 'mock60',   name: 'Sixty club',       test: function (st) { return st.bestMock >= 60; },   hint: 'Score 60+ in a mock' },
+    { id: 'mock80',   name: 'Elite',            test: function (st) { return st.bestMock >= 80; },   hint: 'Score 80+ in a mock' },
+    { id: 'level5',   name: 'Level five',       test: function (st) { return st.level >= 5; },       hint: 'Reach level 5' },
+    { id: 'level10',  name: 'Level ten',        test: function (st) { return st.level >= 10; },      hint: 'Reach level 10' }
+  ];
+
+  function badgeStats() {
+    var answered = 0, hardRight = 0;
+    Object.keys(S.leitner).forEach(function (id) { answered += S.leitner[id].seen || 0; });
+    allTopics().forEach(function (e) {
+      (e.topic.questions || []).forEach(function (q) {
+        var L = S.leitner[q.id];
+        if (q.difficulty === 'hard' && L && L.box >= 3) hardRight++;
+      });
+    });
+    var bestMock = 0;
+    S.mocks.forEach(function (m) { if (m.score > bestMock) bestMock = m.score; });
+    return { answered: answered, hardRight: hardRight, streak: S.streak.count || 0,
+             best60: S.best60 || 0, mocks: S.mocks.length, bestMock: bestMock, level: levelFor(S.xp) };
+  }
+
+  // Returns any badges newly unlocked by the last action, so they can be celebrated.
+  function checkBadges() {
+    var st = badgeStats(), fresh = [];
+    BADGES.forEach(function (b) {
+      if (!S.badges[b.id] && b.test(st)) { S.badges[b.id] = Date.now(); fresh.push(b); }
+    });
+    if (fresh.length) save();
+    return fresh;
+  }
+
+  // A short celebration banner. Deliberately brief: it should reward, not interrupt.
+  function celebrate(html) {
+    var el = document.createElement('div');
+    el.className = 'celebrate';
+    el.innerHTML = html;
+    document.body.appendChild(el);
+    try { if (navigator.vibrate) navigator.vibrate([20, 60, 20, 60, 40]); } catch (e) {}
+    setTimeout(function () { el.classList.add('out'); }, 2200);
+    setTimeout(function () { if (el.parentNode) el.parentNode.removeChild(el); }, 2700);
+  }
+
+  // ---------- LOW-FRICTION MODES ----------
+  // The plan screen is a demand. On a low-dopamine day a demand gets avoided, the
+  // streak breaks, and guilt keeps the app closed. These two modes ask for almost
+  // nothing: one tap, no subject choice, no quota, no way to fail.
+
+  // ONE QUESTION: single question, from anywhere, then a genuine exit.
+  function viewOneQuestion() {
+    var rec = anyQuestion();
+    if (!rec) return viewHome();
+    var qq = rec.q;
+    var html = '<button class="back-link" id="back">‹ Today</button>' +
+      '<div class="quiz-meta"><span>One question</span><span>' + esc(qq.difficulty) + '</span></div>' +
+      '<div class="card"><div class="q-text">' + esc(qq.q) + '</div>' + figureHtml(qq) + '<div id="opts">';
+    (qq.options || []).forEach(function (o, i) {
+      html += '<button class="opt" data-i="' + i + '">' + String.fromCharCode(65 + i) + '.  ' + esc(o) + '</button>';
+    });
+    if (!qq.options || !qq.options.length) {
+      html += '<input type="number" step="any" id="one-nat" placeholder="Type your answer" inputmode="decimal">' +
+        '<div class="btn-row"><button class="btn" id="one-go">Check</button></div>';
+    }
+    html += '</div><div id="after"></div></div>';
+    $view.innerHTML = html;
+    document.getElementById('back').addEventListener('click', function () { nav('home'); });
+    function done(ok, chosen) {
+      recordAnswer(qq, ok, rec.topic);
+      $view.querySelectorAll('.opt').forEach(function (bb, j) {
+        bb.disabled = true;
+        if (j === qq.answer) bb.classList.add('correct');
+        else if (j === chosen && !ok) bb.classList.add('wrong');
+      });
+      document.getElementById('after').innerHTML =
+        '<div class="feedback-banner ' + (ok ? 'ok' : 'no') + '">' + (ok ? 'Correct &middot; +10 XP' : 'Wrong &middot; +3 XP for showing up') + '</div>' +
+        '<div class="explain"><b>' + answerLabel(qq) + '</b>\n' + esc(qq.explanation || '') + '</div>' +
+        '<div class="btn-row"><button class="btn" id="one-more">One more</button>' +
+        '<button class="btn ghost" id="one-stop">Done for now</button></div>' +
+        '<p class="muted small" style="margin-top:10px">Stopping here still counts. One question beats zero.</p>';
+      document.getElementById('one-more').addEventListener('click', viewOneQuestion);
+      document.getElementById('one-stop').addEventListener('click', function () { nav('home'); });
+      window.scrollTo(0, 0);
+    }
+    $view.querySelectorAll('.opt').forEach(function (b) {
+      b.addEventListener('click', function () { var i = +b.getAttribute('data-i'); done(i === qq.answer, i); });
+    });
+    var go = document.getElementById('one-go');
+    if (go) go.addEventListener('click', function () { done(natMatches(qq, document.getElementById('one-nat').value), null); });
+  }
+
+  // SPRINT: 60 seconds, easy-to-medium only, chase a personal best. Pure game loop.
+  function viewSprint() {
+    var left = 60, score = 0, answered = 0, timer = null, streak = 0;
+    function finish() {
+      clearInterval(timer); timer = null;
+      var best = score > S.best60;
+      if (best) { S.best60 = score; save(); }
+      $view.innerHTML = '<div class="card"><div class="eyebrow">60-second sprint</div>' +
+        '<div class="hero-day"><span class="hero-num">' + score + '</span><span class="hero-of">correct</span>' +
+        '<span class="hero-right"><span class="n">' + S.best60 + '</span><div class="eyebrow" style="margin:2px 0 0">Best</div></span></div>' +
+        (best ? '<div class="feedback-banner ok">New personal best</div>' : '') +
+        '<p class="muted small">' + answered + ' attempted &middot; +' + (score * 10 + (answered - score) * 3) + ' XP</p>' +
+        '<div class="btn-row"><button class="btn" id="again">Go again</button>' +
+        '<button class="btn ghost" id="stop">Done</button></div></div>';
+      document.getElementById('again').addEventListener('click', viewSprint);
+      document.getElementById('stop').addEventListener('click', function () { nav('home'); });
+    }
+    function ask() {
+      var rec = anyQuestion('easy');
+      if (!rec) return finish();
+      var qq = rec.q;
+      var mm = Math.floor(left / 60), ss = left % 60;
+      var html = '<div class="quiz-meta"><span>Sprint &middot; ' + score + ' correct' +
+        (streak > 2 ? ' &middot; ' + streak + ' in a row' : '') + '</span>' +
+        '<span class="timer">0' + mm + ':' + String(ss).padStart(2, '0') + '</span></div>' +
+        '<div class="card"><div class="q-text">' + esc(qq.q) + '</div>' + figureHtml(qq) + '<div>';
+      (qq.options || []).forEach(function (o, i) {
+        html += '<button class="opt" data-i="' + i + '">' + String.fromCharCode(65 + i) + '.  ' + esc(o) + '</button>';
+      });
+      html += '</div><div class="btn-row"><button class="btn ghost small-btn" id="skip">Skip</button>' +
+        '<button class="btn ghost small-btn" id="quit">End sprint</button></div></div>';
+      $view.innerHTML = html;
+      $view.querySelectorAll('.opt').forEach(function (b) {
+        b.addEventListener('click', function () {
+          var ok = +b.getAttribute('data-i') === qq.answer;
+          answered++; if (ok) { score++; streak++; } else { streak = 0; }
+          recordAnswer(qq, ok, rec.topic);
+          b.classList.add(ok ? 'correct' : 'wrong');
+          setTimeout(function () { if (timer) ask(); }, ok ? 160 : 700);
+        });
+      });
+      document.getElementById('skip').addEventListener('click', ask);
+      document.getElementById('quit').addEventListener('click', finish);
+    }
+    timer = setInterval(function () {
+      left--;
+      if (left <= 0) return finish();
+      var t = document.querySelector('.timer');
+      if (t) t.textContent = '00:' + String(left).padStart(2, '0');
+    }, 1000);
+    ask();
+  }
+
+  // DAILY CHALLENGE: one hard question, same for the whole day, triple XP, once only.
+  // A single fresh thing each day is a stronger habit anchor than an open-ended quota.
+  function dailyChallengeQuestion() {
+    var pool = [];
+    allTopics().forEach(function (e) {
+      (e.topic.questions || []).forEach(function (q) {
+        if (q.difficulty === 'hard' && q.options && q.options.length) pool.push({ q: q, topic: e.topic.id });
+      });
+    });
+    if (!pool.length) return null;
+    var key = todayKey(), seed = 0;
+    for (var i = 0; i < key.length; i++) seed = (seed * 31 + key.charCodeAt(i)) % 100000;
+    return pool[seed % pool.length];
+  }
+
+  function viewChallenge() {
+    var rec = dailyChallengeQuestion();
+    if (!rec) return viewHome();
+    var qq = rec.q, doneToday = !!S.challenge[todayKey()];
+    var html = '<button class="back-link" id="back">‹ Today</button>' +
+      '<div class="card"><div class="eyebrow">Daily challenge &middot; triple XP</div>' +
+      '<div class="q-text">' + esc(qq.q) + '</div>' + figureHtml(qq) + '<div id="opts">';
+    qq.options.forEach(function (o, i) {
+      html += '<button class="opt" data-i="' + i + '">' + String.fromCharCode(65 + i) + '.  ' + esc(o) + '</button>';
+    });
+    html += '</div><div id="after"></div></div>';
+    $view.innerHTML = html;
+    document.getElementById('back').addEventListener('click', function () { nav('home'); });
+    $view.querySelectorAll('.opt').forEach(function (b) {
+      b.addEventListener('click', function () {
+        var i = +b.getAttribute('data-i'), ok = i === qq.answer;
+        if (!doneToday) { S.challenge[todayKey()] = ok ? 'win' : 'try'; if (ok) S.xp += 20; save(); }
+        recordAnswer(qq, ok, rec.topic);
+        $view.querySelectorAll('.opt').forEach(function (bb, j) {
+          bb.disabled = true;
+          if (j === qq.answer) bb.classList.add('correct');
+          else if (j === i && !ok) bb.classList.add('wrong');
+        });
+        document.getElementById('after').innerHTML =
+          '<div class="feedback-banner ' + (ok ? 'ok' : 'no') + '">' +
+          (ok ? 'Challenge cleared &middot; +30 XP' : 'Missed it &mdash; but you showed up, +3 XP') + '</div>' +
+          '<div class="explain"><b>' + answerLabel(qq) + '</b>\n' + esc(qq.explanation || '') + '</div>' +
+          '<div class="btn-row"><button class="btn" id="ch-done">Back to today</button></div>';
+        document.getElementById('ch-done').addEventListener('click', function () { nav('home'); });
+        window.scrollTo(0, 0);
+      });
+    });
+  }
+
+  function viewBadges() {
+    var st = badgeStats();
+    var got = BADGES.filter(function (b) { return S.badges[b.id]; });
+    var left = BADGES.filter(function (b) { return !S.badges[b.id]; });
+    var html = '<button class="back-link" id="back">‹ Stats</button>' +
+      '<div class="card"><div class="eyebrow">Achievements</div>' +
+      '<div class="hero-day"><span class="hero-num" style="font-size:52px">' + got.length + '</span>' +
+      '<span class="hero-of">/' + BADGES.length + '</span>' +
+      '<span class="hero-right"><span class="n" style="color:var(--accent2)">L' + st.level + '</span>' +
+      '<div class="eyebrow" style="margin:2px 0 0">' + S.xp + ' XP</div></span></div></div>';
+    if (got.length) {
+      html += '<div class="card"><h3>Unlocked</h3>';
+      got.forEach(function (b) { html += '<div class="task-line"><span class="pill gen">✓</span><span>' + esc(b.name) + '</span></div>'; });
+      html += '</div>';
+    }
+    html += '<div class="card"><h3>Next up</h3>';
+    left.slice(0, 6).forEach(function (b) {
+      html += '<div class="task-line"><span class="pill">•</span><span class="muted">' + esc(b.name) + ' &mdash; ' + esc(b.hint) + '</span></div>';
+    });
+    html += '</div>';
+    $view.innerHTML = html;
+    document.getElementById('back').addEventListener('click', function () { nav('progress'); });
+  }
+
   // ---------- MOCK TEST ----------
   // Typical GATE CSE weightage (marks share) used to bias core sampling toward what the paper actually asks.
   var WEIGHT = { engmath: 14, pds: 10, algo: 8, os: 9, dbms: 7, cn: 7, coa: 8, toc: 7, digital: 4, compiler: 5 };
@@ -496,6 +885,8 @@
       html += '<div class="btn-row"><button class="btn good" id="start-mock">Start mock now</button></div>';
     }
     html += '</div>';
+    html += '<div class="list-item" id="open-pyq"><div class="grow"><div class="title">Real past-year papers</div>' +
+      '<div class="muted small">' + ((DATA.pyq || []).length) + ' loaded &middot; actual GATE papers, by year</div></div><span class="arrow">›</span></div>';
     if (S.mocks.length) {
       html += '<div class="card"><h3>Your mock history</h3>';
       S.mocks.slice().reverse().forEach(function (m) {
@@ -504,6 +895,8 @@
       html += '<p class="muted small">Curve to beat: 50 by Day 30 · 70 by Day 60 · 90 by Day 85.</p></div>';
     }
     $view.innerHTML = html;
+    var op = document.getElementById('open-pyq');
+    if (op) op.addEventListener('click', function () { nav('pyq'); });
     var sm = document.getElementById('start-mock');
     if (sm) sm.addEventListener('click', runMock);
     var um = document.getElementById('unlock-mock');
@@ -634,6 +1027,105 @@
     draw();
   }
 
+  // ---------- REAL PAST-YEAR PAPERS ----------
+  // Kept separate from the practice bank: these are transcribed from actual papers,
+  // so the app can honestly label them by year. Empty until papers are imported.
+  function pyqPapers() { return (DATA.pyq || []).slice().sort(function (a, b) { return b.year - a.year; }); }
+
+  function viewPyqList() {
+    var papers = pyqPapers();
+    var html = '<button class="back-link" id="back">‹ Mock</button>' +
+      '<div class="card"><div class="eyebrow">Real past-year papers</div>' +
+      '<h2>' + papers.length + ' paper' + (papers.length === 1 ? '' : 's') + ' loaded</h2>';
+    if (!papers.length) {
+      html += '<p class="muted small">No real papers imported yet. Everything in the Study tab is ' +
+        'practice material written to match GATE patterns &mdash; good training, but not actual exam questions.\n\n' +
+        'To add real ones: download the official GATE CS papers (free), send the PDFs to Claude, ' +
+        'and they get transcribed into this section with their true year and the official answer key.</p></div>';
+    } else {
+      html += '</div>';
+      papers.forEach(function (p) {
+        var log = (S.pyqLog || {})[p.year + '-' + p.paper] || {};
+        html += '<div class="list-item" data-pyq="' + p.year + '-' + p.paper + '"><div class="grow">' +
+          '<div class="title">GATE ' + p.year + ' &middot; ' + esc(p.paper) + '</div>' +
+          '<div class="muted small">' + p.questions.length + ' questions' +
+          (log.score !== undefined ? ' &middot; your score ' + log.score : ' &middot; not attempted') + '</div></div>' +
+          '<span class="arrow">›</span></div>';
+      });
+    }
+    $view.innerHTML = html;
+    document.getElementById('back').addEventListener('click', function () { nav('test'); });
+    $view.querySelectorAll('[data-pyq]').forEach(function (el) {
+      el.addEventListener('click', function () { nav('pyqpaper', el.getAttribute('data-pyq')); });
+    });
+  }
+
+  function viewPyqPaper(key) {
+    var papers = pyqPapers();
+    var paper = null;
+    papers.forEach(function (p) { if (p.year + '-' + p.paper === key) paper = p; });
+    if (!paper) return viewPyqList();
+    var idx = 0, answers = {};
+    function draw() {
+      var it = paper.questions[idx];
+      var kind = qKind(it);
+      var html = '<div class="quiz-meta"><span>GATE ' + paper.year + ' &middot; Q' + (it.n || idx + 1) +
+        '/' + paper.questions.length + '</span><span class="pill">' + it.marks + ' mark' + (it.marks > 1 ? 's' : '') + '</span></div>' +
+        '<div class="card"><div class="q-text">' + esc(it.q) + '</div>' + figureHtml(it) + '<div>';
+      if (kind === 'nat') {
+        html += '<input type="number" step="any" id="pyq-nat" inputmode="decimal" placeholder="Numerical answer" value="' + (answers[idx] !== undefined ? esc(answers[idx]) : '') + '">';
+      } else {
+        (it.options || []).forEach(function (o, i) {
+          var sel = kind === 'msq' ? (Array.isArray(answers[idx]) && answers[idx].indexOf(i) >= 0) : answers[idx] === i;
+          html += '<button class="opt" data-i="' + i + '" style="' + (sel ? 'border-color:var(--accent)' : '') + '">' + String.fromCharCode(65 + i) + '.  ' + esc(o) + '</button>';
+        });
+      }
+      html += '</div></div><div class="btn-row">' +
+        '<button class="btn ghost" id="prev" ' + (idx === 0 ? 'disabled' : '') + '>‹ Prev</button>' +
+        (idx < paper.questions.length - 1 ? '<button class="btn" id="next">Next ›</button>'
+          : '<button class="btn good" id="submit">Submit paper</button>') + '</div>' +
+        '<div class="btn-row"><button class="btn ghost small-btn" id="exit">Leave</button></div>';
+      $view.innerHTML = html;
+      $view.querySelectorAll('.opt').forEach(function (b) {
+        b.addEventListener('click', function () {
+          var i = +b.getAttribute('data-i');
+          if (kind === 'msq') {
+            var cur = Array.isArray(answers[idx]) ? answers[idx].slice() : [];
+            var at = cur.indexOf(i); if (at >= 0) cur.splice(at, 1); else cur.push(i);
+            if (cur.length) answers[idx] = cur; else delete answers[idx];
+          } else answers[idx] = i;
+          draw();
+        });
+      });
+      var nat = document.getElementById('pyq-nat');
+      if (nat) nat.addEventListener('input', function () { if (nat.value === '') delete answers[idx]; else answers[idx] = nat.value; });
+      var el;
+      if ((el = document.getElementById('prev'))) el.addEventListener('click', function () { idx--; draw(); });
+      if ((el = document.getElementById('next'))) el.addEventListener('click', function () { idx++; draw(); });
+      if ((el = document.getElementById('exit'))) el.addEventListener('click', viewPyqList);
+      if ((el = document.getElementById('submit'))) el.addEventListener('click', finish);
+    }
+    function finish() {
+      var score = 0, correct = 0;
+      paper.questions.forEach(function (it, i) {
+        var a = answers[i]; if (a === undefined) return;
+        var kind = qKind(it);
+        var ok = kind === 'nat' ? natMatches(it, a) : kind === 'msq' ? msqMatches(it, a) : a === it.answer;
+        if (ok) { score += it.marks; correct++; } else if (kind === 'mcq') score -= it.marks / 3;
+      });
+      score = Math.round(score * 100) / 100;
+      S.pyqLog = S.pyqLog || {};
+      S.pyqLog[paper.year + '-' + paper.paper] = { score: score, correct: correct, when: Date.now() };
+      save();
+      $view.innerHTML = '<div class="card"><div class="eyebrow">GATE ' + paper.year + ' &middot; real paper</div>' +
+        '<div class="hero-day"><span class="hero-num">' + score + '</span><span class="hero-of">marks</span></div>' +
+        '<p class="muted small">' + correct + ' correct out of ' + paper.questions.length + '</p>' +
+        '<div class="btn-row"><button class="btn" id="back2">Back to papers</button></div></div>';
+      document.getElementById('back2').addEventListener('click', viewPyqList);
+    }
+    draw();
+  }
+
   // ---------- PROGRESS ----------
   function viewProgress() {
     var totalAtt = 0, totalCor = 0;
@@ -700,6 +1192,9 @@
       });
       html += '<p class="muted small">Targets: Day 30 → 50 · Day 60 → 70 · Day 85+ → 90.</p></div>';
     }
+    html += '<div class="list-item" id="open-badges"><div class="grow"><div class="title">Achievements</div>' +
+      '<div class="muted small">' + Object.keys(S.badges).length + ' of ' + BADGES.length + ' unlocked &middot; level ' + levelFor(S.xp) + '</div></div><span class="arrow">›</span></div>';
+
     // backup & restore — localStorage is fragile; never lose 90 days of grind
     html += '<div class="card"><h3>Backup &amp; restore</h3>' +
       '<p class="muted small">Your progress lives only on this device. Export it weekly — paste the code somewhere safe (notes app, email to yourself).</p>' +
@@ -707,6 +1202,8 @@
       '<textarea id="backup-box" style="display:none;width:100%;margin-top:10px;background:var(--card2);color:var(--text);border:1px solid #33396b;border-radius:10px;padding:10px;min-height:90px;font-size:12px"></textarea>' +
       '<div class="btn-row" id="imp-row" style="display:none"><button class="btn good" id="imp-go">Restore from pasted code</button></div></div>';
     $view.innerHTML = html;
+    var ob = document.getElementById('open-badges');
+    if (ob) ob.addEventListener('click', function () { nav('badges'); });
     var box = document.getElementById('backup-box');
     document.getElementById('exp-btn').addEventListener('click', function () {
       box.style.display = 'block';
