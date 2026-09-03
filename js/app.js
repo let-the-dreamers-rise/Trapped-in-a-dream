@@ -138,12 +138,13 @@
   function nav(name, arg, arg2) {
     if (mockTimer && name !== 'mock-run') { clearInterval(mockTimer); mockTimer = null; }
     window.scrollTo(0, 0);
-    setTab(name === 'topic' || name === 'quiz' ? 'subjects' : (name === 'one' || name === 'sprint' || name === 'challenge' ? 'home' : (name === 'badges' ? 'progress' : (name.indexOf('mock') === 0 || name.indexOf('pyq') === 0 ? 'test' : name))));
+    setTab(name === 'topic' || name === 'quiz' || name === 'lesson' ? 'subjects' : (name === 'one' || name === 'sprint' || name === 'challenge' ? 'home' : (name === 'badges' ? 'progress' : (name.indexOf('mock') === 0 || name.indexOf('pyq') === 0 ? 'test' : name))));
     if (name === 'home') return viewHome();
     if (name === 'subjects') return viewSubjects();
     if (name === 'subject') return viewSubject(arg);
     if (name === 'topic') return viewTopic(arg);
     if (name === 'quiz') return viewQuiz(arg, arg2);
+    if (name === 'lesson') return viewLesson(arg);
     if (name === 'one') return viewOneQuestion();
     if (name === 'sprint') return viewSprint();
     if (name === 'challenge') return viewChallenge();
@@ -531,7 +532,8 @@
       (t.theory && t.theory.deep ? '<button data-tt="deep">Deep dive</button>' : '') +
       '<button data-tt="strategy">Exam strategy</button></div>' +
       '<div class="card"><div class="theory-body" id="tbody"></div></div>' +
-      '<button class="btn block good" id="practice">Practice &mdash; infinite quiz</button>' +
+      lessonCta(tid) +
+      '<button class="btn block ghost" id="practice" style="margin-top:8px">Practice &mdash; infinite quiz</button>' +
       (pyqCount(t) ? '<button class="btn block ghost" id="pyq-set" style="margin-top:8px">Exam-pattern set &mdash; ' + pyqCount(t) + ' questions</button>' : '');
     $view.innerHTML = html;
     var body = document.getElementById('tbody');
@@ -544,9 +546,387 @@
       b.addEventListener('click', function () { show(b.getAttribute('data-tt')); });
     });
     document.getElementById('back').addEventListener('click', function () { nav('subject', e.subject); });
+    var lb = document.getElementById('learn');
+    if (lb) lb.addEventListener('click', function () { nav('lesson', tid); });
     document.getElementById('practice').addEventListener('click', function () { nav('quiz', tid); });
     var pb = document.getElementById('pyq-set');
     if (pb) pb.addEventListener('click', function () { nav('quiz', tid, 'pattern'); });
+  }
+
+
+  // ---------- GUIDED LESSON ----------
+  // Reading a whole theory tab and then doing a whole quiz is two long stretches
+  // with no payoff in between, which is exactly the shape an ADHD brain bounces
+  // off. This mode cuts the same material into one idea at a time and puts a
+  // question on that idea immediately after it, so effort and reward stay a few
+  // seconds apart the whole way through the topic.
+  //
+  // Nothing new is authored here — beats are cut from the existing theory and
+  // paired with the topic's own questions by term overlap.
+
+  var LESSON_STOP = ('the a an and or of to in is are be for on with that this it as by from at ' +
+    'which one two can will may not no if then than when where each other any all both some ' +
+    'you your we they has have had was were been its into out over under also such more most ' +
+    'only very much many while about after before between during because so but however thus ' +
+    'gate exam question questions answer answers option options following consider let given ' +
+    'example note here there them their what how why does do done use used using ' +
+    'topic through conceptual concept idea point above below next same different every ' +
+    'first second third last case cases often always never usually simply just even still ' +
+    'means meaning called known common general specific important remember note notice ' +
+    'above below left right side part parts whole must should would could might make makes ' +
+    'take takes give gives find finds show shows says said tells look looks think thinks ' +
+    'need needs want wants like likes well good best worse worst large small long short ' +
+    'number numbers value values result results total amount level levels type types kind ' +
+    'form forms word words line lines term terms thing things way ways time times step steps ' +
+    'compute computes computed calculate calculates determine determines obtain obtains ' +
+    'apply applies applied assume assumes assumed suppose contains contain include includes ' +
+    'called define defines defined denote denotes denoted written write writes above below').split(' ');
+  var LESSON_STOPSET = {};
+  LESSON_STOP.forEach(function (w) { LESSON_STOPSET[w] = true; });
+
+  // Questions written as a follow-up to the previous one. Fine inside a quiz run
+  // where their sibling just appeared; incoherent as the single question after a
+  // teaching card, so the lesson leaves them to the quiz.
+  var LESSON_BACKREF = /(\bagain using\b|\bthe original (system|setup|configuration|scenario|state|table|array|graph|matrix)\b|\b(from|in) the previous question\b|\bas in the previous\b|\bsame (system|setup|scenario|configuration|state) as (above|before|the previous)\b|\bcontinuing from\b|\brefer(ring)? back to\b|\bthe above question\b)/i;
+
+  function lessonWords(s) {
+    return String(s || '').toLowerCase().replace(/[^a-z0-9 ]+/g, ' ').split(/\s+/)
+      .filter(function (w) { return w.length >= 4 && !LESSON_STOPSET[w]; });
+  }
+
+  // Cut a theory string into beats at its ALL-CAPS headings, splitting any beat
+  // that is still too long to read in one sitting.
+  function cutBeats(text, tab) {
+    if (!text) return [];
+    var out = [], cur = null;
+    String(text).split('\n').forEach(function (raw) {
+      var line = raw.trim();
+      if (!line) { if (cur) cur.lines.push(''); return; }
+      var letters = line.replace(/[^A-Za-z]/g, '');
+      if (letters.length > 2 && line === line.toUpperCase() && line.length < 70) {
+        cur = { heading: line, lines: [], tab: tab };
+        out.push(cur);
+      } else {
+        if (!cur) { cur = { heading: '', lines: [], tab: tab }; out.push(cur); }
+        cur.lines.push(line);
+      }
+    });
+    var beats = [];
+    out.forEach(function (sec) {
+      var body = sec.lines.join('\n').trim();
+      if (!body) return;
+      // Long sections become several beats under the same heading, split only at
+      // blank lines so a paragraph is never cut in half.
+      var LIMIT = 750;
+      if (body.length <= LIMIT) { beats.push({ heading: sec.heading, body: body, tab: sec.tab }); return; }
+      var chunk = '', part = 0;
+      body.split(/\n\s*\n/).forEach(function (para) {
+        if (chunk && (chunk.length + para.length) > LIMIT) {
+          beats.push({ heading: sec.heading, body: chunk.trim(), tab: sec.tab, part: ++part });
+          chunk = para;
+        } else chunk = chunk ? chunk + '\n\n' + para : para;
+      });
+      if (chunk.trim()) beats.push({ heading: sec.heading, body: chunk.trim(), tab: sec.tab, part: part ? ++part : 0 });
+    });
+    return beats;
+  }
+
+  // Build the whole lesson for a topic: beats in teaching order, each paired with
+  // the question from this topic that best matches what the beat just explained.
+  function buildLesson(e) {
+    var t = e.topic, th = t.theory || {};
+    var beats = [];
+    if (th.intro) beats.push({ heading: 'THE IDEA', body: th.intro, tab: 'intro' });
+    beats = beats.concat(cutBeats(th.core, 'core'), cutBeats(th.deep, 'deep'));
+
+    // Term frequencies across beats: a word in every beat says nothing about which
+    // question belongs where, a word in one or two beats says a lot.
+    var df = {};
+    beats.forEach(function (b) {
+      var seen = {};
+      lessonWords(b.heading + ' ' + b.body).forEach(function (w) {
+        if (!seen[w]) { seen[w] = true; df[w] = (df[w] || 0) + 1; }
+      });
+    });
+    beats.forEach(function (b) {
+      b.words = {};
+      lessonWords(b.heading + ' ' + b.body).forEach(function (w) { b.words[w] = true; });
+      var counts = {};
+      lessonWords(b.heading + ' ' + b.heading + ' ' + b.body).forEach(function (w) { counts[w] = (counts[w] || 0) + 1; });
+      b.terms = Object.keys(counts)
+        .filter(function (w) { return df[w] <= Math.max(2, beats.length * 0.4); })
+        .sort(function (x, y) { return (counts[y] / df[y]) - (counts[x] / df[x]); })
+        .slice(0, 14);
+    });
+
+    // Domain vocabulary for this topic: words that recur across its questions.
+    // A word that appears in the theory but almost never in a question is prose,
+    // not a concept, so highlighting it would point the eye at nothing.
+    var qVocab = {};
+    (t.questions || []).forEach(function (q) {
+      var seen = {};
+      lessonWords(q.q + ' ' + (q.options || []).join(' ')).forEach(function (w) {
+        if (!seen[w]) { seen[w] = true; qVocab[w] = (qVocab[w] || 0) + 1; }
+      });
+    });
+
+    // Score every (beat, question) pair, then hand each beat its best free question.
+    var pool = (t.questions || []).filter(function (q) { return !LESSON_BACKREF.test(q.q); });
+    var pairs = [];
+    beats.forEach(function (b, bi) {
+      var termSet = {};
+      b.terms.forEach(function (w) { termSet[w] = true; });
+      pool.forEach(function (q, qi) {
+        var hit = {}, score = 0, qWords = {};
+        lessonWords(q.q + ' ' + (q.explanation || '')).forEach(function (w) {
+          qWords[w] = true;
+          if (termSet[w] && !hit[w]) { hit[w] = true; score += 1 / (df[w] || 1); }
+        });
+        // What to highlight: words this beat and this question actually share,
+        // limited to the topic's own question vocabulary so prose is never marked.
+        var marks = [];
+        Object.keys(qWords).forEach(function (w) {
+          if (b.words[w] && qVocab[w]) marks.push(w);
+        });
+        marks.sort(function (a, b3) { return b3.length - a.length; });
+        if (score > 0) pairs.push({ bi: bi, qi: qi, score: score, hits: marks });
+      });
+    });
+    pairs.sort(function (a, b2) { return b2.score - a.score; });
+    var takenQ = {}, filled = {};
+    pairs.forEach(function (p) {
+      if (filled[p.bi] || takenQ[p.qi]) return;
+      filled[p.bi] = true; takenQ[p.qi] = true;
+      beats[p.bi].q = pool[p.qi];
+      beats[p.bi].hits = p.hits.slice(0, 5);
+    });
+    // Any beat the matcher could not serve still gets a question — easiest first,
+    // so a beat never ends without something to do.
+    var spare = pool.map(function (q, i) { return i; })
+      .filter(function (i) { return !takenQ[i]; })
+      .sort(function (a, b2) {
+        var rank = { easy: 0, medium: 1, hard: 2 };
+        return (rank[pool[a].difficulty] || 1) - (rank[pool[b2].difficulty] || 1);
+      });
+    beats.forEach(function (b, bi) {
+      if (b.q) return;
+      var i = spare.shift();
+      if (i !== undefined) { b.q = pool[i]; b.hits = []; takenQ[i] = true; }
+    });
+    // A beat with no matched highlight still gets one: its own most distinctive
+    // words, filtered to the same domain vocabulary.
+    beats.forEach(function (b) {
+      if (b.hits && b.hits.length) return;
+      b.hits = Object.keys(b.words || {}).filter(function (w) { return qVocab[w]; })
+        .sort(function (a, b3) { return b3.length - a.length; }).slice(0, 5);
+    });
+    var lesson = beats.filter(function (b) { return b.q; });
+    // Questions the matcher never used are still the topic's own — keep them for
+    // the "one more on this" button so the pool does not run dry mid-lesson.
+    lesson.spare = spare.map(function (i) { return pool[i]; });
+    lesson.strategy = th.strategy || '';
+    return lesson;
+  }
+
+  var lessonCache = {};
+  function lessonFor(tid) {
+    if (!lessonCache[tid]) {
+      var e = topicById(tid);
+      lessonCache[tid] = e ? buildLesson(e) : [];
+    }
+    return lessonCache[tid];
+  }
+
+  // Highlight, inside the teaching text, the exact words the question is about to
+  // test. Walks text nodes rather than the HTML string so no markup can be broken.
+  function markTerms(root, terms, cap) {
+    if (!terms || !terms.length) return;
+    var uniq = terms.filter(function (w, i) { return terms.indexOf(w) === i && w.length >= 4; });
+    if (!uniq.length) return;
+    var re = new RegExp('\\b(' + uniq.map(function (w) { return w.replace(/[.*+?^${}()|[\]\\]/g, '\\  // Figures: questions may carry an inline SVG diagram'); }).join('|') + ')\\b', 'gi');
+    var nodes = [], walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, null);
+    var n; while ((n = walker.nextNode())) nodes.push(n);
+    var left = cap || 8;
+    nodes.forEach(function (node) {
+      if (left <= 0) return;
+      if (node.parentNode && /^(MARK|CODE|SCRIPT|STYLE)$/.test(node.parentNode.nodeName)) return;
+      var txt = node.nodeValue;
+      re.lastIndex = 0;
+      if (!re.test(txt)) return;
+      re.lastIndex = 0;
+      var frag = document.createDocumentFragment(), last = 0, m;
+      while ((m = re.exec(txt)) && left > 0) {
+        if (m.index > last) frag.appendChild(document.createTextNode(txt.slice(last, m.index)));
+        var mk = document.createElement('mark');
+        mk.className = 'hl';
+        mk.textContent = m[0];
+        frag.appendChild(mk);
+        last = m.index + m[0].length;
+        left--;
+      }
+      if (last < txt.length) frag.appendChild(document.createTextNode(txt.slice(last)));
+      node.parentNode.replaceChild(frag, node);
+    });
+  }
+
+// The guided walk is the headline action on a topic. It says how far in you
+  // already are, because resuming something half-done is a far easier decision
+  // than starting something whole.
+  function lessonCta(tid) {
+    var lesson = lessonFor(tid);
+    if (!lesson.length) return '';
+    var st = (S.lesson || {})[tid] || { beat: 0, done: 0 };
+    var resuming = st.beat > 0;
+    return '<button class="btn block good" id="learn">' +
+      (resuming ? 'Resume the walk &mdash; step ' + (st.beat + 1) + ' of ' + lesson.length
+                : 'Learn it step by step &mdash; ' + lesson.length + ' concepts') + '</button>' +
+      '<div class="small muted" style="text-align:center;margin:6px 0 2px">' +
+      (st.done ? 'Walked ' + st.done + (st.done === 1 ? ' time' : ' times') + '. '
+               : 'One idea, then a question on it, all the way through. ') +
+      'Nothing skipped.</div>';
+  }
+
+  function viewLesson(tid) {
+    var e = topicById(tid); if (!e) return viewSubjects();
+    var lesson = lessonFor(tid);
+    if (!lesson.length) return viewTopic(tid);
+    S.lesson = S.lesson || {};
+    var st = S.lesson[tid] || { beat: 0, done: 0 };
+    if (st.beat >= lesson.length) st.beat = 0;
+    var i = st.beat, phase = 'teach', extra = null, qStart = 0;
+
+    function head() {
+      var pct = Math.round(i / lesson.length * 100);
+      return '<button class="back-link" id="back">‹ ' + esc(e.topic.name) + '</button>' +
+        '<div class="quiz-meta"><span>Step ' + (i + 1) + ' of ' + lesson.length + '</span>' +
+        '<span class="pill">' + esc(e.subjectName) + '</span></div>' +
+        '<div class="progress-track" style="margin-bottom:14px"><div class="progress-fill" style="width:' + pct + '%"></div></div>';
+    }
+    function wireBack() {
+      var b = document.getElementById('back');
+      if (b) b.addEventListener('click', function () { nav('topic', tid); });
+    }
+
+    function teach() {
+      phase = 'teach';
+      var b = lesson[i];
+      $view.innerHTML = head() +
+        '<div class="card lesson-card">' +
+        (b.heading ? '<div class="eyebrow">' + esc(b.heading) + (b.part ? ' &middot; ' + b.part : '') + '</div>' : '') +
+        '<div class="theory-body" id="lbody"></div></div>' +
+        '<button class="btn block good" id="go-q">Got it &mdash; question me</button>' +
+        '<div class="small muted" style="text-align:center;margin-top:8px">Highlighted words are what the question is about.</div>';
+      var body = document.getElementById('lbody');
+      body.innerHTML = renderTheory(b.body, (e.topic.theory || {}).figs);
+      markTerms(body, b.hits || []);
+      wireBack();
+      document.getElementById('go-q').addEventListener('click', function () { ask(lesson[i].q); });
+    }
+
+    function ask(qq) {
+      phase = 'ask';
+      qStart = Date.now();
+      var kind = qKind(qq);
+      var html = head() +
+        '<div class="card"><div class="eyebrow" style="color:var(--accent)">Your turn</div>' +
+        '<div class="q-text">' + esc(qq.q) + '</div>' + figureHtml(qq) + '<div id="opts">';
+      if (kind === 'nat') {
+        html += '<input type="number" step="any" id="nat-in" placeholder="Type your numerical answer" inputmode="decimal">' +
+          '<div class="btn-row"><button class="btn" id="nat-go">Check answer</button></div>';
+      } else {
+        (qq.options || []).forEach(function (o, oi) {
+          html += '<button class="opt" data-i="' + oi + '">' + String.fromCharCode(65 + oi) + '.  ' + esc(o) + '</button>';
+        });
+        if (kind === 'msq') html += '<div class="btn-row"><button class="btn" id="msq-go">Submit selection</button></div>';
+      }
+      html += '</div><div id="after"></div></div>';
+      $view.innerHTML = html;
+      wireBack();
+
+      function settle(ok, chosen) {
+        recordAnswer(qq, ok, tid);
+        var secs = Math.round((Date.now() - qStart) / 1000);
+        S.speed = S.speed || { n: 0, total: 0 };
+        S.speed.n++; S.speed.total += secs;
+        $view.querySelectorAll('.opt').forEach(function (bb, j) {
+          bb.disabled = true;
+          var isRight = kind === 'msq' ? qq.answers.indexOf(j) >= 0 : j === qq.answer;
+          var picked = kind === 'msq' ? (chosen || []).indexOf(j) >= 0 : j === chosen;
+          if (isRight) bb.classList.add('correct');
+          else if (picked) bb.classList.add('wrong');
+        });
+        var g = document.getElementById('msq-go') || document.getElementById('nat-go');
+        if (g) g.disabled = true;
+        var ni = document.getElementById('nat-in'); if (ni) ni.disabled = true;
+        var last = (i >= lesson.length - 1);
+        document.getElementById('after').innerHTML =
+          '<div class="feedback-banner ' + (ok ? 'ok' : 'no') + '">' +
+          (ok ? 'Correct &mdash; that concept is yours' : 'Not yet &mdash; read why, then carry on') + '</div>' +
+          '<div class="explain"><b>' + answerLabel(qq) + '</b>\n' + esc(qq.explanation || '') + '</div>' +
+          '<div class="btn-row">' +
+          '<button class="btn good" id="nextb">' + (last ? 'Finish topic →' : 'Next concept →') + '</button>' +
+          (lesson.spare && lesson.spare.length ? '<button class="btn ghost" id="more">One more on this</button>' : '') +
+          '</div>' +
+          (ok ? '' : '<div class="small muted" style="margin-top:8px">It goes back in the deck — you will see it again.</div>');
+        document.getElementById('nextb').addEventListener('click', function () {
+          if (last) return done();
+          i++; st.beat = i; S.lesson[tid] = st; save();
+          teach();
+        });
+        var mb = document.getElementById('more');
+        if (mb) mb.addEventListener('click', function () {
+          extra = lesson.spare.shift();
+          if (extra) ask(extra); else mb.disabled = true;
+        });
+        window.scrollTo(0, 0);
+      }
+
+      if (kind === 'mcq') {
+        $view.querySelectorAll('.opt').forEach(function (b) {
+          b.addEventListener('click', function () {
+            var oi = Number(b.getAttribute('data-i'));
+            settle(oi === qq.answer, oi);
+          });
+        });
+      } else if (kind === 'msq') {
+        var sel = {};
+        $view.querySelectorAll('.opt').forEach(function (b) {
+          b.addEventListener('click', function () {
+            var oi = Number(b.getAttribute('data-i'));
+            sel[oi] = !sel[oi];
+            b.style.borderColor = sel[oi] ? 'var(--accent)' : '';
+          });
+        });
+        document.getElementById('msq-go').addEventListener('click', function () {
+          var chosen = Object.keys(sel).filter(function (k) { return sel[k]; }).map(Number);
+          settle(msqMatches(qq, chosen), chosen);
+        });
+      } else {
+        document.getElementById('nat-go').addEventListener('click', function () {
+          settle(natMatches(qq, document.getElementById('nat-in').value), null);
+        });
+      }
+    }
+
+    function done() {
+      st.beat = 0; st.done = (st.done || 0) + 1; S.lesson[tid] = st; save();
+      celebrate('<b>Topic walked</b><span>' + lesson.length + ' concepts, ' + lesson.length + ' questions</span>');
+      $view.innerHTML = '<button class="back-link" id="back">‹ ' + esc(e.topic.name) + '</button>' +
+        '<div class="card"><div class="eyebrow">Done</div><h2>' + esc(e.topic.name) + ' &mdash; walked end to end</h2>' +
+        '<p class="muted small">' + lesson.length + ' concepts, each one tested the moment you read it. ' +
+        'That is the whole topic, not a sample of it.</p>' +
+        (lesson.strategy ? '<hr class="sep"><div class="eyebrow">Before you leave &mdash; exam strategy</div>' +
+          '<div class="theory-body" id="strat"></div>' : '') +
+        '<div class="btn-row"><button class="btn good" id="drill">Now drill it &mdash; infinite quiz</button></div>' +
+        '<div class="btn-row"><button class="btn ghost" id="again">Walk it again</button></div></div>';
+      var sEl = document.getElementById('strat');
+      if (sEl) sEl.innerHTML = renderTheory(lesson.strategy, null);
+      wireBack();
+      document.getElementById('drill').addEventListener('click', function () { nav('quiz', tid); });
+      document.getElementById('again').addEventListener('click', function () { i = 0; st.beat = 0; save(); teach(); });
+    }
+
+    teach();
   }
 
   // Figures: questions may carry an inline SVG diagram (automata, circuits, graphs, Gantt...).

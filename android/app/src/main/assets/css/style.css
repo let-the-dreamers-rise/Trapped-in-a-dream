@@ -237,3 +237,25 @@ input[type=date], input[type=number], select, textarea { background: none; color
   border: 2px solid var(--accent2); color: var(--accent2);
   padding: 12px 14px; margin-bottom: 10px;
 }
+
+/* ---- Guided lesson: one concept, then a question on that concept. The card is
+       deliberately plain so the highlighted words are the only thing shouting. ---- */
+.lesson-card { border-left: 4px solid var(--accent2); }
+mark.hl {
+  background: rgba(53,208,186,.22); color: var(--text);
+  padding: 0 3px; border-radius: 0; font-weight: 700;
+  box-shadow: inset 0 -2px 0 var(--accent2);
+}
+
+/* One concept per card, sized to be read in a single breath. Larger type and
+   more air than the reference-style theory tabs, because this is the mode you
+   open when concentration is scarce. */
+.lesson-card {
+  border-left: 4px solid var(--accent2);
+  padding: 20px 18px 22px;
+}
+.lesson-card .theory-body { font-size: 16px; line-height: 1.72; }
+.lesson-card .theory-body p { margin: 0 0 14px; }
+.lesson-card .theory-body p:last-child { margin-bottom: 0; }
+.lesson-card .eyebrow { color: var(--accent2); margin-bottom: 12px; }
+.lesson-step { display: flex; align-items: center; gap: 8px; }
