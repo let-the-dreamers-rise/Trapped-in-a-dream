@@ -4110,3 +4110,138 @@ window.GATE_DATA.questions['os'].topics.find(function(t){return t.id==='os-memor
     "explanation": "Compute overhead(p) = p/2 + (S/p)*4 for each candidate, with S=1,048,576 bytes. At p=512: numPages=2048, page-table size=2048x4=8192 bytes, internal frag=256 bytes, total=8448 bytes -- the largest of all five values, confirming option A is TRUE. At p=1024 (1 KB): numPages=1024, table=4096, frag=512, total=4608 bytes. At p=2048 (2 KB): numPages=512, table=2048, frag=1024, total=3072 bytes. At p=4096 (4 KB): numPages=256, table=1024, frag=2048, total=3072 bytes -- EXACTLY tied with the 2 KB result, both landing at the minimum overhead among the tested candidates; option C is TRUE (the tie itself, and that it is the minimum, are both confirmed). At p=8192 (8 KB): numPages=128, table=512, frag=4096, total=4608 bytes -- this is HIGHER than the 3072-byte minimum reached at 2 KB and 4 KB, meaning overhead actually turns around and starts INCREASING again past the sweet spot, so option D (claiming a strict continuous decrease all the way to 8 KB) is FALSE. Since 1 KB gives 4608 bytes, well above the 3072-byte minimum achieved at 2 KB/4 KB, option B is also FALSE. This demonstrates the classic page-size trade-off curve: overhead first falls (as the page-table shrinks faster than internal fragmentation grows) then rises again (once internal fragmentation, growing linearly with p, starts to dominate), with a genuine minimum region rather than a monotonic trend in either direction -- and here that minimum happens to be a flat tie across two adjacent candidate sizes, not a single unique best answer."
   }
 ]);
+
+window.GATE_DATA.questions['os'].topics.find(function(t){return t.id==='os-file-disk';}).questions.push.apply(window.GATE_DATA.questions['os'].topics.find(function(t){return t.id==='os-file-disk';}).questions, [
+  {
+    "id": "os-file-disk-h1",
+    "q": "A disk has cylinders numbered 0-199, and the head starts at cylinder 53. The pending request queue, in ARRIVAL order, is: 98, 183, 37, 122, 14, 124, 65, 67. Using FCFS (First-Come-First-Served) disk scheduling, the total head movement works out to 640 cylinders. Given: seek time = 0.2 ms per cylinder of head movement, average rotational latency = 5 ms per request (half a rotation, at 6000 RPM), and transfer time = 2 ms per request. Compute the TOTAL service time (in ms) to service the entire queue of 8 requests under FCFS, including all seek, rotational, and transfer components.",
+    "options": [],
+    "answer": 184,
+    "marks": 2,
+    "difficulty": "hard",
+    "type": "numerical",
+    "kind": "nat",
+    "explanation": "Under FCFS, requests are serviced strictly in arrival order: |98-53|+|183-98|+|37-183|+|122-37|+|14-122|+|124-14|+|65-124|+|67-65| = 45+85+146+85+108+110+59+2 = 640 cylinders total head movement (this already correctly includes the initial move from the starting position 53 to the first request, 98). Total seek time = 640 cylinders x 0.2 ms/cylinder = 128 ms. Beyond seek time, EVERY one of the 8 requests independently incurs its own rotational latency (the platter must spin the target sector under the head) and its own transfer time (the actual data read/write) -- these do not depend on how far the head moved to get there, and must be added per-request, not just once for the whole batch. Total rotational latency = 8 requests x 5 ms = 40 ms. Total transfer time = 8 requests x 2 ms = 16 ms. Total service time = seek + rotation + transfer = 128 + 40 + 16 = 184 ms. The genuine trap this question is built around is treating disk service time as JUST the seek time (a common oversimplification when students only remember the head-movement formula from disk-scheduling comparisons) and forgetting that rotational latency and transfer time are separate, additive, PER-REQUEST costs that apply regardless of which scheduling algorithm arranged the seek order."
+  },
+  {
+    "id": "os-file-disk-h2",
+    "q": "Using the SAME disk, head start position (53), and request queue (98, 183, 37, 122, 14, 124, 65, 67) as the previous question, but now using SSTF (Shortest-Seek-Time-First) scheduling, the total head movement works out to 236 cylinders. Using the SAME per-unit costs (seek = 0.2 ms/cylinder, rotational latency = 5 ms/request, transfer = 2 ms/request), compute the TOTAL service time (in ms) under SSTF.",
+    "options": [],
+    "answer": 103.2,
+    "marks": 2,
+    "difficulty": "hard",
+    "type": "numerical",
+    "kind": "nat",
+    "explanation": "Under SSTF, the head always jumps next to whichever pending request is CLOSEST to its current position, greedily minimizing each individual seek rather than servicing in arrival order. Working through this queue from head=53: nearest is 65 (dist 12), then 67 (dist 2), then 37 (dist 30), then 14 (dist 23), then 98 (dist 84), then 122 (dist 24), then 124 (dist 2), then 183 (dist 59) -- summing: 12+2+30+23+84+24+2+59 = 236 cylinders total. Total seek time = 236 x 0.2 = 47.2 ms. Exactly as before, rotational latency and transfer time are incurred once PER REQUEST regardless of scheduling order or seek distance: total rotational latency = 8 x 5 = 40 ms, total transfer time = 8 x 2 = 16 ms. Total service time = 47.2 + 40 + 16 = 103.2 ms. Comparing this to FCFS's 184 ms from the previous question, SSTF's much smaller total head movement (236 vs 640 cylinders) translates directly into a smaller seek-time contribution (47.2 ms vs 128 ms), while the rotational and transfer components stay IDENTICAL between the two scheduling algorithms (both always total 40+16=56 ms, since the same 8 requests need the same total rotation and transfer regardless of the order they're serviced in) -- the trap is forgetting that these fixed per-request components do not scale with, or benefit from, a smarter seek algorithm at all."
+  },
+  {
+    "id": "os-file-disk-h3",
+    "q": "Using the same disk (cylinders 0-199, head starts at 53) and request queue (98, 183, 37, 122, 14, 124, 65, 67), apply C-SCAN (circular SCAN) disk scheduling: the head moves in ONE direction (assume upward/increasing first), servicing all requests in its path, continues all the way to the disk's last cylinder (199) even if no request is there, then JUMPS immediately back to cylinder 0 (this jump itself DOES count as head movement, by convention for this question), and then continues servicing the remaining requests moving upward again from 0. Compute the TOTAL head movement (in cylinders) under this C-SCAN policy.",
+    "options": [],
+    "answer": 382,
+    "marks": 2,
+    "difficulty": "hard",
+    "type": "numerical",
+    "kind": "nat",
+    "explanation": "Starting at 53, moving upward (toward increasing cylinder numbers), the requests encountered in increasing order are 65, 67, 98, 122, 124, 183 (all requests >= 53); after servicing 183, C-SCAN continues all the way to the disk's final cylinder, 199, even though no request sits there, purely because C-SCAN's rule is to always sweep to the boundary before wrapping. Head movement for this upward leg: 53 to 65 (12) + 65 to 67 (2) + 67 to 98 (31) + 98 to 122 (24) + 122 to 124 (2) + 124 to 183 (59) + 183 to 199 (16) = 12+2+31+24+2+59+16 = 146 cylinders. Then the head jumps from 199 back to cylinder 0 -- by this question's stated convention, this return jump counts as head movement too, contributing 199 cylinders. From 0, the head resumes moving upward and services the one remaining request below the original starting point, 37 and 14 (both < 53): moving from 0, it hits 14 first (14 cylinders), then 37 (23 more cylinders), for 14+23=37 cylinders on this final leg. Grand total = 146 + 199 + 37 = 382 cylinders. The genuine trap is twofold: first, forgetting that C-SCAN (unlike LOOK) must travel all the way to the disk's physical boundary (199) even when the last actual request (183) is short of it; second, whether or not the return jump (199 back to 0) counts as head movement is a convention that must be stated explicitly (as this question does) since different textbooks treat it differently -- omitting it, or double-counting it, are both easy mistakes."
+  },
+  {
+    "id": "os-file-disk-h4",
+    "q": "Using the same disk (cylinders 0-199, head starts at 53) and request queue (98, 183, 37, 122, 14, 124, 65, 67), which of the following are TRUE?",
+    "options": [
+      "FCFS produces a total head movement of exactly 640 cylinders",
+      "SSTF produces a total head movement of exactly 236 cylinders",
+      "LOOK (which reverses direction at the last REQUEST in each direction, rather than sweeping all the way to the disk's physical boundary like SCAN does) produces a total head movement that is exactly 32 cylinders LESS than plain SCAN's 331 cylinders",
+      "SSTF is GUARANTEED to always produce the globally minimum possible total head movement, among literally every possible ordering of the 8 requests"
+    ],
+    "answers": [
+      0,
+      1,
+      2
+    ],
+    "marks": 2,
+    "difficulty": "hard",
+    "type": "msq",
+    "kind": "msq",
+    "explanation": "Option A restates the FCFS result verified in an earlier question (45+85+146+85+108+110+59+2 = 640) -- TRUE. Option B restates the SSTF result (12+2+30+23+84+24+2+59 = 236) -- TRUE. For option C: SCAN, sweeping upward and going all the way to cylinder 199 before reversing, produces total movement of 331 cylinders (from 53, servicing 65,67,98,122,124,183 upward then continuing to 199, then reversing down through 37 and 14). LOOK performs the identical upward sweep servicing the same requests in the same order, but reverses direction as soon as it services the LAST actual request in that direction (183) rather than continuing needlessly to the empty boundary at 199 -- this saves the round trip of 199-183=16 cylinders going out AND the same 16 cylinders that would otherwise be needed coming back into range, a total saving of 2x16=32 cylinders, giving LOOK a total of 331-32=299 cylinders; the difference (331-299=32) matches option C exactly -- TRUE. Option D is the classic conceptual trap: SSTF is a purely GREEDY, locally-optimal algorithm (always picking the nearest pending request next) -- it is well known that greedy nearest-neighbor selection does not, in general, guarantee a globally minimal total distance across an entire sequence (this is structurally the same issue as the traveling-salesman problem, where greedy nearest-neighbor tours are not always shortest); SSTF is simply a good heuristic, never a provable global optimum, so option D is FALSE."
+  },
+  {
+    "id": "os-file-disk-h5",
+    "q": "A file system uses inodes with 10 direct block pointers, 1 single-indirect pointer, 1 double-indirect pointer, and 1 triple-indirect pointer. The block size is 1024 bytes and each pointer occupies 4 bytes (so each block can hold exactly 1024/4=256 pointers). Compute the MAXIMUM possible file size, in BYTES, that this inode structure can address.",
+    "options": [],
+    "answer": 17247250432,
+    "marks": 2,
+    "difficulty": "hard",
+    "type": "numerical",
+    "kind": "nat",
+    "explanation": "First derive the unstated intermediate: the number of pointers per block, p = block size / pointer size = 1024/4 = 256. Direct blocks contribute 10 data blocks directly. The single-indirect pointer points to ONE block full of pointers, each pointing to a data block, contributing p = 256 data blocks. The double-indirect pointer points to a block of p=256 pointers, each of which points to ANOTHER block of 256 pointers, each of THOSE pointing to a data block -- contributing p*p = 256*256 = 65,536 data blocks. The triple-indirect pointer adds one more level of this same indirection, contributing p*p*p = 256^3 = 16,777,216 data blocks. Total addressable data blocks = 10 + 256 + 65,536 + 16,777,216 = 16,843,018 blocks. Maximum file size in bytes = 16,843,018 blocks x 1024 bytes/block = 17,247,250,432 bytes (approximately 16.06 GB). The genuine trap combines two things: first, deriving p=256 as an unstated intermediate rather than being handed it directly, and second, correctly recognizing that double- and triple-indirect blocks contribute p-SQUARED and p-CUBED data blocks respectively (not merely 2p and 3p, a common but incorrect linear-scaling assumption) -- because each additional level of indirection multiplies, rather than adds to, the number of reachable data blocks."
+  },
+  {
+    "id": "os-file-disk-h6",
+    "q": "A 500 GB disk (using 1 GB = 2^30 bytes) is divided into 4 KB blocks, and free-space management uses a BITMAP with exactly 1 bit per block. The bitmap itself must be stored within the disk, occupying some whole number of its own 4 KB blocks. How many blocks does the bitmap occupy?",
+    "options": [],
+    "answer": 4000,
+    "marks": 2,
+    "difficulty": "hard",
+    "type": "numerical",
+    "kind": "nat",
+    "explanation": "Total disk size in bytes = 500 x 2^30 = 536,870,912,000 bytes. Total number of blocks = disk size / block size = 536,870,912,000 / 4096 = 131,072,000 blocks (this is the unstated intermediate the question requires deriving first). The bitmap needs exactly 1 bit per block, so its total size = 131,072,000 bits. Converting to bytes: 131,072,000 / 8 = 16,384,000 bytes. To find how many 4 KB blocks this consumes: 16,384,000 / 4096 = 4000 blocks exactly (a clean division, confirming the arithmetic). So the bitmap occupies exactly 4000 blocks of the disk it is describing. The genuine trap here is a self-referential subtlety many overlook: the bitmap tracks free/used status for EVERY block on the disk, including the very blocks the bitmap itself occupies -- in a fully rigorous design, those 4000 blocks would need to be marked permanently 'used' within the bitmap (since they store the bitmap, not free space), meaning the bitmap describes a disk that includes its own storage overhead as part of the total it accounts for, rather than the bitmap somehow existing 'outside' the space it manages. This four-step chain (bytes to blocks, blocks to bits, bits to bytes, bytes to blocks again) is exactly the kind of multi-stage unit conversion where an error in any single step propagates to a wrong final answer."
+  },
+  {
+    "id": "os-file-disk-h7",
+    "q": "A storage array uses 7 identical disks, each with 2 TB capacity. Which of the following are TRUE?",
+    "options": [
+      "Configured as RAID-5 (single parity, distributed across all disks), the usable capacity is 12 TB",
+      "RAID-5 (as configured above) can survive ANY 2 simultaneous disk failures without data loss",
+      "Configured as RAID-6 (dual parity) instead, using the same 7 disks, the usable capacity is 10 TB",
+      "Switching this array from RAID-5 to RAID-6 costs exactly 2 TB of usable capacity, in exchange for tolerating one additional simultaneous disk failure (from 1 up to 2)"
+    ],
+    "answers": [
+      0,
+      2,
+      3
+    ],
+    "marks": 2,
+    "difficulty": "hard",
+    "type": "msq",
+    "kind": "msq",
+    "explanation": "RAID-5 dedicates the equivalent of exactly ONE disk's worth of capacity to (distributed) parity, regardless of which physical disk it's rotated across, so usable capacity = (N-1) x per-disk size = (7-1) x 2 TB = 12 TB -- option A is TRUE. RAID-5's single parity block per stripe can reconstruct data after the loss of exactly ONE disk, but a SECOND simultaneous failure destroys the ability to reconstruct at least one stripe (there is no second layer of redundancy), so RAID-5 can NOT survive any 2 simultaneous failures -- option B is FALSE, a common trap confusing RAID-5's tolerance (exactly 1) with RAID-6's (exactly 2). RAID-6 dedicates the equivalent of TWO disks' worth of capacity to dual (independent) parity schemes, so usable capacity = (N-2) x per-disk size = (7-2) x 2 TB = 10 TB -- option C is TRUE. Comparing the two configurations on the identical 7-disk array: capacity drops from 12 TB (RAID-5) to 10 TB (RAID-6), a cost of exactly 12-10=2 TB, and in exchange fault tolerance improves from surviving 1 simultaneous disk failure (RAID-5) to surviving 2 simultaneous disk failures (RAID-6) -- option D correctly states both the capacity cost and the fault-tolerance gain, so it is TRUE."
+  },
+  {
+    "id": "os-file-disk-h8",
+    "q": "An 8-disk RAID-10 array (1 TB per disk, configured as 4 mirrored pairs, striped across the 4 pairs) experiences exactly 2 simultaneous disk failures. Under which condition does the array actually LOSE data?",
+    "options": [
+      "Always -- any 2 simultaneous disk failures in a RAID-10 array cause data loss, with no exceptions",
+      "Only if the two failed disks happen to belong to the SAME mirrored pair (i.e., both halves of one mirror fail together)",
+      "Never -- RAID-10 always survives any 2 simultaneous disk failures, regardless of which disks fail",
+      "Only if the two failed disks belong to two DIFFERENT mirrored pairs"
+    ],
+    "answer": 1,
+    "marks": 2,
+    "difficulty": "hard",
+    "type": "numerical",
+    "explanation": "RAID-10 (also called RAID 1+0) combines mirroring (RAID-1, within each pair) with striping (RAID-0, across the pairs): each of the 4 mirrored pairs independently holds two IDENTICAL copies of its data, and the 4 pairs are then striped together to form the full array. Data is lost ONLY if an ENTIRE mirrored pair becomes unavailable, i.e., BOTH disks within the SAME pair fail -- because then that pair's unique slice of the striped data has no surviving copy anywhere. If the two failures instead land on disks belonging to TWO DIFFERENT mirrored pairs, each affected pair still has its other (surviving) mirror disk intact, so no data is lost at all, even though 2 separate disks failed in the array overall. This is the specific nuance that distinguishes RAID-10 from RAID-5 (which has a flat, unconditional tolerance of exactly 1 failure with no such 'depends on which disks' subtlety): RAID-10's fault tolerance for a SECOND failure depends entirely on WHICH disk fails relative to the first, not merely on the count of simultaneous failures. So option B is correct: data loss occurs precisely when, and only when, both members of some single mirrored pair fail together; options A and C are both wrong because they ignore this conditional dependence, and option D describes exactly the SAFE case, not the data-loss case."
+  },
+  {
+    "id": "os-file-disk-h9",
+    "q": "A file system uses inodes with 12 direct block pointers, 1 single-indirect, 1 double-indirect, and 1 triple-indirect pointer. The block size is 4096 bytes and each pointer occupies 6 bytes (an unusual, deliberately awkward size). Since a pointer cannot be split across two blocks, only WHOLE pointers fit in an indirect block -- compute the number of pointers per block by taking the floor of (block size / pointer size). Using this correctly-derived value, compute the MAXIMUM possible file size, in BYTES, that this inode structure can address.",
+    "options": [],
+    "answer": 1301218861056,
+    "marks": 2,
+    "difficulty": "hard",
+    "type": "numerical",
+    "kind": "nat",
+    "explanation": "Block size / pointer size = 4096/6 = 682.666..., which is NOT a whole number -- since a pointer entry cannot be split across a block boundary, only whole pointers fit, so the number of pointers per block must be FLOORED: p = floor(682.666...) = 682 (the small leftover space within each indirect block, from the non-integer remainder, is simply wasted/unused padding). Direct blocks contribute 12 data blocks. Single-indirect contributes p = 682 data blocks. Double-indirect contributes p^2 = 682 x 682 = 465,124 data blocks. Triple-indirect contributes p^3 = 682 x 682 x 682 = 317,214,568 data blocks. Total addressable blocks = 12 + 682 + 465,124 + 317,214,568 = 317,680,386 blocks. Maximum file size = 317,680,386 blocks x 4096 bytes/block = 1,301,218,861,056 bytes (approximately 1211.85 GB). The genuine trap here is twofold: first, recognizing that block-size/pointer-size does NOT always divide evenly (unlike the far more common power-of-2-friendly examples), requiring an explicit floor operation rather than assuming a clean integer result; second, correctly cubing (not merely tripling) the pointers-per-block value for the triple-indirect level, since each additional level of indirection multiplies the reachable block count rather than adding to it linearly."
+  },
+  {
+    "id": "os-file-disk-h10",
+    "q": "A 500 GB disk (1 GB = 2^30 bytes) with 4 KB blocks has 131,072,000 total blocks. Free-space management is compared under two designs: (i) a BITMAP (1 bit per block, for ALL blocks, fixed regardless of how many are actually free) -- as derived earlier, this occupies exactly 4000 blocks; (ii) an EXPLICIT FREE LIST stored as a separate array of 4-byte block-addresses, containing one entry for EVERY currently-FREE block (not stored in-place within the free blocks themselves, but in its own dedicated array). Currently, 90% of all blocks are free. Compute how many MORE blocks design (ii) requires compared to design (i).",
+    "options": [],
+    "answer": 111200,
+    "marks": 2,
+    "difficulty": "hard",
+    "type": "numerical",
+    "kind": "nat",
+    "explanation": "Number of free blocks = 90% of 131,072,000 = 117,964,800. The explicit free-list array needs one 4-byte address entry per free block: 117,964,800 x 4 = 471,859,200 bytes. Converting this to whole 4 KB blocks: 471,859,200 / 4096 = 115,200 blocks exactly (a clean division). The bitmap, as established earlier, occupies a FIXED 4000 blocks regardless of how many blocks are actually free (since it always needs exactly 1 bit for every block on the disk, used or not). The difference: 115,200 - 4000 = 111,200 blocks -- the explicit free-list design needs 111,200 MORE blocks of overhead than the bitmap. The genuine trap here is the counter-intuitive result itself: naive intuition suggests that a free list, which only stores entries for the (fewer) FREE blocks rather than for every block on the disk, ought to be more space-efficient than a bitmap that always covers the entire disk -- but because each free-list entry costs a full 4 BYTES (32 bits) while a bitmap entry costs just 1 BIT, the free list's per-entry cost is 32 times larger, and at a 90% free ratio this factor overwhelms the fact that the free list has fewer 'entries' than the bitmap has 'bits', making the bitmap dramatically more space-efficient in this scenario despite tracking every single block, free or not."
+  }
+]);
