@@ -276,6 +276,77 @@
     return (t.questions || []).filter(function (q) { return !!q.pyqStyle; }).length;
   }
 
+  // Theory is authored as plain text with conventions: ALL-CAPS section heads,
+  // "• " bullets, "Term. explanation" lead-ins, and [[FIG:id]] markers that pull in
+  // a diagram from the topic's theory.figs. Render it with real hierarchy so it
+  // reads like a textbook page instead of a wall of grey text.
+  function renderTheory(text, figs) {
+    if (!text) return '<p class="muted">Theory coming soon.</p>';
+    var figMap = {};
+    (figs || []).forEach(function (f) { figMap[f.id] = f; });
+    var used = {};
+    var lines = String(text).split('\n');
+    var out = [], inList = false;
+    function closeList() { if (inList) { out.push('</ul>'); inList = false; } }
+    lines.forEach(function (raw) {
+      var line = raw.trim();
+      if (!line) { closeList(); return; }
+
+      var figM = line.match(/^\[\[FIG:([a-zA-Z0-9_-]+)\]\]$/);
+      if (figM) {
+        closeList();
+        var f = figMap[figM[1]];
+        if (f) {
+          used[f.id] = true;
+          out.push('<figure class="th-fig">' + f.svg +
+            (f.caption ? '<figcaption>' + esc(f.caption) + '</figcaption>' : '') + '</figure>');
+        }
+        return;
+      }
+
+      // A short all-caps line is a section heading.
+      var letters = line.replace(/[^A-Za-z]/g, '');
+      if (letters.length > 2 && line === line.toUpperCase() && line.length < 70) {
+        closeList();
+        out.push('<h4 class="th-head">' + esc(line) + '</h4>');
+        return;
+      }
+
+      if (line.indexOf('•') === 0) {
+        if (!inList) { out.push('<ul class="th-list">'); inList = true; }
+        out.push('<li>' + inlineTheory(line.replace(/^•\s*/, '')) + '</li>');
+        return;
+      }
+
+      closeList();
+      // "Lead-in term. Rest of the paragraph" — bold the lead-in.
+      var lead = line.match(/^([A-Z][^.]{2,48})\.\s+(.*)$/);
+      if (lead && lead[2].length > 20) {
+        out.push('<p><b class="th-term">' + esc(lead[1]) + '.</b> ' + inlineTheory(lead[2]) + '</p>');
+      } else {
+        out.push('<p>' + inlineTheory(line) + '</p>');
+      }
+    });
+    closeList();
+
+    // Any figures never placed by a marker go at the end so they are never lost.
+    (figs || []).forEach(function (f) {
+      if (!used[f.id]) {
+        out.push('<figure class="th-fig">' + f.svg +
+          (f.caption ? '<figcaption>' + esc(f.caption) + '</figcaption>' : '') + '</figure>');
+      }
+    });
+    return out.join('');
+  }
+
+  // Formula-ish fragments get monospace so they stand out mid-sentence.
+  function inlineTheory(s) {
+    var e = esc(s);
+    e = e.replace(/(^|[\s(])([A-Za-z0-9_]+\s*=\s*[^,.;:]{1,40})(?=[,.;:)]|$)/g,
+      function (m, pre, expr) { return pre + '<code>' + expr + '</code>'; });
+    return e;
+  }
+
   // ---------- TOPIC (theory) ----------
   function viewTopic(tid) {
     var e = topicById(tid); if (!e) return viewSubjects();
@@ -293,7 +364,7 @@
     $view.innerHTML = html;
     var body = document.getElementById('tbody');
     function show(k) {
-      body.textContent = (t.theory && t.theory[k]) || 'Theory coming soon.';
+      body.innerHTML = renderTheory(t.theory && t.theory[k], t.theory && t.theory.figs);
       $view.querySelectorAll('[data-tt]').forEach(function (b) { b.classList.toggle('active', b.getAttribute('data-tt') === k); });
     }
     show('intro');
