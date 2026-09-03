@@ -959,7 +959,25 @@
   function viewMockLanding() {
     var last = S.mocks[S.mocks.length - 1];
     var blocked = last && last.wrong > 0 && (last.tagged || 0) < last.wrong;
-    var html = '<div class="card"><h2>Full mock test</h2><p class="muted small">65 questions · 100 marks · 3 hours · real GATE negative marking (−1/3 on 1-mark, −2/3 on 2-mark MCQs). No pausing — treat it like the real hall.</p>';
+    var papers = (DATA.pyq || []).length;
+    var html = '';
+
+    // Real papers come first. A generated mock is unlimited but approximate; these
+    // are the actual exam, and doing them is the single highest-value practice
+    // there is. The generated mock is what you fall back on once they run out.
+    if (papers) {
+      var attempted = Object.keys(S.pyqLog || {}).length;
+      html += '<div class="card" style="border-left:4px solid var(--accent2)">' +
+        '<div class="eyebrow">The real thing</div><h2>Past-year papers</h2>' +
+        '<p class="muted small">' + papers + ' actual GATE papers with the official answer key. ' +
+        'Nothing here is written to look like GATE — it is GATE. ' +
+        (attempted ? 'You have attempted ' + attempted + '.' : 'Start with the most recent one.') + '</p>' +
+        '<div class="btn-row"><button class="btn good block" id="open-pyq">Open past papers</button></div></div>';
+    }
+
+    html += '<div class="card"><h2>Full mock test</h2><p class="muted small">' +
+      (papers ? 'Generated from the practice bank — unlimited, for when you have used up the real papers. ' : '') +
+      '65 questions · 100 marks · 3 hours · real GATE negative marking (−1/3 on 1-mark, −2/3 on 2-mark MCQs). No pausing — treat it like the real hall.</p>';
     if (blocked) {
       html += '<div class="feedback-banner no small">Locked &mdash; your last mock has ' + (last.wrong - (last.tagged || 0)) + ' untagged mistakes. Toppers never take a new mock before dissecting the last one — analyse every wrong answer first.</div>' +
         '<div class="btn-row"><button class="btn ghost" id="unlock-mock">I analysed every mistake on paper — unlock</button></div>';
@@ -967,8 +985,6 @@
       html += '<div class="btn-row"><button class="btn good" id="start-mock">Start mock now</button></div>';
     }
     html += '</div>';
-    html += '<div class="list-item" id="open-pyq"><div class="grow"><div class="title">Real past-year papers</div>' +
-      '<div class="muted small">' + ((DATA.pyq || []).length) + ' loaded &middot; actual GATE papers, by year</div></div><span class="arrow">›</span></div>';
     if (S.mocks.length) {
       html += '<div class="card"><h3>Your mock history</h3>';
       S.mocks.slice().reverse().forEach(function (m) {
@@ -1187,13 +1203,21 @@
       if ((el = document.getElementById('exit'))) el.addEventListener('click', viewPyqList);
       if ((el = document.getElementById('submit'))) el.addEventListener('click', finish);
     }
+    // Was this question answered correctly? Unanswered counts as wrong for review
+    // purposes but is scored as a skip (no negative marking), like the real exam.
+    function graded(it, a) {
+      if (a === undefined) return { attempted: false, ok: false };
+      var kind = qKind(it);
+      return { attempted: true, ok: kind === 'nat' ? natMatches(it, a) : kind === 'msq' ? msqMatches(it, a) : a === it.answer };
+    }
+
     function finish() {
-      var score = 0, correct = 0;
+      var score = 0, correct = 0, wrong = 0, skipped = 0;
       paper.questions.forEach(function (it, i) {
-        var a = answers[i]; if (a === undefined) return;
-        var kind = qKind(it);
-        var ok = kind === 'nat' ? natMatches(it, a) : kind === 'msq' ? msqMatches(it, a) : a === it.answer;
-        if (ok) { score += it.marks; correct++; } else if (kind === 'mcq') score -= it.marks / 3;
+        var g = graded(it, answers[i]);
+        if (!g.attempted) { skipped++; return; }
+        if (g.ok) { score += it.marks; correct++; }
+        else { wrong++; if (qKind(it) === 'mcq') score -= it.marks / 3; }
       });
       score = Math.round(score * 100) / 100;
       S.pyqLog = S.pyqLog || {};
@@ -1201,9 +1225,59 @@
       save();
       $view.innerHTML = '<div class="card"><div class="eyebrow">GATE ' + paper.year + ' &middot; real paper</div>' +
         '<div class="hero-day"><span class="hero-num">' + score + '</span><span class="hero-of">marks</span></div>' +
-        '<p class="muted small">' + correct + ' correct out of ' + paper.questions.length + '</p>' +
-        '<div class="btn-row"><button class="btn" id="back2">Back to papers</button></div></div>';
+        '<p class="muted small">' + correct + ' right &middot; ' + wrong + ' wrong &middot; ' + skipped + ' left blank, ' +
+        'out of ' + paper.questions.length + '</p>' +
+        '<div class="btn-row">' +
+        (wrong + skipped ? '<button class="btn good" id="rev-bad">Review what you missed</button>' : '') +
+        '<button class="btn" id="rev-all">Review every question</button></div>' +
+        '<div class="btn-row"><button class="btn ghost small-btn" id="back2">Back to papers</button></div></div>';
+      var el;
+      if ((el = document.getElementById('rev-bad'))) el.addEventListener('click', function () { review(true); });
+      if ((el = document.getElementById('rev-all'))) el.addEventListener('click', function () { review(false); });
       document.getElementById('back2').addEventListener('click', viewPyqList);
+    }
+
+    // The whole point of doing a past paper is the walk back through it. Show the
+    // question, what you put, what the official key says, and why.
+    function review(missedOnly) {
+      var html = '<button class="back-link" id="back3">‹ Score</button>' +
+        '<div class="card"><div class="eyebrow">GATE ' + paper.year + ' &middot; ' + esc(paper.paper) + '</div>' +
+        '<h2>' + (missedOnly ? 'What you missed' : 'Every question') + '</h2>' +
+        '<p class="muted small">Official answers, from the published answer key.</p></div>';
+      var shown = 0;
+      paper.questions.forEach(function (it, i) {
+        var g = graded(it, answers[i]);
+        if (missedOnly && g.ok) return;
+        shown++;
+        var kind = qKind(it);
+        var tag = !g.attempted ? '<span class="pill">Left blank</span>'
+          : g.ok ? '<span class="pill" style="color:var(--accent2);border-color:var(--accent2)">Correct</span>'
+                 : '<span class="pill" style="color:var(--accent);border-color:var(--accent)">Wrong</span>';
+        html += '<div class="card q-review"><div class="quiz-meta"><span>Q' + (it.n || i + 1) + ' &middot; ' +
+          it.marks + ' mark' + (it.marks > 1 ? 's' : '') + '</span>' + tag + '</div>' +
+          '<div class="q-text">' + esc(it.q) + '</div>' + figureHtml(it);
+        if (kind === 'nat') {
+          html += '<div class="opt-nat">' + esc(String(it.answer)) +
+            (it.tolerance ? ' <span class="muted small">(accepted &plusmn; ' + it.tolerance + ')</span>' : '') + '</div>';
+          if (g.attempted) html += '<p class="small muted">You answered ' + esc(String(answers[i])) + '.</p>';
+        } else {
+          var right = Array.isArray(it.answers) ? it.answers : [it.answer];
+          var mine = Array.isArray(answers[i]) ? answers[i] : (answers[i] === undefined ? [] : [answers[i]]);
+          (it.options || []).forEach(function (o, oi) {
+            var isRight = right.indexOf(oi) >= 0, isMine = mine.indexOf(oi) >= 0;
+            var style = isRight ? 'border-color:var(--accent2);color:var(--accent2)'
+              : (isMine ? 'border-color:var(--accent);color:var(--accent)' : 'opacity:.6');
+            html += '<div class="opt" style="' + style + '">' + String.fromCharCode(65 + oi) + '.  ' + esc(o) +
+              (isRight ? '  &check;' : (isMine ? '  &times; your answer' : '')) + '</div>';
+          });
+        }
+        if (it.explanation) html += '<div class="q-why">' + inlineTheory(it.explanation) + '</div>';
+        html += '</div>';
+      });
+      if (!shown) html += '<div class="card"><p class="muted">Nothing to review — you got every question right.</p></div>';
+      $view.innerHTML = html;
+      document.getElementById('back3').addEventListener('click', finish);
+      window.scrollTo(0, 0);
     }
     draw();
   }
