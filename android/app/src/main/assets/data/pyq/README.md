@@ -27,3 +27,28 @@ Rules for anything added here:
 - `year` must be the paper's actual year. If the year is unknown, the question does
   not belong in this directory — put it in the practice bank instead.
 - `answer` must match the official answer key, not a guess.
+
+## Questions deliberately left out
+
+Most gaps are now closed by reading the rendered page rather than the extracted
+text. A few questions are still excluded on purpose, and it is worth recording why
+so nobody "fixes" them back in:
+
+- **The official key accepts two answers.** GATE 2019 CS 12 (`C OR D`) and CS 42
+  (`3.7 to 3.8 OR 4.0 to 4.1`), GATE 2023 CS 17 and CS 30. A question with no
+  single correct answer would be scored wrong half the time by a learner who
+  reasoned correctly.
+- **The key marks the question dropped.** GATE 2023 GA 2, `MTA` — marks to all.
+- **The diagram cannot be reproduced faithfully.** GATE 2022 CS 50 (the Petersen
+  graph, whose option C embeds a second graph that has to be judged isomorphic to
+  the first) and GATE 2025 Set 1 GA 9 (a paper-folding puzzle whose four options
+  each carry eight small corner marks that are the entire content). An approximate
+  redraw of either would misrepresent the question rather than illustrate it.
+- **GATE 2014 Set 2 CS 25** — the TTL question. The diagram shows five router
+  squares along the path from S to R, which gives 32 − 5 = 27, but the official key
+  says 26. The count could not be reconciled against the scan at 4× magnification.
+  Rather than ship a figure that visibly contradicts its own answer, the question
+  is left out. If someone can establish the true router count, it can come back.
+
+The rule throughout: a question that teaches something false is worse than a
+question that is not there.
