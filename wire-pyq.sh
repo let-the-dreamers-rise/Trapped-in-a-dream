@@ -61,8 +61,15 @@ JS
 n=$(echo "$files" | grep -c . || true)
 echo "wired $n paper file(s)"
 
-# ---- textbook chapters: data/chapters/*.js, same idea, no validation gate ----
-chap=$(ls data/chapters/*.js 2>/dev/null | sort || true)
+# ---- textbook chapters: data/chapters/*.js ----
+# Only chapters that pass tools/validate-chapters.js get wired in — a half-written
+# or thin chapter must never reach the app.
+chap=""
+for f in $(ls data/chapters/*.js 2>/dev/null | sort); do
+  b=$(basename "$f" .js)
+  if node tools/validate-chapters.js "$b" >/dev/null 2>&1; then chap="$chap$f\n"; else echo "SKIPPING $f — fails chapter validation" >&2; fi
+done
+chap=$(printf '%b' "$chap")
 ctags=""
 for f in $chap; do ctags="$ctags  <script src=\"$f\"></script>\n"; done
 /opt/node22/bin/node - "$ctags" <<'JS'
