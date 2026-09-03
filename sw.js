@@ -1,5 +1,5 @@
 // Offline cache — the whole app works with zero network after first load.
-var CACHE = 'gate-r1-v15';
+var CACHE = 'gate-r1-v16';
 var ASSETS = [
   './', './index.html', './css/style.css', './js/app.js', './js/generators.js',
   './data/plan90.js', './data/astro.js', './icon.svg', './manifest.webmanifest',
@@ -10,6 +10,8 @@ var ASSETS = [
 ];
 // CHAPTERS:START
 ASSETS = ASSETS.concat([
+  './data/chapters/algo-divide-conquer.js',
+  './data/chapters/algo-greedy.js',
   './data/chapters/os-deadlock.js',
   './data/chapters/os-file-disk.js',
   './data/chapters/os-memory.js',
@@ -18,6 +20,8 @@ ASSETS = ASSETS.concat([
   './data/chapters/os-sync.js',
   './data/chapters/os-virtual-memory.js',
   './data/chapters/pds-c-basics.js',
+  './data/chapters/pds-graphs-rep.js',
+  './data/chapters/pds-heaps.js',
   './data/chapters/pds-linked-lists.js',
   './data/chapters/pds-pointers.js',
   './data/chapters/pds-recursion.js',
