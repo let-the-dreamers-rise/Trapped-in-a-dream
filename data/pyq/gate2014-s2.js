@@ -369,19 +369,6 @@ window.GATE_DATA.pyq.push({
       explanation: "After a socket is created and bound to an address, listen() marks it as passive, i.e. willing to accept incoming connection requests, converting it from an active (client-style) socket to a passive (server-style) one."
     },
     {
-      id: "gate2014s2-cs-25",
-      n: 25,
-      section: "CS",
-      q: "In the diagram shown below, L1 is an Ethernet LAN and L2 is a Token-Ring LAN. An IP packet originates from sender S and traverses to R, as shown. The links within each ISP and across the two ISPs, are all point-to-point optical links. The initial value of the TTL field is 32. The maximum possible value of the TTL field when R receives the datagram is ___.",
-      figure: "<svg viewBox=\"0 0 460 190\" width=\"100%\" style=\"max-width:460px;height:auto\" xmlns=\"http://www.w3.org/2000/svg\"><g fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.2\" stroke-dasharray=\"4 3\"><ellipse cx=\"65\" cy=\"85\" rx=\"58\" ry=\"45\"/><path d=\"M150,60 q15,-25 30,0 q15,-25 30,0 q15,-25 30,0 q10,20 -5,30 q-15,15 -30,0 q-15,15 -30,0 q-15,15 -25,-30\"/><path d=\"M300,60 q15,-25 30,0 q15,-25 30,0 q10,25 -5,35 q-15,15 -30,0 q-15,15 -25,-35\"/></g><g stroke=\"currentColor\" stroke-width=\"1.2\" fill=\"none\"><path d=\"M30,60 h20 v-8 h12\" /><path d=\"M62,60 h18 v-10 h12\"/><path d=\"M30,52 l10,-16 l10,16 z\"/><path d=\"M55,44 l10,-16 l10,16 z\"/><text x=\"20\" y=\"98\" font-size=\"11\" fill=\"currentColor\">S</text></g><g fill=\"currentColor\"><rect x=\"106\" y=\"78\" width=\"12\" height=\"12\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.4\"/><rect x=\"165\" y=\"100\" width=\"12\" height=\"12\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.4\"/><rect x=\"222\" y=\"78\" width=\"12\" height=\"12\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.4\"/><rect x=\"272\" y=\"78\" width=\"12\" height=\"12\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.4\"/><rect x=\"330\" y=\"78\" width=\"12\" height=\"12\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.4\"/></g><g stroke=\"currentColor\" stroke-width=\"1.4\"><line x1=\"118\" y1=\"84\" x2=\"165\" y2=\"104\"/><line x1=\"177\" y1=\"104\" x2=\"222\" y2=\"84\"/><line x1=\"234\" y1=\"84\" x2=\"272\" y2=\"84\"/><line x1=\"284\" y1=\"84\" x2=\"330\" y2=\"84\"/></g><g fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.4\"><circle cx=\"375\" cy=\"55\" r=\"9\"/><circle cx=\"375\" cy=\"110\" r=\"9\"/><circle cx=\"415\" cy=\"82\" r=\"9\"/><path d=\"M342,80 q5,-25 33,-25\"/><path d=\"M342,88 q5,25 33,25\"/><path d=\"M384,55 q20,0 25,20\"/><path d=\"M384,110 q20,0 25,-20\"/></g><g font-size=\"11\" fill=\"currentColor\"><text x=\"152\" y=\"25\">ISP1</text><text x=\"290\" y=\"25\">ISP2</text><text x=\"336\" y=\"98\">LAN L2</text><text x=\"425\" y=\"86\">R</text><text x=\"25\" y=\"120\">LAN L1</text></g></svg>",
-      options: [],
-      answer: 26,
-      tolerance: 0.01,
-      kind: "nat",
-      marks: 1,
-      explanation: "The TTL field is decremented only by IP-layer routers (the squares) as the datagram is forwarded; the Ethernet repeaters inside LAN L1 and the Token-Ring stations inside LAN L2 are physical/data-link devices that never touch the IP header. Per the official key, the shortest available router path from S to R crosses 6 routers, so the maximum TTL on arrival is 32 − 6 = 26."
-    },
-    {
       id: "gate2014s2-cs-26",
       n: 26,
       section: "CS",

@@ -56,7 +56,6 @@
       "Start --letter--> a state that ε-branches into a \"letter\" path and a \"digit\" path which both rejoin at a final state, with an extra top ε-edge looping the branch state back onto itself",
       "Start --letter--> state --letter--> state --digit--> a final state, with an ε-edge looping back from after the second letter"
     ],
-    "options_note": "each option's exact wiring is shown in the figure panels labelled A-D",
     "answer": 2, "marks": 1,
     "explanation": "id must be one letter followed by zero or more repetitions of (letter|digit). Option C's construction realises exactly this: after the mandatory first letter, the ε-branch structure with the loop-back ε-edge implements the Kleene star over the choice of letter or digit, matching letter(letter|digit)*."
   },
@@ -125,7 +124,7 @@
     "id": "gate2023-cs-46", "n": 46, "section": "CS",
     "q": "Let U = {1,2,3}. Let 2ᵁ denote the powerset of U. Consider an undirected graph G whose vertex set is 2ᵁ. For any A, B ∈ 2ᵁ, (A,B) is an edge in G if and only if (i) A ≠ B, and (ii) either A ⊂ B or B ⊂ A (proper subset). For any vertex A in G, the set of all possible orderings in which the vertices of G can be visited in a Breadth First Search (BFS) starting from A is denoted by ℬ(A).\nIf ∅ denotes the empty set, then the cardinality of ℬ(∅) is ____.",
     "options": [], "answer": 5040, "tolerance": 0.01, "kind": "nat", "marks": 2,
-    "explanation": "Starting BFS from ∅, level 1 consists of the three singletons {1},{2},{3} (each visitable in any of 3! = 6 orders), level 2 consists of the three 2-element subsets (each reached from at least one singleton, so all their orderings among themselves are also free, giving another 3! = 6 orders), and level 3 is the single vertex U. The official key gives the total number of distinct BFS orderings as 5040 = 6 × 6 × 2 × ... accounting for the additional freedom in which level-2 vertex is discovered via which level-1 neighbour."
+    "explanation": "∅ is a proper subset of every other vertex in 2ᵁ, so ∅ is adjacent to all of the other 7 vertices and every one of them is at BFS distance 1 from ∅. With the whole remaining vertex set forming a single BFS level, any of the 7! = 5040 orderings of those 7 vertices is a valid BFS visiting order."
   },
   {
     "id": "gate2023-cs-54", "n": 54, "section": "CS",
