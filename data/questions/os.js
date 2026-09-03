@@ -3519,3 +3519,594 @@ window.GATE_DATA.questions['os'].topics.find(function(t){return t.id==='os-file-
 (function(){ var t = window.GATE_DATA.questions['os'].topics.find(function(t){return t.id==='os-file-disk';});
   t.theory.core = t.theory.core.replace('Maximum file size under an inode scheme', '[[FIG:inode-indirect]]\n\nMaximum file size under an inode scheme');
   t.theory.core = t.theory.core.replace('Disk scheduling decides the ORDER in which a queue of pending cylinder requests is serviced', '[[FIG:disk-scan]]\n\nDisk scheduling decides the ORDER in which a queue of pending cylinder requests is serviced'); })();
+
+window.GATE_DATA.questions['os'].topics.find(function(t){return t.id==='os-processes';}).questions.push.apply(window.GATE_DATA.questions['os'].topics.find(function(t){return t.id==='os-processes';}).questions, [
+  {
+    "id": "os-processes-h1",
+    "q": "Consider this C program, where stdout is redirected to a FILE (so stdio is FULLY buffered -- a newline does NOT trigger a flush; the buffer is only flushed when a process exits):\n\nprintf(\"A\");\nfork();\nprintf(\"B\\n\");\nfork();\nprintf(\"C\\n\");\n\nAcross ALL processes that this program creates, how many times does the character 'A' appear in the total output written to the file?",
+    "options": [
+      "2",
+      "4",
+      "6",
+      "8"
+    ],
+    "answer": 1,
+    "marks": 2,
+    "difficulty": "hard",
+    "type": "numerical",
+    "explanation": "Since stdout is fully buffered (not a terminal), printf(\"A\") writes 'A' into the process's private stdio buffer but does NOT flush it, even though later writes contain '\\n' -- full buffering only flushes at exit (or an explicit fflush). Trace: the single process appends \"A\" to its buffer. fork() duplicates the ENTIRE process image, including this unflushed buffer, so now 2 processes each hold buffer \"A\". Each executes printf(\"B\\n\"), appending to give buffer \"AB\\n\" in both (still not flushed, since fully-buffered mode ignores the newline). The second fork() duplicates each of these 2 processes, giving 4 processes, each starting from buffer \"AB\\n\" already containing one 'A'. Each of these 4 appends \"C\\n\", giving buffer \"AB\\nC\\n\", and then the process exits, flushing this buffer to the file exactly once. So the file receives 4 flushed copies of \"AB\\nC\\n\", each containing exactly one 'A' (the character was written once, before either fork, and every subsequent fork merely copies that already-buffered character along with the process). Total processes = 2^(number of forks) = 2^2 = 4, and since 'A' appears once per process's buffer, the total count of 'A' in the file is 4. The trap is assuming buffering is irrelevant to counting output, or assuming line-buffering (which would flush at each \\n and change the answer)."
+  },
+  {
+    "id": "os-processes-h2",
+    "q": "The exact same program as before runs, but this time stdout is connected to an interactive TERMINAL, so stdio is LINE buffered (the buffer is flushed as soon as a '\\n' is written to it, before execution continues):\n\nprintf(\"A\");\nfork();\nprintf(\"B\\n\");\nfork();\nprintf(\"C\\n\");\n\nHow many times does the character 'B' appear in the total output shown on the terminal?",
+    "options": [
+      "1",
+      "2",
+      "4",
+      "8"
+    ],
+    "answer": 1,
+    "marks": 2,
+    "difficulty": "hard",
+    "type": "numerical",
+    "explanation": "printf(\"A\") still leaves 'A' sitting unflushed in the buffer (no newline yet), so the first fork() duplicates that pending \"A\" into both the parent and child -- there are now 2 processes, each holding buffer \"A\". Each process then executes printf(\"B\\n\"); because the buffer now contains a newline AND stdout is line-buffered, this flushes IMMEDIATELY: the terminal receives \"AB\\n\" once from each of the 2 currently-existing processes, and each process's buffer resets to empty. Only after this flush does the SECOND fork() execute, duplicating each of the 2 (now-empty-buffer) processes into 4 processes. Each of the 4 executes printf(\"C\\n\"), which flushes \"C\\n\" immediately (4 separate flushes, one per process). So 'B' was only ever written and flushed while exactly 2 processes existed, giving 2 total appearances of 'B' -- contrast this with the fully-buffered version of this same code (previous question), where the unflushed \"AB\\n\" survived to be duplicated by the SECOND fork() too, giving 4 copies of 'B'. This pair of questions demonstrates the genuine trap: the buffering mode (terminal vs redirected-to-file), not just the program's fork structure, determines exactly how many times buffered output gets duplicated across forks."
+  },
+  {
+    "id": "os-processes-h3",
+    "q": "A process runs this code (assume line-buffered/immediate output, so no buffer-duplication effects apply here):\n\nfor (i = 0; i < 3; i++) {\n    if (fork() == 0) {\n        printf(\"%d\", i);\n        break;\n    }\n}\n\nEach child that is created immediately prints its own copy of i and then breaks out of the loop; the original (root) process never enters the if-branch itself and simply lets the loop run to completion. Across the ENTIRE process tree, how many times does printf get called in total, and what is the multiset of digits printed?",
+    "options": [
+      "4 calls; digits {0,1,1,2}",
+      "3 calls; digits {0,1,2}",
+      "3 calls; digits {0,0,0}",
+      "7 calls; digits {0,1,2,0,1,2,0}"
+    ],
+    "answer": 1,
+    "marks": 2,
+    "difficulty": "hard",
+    "type": "numerical",
+    "explanation": "Only a process that gets fork()==0 (i.e., a freshly created child) enters the if-branch, prints, and breaks; every process that gets fork()>0 (the parent side) just continues its own loop to the next iteration without printing. Trace the ORIGINAL process only, since it is the only one that keeps looping (every child breaks after printing once, so no child ever forks again): at i=0, it calls fork(); the new child gets 0, prints \"0\", and breaks (that child is done, 1 process total from this branch). The original process itself got a non-zero return, so it continues the loop to i=1: it forks again; the new child gets 0, prints \"1\", and breaks. The original continues to i=2: forks once more; that child prints \"2\" and breaks. Now i becomes 3, the loop condition fails, and the ORIGINAL process exits the loop having never printed anything itself (it always received the non-zero fork() return in every iteration it participated in). So exactly 3 printf calls happen in total -- one per child, created at i=0,1,2 respectively -- each child printing its own private copy of i captured at its creation point (0, 1, and 2). The total process count is 4 (1 original + 3 children), but only the 3 children ever execute the printf, giving digits {0,1,2}. The trap is assuming the root process eventually prints too, or double-counting because 4 processes exist."
+  },
+  {
+    "id": "os-processes-h4",
+    "q": "A parent process P creates exactly 3 child processes using fork() in a loop; none of them are waited on at creation time. All 3 children run briefly and call exit() almost immediately, well before P calls wait() even once. P continues doing unrelated work for a long time (never calling wait()), and then finally calls wait() exactly ONCE (a single call, in a loop with no repetition) before continuing to run further (it does not exit). Immediately after this single wait() call returns, how many zombie processes remain in the system that were children of P?",
+    "options": [
+      "0",
+      "1",
+      "2",
+      "3"
+    ],
+    "answer": 2,
+    "marks": 2,
+    "difficulty": "hard",
+    "type": "numerical",
+    "explanation": "When a child process calls exit() but its parent has not yet called wait()/waitpid() to collect its exit status, the child does not disappear -- it becomes a ZOMBIE: its process control block (PID, exit status) is kept by the kernel until the parent reaps it. Since all 3 children exit before P ever calls wait(), all 3 become zombies simultaneously, and P's process table now lists 3 zombie children. A single call to wait() (with no PID argument, or WAIT for 'any child') reaps EXACTLY ONE arbitrary terminated child per call -- it does not reap all outstanding zombies at once. So after P's ONE wait() call, exactly 1 of the 3 zombies is reaped (its resources freed), leaving 3 - 1 = 2 zombies still present, still consuming a process-table slot, still waiting to be reaped by a future wait() call that P has not yet made. The genuine trap here is the common misconception that 'calling wait()' clears all outstanding zombies for a process -- it reaps only one per invocation, so cleaning up N zombies requires N separate wait() calls (typically in a loop). The answer is 2, not 0 (which would assume wait() reaps everything) and not 3 (which would assume wait() did nothing)."
+  },
+  {
+    "id": "os-processes-h5",
+    "q": "Compare two designs for handling 5 concurrent units of work within one process's virtual address space of 12 MB of shared code+data (identical either way):\n\n(i) THREAD design: create 5 threads, each given its own private 1 MB stack (all other memory is shared).\n\n(ii) FORK design: instead fork() 5 child processes (full copy-on-write address-space duplication each), and after forking, each child subsequently WRITES to (dirties) exactly 3 MB worth of pages that were marked copy-on-write, forcing the kernel to physically copy exactly that many MB of frames per child.\n\nCompute: (total physical frames actually copied across all 5 children in design (ii), in MB) minus (total private stack memory required across all 5 threads in design (i), in MB).",
+    "options": [
+      "0 MB",
+      "5 MB",
+      "10 MB",
+      "15 MB"
+    ],
+    "answer": 2,
+    "marks": 2,
+    "difficulty": "hard",
+    "type": "numerical",
+    "explanation": "In the THREAD design, only the stacks are private per thread (everything else -- code, data, heap -- is shared by construction, costing no extra memory per thread); 5 threads x 1 MB private stack each = 5 MB of additional memory needed for the thread version, regardless of how much of the 12 MB shared region is touched. In the FORK design, fork() itself does NOT copy any data pages at the moment of the call -- it duplicates only page-table entries, marking the underlying frames as copy-on-write (COW) and shared between parent and child. A physical frame is only actually copied the moment a process WRITES to a COW page (a write fault triggers the real duplication). Since each of the 5 children is stated to dirty exactly 3 MB worth of such pages, the kernel performs 5 x 3 MB = 15 MB of real physical frame copying in total. The question asks for (ii) minus (i): 15 MB - 5 MB = 10 MB. The genuine trap is twofold: assuming fork() copies the full 12 MB address space per child immediately (it does not -- COW defers this), and forgetting that the THREAD design's cost is bounded purely by stack allocation while the FORK design's cost is bounded purely by how many COW pages are later written to, not by the total address space size."
+  },
+  {
+    "id": "os-processes-h6",
+    "q": "Two threads T1 and T2 share a single global integer counter, initialized to 0, and NO synchronization (no locks, no atomics) is used. Each thread executes the statement counter++ exactly TWICE. Assume counter++ compiles to exactly three separate, non-atomic machine instructions per invocation: LOAD counter into a private register, INCREMENT that register, and STORE the register back to counter -- and that instructions from T1 and T2 can be interleaved in ANY order (as long as each thread's own 3-instruction sequences occur in their own program order). Which of the following statements about the FINAL value of counter (after both threads finish all their increments) are TRUE? (Select all that apply.)",
+    "options": [
+      "The final value can be exactly 3",
+      "The final value can be exactly 1",
+      "The final value can never be less than 2",
+      "The final value can be exactly 4 (the fully correct result with no lost updates)"
+    ],
+    "answers": [
+      0,
+      2,
+      3
+    ],
+    "marks": 2,
+    "difficulty": "hard",
+    "type": "msq",
+    "kind": "msq",
+    "explanation": "With 2 threads each performing 2 non-atomic read-modify-write increments (6 instructions total per thread's contribution being LOAD/INC/STORE twice), exhaustively enumerating every legal interleaving of the two threads' instruction sequences (preserving each thread's own program order) and simulating the resulting register/counter values shows the SET of achievable final values is exactly {2, 3, 4} -- never 0, and never 1. The maximum, 4, is achieved whenever the two threads' read-modify-write sequences never overlap (fully serialized), giving the textbook-correct answer with no lost updates -- so option D is TRUE. The minimum achievable value is 2, not 1 and certainly not 0: because each thread performs 2 separate LOAD/INC/STORE sequences and a 'lost update' can destroy at most one of the two updates per thread's pair when a stale LOAD from before the other thread's STORE gets overwritten, the worst-case loss is bounded, and 1 is never actually reachable by any interleaving of exactly this structure (2 increments each). So option A (3 is achievable) is TRUE, option C (never below 2) is TRUE, and option B (1 is achievable) is FALSE. The genuine trap is assuming that 'no synchronization' means the value can collapse arbitrarily low (even to 0 or 1) -- the actual floor depends precisely on the number of read-modify-write operations per thread, and here it is provably 2, not 1."
+  },
+  {
+    "id": "os-processes-h7",
+    "q": "A process has a resident set of 40 pages at the moment it calls fork(). Of these, 8 pages are the read-only shared text segment (never marked copy-on-write, and never duplicated -- both parent and child always share these physical frames directly). The remaining 32 pages are private data pages, which fork() marks as copy-on-write (COW) in both parent's and child's page tables, without copying any frame yet. After the fork(), the CHILD process goes on to write to 12 distinct pages among those 32 COW pages (the parent writes to none of them). How many NEW physical page frames get allocated as a direct result of this fork() and the child's subsequent writes?",
+    "options": [],
+    "answer": 12,
+    "marks": 2,
+    "difficulty": "hard",
+    "type": "numerical",
+    "kind": "nat",
+    "explanation": "The core mechanism being tested is copy-on-write: fork() itself allocates ZERO new data frames at the moment it is called -- it only duplicates page-table entries so that both parent and child point at the SAME underlying physical frames, marking the writable ones as read-only/COW so that any write triggers a protection fault the kernel intercepts. The 8 shared text pages are never COW at all (they are permanently shared, e.g. for the same executable code) and are explicitly excluded from the count by the question. Of the 32 COW-marked data pages, a NEW physical frame is allocated only at the exact moment a write actually occurs to a COW page -- the kernel copies just that one page's content into a freshly allocated frame and updates the writer's page table to point to it (the original frame remains referenced by whichever process didn't write). Since the child writes to exactly 12 distinct pages (and the parent writes to none, so none of the parent's mappings ever trigger a copy), exactly 12 write faults occur, and exactly 12 new frames are allocated -- one per faulted page, no more. The other 20 untouched COW pages remain shared indefinitely, needing no frame at all. The genuine trap is answering 32 (assuming ALL COW-marked pages get physically duplicated at fork time or eventually) instead of realizing COW duplication is strictly lazy and pay-per-write."
+  },
+  {
+    "id": "os-processes-h8",
+    "q": "5 CPU-bound processes are scheduled by pure Round Robin with time quantum q = 4 ms; each process needs exactly 18 ms of total CPU time and none perform I/O. Every context switch (a dispatch from one process to a different one) costs 1.2 ms of pure overhead, charged once per switch (NOT once per process, and NOT once per quantum used). No context switch is needed after the very last process in the system finishes (there is nothing left to switch to). Compute the TOTAL wall-clock time (in ms) to complete all 5 processes, including all context-switch overhead.",
+    "options": [],
+    "answer": 118.8,
+    "marks": 2,
+    "difficulty": "hard",
+    "type": "numerical",
+    "kind": "nat",
+    "explanation": "Each process needs 18 ms of CPU time serviced in quanta of 4 ms, requiring ceil(18/4) = 5 dispatches per process (bursts of 4,4,4,4,2 ms, the last one shorter since only 2 ms remain). With 5 processes each needing 5 dispatches, the TOTAL number of dispatches across the whole run is 5 x 5 = 25. A context switch occurs BETWEEN every two consecutive dispatches (whether or not the previous dispatch used the full quantum) -- so with 25 total dispatches in sequence, there are exactly 25 - 1 = 24 'gaps' between them, i.e., 24 context switches; there is no switch needed after the 25th (final) dispatch since nothing more remains to run. Total pure CPU burst time across all processes = 5 x 18 ms = 90 ms (this never changes regardless of scheduling). Total context-switch overhead = 24 switches x 1.2 ms/switch = 28.8 ms. Total wall-clock time = 90 + 28.8 = 118.8 ms. The genuine trap is charging the overhead per PROCESS (which would wrongly give 5 x 1.2 = 6 ms) or per QUANTUM DISPATCHED (which would wrongly give 25 x 1.2 = 30 ms) instead of correctly counting only the 24 actual transitions between consecutive dispatches -- context-switch cost is incurred per switch, and the number of switches is always (number of dispatches - 1) for a single unbroken run with no idle gaps."
+  },
+  {
+    "id": "os-processes-h9",
+    "q": "A server design compares two ways to handle 500 incoming requests: creating a brand-new PROCESS per request (fork+exec plus full address-space setup costs 1800 microseconds each) versus creating a new THREAD per request within one already-running process (stack + thread-control-block setup only, since the address space is shared, costs 60 microseconds each). Compute the DIFFERENCE between the total worker-creation overhead of the process-per-request model and the thread-per-request model, for all 500 requests, in milliseconds.",
+    "options": [],
+    "answer": 870,
+    "marks": 2,
+    "difficulty": "hard",
+    "type": "numerical",
+    "kind": "nat",
+    "explanation": "Total process-creation overhead = 500 requests x 1800 microseconds/request = 900,000 microseconds. Converting to milliseconds: 900,000 / 1000 = 900 ms. Total thread-creation overhead = 500 requests x 60 microseconds/request = 30,000 microseconds = 30,000 / 1000 = 30 ms. The difference (process model minus thread model) = 900 ms - 30 ms = 870 ms. This large gap directly reflects the structural reason threads are cheaper to create than processes: a new process needs its own page tables and a freshly built (or copy-on-write duplicated) address space, file descriptor table, and other per-process kernel bookkeeping, all of which a new thread skips entirely by sharing its parent process's address space, open files, and most other resources -- a thread only needs a private stack and a small thread-control-block. The question requires four clean arithmetic steps (multiply for each model, convert units for each, then subtract) with deliberately awkward-looking per-operation costs (1800 us and 60 us) that must be tracked through a unit conversion (microseconds to milliseconds) before the final subtraction, rather than a single one-line lookup -- a common error is subtracting in microseconds and forgetting to convert (giving 870,000 instead of 870), or subtracting the per-operation costs (1800-60=1740) instead of the totals."
+  },
+  {
+    "id": "os-processes-h10",
+    "q": "Process P forks three children C1, C2, C3, in that order, without ever calling wait(). Later, in termination order, C2 exits first, then C1, then C3 -- but P is busy and has still not called wait() when all three have already exited (so all three are now zombies). P then calls wait() exactly twice, in a simple loop with no error checking, and after that continues running without calling wait() a third time. Which of the following are TRUE at the moment right after P's second wait() call returns (P has not exited)?",
+    "options": [
+      "Exactly one zombie process (a former child of P) still remains, not yet reaped",
+      "POSIX guarantees that P's FIRST wait() call must reap C2 specifically, because C2 was the first child to actually terminate",
+      "If P now terminates without ever calling wait() a third time, the one remaining zombie becomes an orphan and is reparented to init (or the nearest subreaper), which then reaps it",
+      "A zombie process consumes essentially the same memory as a running process, including its full address space, heap, and open file table"
+    ],
+    "answers": [
+      0,
+      2
+    ],
+    "marks": 2,
+    "difficulty": "hard",
+    "type": "msq",
+    "kind": "msq",
+    "explanation": "All three children became zombies before P called wait() at all, since none of them were reaped at the time they exited (a terminated-but-unreaped child is exactly what a zombie is). A plain wait() call (waiting for 'any' terminated child) reaps exactly ONE zombie per call, chosen from among the currently-zombie children -- POSIX does NOT specify or guarantee which one is picked, so the common assumption that termination order determines reap order is false; option B is therefore FALSE (it is a genuine trap, since many implementations happen to reap in termination order in simple test cases, but this is not a language/standard guarantee). Regardless of exactly WHICH two of {C1, C2, C3} got reaped by P's two wait() calls, the count is what matters: 3 zombies existed, 2 calls reaped 2 of them, leaving exactly 3 - 2 = 1 zombie remaining -- option A is TRUE. If P now exits without reaping this last zombie, standard UNIX process semantics reparent any of P's remaining children (including zombies) to process 1 (init) or a designated subreaper, which periodically calls wait() and cleans them up -- option C is TRUE. Finally, a zombie is not a real running process: the kernel has already released its address space, open files, and most resources, retaining only a minimal process-table entry (PID and exit status) purely so a future wait() can retrieve that status -- option D is FALSE."
+  }
+]);
+
+window.GATE_DATA.questions['os'].topics.find(function(t){return t.id==='os-sync';}).questions.push.apply(window.GATE_DATA.questions['os'].topics.find(function(t){return t.id==='os-sync';}).questions, [
+  {
+    "id": "os-sync-h1",
+    "q": "A counting semaphore S is initialized to 2. Using the convention wait(S): S=S-1, and if S<0 the calling process blocks and joins a FIFO wait queue; signal(S): S=S+1, and if S<=0 (after incrementing) the process at the head of the wait queue is woken (moved to ready, no longer blocked). The following operations occur strictly in this time order: P1 wait(S); P2 wait(S); P3 wait(S); P1 signal(S); P4 wait(S); P5 wait(S); P2 signal(S). Which of the following are TRUE about the state immediately after the last operation (P2's signal)?",
+    "options": [
+      "The final value of S is -1",
+      "Exactly 1 process is currently blocked",
+      "P3 is among the currently blocked processes",
+      "Exactly 2 signal() calls occurred, and together they woke exactly 2 processes total"
+    ],
+    "answers": [
+      0,
+      1,
+      3
+    ],
+    "marks": 2,
+    "difficulty": "hard",
+    "type": "msq",
+    "kind": "msq",
+    "explanation": "Trace S starting at 2: P1 wait -> S=1 (no block, 1>=0). P2 wait -> S=0 (no block). P3 wait -> S=-1 (blocks, since S<0; queue=[P3]). P1 signal -> S=0; since S<=0, wake the head of the queue, P3 (queue becomes empty) -- P3 is now READY, not blocked. P4 wait -> S=-1 (blocks; queue=[P4]). P5 wait -> S=-2 (blocks; queue=[P4,P5]). P2 signal -> S=-1; since S<=0, wake the head, P4 (queue becomes [P5]). Final state: S=-1, queue=[P5], so exactly 1 process (P5) is blocked -- options A and B are TRUE. P3 was blocked only briefly and was woken by P1's very first signal, so by the end it is NOT blocked -- option C is FALSE, a genuine trap for anyone who forgets that a signal() call actively wakes someone from the queue rather than merely incrementing a counter in isolation. Exactly 2 signal() calls happened (by P1 and by P2), and since S was <=0 immediately after each increment, each one successfully woke exactly one waiting process (P3, then P4) -- so option D, '2 signals woke 2 processes', is TRUE. The core trap tested throughout is that a counting semaphore's value can go negative, and its magnitude (here, |-1|=1) directly equals the number of currently blocked processes -- not some derived or capped value."
+  },
+  {
+    "id": "os-sync-h2",
+    "q": "A bounded buffer of capacity N=3 is managed by the classic semaphores empty (init N), full (init 0), mutex (init 1), with Producer doing wait(empty); wait(mutex); insert; signal(mutex); signal(full), and Consumer doing wait(full); wait(mutex); remove; signal(mutex); signal(empty). Starting from an EMPTY buffer, this exact sequence of calls is attempted strictly in order, each one running to completion before the next begins UNLESS it blocks: produce, produce, produce, consume, produce, produce, consume, consume, produce. At which step number (1-indexed, counting only calls that are actually issued/attempted) does a call FIRST block waiting on a semaphore?",
+    "options": [
+      "4",
+      "5",
+      "6",
+      "7"
+    ],
+    "answer": 2,
+    "marks": 2,
+    "difficulty": "hard",
+    "type": "numerical",
+    "explanation": "Track (empty, full, items-in-buffer) starting at (3, 0, 0). Step 1 produce: wait(empty) succeeds (empty: 3->2), item inserted, items=1, signal(full) (full: 0->1). Step 2 produce: empty 2->1, items=2, full 1->2. Step 3 produce: empty 1->0, items=3 (buffer now FULL, at capacity 3), full 2->3. Step 4 consume: wait(full) succeeds (full 3->2), item removed, items=2, signal(empty) (empty 0->1). Step 5 produce: wait(empty) succeeds since empty=1>0 (empty 1->0), items=3 (buffer full again), full 2->3. Step 6 produce: wait(empty) is attempted with empty currently 0 -- decrementing gives -1, which is negative, so this call BLOCKS. This is the first call in the whole sequence that blocks. The key derivation the question demands is realizing that after only ONE consume (step 4) frees exactly one slot, the very next produce (step 5) immediately re-fills the buffer back to full capacity (3 items) -- so the SECOND produce after that single consume (step 6, not step 5) is the one that finds no room and blocks. The genuine trap is assuming the first produce after any consume is safe (which it is) while forgetting that a single consume only creates exactly one slot of headroom, not unlimited headroom, so the very next produce after that one immediately re-saturates the buffer."
+  },
+  {
+    "id": "os-sync-h3",
+    "q": "A system uses the FIRST readers-writers solution (readers have priority: a semaphore 'wrt' guards writer access, and 'wrt' is only released -- signaled -- by the LAST reader to leave, i.e., exactly when the shared readcount variable drops back to 0; new readers may freely start as long as they only need to increment readcount, even while other readers are already active). A writer W has been waiting to acquire wrt since time t=0. From t=0 onward, readers keep arriving continuously such that a new reader always starts reading before the previous batch of readers has fully finished (so readcount NEVER returns to 0 for the entire observation window). If 2,000,000 individual reader arrivals occur during this window, how many times does W actually gain access to wrt during this entire window?",
+    "options": [
+      "0",
+      "1",
+      "1,000,000",
+      "2,000,000"
+    ],
+    "answer": 0,
+    "marks": 2,
+    "difficulty": "hard",
+    "type": "numerical",
+    "explanation": "In the readers-priority (first) readers-writers solution, wrt is acquired once (by the first reader to arrive when readcount transitions 0->1) and is only ever released -- signaled -- by whichever reader causes readcount to transition back down to exactly 0. As long as the system is structured so that a new reader always arrives and increments readcount before the currently active readers have all departed (readcount never actually reaches 0), the semaphore wrt is NEVER signaled during the entire window, no matter how many total reader arrivals occur. This is precisely the textbook 'writer starvation' failure mode of the readers-priority solution: the writer W remains permanently blocked on wrt, and it does not matter whether there are 2, 2000, or 2,000,000 reader arrivals -- the writer's access count is 0 regardless, because the STRUCTURAL condition (readcount never hitting 0) is what matters, not the magnitude of reader traffic. The genuine trap is treating this as a numeric/probabilistic question (e.g., assuming the writer eventually 'gets a turn' after enough readers, or computing some fraction like half of 2,000,000) rather than recognizing that the writer-starvation condition here is absolute and structural: the number of reader arrivals is a red herring, since the answer is 0 regardless of that number as long as readcount truly never returns to 0."
+  },
+  {
+    "id": "os-sync-h4",
+    "q": "Peterson's algorithm for two processes P0 and P1 is normally: flag[i]=true; turn=j; while(flag[j] && turn==j) {} ; <critical section>. A buggy variant swaps the first two lines' order for BOTH processes, giving: turn=j; flag[i]=true; while(flag[j] && turn==j) {} ; <critical section>. Consider this exact interleaving: (1) P0 executes turn=1. (2) Before P0 continues, P1 executes turn=0; flag[1]=true; then evaluates its while-condition: flag[0] is still false (P0 has not reached its flag[0]=true yet) so the condition is false and P1 immediately proceeds into its critical section. (3) P0 now resumes: flag[0]=true; then evaluates its while-condition: flag[1] is true, but turn is now 0 (P1 overwrote it in step 2), so turn==1 is false, making the whole condition false -- P0 also immediately proceeds into ITS critical section. What is the outcome?",
+    "options": [
+      "Mutual exclusion is violated: both P0 and P1 are inside their critical sections at the same time",
+      "Only P1 enters its critical section; P0 spins forever",
+      "Only P0 enters its critical section; P1 spins forever",
+      "Deadlock: neither process ever enters its critical section"
+    ],
+    "answer": 0,
+    "marks": 2,
+    "difficulty": "hard",
+    "type": "numerical",
+    "explanation": "Follow the interleaving exactly as given: after step 2, P1 is already inside its critical section, having found flag[0]==false (since P0 had only set turn=1 so far, not yet flag[0]) -- so P1's while-loop condition (flag[0] && turn==0) evaluated to false immediately. Then in step 3, P0 sets flag[0]=true and checks its OWN condition (flag[1] && turn==1); flag[1] is indeed true (P1 set it in step 2), but turn is no longer 1 -- it was overwritten to 0 by P1's own 'turn=0' assignment in step 2 (since in the swapped-order bug, turn is set to the OTHER process's index BEFORE flag, so P1 sets turn=0, meaning 'let P0 go if there's a tie', and P0 sets turn=1 meaning 'let P1 go if there's a tie' -- whichever assignment happens LAST wins, and here P1's assignment happened after P0's, so turn ends up 0). Since turn==1 is false for P0's check, its whole while-condition is false, and P0 also proceeds straight into its critical section -- concurrently with P1. This demonstrates why the ORDER of setting flag[i] before turn=j (as in the correct algorithm) is essential: it guarantees that by the time a process checks the other's flag, its OWN flag is already visible, and the LAST process to set turn effectively yields priority correctly. Swapping the order breaks this guarantee and destroys mutual exclusion outright, not merely progress or bounded waiting -- the two processes genuinely run concurrently inside their critical sections."
+  },
+  {
+    "id": "os-sync-h5",
+    "q": "A counting semaphore S is initialized to some UNKNOWN non-negative value S0. The following sequence of wait (W) and signal (V) calls is issued, strictly in this order, by various processes: W, W, V, W, W, W, V, W. Using the convention that wait() decrements S and a call that would make S negative instead BLOCKS the caller (does not proceed) rather than being allowed to complete, what is the MINIMUM value of S0 such that NONE of these 8 calls ever blocks?",
+    "options": [],
+    "answer": 4,
+    "marks": 2,
+    "difficulty": "hard",
+    "type": "numerical",
+    "kind": "nat",
+    "explanation": "Model each W as a -1 step and each V as a +1 step, and track the CUMULATIVE change relative to S0 after each call, requiring that S0 plus this cumulative change never dips below 0 at any point (since a call that would make S negative blocks instead of proceeding, so for 'never blocks' the running value must stay >= 0 throughout, including right after the decrementing calls). Cumulative deltas after each call: after call 1 (W): -1. After call 2 (W): -2. After call 3 (V): -1. After call 4 (W): -2. After call 5 (W): -3. After call 6 (W): -4. After call 7 (V): -3. After call 8 (W): -4. The most negative this cumulative running total ever reaches is -4 (achieved twice: after call 6 and again after call 8). For S0 + (running total) to stay >= 0 at every single point, we need S0 >= 4 at the worst point, i.e., S0 - 4 >= 0, so S0_min = 4. Verify: with S0=4, the actual S values after each call are 3,2,3,2,1,0,1,0 -- never negative, confirming no call ever blocks. With S0=3 (one less), the value after call 6 would be -1, which blocks. The genuine trap is computing only the FINAL cumulative deficit (-4, matching the final value here) and missing that an EARLIER dip (also -4, at call 6, well before the sequence ends) already determines the true minimum requirement -- in general the minimum S0 is set by the single worst (most negative) intermediate point, not necessarily the last one, and both must be checked."
+  },
+  {
+    "id": "os-sync-h6",
+    "q": "A readers-writers system uses the SECOND (writer-priority) solution: once a writer arrives, no NEW reader may begin (even though currently-reading readers are allowed to finish undisturbed), and the writer gets exclusive access as soon as all currently-active readers finish. Timeline: R1 arrives at t=0 and reads for 5 time units (finishes at t=5). R2 arrives at t=1 and reads for 5 time units (finishes at t=6). Writer W1 arrives at t=2 (before R1 or R2 finish) and immediately waits. R3 arrives at t=3 (after W1 has already arrived). R4 arrives at t=6 (also after W1 arrived, and while W1 might still be waiting or writing). W1's write, once it starts, takes exactly 2 time units. How many readers are forced to wait (blocked, unable to start reading immediately upon arrival) because of writer-priority?",
+    "options": [],
+    "answer": 2,
+    "marks": 2,
+    "difficulty": "hard",
+    "type": "numerical",
+    "kind": "nat",
+    "explanation": "R1 (arrives t=0) and R2 (arrives t=1) both start reading immediately since no writer has arrived yet when they show up -- neither is blocked. W1 arrives at t=2, while both R1 and R2 are still actively reading (R1 finishes at t=5, R2 at t=6); under writer priority, W1 must wait for these ALREADY-ACTIVE readers to finish (it cannot interrupt them), but from this point onward NO NEW reader is allowed to begin, even though the shared resource is technically still being read by R1/R2. R3 arrives at t=3, which is after W1 already arrived (t=2) -- so R3 is blocked from starting immediately and must wait. The last of the currently-active readers, R2, finishes at t=6, at which point W1 (having been waiting since t=2) finally gets exclusive access and writes from t=6 to t=8 (2 time units). R4 arrives at t=6, which is also after W1 arrived, so R4 is likewise forced to wait, resting until W1 finishes at t=8, and can only then start reading. So exactly 2 readers, R3 and R4, are forced to wait because of writer priority (R1 and R2 both started before W1 ever showed up, so writer-priority never touched them). The genuine trap is assuming ANY reader present when a writer is waiting is blocked (which would wrongly include R1 and R2, who were already running before W1 arrived and are allowed to finish undisturbed under this solution) -- writer priority blocks only readers that ARRIVE after the writer, not ones already in progress."
+  },
+  {
+    "id": "os-sync-h7",
+    "q": "A BINARY semaphore B (value can only ever be 0 or 1) is initialized to 1, using the convention that signal() on a binary semaphore, if a process is currently waiting in the queue, wakes that process directly WITHOUT actually incrementing B to 2 (B conceptually stays 'held', just passed to the next owner); only if the queue is EMPTY does signal() actually set B back to 1. This sequence occurs in order: P1 wait(B) [succeeds, B: 1->0]; P2 wait(B) [B is 0, so P2 BLOCKS, joining the queue]; P1 signal(B) [queue is non-empty, so P2 is woken directly, B stays 0]; P1 (buggy) calls signal(B) a SECOND time, by mistake, even though it already signaled once and holds nothing further [queue is now empty, so this erroneous call actually sets B to 1]; P3 wait(B) [B is 1, so P3 succeeds immediately without blocking, B: 1->0]. At the moment P3's wait() call returns, how many processes are concurrently inside the critical section that B is supposed to protect (counting only processes that have entered but not yet signaled/exited)?",
+    "options": [],
+    "answer": 2,
+    "marks": 2,
+    "difficulty": "hard",
+    "type": "numerical",
+    "kind": "nat",
+    "explanation": "Trace carefully: P1 acquires B first (B: 1->0), entering the critical section. P2 then tries to wait(B) but B is 0, so P2 blocks (joins the queue) -- P2 has NOT entered the critical section yet. P1 calls signal(B): since P2 is waiting, ownership passes directly to P2 (B conceptually remains 0, now 'held' by P2), and P2 is unblocked and enters the critical section -- at this point P1 is assumed to have just exited (its one legitimate signal corresponds to its one wait), but P2 is now inside. Then P1 mistakenly calls signal(B) AGAIN (a bug -- calling signal without a matching wait): since the queue is now empty (no one is waiting), this erroneous second signal has nowhere to hand off to, so it simply sets B to 1 -- effectively fabricating a spurious 'free' permit out of nothing, even though P2 is still actively inside the critical section. P3 then calls wait(B): B is 1 (thanks to the bogus extra signal), so P3 succeeds immediately (B: 1->0) and also enters the critical section -- WHILE P2 is still there. At this exact moment, both P2 and P3 are simultaneously inside the critical section, giving a count of 2. This demonstrates a classic and genuinely dangerous synchronization bug: an unmatched/extra signal() call on a semaphore can silently destroy mutual exclusion, even though at every individual step the semaphore's value stayed within the valid binary range {0,1}."
+  },
+  {
+    "id": "os-sync-h8",
+    "q": "A bounded buffer starts EMPTY. Using the same Producer/Consumer semaphore protocol as before, the following sequence of produce (P) and consume (C) operations is issued strictly in order, each one assumed to succeed without ever blocking: P, P, C, P, P, P, C, C, C. What is the MINIMUM buffer capacity N such that NO produce operation in this entire sequence ever blocks (i.e., the buffer never needs to hold more items than its capacity at any point)?",
+    "options": [],
+    "answer": 4,
+    "marks": 2,
+    "difficulty": "hard",
+    "type": "numerical",
+    "kind": "nat",
+    "explanation": "Track the number of items currently in the buffer after each operation, treating each P as +1 and each C as -1, starting from 0: after op1 (P): 1. After op2 (P): 2. After op3 (C): 1. After op4 (P): 2. After op5 (P): 3. After op6 (P): 4. After op7 (C): 3. After op8 (C): 2. After op9 (C): 1. The PEAK number of items ever held in the buffer simultaneously, across this whole sequence, is 4 (reached right after op6, the third produce in the P,P,P run following the single earlier consume). For no produce operation to ever block, the buffer's capacity N must be large enough to accommodate this peak -- if N were only 3, then op6 (the third produce in that run) would find the buffer already at 3 items and would have to block waiting for empty. So N_min = 4. The genuine trap is either (a) simply counting the total number of produce calls (5) and assuming that must be the capacity, ignoring that consumes interleaved in between free up space, or (b) looking only at the FINAL item count (1) rather than tracking the running peak throughout the whole sequence, which is what actually constrains the minimum capacity -- the buffer must be sized for its worst (highest) instantaneous occupancy, not its ending occupancy or its total operation count."
+  },
+  {
+    "id": "os-sync-h9",
+    "q": "In a buggy implementation of Peterson's algorithm, process P1 correctly resets flag[1]=false immediately after leaving its critical section every time. However, process P0 has a bug: it NEVER resets flag[0] back to false after leaving its critical section (once P0 sets flag[0]=true the first time it wants to enter, that flag stays true forever afterward, even long after P0 has exited and moved on to other work that never again requires the critical section). Suppose P0 enters and exits its critical section exactly once (setting flag[0]=true beforehand and, due to the bug, never resetting it), and afterward P0 never tries to enter the critical section again. Later, P1 tries to enter its critical section for the first time (setting flag[1]=true, turn=0, then checking its while-condition). What happens to P1?",
+    "options": [
+      "P1 enters immediately, since P0 is no longer interested in the critical section",
+      "P1 spins forever (starves), unable to enter, purely because of P0's stale flag -- even though P0 will never ask for the critical section again",
+      "P1 and P0 both enter simultaneously, violating mutual exclusion",
+      "Deadlock: P1 spins forever AND, if P0 later tries again, P0 also spins forever"
+    ],
+    "answer": 1,
+    "marks": 2,
+    "difficulty": "hard",
+    "type": "numerical",
+    "explanation": "P1's while-condition in Peterson's algorithm is while(flag[0] && turn==0). Because of P0's bug, flag[0] was set to true once and is NEVER reset to false, even though P0 has permanently finished using the critical section and will never contend for it again. When P1 sets turn=0 (meaning 'let P0 go if there's a conflict') and then evaluates its condition, flag[0] is still (falsely) true, and turn is indeed 0, so the entire while-condition evaluates to true, forcing P1 to keep spinning. Since flag[0] will never again become false (P0's bug guarantees this permanently), and turn is never changed again either (P0 never runs the algorithm's entry code again to overwrite it), P1's condition never becomes false, and P1 spins forever -- a genuine starvation/progress violation, NOT a mutual-exclusion violation (since P0 isn't actually inside the critical section anymore, it just LOOKS like it still is from P1's point of view) and not a full deadlock in the classic circular-wait sense (P0 itself is not blocked at all; it has simply moved on and finished). The critical insight the question tests is distinguishing the SPECIFIC liveness property being violated -- progress (P1 is denied entry even though the critical section is actually free) -- from mutual exclusion (still intact) or deadlock (P0 is not stuck; only P1 is)."
+  },
+  {
+    "id": "os-sync-h10",
+    "q": "A buggy Producer accidentally has its FIRST TWO lines swapped from the correct order, becoming: wait(mutex); wait(empty); insert_item(); signal(mutex); signal(full) (instead of the correct wait(empty); wait(mutex); ...). The Consumer remains correctly ordered: wait(full); wait(mutex); remove_item(); signal(mutex); signal(empty). Semaphores start at their usual values: empty=N (buffer capacity), full=0, mutex=1. Suppose the buffer is currently completely FULL (so empty=0, full=N) and, at this exact moment, the buggy Producer attempts to run, immediately followed by the Consumer attempting to run. What is the resulting outcome?",
+    "options": [
+      "No problem: the Producer waits briefly, then the Consumer removes an item and everything proceeds normally",
+      "Deadlock: the Producer acquires mutex then blocks forever on wait(empty) while holding mutex, and the Consumer then blocks forever on wait(mutex) -- exactly 2 processes are blocked forever",
+      "Only the Producer blocks; the Consumer successfully removes an item and the system recovers on its own",
+      "Only the Consumer blocks; the Producer eventually succeeds once the Consumer times out"
+    ],
+    "answer": 1,
+    "marks": 2,
+    "difficulty": "hard",
+    "type": "numerical",
+    "explanation": "The buggy Producer executes wait(mutex) FIRST, successfully acquiring the mutex (mutex: 1->0), since nothing else currently holds it. It then executes wait(empty): since the buffer is already full, empty is 0, so decrementing it makes it -1, and the Producer BLOCKS -- but critically, it blocks WHILE STILL HOLDING mutex, because it acquired mutex before attempting to wait on empty (the whole point of the bug is this reversed order). Now the Consumer attempts to run: it first executes wait(full), which succeeds immediately since full=N>0 (the buffer is full of items to consume), decrementing full. It then attempts wait(mutex) -- but mutex is currently held by the stuck Producer (mutex=0), so the Consumer also BLOCKS, waiting for mutex to be released. Since the Producer can only release mutex via signal(mutex), which appears AFTER the now-permanently-blocked wait(empty) in its code, mutex is never released, so the Consumer can never proceed either. Both processes are now blocked forever: the Producer on empty (while holding mutex) and the Consumer on mutex -- a genuine deadlock, with exactly 2 processes stuck permanently, and NO further consume can ever happen to free up buffer space, guaranteeing this state persists forever. This is the classic real-world lesson that the ORDER of acquiring semaphores matters critically: acquiring the general-purpose mutex before a potentially-blocking resource-counting semaphore (rather than after) can turn an ordinary wait into a full deadlock."
+  }
+]);
+
+window.GATE_DATA.questions['os'].topics.find(function(t){return t.id==='os-deadlock';}).questions.push.apply(window.GATE_DATA.questions['os'].topics.find(function(t){return t.id==='os-deadlock';}).questions, [
+  {
+    "id": "os-deadlock-h1",
+    "q": "A system has 4 processes (P0-P3) and 3 resource types A, B, C with 10, 5, and 7 total instances respectively. The current Allocation matrix is P0=(0,1,0), P1=(2,0,0), P2=(3,0,2), P3=(2,1,1); the Max matrix is P0=(7,5,3), P1=(3,2,2), P2=(9,0,2), P3=(4,2,2). Is the system currently in a safe state, and if so, which of the following is a valid safe sequence?",
+    "options": [
+      "P0, P1, P2, P3",
+      "P1, P3, P0, P2",
+      "P2, P0, P1, P3",
+      "The system is NOT in a safe state"
+    ],
+    "answer": 1,
+    "marks": 2,
+    "difficulty": "hard",
+    "type": "numerical",
+    "explanation": "First compute Available = Total - (column sums of Allocation): sum of Allocation is A=0+2+3+2=7, B=1+0+0+1=2, C=0+0+2+1=3, so Available = (10-7, 5-2, 7-3) = (3,3,4). Compute Need = Max - Allocation: Need[P0]=(7,4,3), Need[P1]=(1,2,2), Need[P2]=(6,0,0), Need[P3]=(2,1,1). Now run the safety algorithm: with Work=(3,3,4), check each process's Need against Work. P0's need (7,4,3) exceeds Work in the A component (7>3) -- P0 cannot run yet. P1's need (1,2,2) is <= Work (3,3,4) -- P1 CAN run: after it finishes, Work becomes Work + Allocation[P1] = (3,3,4)+(2,0,0) = (5,3,4). Next, P3's need (2,1,1) <= (5,3,4) -- P3 runs, Work becomes (5,3,4)+(2,1,1) = (7,4,5). Next, P0's need (7,4,3) <= (7,4,5) -- P0 now runs, Work becomes (7,4,5)+(0,1,0) = (7,5,5). Finally P2's need (6,0,0) <= (7,5,5) -- P2 runs, Work becomes (7,5,5)+(3,0,2) = (10,5,7), matching Total exactly, confirming correctness. This gives the safe sequence P1, P3, P0, P2 -- option B. Options A and C either try a process whose need is not yet satisfiable at that point (e.g., starting with P0 immediately fails since Work=(3,3,4) can't cover Need[P0]=(7,4,3)) or otherwise deviate from a sequence that the algorithm can actually validate step by step."
+  },
+  {
+    "id": "os-deadlock-h2",
+    "q": "Using the exact same system as the previous question (Allocation, Max, Total=(10,5,7), Available=(3,3,4) before any new request), process P2 now REQUESTS 2 additional instances of A, 0 of B, and 0 of C, i.e., Request=(2,0,0). Can this request be granted while keeping the system in a safe state, and if so, what is the resulting Available vector immediately after granting it?",
+    "options": [
+      "(1,3,4)",
+      "(3,3,4) -- unchanged",
+      "(1,3,4) is wrong; the request must be DENIED",
+      "(0,3,4)"
+    ],
+    "answer": 0,
+    "marks": 2,
+    "difficulty": "hard",
+    "type": "numerical",
+    "explanation": "First check the two mandatory preconditions before even considering safety: Request (2,0,0) must not exceed Need[P2]=(6,0,0) -- indeed 2<=6, 0<=0, 0<=0, so this passes. Request must also not exceed the current Available=(3,3,4) -- 2<=3, 0<=3, 0<=4, so this also passes. Only now do we tentatively grant the request and re-run the FULL safety algorithm on the resulting hypothetical state: Available becomes (3-2, 3-0, 4-0) = (1,3,4), Allocation[P2] becomes (3+2,0,2)=(5,0,2), and Need[P2] becomes (9-5,0-0,2-2)=(4,0,0). Re-running the safety check with Work=(1,3,4): P1's need (1,2,2) <= (1,3,4) -- runs, Work becomes (1,3,4)+(2,0,0)=(3,3,4). P3's need (2,1,1) <= (3,3,4) -- runs, Work becomes (3,3,4)+(2,1,1)=(5,4,5). P2's (now-updated) need (4,0,0) <= (5,4,5) -- runs, Work becomes (5,4,5)+(5,0,2)=(10,4,7). P0's need (7,4,3) <= (10,4,7) -- runs, Work becomes (10,5,7), matching Total. Since a complete safe sequence (P1,P3,P2,P0) still exists after granting, the request CAN be safely granted, and the resulting Available vector is (1,3,4). The trap in the distractors is either forgetting to subtract the request from Available at all, or wrongly assuming any request that individually satisfies the two preconditions must automatically be granted without re-checking full safety."
+  },
+  {
+    "id": "os-deadlock-h3",
+    "q": "Again using the ORIGINAL system before any request (Allocation, Max, Total=(10,5,7), Available=(3,3,4), Need[P0]=(7,4,3)), process P0 now requests 3 additional instances of A only, i.e., Request=(3,0,0). This passes both basic checks (3<=Need[P0]'s A-component of 7, and 3<=Available's A-component of 3). Should the OS grant this request?",
+    "options": [
+      "Yes -- it passes both the need-check and the availability-check, so it must be granted",
+      "No -- it must be DENIED, because granting it leaves the system in an UNSAFE state, even though it passes both basic checks",
+      "No -- it must be denied because 3 exceeds P0's declared maximum need",
+      "No -- it must be denied because it exceeds the total system capacity of resource A"
+    ],
+    "answer": 1,
+    "marks": 2,
+    "difficulty": "hard",
+    "type": "numerical",
+    "explanation": "Tentatively grant the request: Available becomes (3-3,3,4)=(0,3,4), Allocation[P0] becomes (0+3,1,0)=(3,1,0), and Need[P0] becomes (7-3,4,3)=(4,4,3). Re-run the safety algorithm with Work=(0,3,4): check P0's need (4,4,3) -- exceeds Work's A component (4>0), cannot run. Check P1's need (1,2,2) <= (0,3,4)? The A component fails (1>0), cannot run. Check P2's need (6,0,0) <= (0,3,4)? A component fails (6>0), cannot run. Check P3's need (2,1,1) <= (0,3,4)? A component fails (2>0), cannot run. No process can proceed with Work=(0,3,4) -- the algorithm is stuck with NO process finishable, so this hypothetical state is UNSAFE (there exists no safe sequence). Even though the request individually satisfies BOTH of the two preliminary checks (it doesn't exceed P0's stated need of 7, and it doesn't exceed the currently available 3 units), the Banker's algorithm requires a THIRD, final check: does granting it still leave a safe state reachable? Here it does not, so the request must be denied and P0 must wait, even though nothing about the request looks superficially problematic. This is exactly the trap the question is built around -- many students stop checking after the first two (easy, mechanical) conditions and forget the safety re-verification is mandatory and can independently fail."
+  },
+  {
+    "id": "os-deadlock-h4",
+    "q": "5 processes each declare a maximum requirement of 4 instances of a single resource type R (there is only one resource type in this system). What is the MINIMUM total number of instances of R that must exist in the system to GUARANTEE that deadlock involving R can never occur, no matter what order or timing the processes make their requests in?",
+    "options": [],
+    "answer": 16,
+    "marks": 2,
+    "difficulty": "hard",
+    "type": "numerical",
+    "kind": "nat",
+    "explanation": "Deadlock over a single resource type can only occur if it becomes possible for EVERY process to simultaneously hold at least one instance while still needing at least one more (a circular wait where nobody can complete and release). To guarantee this can never happen, the total instance count must be large enough that it is IMPOSSIBLE for all n processes to simultaneously be 'stuck' -- i.e., each holding some amount strictly less than its maximum (so each still wants more) while the pool has nothing left to give. The worst case to defend against is exactly this: each of the n=5 processes holds (M-1) = 4-1 = 3 instances (one short of its maximum, so it is still waiting for one more but cannot finish), totalling n(M-1) = 5*3 = 15 instances tied up in this 'everyone stuck' configuration. If the total supply is exactly 15, this deadlock configuration is achievable and the system CAN deadlock. But if the total supply is ONE more than this worst case, i.e., n(M-1)+1 = 16, then it becomes mathematically impossible for every single process to simultaneously hold only (M-1) instances, because 5 processes each holding 3 would only consume 15, leaving 1 spare instance -- that spare instance must belong to SOME process, pushing that process's holding up to at least 4 (its max), meaning that process can complete and release everything, breaking any potential circular wait. So the minimum safe total is n(M-1)+1 = 5*3+1 = 16. The genuine trap is either forgetting the '+1' (giving the wrong, still-deadlockable value of 15) or using n*M instead of n*(M-1) (which would overshoot to 20)."
+  },
+  {
+    "id": "os-deadlock-h5",
+    "q": "6 processes each declare a maximum requirement of 3 instances of resource type X and, independently, a maximum requirement of 2 instances of a SEPARATE resource type Y. Treating X and Y as two entirely independent single-resource-type deadlock-avoidance problems, compute the minimum number of instances of X needed to guarantee deadlock-freedom for X, plus (separately) the minimum number of instances of Y needed to guarantee deadlock-freedom for Y, and report their SUM.",
+    "options": [],
+    "answer": 20,
+    "marks": 2,
+    "difficulty": "hard",
+    "type": "numerical",
+    "kind": "nat",
+    "explanation": "Apply the same reasoning as the single-resource-type minimum-for-deadlock-freedom derivation independently to each resource type, since with two entirely separate resource types (no process needs both simultaneously to make progress in this simplified framing), each type's worst-case 'everyone stuck one short of their max' configuration is analyzed on its own. For resource X: n=6 processes, each maximum M_X=3, so the worst-case stuck total is n(M_X - 1) = 6*2 = 12, and the minimum safe total is that plus one more instance: 12+1 = 13. For resource Y: n=6 processes, each maximum M_Y=2, so the worst-case stuck total is n(M_Y - 1) = 6*1 = 6, and the minimum safe total is 6+1 = 7. The question asks for the SUM of these two independently-derived minimums: 13 + 7 = 20. The genuine trap here is treating the two resource types as needing to be analyzed TOGETHER using a combined formula (which would be conceptually wrong since deadlock-freedom for one resource type does not depend on how many instances of an unrelated resource type exist) or forgetting to redo the full n(M-1)+1 derivation separately for Y with its own (smaller) maximum of 2 rather than reusing X's per-process worst-case figure of 2 units held (from M_X-1=2) for Y as well, which would incorrectly give Y a minimum of 6*2+1=13 instead of the correct 6*1+1=7."
+  },
+  {
+    "id": "os-deadlock-h6",
+    "q": "Resource type R1 has exactly 2 total instances, and resource type R2 has 1 total instance (single-instance). Process P1 currently holds 1 instance of R1 and REQUESTS R2 (held by P2). Process P2 currently holds the 1 instance of R2 and REQUESTS R1. The resulting resource-allocation graph (RAG) contains the cycle P1 -> R2 -> P2 -> R1 -> P1. Which of the following statements about this exact scenario are TRUE?",
+    "options": [
+      "The resource-allocation graph does contain a cycle, exactly as described: P1 -> R2 -> P2 -> R1 -> P1",
+      "Because a cycle exists in the RAG, the system MUST currently be deadlocked",
+      "P2's request for R1 can be satisfied immediately, since R1 has a second, currently-unallocated instance available -- so the system is NOT actually deadlocked despite the cycle",
+      "If R1 instead had only 1 total instance (not 2), this same cycle structure would GUARANTEE deadlock"
+    ],
+    "answers": [
+      0,
+      2,
+      3
+    ],
+    "marks": 2,
+    "difficulty": "hard",
+    "type": "msq",
+    "kind": "msq",
+    "explanation": "The RAG as described does literally contain the stated cycle -- option A is simply confirming the given structure, so it is TRUE. However, R1 has 2 total instances and P1 currently holds only 1 of them, meaning exactly 1 instance of R1 remains free and unallocated; this free instance can be granted directly to P2's request for R1 without needing P1 to release anything first. Since P2 can therefore proceed, finish its work, and eventually release both its held R2 and the R1 instance it just received, P1's request for R2 can then also be satisfied -- nobody is permanently stuck, so the system is NOT deadlocked, even though a cycle exists in the graph. This is the crucial, classic distinction tested here: for MULTI-INSTANCE resource types, a cycle in the RAG is a NECESSARY but NOT SUFFICIENT condition for deadlock (option B is FALSE, and option C, describing exactly why, is TRUE). By contrast, if R1 had only 1 total instance (making both R1 and R2 single-instance resources), then P1 holding R1's only instance while requesting R2, and P2 holding R2's only instance while requesting R1, would leave absolutely no free instance of either resource anywhere in the system -- for single-instance resource types, a cycle in the RAG is BOTH necessary AND sufficient for deadlock, so option D is TRUE."
+  },
+  {
+    "id": "os-deadlock-h7",
+    "q": "A different system has 5 processes (P0-P4) and 2 resource types A and B, with 10 and 12 total instances respectively. Allocation: P0=(1,2), P1=(2,1), P2=(1,0), P3=(0,2), P4=(2,2). Max: P0=(3,3), P1=(3,2), P2=(2,2), P3=(1,3), P4=(4,4). Is this system in a safe state, and which is a valid safe sequence?",
+    "options": [
+      "P0, P1, P2, P3, P4",
+      "P4, P3, P2, P1, P0",
+      "P2, P4, P1, P3, P0",
+      "The system is NOT in a safe state"
+    ],
+    "answer": 0,
+    "marks": 2,
+    "difficulty": "hard",
+    "type": "numerical",
+    "explanation": "Column sums of Allocation: A=1+2+1+0+2=6, B=2+1+0+2+2=7. Available = Total - sums = (10-6, 12-7) = (4,5). Need = Max - Allocation: Need[P0]=(2,1), Need[P1]=(1,1), Need[P2]=(1,2), Need[P3]=(1,1), Need[P4]=(2,2). Run the safety algorithm starting with Work=(4,5): Need[P0]=(2,1)<=(4,5) -- P0 runs, Work becomes (4,5)+(1,2)=(5,7). Need[P1]=(1,1)<=(5,7) -- P1 runs, Work becomes (5,7)+(2,1)=(7,8). Need[P2]=(1,2)<=(7,8) -- P2 runs, Work becomes (7,8)+(1,0)=(8,8). Need[P3]=(1,1)<=(8,8) -- P3 runs, Work becomes (8,8)+(0,2)=(8,10). Need[P4]=(2,2)<=(8,10) -- P4 runs, Work becomes (8,10)+(2,2)=(10,12), matching Total exactly. Since each process's need could be satisfied strictly in index order (0,1,2,3,4) without ever needing to skip ahead, the sequence P0,P1,P2,P3,P4 is indeed a valid safe sequence -- option A. Because every process's need happens to be satisfiable at each step in numeric order here, this system is comparatively 'easier' to verify than the earlier 4-process example, but the derivation of Available, Need, and the step-by-step Work accumulation is exactly as mandatory as always; simply asserting safety without running the algorithm would not distinguish this from a superficially similar but actually-unsafe configuration."
+  },
+  {
+    "id": "os-deadlock-h8",
+    "q": "Using the SAME system as the previous question (Allocation, Max, Total=(10,12), Available=(4,5), Need[P0]=(2,1), Need[P1]=(1,1), Need[P2]=(1,2), Need[P3]=(1,1), Need[P4]=(2,2)), FOUR separate hypothetical requests are considered INDEPENDENTLY (each evaluated starting fresh from the original state, not cumulatively): (i) P2 requests (2,0); (ii) P4 requests (2,2); (iii) P2 requests (1,1); (iv) P0 requests (1,0). Which of the following are TRUE?",
+    "options": [
+      "Request (i), P2 requesting (2,0), CAN be granted, since 2 does not exceed the currently Available amount of A (which is 4)",
+      "Request (ii), P4 requesting (2,2), can be safely granted",
+      "Request (iii), P2 requesting (1,1), can be safely granted",
+      "Request (iv), P0 requesting (1,0), can be safely granted"
+    ],
+    "answers": [
+      1,
+      2,
+      3
+    ],
+    "marks": 2,
+    "difficulty": "hard",
+    "type": "msq",
+    "kind": "msq",
+    "explanation": "This tests four completely independent Banker's-algorithm evaluations, each starting fresh from Available=(4,5). (i) P2 requesting (2,0): it is true that 2 does not exceed the currently Available A-count of 4, but availability is not the only precondition -- Need[P2]=(1,2), so the A-component of Need is only 1, and the request asks for 2, which EXCEEDS P2's own declared maximum need outright (2>1). A process can never legitimately request more than the maximum it originally declared, so this is an invalid/erroneous request that the OS must reject immediately as a bug, without ever running the safety algorithm on it -- option A's claim that it 'can be granted' just because it clears the availability check is FALSE, the central trap of this question (passing one precondition does not mean all preconditions are satisfied). (ii) P4 requesting (2,2): this exactly equals Need[P4]=(2,2) and Available=(4,5) covers it; tentative Available becomes (2,3), Allocation[P4] becomes its full Max (4,4), Need[P4] becomes (0,0). Re-running safety with Work=(2,3): Need[P0]=(2,1)<=(2,3) runs, Work becomes (3,5); Need[P1]=(1,1)<=(3,5) runs, Work becomes (5,6); Need[P2]=(1,2)<=(5,6) runs, Work becomes (6,6); Need[P3]=(1,1)<=(6,6) runs, Work becomes (6,8); all five processes finish, confirming (ii) is safely grantable -- TRUE. (iii) P2 requesting (1,1): within Need[P2]=(1,2) and within Available=(4,5); tentative Available becomes (3,4), and re-running the full safety algorithm from there also finds a complete safe sequence (0,1,2,3,4) -- TRUE. (iv) P0 requesting (1,0): trivially within Need[P0]=(2,1) and Available; tentative Available becomes (3,5), and safety re-verification again succeeds -- TRUE. So the TRUE options are (ii), (iii), and (iv) -- indices 1, 2, 3 -- while (i) is FALSE despite passing the availability check, because it fails the more fundamental within-Need check first."
+  },
+  {
+    "id": "os-deadlock-h9",
+    "q": "Resources R1 and R2 are BOTH single-instance resource types. Process P1 holds R1 and requests R2. Process P2 holds R2 and requests R1 -- forming the cycle P1 -> R2 -> P2 -> R1 -> P1 in the resource-allocation graph. A third process P3, which currently holds nothing at all, also requests R1 (joining the queue of processes waiting for R1, behind P2's eventual claim). How many processes are direct PARTICIPANTS in the deadlock CYCLE itself (as opposed to processes that are merely blocked forever as an indirect consequence of the deadlock, without being part of the cycle)?",
+    "options": [],
+    "answer": 2,
+    "marks": 2,
+    "difficulty": "hard",
+    "type": "numerical",
+    "kind": "nat",
+    "explanation": "Since R1 and R2 are both single-instance resources, the cycle P1 -> R2 -> P2 -> R1 -> P1 by itself is both necessary and sufficient to establish that P1 and P2 are genuinely deadlocked: P1 can never get R2 (P2 will never release it, since P2 itself can never finish), and P2 can never get R1 (P1 will never release it, for the same reason) -- this circular wait involves exactly the 2 processes P1 and P2, who ARE the cycle. P3 is a separate matter: it holds no resources at all and is simply waiting in line for R1, which is currently held by P1 (who is permanently stuck due to the P1-P2 deadlock and will never release R1). Because R1 will never become free, P3 will also never receive it and will wait forever -- P3 is genuinely blocked indefinitely as a CONSEQUENCE of the P1-P2 deadlock, but P3 does not itself form part of any cycle in the resource-allocation graph (there is no edge FROM R1 or any other resource back TO P3 that would close a loop through P3), since P3 holds nothing that anyone else needs. This distinction -- between processes that are structurally part of the deadlock cycle (here, exactly 2: P1 and P2) versus processes that are merely collateral, indefinitely-blocked victims of a deadlock elsewhere in the graph (here, P3) -- is precisely the trap the question probes; a common mistake is to count all indefinitely-blocked processes (which would wrongly give 3) as if they were all part of the cycle."
+  },
+  {
+    "id": "os-deadlock-h10",
+    "q": "Using the ORIGINAL 4-process, 3-resource-type Banker's system from the earlier questions (Allocation, Max, Total=(10,5,7), Available=(3,3,4), Need[P0]=(7,4,3), Need[P1]=(1,2,2), Need[P2]=(6,0,0), Need[P3]=(2,1,1)), FOUR separate hypothetical requests are considered INDEPENDENTLY, each starting fresh from this same original state: (i) P2 requests (4,0,0); (ii) P2 requests (0,3,0); (iii) P0 requests (3,0,0); (iv) P1 requests (1,2,0). Which of the following are TRUE?",
+    "options": [
+      "Request (i), P2 requesting (4,0,0), cannot be granted right now purely because it exceeds the currently Available amount of A (only 3 units available), NOT because of any deeper safety violation",
+      "Request (ii), P2 requesting (0,3,0), must be flagged as an immediate ERROR by the OS, because it exceeds P2's own declared Need of 0 additional units of B -- the safety algorithm should never even be invoked for it",
+      "Request (iii), P0 requesting (3,0,0), satisfies both the within-Need check and the within-Available check, so by that fact alone, the OS is obligated to grant it",
+      "Request (iv), P1 requesting (1,2,0), can be safely granted"
+    ],
+    "answers": [
+      0,
+      1,
+      3
+    ],
+    "marks": 2,
+    "difficulty": "hard",
+    "type": "msq",
+    "kind": "msq",
+    "explanation": "(i) P2 requesting (4,0,0): Available's A-component is 3, and the request's A-component is 4, which exceeds it (4>3) -- this fails the availability check outright, before safety is even relevant, so P2 simply must wait; option A correctly identifies the true reason (exceeds Available), making it TRUE. (ii) P2 requesting (0,3,0): Need[P2]=(6,0,0), so the B-component of Need is 0, but the request asks for 3 units of B -- this exceeds P2's own declared need and is an invalid/erroneous request that the OS must reject immediately as a bug, without ever running the safety algorithm on it; option B is TRUE. (iii) P0 requesting (3,0,0): as derived in an earlier question in this set, this request DOES pass both the within-Need check (3<=7) and the within-Available check (3<=3), yet granting it leads to an UNSAFE state (no process can proceed afterward, as shown by working through the safety algorithm on the resulting hypothetical state) -- so despite passing the two basic checks, it must still be DENIED; option C's claim that passing those two checks alone obligates the OS to grant it is therefore FALSE, the central trap of this question. (iv) P1 requesting (1,2,0): within Need[P1]=(1,2,2) and within Available=(3,3,4); tentatively granting gives Available=(2,1,4), and re-running the safety algorithm from there succeeds in finding a complete safe sequence -- TRUE."
+  }
+]);
+
+window.GATE_DATA.questions['os'].topics.find(function(t){return t.id==='os-memory';}).questions.push.apply(window.GATE_DATA.questions['os'].topics.find(function(t){return t.id==='os-memory';}).questions, [
+  {
+    "id": "os-memory-h1",
+    "q": "A system uses 44-bit virtual addresses and 16 KB pages, with a two-level page table where the OUTER (top-level) index is fixed at 10 bits and the INNER index takes whatever bits remain of the virtual page number. Each page table entry (PTE) is 4 bytes. Consider a process that, over its ENTIRE execution, only ever touches memory within a single 16 KB page (so it needs the top-level table plus exactly ONE fully-populated inner table). Compare this actual two-level usage against a hypothetical SINGLE-level page table covering the same 44-bit address space directly (one PTE per virtual page, no inner tables at all). How many KB of memory does the two-level scheme SAVE compared to the single-level scheme, for this process?",
+    "options": [],
+    "answer": 4190204,
+    "marks": 2,
+    "difficulty": "hard",
+    "type": "numerical",
+    "kind": "nat",
+    "explanation": "First derive the offset: 16 KB pages need log2(16*1024)=14 offset bits. The virtual page number (VPN) therefore has 44-14=30 bits. With a fixed 10-bit outer index, the inner index takes the remaining 30-10=20 bits, so each inner table has 2^20 entries. Two-level actual usage for this process: the top-level (outer) table always exists in full, with 2^10=1024 entries x 4 bytes = 4096 bytes = 4 KB; since the process touches only one page, exactly ONE inner table is populated, with 2^20 entries x 4 bytes = 4,194,304 bytes = 4096 KB (4 MB). Total two-level usage = 4 KB + 4096 KB = 4100 KB. The single-level alternative would need one PTE per possible virtual page across the WHOLE 30-bit VPN space: 2^30 entries x 4 bytes = 4,294,967,296 bytes = 4,194,304 KB (4 GB) -- allocated in full regardless of how little of the address space the process actually uses, since a single-level table cannot be populated lazily per-region the way a multi-level table's inner tables can. The savings = 4,194,304 KB - 4,100 KB = 4,190,204 KB. This dramatic gap is exactly why multi-level page tables exist: a two-level (or deeper) scheme lets the OS allocate only the outer table plus whichever inner tables actually have mapped pages, instead of being forced to reserve the full flat table's astronomical size up front no matter how sparse the address space usage actually is."
+  },
+  {
+    "id": "os-memory-h2",
+    "q": "A system has 2 GB of physical memory and 8 KB pages/frames. It uses an INVERTED page table where there is exactly ONE entry per PHYSICAL FRAME (not per virtual page), and each entry occupies 12 bytes (holding the owning process's PID, the frame's currently-mapped virtual page number, and a hash-chain pointer). The system's virtual address space per process is a full 64 bits. Compute the total size, in MB, of this inverted page table.",
+    "options": [],
+    "answer": 3,
+    "marks": 2,
+    "difficulty": "hard",
+    "type": "numerical",
+    "kind": "nat",
+    "explanation": "The defining property of an inverted page table is that its size depends ONLY on the amount of PHYSICAL memory (i.e., the number of physical frames), never on the size of the virtual address space -- this is precisely why inverted page tables are attractive for very large (e.g., 64-bit) virtual address spaces, where a conventional (even multi-level) per-process page table would otherwise need to reserve entries proportional to the virtual space. Number of physical frames = physical memory / frame size = 2 GB / 8 KB = 2^31 bytes / 2^13 bytes = 2^18 = 262,144 frames. Total inverted page table size = 262,144 frames x 12 bytes/entry = 3,145,728 bytes. Converting to MB: 3,145,728 / (1024*1024) = 3,145,728 / 1,048,576 = exactly 3 MB. The genuine trap here is being tempted to bring the stated 64-bit virtual address space into the calculation at all (e.g., trying to compute some number of virtual pages, or reasoning about VPN bit-widths as one would for a conventional or multi-level page table) -- for an inverted page table this is a red herring entirely: the table has one entry per FRAME, full stop, so only the physical memory size and frame size matter, and the answer comes out to a clean 3 MB."
+  },
+  {
+    "id": "os-memory-h3",
+    "q": "A paged-segmentation system defines Segment 3 with page-table base at frame 200, a LIMIT of 50 pages (meaning only pages numbered 0 through 49 are valid for this segment), and a page size of 2 KB (11-bit offset). A process issues a logical address requesting (segment 3, page 55, offset 300). What happens?",
+    "options": [
+      "Valid access: physical address is computed as (page-table-base + page-number) x page-size + offset = (200+55) x 2048 + 300",
+      "A protection fault / segmentation fault occurs, because page 55 exceeds the segment's limit of 50 pages (valid pages are only 0 through 49)",
+      "Valid access: the page-table entry for page 55 is looked up normally and a physical frame is returned",
+      "The address silently wraps around to page 5 (55 mod 50) and is translated normally"
+    ],
+    "answer": 1,
+    "marks": 2,
+    "difficulty": "hard",
+    "type": "numerical",
+    "explanation": "Before any page-table lookup or arithmetic is even attempted, paged segmentation ALWAYS checks the requested page number against the segment's declared LIMIT -- this is the entire point of maintaining a limit alongside the page-table base, exactly analogous to how pure segmentation checks an offset against a segment's byte-length limit. Here, the segment's limit is 50 pages, meaning only page numbers 0 through 49 (50 distinct values) are legally part of this segment; page number 55 is well beyond that range (55 > 49), so the memory management unit raises a protection fault (a segmentation fault) immediately, and NO physical address is ever computed at all -- the access simply never reaches the page-table lookup or offset-addition stage. Option A represents a naive-but-wrong shortcut some students take (directly adding page-table base and page number as if they were compatible physical quantities, which is not even how the translation should work regardless of the limit issue -- the page-table base points to a page TABLE, and the actual per-page frame number must be looked up from an entry within that table, not derived by simple addition). Option C is wrong because the limit check fails before any lookup happens. Option D describes a modular-wraparound behavior that real segment-limit checking never performs; an out-of-range page number is always an error, never silently remapped."
+  },
+  {
+    "id": "os-memory-h4",
+    "q": "A paged-segmentation system defines Segment 1 with page-table base at frame 800, a limit of 32 pages, and a page size of 1 KB (10-bit offset). The page-table entry for page number 12 (which IS within the segment's limit) maps to physical frame 1500. A process issues a logical address requesting (segment 1, page 12, offset 777). Compute the resulting physical address.",
+    "options": [],
+    "answer": 1536777,
+    "marks": 2,
+    "difficulty": "hard",
+    "type": "numerical",
+    "kind": "nat",
+    "explanation": "First, the limit check: page number 12 is well within the segment's declared limit of 32 pages (valid range 0-31), so the access is legal and translation proceeds. The page-table LOOKUP (not any direct arithmetic combining the base and page number) is what actually resolves page 12 to its physical frame: the entry for page 12, within the page table located at frame 800, states that this page currently resides in physical frame 1500 -- this frame number is given directly in the problem and must simply be used as-is (the page-table base of 800 was only needed to confirm where to look up the entry, and to know the ENTRY exists at all; it does not get added into the final physical address). The physical address is then computed as: (mapped frame number) x (page size in bytes) + (offset) = 1500 x 1024 + 777 = 1,536,000 + 777 = 1,536,777. The genuine trap here is confusing the page-TABLE base (frame 800, used only for locating the table containing the translation entries) with the actual mapped FRAME NUMBER for this specific page (1500, obtained by looking up the entry) -- a common mistake is to instead compute (800+12) x 1024 + 777, treating the page-table base as if it were directly combinable with the page number the way it might naively seem to work, which conflates two entirely different quantities in the address-translation pipeline."
+  },
+  {
+    "id": "os-memory-h5",
+    "q": "Memory holes of sizes 100 KB, 500 KB, 200 KB, 300 KB, 600 KB (in that left-to-right order) are available. Processes P1=212 KB, P2=417 KB, P3=112 KB, P4=426 KB request memory in that order. Using FIRST-FIT, P1, P2, and P3 get placed (into the 500 KB, 600 KB, and 200 KB holes respectively) but P4 fails to find any hole big enough and is rejected. Using WORST-FIT, P1, P2, and P3 also get placed (into the 600 KB, 500 KB, and 300 KB holes respectively) but P4 again fails and is rejected. Compute (total internal fragmentation under WORST-FIT, counting only its 3 successfully-placed processes) MINUS (total internal fragmentation under FIRST-FIT, counting only its 3 successfully-placed processes), in KB.",
+    "options": [],
+    "answer": 100,
+    "marks": 2,
+    "difficulty": "hard",
+    "type": "numerical",
+    "kind": "nat",
+    "explanation": "Under FIRST-FIT: P1 (212 KB) goes into the first hole big enough, the 500 KB hole, leaving 500-212=288 KB unused; P2 (417 KB) then goes into the first REMAINING hole big enough scanning left to right (100 is too small, 200 too small, 300 too small, so it lands in the 600 KB hole), leaving 600-417=183 KB unused; P3 (112 KB) then fits in the first remaining hole big enough, the 200 KB hole, leaving 200-112=88 KB unused. Total internal fragmentation under first-fit (for its 3 placed processes) = 288+183+88 = 559 KB. Under WORST-FIT: each process is placed into the LARGEST currently-available hole. P1 (212 KB) goes into the largest hole, 600 KB, leaving 600-212=388 KB; P2 (417 KB) then goes into the next-largest remaining hole, 500 KB, leaving 500-417=83 KB; P3 (112 KB) then goes into the next-largest remaining hole, 300 KB, leaving 300-112=188 KB. Total internal fragmentation under worst-fit = 388+83+188 = 659 KB. The question asks for worst-fit's total minus first-fit's total: 659 - 559 = 100 KB. The genuine trap is that BOTH strategies fail to place P4 in this classic example (only best-fit succeeds at placing all four, since it would use the 300 KB hole for P1 instead, preserving the 500 and 600 KB holes for the larger P2 and P4) -- so the comparison here must correctly restrict itself to only the 3 processes each strategy actually manages to place, not all 4."
+  },
+  {
+    "id": "os-memory-h6",
+    "q": "Using the same memory holes (100, 500, 200, 300, 600 KB) and the same process requests in order (P1=212, P2=417, P3=112, P4=426 KB), which of the following are TRUE?",
+    "options": [
+      "Under FIRST-FIT, process P4 fails to be allocated any memory at all",
+      "Under WORST-FIT, process P4 fails to be allocated any memory at all",
+      "Under BEST-FIT, total internal fragmentation across all 4 successfully-placed processes is exactly 433 KB",
+      "Under BEST-FIT, process P1 ends up placed into the 500 KB hole"
+    ],
+    "answers": [
+      0,
+      1,
+      2
+    ],
+    "marks": 2,
+    "difficulty": "hard",
+    "type": "msq",
+    "kind": "msq",
+    "explanation": "As derived in the previous question, both FIRST-FIT and WORST-FIT run out of any hole large enough for P4 (426 KB) once their first three placements have consumed the larger holes, so P4 is rejected under both strategies -- options A and B are TRUE. Under BEST-FIT, each process is placed into the SMALLEST hole that still fits it: P1 (212 KB) fits into holes 500, 300, and 600 (100 and 200 are too small), and the smallest of those is 300 KB, so P1 goes there, leaving 300-212=88 KB; P2 (417 KB) fits only into 500 or 600, and the smallest of those is 500 KB, so P2 goes there, leaving 500-417=83 KB; P3 (112 KB) fits into 200 or 600 (300 is now taken), and the smallest is 200 KB, so P3 goes there, leaving 200-112=88 KB; P4 (426 KB) has only the 600 KB hole left, and it fits, leaving 600-426=174 KB. Total internal fragmentation under best-fit = 88+83+88+174 = 433 KB, confirming option C is TRUE. However, P1 is placed into the 300 KB hole under best-fit, NOT the 500 KB hole (that misconception might arise from confusing this with the first-fit placement, where P1 does go into the 500 KB hole) -- option D is FALSE, the deliberate trap testing whether the specific best-fit placement (not just the final fragmentation total) was correctly traced through."
+  },
+  {
+    "id": "os-memory-h7",
+    "q": "A system uses a 47-bit virtual address, 4 KB pages (12-bit offset), and a THREE-level page table where the remaining 35 VPN bits are unevenly split as: 12 bits for level-1 (outermost), 12 bits for level-2, and 11 bits for level-3 (innermost/leaf, where entries point directly to physical frames). Each page table entry (at every level) is 8 bytes. If this three-level page table were FULLY populated at every level (i.e., every possible entry at every level actually exists, mapping the entire address space), what would the TOTAL memory (in GB) consumed by all the page tables combined be? (Give your answer to 3 decimal places.)",
+    "options": [],
+    "answer": 256.125,
+    "marks": 2,
+    "difficulty": "hard",
+    "type": "numerical",
+    "kind": "nat",
+    "explanation": "Compute each level's total footprint when fully populated. Level-3 (leaf) tables: each one has 2^11=2048 entries x 8 bytes = 16,384 bytes (16 KB) per table; the NUMBER of level-3 tables needed to fully populate the space is 2^12 (level-1 entries) x 2^12 (level-2 entries) = 2^24 = 16,777,216 tables. Total level-3 memory = 16,777,216 x 16,384 bytes = 274,877,906,944 bytes. Level-2 tables: each has 2^12=4096 entries x 8 bytes = 32,768 bytes (32 KB) per table; the number of level-2 tables needed is 2^12 (one per level-1 entry) = 4096 tables. Total level-2 memory = 4096 x 32,768 = 134,217,728 bytes. Level-1: just a single table with 2^12=4096 entries x 8 bytes = 32,768 bytes. Grand total = 274,877,906,944 + 134,217,728 + 32,768 = 275,012,157,440 bytes. Converting to GB (1 GB = 2^30 = 1,073,741,824 bytes): 275,012,157,440 / 1,073,741,824 = 256.125 GB exactly. This astronomical figure (over 256 GB just for page tables, if fully populated) is precisely why real multi-level page tables are never fully populated -- only the branches actually leading to mapped pages are allocated on demand, and the genuine trap here is realizing that the LEAF level alone (274,877,906,944 bytes, i.e. 256.0 GB) utterly dominates the total, with the level-1 and level-2 tables together contributing only a further 0.125 GB -- the multiplicative compounding across three levels of indexing is what makes a fully-populated table so enormous, even though each individual table itself is modest in size."
+  },
+  {
+    "id": "os-memory-h8",
+    "q": "An inverted page table uses hash-table chaining with 8 buckets, where a virtual page number (VPN) is mapped to bucket = VPN mod 8, and new entries are inserted at the TAIL of their bucket's chain. Entries are inserted, in this exact order, for these (frame, VPN) pairs: (frame1,VPN=9), (frame3,VPN=1), (frame4,VPN=17), (frame5,VPN=33), (frame7,VPN=41), (frame8,VPN=25), (frame9,VPN=49). All seven of these VPNs hash to the SAME bucket (since 9,1,17,33,41,25,49 are all congruent to 1 mod 8). To look up VPN=41, the OS computes its bucket and then walks that bucket's chain from the head, comparing each entry until it finds a match. How many comparisons (probes), INCLUDING the successful matching comparison itself, are needed to find VPN=41?",
+    "options": [],
+    "answer": 5,
+    "marks": 2,
+    "difficulty": "hard",
+    "type": "numerical",
+    "kind": "nat",
+    "explanation": "Since entries are inserted at the TAIL of the chain in the given order, and every one of these seven VPNs happens to hash into the identical bucket (bucket 1, since 9 mod 8=1, 1 mod 8=1, 17 mod 8=1, 33 mod 8=1, 41 mod 8=1, 25 mod 8=1, 49 mod 8=1), the resulting chain, from head to tail, is exactly the insertion order: [9, 1, 17, 33, 41, 25, 49]. A lookup for VPN=41 must walk this chain starting from the head, comparing each entry in turn: comparison 1 checks VPN=9 (no match), comparison 2 checks VPN=1 (no match), comparison 3 checks VPN=17 (no match), comparison 4 checks VPN=33 (no match), comparison 5 checks VPN=41 -- a MATCH. So exactly 5 comparisons are needed, including the final successful one. This scenario is a deliberately worst-case-skewed illustration of why inverted page tables, despite their space efficiency (one entry per physical frame, independent of virtual address space size, as explored in an earlier question), pay a real lookup-time cost whenever the hash function distributes VPNs poorly: here, all seven entries collided into a single bucket instead of spreading across all 8, turning what should ideally be a close-to-O(1) lookup into an O(n)-like linear chain walk. The genuine trap is assuming inverted-page-table lookups are always fast just because the table itself is compact -- the table's SIZE and its LOOKUP TIME are governed by entirely different factors (frame count vs. hash distribution quality)."
+  },
+  {
+    "id": "os-memory-h9",
+    "q": "A system defines three segments, each mapped via a simplifying rule where the page table for segment i maps its page number p directly to physical frame (base_i + p): Segment 0 has base=100, limit=20 pages, page size=2 KB; Segment 1 has base=300, limit=8 pages, page size=2 KB; Segment 2 has base=50, limit=40 pages, page size=2 KB. Four logical addresses (segment, page, offset) are requested: A=(0, 15, 500); B=(1, 8, 100); C=(2, 39, 2047); D=(0, 20, 0). Which of the following are TRUE?",
+    "options": [
+      "Address A translates to physical address 236020",
+      "Address B is a VALID access (page 8 is within segment 1's 8-page limit) and translates to frame 108",
+      "Address C translates to physical address 184319",
+      "Address D triggers a protection/segmentation fault"
+    ],
+    "answers": [
+      0,
+      2,
+      3
+    ],
+    "marks": 2,
+    "difficulty": "hard",
+    "type": "msq",
+    "kind": "msq",
+    "explanation": "Address A=(0,15,500): segment 0's limit is 20 pages, meaning valid page numbers are 0 through 19; page 15 is valid. Frame = base_0 + page = 100+15 = 115. Physical address = 115 x 2048 + 500 = 235,520 + 500 = 236,020, matching option A exactly -- TRUE. Address B=(1,8,100): segment 1's limit is 8 pages -- this means EXACTLY 8 pages are valid, numbered 0 through 7 (a limit of 8 pages does NOT include page number 8 itself; it is an off-by-one boundary, the classic trap here). Page 8 is therefore INVALID for this segment, and the access should trigger a protection fault, NOT translate to frame 300+8=308 (note option B additionally states an inconsistent frame value of 108, compounding the error) -- option B is FALSE on two counts: the access is invalid at all, and even the specific frame arithmetic offered is wrong. Address C=(2,39,2047): segment 2's limit is 40 pages, meaning valid pages are 0 through 39; page 39 is exactly the last valid page (another boundary case, this time landing correctly within range). Frame = 50+39 = 89. Physical address = 89 x 2048 + 2047 = 182,272 + 2047 = 184,319, matching option C -- TRUE. Address D=(0,20,0): segment 0's limit is 20 pages (valid pages 0-19); page 20 is exactly one past the valid range, so this triggers a protection fault -- option D is TRUE. This question specifically probes the off-by-one boundary between a segment's LIMIT (a count) and its highest VALID page number (limit - 1)."
+  },
+  {
+    "id": "os-memory-h10",
+    "q": "A single process of total size S=1 MB (1,048,576 bytes) is paged with a page table entry (PTE) size of 4 bytes. The total memory 'overhead' for a given page size p is defined as: (internal fragmentation, approximated as p/2, since on average half of the process's last page is wasted) PLUS (page table size, computed as (S/p) x 4 bytes). Candidate page sizes 512 B, 1 KB, 2 KB, 4 KB, and 8 KB are evaluated. Which of the following are TRUE?",
+    "options": [
+      "A 512 B page size produces the HIGHEST total overhead (8448 bytes) among all five candidates",
+      "A 1 KB page size produces the MINIMUM total overhead among all five candidates",
+      "2 KB and 4 KB page sizes produce EXACTLY the same total overhead (3072 bytes each), and this tied value is the minimum among all five candidates",
+      "Overhead strictly and continuously DECREASES as page size increases from 512 B all the way up through 8 KB, with no reversal"
+    ],
+    "answers": [
+      0,
+      2
+    ],
+    "marks": 2,
+    "difficulty": "hard",
+    "type": "msq",
+    "kind": "msq",
+    "explanation": "Compute overhead(p) = p/2 + (S/p)*4 for each candidate, with S=1,048,576 bytes. At p=512: numPages=2048, page-table size=2048x4=8192 bytes, internal frag=256 bytes, total=8448 bytes -- the largest of all five values, confirming option A is TRUE. At p=1024 (1 KB): numPages=1024, table=4096, frag=512, total=4608 bytes. At p=2048 (2 KB): numPages=512, table=2048, frag=1024, total=3072 bytes. At p=4096 (4 KB): numPages=256, table=1024, frag=2048, total=3072 bytes -- EXACTLY tied with the 2 KB result, both landing at the minimum overhead among the tested candidates; option C is TRUE (the tie itself, and that it is the minimum, are both confirmed). At p=8192 (8 KB): numPages=128, table=512, frag=4096, total=4608 bytes -- this is HIGHER than the 3072-byte minimum reached at 2 KB and 4 KB, meaning overhead actually turns around and starts INCREASING again past the sweet spot, so option D (claiming a strict continuous decrease all the way to 8 KB) is FALSE. Since 1 KB gives 4608 bytes, well above the 3072-byte minimum achieved at 2 KB/4 KB, option B is also FALSE. This demonstrates the classic page-size trade-off curve: overhead first falls (as the page-table shrinks faster than internal fragmentation grows) then rises again (once internal fragmentation, growing linearly with p, starts to dominate), with a genuine minimum region rather than a monotonic trend in either direction -- and here that minimum happens to be a flat tie across two adjacent candidate sizes, not a single unique best answer."
+  }
+]);
