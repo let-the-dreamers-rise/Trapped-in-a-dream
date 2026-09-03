@@ -143,6 +143,19 @@ if (require.main === module) (function () {
     var seen = {};
     var counts = { mcq: 0, msq: 0, nat: 0 };
 
+    // Papers disagree about how the CS section is numbered. Most print Q.1-Q.65
+    // straight through, with 11-65 being Computer Science; GATE 2023 restarts the
+    // CS section at Q.1 and runs to Q.55. The `n` we store is what the candidate
+    // sees printed on the paper, but every official key numbers rows 1-65, so a
+    // restart-style paper needs its CS numbers shifted by 10 to find the key row.
+    var csNums = paper.questions.filter(function (q) { return q.section === 'CS'; })
+      .map(function (q) { return q.n; });
+    var csOffset = 0;
+    if (key && key.layout === 'C' && csNums.length && Math.max.apply(null, csNums) <= 55) csOffset = 10;
+    function keyRow(q) {
+      return key.map[q.section + ':' + (q.section === 'CS' ? q.n + csOffset : q.n)];
+    }
+
     paper.questions.forEach(function (q) {
       var where = q.id || ('n=' + q.n);
       function bad(msg) { problems.push(where + ': ' + msg); }
@@ -176,8 +189,8 @@ if (require.main === module) (function () {
 
       // The real check: does this answer match the official key, re-parsed here?
       if (!key) return;
-      var entry = key.map[q.section + ':' + q.n];
-      if (!entry) { bad('no key entry for ' + q.section + ' ' + q.n); return; }
+      var entry = keyRow(q);
+      if (!entry) { bad('no key entry for ' + q.section + ' ' + q.n + (csOffset ? ' (key row ' + (q.n + csOffset) + ')' : '')); return; }
       if (entry.marks !== q.marks) bad('marks ' + q.marks + ' but key says ' + entry.marks);
       var v = entry.value;
       if (v.dropped) { bad('key marks this dropped/marks-to-all — it should have been skipped'); return; }
@@ -208,7 +221,8 @@ if (require.main === module) (function () {
     console.log('\n' + f + '  —  ' + paper.year + ' ' + paper.paper);
     console.log('  ' + paper.questions.length + ' questions (' + counts.mcq + ' MCQ, ' +
       counts.msq + ' MSQ, ' + counts.nat + ' NAT)' +
-      (key ? ', key layout ' + key.layout + ' parsed ' + keyTotal + ' entries' : ''));
+      (key ? ', key layout ' + key.layout + ' parsed ' + keyTotal + ' entries' : '') +
+      (csOffset ? ', CS section restarts at 1 (key rows shifted by ' + csOffset + ')' : ''));
     if (key && keyTotal !== 65) console.log('  ! key parsed ' + keyTotal + ' entries, expected 65 — parser may be missing rows');
     if (!problems.length) console.log('  all answers match the official key');
     else {

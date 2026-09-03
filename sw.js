@@ -1,5 +1,5 @@
 // Offline cache — the whole app works with zero network after first load.
-var CACHE = 'gate-r1-v7';
+var CACHE = 'gate-r1-v8';
 var ASSETS = [
   './', './index.html', './css/style.css', './js/app.js', './js/generators.js',
   './data/plan90.js', './data/astro.js', './icon.svg', './manifest.webmanifest',
@@ -11,9 +11,14 @@ var ASSETS = [
 // PYQ:START
 ASSETS = ASSETS.concat([
   './data/pyq/gate2014-s1.js',
+  './data/pyq/gate2014-s2.js',
   './data/pyq/gate2014-s3.js',
   './data/pyq/gate2016-s1.js',
+  './data/pyq/gate2016-s2.js',
+  './data/pyq/gate2018.js',
   './data/pyq/gate2019.js',
+  './data/pyq/gate2022.js',
+  './data/pyq/gate2023.js',
   './data/pyq/gate2024-s1.js',
   './data/pyq/gate2024-s2.js',
   './data/pyq/gate2025-s1.js'

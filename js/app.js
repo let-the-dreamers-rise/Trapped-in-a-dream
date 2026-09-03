@@ -1187,13 +1187,21 @@
       if ((el = document.getElementById('exit'))) el.addEventListener('click', viewPyqList);
       if ((el = document.getElementById('submit'))) el.addEventListener('click', finish);
     }
+    // Was this question answered correctly? Unanswered counts as wrong for review
+    // purposes but is scored as a skip (no negative marking), like the real exam.
+    function graded(it, a) {
+      if (a === undefined) return { attempted: false, ok: false };
+      var kind = qKind(it);
+      return { attempted: true, ok: kind === 'nat' ? natMatches(it, a) : kind === 'msq' ? msqMatches(it, a) : a === it.answer };
+    }
+
     function finish() {
-      var score = 0, correct = 0;
+      var score = 0, correct = 0, wrong = 0, skipped = 0;
       paper.questions.forEach(function (it, i) {
-        var a = answers[i]; if (a === undefined) return;
-        var kind = qKind(it);
-        var ok = kind === 'nat' ? natMatches(it, a) : kind === 'msq' ? msqMatches(it, a) : a === it.answer;
-        if (ok) { score += it.marks; correct++; } else if (kind === 'mcq') score -= it.marks / 3;
+        var g = graded(it, answers[i]);
+        if (!g.attempted) { skipped++; return; }
+        if (g.ok) { score += it.marks; correct++; }
+        else { wrong++; if (qKind(it) === 'mcq') score -= it.marks / 3; }
       });
       score = Math.round(score * 100) / 100;
       S.pyqLog = S.pyqLog || {};
@@ -1201,9 +1209,59 @@
       save();
       $view.innerHTML = '<div class="card"><div class="eyebrow">GATE ' + paper.year + ' &middot; real paper</div>' +
         '<div class="hero-day"><span class="hero-num">' + score + '</span><span class="hero-of">marks</span></div>' +
-        '<p class="muted small">' + correct + ' correct out of ' + paper.questions.length + '</p>' +
-        '<div class="btn-row"><button class="btn" id="back2">Back to papers</button></div></div>';
+        '<p class="muted small">' + correct + ' right &middot; ' + wrong + ' wrong &middot; ' + skipped + ' left blank, ' +
+        'out of ' + paper.questions.length + '</p>' +
+        '<div class="btn-row">' +
+        (wrong + skipped ? '<button class="btn good" id="rev-bad">Review what you missed</button>' : '') +
+        '<button class="btn" id="rev-all">Review every question</button></div>' +
+        '<div class="btn-row"><button class="btn ghost small-btn" id="back2">Back to papers</button></div></div>';
+      var el;
+      if ((el = document.getElementById('rev-bad'))) el.addEventListener('click', function () { review(true); });
+      if ((el = document.getElementById('rev-all'))) el.addEventListener('click', function () { review(false); });
       document.getElementById('back2').addEventListener('click', viewPyqList);
+    }
+
+    // The whole point of doing a past paper is the walk back through it. Show the
+    // question, what you put, what the official key says, and why.
+    function review(missedOnly) {
+      var html = '<button class="back-link" id="back3">‹ Score</button>' +
+        '<div class="card"><div class="eyebrow">GATE ' + paper.year + ' &middot; ' + esc(paper.paper) + '</div>' +
+        '<h2>' + (missedOnly ? 'What you missed' : 'Every question') + '</h2>' +
+        '<p class="muted small">Official answers, from the published answer key.</p></div>';
+      var shown = 0;
+      paper.questions.forEach(function (it, i) {
+        var g = graded(it, answers[i]);
+        if (missedOnly && g.ok) return;
+        shown++;
+        var kind = qKind(it);
+        var tag = !g.attempted ? '<span class="pill">Left blank</span>'
+          : g.ok ? '<span class="pill" style="color:var(--accent2);border-color:var(--accent2)">Correct</span>'
+                 : '<span class="pill" style="color:var(--accent);border-color:var(--accent)">Wrong</span>';
+        html += '<div class="card q-review"><div class="quiz-meta"><span>Q' + (it.n || i + 1) + ' &middot; ' +
+          it.marks + ' mark' + (it.marks > 1 ? 's' : '') + '</span>' + tag + '</div>' +
+          '<div class="q-text">' + esc(it.q) + '</div>' + figureHtml(it);
+        if (kind === 'nat') {
+          html += '<div class="opt-nat">' + esc(String(it.answer)) +
+            (it.tolerance ? ' <span class="muted small">(accepted &plusmn; ' + it.tolerance + ')</span>' : '') + '</div>';
+          if (g.attempted) html += '<p class="small muted">You answered ' + esc(String(answers[i])) + '.</p>';
+        } else {
+          var right = Array.isArray(it.answers) ? it.answers : [it.answer];
+          var mine = Array.isArray(answers[i]) ? answers[i] : (answers[i] === undefined ? [] : [answers[i]]);
+          (it.options || []).forEach(function (o, oi) {
+            var isRight = right.indexOf(oi) >= 0, isMine = mine.indexOf(oi) >= 0;
+            var style = isRight ? 'border-color:var(--accent2);color:var(--accent2)'
+              : (isMine ? 'border-color:var(--accent);color:var(--accent)' : 'opacity:.6');
+            html += '<div class="opt" style="' + style + '">' + String.fromCharCode(65 + oi) + '.  ' + esc(o) +
+              (isRight ? '  &check;' : (isMine ? '  &times; your answer' : '')) + '</div>';
+          });
+        }
+        if (it.explanation) html += '<div class="q-why">' + inlineTheory(it.explanation) + '</div>';
+        html += '</div>';
+      });
+      if (!shown) html += '<div class="card"><p class="muted">Nothing to review — you got every question right.</p></div>';
+      $view.innerHTML = html;
+      document.getElementById('back3').addEventListener('click', finish);
+      window.scrollTo(0, 0);
     }
     draw();
   }

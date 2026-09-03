@@ -218,3 +218,22 @@ input[type=date], input[type=number], select, textarea { background: none; color
 .celebrate.out { opacity: 0; transition: opacity .45s; }
 @keyframes pop { from { transform: translateX(-50%) scale(.8); opacity: 0; } to { transform: translateX(-50%) scale(1); opacity: 1; } }
 @media (prefers-reduced-motion: reduce) { .celebrate { animation: none; } }
+
+/* ---- Past-paper review: the explanation under a question you just attempted.
+       Same teal "this is the takeaway" language as theory, but labelled for the
+       context — you are being told why the official key says what it says. ---- */
+.q-why {
+  border-left: 4px solid var(--accent2); background: rgba(53,208,186,.09);
+  padding: 12px 14px; margin: 14px 0 2px; font-size: 14.5px; line-height: 1.55;
+}
+.q-why::before {
+  content: 'Why'; display: block; font-size: 9px; font-weight: 800;
+  letter-spacing: .16em; text-transform: uppercase; color: var(--accent2); margin-bottom: 5px;
+}
+/* In review the options are static markers, not buttons — kill the pointer. */
+.q-review .opt { cursor: default; }
+.q-review .opt-nat {
+  font-family: ui-monospace, Menlo, Consolas, monospace; font-size: 15px;
+  border: 2px solid var(--accent2); color: var(--accent2);
+  padding: 12px 14px; margin-bottom: 10px;
+}

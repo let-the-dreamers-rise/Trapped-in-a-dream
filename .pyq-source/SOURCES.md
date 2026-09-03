@@ -73,3 +73,16 @@ judgement. Any question whose text did not survive extraction legibly — garble
 maths, matrices, layout-dependent code, anything referring to a figure — is
 skipped, not reconstructed. A skipped question is fine; a wrong one teaches the
 wrong thing.
+
+## One more trap: the CS section is not numbered the same way every year
+
+Every official key numbers its rows 1–65. The **printed paper** does not always
+agree. Most years print Q.1–Q.65 straight through, so Computer Science is Q.11–Q.65
+and the key row number is the printed number. **GATE 2023 restarts the CS section
+at Q.1** and runs to Q.55, so its printed CS number is ten less than its key row.
+
+The `n` field stored in `data/pyq/*.js` is always the number *printed on the paper*,
+because that is what the candidate sees. `tools/validate-pyq.js` detects which
+convention a paper uses and shifts before looking up the key, and says which it
+found. Get this backwards and every CS answer in the file silently shifts by ten
+questions while still looking internally consistent.
