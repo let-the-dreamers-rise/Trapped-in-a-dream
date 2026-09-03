@@ -21,6 +21,9 @@
   S.planChecks = S.planChecks || {}; // day -> {taskIdx: true}
   S.mocks = S.mocks || [];           // {dateISO, day, score, max, correct, wrong, skipped}
   S.streak = S.streak || { last: null, count: 0 };
+  S.xp = S.xp || 0;                  // every answered question earns XP; never decreases
+  S.best60 = S.best60 || 0;          // personal best in the 60-second sprint
+  S.combo = 0;                       // in-session correct streak (not persisted)
 
   function localKey(d) { return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); }
   function todayKey() { return localKey(new Date()); }
@@ -55,6 +58,10 @@
       else { L.box = 0; L.wrong++; }
       S.leitner[qq.id] = L;
     }
+    // XP only ever goes up — a bad session must never feel like losing ground.
+    S.xp += correct ? 10 : 3;
+    S.combo = correct ? S.combo + 1 : 0;
+    try { if (navigator.vibrate) navigator.vibrate(correct ? 18 : [12, 40, 12]); } catch (e) {}
     var st = S.topicStats[topicId] || { attempts: 0, correct: 0 };
     st.attempts++; if (correct) st.correct++;
     S.topicStats[topicId] = st;
@@ -118,12 +125,14 @@
   function nav(name, arg, arg2) {
     if (mockTimer && name !== 'mock-run') { clearInterval(mockTimer); mockTimer = null; }
     window.scrollTo(0, 0);
-    setTab(name === 'topic' || name === 'quiz' ? 'subjects' : (name.indexOf('mock') === 0 ? 'test' : name));
+    setTab(name === 'topic' || name === 'quiz' ? 'subjects' : (name === 'one' || name === 'sprint' ? 'home' : (name.indexOf('mock') === 0 ? 'test' : name)));
     if (name === 'home') return viewHome();
     if (name === 'subjects') return viewSubjects();
     if (name === 'subject') return viewSubject(arg);
     if (name === 'topic') return viewTopic(arg);
     if (name === 'quiz') return viewQuiz(arg, arg2);
+    if (name === 'one') return viewOneQuestion();
+    if (name === 'sprint') return viewSprint();
     if (name === 'test') return viewMockLanding();
     if (name === 'progress') return viewProgress();
     if (name === 'plan') return viewPlan();
@@ -172,9 +181,20 @@
       '<div class="card"><h3>' + esc(plan ? plan.title : 'Grind') +
       (plan && plan.mock ? ' · <span style="color:var(--accent)">Mock day — target ' + plan.target + '/100</span>' : '') + '</h3>' +
       '<div class="hero-day"><span class="hero-num" style="font-size:52px">' + answered + '</span>' +
-      '<span class="hero-of">/' + quota + ' Q</span>' +
-      '<span class="hero-right"><div class="eyebrow" style="margin:0">Phase ' + (plan ? plan.phase : '-') + '</div></span></div>' +
-      '<div class="progress-track"><div class="progress-fill" style="width:' + pct + '%"></div></div></div>';
+      '<span class="hero-of">solved today</span>' +
+      '<span class="hero-right"><span class="n" style="color:var(--accent2)">L' + levelFor(S.xp) + '</span>' +
+      '<div class="eyebrow" style="margin:2px 0 0">' + S.xp + ' XP</div></span></div>' +
+      '<div class="progress-track"><div class="progress-fill" style="width:' + pct + '%"></div></div>' +
+      '<div class="small muted">' + (answered === 0
+        ? 'Nothing yet today. One question is a win — start there.'
+        : (answered >= quota ? 'Full target hit. Anything more is bonus.'
+           : 'Target ' + quota + '. You are moving — keep going.')) + '</div></div>' +
+
+      // The two lowest-friction entry points, placed above everything that asks for effort.
+      '<div class="card"><h3>Low fuel? Start here</h3>' +
+      '<div class="btn-row"><button class="btn good" id="go-one">One question</button>' +
+      '<button class="btn" id="go-sprint">60-second sprint</button></div>' +
+      '<div class="small muted" style="margin-top:8px">No setup, no subject to pick, no way to fail. Best sprint: ' + S.best60 + '.</div></div>';
 
     if (plan) {
       html += '<div class="card"><h3>Today\'s objectives</h3>';
@@ -225,6 +245,10 @@
         var c = S.planChecks[d] || {}; c[cb.getAttribute('data-task')] = cb.checked; S.planChecks[d] = c; save();
       });
     });
+    var g1 = document.getElementById('go-one');
+    if (g1) g1.addEventListener('click', function () { nav('one'); });
+    var g2 = document.getElementById('go-sprint');
+    if (g2) g2.addEventListener('click', function () { nav('sprint'); });
     $view.querySelectorAll('[data-go-subject]').forEach(function (b) {
       b.addEventListener('click', function () { nav('subject', b.getAttribute('data-go-subject')); });
     });
@@ -368,6 +392,26 @@
       function (m, pre, expr) { return pre + '<code>' + expr + '</code>'; });
     return e;
   }
+
+  // Pull one question from the whole bank. Used by the low-friction modes where
+  // choosing a subject is itself the barrier that stops a session starting.
+  function anyQuestion(maxDifficulty) {
+    var pool = [];
+    allTopics().forEach(function (e) {
+      (e.topic.questions || []).forEach(function (q) {
+        if (maxDifficulty === 'easy' && q.difficulty === 'hard') return;
+        pool.push({ q: q, topic: e.topic.id });
+      });
+    });
+    if (!pool.length) return null;
+    // bias toward questions previously answered wrong, then unseen
+    var due = pool.filter(function (r) { var L = S.leitner[r.q.id]; return L && L.box === 0; });
+    var unseen = pool.filter(function (r) { return !S.leitner[r.q.id]; });
+    var bag = (due.length && Math.random() < 0.4) ? due : (unseen.length ? unseen : pool);
+    return bag[Math.floor(Math.random() * bag.length)];
+  }
+
+  function levelFor(xp) { return Math.floor(Math.sqrt(xp / 40)) + 1; }
 
   // ---------- TOPIC (theory) ----------
   function viewTopic(tid) {
@@ -544,6 +588,106 @@
         });
       }
     }
+    ask();
+  }
+
+  // ---------- LOW-FRICTION MODES ----------
+  // The plan screen is a demand. On a low-dopamine day a demand gets avoided, the
+  // streak breaks, and guilt keeps the app closed. These two modes ask for almost
+  // nothing: one tap, no subject choice, no quota, no way to fail.
+
+  // ONE QUESTION: single question, from anywhere, then a genuine exit.
+  function viewOneQuestion() {
+    var rec = anyQuestion();
+    if (!rec) return viewHome();
+    var qq = rec.q;
+    var html = '<button class="back-link" id="back">‹ Today</button>' +
+      '<div class="quiz-meta"><span>One question</span><span>' + esc(qq.difficulty) + '</span></div>' +
+      '<div class="card"><div class="q-text">' + esc(qq.q) + '</div>' + figureHtml(qq) + '<div id="opts">';
+    (qq.options || []).forEach(function (o, i) {
+      html += '<button class="opt" data-i="' + i + '">' + String.fromCharCode(65 + i) + '.  ' + esc(o) + '</button>';
+    });
+    if (!qq.options || !qq.options.length) {
+      html += '<input type="number" step="any" id="one-nat" placeholder="Type your answer" inputmode="decimal">' +
+        '<div class="btn-row"><button class="btn" id="one-go">Check</button></div>';
+    }
+    html += '</div><div id="after"></div></div>';
+    $view.innerHTML = html;
+    document.getElementById('back').addEventListener('click', function () { nav('home'); });
+    function done(ok, chosen) {
+      recordAnswer(qq, ok, rec.topic);
+      $view.querySelectorAll('.opt').forEach(function (bb, j) {
+        bb.disabled = true;
+        if (j === qq.answer) bb.classList.add('correct');
+        else if (j === chosen && !ok) bb.classList.add('wrong');
+      });
+      document.getElementById('after').innerHTML =
+        '<div class="feedback-banner ' + (ok ? 'ok' : 'no') + '">' + (ok ? 'Correct &middot; +10 XP' : 'Wrong &middot; +3 XP for showing up') + '</div>' +
+        '<div class="explain"><b>' + answerLabel(qq) + '</b>\n' + esc(qq.explanation || '') + '</div>' +
+        '<div class="btn-row"><button class="btn" id="one-more">One more</button>' +
+        '<button class="btn ghost" id="one-stop">Done for now</button></div>' +
+        '<p class="muted small" style="margin-top:10px">Stopping here still counts. One question beats zero.</p>';
+      document.getElementById('one-more').addEventListener('click', viewOneQuestion);
+      document.getElementById('one-stop').addEventListener('click', function () { nav('home'); });
+      window.scrollTo(0, 0);
+    }
+    $view.querySelectorAll('.opt').forEach(function (b) {
+      b.addEventListener('click', function () { var i = +b.getAttribute('data-i'); done(i === qq.answer, i); });
+    });
+    var go = document.getElementById('one-go');
+    if (go) go.addEventListener('click', function () { done(natMatches(qq, document.getElementById('one-nat').value), null); });
+  }
+
+  // SPRINT: 60 seconds, easy-to-medium only, chase a personal best. Pure game loop.
+  function viewSprint() {
+    var left = 60, score = 0, answered = 0, timer = null, streak = 0;
+    function finish() {
+      clearInterval(timer); timer = null;
+      var best = score > S.best60;
+      if (best) { S.best60 = score; save(); }
+      $view.innerHTML = '<div class="card"><div class="eyebrow">60-second sprint</div>' +
+        '<div class="hero-day"><span class="hero-num">' + score + '</span><span class="hero-of">correct</span>' +
+        '<span class="hero-right"><span class="n">' + S.best60 + '</span><div class="eyebrow" style="margin:2px 0 0">Best</div></span></div>' +
+        (best ? '<div class="feedback-banner ok">New personal best</div>' : '') +
+        '<p class="muted small">' + answered + ' attempted &middot; +' + (score * 10 + (answered - score) * 3) + ' XP</p>' +
+        '<div class="btn-row"><button class="btn" id="again">Go again</button>' +
+        '<button class="btn ghost" id="stop">Done</button></div></div>';
+      document.getElementById('again').addEventListener('click', viewSprint);
+      document.getElementById('stop').addEventListener('click', function () { nav('home'); });
+    }
+    function ask() {
+      var rec = anyQuestion('easy');
+      if (!rec) return finish();
+      var qq = rec.q;
+      var mm = Math.floor(left / 60), ss = left % 60;
+      var html = '<div class="quiz-meta"><span>Sprint &middot; ' + score + ' correct' +
+        (streak > 2 ? ' &middot; ' + streak + ' in a row' : '') + '</span>' +
+        '<span class="timer">0' + mm + ':' + String(ss).padStart(2, '0') + '</span></div>' +
+        '<div class="card"><div class="q-text">' + esc(qq.q) + '</div>' + figureHtml(qq) + '<div>';
+      (qq.options || []).forEach(function (o, i) {
+        html += '<button class="opt" data-i="' + i + '">' + String.fromCharCode(65 + i) + '.  ' + esc(o) + '</button>';
+      });
+      html += '</div><div class="btn-row"><button class="btn ghost small-btn" id="skip">Skip</button>' +
+        '<button class="btn ghost small-btn" id="quit">End sprint</button></div></div>';
+      $view.innerHTML = html;
+      $view.querySelectorAll('.opt').forEach(function (b) {
+        b.addEventListener('click', function () {
+          var ok = +b.getAttribute('data-i') === qq.answer;
+          answered++; if (ok) { score++; streak++; } else { streak = 0; }
+          recordAnswer(qq, ok, rec.topic);
+          b.classList.add(ok ? 'correct' : 'wrong');
+          setTimeout(function () { if (timer) ask(); }, ok ? 160 : 700);
+        });
+      });
+      document.getElementById('skip').addEventListener('click', ask);
+      document.getElementById('quit').addEventListener('click', finish);
+    }
+    timer = setInterval(function () {
+      left--;
+      if (left <= 0) return finish();
+      var t = document.querySelector('.timer');
+      if (t) t.textContent = '00:' + String(left).padStart(2, '0');
+    }, 1000);
     ask();
   }
 
