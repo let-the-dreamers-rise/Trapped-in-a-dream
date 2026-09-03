@@ -3888,3 +3888,93 @@ Input snippet: intx = integer + 1;
 1. Scan 'intx': the identifier pattern (letter, then letters/digits) matches all five characters 'i','n','t','x' greedily via maximal munch, producing the single lexeme "intx", five characters long - NOT the keyword "int" followed separately by "x", because maximal munch always grabs the longest matching identifier-pattern prefix before stopping, and "intx" as a whole matches the identifier pattern with no interruption (there's no space or symbol splitting the letters).
 2. Since the matched lexeme "intx" (five characters) does NOT exactly equal the reserved word "int" (three characters) in the keyword lookup table, it is classified as a plain ID token, not a keyword - the keyword check only reclassifies an EXACT, WHOLE lexeme match, never a mere prefix or substring match.
 3. Continuing: '=' (ASSIGN), 'integer' (again, checked against the keyword table as a WHOLE seven-character lexeme; assuming "integer" itself is not a listed keyword in this hypothetical language, it too is a plain ID), '+' (OP), '1' (NUM), ';' (PUNCTUATION). This example is the standard GATE trap illustrating that keyword recognition depends entirely on the FULL matched lexeme, never on merely containing a keyword as a substring or prefix.`; })();
+
+(function(){ var t = window.GATE_DATA.questions['compiler'].topics.find(function(t){return t.id==='compiler-parsing';});
+  t.theory.deep = (t.theory.deep||'') + `
+
+FROM ZERO: FOUNDATIONS
+
+• Parsing, plainly. Parsing takes the flat token stream from the lexer and figures out its GRAMMATICAL STRUCTURE according to the language's context-free grammar - the output is a parse tree (or an equivalent internal structure) showing how tokens group into expressions, statements, and larger constructs.
+• Top-down vs bottom-up. A top-down parser starts at the grammar's start symbol and tries to EXPAND it, guessing which production to apply, until the expansion matches the input tokens exactly (like starting from the tree root and growing down to the leaves). A bottom-up parser starts at the actual input tokens (the leaves) and repeatedly RECOGNISES and collapses matched pieces (reduces them) upward until it reaches the start symbol at the root.
+• Lookahead. Lookahead is simply how many upcoming, not-yet-consumed tokens the parser is allowed to peek at before deciding what to do next. LL(1) and LR(1) both mean "using exactly 1 token of lookahead" (the "1" in the name).
+• Item (for LR parsing). An LR item is a production with a dot placed somewhere in its right-hand side, marking how much of that production has been matched so far during a bottom-up scan, e.g. A -> alpha . beta means alpha has already been recognised and beta is still expected next.
+• Handle. A handle is the exact substring on the parsing stack that matches a complete production's right-hand side and is ready to be reduced back to its left-hand-side non-terminal, at exactly the right moment in a correct bottom-up parse.
+
+EVERY EDGE CASE
+
+GATE TRAP: an LL(1) grammar cannot have left recursion (direct or indirect) OR two alternatives sharing a common prefix (needing left factoring) - both must be eliminated first, and they are two DIFFERENT fixes for two DIFFERENT problems (see the CFL topic's worked example for both transformations side by side).
+KEY: SLR(1), LALR(1), and CLR(1) [also called canonical LR(1)] are three bottom-up parsing techniques with STRICTLY increasing parsing power in that order: every SLR(1) grammar is LALR(1), and every LALR(1) grammar is CLR(1), but not conversely - there exist grammars that are LALR(1) but not SLR(1), and grammars that are CLR(1) but not LALR(1).
+GATE TRAP: LALR(1) is built by MERGING CLR(1) states that have identical "core" (identical item sets ignoring lookahead sets) - this merging can occasionally introduce a NEW reduce-reduce conflict that was NOT present in the original CLR(1) table (because the merged state now combines lookahead sets from two formerly-separate states). A shift-reduce conflict, however, can never newly appear purely from this LALR merging step. So: "a conflict exists in the LALR table but not in the CLR table for the same grammar" can genuinely happen, and when it does, it is specifically a reduce-reduce conflict, not a shift-reduce one.
+GATE TRAP: dangling else - the grammar stmt -> if expr then stmt | if expr then stmt else stmt | other is classically AMBIGUOUS, because on seeing "if E1 then if E2 then S1 else S2", the else could attach to EITHER the inner or the outer if. The standard disambiguating convention (and what every real parser generator does by default) is: match each else with the NEAREST unmatched then/if - this is typically enforced not by rewriting the grammar cleanly but by a parser-generator PRECEDENCE DIRECTIVE that resolves the resulting shift-reduce conflict in favour of SHIFT (shifting the else to attach it to the innermost if) rather than reducing early.
+GATE TRAP: a shift-reduce conflict in an LR table is, by long-standing convention, ALWAYS resolved by preferring SHIFT (this is exactly what correctly handles dangling-else and operator-precedence situations by default) - a reduce-reduce conflict has no universal default and must be resolved by rule ordering or grammar redesign, since blindly always choosing "the first-listed rule" can silently produce a parser that accepts the wrong language.
+
+WORKED EXAMPLE 1 - full FIRST/FOLLOW for a grammar with a nullable non-terminal, then build the LL(1) table
+
+Grammar: S -> a A | epsilon is not used here; instead use S -> A B, A -> a | epsilon, B -> b.
+1. FIRST(A) = {a, epsilon} (A can produce terminal a, or vanish to epsilon).
+2. FIRST(B) = {b}.
+3. FIRST(S) = (FIRST(A) minus epsilon) union FIRST(B), since A is nullable = {a, b}.
+4. FOLLOW(S) = {$} (start symbol always gets end-marker).
+5. FOLLOW(A) = FIRST(B) = {b} (A is immediately followed by B in the only production containing it).
+6. FOLLOW(B) = FOLLOW(S) = {$} (B is at the very end of S's production, so it inherits S's own follow set).
+7. LL(1) table entries: M[S, a] = S->AB, M[S,b] = S->AB (since a and b both appear in FIRST(S)); M[A,a] = A->a; M[A,b] = A->epsilon (because b is in FOLLOW(A), and A is nullable, so on seeing a FOLLOW(A) token we apply the epsilon-production); M[B,b] = B->b. No cell has two competing entries, confirming this grammar IS LL(1).
+
+WORKED EXAMPLE 2 - full LR(0) item-set construction (canonical collection) for a tiny grammar
+
+Grammar (augmented): S' -> S, S -> a S | b.
+1. I0 = closure({S' -> .S}): adding S' -> .S forces closure to also add every production for S (since S appears right after a dot): S -> .aS, S -> .b. So I0 = {S'->.S, S->.aS, S->.b}.
+2. GOTO(I0, S) = {S'->S.} - this state, call it I1, has the dot at the very end of S'->S, meaning "accept" (this is the accepting item for the augmented start production).
+3. GOTO(I0, a) = closure({S->a.S}) - the dot follows a, and since a non-terminal S is right after the dot, closure re-adds S's own productions: {S->a.S, S->.aS, S->.b}. Call this I2.
+4. GOTO(I0, b) = closure({S->b.}) = {S->b.} (dot at the end, a pure reduce item). Call this I3.
+5. GOTO(I2, S) = {S->aS.} (dot at the end, reduce item) - call this I4. GOTO(I2, a) = I2 itself (self-loop, same closure as step 3 recomputed identically). GOTO(I2, b) = I3 (identical closure to step 4).
+6. Final states: I0 (start), I1 (accept on S), I2 (after reading one a, expects another S), I3 (reduce S->b), I4 (reduce S->aS). This five-state machine is the complete LR(0) automaton, and every entry in the SLR/LALR/CLR parsing table is read directly off which state you are in and which item(s) that state contains.
+
+WORKED EXAMPLE 3 - resolving the dangling-else shift-reduce conflict explicitly
+
+Grammar: stmt -> if expr then stmt else stmt | if expr then stmt | other. Consider the LR state reached after parsing "if E then S" with lookahead "else" available.
+1. In this state, the item if-expr-then-stmt-else-stmt-in-progress calls for a SHIFT of the else token (continuing to try to match the longer else-containing alternative).
+2. Simultaneously, the item if-expr-then-stmt (the shorter, already-complete alternative) calls for a REDUCE right here, since "if expr then stmt" is itself a complete, valid stmt production body once nothing else follows it.
+3. Both actions are legal in the same state with the same lookahead token else - this IS the shift-reduce conflict, occurring precisely at the else token. Standard parser generators resolve it by defaulting to SHIFT, which has the effect of extending the match to consume the else and attach it to the NEAREST enclosing if - exactly matching the universally expected dangling-else semantics, achieved without rewriting the ambiguous grammar at all, purely through this one default conflict-resolution rule.`; })();
+
+(function(){ var t = window.GATE_DATA.questions['compiler'].topics.find(function(t){return t.id==='compiler-sdt';});
+  t.theory.deep = (t.theory.deep||'') + `
+
+FROM ZERO: FOUNDATIONS
+
+• Syntax-directed definition (SDD), plainly. An SDD attaches ATTRIBUTES (extra pieces of information, like a computed value or a type) to grammar symbols, and attaches SEMANTIC RULES to each production telling how to compute one symbol's attributes from other symbols' attributes in that same production. It is a high-level specification, not tied to any particular evaluation order.
+• Synthesized attribute. A synthesized attribute at a non-terminal is computed purely from the attributes of its CHILDREN in the parse tree (information flows UP the tree, from leaves toward the root) - e.g. an expression node's computed numeric value, built from its sub-expressions' values.
+• Inherited attribute. An inherited attribute at a non-terminal is computed from the attributes of its PARENT and/or its SIBLINGS in the parse tree (information flows DOWN or SIDEWAYS) - e.g. passing a variable's declared type down into the specific place it is used, or passing a running left-to-right position down across sibling symbols.
+• Syntax-directed translation scheme (SDT). An SDT is the same idea as an SDD but made concrete for execution: semantic actions (bits of code, written in curly braces) are embedded directly INSIDE the production bodies at specific positions, specifying exactly WHEN during parsing each action runs.
+• Dependency graph. A dependency graph draws one node per attribute instance in a specific parse tree and one edge from attribute X to attribute Y whenever Y's computation rule directly needs X's value - this graph must have NO CYCLES for the attributes to be computable at all (a cycle would mean an attribute depends on itself, directly or indirectly).
+
+EVERY EDGE CASE
+
+GATE TRAP: S-attributed (only synthesized attributes, no inherited ones at all) SDDs can ALWAYS be evaluated during a purely bottom-up (LR) parse, attaching the semantic action at the END of each production (evaluated exactly when that production is reduced) - this is the easiest, most implementation-friendly case.
+GATE TRAP: L-attributed SDDs (a broader class allowing inherited attributes, but ONLY ones that depend on attributes from the LEFT: the parent, or LEFT siblings already processed, never a RIGHT sibling not yet seen) can be evaluated during a single left-to-right depth-first tree walk, and specifically fit cleanly into predictive top-down (LL) parsing, where semantic actions can be interspersed within the production body at the position matching what information is available at that point.
+GATE TRAP: NOT every SDD with inherited attributes is automatically L-attributed - an inherited attribute at a symbol that depends on a sibling appearing to its RIGHT in the same production body breaks the L-attributed restriction (that dependency would require information not yet available in a strict left-to-right pass), forcing a more general (and more complex) evaluation strategy, or a rewritten grammar/attribute scheme.
+GATE TRAP: a dependency graph with a CYCLE means the SDD, as written, is simply not evaluable at all on that parse tree - no evaluation order exists that could compute every attribute, since some attribute would need its own not-yet-computed value. This is a genuine design error in the SDD, not just an inconvenience, and GATE loves drawing a small dependency graph and asking you to spot the cycle.
+KEY: annotated parse tree = a parse tree with every attribute's actual COMPUTED VALUE written next to its node - the standard way GATE asks you to "evaluate" an SDD on a specific input string, working attribute-by-attribute according to the dependency graph's valid order.
+
+WORKED EXAMPLE 1 - full synthesized-attribute evaluation for arithmetic expression grammar
+
+Grammar with synthesized attribute val: E -> E1 + T { E.val = E1.val + T.val }, E -> T { E.val = T.val }, T -> T1 * F { T.val = T1.val * F.val }, T -> F { T.val = F.val }, F -> digit { F.val = digit.lexval }. Evaluate on input 2+3*4.
+1. Parse tree bottom level: F.val = 2 (from digit lexval 2), F.val = 3, F.val = 4 - three separate F nodes for the three digit occurrences.
+2. T -> F for the first F (value 2): T.val = 2. Separately, the second T is built from T1 -> F (value 3) times F (value 4) via T -> T1 * F: T.val = T1.val * F.val = 3 * 4 = 12.
+3. E -> E1 + T where E1 reduces down to T -> F (value 2, so E1.val = 2 via E->T), and the second T just computed has val 12: E.val = E1.val + T.val = 2 + 12 = 14.
+4. Final answer: E.val = 14 - correctly respecting operator precedence (multiplication grouped tighter than addition) purely because of how the GRAMMAR itself is structured (T handles * before E handles +), not because of any special-cased precedence logic in the semantic rules.
+
+WORKED EXAMPLE 2 - L-attributed inherited-attribute evaluation for declarations
+
+Grammar distributing a declared type across a list of identifiers: D -> T L, T -> int { T.type = int } | float { T.type = float }, L -> L1 , id { L1.inh = L.inh; addtype(id.entry, L.inh) } | id { addtype(id.entry, L.inh) }, with L.inh inherited from D -> T L via the rule { L.inh = T.type }. Evaluate on: float x , y , z.
+1. T reduces from 'float', giving T.type = float.
+2. D -> T L passes down L.inh = T.type = float to the top-level L (which spans "x , y , z").
+3. That L is built as L -> L1 , id (matching ", z" at the outermost level), so L1.inh = L.inh = float is passed down to the L1 covering "x , y", and addtype(z.entry, float) records z's type immediately.
+4. Recursing: L1 -> L2 , id (matching ", y"), so L2.inh = L1.inh = float, and addtype(y.entry, float) is called.
+5. Finally L2 -> id (just "x"), so addtype(x.entry, float) is called using L2.inh = float. All three identifiers x, y, z get type float recorded, and note the inherited attribute flows strictly LEFTWARD/DOWNWARD (parent-to-child, same value threaded through each recursive L level) - exactly the L-attributed pattern.
+
+WORKED EXAMPLE 3 - detecting a genuine dependency-graph cycle
+
+Suppose (as a deliberately broken SDD) a production A -> B C carries the rules: B.inh = C.syn (B's inherited attribute needs C's synthesized attribute) and C.inh = B.syn (C's inherited attribute needs B's synthesized attribute), while additionally B.syn depends on B.inh, and C.syn depends on C.inh.
+1. Draw the edges: B.inh <- C.syn, C.syn <- C.inh, C.inh <- B.syn, B.syn <- B.inh.
+2. Trace the cycle: start at B.inh, follow to C.syn, follow to C.inh, follow to B.syn, follow back to B.inh - this is a complete cycle of four dependency edges returning to the starting attribute.
+3. Conclusion: this SDD has NO valid evaluation order at all (every one of these four attributes transitively depends on itself), so it must be rejected/redesigned - this is exactly the kind of small four-node graph GATE draws and asks "can this SDD be evaluated on any parse tree", expecting the answer no, with a cycle identified as the reason.`; })();
