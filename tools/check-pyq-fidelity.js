@@ -21,6 +21,11 @@
 // those back, so a faithful transcription scores zero against them. Verified by
 // hand for the 2014 papers; both were genuine.
 //
+// Questions RECOVERED from the page images score low here by construction: they
+// were read off the rendered page precisely because the extracted text for them
+// was garbage, so there is nothing in the haystack for them to match. A paper
+// mean that drops after a recovery pass is expected, not a regression.
+//
 // Usage:  node tools/check-pyq-fidelity.js [gate2019]
 
 var fs = require('fs');
