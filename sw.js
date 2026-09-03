@@ -1,5 +1,5 @@
 // Offline cache — the whole app works with zero network after first load.
-var CACHE = 'gate-r1-v17';
+var CACHE = 'gate-r1-v18';
 var ASSETS = [
   './', './index.html', './css/style.css', './js/app.js', './js/generators.js',
   './data/plan90.js', './data/astro.js', './icon.svg', './manifest.webmanifest',
@@ -22,6 +22,7 @@ ASSETS = ASSETS.concat([
   './data/chapters/os-virtual-memory.js',
   './data/chapters/pds-c-basics.js',
   './data/chapters/pds-graphs-rep.js',
+  './data/chapters/pds-hashing.js',
   './data/chapters/pds-heaps.js',
   './data/chapters/pds-linked-lists.js',
   './data/chapters/pds-pointers.js',
