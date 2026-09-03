@@ -138,7 +138,7 @@
   function nav(name, arg, arg2) {
     if (mockTimer && name !== 'mock-run') { clearInterval(mockTimer); mockTimer = null; }
     window.scrollTo(0, 0);
-    setTab(name === 'topic' || name === 'quiz' ? 'subjects' : (name === 'one' || name === 'sprint' || name === 'challenge' ? 'home' : (name === 'badges' ? 'progress' : (name.indexOf('mock') === 0 ? 'test' : name))));
+    setTab(name === 'topic' || name === 'quiz' ? 'subjects' : (name === 'one' || name === 'sprint' || name === 'challenge' ? 'home' : (name === 'badges' ? 'progress' : (name.indexOf('mock') === 0 || name.indexOf('pyq') === 0 ? 'test' : name))));
     if (name === 'home') return viewHome();
     if (name === 'subjects') return viewSubjects();
     if (name === 'subject') return viewSubject(arg);
@@ -148,6 +148,8 @@
     if (name === 'sprint') return viewSprint();
     if (name === 'challenge') return viewChallenge();
     if (name === 'badges') return viewBadges();
+    if (name === 'pyq') return viewPyqList();
+    if (name === 'pyqpaper') return viewPyqPaper(arg);
     if (name === 'test') return viewMockLanding();
     if (name === 'progress') return viewProgress();
     if (name === 'plan') return viewPlan();
@@ -883,6 +885,8 @@
       html += '<div class="btn-row"><button class="btn good" id="start-mock">Start mock now</button></div>';
     }
     html += '</div>';
+    html += '<div class="list-item" id="open-pyq"><div class="grow"><div class="title">Real past-year papers</div>' +
+      '<div class="muted small">' + ((DATA.pyq || []).length) + ' loaded &middot; actual GATE papers, by year</div></div><span class="arrow">›</span></div>';
     if (S.mocks.length) {
       html += '<div class="card"><h3>Your mock history</h3>';
       S.mocks.slice().reverse().forEach(function (m) {
@@ -891,6 +895,8 @@
       html += '<p class="muted small">Curve to beat: 50 by Day 30 · 70 by Day 60 · 90 by Day 85.</p></div>';
     }
     $view.innerHTML = html;
+    var op = document.getElementById('open-pyq');
+    if (op) op.addEventListener('click', function () { nav('pyq'); });
     var sm = document.getElementById('start-mock');
     if (sm) sm.addEventListener('click', runMock);
     var um = document.getElementById('unlock-mock');
@@ -1018,6 +1024,105 @@
       var t = document.querySelector('.timer');
       if (t) { var h = Math.floor(seconds / 3600), m = Math.floor(seconds % 3600 / 60), s = seconds % 60; t.textContent = [h, m, s].map(function (x) { return String(x).padStart(2, '0'); }).join(':'); }
     }, 1000);
+    draw();
+  }
+
+  // ---------- REAL PAST-YEAR PAPERS ----------
+  // Kept separate from the practice bank: these are transcribed from actual papers,
+  // so the app can honestly label them by year. Empty until papers are imported.
+  function pyqPapers() { return (DATA.pyq || []).slice().sort(function (a, b) { return b.year - a.year; }); }
+
+  function viewPyqList() {
+    var papers = pyqPapers();
+    var html = '<button class="back-link" id="back">‹ Mock</button>' +
+      '<div class="card"><div class="eyebrow">Real past-year papers</div>' +
+      '<h2>' + papers.length + ' paper' + (papers.length === 1 ? '' : 's') + ' loaded</h2>';
+    if (!papers.length) {
+      html += '<p class="muted small">No real papers imported yet. Everything in the Study tab is ' +
+        'practice material written to match GATE patterns &mdash; good training, but not actual exam questions.\n\n' +
+        'To add real ones: download the official GATE CS papers (free), send the PDFs to Claude, ' +
+        'and they get transcribed into this section with their true year and the official answer key.</p></div>';
+    } else {
+      html += '</div>';
+      papers.forEach(function (p) {
+        var log = (S.pyqLog || {})[p.year + '-' + p.paper] || {};
+        html += '<div class="list-item" data-pyq="' + p.year + '-' + p.paper + '"><div class="grow">' +
+          '<div class="title">GATE ' + p.year + ' &middot; ' + esc(p.paper) + '</div>' +
+          '<div class="muted small">' + p.questions.length + ' questions' +
+          (log.score !== undefined ? ' &middot; your score ' + log.score : ' &middot; not attempted') + '</div></div>' +
+          '<span class="arrow">›</span></div>';
+      });
+    }
+    $view.innerHTML = html;
+    document.getElementById('back').addEventListener('click', function () { nav('test'); });
+    $view.querySelectorAll('[data-pyq]').forEach(function (el) {
+      el.addEventListener('click', function () { nav('pyqpaper', el.getAttribute('data-pyq')); });
+    });
+  }
+
+  function viewPyqPaper(key) {
+    var papers = pyqPapers();
+    var paper = null;
+    papers.forEach(function (p) { if (p.year + '-' + p.paper === key) paper = p; });
+    if (!paper) return viewPyqList();
+    var idx = 0, answers = {};
+    function draw() {
+      var it = paper.questions[idx];
+      var kind = qKind(it);
+      var html = '<div class="quiz-meta"><span>GATE ' + paper.year + ' &middot; Q' + (it.n || idx + 1) +
+        '/' + paper.questions.length + '</span><span class="pill">' + it.marks + ' mark' + (it.marks > 1 ? 's' : '') + '</span></div>' +
+        '<div class="card"><div class="q-text">' + esc(it.q) + '</div>' + figureHtml(it) + '<div>';
+      if (kind === 'nat') {
+        html += '<input type="number" step="any" id="pyq-nat" inputmode="decimal" placeholder="Numerical answer" value="' + (answers[idx] !== undefined ? esc(answers[idx]) : '') + '">';
+      } else {
+        (it.options || []).forEach(function (o, i) {
+          var sel = kind === 'msq' ? (Array.isArray(answers[idx]) && answers[idx].indexOf(i) >= 0) : answers[idx] === i;
+          html += '<button class="opt" data-i="' + i + '" style="' + (sel ? 'border-color:var(--accent)' : '') + '">' + String.fromCharCode(65 + i) + '.  ' + esc(o) + '</button>';
+        });
+      }
+      html += '</div></div><div class="btn-row">' +
+        '<button class="btn ghost" id="prev" ' + (idx === 0 ? 'disabled' : '') + '>‹ Prev</button>' +
+        (idx < paper.questions.length - 1 ? '<button class="btn" id="next">Next ›</button>'
+          : '<button class="btn good" id="submit">Submit paper</button>') + '</div>' +
+        '<div class="btn-row"><button class="btn ghost small-btn" id="exit">Leave</button></div>';
+      $view.innerHTML = html;
+      $view.querySelectorAll('.opt').forEach(function (b) {
+        b.addEventListener('click', function () {
+          var i = +b.getAttribute('data-i');
+          if (kind === 'msq') {
+            var cur = Array.isArray(answers[idx]) ? answers[idx].slice() : [];
+            var at = cur.indexOf(i); if (at >= 0) cur.splice(at, 1); else cur.push(i);
+            if (cur.length) answers[idx] = cur; else delete answers[idx];
+          } else answers[idx] = i;
+          draw();
+        });
+      });
+      var nat = document.getElementById('pyq-nat');
+      if (nat) nat.addEventListener('input', function () { if (nat.value === '') delete answers[idx]; else answers[idx] = nat.value; });
+      var el;
+      if ((el = document.getElementById('prev'))) el.addEventListener('click', function () { idx--; draw(); });
+      if ((el = document.getElementById('next'))) el.addEventListener('click', function () { idx++; draw(); });
+      if ((el = document.getElementById('exit'))) el.addEventListener('click', viewPyqList);
+      if ((el = document.getElementById('submit'))) el.addEventListener('click', finish);
+    }
+    function finish() {
+      var score = 0, correct = 0;
+      paper.questions.forEach(function (it, i) {
+        var a = answers[i]; if (a === undefined) return;
+        var kind = qKind(it);
+        var ok = kind === 'nat' ? natMatches(it, a) : kind === 'msq' ? msqMatches(it, a) : a === it.answer;
+        if (ok) { score += it.marks; correct++; } else if (kind === 'mcq') score -= it.marks / 3;
+      });
+      score = Math.round(score * 100) / 100;
+      S.pyqLog = S.pyqLog || {};
+      S.pyqLog[paper.year + '-' + paper.paper] = { score: score, correct: correct, when: Date.now() };
+      save();
+      $view.innerHTML = '<div class="card"><div class="eyebrow">GATE ' + paper.year + ' &middot; real paper</div>' +
+        '<div class="hero-day"><span class="hero-num">' + score + '</span><span class="hero-of">marks</span></div>' +
+        '<p class="muted small">' + correct + ' correct out of ' + paper.questions.length + '</p>' +
+        '<div class="btn-row"><button class="btn" id="back2">Back to papers</button></div></div>';
+      document.getElementById('back2').addEventListener('click', viewPyqList);
+    }
     draw();
   }
 
