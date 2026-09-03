@@ -3387,3 +3387,48 @@ window.GATE_DATA.questions['toc'].topics.find(function(t){return t.id==='toc-hie
   t.theory.core = t.theory.core.replace('Chomsky\'s four types are defined by restrictions', '[[FIG:chomsky-rings]]\n\nChomsky\'s four types are defined by restrictions'); })();
 (function(){ var t = window.GATE_DATA.questions['toc'].topics.find(function(t){return t.id==='toc-hierarchy';});
   t.theory.core = t.theory.core.replace('The containment chain.', '[[FIG:containment-chain]]\n\nThe containment chain.'); })();
+
+(function(){ var t = window.GATE_DATA.questions['toc'].topics.find(function(t){return t.id==='toc-regular';});
+  t.theory.deep = (t.theory.deep||'') + `
+
+FROM ZERO: FOUNDATIONS
+
+• Alphabet. An alphabet (written Sigma) is just a finite, non-empty set of symbols you agree to use, like {0,1} or {a,b}. Nothing more mystical than the set of letters you are allowed to write with.
+• String. A string (or word) is a finite sequence of symbols from Sigma, written by just juxtaposing them: 011 is a string over {0,1}. The empty string, written epsilon, is the unique string of length 0 - it contains no symbols at all, but it is still a perfectly valid string.
+• Language. A language is simply a SET of strings over some alphabet - nothing about grammar or meaning, purely set membership. L = {0, 00, 000} is a language; so is Sigma* (the set of ALL possible strings over Sigma, including epsilon); so is the empty set {} (a language with zero strings in it).
+• State. A state is a snapshot of "how much of the pattern-so-far has been recognised" - think of it as a labelled box the machine can be sitting in at any instant. A finite automaton has finitely many such boxes, and that finiteness is the entire reason regular languages are limited (no box can count arbitrarily high).
+• Transition. A transition is simply a rule "if you are in box X and you read symbol s, move to box Y". A DFA (deterministic finite automaton) has EXACTLY one transition per state per input symbol - no choices, no gaps (a complete DFA has a transition drawn for every symbol from every state, using a dead state if needed). An NFA (nondeterministic finite automaton) is allowed zero, one, or many transitions for a given state-symbol pair, and may additionally have epsilon-transitions: moves the machine can take WITHOUT consuming any input symbol at all, purely by choice.
+
+EVERY EDGE CASE
+
+GATE TRAP: epsilon (the empty STRING, length 0) is completely different from the empty LANGUAGE {} (a set containing zero strings). A DFA can easily accept the language {epsilon} (just accept at the start state on no further input) while a machine accepting the empty language {} has no accepting state reachable at all - these are two entirely different concepts that examiners deliberately swap in wording.
+GATE TRAP: a dead state (a non-accepting state from which no accepting state is ever reachable, on any input) is still a REAL, necessary state that must be counted in "minimum number of states" questions. Forgetting the dead/trap state and undercounting by one is one of the single most common GATE numerical-answer errors (see Q11 above).
+GATE TRAP: an unreachable state (one the start state can never reach on any input string) must be DELETED before minimizing - unreachable states are never merged with anything, they are simply removed, and failing to prune them first can make the table-filling method give wrong distinguishability results.
+GATE TRAP: epsilon-transitions exist ONLY in NFA definitions (specifically NFA-epsilon); a DFA by definition never has them - if a diagram claims to be a "DFA" but shows an epsilon-labelled arrow, the diagram is self-contradictory and any question built on it should be answered using NFA rules.
+KEY: NFA and DFA are equal in EXPRESSIVE POWER (every NFA has an equivalent DFA and vice versa) but NOT equal in SIZE - subset construction can blow an n-state NFA up to 2^n DFA states, and this bound is tight (achieved, not just an upper limit) for specific witness languages.
+
+WORKED EXAMPLE 1 - full subset construction
+
+Let the NFA have states {q0, q1, q2}, alphabet {a,b}, start q0, accepting {q2}, and transitions: q0 --a--> q0, q0 --a--> q1, q0 --b--> q0, q1 --b--> q2 (this NFA guesses when the "second-to-last-a" pattern a?b starts; it recognises strings ending in ab).
+1. Start set: {q0} (epsilon-closure of the start state; no epsilon moves here so it's just {q0}).
+2. From {q0} on a: NFA moves q0->q0 and q0->q1, so the new DFA state is {q0,q1}. From {q0} on b: only q0->q0, so stay at {q0}.
+3. From {q0,q1} on a: q0 contributes {q0,q1} again (q0->q0, q0->q1); q1 has no a-transition. Union = {q0,q1}. From {q0,q1} on b: q0->q0 and q1->q2, giving {q0,q2}.
+4. From {q0,q2} on a: only q0 contributes, giving {q0,q1} (q2 is dead-end here, contributes nothing). From {q0,q2} on b: q0->q0, q2 has no transition, giving {q0} - but since q2 was in the set, this DFA state {q0,q2} IS accepting (contains q2).
+5. Final DFA states: {q0} (start), {q0,q1}, {q0,q2} (accepting). All three are reachable, and this matches the informal expectation for "ends in ab": 3 states.
+
+WORKED EXAMPLE 2 - table-filling minimization
+
+DFA over {0,1}: states A(start),B,C,D; D is a dead/trap state. F = {C}. Transitions: A-0->B, A-1->A; B-0->B, B-1->C; C-0->B, C-1->A; suppose D never appears reachable in this particular machine (already pruned).
+1. Mark all pairs (X,Y) where exactly one of X,Y is accepting: (A,C), (B,C) get marked distinguishable immediately (C is accepting, A and B are not).
+2. Check the unmarked pair (A,B): on symbol 0, A goes to B and B goes to B - both land in the SAME state, no info yet. On symbol 1, A goes to A and B goes to C - and (A,C) is ALREADY marked distinguishable, so (A,B) must also be marked distinguishable (their 1-successors are distinguishable).
+3. No pairs remain unmarked, so all three states A, B, C are pairwise distinguishable - the DFA is already minimal with 3 states. (If any pair had survived every round unmarked, those two states would be merged into one.)
+
+WORKED EXAMPLE 3 - pumping lemma proof that {a^n b^n : n>=0} is not regular
+
+1. Assume for contradiction that L = {a^n b^n} is regular; let p be its pumping length (guaranteed to exist by the lemma).
+2. Choose w = a^p b^p (this is in L and has length 2p >= p, satisfying the lemma's precondition).
+3. The lemma guarantees a split w = xyz with |xy| <= p, |y| >= 1. Since |xy| <= p and the first p symbols of w are all a's, xy must consist ENTIRELY of a's, so y = a^k for some k >= 1.
+4. Pump with i=2: xy^2z = a^(p+k) b^p. This string has MORE a's than b's (p+k versus p, and k >= 1), so it is NOT in L.
+5. This contradicts the pumping lemma's guarantee that xy^iz must remain in L for every i>=0. Contradiction means the assumption was false: L is not regular. This exact five-step template (assume regular, pick w depending on p, note the forced position of y, choose a convenient i, derive a contradiction) is the one to reuse on every pumping-lemma question.
+
+REMEMBER: the pumping lemma proof ALWAYS gets to CHOOSE w (after p is fixed by the adversary) and gets to CHOOSE i, but has NO control over exactly where xy splits inside w beyond the constraints |xy|<=p and |y|>=1 - the proof must work for every possible legal split the adversary picks, which is why w is chosen so that any valid split is forced into a predictable region (like "all a's" above).`; })();
