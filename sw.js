@@ -1,5 +1,5 @@
 // Offline cache — the whole app works with zero network after first load.
-var CACHE = 'gate-r1-v10';
+var CACHE = 'gate-r1-v11';
 var ASSETS = [
   './', './index.html', './css/style.css', './js/app.js', './js/generators.js',
   './data/plan90.js', './data/astro.js', './icon.svg', './manifest.webmanifest',
@@ -10,7 +10,9 @@ var ASSETS = [
 ];
 // CHAPTERS:START
 ASSETS = ASSETS.concat([
-  './data/chapters/os-processes.js'
+  './data/chapters/os-memory.js',
+  './data/chapters/os-processes.js',
+  './data/chapters/os-sync.js'
 ]);
 // CHAPTERS:END
 // PYQ:START
