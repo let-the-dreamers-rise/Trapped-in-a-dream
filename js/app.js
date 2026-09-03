@@ -319,6 +319,28 @@
       }
 
       closeList();
+
+      // Traps / gotchas get a red warning card — these are the marks people lose.
+      if (/^(GATE TRAP|TRAP|WARNING|CAUTION|COMMON MISTAKE|PITFALL)S?\b[:.\-]/i.test(line)) {
+        out.push('<div class="th-trap">' + inlineTheory(line.replace(/^[^:.\-]*[:.\-]\s*/, '')) + '</div>');
+        return;
+      }
+      // Remember-this lines get a teal key card.
+      if (/^(KEY|REMEMBER|NOTE|SHORTCUT|EXAM TIP|RULE OF THUMB|FAST ROUTE)\b[:.\-]/i.test(line)) {
+        out.push('<div class="th-key">' + inlineTheory(line.replace(/^[^:.\-]*[:.\-]\s*/, '')) + '</div>');
+        return;
+      }
+      // A line that is essentially one formula becomes a display block.
+      if (line.length < 90 && /=/.test(line) && !/[.!?]\s/.test(line) && /[0-9()^*\/+\-]/.test(line)) {
+        out.push('<div class="th-formula">' + esc(line) + '</div>');
+        return;
+      }
+      // Numbered steps get a step chip.
+      var step = line.match(/^(\d{1,2})[.)]\s+(.*)$/);
+      if (step) {
+        out.push('<div class="th-step"><span class="th-num">' + step[1] + '</span><span>' + inlineTheory(step[2]) + '</span></div>');
+        return;
+      }
       // "Lead-in term. Rest of the paragraph" — bold the lead-in.
       var lead = line.match(/^([A-Z][^.]{2,48})\.\s+(.*)$/);
       if (lead && lead[2].length > 20) {

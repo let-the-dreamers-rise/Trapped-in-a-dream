@@ -174,3 +174,34 @@ input[type=date], input[type=number], select, textarea { background: none; color
   margin-top: 10px; font-size: 11px; font-weight: 800; letter-spacing: .1em;
   text-transform: uppercase; color: var(--muted); text-align: left;
 }
+
+/* ---- ADHD-friendly theory decoration: visual anchors so the eye can rest and
+       resume without re-reading. Each device means one specific thing. ---- */
+.theory-body .th-trap {
+  border-left: 4px solid var(--accent); background: rgba(236,48,19,.09);
+  padding: 12px 14px; margin: 14px 0; font-size: 14.5px; line-height: 1.55;
+}
+.theory-body .th-trap::before {
+  content: 'Trap'; display: block; font-size: 9px; font-weight: 800;
+  letter-spacing: .16em; text-transform: uppercase; color: var(--accent); margin-bottom: 5px;
+}
+.theory-body .th-key {
+  border-left: 4px solid var(--accent2); background: rgba(53,208,186,.09);
+  padding: 12px 14px; margin: 14px 0; font-size: 14.5px; line-height: 1.55;
+}
+.theory-body .th-key::before {
+  content: 'Remember'; display: block; font-size: 9px; font-weight: 800;
+  letter-spacing: .16em; text-transform: uppercase; color: var(--accent2); margin-bottom: 5px;
+}
+.theory-body .th-formula {
+  font-family: ui-monospace, Menlo, Consolas, monospace; font-size: 14px;
+  background: var(--card2); border: 1px solid var(--faint); padding: 12px 14px;
+  margin: 12px 0; text-align: center; color: var(--text); overflow-x: auto;
+}
+.theory-body .th-step { display: flex; gap: 11px; align-items: flex-start; margin: 0 0 10px; }
+.theory-body .th-step .th-num {
+  flex: none; width: 22px; height: 22px; background: var(--accent); color: #fff;
+  font-size: 11px; font-weight: 800; display: flex; align-items: center;
+  justify-content: center; margin-top: 1px;
+}
+.theory-body .th-step span:last-child { font-size: 15px; line-height: 1.55; color: rgba(243,242,242,.88); }
