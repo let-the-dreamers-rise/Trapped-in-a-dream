@@ -3837,3 +3837,54 @@ window.GATE_DATA.questions['compiler'].topics.find(function(t){return t.id==='co
   explanation: "Scan left to right: 'while' is a keyword token (1). '(' is a punctuation token (2). 'i' is an identifier (3). '<' is a standalone relational operator - the following character '1' (a digit) does not extend it into any valid compound operator (there is no '<1' pattern), so it stands alone as a single '<' token (4). '10' is a single maximal-munch number token, combining both digits (5). ')' is a punctuation token (6). 'i' is an identifier (7). '=' is a standalone assignment operator, since the following character 'i' cannot extend it into any compound form (8). 'i' is an identifier (9). '+' is a standalone operator, since the following character '1' does not extend it into any compound operator like '++' or '+=' (10). '1' is a number token (11). ';' is a punctuation token (12). Total: while, (, i, <, 10, ), i, =, i, +, 1, ; - exactly 12 tokens. This example reinforces that a comparison/arithmetic operator immediately followed by a digit (as in '<10' or '+1') does NOT get glued to that digit into one combined lexeme - the operator and the following number are always two entirely separate tokens, since operator-symbol patterns and number patterns never overlap or merge under standard maximal munch."
 }
 );
+
+(function(){ var t = window.GATE_DATA.questions['compiler'].topics.find(function(t){return t.id==='compiler-lexical';});
+  t.theory.deep = (t.theory.deep||'') + `
+
+FROM ZERO: FOUNDATIONS
+
+• Source program as characters. Before any compiler phase runs, a program is nothing but a raw sequence of characters (letters, digits, spaces, punctuation) - the lexer's entire job is to be the FIRST piece of code that imposes any structure on that raw character stream at all.
+• Token, lexeme, pattern - the three-layer idea. A pattern is a rule (usually a regular expression) describing a whole CLASS of acceptable spellings, e.g. the pattern for identifiers might be "a letter followed by any number of letters/digits". A lexeme is one actual matched piece of text pulled straight from the source, e.g. the specific text "count1". A token is the abstract category label handed to the parser, e.g. ID, paired with an attribute value (often a pointer into the symbol table) that remembers which lexeme it actually was.
+• Symbol table. A symbol table is simply a lookup data structure (often a hash table) mapping each identifier's spelling to information about it (its type, scope, memory location). The lexer typically inserts new identifiers into it as they are first seen.
+• Maximal munch (longest match rule). When several prefixes of the remaining input could all validly form a token, the lexer always takes the LONGEST one that still matches some pattern - e.g. seeing the characters < and = in a row, it forms the single token <= rather than the token < followed separately by =.
+
+EVERY EDGE CASE
+
+GATE TRAP: an operator symbol immediately followed by a digit or letter that could START a different token does NOT get glued onto that following token - e.g. in i<10, the < stands alone (there is no such compound token as "<1"), while in i<=10 the <= DOES combine because <= is itself a valid, longer token pattern. Maximal munch only combines characters into ONE token when a longer matching pattern actually exists for that exact combination.
+GATE TRAP: whitespace and comments are typically consumed and DISCARDED by the lexer - they generate NO tokens at all (not even a special "whitespace token" in most designs), though they do still serve as token separators (e.g. distinguishing "in t" as two tokens "in" and "t" versus "int" as one keyword token).
+GATE TRAP: identifying whether a bracket/parenthesis stream is correctly balanced and nested is NOT a lexical-analysis task, even though brackets are individual tokens - checking balance requires unbounded matching across the whole token stream, which is a parsing (syntax analysis) job handled by the context-free grammar and its stack, not something a finite-state, single-token-at-a-time scanner can do.
+KEY: a lexeme with LEADING zeros or unusual but still pattern-matching spelling is still one valid lexeme of its token class (e.g. "007" is still one NUM token) - the lexer does not judge semantic validity or "sensible" values, only pattern shape.
+KEY: keywords are typically recognised by first matching the general identifier pattern, and then doing a SEPARATE lookup in a fixed reserved-word table to reclassify matches like "while", "if", "int" as their own specific keyword tokens rather than as generic ID tokens - this order (match as identifier pattern first, then filter) is the standard implementation technique asked about conceptually.
+GATE TRAP: an unrecognised character sequence that matches NO valid pattern at all (a lexical error, e.g. a stray @ symbol where the language grammar never uses one) is reported and typically the lexer attempts error recovery by skipping characters and resuming, rather than the whole compilation immediately halting - lexical errors are usually the most localised and recoverable of all compiler error types.
+
+WORKED EXAMPLE 1 - full token count for a complete statement
+
+Input: if(x>=5)y=x*2;
+1. 'if' - matches the reserved keyword pattern exactly (not left as generic ID since 'if' is in the keyword table) -> KEYWORD token (1).
+2. '(' -> PUNCTUATION token (2).
+3. 'x' -> ID token (3).
+4. '>=' - maximal munch: '>' alone COULD be a token, but the next character '=' extends it into the longer valid pattern '>=', so the longer match wins -> RELOP token (4).
+5. '5' -> NUM token (5).
+6. ')' -> PUNCTUATION token (6).
+7. 'y' -> ID token (7).
+8. '=' - maximal munch check: the next character is 'x', which cannot extend '=' into any longer valid operator (there is no '=x' pattern), so '=' stands alone -> ASSIGN token (8).
+9. 'x' -> ID token (9).
+10. '*' - next character is '2', no compound '*2' pattern exists, so '*' stands alone -> OP token (10).
+11. '2' -> NUM token (11).
+12. ';' -> PUNCTUATION token (12).
+Total: 12 tokens. This step-by-step "check the very next character for a longer valid pattern before finalising each token" discipline is exactly how every GATE token-counting numerical should be worked.
+
+WORKED EXAMPLE 2 - designing a regular-expression-based scanner rule set
+
+Task: define patterns recognising identifiers, unsigned integers, and the three operators +, ++, +=.
+1. Identifier pattern: letter (letter | digit)* - one letter, followed by zero or more letters/digits. This single regular expression covers every valid identifier spelling in one rule.
+2. Unsigned integer pattern: digit digit* (equivalently digit+) - one or more digits, with no separate rule needed for "how many digits" since the Kleene star/plus already covers any length.
+3. Operator family +, ++, +=: because maximal munch always prefers the longest match, simply define all three as separate patterns ('+', '++', '+=') and let the scanner's tie-breaking rule (prefer longest match; if still tied, prefer the rule listed first / higher priority) pick correctly - seeing '+' followed by another '+' matches the two-character '++' pattern instead of two separate single '+' matches, because the scanner always looks ahead for a longer valid continuation before committing to the shorter token.
+4. This illustrates the general design principle: each token class gets its own independent regular expression, and the lexer generator combines them all into a single big NFA/DFA (via the same union + subset construction from the Regular Languages topic) that picks, at each position, the longest lexeme matching ANY of the combined patterns.
+
+WORKED EXAMPLE 3 - tracing keyword-vs-identifier disambiguation
+
+Input snippet: intx = integer + 1;
+1. Scan 'intx': the identifier pattern (letter, then letters/digits) matches all five characters 'i','n','t','x' greedily via maximal munch, producing the single lexeme "intx", five characters long - NOT the keyword "int" followed separately by "x", because maximal munch always grabs the longest matching identifier-pattern prefix before stopping, and "intx" as a whole matches the identifier pattern with no interruption (there's no space or symbol splitting the letters).
+2. Since the matched lexeme "intx" (five characters) does NOT exactly equal the reserved word "int" (three characters) in the keyword lookup table, it is classified as a plain ID token, not a keyword - the keyword check only reclassifies an EXACT, WHOLE lexeme match, never a mere prefix or substring match.
+3. Continuing: '=' (ASSIGN), 'integer' (again, checked against the keyword table as a WHOLE seven-character lexeme; assuming "integer" itself is not a listed keyword in this hypothetical language, it too is a plain ID), '+' (OP), '1' (NUM), ';' (PUNCTUATION). This example is the standard GATE trap illustrating that keyword recognition depends entirely on the FULL matched lexeme, never on merely containing a keyword as a substring or prefix.`; })();

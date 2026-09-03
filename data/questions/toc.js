@@ -3432,3 +3432,166 @@ WORKED EXAMPLE 3 - pumping lemma proof that {a^n b^n : n>=0} is not regular
 5. This contradicts the pumping lemma's guarantee that xy^iz must remain in L for every i>=0. Contradiction means the assumption was false: L is not regular. This exact five-step template (assume regular, pick w depending on p, note the forced position of y, choose a convenient i, derive a contradiction) is the one to reuse on every pumping-lemma question.
 
 REMEMBER: the pumping lemma proof ALWAYS gets to CHOOSE w (after p is fixed by the adversary) and gets to CHOOSE i, but has NO control over exactly where xy splits inside w beyond the constraints |xy|<=p and |y|>=1 - the proof must work for every possible legal split the adversary picks, which is why w is chosen so that any valid split is forced into a predictable region (like "all a's" above).`; })();
+
+(function(){ var t = window.GATE_DATA.questions['toc'].topics.find(function(t){return t.id==='toc-cfl';});
+  t.theory.deep = (t.theory.deep||'') + `
+
+FROM ZERO: FOUNDATIONS
+
+• Grammar. A grammar is a set of rewrite RULES for generating strings, built from two kinds of symbols: terminals (the actual alphabet symbols that appear in final strings, e.g. a, b) and non-terminals (placeholder "variable" symbols, conventionally capital letters, that get expanded further). One non-terminal is marked the start symbol.
+• Production. A production is one rewrite rule, written LHS -> RHS, meaning "wherever the LHS non-terminal appears, you may replace it with the RHS string of terminals/non-terminals". A context-FREE production always has exactly ONE non-terminal alone on the left (no surrounding context required to apply it - that is the literal meaning of "context-free").
+• Derivation. A derivation is a sequence of rewriting steps starting from the start symbol and ending at a string of terminals only, applying one production at a time. Term. Leftmost derivation always expands the leftmost non-terminal first; rightmost derivation always expands the rightmost one - both can produce the same final string, just via different orders of expanding the same tree.
+• Parse tree. A parse tree draws the derivation as a tree: the root is the start symbol, each internal node is a non-terminal with its children being the RHS symbols of the production used to expand it, and the leaves read left to right spell out the generated string. One parse tree can correspond to MANY different derivation orders (leftmost, rightmost, or mixed), but each represents the same underlying structure.
+• Pushdown automaton (PDA). A PDA is a finite automaton plus one unbounded stack: at each step it reads an input symbol (or epsilon), looks at the top of the stack, and based on both, moves to a new state and pushes/pops symbols on the stack. The stack is what lets a PDA count/match things a plain finite automaton cannot.
+
+EVERY EDGE CASE
+
+GATE TRAP: unit production (A -> B, a single non-terminal producing a single other non-terminal) and null/epsilon production (A -> epsilon) must both be eliminated before converting a grammar to Chomsky Normal Form (CNF); forgetting to remove them first is the most common CNF-conversion mistake.
+GATE TRAP: left recursion (A -> A alpha | beta) makes a grammar unusable for top-down/recursive-descent or LL parsing (it causes infinite recursion without consuming input) and must be eliminated by rewriting: A -> beta A', A' -> alpha A' | epsilon. Left FACTORING is a completely different fix for a completely different problem - it applies when two productions for the same non-terminal share a common prefix (A -> alpha beta1 | alpha beta2), making the parser unable to decide which to pick by just one lookahead symbol; the fix is A -> alpha A', A' -> beta1 | beta2. Confusing these two distinct techniques (recursion elimination vs. prefix factoring) is a frequent GATE trap.
+GATE TRAP: a grammar is ambiguous if SOME string has two or more distinct parse trees (or, equivalently, two distinct leftmost derivations). A language is inherently ambiguous if EVERY grammar generating it is ambiguous - no rewriting can ever remove the ambiguity. Ambiguity is a property of a GRAMMAR (often fixable by rewriting); inherent ambiguity is a property of the LANGUAGE ITSELF (unfixable). The classic inherently ambiguous language example is {a^i b^j c^k : i=j or j=k}.
+GATE TRAP: DCFL (deterministic context-free languages, accepted by a PDA that never needs to guess/branch) is a STRICT subset of CFL. Crucially, DCFLs are closed under COMPLEMENT, but general CFLs are NOT closed under complement - this asymmetry is a favourite true/false target. {ww^R} (even-length palindromes) is a CFL but is NOT a DCFL, because recognising it requires guessing the exact midpoint.
+KEY: CFL closure summary - closed under union, concatenation, Kleene star, substitution, homomorphism, and intersection WITH A REGULAR language; NOT closed under intersection (of two CFLs), NOT closed under complement, and NOT closed under difference (in general). This is the single most heavily tested closure table in this topic - contrast sharply with regular languages, which ARE closed under all of intersection, complement, and difference.
+
+WORKED EXAMPLE 1 - full FIRST/FOLLOW computation
+
+Grammar: S -> A B, A -> a A | epsilon, B -> b B | c.
+1. FIRST(A): A can derive epsilon directly, so epsilon is in FIRST(A). A -> a A also starts with terminal a, so a is in FIRST(A). FIRST(A) = {a, epsilon}.
+2. FIRST(B): B -> b B gives b; B -> c gives c. FIRST(B) = {b, c} (no epsilon, since B cannot derive the empty string - every production produces at least one terminal).
+3. FIRST(S): S -> A B. Since A can be epsilon, FIRST(S) includes FIRST(A) minus epsilon, PLUS (because A is nullable) FIRST(B) too. FIRST(S) = {a, b, c}.
+4. FOLLOW(S): S is the start symbol, so $ (end marker) is always in FOLLOW(S). FOLLOW(S) = {$}.
+5. FOLLOW(A): A is followed by B in the production S -> A B, so everything in FIRST(B) that isn't epsilon goes into FOLLOW(A): {b, c}. Also, since B can eventually derive down to nothing extra AFTER A in no other rule, and A -> aA has A followed by nothing further at the end of that same production body meaning FOLLOW(A) also inherits FOLLOW(A) itself (self-referential, contributes nothing new) - no epsilon-follow-through beyond B here since B is not nullable. FOLLOW(A) = {b, c}.
+6. FOLLOW(B): B appears at the end of S -> A B, so FOLLOW(B) inherits FOLLOW(S) = {$}. Also B -> bB puts B at the end of its own production, so FOLLOW(B) inherits FOLLOW(B) itself, again contributing nothing new. FOLLOW(B) = {$}.
+
+WORKED EXAMPLE 2 - eliminating left recursion and left factoring together
+
+Grammar: E -> E + T | T, T -> T * F | F, F -> ( E ) | id.
+1. E has direct left recursion (E -> E + T). Rewrite: E -> T E', E' -> + T E' | epsilon.
+2. T has direct left recursion (T -> T * F). Rewrite: T -> F T', T' -> * F T' | epsilon.
+3. F -> ( E ) | id has no left recursion and the two alternatives start with different symbols ( and id, so no left factoring is needed here.
+4. Final LL(1)-ready grammar: E -> T E', E' -> + T E' | epsilon, T -> F T', T' -> * F T' | epsilon, F -> ( E ) | id. This is the textbook expression-grammar transformation GATE draws numericals and derivation questions from.
+
+WORKED EXAMPLE 3 - PDA construction sketch for balanced parentheses
+
+Language: strings of ( and ) that are properly balanced and nested.
+1. Start state q0, single stack symbol Z0 (bottom marker) plus a working symbol X.
+2. On reading (, push X onto the stack regardless of current top (accumulate "open" obligations).
+3. On reading ), pop one X from the stack (this consumes/closes one pending open-paren); if the stack shows only Z0 (empty of X's) when a ) arrives, there is no matching open, so REJECT (this branch simply has no valid transition, causing rejection).
+4. Accept by empty stack (or by reaching Z0 alone) exactly when the entire input has been consumed and every pushed X has been popped - i.e., opens and closes matched up perfectly with correct nesting order, because pops always remove the MOST RECENTLY pushed X first (last-in-first-out), which is exactly what "properly nested" requires.
+
+REMEMBER: CNF (Chomsky Normal Form) requires every production to be either A -> BC (two non-terminals) or A -> a (single terminal), with the sole exception that S -> epsilon is allowed only if S is the start symbol and S does not appear on the right side of any production. Converting to CNF is a strict multi-pass procedure: remove epsilon-productions first, then unit productions, then break long/terminal-mixed bodies into the BC or a shape - skipping a pass or doing them out of order produces an incorrect CNF grammar, a common source of GATE numerical mismatches when counting productions after conversion.`; })();
+
+(function(){ var t = window.GATE_DATA.questions['toc'].topics.find(function(t){return t.id==='toc-turing';});
+  t.theory.deep = (t.theory.deep||'') + `
+
+FROM ZERO: FOUNDATIONS
+
+• Tape. Think of the Turing machine's tape as an infinite strip of cells, each holding one symbol (initially the input string, then blanks _ everywhere else). It is "infinite" only in the sense that it never runs out of room - at any real moment only finitely many cells have been written on.
+• Head. The head is a pointer sitting over one tape cell at a time; it can read the symbol there, optionally overwrite it, and then move one cell Left or Right (or stay, in some variants).
+• Configuration/state transition here. A TM transition rule says: "if current state is q and the symbol under the head is s, then write symbol s', move Left or Right, and go to state q'". Unlike a DFA (which only reads and moves right), a TM READS, WRITES, and moves in BOTH directions - that extra power (unbounded read/write memory) is what makes it more powerful than every earlier automaton model.
+• Halting. A TM run either eventually reaches a designated accept state (and halts, accepting), reaches a reject state (and halts, rejecting), or never halts at all (loops forever) - this three-way outcome, especially the possibility of looping forever with no warning, is the entire reason decidability becomes a hard, non-trivial question for TMs, unlike for DFAs/PDAs which always eventually finish reading the input.
+• Why an "intermediate representation" of computation matters conceptually: a TM is a MODEL used to reason about what is computable in principle, not an actual physical device - it establishes a mathematical ceiling on what any algorithm, in any real programming language, could ever compute (the Church-Turing thesis: anything "effectively computable" by any reasonable model is computable by some TM).
+
+EVERY EDGE CASE
+
+KEY: Recursive (REC, also called decidable): some TM halts on every input, accepting members of L and rejecting non-members. Recursively enumerable (RE, also called semi-decidable or Turing-recognisable): some TM accepts every member of L, but on non-members it may reject OR loop forever - there is no guaranteed halt on non-membership.
+KEY: REC is closed under complement (swap accept/reject roles of the same total machine, still total, still correct). RE is NOT closed under complement in general - if L and its complement are both RE, then L is actually REC (this "RE and co-RE implies REC" fact is one of the highest-yield single sentences in the whole TOC syllabus).
+GATE TRAP: "co-RE" means the COMPLEMENT of the language is RE - it does NOT mean "not RE". A language can be RE, co-RE, both (exactly when it is REC), or neither (e.g. some pathological languages built by diagonalization are neither RE nor co-RE) - do not assume every language falls into a clean RE-or-co-RE dichotomy.
+GATE TRAP: variants of the TM (multi-tape, multi-track, two-way infinite tape, non-deterministic TM) all accept EXACTLY the same class of languages (RE) as the standard single-tape TM - none of them add computational power, only potentially speed (they may be more time-efficient, never more capable of deciding a new language).
+GATE TRAP: an unrestricted/Type-0 grammar (rules of the form alpha -> beta, with alpha containing at least one non-terminal, no shape restriction otherwise) generates EXACTLY the RE languages - this is the direct grammar-side counterpart to the TM-side definition and a common "which class corresponds to which grammar" mapping question.
+KEY: a set is countable if its elements can be listed 1st, 2nd, 3rd, ... (possibly forever) without missing any - the set of all TM descriptions (finite strings over a finite alphabet) is countable, so there are only countably many RE languages, but the set of ALL possible languages over any fixed alphabet is uncountable (Cantor's diagonal argument on the power set of strings) - hence almost all languages are NOT RE, they are not even describable by any algorithm at all.
+
+WORKED EXAMPLE 1 - TM design for {a^n b^n c^n : n >= 0}
+
+1. If the tape is empty (n=0 case), accept immediately (a^0b^0c^0 is the empty string, which trivially satisfies the pattern).
+2. Otherwise repeat: scan right from the left end, find the LEFTMOST unmarked a, mark it (e.g. overwrite with X), then continue scanning right past remaining a's and b's to find the LEFTMOST unmarked b, mark it (overwrite with Y), then continue right to find the leftmost unmarked c, mark it (overwrite with Z).
+3. After marking one a, one b, one c, move the head back to the left end (scan left until off the marked region) and repeat step 2, marking the next unmarked a, b, c triple.
+4. If at any repetition an a is found but no corresponding unmarked b or unmarked c exists before hitting a blank or the wrong symbol, reject. If all a's, b's, c's get marked in lockstep and the tape becomes entirely X's, Y's, Z's with nothing left unmarked, accept. This "mark one of each per pass" technique is the standard way to verify a 1:1:1 count matching that no finite-state or single-stack machine could ever check.
+
+WORKED EXAMPLE 2 - closure argument: REC closed under complement, RE not necessarily
+
+1. Suppose L is REC via total TM M (halts on every input, accepting L, rejecting complement of L). Build M' identical to M but with accept/reject states swapped. M' is still total (halts on the same inputs M did) and accepts exactly the complement of L. So complement of L is REC too - REC is closed under complement. QED for this direction.
+2. Now suppose L is RE via TM N that may loop on non-members. Try the same swap trick: make N' swap accept/reject. But if N loops forever on some non-member w (never reaching either state), N' ALSO loops forever on w - N' still fails to halt on w, so N' does not demonstrate that complement of L is RE (semi-deciding requires accepting all members of the complement, but N' provides no guarantee about the loop cases). This is exactly why the accept/reject-swap trick, which works perfectly for REC, breaks down for RE - the failure mode is the uncontrolled infinite loop.
+
+WORKED EXAMPLE 3 - proving the Halting Problem is RE but not REC (sketch)
+
+1. RE membership: build a universal TM U that, on input <M, w> (encoding of machine M and string w), simulates M running on w step by step. If M halts (accept or reject), U accepts <M,w>. If M never halts, U also never halts. This U is exactly a semi-decider for the Halting Problem - it accepts every halting instance, and never falsely accepts, so Halting Problem is RE.
+2. Not REC (by contradiction): suppose a total decider H existed for the Halting Problem: H(<M,w>) always halts, outputting yes if M halts on w, no otherwise. Construct a new machine D that, on input <M>, runs H(<M,M>) and does the OPPOSITE - if H says M halts on M, D loops forever; if H says M does not halt on M, D halts. Now ask: does D halt on input <D> itself? If it does, then by D's own definition D must loop - contradiction. If it loops, then by D's own definition D must halt - contradiction either way. So no such total H can exist: the Halting Problem is not decidable (not REC), while still being RE (from step 1). This diagonalization pattern (build a machine that contradicts what the assumed decider says about itself) is the master template reused throughout the decidability topic.`; })();
+
+(function(){ var t = window.GATE_DATA.questions['toc'].topics.find(function(t){return t.id==='toc-decidability';});
+  t.theory.deep = (t.theory.deep||'') + `
+
+FROM ZERO: FOUNDATIONS
+
+• Decision problem. A decision problem is any question with a YES/NO answer that must be answered for every possible input in some infinite family (e.g. "does this DFA accept any string at all?", asked for every possible DFA). It is naturally encoded as a language: the set of all input-encodings whose answer is YES.
+• Decidable/undecidable. A decision problem is decidable exactly when its corresponding language is REC (recursive) - some algorithm always halts with the correct yes/no. It is undecidable when no such always-halting algorithm can exist, even in principle, no matter how clever.
+• Reduction. A reduction from problem A to problem B is an algorithm that transforms any instance of A into an instance of B such that "A's instance is a yes-instance" if and only if "B's transformed instance is a yes-instance". Term. If A reduces to B and B is decidable, then A is decidable too (just transform, then use B's decider). Contrapositive, which is how reductions are actually used on GATE: if A is KNOWN undecidable and A reduces to B, then B must ALSO be undecidable (if B were decidable, that would make A decidable too, a contradiction).
+• Property of a language vs. property of a machine. A property of a LANGUAGE only depends on the SET of strings accepted (e.g. "L is empty", "L is finite", "L contains at least one palindrome") - it does not care which particular machine/grammar produced that set. A property of a MACHINE additionally depends on machine-specific structure (e.g. "M has exactly 5 states", "M's transition table has a specific shape") - two different machines can accept the exact same language yet differ wildly in such syntactic properties.
+
+EVERY EDGE CASE
+
+KEY: Rice's theorem says every NON-TRIVIAL property of the LANGUAGE recognised by a Turing machine is undecidable. "Non-trivial" means the property is true for SOME RE languages and false for OTHERS (not universally true or universally false, since a universal property is trivially decidable - always answer the same fixed way).
+GATE TRAP: Rice's theorem applies ONLY to semantic properties of the LANGUAGE a TM recognises (e.g. "L(M) is empty", "L(M) is regular", "L(M) is finite", "L(M) contains the string 001"). It does NOT apply to syntactic/structural properties of the MACHINE'S DESCRIPTION itself (e.g. "M has at least 10 states", "M's transition table has an unused state", "M's description string has even length") - those CAN be decidable, since you can just inspect the machine's code directly without ever running it. Applying Rice's theorem to a machine-structure property is a guaranteed-wrong-answer trap GATE sets deliberately.
+KEY: standard decidability catalogue to MEMORISE cold - for DFAs/NFAs: emptiness, membership (does M accept w), equivalence of two DFAs, and finiteness are all DECIDABLE. For CFGs/PDAs: membership and emptiness are DECIDABLE, but AMBIGUITY of a CFG, equivalence of two CFGs, and "is a CFG inherently ambiguous" are all UNDECIDABLE. For Turing machines: membership (does M accept w) is UNDECIDABLE in general (only semi-decidable/RE), and virtually every non-trivial semantic question about a TM's language (emptiness, finiteness, regularity, equivalence to another TM) is UNDECIDABLE by Rice's theorem.
+GATE TRAP: reduction DIRECTION matters and is the single most common source of lost marks. To prove B is undecidable using a known-undecidable A, you must reduce A to B (transform A-instances into B-instances) - NOT the other way around. Reducing a known-undecidable problem FROM a target problem (i.e. B to A) proves nothing about B's decidability; it is a backwards, useless reduction for this purpose.
+GATE TRAP: the Post Correspondence Problem (PCP) - given pairs of strings (top_i, bottom_i), does some sequence of indices make the concatenated top strings equal the concatenated bottom strings? - is UNDECIDABLE in general, and is the standard tool many decidability proofs (and GATE-adjacent theory courses) reduce FROM to prove ambiguity/equivalence undecidability results for CFGs.
+
+WORKED EXAMPLE 1 - classify five properties as decidable or undecidable
+
+1. "Does DFA M accept string w?" - DECIDABLE: simulate M on w for exactly |w| steps (a DFA always finishes reading the whole string in exactly |w| transitions, no risk of looping), then check the ending state.
+2. "Is L(M) empty for a given PDA M?" - DECIDABLE: convert the PDA's grammar to CNF and check whether the start symbol can derive any terminal string using a bottom-up "which non-terminals are generating" reachability computation (a finite, terminating procedure).
+3. "Is L(M) empty for a given Turing machine M?" - UNDECIDABLE by Rice's theorem: emptiness is a non-trivial semantic property of the language (some RE languages are empty, some are not), so no algorithm can decide it in general for arbitrary TMs.
+4. "Does Turing machine M have exactly 17 states?" - DECIDABLE: this is purely a syntactic property of the machine's description (just count the states listed in the encoding) - Rice's theorem does NOT apply here because it is not a property of the language M recognises.
+5. "Is CFG G ambiguous?" - UNDECIDABLE: this is a classical result proved via reduction from PCP, and it is one of the standard named-undecidable results (alongside CFG-equivalence and CFG-is-Sigma*) worth memorising directly rather than re-deriving.
+
+WORKED EXAMPLE 2 - applying Rice's theorem step by step
+
+Question: is "L(M) is regular" decidable, for M an arbitrary Turing machine?
+1. Identify the property: P = {languages L : L is regular}, restricted to RE languages (since only RE languages are ever L(M) for some TM M).
+2. Check non-triviality: is there an RE language that IS regular? Yes - e.g. Sigma* itself, recognised by a trivial TM. Is there an RE language that is NOT regular? Yes - e.g. {a^n b^n}, which is RE (even REC) but provably not regular. Since the property is true for some and false for other RE languages, it is non-trivial.
+3. By Rice's theorem, any non-trivial property of the RE languages is undecidable when phrased as "given a TM M, does L(M) have property P?" - so "is L(M) regular?" is UNDECIDABLE, full stop, regardless of how clever an algorithm one tries to design.
+
+WORKED EXAMPLE 3 - a correct reduction to show a new problem is undecidable
+
+Claim: "Given a TM M, does M accept at least one string of even length?" is undecidable. Prove it by reducing the (known-undecidable) Halting Problem to it.
+1. Given an arbitrary instance <M, w> of the Halting Problem (does M halt on w?), construct a new machine M' as follows: on any input x, M' first ignores x, simulates M on the FIXED string w; if that simulation halts, M' then accepts x (accepting every input, including even-length ones) - if the simulation never halts, M' also never halts on x.
+2. If M halts on w, then M' accepts EVERY string, including plenty of even-length ones - so "M' accepts at least one even-length string" is YES. If M never halts on w, M' never accepts anything at all (it never finishes the simulation step) - so the answer is NO.
+3. This transformation is computable (just paste M and w into a fixed template) and correctly preserves the yes/no answer, so it is a valid reduction from the Halting Problem to this new problem. Since the Halting Problem is undecidable and reduces TO this new problem, the new problem must be undecidable too (if it were decidable, we could decide the Halting Problem by reducing to it, contradiction).`; })();
+
+(function(){ var t = window.GATE_DATA.questions['toc'].topics.find(function(t){return t.id==='toc-hierarchy';});
+  t.theory.deep = (t.theory.deep||'') + `
+
+FROM ZERO: FOUNDATIONS
+
+• Chomsky hierarchy, plainly. Noam Chomsky classified grammars into four types based purely on what SHAPE their production rules are allowed to take - more restrictive shapes generate smaller, "weaker" language families; fewer restrictions generate larger, more powerful families. It is purely a classification of RULE SHAPES, nothing about meaning.
+• Type-3 (regular). Every production has the shape A -> a or A -> aB (or A -> Ba, consistently one side) - a single non-terminal produces at most one terminal followed by at most one non-terminal. This is exactly what a finite automaton's transitions correspond to.
+• Type-2 (context-free). Every production has EXACTLY one non-terminal alone on the left (A -> alpha, any string alpha on the right) - the non-terminal can be replaced "regardless of context", hence the name. Accepted by pushdown automata.
+• Type-1 (context-sensitive). Every production has the shape alpha A beta -> alpha gamma beta, where gamma is non-empty (the RHS is never shorter than the LHS, except a single allowed S -> epsilon rule) - the replacement of A into gamma is only permitted in the specific surrounding CONTEXT alpha _ beta, hence "context-sensitive". Accepted by linear-bounded automata (a TM restricted to using only the input-length worth of tape).
+• Type-0 (unrestricted/recursively enumerable). No shape restriction at all beyond having at least one non-terminal on the left. Accepted by a general, unrestricted Turing machine.
+• Recursive (REC) languages sit as an extra, important class squeezed strictly between context-sensitive and Type-0/RE - every context-sensitive language is decidable (REC), and every REC language is RE, but REC itself is not one of Chomsky's original four numbered types; it is a machine-based (not grammar-shape-based) classification laid on top of the hierarchy.
+
+EVERY EDGE CASE
+
+KEY: the strict containment chain to memorise cold - Regular subset-of DCFL subset-of CFL subset-of CSL subset-of REC subset-of RE subset-of (the set of ALL languages). Every single inclusion is STRICT (proper) - a witness language exists separating every consecutive pair, and RE itself is a proper subset of all languages (RE is countable, the set of all languages is uncountable).
+GATE TRAP: "L is context-free" and "L is not regular" can BOTH be true statements about the exact same language at the same time (e.g. {a^n b^n}) - being not-regular does not stop a language from still being classified precisely as context-free. Exam options often ask for the TIGHTEST correct classification, and a technically-true-but-looser classification (like just "it's a CFL" when it's actually regular) is the wrong choice if a tighter one is available.
+GATE TRAP: closure properties do NOT transfer uniformly up the hierarchy. Regular languages are closed under intersection AND complement; CFLs are closed under NEITHER in general (only closed under intersection with a REGULAR language specifically); context-sensitive languages ARE closed under intersection and complement (complementation of CSLs was a famously hard open problem, resolved positively - the Immerman-Szelepcsenyi theorem); recursive languages are closed under complement (swap accept/reject on a total TM); RE languages are closed under union and intersection but NOT under complement in general.
+GATE TRAP: every regular language is trivially also context-free, context-sensitive, recursive, and RE (the hierarchy nests upward) - a true/false question asserting "L is regular, therefore L is not a CFL" is simply false; regular is the STRONGEST classification, not a separate, disjoint one.
+KEY: grammar-shape to machine-model to language-family correspondence (memorise the whole row together): Type-3/regular grammar <-> finite automaton <-> regular language; Type-2/CFG <-> pushdown automaton <-> CFL; Type-1/context-sensitive grammar <-> linear-bounded automaton <-> CSL; Type-0/unrestricted grammar <-> Turing machine <-> RE language.
+
+WORKED EXAMPLE 1 - classify {a^n b^n c^n : n >= 0} through the whole hierarchy
+
+1. Is it regular? No - by the Myhill-Nerode/pumping-lemma argument (unboundedly many distinguishable prefixes a^n, since matching against b^nc^n requires remembering n exactly).
+2. Is it context-free? No - it requires matching TWO independent counts simultaneously (n against the b's AND n against the c's), which a single stack (which can only reliably compare ONE pair of counts via push/pop) cannot enforce; this can be proven with the CFL pumping lemma.
+3. Is it context-sensitive? Yes - a linear-bounded automaton (TM restricted to tape length = input length) can mark off one a, one b, one c per pass exactly as in the earlier TM construction, using only the space already on the tape, never needing extra space beyond the input's own length.
+4. Final answer: {a^n b^n c^n} is context-sensitive but not context-free (and hence also not regular). Tightest correct classification: CSL.
+
+WORKED EXAMPLE 2 - classify the language of syntactically valid, balanced-bracket well-formed formulas with equal nesting depth constraint of at most a FIXED constant k
+
+1. Since the nesting depth is bounded by a FIXED constant k (not growing with input length), the automaton only ever needs to track a depth counter from 0 to k - that is a FINITE amount of information (k+1 possible counter values), regardless of how long the input string gets.
+2. A finite automaton CAN track a bounded counter (0 through k) using k+1 states for the depth, since it never needs to count higher than the fixed bound k.
+3. Therefore this restricted, depth-bounded language IS regular - contrast sharply with the UNBOUNDED-depth version (ordinary balanced parentheses with no depth limit), which is a classic non-regular, properly context-free language (it needs the unbounded stack precisely because depth is unbounded). This pair of examples is a favourite GATE contrast: "matched parentheses" alone (unbounded) versus "matched parentheses up to depth 5" (bounded, hence regular) can appear as two separate options in the same question.
+
+WORKED EXAMPLE 3 - is the language {ww : w is in {a,b}*} context-free?
+
+1. Try to design a PDA: to check the second half equals the first half, a machine would need to first read and REMEMBER the entire first half w on the stack, then compare it against the second half.
+2. The problem: a stack is LIFO (last-in-first-out) - popping it while reading the second half would retrieve the first half in REVERSED order, letting you check w against w^R (reverse) easily (that language {w w^R}, even-length palindromes, IS context-free), but NOT w against w again in the same order, since comparison requires reading the remembered first half forwards, not backwards.
+3. This is provably not fixable with any single-stack design; a rigorous CFL pumping lemma argument confirms {ww} is not context-free. It IS, however, context-sensitive (a linear-bounded automaton, with random tape access rather than LIFO-only access, can directly index-compare corresponding positions). So {ww} sits one level higher than {ww^R} in the strict hierarchy - a frequently tested pair precisely because they look superficially similar but classify two levels apart.`; })();
