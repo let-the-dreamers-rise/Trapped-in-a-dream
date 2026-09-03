@@ -6,6 +6,22 @@
   'use strict';
   var $view = document.getElementById('view');
   var DATA = window.GATE_DATA || {};
+
+  // Textbook chapters live in data/chapters/<topic>.js and are merged into the
+  // topic here. A chapter is the full teaching text — the thing you learn from —
+  // while the intro/core/deep summaries stay as reference cards. Its figures join
+  // the topic's figure list so [[FIG:id]] markers in either resolve.
+  (function attachChapters() {
+    var ch = DATA.chapters || {};
+    Object.keys(DATA.questions || {}).forEach(function (k) {
+      (DATA.questions[k].topics || []).forEach(function (t) {
+        var c = ch[t.id]; if (!c) return;
+        t.theory = t.theory || {};
+        t.theory.chapter = c.text;
+        t.theory.figs = (t.theory.figs || []).concat(c.figs || []);
+      });
+    });
+  })();
   var BANK = DATA.questions || {};
   var SUBJECT_ORDER = ['engmath', 'digital', 'coa', 'pds', 'algo', 'toc', 'compiler', 'os', 'dbms', 'cn', 'apti'];
 
@@ -495,7 +511,10 @@
   // Formula-ish fragments get monospace so they stand out mid-sentence.
   function inlineTheory(s) {
     var e = esc(s);
-    e = e.replace(/(^|[\s(])([A-Za-z0-9_]+\s*=\s*[^,.;:]{1,40})(?=[,.;:)]|$)/g,
+    // Mark "x = …" as code only when the left side looks like a variable — short,
+    // or carrying a digit or underscore (C2, in, SIZE, T_n). A plain English word
+    // in front of an equals sign ("created = 8 − 1 = 7") is prose, not code.
+    e = e.replace(/(^|[\s(])((?:[A-Za-z0-9_]{1,6}|[A-Za-z_]*[0-9_][A-Za-z0-9_]*)\s*=\s*[^,.;:]{1,40})(?=[,.;:)]|$)/g,
       function (m, pre, expr) { return pre + '<code>' + expr + '</code>'; });
     return e;
   }
@@ -527,7 +546,8 @@
     var html = '<button class="back-link" id="back">‹ ' + esc(e.subjectName) + '</button>' +
       '<h2 style="margin-bottom:10px">' + esc(t.name) + '</h2>' +
       '<div class="theory-tabs">' +
-      '<button data-tt="intro" class="active">Intro</button>' +
+      (t.theory && t.theory.chapter ? '<button data-tt="chapter" class="active">Chapter</button>' : '') +
+      '<button data-tt="intro" class="' + (t.theory && t.theory.chapter ? '' : 'active') + '">Intro</button>' +
       '<button data-tt="core">Core theory</button>' +
       (t.theory && t.theory.deep ? '<button data-tt="deep">Deep dive</button>' : '') +
       '<button data-tt="strategy">Exam strategy</button></div>' +
@@ -541,7 +561,7 @@
       body.innerHTML = renderTheory(t.theory && t.theory[k], t.theory && t.theory.figs);
       $view.querySelectorAll('[data-tt]').forEach(function (b) { b.classList.toggle('active', b.getAttribute('data-tt') === k); });
     }
-    show('intro');
+    show(t.theory && t.theory.chapter ? 'chapter' : 'intro');
     $view.querySelectorAll('[data-tt]').forEach(function (b) {
       b.addEventListener('click', function () { show(b.getAttribute('data-tt')); });
     });
@@ -636,8 +656,12 @@
   function buildLesson(e) {
     var t = e.topic, th = t.theory || {};
     var beats = [];
-    if (th.intro) beats.push({ heading: 'THE IDEA', body: th.intro, tab: 'intro' });
-    beats = beats.concat(cutBeats(th.core, 'core'), cutBeats(th.deep, 'deep'));
+    if (th.chapter) {
+      beats = cutBeats(th.chapter, 'chapter');
+    } else {
+      if (th.intro) beats.push({ heading: 'THE IDEA', body: th.intro, tab: 'intro' });
+      beats = beats.concat(cutBeats(th.core, 'core'), cutBeats(th.deep, 'deep'));
+    }
 
     // Term frequencies across beats: a word in every beat says nothing about which
     // question belongs where, a word in one or two beats says a lot.
@@ -719,6 +743,16 @@
       if (b.hits && b.hits.length) return;
       b.hits = Object.keys(b.words || {}).filter(function (w) { return qVocab[w]; })
         .sort(function (a, b3) { return b3.length - a.length; }).slice(0, 5);
+    });
+    // A card must never be dropped because the questions ran out — the teaching
+    // is the point. Beats still unserved reuse the best-matching question even
+    // though another card already used it; failing that, any question at all.
+    beats.forEach(function (b, bi) {
+      if (b.q) return;
+      var best = null;
+      pairs.forEach(function (p) { if (p.bi === bi && (!best || p.score > best.score)) best = p; });
+      if (best) { b.q = pool[best.qi]; b.hits = best.hits.slice(0, 5); }
+      else if (pool.length) { b.q = pool[bi % pool.length]; b.hits = []; }
     });
     var lesson = beats.filter(function (b) { return b.q; });
     // Questions the matcher never used are still the topic's own — keep them for
@@ -817,7 +851,9 @@
         '<button class="btn block good" id="go-q">Got it &mdash; question me</button>' +
         '<div class="small muted" style="text-align:center;margin-top:8px">Highlighted words are what the question is about.</div>';
       var body = document.getElementById('lbody');
-      body.innerHTML = renderTheory(b.body, (e.topic.theory || {}).figs);
+      var allFigs = (e.topic.theory || {}).figs || [];
+      var mine = allFigs.filter(function (f) { return b.body.indexOf('[[FIG:' + f.id + ']]') >= 0; });
+      body.innerHTML = renderTheory(b.body, mine);
       markTerms(body, b.hits || []);
       wireBack();
       document.getElementById('go-q').addEventListener('click', function () { ask(lesson[i].q); });
