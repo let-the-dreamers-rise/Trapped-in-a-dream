@@ -205,3 +205,16 @@ input[type=date], input[type=number], select, textarea { background: none; color
   justify-content: center; margin-top: 1px;
 }
 .theory-body .th-step span:last-child { font-size: 15px; line-height: 1.55; color: rgba(243,242,242,.88); }
+
+/* ---- celebration toast: brief, physical, never blocking ---- */
+.celebrate {
+  position: fixed; left: 50%; bottom: 110px; transform: translateX(-50%);
+  background: var(--accent); color: #fff; padding: 14px 22px; z-index: 60;
+  text-align: center; min-width: 190px; animation: pop .28s ease-out;
+  box-shadow: 0 8px 30px rgba(0,0,0,.5);
+}
+.celebrate b { display: block; font-size: 15px; font-weight: 800; letter-spacing: .04em; text-transform: uppercase; }
+.celebrate span { display: block; font-size: 11px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; opacity: .85; margin-top: 3px; }
+.celebrate.out { opacity: 0; transition: opacity .45s; }
+@keyframes pop { from { transform: translateX(-50%) scale(.8); opacity: 0; } to { transform: translateX(-50%) scale(1); opacity: 1; } }
+@media (prefers-reduced-motion: reduce) { .celebrate { animation: none; } }

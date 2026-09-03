@@ -24,6 +24,9 @@
   S.xp = S.xp || 0;                  // every answered question earns XP; never decreases
   S.best60 = S.best60 || 0;          // personal best in the 60-second sprint
   S.combo = 0;                       // in-session correct streak (not persisted)
+  S.badges = S.badges || {};         // unlocked achievement ids
+  S.challenge = S.challenge || {};   // { dateKey: true } once the daily challenge is done
+  S.lastLevel = S.lastLevel || 1;    // to detect a level-up moment
 
   function localKey(d) { return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); }
   function todayKey() { return localKey(new Date()); }
@@ -59,7 +62,10 @@
       S.leitner[qq.id] = L;
     }
     // XP only ever goes up — a bad session must never feel like losing ground.
-    S.xp += correct ? 10 : 3;
+    // ~8% of correct answers pay double: variable reward beats a fixed rate.
+    var bonus = (correct && Math.random() < 0.08);
+    S.xp += correct ? (bonus ? 20 : 10) : 3;
+    if (bonus) setTimeout(function () { celebrate('<b>Double XP</b><span>+20 on that one</span>'); }, 260);
     S.combo = correct ? S.combo + 1 : 0;
     try { if (navigator.vibrate) navigator.vibrate(correct ? 18 : [12, 40, 12]); } catch (e) {}
     var st = S.topicStats[topicId] || { attempts: 0, correct: 0 };
@@ -73,6 +79,13 @@
       S.streak.count = (S.streak.last === localKey(y)) ? S.streak.count + 1 : 1;
       S.streak.last = k;
     }
+    var lvl = levelFor(S.xp);
+    if (lvl > (S.lastLevel || 1)) {
+      S.lastLevel = lvl;
+      setTimeout(function () { celebrate('<b>Level ' + lvl + '</b><span>' + S.xp + ' XP total</span>'); }, 300);
+    }
+    var fresh = checkBadges();
+    if (fresh.length) setTimeout(function () { celebrate('<b>' + esc(fresh[0].name) + '</b><span>Achievement unlocked</span>'); }, 700);
     save(); renderChips();
   }
 
@@ -125,7 +138,7 @@
   function nav(name, arg, arg2) {
     if (mockTimer && name !== 'mock-run') { clearInterval(mockTimer); mockTimer = null; }
     window.scrollTo(0, 0);
-    setTab(name === 'topic' || name === 'quiz' ? 'subjects' : (name === 'one' || name === 'sprint' ? 'home' : (name.indexOf('mock') === 0 ? 'test' : name)));
+    setTab(name === 'topic' || name === 'quiz' ? 'subjects' : (name === 'one' || name === 'sprint' || name === 'challenge' ? 'home' : (name === 'badges' ? 'progress' : (name.indexOf('mock') === 0 ? 'test' : name))));
     if (name === 'home') return viewHome();
     if (name === 'subjects') return viewSubjects();
     if (name === 'subject') return viewSubject(arg);
@@ -133,6 +146,8 @@
     if (name === 'quiz') return viewQuiz(arg, arg2);
     if (name === 'one') return viewOneQuestion();
     if (name === 'sprint') return viewSprint();
+    if (name === 'challenge') return viewChallenge();
+    if (name === 'badges') return viewBadges();
     if (name === 'test') return viewMockLanding();
     if (name === 'progress') return viewProgress();
     if (name === 'plan') return viewPlan();
@@ -191,6 +206,11 @@
            : 'Target ' + quota + '. You are moving — keep going.')) + '</div></div>' +
 
       // The two lowest-friction entry points, placed above everything that asks for effort.
+      (S.challenge[todayKey()]
+        ? '<div class="card"><h3>Daily challenge</h3><div class="small" style="color:var(--accent2)">Done today. Come back tomorrow for a new one.</div></div>'
+        : '<div class="card" style="border-left:4px solid var(--accent)"><h3>Daily challenge &middot; triple XP</h3>' +
+          '<div class="small muted" style="margin-bottom:10px">One hard question. New one every day. Takes two minutes.</div>' +
+          '<button class="btn block" id="go-challenge">Take today\'s challenge</button></div>') +
       '<div class="card"><h3>Low fuel? Start here</h3>' +
       '<div class="btn-row"><button class="btn good" id="go-one">One question</button>' +
       '<button class="btn" id="go-sprint">60-second sprint</button></div>' +
@@ -245,6 +265,8 @@
         var c = S.planChecks[d] || {}; c[cb.getAttribute('data-task')] = cb.checked; S.planChecks[d] = c; save();
       });
     });
+    var gc = document.getElementById('go-challenge');
+    if (gc) gc.addEventListener('click', function () { nav('challenge'); });
     var g1 = document.getElementById('go-one');
     if (g1) g1.addEventListener('click', function () { nav('one'); });
     var g2 = document.getElementById('go-sprint');
@@ -591,6 +613,61 @@
     ask();
   }
 
+  var BADGES = [
+    { id: 'first',    name: 'First blood',      test: function (st) { return st.answered >= 1; },    hint: 'Answer your first question' },
+    { id: 'ton',      name: 'Century',          test: function (st) { return st.answered >= 100; },  hint: 'Answer 100 questions' },
+    { id: 'fivehund', name: 'Five hundred',     test: function (st) { return st.answered >= 500; },  hint: 'Answer 500 questions' },
+    { id: 'grand',    name: 'Thousand club',    test: function (st) { return st.answered >= 1000; }, hint: 'Answer 1000 questions' },
+    { id: 'hard10',   name: 'Iron stomach',     test: function (st) { return st.hardRight >= 10; },  hint: 'Get 10 hard questions right' },
+    { id: 'hard50',   name: 'Hard mode',        test: function (st) { return st.hardRight >= 50; },  hint: 'Get 50 hard questions right' },
+    { id: 'streak3',  name: 'Three in a row',   test: function (st) { return st.streak >= 3; },      hint: '3-day streak' },
+    { id: 'streak7',  name: 'Full week',        test: function (st) { return st.streak >= 7; },      hint: '7-day streak' },
+    { id: 'streak30', name: 'Month of fire',    test: function (st) { return st.streak >= 30; },     hint: '30-day streak' },
+    { id: 'sprint10', name: 'Quick draw',       test: function (st) { return st.best60 >= 10; },     hint: '10 correct in one sprint' },
+    { id: 'sprint20', name: 'Lightning',        test: function (st) { return st.best60 >= 20; },     hint: '20 correct in one sprint' },
+    { id: 'mock1',    name: 'Battle tested',    test: function (st) { return st.mocks >= 1; },       hint: 'Finish a full mock' },
+    { id: 'mock60',   name: 'Sixty club',       test: function (st) { return st.bestMock >= 60; },   hint: 'Score 60+ in a mock' },
+    { id: 'mock80',   name: 'Elite',            test: function (st) { return st.bestMock >= 80; },   hint: 'Score 80+ in a mock' },
+    { id: 'level5',   name: 'Level five',       test: function (st) { return st.level >= 5; },       hint: 'Reach level 5' },
+    { id: 'level10',  name: 'Level ten',        test: function (st) { return st.level >= 10; },      hint: 'Reach level 10' }
+  ];
+
+  function badgeStats() {
+    var answered = 0, hardRight = 0;
+    Object.keys(S.leitner).forEach(function (id) { answered += S.leitner[id].seen || 0; });
+    allTopics().forEach(function (e) {
+      (e.topic.questions || []).forEach(function (q) {
+        var L = S.leitner[q.id];
+        if (q.difficulty === 'hard' && L && L.box >= 3) hardRight++;
+      });
+    });
+    var bestMock = 0;
+    S.mocks.forEach(function (m) { if (m.score > bestMock) bestMock = m.score; });
+    return { answered: answered, hardRight: hardRight, streak: S.streak.count || 0,
+             best60: S.best60 || 0, mocks: S.mocks.length, bestMock: bestMock, level: levelFor(S.xp) };
+  }
+
+  // Returns any badges newly unlocked by the last action, so they can be celebrated.
+  function checkBadges() {
+    var st = badgeStats(), fresh = [];
+    BADGES.forEach(function (b) {
+      if (!S.badges[b.id] && b.test(st)) { S.badges[b.id] = Date.now(); fresh.push(b); }
+    });
+    if (fresh.length) save();
+    return fresh;
+  }
+
+  // A short celebration banner. Deliberately brief: it should reward, not interrupt.
+  function celebrate(html) {
+    var el = document.createElement('div');
+    el.className = 'celebrate';
+    el.innerHTML = html;
+    document.body.appendChild(el);
+    try { if (navigator.vibrate) navigator.vibrate([20, 60, 20, 60, 40]); } catch (e) {}
+    setTimeout(function () { el.classList.add('out'); }, 2200);
+    setTimeout(function () { if (el.parentNode) el.parentNode.removeChild(el); }, 2700);
+  }
+
   // ---------- LOW-FRICTION MODES ----------
   // The plan screen is a demand. On a low-dopamine day a demand gets avoided, the
   // streak breaks, and guilt keeps the app closed. These two modes ask for almost
@@ -689,6 +766,79 @@
       if (t) t.textContent = '00:' + String(left).padStart(2, '0');
     }, 1000);
     ask();
+  }
+
+  // DAILY CHALLENGE: one hard question, same for the whole day, triple XP, once only.
+  // A single fresh thing each day is a stronger habit anchor than an open-ended quota.
+  function dailyChallengeQuestion() {
+    var pool = [];
+    allTopics().forEach(function (e) {
+      (e.topic.questions || []).forEach(function (q) {
+        if (q.difficulty === 'hard' && q.options && q.options.length) pool.push({ q: q, topic: e.topic.id });
+      });
+    });
+    if (!pool.length) return null;
+    var key = todayKey(), seed = 0;
+    for (var i = 0; i < key.length; i++) seed = (seed * 31 + key.charCodeAt(i)) % 100000;
+    return pool[seed % pool.length];
+  }
+
+  function viewChallenge() {
+    var rec = dailyChallengeQuestion();
+    if (!rec) return viewHome();
+    var qq = rec.q, doneToday = !!S.challenge[todayKey()];
+    var html = '<button class="back-link" id="back">‹ Today</button>' +
+      '<div class="card"><div class="eyebrow">Daily challenge &middot; triple XP</div>' +
+      '<div class="q-text">' + esc(qq.q) + '</div>' + figureHtml(qq) + '<div id="opts">';
+    qq.options.forEach(function (o, i) {
+      html += '<button class="opt" data-i="' + i + '">' + String.fromCharCode(65 + i) + '.  ' + esc(o) + '</button>';
+    });
+    html += '</div><div id="after"></div></div>';
+    $view.innerHTML = html;
+    document.getElementById('back').addEventListener('click', function () { nav('home'); });
+    $view.querySelectorAll('.opt').forEach(function (b) {
+      b.addEventListener('click', function () {
+        var i = +b.getAttribute('data-i'), ok = i === qq.answer;
+        if (!doneToday) { S.challenge[todayKey()] = ok ? 'win' : 'try'; if (ok) S.xp += 20; save(); }
+        recordAnswer(qq, ok, rec.topic);
+        $view.querySelectorAll('.opt').forEach(function (bb, j) {
+          bb.disabled = true;
+          if (j === qq.answer) bb.classList.add('correct');
+          else if (j === i && !ok) bb.classList.add('wrong');
+        });
+        document.getElementById('after').innerHTML =
+          '<div class="feedback-banner ' + (ok ? 'ok' : 'no') + '">' +
+          (ok ? 'Challenge cleared &middot; +30 XP' : 'Missed it &mdash; but you showed up, +3 XP') + '</div>' +
+          '<div class="explain"><b>' + answerLabel(qq) + '</b>\n' + esc(qq.explanation || '') + '</div>' +
+          '<div class="btn-row"><button class="btn" id="ch-done">Back to today</button></div>';
+        document.getElementById('ch-done').addEventListener('click', function () { nav('home'); });
+        window.scrollTo(0, 0);
+      });
+    });
+  }
+
+  function viewBadges() {
+    var st = badgeStats();
+    var got = BADGES.filter(function (b) { return S.badges[b.id]; });
+    var left = BADGES.filter(function (b) { return !S.badges[b.id]; });
+    var html = '<button class="back-link" id="back">‹ Stats</button>' +
+      '<div class="card"><div class="eyebrow">Achievements</div>' +
+      '<div class="hero-day"><span class="hero-num" style="font-size:52px">' + got.length + '</span>' +
+      '<span class="hero-of">/' + BADGES.length + '</span>' +
+      '<span class="hero-right"><span class="n" style="color:var(--accent2)">L' + st.level + '</span>' +
+      '<div class="eyebrow" style="margin:2px 0 0">' + S.xp + ' XP</div></span></div></div>';
+    if (got.length) {
+      html += '<div class="card"><h3>Unlocked</h3>';
+      got.forEach(function (b) { html += '<div class="task-line"><span class="pill gen">✓</span><span>' + esc(b.name) + '</span></div>'; });
+      html += '</div>';
+    }
+    html += '<div class="card"><h3>Next up</h3>';
+    left.slice(0, 6).forEach(function (b) {
+      html += '<div class="task-line"><span class="pill">•</span><span class="muted">' + esc(b.name) + ' &mdash; ' + esc(b.hint) + '</span></div>';
+    });
+    html += '</div>';
+    $view.innerHTML = html;
+    document.getElementById('back').addEventListener('click', function () { nav('progress'); });
   }
 
   // ---------- MOCK TEST ----------
@@ -937,6 +1087,9 @@
       });
       html += '<p class="muted small">Targets: Day 30 → 50 · Day 60 → 70 · Day 85+ → 90.</p></div>';
     }
+    html += '<div class="list-item" id="open-badges"><div class="grow"><div class="title">Achievements</div>' +
+      '<div class="muted small">' + Object.keys(S.badges).length + ' of ' + BADGES.length + ' unlocked &middot; level ' + levelFor(S.xp) + '</div></div><span class="arrow">›</span></div>';
+
     // backup & restore — localStorage is fragile; never lose 90 days of grind
     html += '<div class="card"><h3>Backup &amp; restore</h3>' +
       '<p class="muted small">Your progress lives only on this device. Export it weekly — paste the code somewhere safe (notes app, email to yourself).</p>' +
@@ -944,6 +1097,8 @@
       '<textarea id="backup-box" style="display:none;width:100%;margin-top:10px;background:var(--card2);color:var(--text);border:1px solid #33396b;border-radius:10px;padding:10px;min-height:90px;font-size:12px"></textarea>' +
       '<div class="btn-row" id="imp-row" style="display:none"><button class="btn good" id="imp-go">Restore from pasted code</button></div></div>';
     $view.innerHTML = html;
+    var ob = document.getElementById('open-badges');
+    if (ob) ob.addEventListener('click', function () { nav('badges'); });
     var box = document.getElementById('backup-box');
     document.getElementById('exp-btn').addEventListener('click', function () {
       box.style.display = 'block';
