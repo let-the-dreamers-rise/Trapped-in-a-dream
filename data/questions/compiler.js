@@ -3978,3 +3978,46 @@ Suppose (as a deliberately broken SDD) a production A -> B C carries the rules: 
 1. Draw the edges: B.inh <- C.syn, C.syn <- C.inh, C.inh <- B.syn, B.syn <- B.inh.
 2. Trace the cycle: start at B.inh, follow to C.syn, follow to C.inh, follow to B.syn, follow back to B.inh - this is a complete cycle of four dependency edges returning to the starting attribute.
 3. Conclusion: this SDD has NO valid evaluation order at all (every one of these four attributes transitively depends on itself), so it must be rejected/redesigned - this is exactly the kind of small four-node graph GATE draws and asks "can this SDD be evaluated on any parse tree", expecting the answer no, with a cycle identified as the reason.`; })();
+
+(function(){ var t = window.GATE_DATA.questions['compiler'].topics.find(function(t){return t.id==='compiler-icg';});
+  t.theory.deep = (t.theory.deep||'') + `
+
+FROM ZERO: FOUNDATIONS
+
+• Intermediate representation (IR), what it's actually FOR. After parsing produces a parse tree/AST, a compiler does not jump straight to machine code - it first translates into an IR: a simpler, machine-INDEPENDENT form that is easy to analyse and optimise. The point of an IR is to let ONE set of optimisation techniques work for MANY source languages and MANY target machines, instead of writing separate optimisers for every source-target pair.
+• Three-address code (TAC). TAC is a common IR where every instruction has AT MOST one operator on the right-hand side and at most three addresses/operands total (e.g. t1 = t2 + t3) - complex expressions get broken into a sequence of these simple steps, each computing one elementary operation.
+• Quadruple, triple. A quadruple represents one TAC instruction as four fields (operator, arg1, arg2, result) - the result gets an explicit name/temporary. A triple instead represents an instruction as three fields (operator, arg1, arg2) and refers to OTHER instructions' RESULTS by their position/index number in the triple list, rather than inventing an explicit named temporary for every intermediate result.
+• DAG (directed acyclic graph) for expressions. A DAG represents an expression so that if the SAME sub-expression appears more than once, it is represented by just ONE shared node (reused), instead of duplicating the computation - this is the standard tool for local common-subexpression elimination.
+• Backpatching. Backpatching is a technique for generating jump/branch instructions for control-flow constructs (if, while) BEFORE the target label/address is actually known yet - the jump instruction is emitted with its target left blank, and the blank is filled in ("patched") later once the true target position becomes known.
+
+EVERY EDGE CASE
+
+GATE TRAP: converting infix expressions with standard operator precedence to TAC must respect precedence and associativity EXACTLY as the grammar defines it (e.g. * before +, left-to-right for same precedence) - a numerical question asking "how many three-address statements are generated" is really testing whether you can correctly count each atomic OPERATION (not each operand or each parenthesis) in the fully precedence-resolved expression tree.
+GATE TRAP: short-circuit evaluation of boolean expressions (a && b, a || b) generates control-flow jumps DURING evaluation itself, rather than computing a full true/false value first and then branching - e.g. for a && b, if a evaluates to false, the code must jump directly to the "false" outcome WITHOUT ever evaluating b at all. Counting instructions or predicting execution paths without accounting for this early-exit jump is a frequent source of wrong numerical answers.
+KEY: DAG construction for an expression re-uses a node for a repeated sub-expression ONLY when that sub-expression is syntactically identical AND none of its operands have been reassigned/killed in between the two occurrences - if an intermediate variable gets overwritten by an assignment before its second use, the DAG must NOT merge the two occurrences (this is the classic "DAG vs available expressions with intervening assignment" trap).
+GATE TRAP: quadruples and triples differ specifically in how they REFER to intermediate results - quadruples name every temporary explicitly (position-independent, so REORDERING quadruples for optimisation is safe), while triples refer to earlier instructions BY POSITION NUMBER, meaning reordering or deleting a triple can silently invalidate every later triple's references to it (this fragility-under-reordering distinction is a common conceptual true/false target).
+KEY: for backpatching, three special lists are the standard tool - truelist (jump instructions still needing the "when true, go here" target filled in), falselist (same for the false case), and nextlist (unconditional jumps to "whatever comes right after this statement"); the whole technique is exactly: emit jumps with blanks now, remember their instruction numbers in these lists, and patch in the real target address once it becomes known (e.g. once the loop-body's start label or the statement-after-the-if's position is reached).
+
+WORKED EXAMPLE 1 - full three-address code and full DAG for a single expression
+
+Expression: (a + b) * (a + b) - c
+1. Three-address code, respecting precedence (parenthesised addition first, then multiplication, then subtraction): t1 = a + b; t2 = a + b; t3 = t1 * t2; t4 = t3 - c. Naively this is FOUR instructions if generated straight from a tree with no sharing.
+2. Now build the DAG: node1 = leaf 'a', node2 = leaf 'b', node3 = '+' with children node1,node2 (representing a+b) - crucially, since (a+b) appears TWICE in the source expression and neither a nor b is reassigned in between, BOTH occurrences point to the exact same node3, rather than creating a duplicate node.
+3. node4 = '*' with children node3, node3 (both operands of the multiply point to the SAME shared addition node) - representing (a+b)*(a+b) using only one underlying addition computation.
+4. node5 = '-' with children node4 (the multiply result) and leaf 'c' - representing the final subtraction.
+5. DAG-optimised TAC, reading off the DAG (only 3 instructions now, one per DISTINCT node, since the DAG has only one addition node not two): t1 = a + b; t2 = t1 * t1; t3 = t2 - c. This is the concrete mechanism of common-subexpression elimination: the DAG naturally exposes and eliminates the redundant second computation of a+b.
+
+WORKED EXAMPLE 2 - backpatching for an if-else statement
+
+Statement: if (a < b) then S1 else S2, using backpatching with truelist/falselist/nextlist.
+1. Generate code for the condition a < b as: code_cond; if a < b goto _ (target blank, add this instruction's number to truelist); goto _ (target blank, add to falselist).
+2. Emit the label for S1's code (this is exactly the address to backpatch into every entry of truelist - patch truelist now to point here). Generate S1's code, then emit an unconditional goto _ with its target blank, add this to nextlist (this jump exists to skip over S2 once S1 finishes).
+3. Emit the label for S2's code (this is exactly the address to backpatch into every entry of falselist - patch falselist now to point here). Generate S2's code.
+4. Emit the label for the statement immediately AFTER the whole if-else (this is exactly the address to backpatch into nextlist, so that S1's trailing goto correctly skips past S2 and lands right after the entire construct). All blanks are now filled with real, correct addresses - and crucially, ALL of this could be emitted in a SINGLE left-to-right pass, never needing to go back and re-scan the source, precisely because the actual patching (writing the real number into the blank field) happens after the target position is known, not the code generation position itself.
+
+WORKED EXAMPLE 3 - counting TAC statements for a boolean expression with short-circuiting
+
+Expression used as a condition: if (a < b && c > d) goto L.
+1. Because && short-circuits, the code must be: if a < b goto L2 (fall through/continue evaluating on true) else goto Lfalse (skip evaluating the second condition entirely) - this is already different from unconditionally computing both comparisons first.
+2. L2: if c > d goto L else goto Lfalse - the second comparison is only evaluated at all when the first one succeeded, and its own result decides the final jump directly.
+3. Total distinct conditional-jump instructions: exactly 2 (one per comparison), NOT computing two separate boolean temporary values and then a THIRD instruction ANDing them together - that "compute both fully, then combine" approach is what a naive non-short-circuit translation would do, and mistakenly assuming that style is the classic error this topic tests. Short-circuit code is generally MORE instructions in the worst case (multiple jump targets) but potentially FEWER actual operations executed at runtime (skips evaluating the second operand when the first already determines the outcome).`; })();
