@@ -1,5 +1,5 @@
 // Offline cache — the whole app works with zero network after first load.
-var CACHE = 'gate-r1-v2';
+var CACHE = 'gate-r1-v7';
 var ASSETS = [
   './', './index.html', './css/style.css', './js/app.js', './js/generators.js',
   './data/plan90.js', './data/astro.js', './icon.svg', './manifest.webmanifest',
@@ -8,6 +8,17 @@ var ASSETS = [
   './data/questions/compiler.js', './data/questions/os.js', './data/questions/dbms.js',
   './data/questions/cn.js', './data/questions/apti.js'
 ];
+// PYQ:START
+ASSETS = ASSETS.concat([
+  './data/pyq/gate2014-s1.js',
+  './data/pyq/gate2014-s3.js',
+  './data/pyq/gate2016-s1.js',
+  './data/pyq/gate2019.js',
+  './data/pyq/gate2024-s1.js',
+  './data/pyq/gate2024-s2.js',
+  './data/pyq/gate2025-s1.js'
+]);
+// PYQ:END
 self.addEventListener('install', function (e) {
   e.waitUntil(caches.open(CACHE).then(function (c) { return c.addAll(ASSETS); }).then(function () { return self.skipWaiting(); }));
 });
