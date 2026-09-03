@@ -959,7 +959,25 @@
   function viewMockLanding() {
     var last = S.mocks[S.mocks.length - 1];
     var blocked = last && last.wrong > 0 && (last.tagged || 0) < last.wrong;
-    var html = '<div class="card"><h2>Full mock test</h2><p class="muted small">65 questions · 100 marks · 3 hours · real GATE negative marking (−1/3 on 1-mark, −2/3 on 2-mark MCQs). No pausing — treat it like the real hall.</p>';
+    var papers = (DATA.pyq || []).length;
+    var html = '';
+
+    // Real papers come first. A generated mock is unlimited but approximate; these
+    // are the actual exam, and doing them is the single highest-value practice
+    // there is. The generated mock is what you fall back on once they run out.
+    if (papers) {
+      var attempted = Object.keys(S.pyqLog || {}).length;
+      html += '<div class="card" style="border-left:4px solid var(--accent2)">' +
+        '<div class="eyebrow">The real thing</div><h2>Past-year papers</h2>' +
+        '<p class="muted small">' + papers + ' actual GATE papers with the official answer key. ' +
+        'Nothing here is written to look like GATE — it is GATE. ' +
+        (attempted ? 'You have attempted ' + attempted + '.' : 'Start with the most recent one.') + '</p>' +
+        '<div class="btn-row"><button class="btn good block" id="open-pyq">Open past papers</button></div></div>';
+    }
+
+    html += '<div class="card"><h2>Full mock test</h2><p class="muted small">' +
+      (papers ? 'Generated from the practice bank — unlimited, for when you have used up the real papers. ' : '') +
+      '65 questions · 100 marks · 3 hours · real GATE negative marking (−1/3 on 1-mark, −2/3 on 2-mark MCQs). No pausing — treat it like the real hall.</p>';
     if (blocked) {
       html += '<div class="feedback-banner no small">Locked &mdash; your last mock has ' + (last.wrong - (last.tagged || 0)) + ' untagged mistakes. Toppers never take a new mock before dissecting the last one — analyse every wrong answer first.</div>' +
         '<div class="btn-row"><button class="btn ghost" id="unlock-mock">I analysed every mistake on paper — unlock</button></div>';
@@ -967,8 +985,6 @@
       html += '<div class="btn-row"><button class="btn good" id="start-mock">Start mock now</button></div>';
     }
     html += '</div>';
-    html += '<div class="list-item" id="open-pyq"><div class="grow"><div class="title">Real past-year papers</div>' +
-      '<div class="muted small">' + ((DATA.pyq || []).length) + ' loaded &middot; actual GATE papers, by year</div></div><span class="arrow">›</span></div>';
     if (S.mocks.length) {
       html += '<div class="card"><h3>Your mock history</h3>';
       S.mocks.slice().reverse().forEach(function (m) {
