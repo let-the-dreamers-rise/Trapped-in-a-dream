@@ -1,0 +1,143 @@
+[
+  {
+    "id": "gate2018-ga-3",
+    "n": 3,
+    "section": "GA",
+    "q": "The area of a square is d. What is the area of the circle which has the diagonal of the square as its diameter?",
+    "options": [
+      "πd",
+      "πd²",
+      "(1/4)πd²",
+      "(1/2)πd"
+    ],
+    "answer": 3,
+    "marks": 1,
+    "explanation": "Side² = d, so the diagonal² = 2d, and the diagonal is the circle's diameter. Radius² = diagonal²/4 = d/2, so the circle's area = πr² = (1/2)πd."
+  },
+  {
+    "id": "gate2018-ga-9",
+    "n": 9,
+    "section": "GA",
+    "q": "In the figure below, ∠DEC + ∠BFC is equal to ____________.",
+    "figure": "<svg viewBox=\"0 0 380 260\" width=\"100%\" style=\"max-width:420px;height:auto\" xmlns=\"http://www.w3.org/2000/svg\"><line x1=\"60\" y1=\"20\" x2=\"90\" y2=\"220\" stroke=\"currentColor\" stroke-width=\"1.5\"/><line x1=\"76\" y1=\"130\" x2=\"350\" y2=\"150\" stroke=\"currentColor\" stroke-width=\"1.5\"/><line x1=\"90\" y1=\"220\" x2=\"350\" y2=\"150\" stroke=\"currentColor\" stroke-width=\"1.5\"/><line x1=\"60\" y1=\"20\" x2=\"246\" y2=\"178\" stroke=\"currentColor\" stroke-width=\"1.5\"/><circle cx=\"60\" cy=\"20\" r=\"2.5\" fill=\"currentColor\"/><text x=\"45\" y=\"14\" font-size=\"13\" fill=\"currentColor\">E</text><circle cx=\"76\" cy=\"130\" r=\"2.5\" fill=\"currentColor\"/><text x=\"52\" y=\"134\" font-size=\"13\" fill=\"currentColor\">D</text><circle cx=\"200\" cy=\"139\" r=\"2.5\" fill=\"currentColor\"/><text x=\"206\" y=\"134\" font-size=\"13\" fill=\"currentColor\">C</text><circle cx=\"350\" cy=\"150\" r=\"2.5\" fill=\"currentColor\"/><text x=\"358\" y=\"154\" font-size=\"13\" fill=\"currentColor\">F</text><circle cx=\"246\" cy=\"178\" r=\"2.5\" fill=\"currentColor\"/><text x=\"248\" y=\"198\" font-size=\"13\" fill=\"currentColor\">B</text><circle cx=\"90\" cy=\"220\" r=\"2.5\" fill=\"currentColor\"/><text x=\"78\" y=\"240\" font-size=\"13\" fill=\"currentColor\">A</text></svg>",
+    "options": [
+      "∠BCD − ∠BAD",
+      "∠BAD + ∠BCF",
+      "∠BAD + ∠BCD",
+      "∠CBA + ∠ADC"
+    ],
+    "answer": 0,
+    "marks": 2,
+    "explanation": "D lies on AE and B lies on AF, and the cevians DF and EB cross at C. Applying the exterior-angle theorem at C to the two small triangles formed shows ∠DEC + ∠BFC works out to ∠BCD − ∠BAD."
+  },
+  {
+    "id": "gate2018-cs-1",
+    "n": 1,
+    "section": "CS",
+    "q": "Which one of the following is a closed form expression for the generating function of the sequence {aₙ}, where aₙ = 2n + 3 for all n = 0, 1, 2, … ?",
+    "options": [
+      "3/(1−x)²",
+      "3x/(1−x)²",
+      "(2−x)/(1−x)²",
+      "(3−x)/(1−x)²"
+    ],
+    "answer": 3,
+    "marks": 1,
+    "explanation": "G(x) = Σ(2n+3)xⁿ = 2·x/(1−x)² + 3/(1−x) = [2x + 3(1−x)]/(1−x)² = (3−x)/(1−x)²."
+  },
+  {
+    "id": "gate2018-cs-4",
+    "n": 4,
+    "section": "CS",
+    "q": "Let ⊕ and ⊙ denote the Exclusive OR and Exclusive NOR operations, respectively. Which one of the following is NOT CORRECT?",
+    "options": [
+      "¬(P ⊕ Q) = P ⊙ Q",
+      "¬P ⊕ Q = P ⊙ Q",
+      "¬P ⊕ ¬Q = P ⊕ Q",
+      "(P ⊕ ¬P) ⊕ Q = (P ⊙ ¬P) ⊙ ¬Q"
+    ],
+    "answer": 3,
+    "marks": 1,
+    "explanation": "P ⊕ ¬P is always 1, so the left side reduces to 1 ⊕ Q = ¬Q. P ⊙ ¬P is always 0, so the right side reduces to 0 ⊙ ¬Q = Q. Since ¬Q ≠ Q in general, option (D) is the one that is NOT correct."
+  },
+  {
+    "id": "gate2018-cs-17",
+    "n": 17,
+    "section": "CS",
+    "q": "Consider a matrix A = uvᵀ where u = (1, 2)ᵀ, v = (1, 1)ᵀ. Note that vᵀ denotes the transpose of v. The largest eigenvalue of A is _____.",
+    "options": [],
+    "answer": 3,
+    "tolerance": 0.01,
+    "kind": "nat",
+    "marks": 1,
+    "explanation": "A = uvᵀ is a rank-1 matrix, so its only nonzero eigenvalue equals trace(A) = u·v = (1)(1) + (2)(1) = 3."
+  },
+  {
+    "id": "gate2018-cs-18",
+    "n": 18,
+    "section": "CS",
+    "q": "The chromatic number of the following graph is ________.",
+    "figure": "<svg viewBox=\"0 0 300 210\" width=\"100%\" style=\"max-width:420px;height:auto\" xmlns=\"http://www.w3.org/2000/svg\"><g stroke=\"currentColor\" stroke-width=\"1.5\" fill=\"none\"><line x1=\"60\" y1=\"30\" x2=\"240\" y2=\"30\"/><line x1=\"60\" y1=\"30\" x2=\"60\" y2=\"170\"/><line x1=\"60\" y1=\"30\" x2=\"120\" y2=\"90\"/><line x1=\"240\" y1=\"30\" x2=\"120\" y2=\"90\"/><line x1=\"240\" y1=\"30\" x2=\"240\" y2=\"170\"/><line x1=\"60\" y1=\"170\" x2=\"120\" y2=\"90\"/><line x1=\"60\" y1=\"170\" x2=\"240\" y2=\"170\"/><line x1=\"60\" y1=\"170\" x2=\"190\" y2=\"100\"/><line x1=\"120\" y1=\"90\" x2=\"190\" y2=\"100\"/><line x1=\"190\" y1=\"100\" x2=\"240\" y2=\"170\"/></g><g fill=\"currentColor\"><circle cx=\"60\" cy=\"30\" r=\"12\" fill=\"none\" stroke=\"currentColor\"/><text x=\"56\" y=\"34\" font-size=\"12\">a</text><circle cx=\"240\" cy=\"30\" r=\"12\" fill=\"none\" stroke=\"currentColor\"/><text x=\"236\" y=\"34\" font-size=\"12\">e</text><circle cx=\"120\" cy=\"90\" r=\"12\" fill=\"none\" stroke=\"currentColor\"/><text x=\"116\" y=\"94\" font-size=\"12\">c</text><circle cx=\"190\" cy=\"100\" r=\"12\" fill=\"none\" stroke=\"currentColor\"/><text x=\"186\" y=\"104\" font-size=\"12\">d</text><circle cx=\"60\" cy=\"170\" r=\"12\" fill=\"none\" stroke=\"currentColor\"/><text x=\"56\" y=\"174\" font-size=\"12\">b</text><circle cx=\"240\" cy=\"170\" r=\"12\" fill=\"none\" stroke=\"currentColor\"/><text x=\"236\" y=\"174\" font-size=\"12\">f</text></g></svg>",
+    "options": [],
+    "answer": 3,
+    "tolerance": 0.01,
+    "kind": "nat",
+    "marks": 1,
+    "explanation": "Triangle a-c-b (and b-c-d, c-d-e, b-d-f cliques) force at least 3 colours, and a proper 3-colouring exists (e.g. {a,d}, {b,e}, {c,f}), so the chromatic number is 3."
+  },
+  {
+    "id": "gate2018-cs-22",
+    "n": 22,
+    "section": "CS",
+    "q": "Consider the sequential circuit shown in the figure, where both flip-flops used are positive edge-triggered D flip-flops. The circuit is a 2-bit shift register with input 'in' feeding the first flip-flop, whose output feeds the second flip-flop's D input, both driven by the same clock, with 'out' taken from the second flip-flop. The number of states in the state transition diagram of this circuit that have a transition back to the same state on some value of 'in' is _____.",
+    "figure": "<svg viewBox=\"0 0 300 150\" width=\"100%\" style=\"max-width:420px;height:auto\" xmlns=\"http://www.w3.org/2000/svg\"><g stroke=\"currentColor\" stroke-width=\"1.5\" fill=\"none\"><rect x=\"70\" y=\"30\" width=\"60\" height=\"50\"/><rect x=\"170\" y=\"30\" width=\"60\" height=\"50\"/><line x1=\"20\" y1=\"55\" x2=\"70\" y2=\"55\" marker-end=\"url(#ah2018cs22)\"/><line x1=\"130\" y1=\"55\" x2=\"170\" y2=\"55\" marker-end=\"url(#ah2018cs22)\"/><line x1=\"230\" y1=\"55\" x2=\"270\" y2=\"55\" marker-end=\"url(#ah2018cs22)\"/><line x1=\"20\" y1=\"110\" x2=\"270\" y2=\"110\"/><line x1=\"100\" y1=\"110\" x2=\"100\" y2=\"80\" marker-end=\"url(#ah2018cs22)\"/><line x1=\"200\" y1=\"110\" x2=\"200\" y2=\"80\" marker-end=\"url(#ah2018cs22)\"/></g><defs><marker id=\"ah2018cs22\" markerWidth=\"8\" markerHeight=\"8\" refX=\"7\" refY=\"4\" orient=\"auto\"><path d=\"M0,0 L8,4 L0,8 Z\" fill=\"currentColor\"/></marker></defs><text x=\"6\" y=\"50\" font-size=\"12\" fill=\"currentColor\">in</text><text x=\"235\" y=\"50\" font-size=\"12\" fill=\"currentColor\">out</text><text x=\"10\" y=\"125\" font-size=\"12\" fill=\"currentColor\">clock</text><text x=\"82\" y=\"60\" font-size=\"13\" fill=\"currentColor\">D  Q</text><text x=\"182\" y=\"60\" font-size=\"13\" fill=\"currentColor\">D  Q</text></svg>",
+    "options": [],
+    "answer": 2,
+    "tolerance": 0.01,
+    "kind": "nat",
+    "marks": 1,
+    "explanation": "With state (Q1,Q2) and next state (in, Q1), state (0,0) self-loops when in=0 and state (1,1) self-loops when in=1; the other two states (0,1) and (1,0) never return to themselves. So 2 states have a self-loop."
+  },
+  {
+    "id": "gate2018-cs-38",
+    "n": 38,
+    "section": "CS",
+    "q": "Consider the following parse tree for the expression a#b$c$d#e#f, involving two binary operators $ and #. Which one of the following is correct for the given parse tree?",
+    "figure": "<svg viewBox=\"0 0 550 290\" width=\"100%\" style=\"max-width:420px;height:auto\" xmlns=\"http://www.w3.org/2000/svg\"><g stroke=\"currentColor\" stroke-width=\"1.2\"><line x1=\"300\" y1=\"20\" x2=\"150\" y2=\"80\"/><line x1=\"300\" y1=\"20\" x2=\"400\" y2=\"80\"/><line x1=\"400\" y1=\"80\" x2=\"330\" y2=\"140\"/><line x1=\"400\" y1=\"80\" x2=\"470\" y2=\"140\"/><line x1=\"330\" y1=\"140\" x2=\"270\" y2=\"200\"/><line x1=\"330\" y1=\"140\" x2=\"390\" y2=\"200\"/><line x1=\"470\" y1=\"140\" x2=\"440\" y2=\"200\"/><line x1=\"470\" y1=\"140\" x2=\"500\" y2=\"200\"/><line x1=\"270\" y1=\"200\" x2=\"230\" y2=\"260\"/><line x1=\"270\" y1=\"200\" x2=\"310\" y2=\"260\"/></g><g font-size=\"14\" fill=\"currentColor\" text-anchor=\"middle\"><text x=\"300\" y=\"16\">#</text><text x=\"150\" y=\"95\">a</text><text x=\"400\" y=\"76\">#</text><text x=\"330\" y=\"136\">$</text><text x=\"470\" y=\"136\">#</text><text x=\"270\" y=\"196\">$</text><text x=\"390\" y=\"215\">d</text><text x=\"440\" y=\"215\">e</text><text x=\"500\" y=\"215\">f</text><text x=\"230\" y=\"275\">b</text><text x=\"310\" y=\"275\">c</text></g></svg>",
+    "options": [
+      "$ has higher precedence and is left associative; # is right associative",
+      "# has higher precedence and is left associative; $ is right associative",
+      "$ has higher precedence and is left associative; # is left associative",
+      "# has higher precedence and is right associative; $ is left associative"
+    ],
+    "answer": 0,
+    "marks": 2,
+    "explanation": "The $ subexpressions (b$c, then (b$c)$d) are nested deepest, so $ binds tighter than #, and its left-leaning nesting ((b$c)$d) shows left associativity; the right-leaning nesting of # (a # (... # (e#f))) shows # is right associative."
+  },
+  {
+    "id": "gate2018-cs-47",
+    "n": 47,
+    "section": "CS",
+    "q": "Consider the following undirected graph G with edge weights as shown (the top vertex connects to the left vertex with weight 4, to the right vertex with weight x, and by two diagonals of weight 1 and 3 to the bottom-left and bottom-right vertices respectively; the left and bottom-left vertices are joined by an edge of weight 4, the two bottom vertices by an edge of weight 4, and the bottom-right and right vertices by an edge of weight 5). Choose a value for x that will maximize the number of minimum weight spanning trees (MWSTs) of G. The number of MWSTs of G for this value of x is ______.",
+    "figure": "<svg viewBox=\"0 0 300 220\" width=\"100%\" style=\"max-width:420px;height:auto\" xmlns=\"http://www.w3.org/2000/svg\"><g stroke=\"currentColor\" stroke-width=\"1.5\"><line x1=\"150\" y1=\"40\" x2=\"60\" y2=\"110\"/><line x1=\"150\" y1=\"40\" x2=\"240\" y2=\"110\"/><line x1=\"150\" y1=\"40\" x2=\"90\" y2=\"190\"/><line x1=\"150\" y1=\"40\" x2=\"210\" y2=\"190\"/><line x1=\"60\" y1=\"110\" x2=\"90\" y2=\"190\"/><line x1=\"90\" y1=\"190\" x2=\"210\" y2=\"190\"/><line x1=\"210\" y1=\"190\" x2=\"240\" y2=\"110\"/></g><g fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.5\"><circle cx=\"150\" cy=\"40\" r=\"14\"/><circle cx=\"60\" cy=\"110\" r=\"14\"/><circle cx=\"240\" cy=\"110\" r=\"14\"/><circle cx=\"90\" cy=\"190\" r=\"14\"/><circle cx=\"210\" cy=\"190\" r=\"14\"/></g><g font-size=\"13\" fill=\"currentColor\"><text x=\"100\" y=\"70\">4</text><text x=\"190\" y=\"70\">x</text><text x=\"130\" y=\"120\">1</text><text x=\"165\" y=\"115\">3</text><text x=\"65\" y=\"155\">4</text><text x=\"245\" y=\"155\">5</text><text x=\"145\" y=\"205\">4</text></g></svg>",
+    "options": [],
+    "answer": 4,
+    "tolerance": 0.01,
+    "kind": "nat",
+    "marks": 2,
+    "explanation": "Setting x = 5 ties the top-right edge with the other weight-5 edge, and checking all spanning trees shows the minimum weight of 13 is achieved by exactly 4 different edge subsets, more than for any other value of x."
+  },
+  {
+    "id": "gate2018-cs-52",
+    "n": 52,
+    "section": "CS",
+    "q": "Given a language L, define Lⁱ as follows: L⁰ = {ε}; Lⁱ = Lⁱ⁻¹·L for all i > 0. The order of a language L is defined as the smallest k such that Lᵏ = Lᵏ⁺¹. Consider the language L₁ (over alphabet 0) accepted by the automaton shown, whose start state and the state reached after one '0' are both accepting, and from that accepting state, reading '0' leads to a non-accepting state from which reading '0' returns to the accepting state. The order of L₁ is _____.",
+    "figure": "<svg viewBox=\"0 0 340 160\" width=\"100%\" style=\"max-width:420px;height:auto\" xmlns=\"http://www.w3.org/2000/svg\"><defs><marker id=\"ah2018cs52\" markerWidth=\"8\" markerHeight=\"8\" refX=\"7\" refY=\"4\" orient=\"auto\"><path d=\"M0,0 L8,4 L0,8 Z\" fill=\"currentColor\"/></marker></defs><line x1=\"10\" y1=\"80\" x2=\"50\" y2=\"80\" stroke=\"currentColor\" stroke-width=\"1.5\" marker-end=\"url(#ah2018cs52)\"/><circle cx=\"70\" cy=\"80\" r=\"16\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.5\"/><circle cx=\"70\" cy=\"80\" r=\"11\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.5\"/><line x1=\"86\" y1=\"80\" x2=\"164\" y2=\"80\" stroke=\"currentColor\" stroke-width=\"1.5\" marker-end=\"url(#ah2018cs52)\"/><text x=\"120\" y=\"72\" font-size=\"12\" fill=\"currentColor\">0</text><circle cx=\"185\" cy=\"80\" r=\"16\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.5\"/><circle cx=\"185\" cy=\"80\" r=\"11\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.5\"/><path d=\"M199,70 C230,50 260,50 285,68\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.5\" marker-end=\"url(#ah2018cs52)\"/><text x=\"235\" y=\"52\" font-size=\"12\" fill=\"currentColor\">0</text><path d=\"M285,92 C260,112 230,112 200,92\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.5\" marker-end=\"url(#ah2018cs52)\"/><text x=\"235\" y=\"118\" font-size=\"12\" fill=\"currentColor\">0</text><circle cx=\"300\" cy=\"80\" r=\"16\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.5\"/></svg>",
+    "options": [],
+    "answer": 2,
+    "tolerance": 0.01,
+    "kind": "nat",
+    "marks": 2,
+    "explanation": "L₁ = {0ⁿ : n = 0 or n odd}, so L₁¹ misses even lengths ≥2 while L₁² already contains every length (0+0, 0+odd, odd+odd), and L₁² concatenated with L₁ again gives all lengths, so L₁² = L₁³ while L₁¹ ≠ L₁²; the order is 2."
+  }
+]

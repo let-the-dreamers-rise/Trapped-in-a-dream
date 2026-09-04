@@ -1,0 +1,132 @@
+[
+ {
+  "id": "gate2024s1-ga-2",
+  "n": 2,
+  "section": "GA",
+  "q": "If two distinct non-zero real variables x and y are such that (x + y) is proportional to (x − y), then the value of x/y",
+  "options": [
+   "depends on xy",
+   "depends only on x and not on y",
+   "depends only on y and not on x",
+   "is a constant"
+  ],
+  "answer": 3,
+  "marks": 1,
+  "explanation": "(x+y) = k(x−y) for some constant k gives x(1−k) = −y(1+k), so x/y = −(1+k)/(1−k), a fixed constant independent of the particular x, y, matching the official key (D)."
+ },
+ {
+  "id": "gate2024s1-cs-12",
+  "n": 12,
+  "section": "CS",
+  "q": "The product of all eigenvalues of the matrix\n[1 2 3]\n[4 5 6]\n[7 8 9]\nis",
+  "options": [
+   "−1",
+   "0",
+   "1",
+   "2"
+  ],
+  "answer": 1,
+  "marks": 1,
+  "explanation": "The product of the eigenvalues of a matrix equals its determinant. This matrix has rank 2 (row3 = 2·row2 − row1), so it is singular and det = 0, matching the official key (B)."
+ },
+ {
+  "id": "gate2024s1-cs-20",
+  "n": 20,
+  "section": "CS",
+  "q": "Let S be the specification: \"Instructors teach courses. Students register for courses. Courses are allocated classrooms. Instructors guide students.\" Which one of the following ER diagrams CORRECTLY represents S?",
+  "figure": "<svg viewBox=\"0 0 620 470\" width=\"100%\" style=\"max-width:420px;height:auto\" xmlns=\"http://www.w3.org/2000/svg\"><g font-size=\"9\" fill=\"currentColor\" stroke=\"currentColor\"><g transform=\"translate(10,10)\" fill=\"none\"><rect x=\"0\" y=\"50\" width=\"60\" height=\"22\"/><text x=\"6\" y=\"65\" stroke=\"none\" fill=\"currentColor\">Instructor</text><polygon points=\"75,61 95,47 115,61 95,75\"/><text x=\"80\" y=\"64\" stroke=\"none\" fill=\"currentColor\">Teaches</text><rect x=\"125\" y=\"50\" width=\"55\" height=\"22\"/><text x=\"132\" y=\"65\" stroke=\"none\" fill=\"currentColor\">Course</text><rect x=\"150\" y=\"0\" width=\"65\" height=\"20\"/><text x=\"154\" y=\"14\" stroke=\"none\" fill=\"currentColor\">Registration</text><line x1=\"152\" y1=\"50\" x2=\"182\" y2=\"20\"/><rect x=\"65\" y=\"95\" width=\"60\" height=\"22\"/><text x=\"70\" y=\"110\" stroke=\"none\" fill=\"currentColor\">Classroom</text><polygon points=\"130,106 150,92 170,106 150,120\"/><text x=\"135\" y=\"109\" stroke=\"none\" fill=\"currentColor\">Alloc.</text><polygon points=\"190,106 210,92 230,106 210,120\"/><text x=\"196\" y=\"109\" stroke=\"none\" fill=\"currentColor\">Student</text><line x1=\"125\" y1=\"106\" x2=\"130\" y2=\"106\"/><line x1=\"170\" y1=\"106\" x2=\"190\" y2=\"106\"/><line x1=\"155\" y1=\"72\" x2=\"198\" y2=\"98\"/><polygon points=\"75,150 95,136 115,150 95,164\" fill=\"none\"/><text x=\"80\" y=\"153\" stroke=\"none\" fill=\"currentColor\">Guides</text><line x1=\"30\" y1=\"72\" x2=\"30\" y2=\"150\"/><line x1=\"30\" y1=\"150\" x2=\"75\" y2=\"150\"/><line x1=\"115\" y1=\"150\" x2=\"210\" y2=\"150\"/><line x1=\"210\" y1=\"150\" x2=\"210\" y2=\"120\"/><text x=\"100\" y=\"190\" stroke=\"none\" fill=\"currentColor\">(i)</text></g><g transform=\"translate(340,10)\" fill=\"none\"><rect x=\"0\" y=\"50\" width=\"60\" height=\"22\"/><text x=\"6\" y=\"65\" stroke=\"none\" fill=\"currentColor\">Instructor</text><polygon points=\"75,61 95,47 115,61 95,75\"/><text x=\"80\" y=\"64\" stroke=\"none\" fill=\"currentColor\">Teaches</text><rect x=\"125\" y=\"50\" width=\"55\" height=\"22\"/><text x=\"132\" y=\"65\" stroke=\"none\" fill=\"currentColor\">Course</text><rect x=\"65\" y=\"95\" width=\"60\" height=\"22\"/><text x=\"70\" y=\"110\" stroke=\"none\" fill=\"currentColor\">Classroom</text><polygon points=\"130,106 150,92 170,106 150,120\"/><text x=\"135\" y=\"109\" stroke=\"none\" fill=\"currentColor\">Alloc.</text><polygon points=\"190,106 210,92 230,106 210,120\"/><text x=\"192\" y=\"109\" stroke=\"none\" fill=\"currentColor\">Regis.</text><line x1=\"125\" y1=\"106\" x2=\"130\" y2=\"106\"/><line x1=\"170\" y1=\"106\" x2=\"190\" y2=\"106\"/><line x1=\"155\" y1=\"72\" x2=\"200\" y2=\"98\"/><polygon points=\"75,150 95,136 115,150 95,164\"/><text x=\"80\" y=\"153\" stroke=\"none\" fill=\"currentColor\">Guides</text><line x1=\"30\" y1=\"72\" x2=\"30\" y2=\"150\"/><line x1=\"30\" y1=\"150\" x2=\"75\" y2=\"150\"/><rect x=\"180\" y=\"139\" width=\"60\" height=\"22\"/><text x=\"184\" y=\"154\" stroke=\"none\" fill=\"currentColor\">Projects</text><line x1=\"115\" y1=\"150\" x2=\"180\" y2=\"150\"/><text x=\"100\" y=\"190\" stroke=\"none\" fill=\"currentColor\">(ii)</text></g><g transform=\"translate(10,240)\" fill=\"none\"><rect x=\"0\" y=\"50\" width=\"60\" height=\"22\"/><text x=\"6\" y=\"65\" stroke=\"none\" fill=\"currentColor\">Instructor</text><polygon points=\"75,61 95,47 115,61 95,75\"/><text x=\"80\" y=\"64\" stroke=\"none\" fill=\"currentColor\">Teaches</text><rect x=\"125\" y=\"50\" width=\"55\" height=\"22\"/><text x=\"132\" y=\"65\" stroke=\"none\" fill=\"currentColor\">Course</text><rect x=\"65\" y=\"95\" width=\"60\" height=\"22\"/><text x=\"70\" y=\"110\" stroke=\"none\" fill=\"currentColor\">Classroom</text><polygon points=\"130,106 150,92 170,106 150,120\"/><text x=\"135\" y=\"109\" stroke=\"none\" fill=\"currentColor\">Alloc.</text><polygon points=\"190,106 210,92 230,106 210,120\"/><text x=\"192\" y=\"109\" stroke=\"none\" fill=\"currentColor\">Regis.</text><line x1=\"125\" y1=\"106\" x2=\"130\" y2=\"106\"/><line x1=\"170\" y1=\"106\" x2=\"190\" y2=\"106\"/><line x1=\"155\" y1=\"72\" x2=\"200\" y2=\"98\"/><line x1=\"125\" y1=\"60\" x2=\"95\" y2=\"95\" stroke-dasharray=\"2,2\"/><polygon points=\"75,150 95,136 115,150 95,164\"/><text x=\"80\" y=\"153\" stroke=\"none\" fill=\"currentColor\">Guides</text><line x1=\"30\" y1=\"72\" x2=\"30\" y2=\"150\"/><line x1=\"30\" y1=\"150\" x2=\"75\" y2=\"150\"/><rect x=\"180\" y=\"139\" width=\"55\" height=\"22\"/><text x=\"186\" y=\"154\" stroke=\"none\" fill=\"currentColor\">Student</text><line x1=\"115\" y1=\"150\" x2=\"180\" y2=\"150\"/><text x=\"100\" y=\"190\" stroke=\"none\" fill=\"currentColor\">(iii)</text></g><g transform=\"translate(340,240)\" fill=\"none\"><rect x=\"0\" y=\"50\" width=\"60\" height=\"22\"/><text x=\"6\" y=\"65\" stroke=\"none\" fill=\"currentColor\">Instructor</text><polygon points=\"75,61 95,47 115,61 95,75\"/><text x=\"80\" y=\"64\" stroke=\"none\" fill=\"currentColor\">Teaches</text><rect x=\"125\" y=\"50\" width=\"55\" height=\"22\"/><text x=\"132\" y=\"65\" stroke=\"none\" fill=\"currentColor\">Course</text><rect x=\"65\" y=\"95\" width=\"60\" height=\"22\"/><text x=\"70\" y=\"110\" stroke=\"none\" fill=\"currentColor\">Classroom</text><polygon points=\"130,106 150,92 170,106 150,120\"/><text x=\"135\" y=\"109\" stroke=\"none\" fill=\"currentColor\">Alloc.</text><polygon points=\"190,106 210,92 230,106 210,120\"/><text x=\"192\" y=\"109\" stroke=\"none\" fill=\"currentColor\">Regis.</text><line x1=\"125\" y1=\"106\" x2=\"130\" y2=\"106\"/><line x1=\"170\" y1=\"106\" x2=\"190\" y2=\"106\"/><line x1=\"155\" y1=\"72\" x2=\"200\" y2=\"98\"/><polygon points=\"75,150 95,136 115,150 95,164\"/><text x=\"80\" y=\"153\" stroke=\"none\" fill=\"currentColor\">Guides</text><line x1=\"30\" y1=\"72\" x2=\"30\" y2=\"150\"/><line x1=\"30\" y1=\"150\" x2=\"75\" y2=\"150\"/><rect x=\"180\" y=\"139\" width=\"55\" height=\"22\"/><text x=\"186\" y=\"154\" stroke=\"none\" fill=\"currentColor\">Student</text><line x1=\"115\" y1=\"150\" x2=\"180\" y2=\"150\"/><text x=\"100\" y=\"190\" stroke=\"none\" fill=\"currentColor\">(iv)</text></g></g></svg>",
+  "options": [
+   "(i)",
+   "(ii)",
+   "(iii)",
+   "(iv)"
+  ],
+  "answer": 3,
+  "marks": 1,
+  "explanation": "(i) wrongly draws Registration as an entity and Student as a relationship diamond; (ii) mislabels the Student entity as Projects; (iii) adds a spurious direct edge from Course to Classroom bypassing the Allocation relationship. Only (iv) correctly models all four entities (Instructor, Course, Classroom, Student) and relationships (Teaches, Allocation, Registration, Guides) exactly as specified, matching the official key (D)."
+ },
+ {
+  "id": "gate2024s1-cs-23",
+  "n": 23,
+  "section": "CS",
+  "q": "Let L1, L2 be two regular languages and L3 a language which is not regular. Which of the following statements is/are always TRUE?",
+  "options": [
+   "L1 = L2 if and only if L1 ∩ ¬L2 = ∅",
+   "L1 ∪ L3 is not regular",
+   "¬L3 is not regular",
+   "¬L1 ∪ ¬L2 is regular"
+  ],
+  "answers": [
+   2,
+   3
+  ],
+  "kind": "msq",
+  "marks": 1,
+  "explanation": "Regular languages are closed under complement and union, so ¬L1 ∪ ¬L2 is always regular (D). The complement of a non-regular language is always non-regular, since regularity is closed under complement, so ¬L3 is not regular (C). Statement A only characterizes L1 ⊆ L2, not equality, and B fails whenever L1 already covers Σ* (e.g. L1 = Σ*), so L1 ∪ L3 can be regular, matching the official key (C, D)."
+ },
+ {
+  "id": "gate2024s1-cs-28",
+  "n": 28,
+  "section": "CS",
+  "q": "Consider the circuit shown below where the gates may have propagation delays. Assume that all signal transitions occur instantaneously and that wires have no delays. Which of the following statements about the circuit is/are CORRECT?",
+  "figure": "<svg viewBox=\"0 0 320 160\" width=\"100%\" style=\"max-width:420px;height:auto\" xmlns=\"http://www.w3.org/2000/svg\"><defs><marker id=\"ah-2024s1cs28\" markerWidth=\"8\" markerHeight=\"8\" refX=\"6\" refY=\"4\" orient=\"auto\"><path d=\"M0,0 L8,4 L0,8 Z\" fill=\"currentColor\"/></marker></defs><g fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.5\"><text x=\"35\" y=\"30\" font-size=\"13\" fill=\"currentColor\" stroke=\"none\">X</text><line x1=\"40\" y1=\"40\" x2=\"230\" y2=\"40\" marker-end=\"url(#ah-2024s1cs28)\"/><line x1=\"55\" y1=\"40\" x2=\"55\" y2=\"85\"/><line x1=\"55\" y1=\"85\" x2=\"90\" y2=\"85\"/><path d=\"M90,70 L90,100 L130,85 Z\" marker-end=\"url(#ah-2024s1cs28)\"/><text x=\"98\" y=\"90\" font-size=\"11\" fill=\"currentColor\" stroke=\"none\">NOT</text><circle cx=\"136\" cy=\"85\" r=\"4\"/><line x1=\"140\" y1=\"85\" x2=\"180\" y2=\"85\"/><line x1=\"180\" y1=\"85\" x2=\"180\" y2=\"70\"/><line x1=\"180\" y1=\"70\" x2=\"230\" y2=\"70\" marker-end=\"url(#ah-2024s1cs28)\"/><path d=\"M230,40 h30 a25,25 0 0 1 0,50 h-30 Z\"/><text x=\"245\" y=\"70\" font-size=\"11\" fill=\"currentColor\" stroke=\"none\">AND</text><line x1=\"285\" y1=\"65\" x2=\"310\" y2=\"65\" marker-end=\"url(#ah-2024s1cs28)\"/><text x=\"295\" y=\"55\" font-size=\"13\" fill=\"currentColor\" stroke=\"none\">Y</text></g></svg>",
+  "options": [
+   "With no propagation delays, the output Y is always logic Zero",
+   "With no propagation delays, the output Y is always logic One",
+   "With propagation delays, the output Y can have a transient logic One after X transitions from logic Zero to logic One",
+   "With propagation delays, the output Y can have a transient logic Zero after X transitions from logic One to logic Zero"
+  ],
+  "answers": [
+   0,
+   2
+  ],
+  "kind": "msq",
+  "marks": 1,
+  "explanation": "Y = X AND (NOT X). With zero delay this is identically 0, so (A) holds. With a NOT-gate delay, when X rises from 0 to 1 the AND's direct input becomes 1 immediately while the NOT output (still reflecting the old X=0) briefly stays 1, so both AND inputs are momentarily 1, producing a transient logic One glitch, matching the official key (A, C). When X falls from 1 to 0 the direct input goes to 0 immediately, forcing Y to 0 with no glitch, so (D) is false."
+ },
+ {
+  "id": "gate2024s1-cs-35",
+  "n": 35,
+  "section": "CS",
+  "q": "Consider the following two relations, R(A,B) and S(A,C):\nR\nA   B\n10  20\n20  30\n30  40\n30  50\n50  95\n\nS\nA   C\n10  90\n30  45\n40  80\n\nThe total number of tuples obtained by evaluating the following expression\nσ(B<C) (R ⋈(R.A=S.A) S)\nis ________",
+  "options": [],
+  "answer": 2,
+  "tolerance": 0.01,
+  "kind": "nat",
+  "marks": 1,
+  "explanation": "Joining on A gives (10,20,90), (30,40,45), (30,50,45) — the A=20 and A=50 rows of R and the A=40 row of S have no match. Applying B<C keeps (10,20,90) since 20<90 and (30,40,45) since 40<45, but drops (30,50,45) since 50≥45, leaving 2 tuples, matching the official key."
+ },
+ {
+  "id": "gate2024s1-cs-50",
+  "n": 50,
+  "section": "CS",
+  "q": "Consider the 5-state DFA M accepting the language L(M) ⊂ (0+1)* shown below. For any string w ∈ (0+1)*, let n0(w) be the number of 0's in w and n1(w) be the number of 1's in w.",
+  "figure": "<svg viewBox=\"0 0 380 300\" width=\"100%\" style=\"max-width:420px;height:auto\" xmlns=\"http://www.w3.org/2000/svg\"><defs><marker id=\"ah-2024s1cs50\" markerWidth=\"7\" markerHeight=\"7\" refX=\"6\" refY=\"3.5\" orient=\"auto\"><path d=\"M0,0 L7,3.5 L0,7 Z\" fill=\"currentColor\"/></marker></defs><g fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.3\"><line x1=\"12\" y1=\"150\" x2=\"40\" y2=\"150\" marker-end=\"url(#ah-2024s1cs50)\"/><circle cx=\"60\" cy=\"150\" r=\"18\"/><circle cx=\"60\" cy=\"150\" r=\"13\"/><circle cx=\"170\" cy=\"75\" r=\"18\"/><circle cx=\"280\" cy=\"50\" r=\"18\"/><circle cx=\"170\" cy=\"225\" r=\"18\"/><circle cx=\"280\" cy=\"250\" r=\"18\"/><line x1=\"75\" y1=\"138\" x2=\"155\" y2=\"88\" marker-end=\"url(#ah-2024s1cs50)\"/><line x1=\"158\" y1=\"95\" x2=\"78\" y2=\"145\" marker-end=\"url(#ah-2024s1cs50)\"/><line x1=\"186\" y1=\"66\" x2=\"264\" y2=\"53\" marker-end=\"url(#ah-2024s1cs50)\"/><line x1=\"264\" y1=\"61\" x2=\"186\" y2=\"74\" marker-end=\"url(#ah-2024s1cs50)\"/><line x1=\"72\" y1=\"163\" x2=\"158\" y2=\"213\" marker-end=\"url(#ah-2024s1cs50)\"/><line x1=\"160\" y1=\"220\" x2=\"75\" y2=\"170\" marker-end=\"url(#ah-2024s1cs50)\"/><line x1=\"186\" y1=\"232\" x2=\"264\" y2=\"247\" marker-end=\"url(#ah-2024s1cs50)\"/><line x1=\"264\" y1=\"255\" x2=\"186\" y2=\"240\" marker-end=\"url(#ah-2024s1cs50)\"/><path d=\"M288,33 Q170,-4 56,132\" marker-end=\"url(#ah-2024s1cs50)\"/><path d=\"M288,267 Q170,304 56,168\" marker-end=\"url(#ah-2024s1cs50)\"/></g><g font-size=\"13\" fill=\"currentColor\" stroke=\"none\" text-anchor=\"middle\"><text x=\"60\" y=\"155\">1</text><text x=\"170\" y=\"80\">2</text><text x=\"280\" y=\"55\">3</text><text x=\"170\" y=\"230\">4</text><text x=\"280\" y=\"255\">5</text></g><g font-size=\"11\" fill=\"currentColor\" stroke=\"none\"><text x=\"100\" y=\"102\">0</text><text x=\"125\" y=\"130\">1</text><text x=\"218\" y=\"50\">0</text><text x=\"218\" y=\"82\">1</text><text x=\"95\" y=\"198\">1</text><text x=\"125\" y=\"207\">0</text><text x=\"215\" y=\"225\">1</text><text x=\"215\" y=\"262\">0</text><text x=\"168\" y=\"10\">0</text><text x=\"168\" y=\"298\">1</text></g></svg>",
+  "options": [
+   "States 2 and 4 are distinguishable in M",
+   "States 3 and 4 are distinguishable in M",
+   "States 2 and 5 are distinguishable in M",
+   "Any string w with n0(w) = n1(w) is in L(M)"
+  ],
+  "answers": [
+   1,
+   2
+  ],
+  "kind": "msq",
+  "marks": 2,
+  "explanation": "Transitions are 1→(2 on 0, 4 on 1), 2→(3 on 0, 1 on 1), 3→(1 on 0, 2 on 1), 4→(1 on 0, 5 on 1), 5→(4 on 0, 1 on 1), with state 1 the only accepting state. Partition refinement merges {2,5} and {3,4} into single equivalence classes, so states 3 and 4 are indistinguishable (making B false) and states 2 and 5 are indistinguishable (making C false), while 2 and 4 land in different classes and so are distinguishable (A true). The collapsed 3-state machine tracks (n0−n1) mod 3, and it accepts exactly when this is 0, which any w with n0(w)=n1(w) trivially satisfies, so D is also true. The officially keyed FALSE statements are B and C."
+ },
+ {
+  "id": "gate2024s1-cs-64",
+  "n": 64,
+  "section": "CS",
+  "q": "Consider a digital logic circuit consisting of three 2-to-1 multiplexers M1, M2, and M3 as shown below. X1 and X2 are inputs of M1. X3 and X4 are inputs of M2. A, B, and C are select lines of M1, M2, and M3, respectively. For an instance of inputs X1=1, X2=1, X3=0, and X4=0, the number of combinations of A, B, C that give the output Y=1 is ________",
+  "figure": "<svg viewBox=\"0 0 420 340\" width=\"100%\" style=\"max-width:420px;height:auto\" xmlns=\"http://www.w3.org/2000/svg\"><defs><marker id=\"ah-2024s1cs64\" markerWidth=\"7\" markerHeight=\"7\" refX=\"6\" refY=\"3.5\" orient=\"auto\"><path d=\"M0,0 L7,3.5 L0,7 Z\" fill=\"currentColor\"/></marker></defs><g fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.3\"><rect x=\"150\" y=\"50\" width=\"60\" height=\"80\"/><rect x=\"150\" y=\"200\" width=\"60\" height=\"80\"/><rect x=\"300\" y=\"110\" width=\"60\" height=\"90\"/><line x1=\"115\" y1=\"68\" x2=\"150\" y2=\"68\" marker-end=\"url(#ah-2024s1cs64)\"/><line x1=\"115\" y1=\"112\" x2=\"150\" y2=\"112\" marker-end=\"url(#ah-2024s1cs64)\"/><line x1=\"115\" y1=\"218\" x2=\"150\" y2=\"218\" marker-end=\"url(#ah-2024s1cs64)\"/><line x1=\"115\" y1=\"262\" x2=\"150\" y2=\"262\" marker-end=\"url(#ah-2024s1cs64)\"/><line x1=\"180\" y1=\"160\" x2=\"180\" y2=\"130\" marker-end=\"url(#ah-2024s1cs64)\"/><line x1=\"180\" y1=\"310\" x2=\"180\" y2=\"280\" marker-end=\"url(#ah-2024s1cs64)\"/><line x1=\"330\" y1=\"235\" x2=\"330\" y2=\"200\" marker-end=\"url(#ah-2024s1cs64)\"/><line x1=\"210\" y1=\"90\" x2=\"270\" y2=\"90\"/><line x1=\"270\" y1=\"90\" x2=\"270\" y2=\"130\"/><line x1=\"270\" y1=\"130\" x2=\"300\" y2=\"130\" marker-end=\"url(#ah-2024s1cs64)\"/><line x1=\"210\" y1=\"240\" x2=\"270\" y2=\"240\"/><line x1=\"270\" y1=\"240\" x2=\"270\" y2=\"190\"/><line x1=\"270\" y1=\"190\" x2=\"300\" y2=\"190\" marker-end=\"url(#ah-2024s1cs64)\"/><line x1=\"360\" y1=\"155\" x2=\"395\" y2=\"155\" marker-end=\"url(#ah-2024s1cs64)\"/></g><g font-size=\"12\" fill=\"currentColor\" stroke=\"none\"><text x=\"80\" y=\"72\">X1</text><text x=\"80\" y=\"116\">X2</text><text x=\"80\" y=\"222\">X3</text><text x=\"80\" y=\"266\">X4</text><text x=\"153\" y=\"65\">0</text><text x=\"153\" y=\"109\">1</text><text x=\"153\" y=\"215\">0</text><text x=\"153\" y=\"259\">1</text><text x=\"303\" y=\"128\">0</text><text x=\"303\" y=\"186\">1</text><text x=\"163\" y=\"95\">M1</text><text x=\"163\" y=\"245\">M2</text><text x=\"313\" y=\"160\">M3</text><text x=\"163\" y=\"126\">S1</text><text x=\"163\" y=\"276\">S2</text><text x=\"313\" y=\"196\">S3</text><text x=\"175\" y=\"175\">A</text><text x=\"175\" y=\"325\">B</text><text x=\"325\" y=\"250\">C</text><text x=\"228\" y=\"82\">Q1</text><text x=\"228\" y=\"232\">Q2</text><text x=\"398\" y=\"150\">Y</text></g></svg>",
+  "options": [],
+  "answer": 4,
+  "tolerance": 0.01,
+  "kind": "nat",
+  "marks": 2,
+  "explanation": "Q1 = A?X2:X1 = 1 regardless of A since X1=X2=1, and Q2 = B?X4:X3 = 0 regardless of B since X3=X4=0. Y = C?Q2:Q1, so Y=1 exactly when C=0 (giving Y=Q1=1), independent of A and B, which gives 2×2×1 = 4 combinations of (A,B,C), matching the official key."
+ }
+]

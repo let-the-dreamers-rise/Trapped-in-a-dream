@@ -1,0 +1,261 @@
+/* GATE Rank 1 — modernist/brutalist dark UI.
+   Near-black ground, hairline rules, zero radius, huge tabular numerals, one red accent.
+   ADHD-friendly: high contrast, big targets, one thing at a time. */
+@import url('https://fonts.googleapis.com/css2?family=Archivo:wght@400;600;800&display=swap');
+
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+:root {
+  --bg: #0b0a0a;
+  --card: #0b0a0a;
+  --card2: #151313;
+  --text: #f3f2f2;
+  --muted: rgba(243,242,242,.5);
+  --faint: rgba(243,242,242,.28);
+  --accent: #ec3013;
+  --accent2: #35d0ba;
+  --good: #35d0ba;
+  --bad: #ec3013;
+  --warn: #f0a202;
+  --radius: 0px;
+  --rule: 2px solid rgba(243,242,242,.28);
+}
+html, body { height: 100%; }
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: Archivo, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  font-size: 15px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+#app { max-width: 640px; margin: 0 auto; min-height: 100%; display: flex; flex-direction: column; }
+
+/* ---- chrome ---- */
+#topbar { position: sticky; top: 0; z-index: 20; background: var(--bg); border-bottom: var(--rule); }
+.topbar-inner { display: flex; align-items: center; gap: 10px; padding: 14px 16px 12px; padding-top: calc(14px + env(safe-area-inset-top)); }
+#brand { font-weight: 800; font-size: 15px; letter-spacing: -.01em; text-transform: uppercase; margin-right: auto; }
+.chip { font-size: 10px; font-weight: 800; letter-spacing: .14em; text-transform: uppercase; color: var(--muted); background: none; padding: 0; }
+#day-chip::before { content: ''; display: inline-block; width: 7px; height: 7px; background: var(--accent); margin-right: 7px; vertical-align: middle; }
+
+#view { flex: 1; padding: 0 0 96px; }
+
+#tabbar { position: fixed; bottom: 0; left: 0; right: 0; z-index: 20; display: flex; max-width: 640px; margin: 0 auto; background: var(--bg); border-top: var(--rule); padding-bottom: env(safe-area-inset-bottom); }
+.tab { flex: 1; background: none; border: 0; border-right: 1px solid rgba(243,242,242,.14); color: var(--muted); font-family: inherit; font-size: 9px; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; padding: 12px 0 13px; display: flex; flex-direction: column; align-items: center; gap: 4px; cursor: pointer; }
+.tab:last-child { border-right: 0; }
+.tab.active { color: var(--text); background: rgba(243,242,242,.06); }
+.tab.active .tab-ico { color: var(--accent); }
+.tab-ico { font-size: 15px; line-height: 1; }
+
+/* ---- structure: full-bleed sections divided by rules, not floating cards ---- */
+.card { background: var(--card); padding: 18px 16px; border-bottom: var(--rule); }
+.card h2 { font-weight: 800; font-size: 22px; line-height: 1.1; letter-spacing: -.02em; margin-bottom: 10px; }
+.card h3 { font-weight: 800; font-size: 10px; letter-spacing: .16em; text-transform: uppercase; color: var(--muted); margin: 0 0 10px; }
+.muted { color: var(--muted); font-size: 14px; }
+.small { font-size: 13px; }
+hr.sep { border: 0; border-top: 1px solid var(--faint); margin: 14px 0; }
+
+/* ---- buttons ---- */
+.btn { display: inline-block; background: var(--accent); color: #fff; border: 0; border-radius: 0; padding: 14px 18px; font-family: inherit; font-size: 12px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; cursor: pointer; text-align: center; }
+.btn.block { display: block; width: 100%; }
+.btn.ghost { background: none; color: var(--text); border: 2px solid var(--faint); }
+.btn.good { background: var(--text); color: var(--bg); }
+.btn.small-btn { padding: 9px 12px; font-size: 10px; }
+.btn:active { opacity: .75; }
+.btn:disabled { opacity: .4; }
+.btn-row { display: flex; gap: 8px; margin-top: 12px; }
+.btn-row .btn { flex: 1; }
+
+/* ---- numerals & progress ---- */
+.progress-track { background: rgba(243,242,242,.14); height: 8px; overflow: hidden; margin: 8px 0; }
+.progress-fill { height: 100%; background: var(--accent); transition: width .4s; }
+
+.list-item { display: flex; align-items: center; gap: 14px; background: none; border: 0; border-bottom: 1px solid var(--faint); padding: 16px; cursor: pointer; }
+.list-item .grow { flex: 1; min-width: 0; }
+.list-item .title { font-weight: 800; font-size: 16px; letter-spacing: -.01em; }
+.list-item .arrow { color: var(--muted); font-size: 18px; }
+.list-item:active { background: rgba(243,242,242,.06); }
+
+.pill { display: inline-block; padding: 0; font-size: 9px; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); margin-right: 12px; background: none; }
+.pill.easy { color: var(--accent2); } .pill.medium { color: var(--warn); } .pill.hard { color: var(--accent); }
+.pill.gen { color: var(--accent2); }
+
+/* ---- quiz ---- */
+.q-text { font-size: 17px; font-weight: 600; line-height: 1.45; white-space: pre-wrap; margin-bottom: 16px; }
+.q-fig { border: 1px solid var(--faint); padding: 14px; margin: 0 0 16px; overflow-x: auto; color: var(--text); text-align: center; }
+.q-fig svg { display: inline-block; max-width: 100%; height: auto; }
+/* Hollow shapes in diagrams (automata states, graph vertices, free-instance dots) get the
+   page ground so edges drawn underneath don't run through them. Strokes stay visible. */
+.q-fig svg circle[fill="none"], .q-fig svg rect[fill="none"], .q-fig svg ellipse[fill="none"],
+.q-fig svg circle:not([fill]), .q-fig svg ellipse:not([fill]) { fill: var(--bg); }
+.q-code { background: var(--card2); padding: 14px; font-family: ui-monospace, Menlo, Consolas, monospace; font-size: 13.5px; white-space: pre-wrap; overflow-x: auto; margin-bottom: 14px; }
+.opt { display: block; width: 100%; text-align: left; background: none; color: var(--text); border: 2px solid var(--faint); border-radius: 0; padding: 14px; font-family: inherit; font-size: 15px; margin-bottom: 10px; cursor: pointer; white-space: pre-wrap; }
+.opt:disabled { opacity: 1; }
+.opt.correct { border-color: var(--accent2); background: rgba(53,208,186,.1); }
+.opt.wrong { border-color: var(--accent); background: rgba(236,48,19,.1); }
+.explain { border-left: 3px solid var(--accent); background: var(--card2); padding: 14px; margin-top: 12px; white-space: pre-wrap; font-size: 14.5px; line-height: 1.55; }
+.explain b { color: var(--text); font-weight: 800; text-transform: uppercase; font-size: 11px; letter-spacing: .1em; display: block; margin-bottom: 6px; }
+.quiz-meta { display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; border-bottom: 1px solid var(--faint); font-size: 10px; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); }
+.feedback-banner { padding: 12px 14px; font-weight: 800; font-size: 11px; letter-spacing: .1em; text-transform: uppercase; margin-bottom: 12px; }
+.feedback-banner.ok { background: rgba(53,208,186,.12); color: var(--accent2); }
+.feedback-banner.no { background: rgba(236,48,19,.12); color: var(--accent); }
+
+/* ---- theory ---- */
+.theory-tabs { display: flex; border-bottom: var(--rule); }
+.theory-tabs button { flex: 1; background: none; border: 0; border-right: 1px solid var(--faint); color: var(--muted); font-family: inherit; font-weight: 800; font-size: 9px; letter-spacing: .1em; text-transform: uppercase; padding: 13px 4px; cursor: pointer; }
+.theory-tabs button:last-child { border-right: 0; }
+.theory-tabs button.active { background: var(--accent); color: #fff; }
+.theory-body { white-space: pre-wrap; font-size: 15px; line-height: 1.6; }
+
+/* ---- plan ---- */
+.day-row { display: flex; gap: 14px; align-items: flex-start; border-bottom: 1px solid var(--faint); padding: 14px 16px; }
+.day-row.today { border-left: 4px solid var(--accent); background: rgba(243,242,242,.04); }
+.day-row.done { opacity: .4; }
+.day-num { font-weight: 800; font-size: 15px; font-variant-numeric: tabular-nums; min-width: 46px; letter-spacing: -.01em; }
+.day-row.today .day-num { color: var(--accent); }
+.task-line { display: flex; gap: 12px; align-items: flex-start; padding: 9px 0; border-bottom: 1px solid rgba(243,242,242,.1); }
+.task-line input[type=checkbox] { width: 20px; height: 20px; accent-color: var(--accent); flex: none; margin-top: 1px; border-radius: 0; }
+
+/* ---- stats ---- */
+.stat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1px; background: var(--faint); border: 1px solid var(--faint); }
+.stat { background: var(--bg); padding: 16px 14px; }
+.stat .num { font-weight: 800; font-size: 34px; line-height: .95; letter-spacing: -.03em; font-variant-numeric: tabular-nums; }
+.stat .lbl { font-size: 9px; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); margin-top: 6px; }
+
+.back-link { display: block; width: 100%; text-align: left; color: var(--muted); font-family: inherit; font-weight: 800; font-size: 10px; letter-spacing: .14em; text-transform: uppercase; padding: 13px 16px; cursor: pointer; background: none; border: 0; border-bottom: 1px solid var(--faint); }
+.timer { font-variant-numeric: tabular-nums; font-weight: 800; color: var(--accent); font-size: 13px; letter-spacing: 0; }
+input[type=date], input[type=number], select, textarea { background: none; color: var(--text); border: 2px solid var(--faint); border-radius: 0; padding: 13px; font-family: inherit; font-size: 15px; width: 100%; }
+.astro-card { border-left: 4px solid var(--accent2); }
+
+/* ---- hero numerals (Today screen) ---- */
+.hero-day { display: flex; align-items: flex-end; gap: 10px; }
+.hero-num { font-weight: 800; font-size: 96px; line-height: .82; letter-spacing: -.05em; font-variant-numeric: tabular-nums; }
+.hero-of { font-weight: 800; font-size: 24px; color: rgba(243,242,242,.32); padding-bottom: 8px; }
+.hero-right { margin-left: auto; text-align: right; padding-bottom: 6px; }
+.hero-right .n { font-weight: 800; font-size: 32px; line-height: 1; color: var(--accent); font-variant-numeric: tabular-nums; }
+.eyebrow { font-size: 10px; font-weight: 800; letter-spacing: .16em; text-transform: uppercase; color: var(--muted); margin-bottom: 6px; }
+.day-grid { display: grid; grid-template-columns: repeat(30, 1fr); gap: 2px; margin-top: 18px; }
+.day-grid i { height: 7px; display: block; background: rgba(243,242,242,.16); }
+.day-grid i.done { background: var(--accent); }
+.day-grid i.now { background: var(--text); }
+.pill.pyq { color: var(--accent); }
+
+/* ---- theory typography: hierarchy so long reference text stays scannable ---- */
+.theory-body { white-space: normal; }
+.theory-body p { margin: 0 0 13px; font-size: 15.5px; line-height: 1.62; color: rgba(243,242,242,.88); }
+.theory-body .th-term { color: var(--text); font-weight: 800; }
+.theory-body .th-head {
+  font-size: 11px; font-weight: 800; letter-spacing: .16em; text-transform: uppercase;
+  color: var(--accent); margin: 24px 0 10px; padding-bottom: 6px; border-bottom: 1px solid var(--faint);
+}
+.theory-body .th-head:first-child { margin-top: 0; }
+.theory-body .th-list { list-style: none; margin: 0 0 14px; padding: 0; }
+.theory-body .th-list li {
+  position: relative; padding: 0 0 0 18px; margin-bottom: 9px;
+  font-size: 15px; line-height: 1.58; color: rgba(243,242,242,.86);
+}
+.theory-body .th-list li::before {
+  content: ''; position: absolute; left: 0; top: 9px;
+  width: 6px; height: 6px; background: var(--accent2);
+}
+.theory-body code {
+  font-family: ui-monospace, Menlo, Consolas, monospace; font-size: 13.5px;
+  background: var(--card2); padding: 1px 5px; color: var(--accent2);
+  overflow-wrap: anywhere; word-break: break-word;
+}
+.theory-body .th-fig {
+  margin: 18px 0; padding: 16px; border: 1px solid var(--faint);
+  background: rgba(243,242,242,.03); text-align: center; overflow-x: auto;
+}
+.theory-body .th-fig svg { display: inline-block; max-width: 100%; height: auto; }
+.theory-body .th-fig svg circle[fill="none"], .theory-body .th-fig svg rect[fill="none"],
+.theory-body .th-fig svg ellipse[fill="none"], .theory-body .th-fig svg circle:not([fill]),
+.theory-body .th-fig svg ellipse:not([fill]) { fill: var(--bg); }
+.theory-body .th-fig figcaption {
+  margin-top: 10px; font-size: 11px; font-weight: 800; letter-spacing: .1em;
+  text-transform: uppercase; color: var(--muted); text-align: left;
+}
+
+/* ---- ADHD-friendly theory decoration: visual anchors so the eye can rest and
+       resume without re-reading. Each device means one specific thing. ---- */
+.theory-body .th-trap {
+  border-left: 4px solid var(--accent); background: rgba(236,48,19,.09);
+  padding: 12px 14px; margin: 14px 0; font-size: 14.5px; line-height: 1.55;
+}
+.theory-body .th-trap::before {
+  content: 'Trap'; display: block; font-size: 9px; font-weight: 800;
+  letter-spacing: .16em; text-transform: uppercase; color: var(--accent); margin-bottom: 5px;
+}
+.theory-body .th-key {
+  border-left: 4px solid var(--accent2); background: rgba(53,208,186,.09);
+  padding: 12px 14px; margin: 14px 0; font-size: 14.5px; line-height: 1.55;
+}
+.theory-body .th-key::before {
+  content: 'Remember'; display: block; font-size: 9px; font-weight: 800;
+  letter-spacing: .16em; text-transform: uppercase; color: var(--accent2); margin-bottom: 5px;
+}
+.theory-body .th-formula {
+  font-family: ui-monospace, Menlo, Consolas, monospace; font-size: 14px;
+  background: var(--card2); border: 1px solid var(--faint); padding: 12px 14px;
+  margin: 12px 0; text-align: center; color: var(--text); overflow-x: auto;
+}
+.theory-body .th-step { display: flex; gap: 11px; align-items: flex-start; margin: 0 0 10px; }
+.theory-body .th-step .th-num {
+  flex: none; width: 22px; height: 22px; background: var(--accent); color: #fff;
+  font-size: 11px; font-weight: 800; display: flex; align-items: center;
+  justify-content: center; margin-top: 1px;
+}
+.theory-body .th-step span:last-child { font-size: 15px; line-height: 1.55; color: rgba(243,242,242,.88); }
+
+/* ---- celebration toast: brief, physical, never blocking ---- */
+.celebrate {
+  position: fixed; left: 50%; bottom: 110px; transform: translateX(-50%);
+  background: var(--accent); color: #fff; padding: 14px 22px; z-index: 60;
+  text-align: center; min-width: 190px; animation: pop .28s ease-out;
+  box-shadow: 0 8px 30px rgba(0,0,0,.5);
+}
+.celebrate b { display: block; font-size: 15px; font-weight: 800; letter-spacing: .04em; text-transform: uppercase; }
+.celebrate span { display: block; font-size: 11px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; opacity: .85; margin-top: 3px; }
+.celebrate.out { opacity: 0; transition: opacity .45s; }
+@keyframes pop { from { transform: translateX(-50%) scale(.8); opacity: 0; } to { transform: translateX(-50%) scale(1); opacity: 1; } }
+@media (prefers-reduced-motion: reduce) { .celebrate { animation: none; } }
+
+/* ---- Past-paper review: the explanation under a question you just attempted.
+       Same teal "this is the takeaway" language as theory, but labelled for the
+       context — you are being told why the official key says what it says. ---- */
+.q-why {
+  border-left: 4px solid var(--accent2); background: rgba(53,208,186,.09);
+  padding: 12px 14px; margin: 14px 0 2px; font-size: 14.5px; line-height: 1.55;
+}
+.q-why::before {
+  content: 'Why'; display: block; font-size: 9px; font-weight: 800;
+  letter-spacing: .16em; text-transform: uppercase; color: var(--accent2); margin-bottom: 5px;
+}
+/* In review the options are static markers, not buttons — kill the pointer. */
+.q-review .opt { cursor: default; }
+.q-review .opt-nat {
+  font-family: ui-monospace, Menlo, Consolas, monospace; font-size: 15px;
+  border: 2px solid var(--accent2); color: var(--accent2);
+  padding: 12px 14px; margin-bottom: 10px;
+}
+
+/* ---- Guided lesson: one concept, then a question on that concept. The card is
+       deliberately plain so the highlighted words are the only thing shouting. ---- */
+.lesson-card { border-left: 4px solid var(--accent2); }
+mark.hl {
+  background: rgba(53,208,186,.22); color: var(--text);
+  padding: 0 3px; border-radius: 0; font-weight: 700;
+  box-shadow: inset 0 -2px 0 var(--accent2);
+}
+
+/* One concept per card, sized to be read in a single breath. Larger type and
+   more air than the reference-style theory tabs, because this is the mode you
+   open when concentration is scarce. */
+.lesson-card {
+  border-left: 4px solid var(--accent2);
+  padding: 20px 18px 22px;
+}
+.lesson-card .theory-body { font-size: 16px; line-height: 1.72; }
+.lesson-card .theory-body p { margin: 0 0 14px; }
+.lesson-card .theory-body p:last-child { margin-bottom: 0; }
+.lesson-card .eyebrow { color: var(--accent2); margin-bottom: 12px; }
+.lesson-step { display: flex; align-items: center; gap: 8px; }

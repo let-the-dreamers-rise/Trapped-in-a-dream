@@ -1,0 +1,120 @@
+[
+  {
+    "id": "gate2019-ga-7",
+    "n": 7,
+    "section": "GA",
+    "q": "In the given diagram, teachers are represented in the triangle, researchers in the circle and administrators in the rectangle. Out of the total number of the people, the percentage of administrators shall be in the range of ____________.",
+    "figure": "<svg viewBox=\"0 0 400 380\" width=\"100%\" style=\"max-width:420px;height:auto\" xmlns=\"http://www.w3.org/2000/svg\"><g stroke=\"currentColor\" stroke-width=\"1.3\" fill=\"none\"><polygon points=\"30,40 300,40 165,170\"/><rect x=\"230\" y=\"60\" width=\"110\" height=\"260\"/><circle cx=\"285\" cy=\"300\" r=\"90\"/></g><g fill=\"currentColor\" font-size=\"12\"><text x=\"35\" y=\"60\">Teachers</text><text x=\"140\" y=\"110\">70</text><text x=\"245\" y=\"95\">10</text><text x=\"345\" y=\"150\">Administrators</text><text x=\"260\" y=\"185\">20</text><text x=\"260\" y=\"280\">20</text><text x=\"120\" y=\"330\">Researchers</text><text x=\"225\" y=\"345\">40</text></g></svg>",
+    "options": [
+      "0 to 15",
+      "16 to 30",
+      "31 to 45",
+      "46 to 60"
+    ],
+    "answer": 2,
+    "marks": 2,
+    "explanation": "Total = 70+10+20+20+40 = 160. Administrators = 10 (teacher∩admin) + 20 (admin only) + 20 (admin∩researcher) = 50, which is 50/160 ≈ 31.25%, in the range 31 to 45."
+  },
+  {
+    "id": "gate2019-ga-10",
+    "n": 10,
+    "section": "GA",
+    "q": "Three of the five students allocated to a hostel put in special requests to the warden. Given the floor plan of the vacant rooms (shaded rooms are already occupied; WR is washroom), select the allocation plan that will accommodate all their requests. Request by X: Due to pollen allergy, I want to avoid a wing next to the garden. Request by Y: I want to live as far from the washrooms as possible, since I am very sensitive to smell. Request by Z: I believe in Vaastu and so want to stay in the South-west wing.",
+    "figure": "<svg viewBox=\"0 0 300 250\" width=\"100%\" style=\"max-width:420px;height:auto\" xmlns=\"http://www.w3.org/2000/svg\"><g stroke=\"currentColor\" stroke-width=\"0.5\" fill=\"none\"><rect x=\"8\" y=\"16\" width=\"106\" height=\"70\"/><rect x=\"24\" y=\"30\" width=\"56\" height=\"42\"/><line x1=\"24\" y1=\"16\" x2=\"24\" y2=\"86\"/><line x1=\"94\" y1=\"16\" x2=\"94\" y2=\"86\"/><line x1=\"94\" y1=\"44\" x2=\"114\" y2=\"44\"/><line x1=\"94\" y1=\"58\" x2=\"114\" y2=\"58\"/><line x1=\"28\" y1=\"34\" x2=\"76\" y2=\"68\"/><line x1=\"76\" y1=\"34\" x2=\"28\" y2=\"68\"/></g><g fill=\"currentColor\"><rect x=\"80\" y=\"72\" width=\"14\" height=\"14\" fill-opacity=\"0.35\"/><rect x=\"8\" y=\"30\" width=\"16\" height=\"14\" fill-opacity=\"0.35\"/><rect x=\"8\" y=\"58\" width=\"16\" height=\"14\" fill-opacity=\"0.35\"/><rect x=\"80\" y=\"30\" width=\"14\" height=\"14\" fill-opacity=\"0.35\"/><rect x=\"24\" y=\"16\" width=\"14\" height=\"14\" fill-opacity=\"0.35\"/><rect x=\"38\" y=\"16\" width=\"14\" height=\"14\" fill-opacity=\"0.35\"/><rect x=\"52\" y=\"16\" width=\"14\" height=\"14\" fill-opacity=\"0.35\"/><rect x=\"66\" y=\"16\" width=\"14\" height=\"14\" fill-opacity=\"0.35\"/><rect x=\"38\" y=\"72\" width=\"14\" height=\"14\" fill-opacity=\"0.35\"/><rect x=\"52\" y=\"72\" width=\"14\" height=\"14\" fill-opacity=\"0.35\"/></g><g fill=\"currentColor\" font-family=\"sans-serif\" text-anchor=\"middle\"><text x=\"8\" y=\"13\" font-size=\"8\" text-anchor=\"start\">(A)</text><text x=\"16\" y=\"25\" font-size=\"6.5\">WR</text><text x=\"16\" y=\"81\" font-size=\"6.5\">WR</text><text x=\"16\" y=\"53\" font-size=\"6.5\">Z</text><text x=\"31\" y=\"81\" font-size=\"6.5\">X</text><text x=\"73\" y=\"81\" font-size=\"6.5\">Y</text><text x=\"25\" y=\"37\" font-size=\"5.5\" text-anchor=\"start\">N</text><text x=\"73\" y=\"37\" font-size=\"5.5\" text-anchor=\"start\">E</text><text x=\"25\" y=\"71\" font-size=\"5.5\" text-anchor=\"start\">W</text><text x=\"73\" y=\"71\" font-size=\"5.5\" text-anchor=\"start\">S</text><text x=\"104\" y=\"32\" font-size=\"6\">Gdn</text><text x=\"104\" y=\"53\" font-size=\"6\">Ent</text><text x=\"104\" y=\"74\" font-size=\"6\">Gdn</text></g><g stroke=\"currentColor\" stroke-width=\"0.5\" fill=\"none\"><rect x=\"158\" y=\"16\" width=\"106\" height=\"70\"/><rect x=\"174\" y=\"30\" width=\"56\" height=\"42\"/><line x1=\"174\" y1=\"16\" x2=\"174\" y2=\"86\"/><line x1=\"244\" y1=\"16\" x2=\"244\" y2=\"86\"/><line x1=\"244\" y1=\"44\" x2=\"264\" y2=\"44\"/><line x1=\"244\" y1=\"58\" x2=\"264\" y2=\"58\"/><line x1=\"178\" y1=\"34\" x2=\"226\" y2=\"68\"/><line x1=\"226\" y1=\"34\" x2=\"178\" y2=\"68\"/></g><g fill=\"currentColor\"><rect x=\"230\" y=\"72\" width=\"14\" height=\"14\" fill-opacity=\"0.35\"/><rect x=\"158\" y=\"30\" width=\"16\" height=\"14\" fill-opacity=\"0.35\"/><rect x=\"158\" y=\"58\" width=\"16\" height=\"14\" fill-opacity=\"0.35\"/><rect x=\"230\" y=\"30\" width=\"14\" height=\"14\" fill-opacity=\"0.35\"/><rect x=\"174\" y=\"16\" width=\"14\" height=\"14\" fill-opacity=\"0.35\"/><rect x=\"188\" y=\"16\" width=\"14\" height=\"14\" fill-opacity=\"0.35\"/><rect x=\"202\" y=\"16\" width=\"14\" height=\"14\" fill-opacity=\"0.35\"/><rect x=\"216\" y=\"16\" width=\"14\" height=\"14\" fill-opacity=\"0.35\"/><rect x=\"188\" y=\"72\" width=\"14\" height=\"14\" fill-opacity=\"0.35\"/><rect x=\"202\" y=\"72\" width=\"14\" height=\"14\" fill-opacity=\"0.35\"/></g><g fill=\"currentColor\" font-family=\"sans-serif\" text-anchor=\"middle\"><text x=\"158\" y=\"13\" font-size=\"8\" text-anchor=\"start\">(B)</text><text x=\"166\" y=\"25\" font-size=\"6.5\">WR</text><text x=\"166\" y=\"81\" font-size=\"6.5\">WR</text><text x=\"237\" y=\"25\" font-size=\"6.5\">X</text><text x=\"166\" y=\"53\" font-size=\"6.5\">Z</text><text x=\"237\" y=\"67\" font-size=\"6.5\">Y</text><text x=\"175\" y=\"37\" font-size=\"5.5\" text-anchor=\"start\">N</text><text x=\"223\" y=\"37\" font-size=\"5.5\" text-anchor=\"start\">E</text><text x=\"175\" y=\"71\" font-size=\"5.5\" text-anchor=\"start\">W</text><text x=\"223\" y=\"71\" font-size=\"5.5\" text-anchor=\"start\">S</text><text x=\"254\" y=\"32\" font-size=\"6\">Gdn</text><text x=\"254\" y=\"53\" font-size=\"6\">Ent</text><text x=\"254\" y=\"74\" font-size=\"6\">Gdn</text></g><g stroke=\"currentColor\" stroke-width=\"0.5\" fill=\"none\"><rect x=\"8\" y=\"140\" width=\"106\" height=\"70\"/><rect x=\"24\" y=\"154\" width=\"56\" height=\"42\"/><line x1=\"24\" y1=\"140\" x2=\"24\" y2=\"210\"/><line x1=\"94\" y1=\"140\" x2=\"94\" y2=\"210\"/><line x1=\"94\" y1=\"168\" x2=\"114\" y2=\"168\"/><line x1=\"94\" y1=\"182\" x2=\"114\" y2=\"182\"/><line x1=\"28\" y1=\"158\" x2=\"76\" y2=\"192\"/><line x1=\"76\" y1=\"158\" x2=\"28\" y2=\"192\"/></g><g fill=\"currentColor\"><rect x=\"80\" y=\"196\" width=\"14\" height=\"14\" fill-opacity=\"0.35\"/><rect x=\"8\" y=\"154\" width=\"16\" height=\"14\" fill-opacity=\"0.35\"/><rect x=\"8\" y=\"182\" width=\"16\" height=\"14\" fill-opacity=\"0.35\"/><rect x=\"80\" y=\"154\" width=\"14\" height=\"14\" fill-opacity=\"0.35\"/><rect x=\"24\" y=\"140\" width=\"14\" height=\"14\" fill-opacity=\"0.35\"/><rect x=\"38\" y=\"140\" width=\"14\" height=\"14\" fill-opacity=\"0.35\"/><rect x=\"52\" y=\"140\" width=\"14\" height=\"14\" fill-opacity=\"0.35\"/><rect x=\"66\" y=\"140\" width=\"14\" height=\"14\" fill-opacity=\"0.35\"/><rect x=\"38\" y=\"196\" width=\"14\" height=\"14\" fill-opacity=\"0.35\"/><rect x=\"52\" y=\"196\" width=\"14\" height=\"14\" fill-opacity=\"0.35\"/></g><g fill=\"currentColor\" font-family=\"sans-serif\" text-anchor=\"middle\"><text x=\"8\" y=\"137\" font-size=\"8\" text-anchor=\"start\">(C)</text><text x=\"16\" y=\"149\" font-size=\"6.5\">WR</text><text x=\"16\" y=\"205\" font-size=\"6.5\">WR</text><text x=\"87\" y=\"149\" font-size=\"6.5\">Z</text><text x=\"87\" y=\"191\" font-size=\"6.5\">Y</text><text x=\"31\" y=\"205\" font-size=\"6.5\">X</text><text x=\"25\" y=\"161\" font-size=\"5.5\" text-anchor=\"start\">N</text><text x=\"73\" y=\"161\" font-size=\"5.5\" text-anchor=\"start\">E</text><text x=\"25\" y=\"195\" font-size=\"5.5\" text-anchor=\"start\">W</text><text x=\"73\" y=\"195\" font-size=\"5.5\" text-anchor=\"start\">S</text><text x=\"104\" y=\"156\" font-size=\"6\">Gdn</text><text x=\"104\" y=\"177\" font-size=\"6\">Ent</text><text x=\"104\" y=\"198\" font-size=\"6\">Gdn</text></g><g stroke=\"currentColor\" stroke-width=\"0.5\" fill=\"none\"><rect x=\"158\" y=\"140\" width=\"106\" height=\"70\"/><rect x=\"174\" y=\"154\" width=\"56\" height=\"42\"/><line x1=\"174\" y1=\"140\" x2=\"174\" y2=\"210\"/><line x1=\"244\" y1=\"140\" x2=\"244\" y2=\"210\"/><line x1=\"244\" y1=\"168\" x2=\"264\" y2=\"168\"/><line x1=\"244\" y1=\"182\" x2=\"264\" y2=\"182\"/><line x1=\"178\" y1=\"158\" x2=\"226\" y2=\"192\"/><line x1=\"226\" y1=\"158\" x2=\"178\" y2=\"192\"/></g><g fill=\"currentColor\"><rect x=\"230\" y=\"196\" width=\"14\" height=\"14\" fill-opacity=\"0.35\"/><rect x=\"158\" y=\"154\" width=\"16\" height=\"14\" fill-opacity=\"0.35\"/><rect x=\"158\" y=\"182\" width=\"16\" height=\"14\" fill-opacity=\"0.35\"/><rect x=\"230\" y=\"154\" width=\"14\" height=\"14\" fill-opacity=\"0.35\"/><rect x=\"174\" y=\"140\" width=\"14\" height=\"14\" fill-opacity=\"0.35\"/><rect x=\"188\" y=\"140\" width=\"14\" height=\"14\" fill-opacity=\"0.35\"/><rect x=\"202\" y=\"140\" width=\"14\" height=\"14\" fill-opacity=\"0.35\"/><rect x=\"216\" y=\"140\" width=\"14\" height=\"14\" fill-opacity=\"0.35\"/><rect x=\"188\" y=\"196\" width=\"14\" height=\"14\" fill-opacity=\"0.35\"/><rect x=\"202\" y=\"196\" width=\"14\" height=\"14\" fill-opacity=\"0.35\"/></g><g fill=\"currentColor\" font-family=\"sans-serif\" text-anchor=\"middle\"><text x=\"158\" y=\"137\" font-size=\"8\" text-anchor=\"start\">(D)</text><text x=\"166\" y=\"149\" font-size=\"6.5\">WR</text><text x=\"166\" y=\"205\" font-size=\"6.5\">WR</text><text x=\"237\" y=\"191\" font-size=\"6.5\">Y</text><text x=\"181\" y=\"205\" font-size=\"6.5\">X</text><text x=\"223\" y=\"205\" font-size=\"6.5\">Z</text><text x=\"175\" y=\"161\" font-size=\"5.5\" text-anchor=\"start\">N</text><text x=\"223\" y=\"161\" font-size=\"5.5\" text-anchor=\"start\">E</text><text x=\"175\" y=\"195\" font-size=\"5.5\" text-anchor=\"start\">W</text><text x=\"223\" y=\"195\" font-size=\"5.5\" text-anchor=\"start\">S</text><text x=\"254\" y=\"156\" font-size=\"6\">Gdn</text><text x=\"254\" y=\"177\" font-size=\"6\">Ent</text><text x=\"254\" y=\"198\" font-size=\"6\">Gdn</text></g></svg>",
+    "options": [
+      "Plan (A)",
+      "Plan (B)",
+      "Plan (C)",
+      "Plan (D)"
+    ],
+    "answer": 3,
+    "marks": 2,
+    "explanation": "Plan (B) is eliminated because it puts X in the wing right next to the garden. Among the rest, only plan (D) simultaneously keeps Y in the vacant room farthest from both washrooms and places Z in the south-west wing, so (D) is the only plan that satisfies all three requests."
+  },
+  {
+    "id": "gate2019-cs-2",
+    "n": 2,
+    "section": "CS",
+    "q": "The chip select logic for a certain DRAM chip in a memory system design is shown below (an AND gate whose inputs are A15, A14, A11 directly and A13, A12 through inverting bubbles, producing output CS). Assume that the memory system has 16 address lines denoted by A15 to A0. What is the range of addresses (in hexadecimal) of the memory system that can get enabled by the chip select (CS) signal?",
+    "figure": "<svg viewBox=\"0 0 300 170\" width=\"100%\" style=\"max-width:420px;height:auto\" xmlns=\"http://www.w3.org/2000/svg\"><g stroke=\"currentColor\" stroke-width=\"1.3\" fill=\"none\"><path d=\"M110,20 h50 a35,35 0 0 1 0,70 h-50 z\"/></g><g stroke=\"currentColor\" stroke-width=\"1.3\"><line x1=\"40\" y1=\"28\" x2=\"110\" y2=\"28\"/><line x1=\"40\" y1=\"42\" x2=\"110\" y2=\"42\"/><line x1=\"40\" y1=\"56\" x2=\"103\" y2=\"56\"/><circle cx=\"107\" cy=\"56\" r=\"4\" fill=\"none\" stroke=\"currentColor\"/><line x1=\"40\" y1=\"70\" x2=\"103\" y2=\"70\"/><circle cx=\"107\" cy=\"70\" r=\"4\" fill=\"none\" stroke=\"currentColor\"/><line x1=\"40\" y1=\"84\" x2=\"110\" y2=\"84\"/><line x1=\"195\" y1=\"55\" x2=\"240\" y2=\"55\"/></g><g fill=\"currentColor\" font-size=\"11\"><text x=\"10\" y=\"32\">A15</text><text x=\"10\" y=\"46\">A14</text><text x=\"10\" y=\"60\">A13</text><text x=\"10\" y=\"74\">A12</text><text x=\"10\" y=\"88\">A11</text><text x=\"245\" y=\"59\" font-weight=\"bold\">CS</text></g></svg>",
+    "options": [
+      "C800 to CFFF",
+      "CA00 to CAFF",
+      "C800 to C8FF",
+      "DA00 to DFFF"
+    ],
+    "answer": 0,
+    "marks": 1,
+    "explanation": "CS = A15·A14·¬A13·¬A12·A11, so CS=1 requires the fixed prefix 1100 1 on A15..A11 with A10..A0 free. That gives addresses from 1100 1000 0000 0000 (C800) to 1100 1111 1111 1111 (CFFF)."
+  },
+  {
+    "id": "gate2019-cs-5",
+    "n": 5,
+    "section": "CS",
+    "q": "Let U = {1,2,…,n}. Let A = {(x,X) | x ∈ X, X ⊆ U}. Consider the following two statements on |A|.\nI. |A| = n·2^(n−1)\nII. |A| = Σ_{k=1}^{n} k·C(n,k)\nWhich of the above statements is/are TRUE?",
+    "options": [
+      "Only I",
+      "Only II",
+      "Both I and II",
+      "Neither I nor II"
+    ],
+    "answer": 2,
+    "marks": 1,
+    "explanation": "Counting pairs (x,X) by summing over each subset size k gives Σ k·C(n,k) (statement II), and this classic sum equals n·2^(n−1) (statement I), so both expressions are correct and equal."
+  },
+  {
+    "id": "gate2019-cs-6",
+    "n": 6,
+    "section": "CS",
+    "q": "Which one of the following is NOT a valid identity?",
+    "options": [
+      "(x ⊕ y) ⊕ z = x ⊕ (y ⊕ z)",
+      "(x + y) ⊕ z = x ⊕ (y + z)",
+      "x ⊕ y = x + y, if xy = 0",
+      "x ⊕ y = (xy + x'y')'"
+    ],
+    "answer": 1,
+    "marks": 1,
+    "explanation": "XOR is associative (A) and equals ordinary OR when x and y are not both 1 (C), and (D) is just the standard XOR-in-terms-of-XNOR identity; but replacing z with (x+y) instead of z's own XOR term breaks the identity in general, so (B) is the one that is NOT valid."
+  },
+  {
+    "id": "gate2019-cs-23",
+    "n": 23,
+    "section": "CS",
+    "q": "Consider three concurrent processes P1, P2 and P3 as shown below, which access a shared variable D that has been initialized to 100.\nP1: D = D + 20\nP2: D = D - 50\nP3: D = D + 10\nThe processes are executed on a uniprocessor system running a time-shared operating system. If the minimum and maximum possible values of D after the three processes have completed execution are X and Y respectively, then the value of Y - X is _____.",
+    "options": [],
+    "answer": 80,
+    "tolerance": 0.01,
+    "kind": "nat",
+    "marks": 1,
+    "explanation": "Each update is a non-atomic read-modify-write, so the last process to write determines D, incorporating only the updates of processes that finished writing before its read; enumerating all such interleavings gives reachable values from 50 up to 130, so Y - X = 130 - 50 = 80."
+  },
+  {
+    "id": "gate2019-cs-30",
+    "n": 30,
+    "section": "CS",
+    "q": "Consider three 4-variable functions f1, f2, and f3, which are expressed in sum-of-minterms as f1 = Σ(0,2,5,8,14), f2 = Σ(2,3,6,8,14,15), f3 = Σ(2,7,11,14). For the following circuit with one AND gate and one XOR gate, the output function f can be expressed as:",
+    "figure": "<svg viewBox=\"0 0 300 170\" width=\"100%\" style=\"max-width:420px;height:auto\" xmlns=\"http://www.w3.org/2000/svg\"><g stroke=\"currentColor\" stroke-width=\"1.3\" fill=\"none\"><rect x=\"80\" y=\"25\" width=\"55\" height=\"45\"/><path d=\"M170,20 q10,27.5 0,55 q28,-8 45,-27.5 q-17,-19.5 -45,-27.5 z\"/><path d=\"M162,20 q10,27.5 0,55\" stroke-dasharray=\"0\"/></g><g stroke=\"currentColor\" stroke-width=\"1.3\"><line x1=\"30\" y1=\"38\" x2=\"80\" y2=\"38\"/><line x1=\"30\" y1=\"58\" x2=\"80\" y2=\"58\"/><line x1=\"135\" y1=\"48\" x2=\"170\" y2=\"48\"/><line x1=\"30\" y1=\"115\" x2=\"150\" y2=\"115\" fill=\"none\"/><line x1=\"150\" y1=\"115\" x2=\"150\" y2=\"63\" fill=\"none\" stroke=\"currentColor\"/><line x1=\"150\" y1=\"63\" x2=\"170\" y2=\"63\" fill=\"none\" stroke=\"currentColor\"/><line x1=\"215\" y1=\"48\" x2=\"250\" y2=\"48\"/></g><g fill=\"currentColor\" font-size=\"12\"><text x=\"8\" y=\"42\">f1</text><text x=\"8\" y=\"62\">f2</text><text x=\"8\" y=\"119\">f3</text><text x=\"95\" y=\"52\">AND</text><text x=\"178\" y=\"52\">XOR</text><text x=\"256\" y=\"52\">f</text></g></svg>",
+    "options": [
+      "Σ(7, 8, 11)",
+      "Σ(2, 7, 8, 11, 14)",
+      "Σ(2, 14)",
+      "Σ(0, 2, 3, 5, 6, 7, 8, 11, 14, 15)"
+    ],
+    "answer": 0,
+    "marks": 2,
+    "explanation": "f1 AND f2 is true on the common minterms {2,8,14}. XOR-ing that with f3={2,7,11,14} keeps only minterms in exactly one of the two sets, cancelling 2 and 14 and leaving {7,8,11}."
+  },
+  {
+    "id": "gate2019-cs-44",
+    "n": 44,
+    "section": "CS",
+    "q": "Consider the following matrix:\nR = [[1,2,4,8],[1,3,9,27],[1,4,16,64],[1,5,25,125]]\nThe absolute value of the product of Eigen values of R is _____.",
+    "options": [],
+    "answer": 12,
+    "tolerance": 0.01,
+    "kind": "nat",
+    "marks": 2,
+    "explanation": "The product of the eigenvalues equals det(R). R is a Vandermonde matrix for nodes 2,3,4,5, so det(R) = ∏(x_j − x_i) over 2≤i<j = 1·2·3·1·2·1 = 12."
+  }
+]
