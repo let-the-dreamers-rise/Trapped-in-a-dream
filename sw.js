@@ -1,5 +1,5 @@
 // Offline cache — the whole app works with zero network after first load.
-var CACHE = 'gate-r1-v37';
+var CACHE = 'gate-r1-v38';
 var ASSETS = [
   './', './index.html', './css/style.css', './js/app.js', './js/generators.js',
   './data/plan90.js', './data/astro.js', './icon.svg', './manifest.webmanifest',
@@ -49,7 +49,8 @@ ASSETS = ASSETS.concat([
   './data/chapters/pds-pointers.js',
   './data/chapters/pds-recursion.js',
   './data/chapters/pds-stacks-queues.js',
-  './data/chapters/pds-trees.js'
+  './data/chapters/pds-trees.js',
+  './data/chapters/toc-regular.js'
 ]);
 // CHAPTERS:END
 // PYQ:START
