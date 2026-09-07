@@ -1,5 +1,5 @@
 // Offline cache — the whole app works with zero network after first load.
-var CACHE = 'gate-r1-v29';
+var CACHE = 'gate-r1-v30';
 var ASSETS = [
   './', './index.html', './css/style.css', './js/app.js', './js/generators.js',
   './data/plan90.js', './data/astro.js', './icon.svg', './manifest.webmanifest',
@@ -16,6 +16,7 @@ ASSETS = ASSETS.concat([
   './data/chapters/algo-graph.js',
   './data/chapters/algo-greedy.js',
   './data/chapters/algo-sorting-searching.js',
+  './data/chapters/digital-arithmetic.js',
   './data/chapters/digital-boolean.js',
   './data/chapters/digital-number-systems.js',
   './data/chapters/engmath-calculus.js',
