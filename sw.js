@@ -1,5 +1,5 @@
 // Offline cache — the whole app works with zero network after first load.
-var CACHE = 'gate-r1-v41';
+var CACHE = 'gate-r1-v42';
 var ASSETS = [
   './', './index.html', './css/style.css', './js/app.js', './js/generators.js',
   './data/plan90.js', './data/astro.js', './icon.svg', './manifest.webmanifest',
@@ -52,6 +52,7 @@ ASSETS = ASSETS.concat([
   './data/chapters/pds-trees.js',
   './data/chapters/toc-cfl.js',
   './data/chapters/toc-decidability.js',
+  './data/chapters/toc-hierarchy.js',
   './data/chapters/toc-regular.js',
   './data/chapters/toc-turing.js'
 ]);
