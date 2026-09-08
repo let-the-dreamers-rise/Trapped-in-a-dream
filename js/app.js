@@ -777,15 +777,26 @@
       if (body.length <= LIMIT) { beats.push({ heading: sec.heading, body: body, tab: sec.tab }); return; }
       var pieces = [];
       body.split(/\n\s*\n/).forEach(function (para) {
-        if (para.length > LIMIT) (splitLongParagraph(para, 420) || [para]).forEach(function (c) { pieces.push(c); });
-        else pieces.push(para);
+        if (para.length <= LIMIT) { pieces.push({ text: para, sep: '\n\n' }); return; }
+        var bySentence = splitLongParagraph(para, 420);
+        if (bySentence) { bySentence.forEach(function (c) { pieces.push({ text: c, sep: '\n\n' }); }); return; }
+        // A long block with no sentence boundary to split at is often a run of
+        // bullet lines instead (a comparison table written as several "•" points,
+        // each individually short but with none of the blank lines a paragraph
+        // split needs) — split those bullet-by-bullet so one beat never has to
+        // carry an entire multi-point list at once, joining consecutive bullets
+        // back with a single newline so they still render as ONE continuous list
+        // rather than several short ones stacked with gaps between them.
+        var byBullet = para.split(/\n(?=•)/);
+        if (byBullet.length > 1) byBullet.forEach(function (c, i) { pieces.push({ text: c, sep: i === 0 ? '\n\n' : '\n' }); });
+        else pieces.push({ text: para, sep: '\n\n' });
       });
       var chunk = '', part = 0;
-      pieces.forEach(function (para) {
-        if (chunk && (chunk.length + para.length) > LIMIT) {
+      pieces.forEach(function (p) {
+        if (chunk && (chunk.length + p.text.length) > LIMIT) {
           beats.push({ heading: sec.heading, body: chunk.trim(), tab: sec.tab, part: ++part });
-          chunk = para;
-        } else chunk = chunk ? chunk + '\n\n' + para : para;
+          chunk = p.text;
+        } else chunk = chunk ? chunk + p.sep + p.text : p.text;
       });
       if (chunk.trim()) beats.push({ heading: sec.heading, body: chunk.trim(), tab: sec.tab, part: part ? ++part : 0 });
     });
