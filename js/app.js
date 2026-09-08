@@ -54,6 +54,20 @@
   }
   function esc(s) { return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
 
+  // A short, mostly-uppercase line is a section heading. Requires an actual word
+  // (3+ letters run together, not just 3 letters total) so a plain-text truth-
+  // table row like "F | T | F" (strips to "FTF") isn't mistaken for one. Allows
+  // a SHORT lowercase token here and there — a math variable ("n-BIT WORD"), a
+  // possessive ("TYPE 1's"), a plural suffix ("SDDs") — since real headings in
+  // this corpus often carry one, but draws the line at 4+ consecutive lowercase
+  // letters, which only shows up in genuine prose.
+  function isHeadingLine(line) {
+    var letters = line.replace(/[^A-Za-z]/g, '');
+    if (letters.length < 3 || !/[A-Za-z]{3,}/.test(line) || line.length >= 90) return false;
+    var upper = (line.match(/[A-Z]/g) || []).length;
+    return !/[a-z]{4,}/.test(line) && (upper / letters.length) >= 0.8;
+  }
+
   // ---------- question lookup ----------
   function allTopics() {
     var out = [];
@@ -430,12 +444,7 @@
         return;
       }
 
-      // A short all-caps line is a section heading — but require an actual word
-      // (3+ letters run together), not just 3 letters total. A plain-text truth-
-      // table row such as "F | T | F" strips to "FTF" (3 uppercase letters, no
-      // lowercase to disqualify it) and would otherwise be mistaken for one.
-      var letters = line.replace(/[^A-Za-z]/g, '');
-      if (letters.length > 2 && /[A-Za-z]{3,}/.test(line) && line === line.toUpperCase() && line.length < 70) {
+      if (isHeadingLine(line)) {
         closeList();
         out.push('<h4 class="th-head">' + esc(line) + '</h4>');
         return;
@@ -534,8 +543,7 @@
     String(text).split('\n').forEach(function (raw) {
       var line = raw.trim();
       if (!line) { if (cur) cur.lines.push(''); return; }
-      var letters = line.replace(/[^A-Za-z]/g, '');
-      if (letters.length > 2 && /[A-Za-z]{3,}/.test(line) && line === line.toUpperCase() && line.length < 70) {
+      if (isHeadingLine(line)) {
         cur = { heading: line, lines: [] };
         out.push(cur);
       } else {
@@ -752,8 +760,7 @@
     String(text).split('\n').forEach(function (raw) {
       var line = raw.trim();
       if (!line) { if (cur) cur.lines.push(''); return; }
-      var letters = line.replace(/[^A-Za-z]/g, '');
-      if (letters.length > 2 && /[A-Za-z]{3,}/.test(line) && line === line.toUpperCase() && line.length < 70) {
+      if (isHeadingLine(line)) {
         cur = { heading: line, lines: [], tab: tab };
         out.push(cur);
       } else {
