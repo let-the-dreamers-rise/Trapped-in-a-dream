@@ -781,13 +781,14 @@
         var bySentence = splitLongParagraph(para, 420);
         if (bySentence) { bySentence.forEach(function (c) { pieces.push({ text: c, sep: '\n\n' }); }); return; }
         // A long block with no sentence boundary to split at is often a run of
-        // bullet lines instead (a comparison table written as several "•" points,
-        // each individually short but with none of the blank lines a paragraph
-        // split needs) — split those bullet-by-bullet so one beat never has to
-        // carry an entire multi-point list at once, joining consecutive bullets
-        // back with a single newline so they still render as ONE continuous list
-        // rather than several short ones stacked with gaps between them.
-        var byBullet = para.split(/\n(?=•)/);
+        // bullet or numbered-step lines instead (a comparison table written as
+        // several "•" points, or a case-by-case list as "1. ...", "2. ...", each
+        // individually short but with none of the blank lines a paragraph split
+        // needs) — split those point-by-point so one beat never has to carry an
+        // entire multi-point list at once, joining consecutive points back with
+        // a single newline so they still render as ONE continuous list rather
+        // than several short ones stacked with gaps between them.
+        var byBullet = para.split(/\n(?=•|\d{1,2}[.)]\s)/);
         if (byBullet.length > 1) byBullet.forEach(function (c, i) { pieces.push({ text: c, sep: i === 0 ? '\n\n' : '\n' }); });
         else pieces.push({ text: para, sep: '\n\n' });
       });
