@@ -765,12 +765,23 @@
     out.forEach(function (sec) {
       var body = sec.lines.join('\n').trim();
       if (!body) return;
-      // Long sections become several beats under the same heading, split only at
-      // blank lines so a paragraph is never cut in half.
+      // Long sections become several beats under the same heading, split at blank
+      // lines so a paragraph is never cut in half — except a paragraph that is
+      // ITSELF past the limit (a dense worked-example paragraph easily runs
+      // 1,000-1,700+ characters as a single unbroken block in these chapters, well
+      // past what a blank-line split alone can do anything about), which is first
+      // broken at sentence boundaries by the same splitter the plain chapter view
+      // already uses for exactly this, so no single lesson card ends up carrying
+      // an entire worked example's worth of text on its own.
       var LIMIT = 750;
       if (body.length <= LIMIT) { beats.push({ heading: sec.heading, body: body, tab: sec.tab }); return; }
-      var chunk = '', part = 0;
+      var pieces = [];
       body.split(/\n\s*\n/).forEach(function (para) {
+        if (para.length > LIMIT) (splitLongParagraph(para, 420) || [para]).forEach(function (c) { pieces.push(c); });
+        else pieces.push(para);
+      });
+      var chunk = '', part = 0;
+      pieces.forEach(function (para) {
         if (chunk && (chunk.length + para.length) > LIMIT) {
           beats.push({ heading: sec.heading, body: chunk.trim(), tab: sec.tab, part: ++part });
           chunk = para;
