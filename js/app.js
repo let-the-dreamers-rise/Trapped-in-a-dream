@@ -430,9 +430,12 @@
         return;
       }
 
-      // A short all-caps line is a section heading.
+      // A short all-caps line is a section heading — but require an actual word
+      // (3+ letters run together), not just 3 letters total. A plain-text truth-
+      // table row such as "F | T | F" strips to "FTF" (3 uppercase letters, no
+      // lowercase to disqualify it) and would otherwise be mistaken for one.
       var letters = line.replace(/[^A-Za-z]/g, '');
-      if (letters.length > 2 && line === line.toUpperCase() && line.length < 70) {
+      if (letters.length > 2 && /[A-Za-z]{3,}/.test(line) && line === line.toUpperCase() && line.length < 70) {
         closeList();
         out.push('<h4 class="th-head">' + esc(line) + '</h4>');
         return;
@@ -519,6 +522,39 @@
     return e;
   }
 
+  // A full chapter is now a real textbook chapter — 7,500 to 13,000+ words — and
+  // handing all of it to renderTheory as one scroll is exactly the wall of text
+  // the rest of this file works so hard to avoid everywhere else. Cut it into its
+  // own ALL-CAPS sections (whole, unsplit — cutBeats' 750-char re-split is for the
+  // guided lesson's bite-size cards, not for this) so the chapter tab can offer an
+  // outline and open one section at a time instead of dumping the lot on load.
+  function splitChapterSections(text) {
+    if (!text) return [];
+    var out = [], cur = null;
+    String(text).split('\n').forEach(function (raw) {
+      var line = raw.trim();
+      if (!line) { if (cur) cur.lines.push(''); return; }
+      var letters = line.replace(/[^A-Za-z]/g, '');
+      if (letters.length > 2 && /[A-Za-z]{3,}/.test(line) && line === line.toUpperCase() && line.length < 70) {
+        cur = { heading: line, lines: [] };
+        out.push(cur);
+      } else {
+        if (!cur) { cur = { heading: '', lines: [] }; out.push(cur); }
+        cur.lines.push(line);
+      }
+    });
+    return out
+      .map(function (s) { return { heading: s.heading, body: s.lines.join('\n').trim() }; })
+      .filter(function (s) { return s.body; });
+  }
+
+  // ~180 words/minute — dense, worked-example-heavy technical prose reads slower
+  // than plain narrative text, so this runs a little under the usual 200-230wpm rule.
+  function readMins(text) {
+    var words = (String(text).match(/\S+/g) || []).length;
+    return Math.max(1, Math.round(words / 180));
+  }
+
   // Pull one question from the whole bank. Used by the low-friction modes where
   // choosing a subject is itself the barrier that stops a session starting.
   function anyQuestion(maxDifficulty) {
@@ -539,6 +575,15 @@
 
   function levelFor(xp) { return Math.floor(Math.sqrt(xp / 40)) + 1; }
 
+  // ALL-CAPS is right for a heading sitting alone on the page (th-head already
+  // uppercases it via CSS regardless of source case) but reads as shouting when
+  // a dozen of them are stacked into a compact outline list — sentence case there
+  // scans the way a book's own table of contents does.
+  function sentenceCase(s) {
+    var lower = String(s).toLowerCase();
+    return lower.charAt(0).toUpperCase() + lower.slice(1);
+  }
+
   // ---------- TOPIC (theory) ----------
   function viewTopic(tid) {
     var e = topicById(tid); if (!e) return viewSubjects();
@@ -557,9 +602,91 @@
       (pyqCount(t) ? '<button class="btn block ghost" id="pyq-set" style="margin-top:8px">Exam-pattern set &mdash; ' + pyqCount(t) + ' questions</button>' : '');
     $view.innerHTML = html;
     var body = document.getElementById('tbody');
+    var sections = null; // computed once, lazily — most visits never leave the chapter tab
+
+    // A 7,500-13,000-word chapter dumped into one scroll is the single biggest
+    // wall of text in this app. Splitting it into a collapsed-by-default outline —
+    // one section open at a time, each with its own read time — turns "read this
+    // whole textbook chapter" into a list of small, individually startable tasks,
+    // which is the entire point of every other ADHD device in this file.
+    function showChapter() {
+      if (!sections) sections = splitChapterSections(t.theory.chapter);
+      S.chapterRead = S.chapterRead || {};
+      var read = S.chapterRead[tid] || {};
+      var totalMin = sections.reduce(function (n, s) { return n + readMins(s.body); }, 0);
+      var doneCount = Object.keys(read).filter(function (k) { return read[k] && +k < sections.length; }).length;
+
+      function progressHtml() {
+        var pct = sections.length ? Math.round(doneCount / sections.length * 100) : 0;
+        return '<div class="ch-summary"><span>' + sections.length + ' sections &middot; ~' + totalMin + ' min read</span>' +
+          '<span>' + doneCount + '/' + sections.length + ' opened</span></div>' +
+          '<div class="progress-track" style="margin:0 0 14px"><div class="progress-fill" style="width:' + pct + '%"></div></div>';
+      }
+
+      body.innerHTML = '<div id="ch-progress">' + progressHtml() + '</div>' +
+        '<div class="ch-outline" id="ch-outline">' +
+        sections.map(function (s, i) {
+          return '<button class="ch-chip' + (read[i] ? ' done' : '') + '" data-jump="' + i + '">' +
+            (read[i] ? '✓ ' : '') + esc(sentenceCase(s.heading || 'Section ' + (i + 1))) + '</button>';
+        }).join('') + '</div>' +
+        sections.map(function (s, i) {
+          return '<div class="ch-section' + (read[i] ? ' opened' : '') + '" id="ch-sec-' + i + '">' +
+            '<button class="ch-sec-head" data-toggle="' + i + '">' +
+            '<span class="ch-sec-num">' + (i + 1) + '</span>' +
+            '<span class="ch-sec-title">' + esc(sentenceCase(s.heading || 'Section ' + (i + 1))) + '</span>' +
+            '<span class="ch-sec-time">' + readMins(s.body) + ' min</span>' +
+            '<span class="ch-sec-arrow">' + (read[i] ? '✓' : '›') + '</span>' +
+            '</button>' +
+            '<div class="ch-sec-body" id="ch-body-' + i + '" hidden></div></div>';
+        }).join('');
+
+      function renderInto(i) {
+        var box = document.getElementById('ch-body-' + i);
+        if (box.getAttribute('data-rendered')) return;
+        var allFigs = (t.theory && t.theory.figs) || [];
+        var mine = allFigs.filter(function (f) { return sections[i].body.indexOf('[[FIG:' + f.id + ']]') >= 0; });
+        box.innerHTML = renderTheory(sections[i].body, mine);
+        box.setAttribute('data-rendered', '1');
+      }
+      function markRead(i) {
+        if (read[i]) return;
+        read[i] = true; doneCount++;
+        S.chapterRead[tid] = read; save();
+        document.getElementById('ch-progress').innerHTML = progressHtml();
+        var chip = $view.querySelectorAll('.ch-chip')[i];
+        if (chip) { chip.classList.add('done'); chip.textContent = '✓ ' + sentenceCase(sections[i].heading || 'Section ' + (i + 1)); }
+        var arrow = document.querySelector('#ch-sec-' + i + ' .ch-sec-arrow');
+        if (arrow) arrow.textContent = '✓';
+      }
+      function openSection(i, scroll) {
+        var sec = document.getElementById('ch-sec-' + i);
+        var box = document.getElementById('ch-body-' + i);
+        renderInto(i);
+        box.hidden = false;
+        sec.classList.add('open');
+        markRead(i);
+        if (scroll) sec.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+      function toggleSection(i) {
+        var sec = document.getElementById('ch-sec-' + i);
+        var box = document.getElementById('ch-body-' + i);
+        if (box.hidden) openSection(i, false);
+        else { box.hidden = true; sec.classList.remove('open'); }
+      }
+      $view.querySelectorAll('[data-toggle]').forEach(function (b) {
+        b.addEventListener('click', function () { toggleSection(+b.getAttribute('data-toggle')); });
+      });
+      $view.querySelectorAll('[data-jump]').forEach(function (b) {
+        b.addEventListener('click', function () { openSection(+b.getAttribute('data-jump'), true); });
+      });
+      // First-ever visit: open the first section so the page never looks empty.
+      if (!doneCount) openSection(0, false);
+    }
+
     function show(k) {
-      body.innerHTML = renderTheory(t.theory && t.theory[k], t.theory && t.theory.figs);
       $view.querySelectorAll('[data-tt]').forEach(function (b) { b.classList.toggle('active', b.getAttribute('data-tt') === k); });
+      if (k === 'chapter') { showChapter(); return; }
+      body.innerHTML = renderTheory(t.theory && t.theory[k], t.theory && t.theory.figs);
     }
     show(t.theory && t.theory.chapter ? 'chapter' : 'intro');
     $view.querySelectorAll('[data-tt]').forEach(function (b) {
@@ -623,7 +750,7 @@
       var line = raw.trim();
       if (!line) { if (cur) cur.lines.push(''); return; }
       var letters = line.replace(/[^A-Za-z]/g, '');
-      if (letters.length > 2 && line === line.toUpperCase() && line.length < 70) {
+      if (letters.length > 2 && /[A-Za-z]{3,}/.test(line) && line === line.toUpperCase() && line.length < 70) {
         cur = { heading: line, lines: [], tab: tab };
         out.push(cur);
       } else {

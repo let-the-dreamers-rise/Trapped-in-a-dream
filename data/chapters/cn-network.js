@@ -19,7 +19,7 @@ window.GATE_DATA.chapters['cn-network'] = {
     }
   ],
   text: `
-IPv4 ADDRESSING: STRUCTURE AND CLASSES
+IPV4 ADDRESSING: STRUCTURE AND CLASSES
 
 The previous two chapters in this sequence examined how a SINGLE physical link delivers bits and frames reliably; the NETWORK layer's own job is fundamentally different — delivering PACKETS across an ENTIRE, multi-hop, potentially heterogeneous internetwork, requiring a GLOBALLY meaningful addressing scheme independent of any single link's own physical or MAC addressing.
 
@@ -42,7 +42,7 @@ CLASSLESS INTER-DOMAIN ROUTING (CIDR) AND SUBNETTING
 
 GATE TRAP: forgetting to SUBTRACT 2 for the network and broadcast addresses when computing "usable hosts" is one of the single most common numerical errors on this entire topic — a question asking for the TOTAL address count in a block (2^h) has a DIFFERENT correct answer from a question asking for the number of hosts that can actually be ASSIGNED to real devices (2^h − 2); always identify PRECISELY which of the two a given question is asking for before committing to an answer.
 
-IPv4 HEADER FORMAT AND FRAGMENTATION
+IPV4 HEADER FORMAT AND FRAGMENTATION
 
 1. THE IPv4 header's key fields include: VERSION (4 bits, identifying IPv4 specifically), HEADER LENGTH (4 bits, in units of 4-byte words, accommodating variable-length OPTIONS), TOTAL LENGTH (16 bits, the entire packet's size in bytes, INCLUDING the header), TIME TO LIVE (TTL, 8 bits, decremented by ONE at every router hop, with the packet DISCARDED once it reaches zero, preventing packets from circulating INDEFINITELY around a routing loop), PROTOCOL (8 bits, identifying the transport-layer protocol carried, such as TCP or UDP), and a HEADER CHECKSUM (covering ONLY the header, not the payload, and RECOMPUTED at every hop since the TTL field itself changes at each hop).
 2. FRAGMENTATION becomes necessary when a packet's size EXCEEDS the Maximum Transmission Unit (MTU) of some intermediate LINK along its path — the packet is split into SEVERAL smaller fragments, EACH carrying its own COPY of the IP header (with the TOTAL LENGTH field adjusted to that fragment's own smaller size), and reassembled ONLY at the FINAL destination, never at an intermediate router (since a router may not receive every fragment of a given original packet, and different fragments may take DIFFERENT paths under datagram/connectionless routing).
@@ -104,7 +104,7 @@ HIERARCHICAL ROUTING: AUTONOMOUS SYSTEMS AND INTER-DOMAIN ROUTING
 
 GATE TRAP: assuming BGP suffers from the SAME count-to-infinity weakness that plain distance-vector routing does is incorrect — BGP's own EXPLICIT path-vector information (the complete sequence of autonomous systems a route has already traversed) lets a receiving router detect a loop DIRECTLY and IMMEDIATELY, simply by checking whether its own AS number already appears in the advertised path, a structural advantage plain distance-vector's opaque, summarized distance values do not provide at all.
 
-IPv6: ADDRESSING AND KEY DIFFERENCES FROM IPv4
+IPV6: ADDRESSING AND KEY DIFFERENCES FROM IPV4
 
 1. IPv6 uses 128-bit addresses (compared to IPv4's 32 bits), written as EIGHT groups of four hexadecimal digits separated by colons (for instance, 2001:0db8:85a3:0000:0000:8a2e:0370:7334) — this VASTLY larger address space (2^128, versus IPv4's 2^32) was designed SPECIFICALLY to solve IPv4's own address-exhaustion problem, the SAME problem NAT (examined earlier in this chapter) was designed to merely WORK AROUND rather than genuinely solve.
 2. IPv6 ADDRESSES may be ABBREVIATED by omitting LEADING zeros within each group, and by replacing ONE (and only one) contiguous run of all-zero groups with a DOUBLE COLON (::) — for instance, 2001:0db8:0000:0000:0000:0000:0000:0001 abbreviates to 2001:db8::1; only ONE double-colon may appear in a given address, since permitting more than one would make the abbreviation AMBIGUOUS about how many zero groups each "::" actually represents. The special address ::1 (seven leading zero groups compressed, followed by a single 1) is IPv6's own loopback address, the direct counterpart of IPv4's familiar 127.0.0.1.
@@ -115,7 +115,7 @@ KEY: IPv6's decision to move fragmentation entirely to the originating host (rat
 
 KEY: the hierarchical AS/BGP structure examined in this chapter and the earlier Databases Indexing chapter's own multi-level indexing structure are, once again, the SAME underlying pattern applied to entirely different problems — both divide an otherwise UNMANAGEABLY large, flat structure into a hierarchy of smaller, independently manageable pieces, with a SEPARATE, coarser mechanism operating ONE level up to coordinate across those pieces, confirming that "hierarchical decomposition of a flat structure that has grown too large" is among the most broadly recurring engineering patterns this entire book has identified across its many different subjects.
 
-IPv6 ADDRESS TYPES AND HEADER STRUCTURE
+IPV6 ADDRESS TYPES AND HEADER STRUCTURE
 
 1. IPv6 defines THREE fundamental address types, replacing IPv4's broadcast concept entirely: UNICAST (identifying a SINGLE specific interface, delivered to exactly that one interface, directly analogous to an ordinary IPv4 address), MULTICAST (identifying a GROUP of interfaces, delivered to ALL members of that group, directly analogous to IPv4's own Class D multicast addresses), and ANYCAST (identifying a GROUP of interfaces, but delivered to only the SINGLE member of that group considered "nearest" according to the routing protocol's own metric — a genuinely NEW address type IPv4 never had).
 2. THIS elimination of broadcast in favor of scoped multicast is itself a deliberate efficiency improvement. IPv6 has NO broadcast address type at all — functionality IPv4 achieved via broadcast (such as reaching every host on a local segment) is achieved in IPv6 via a special, reserved, LOCAL-SCOPE multicast address instead, avoiding the inefficiency of forcing EVERY device on a segment to process EVERY broadcast packet regardless of whether it is actually relevant to that specific device.

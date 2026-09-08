@@ -22,7 +22,7 @@ WHAT A "MACHINE" MEANS IN THIS SUBJECT
 
 Every automaton this chapter studies is, underneath its formal notation, an answer to one single question: given a string presented one symbol at a time, using ONLY a bounded, FIXED amount of memory (a finite set of internal states, nothing more), can the machine correctly decide whether that string belongs to some target language? The entire finite-automata theory that follows is the precise mathematical account of exactly what such a bounded-memory recognizer CAN and CANNOT do, and regular languages are, by definition, exactly the class of languages some such finite-memory machine can recognize.
 
-FORMAL DEFINITIONS: DFA, NFA, AND ε-NFA
+FORMAL DEFINITIONS: DFA, NFA, AND EPSILON-NFA
 
 1. A DETERMINISTIC FINITE AUTOMATON (DFA) is a 5-tuple M = (Q, Σ, δ, q0, F), where Q is a finite set of states, Σ is a finite input alphabet, δ: Q × Σ → Q is the TRANSITION FUNCTION (crucially, a TOTAL function — EXACTLY one transition exists for every state-symbol pair, never zero and never more than one), q0 ∈ Q is the start state, and F ⊆ Q is the set of accepting (final) states. The language ACCEPTED by M, written L(M), is the set of all strings w such that the EXTENDED transition function δ*(q0, w) lands in F.
 2. A NONDETERMINISTIC FINITE AUTOMATON (NFA) relaxes the transition function to δ: Q × Σ → 2^Q — for a given state and input symbol, the machine may have ZERO, ONE, or SEVERAL possible next states available simultaneously. A string w is accepted if THERE EXISTS at least one computation PATH (one particular sequence of nondeterministic choices) that ends in an accepting state — even if many OTHER possible paths for that same string fail to reach one.

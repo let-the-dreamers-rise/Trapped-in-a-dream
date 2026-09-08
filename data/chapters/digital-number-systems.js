@@ -156,7 +156,7 @@ GATE TRAP: forgetting the IMPLICIT leading 1 — either by storing it explicitly
 
 KEY: IEEE 754's design choices are not arbitrary conventions — each one solves a specific representational problem directly: the implicit leading 1 recovers one "free" bit of precision by exploiting the fact that a normalised binary significand's leading digit is always exactly 1; the bias lets an unsigned exponent field represent negative true exponents without a dedicated exponent sign bit; and the earlier observation that many decimal fractions (like 0.1) never terminate in binary is exactly why floating-point arithmetic on "ordinary-looking" decimal values so often produces small, visible representation errors — the finite mantissa field can only ever store a TRUNCATED prefix of what may be an infinitely repeating true binary expansion.
 
-SPECIAL IEEE 754 VALUES: ZERO, INFINITY, AND NaN
+SPECIAL IEEE 754 VALUES: ZERO, INFINITY, AND NAN
 
 The exponent field's two EXTREME values (all-zero, and all-one) are RESERVED for special cases outside the ordinary normalised-number encoding described above, rather than representing ordinary numbers via the usual implicit-leading-1 formula.
 
