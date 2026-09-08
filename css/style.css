@@ -223,8 +223,9 @@ input[type=date], input[type=number], select, textarea { background: none; color
 }
 .ch-chip {
   flex: none; background: none; color: var(--muted); border: 1px solid var(--faint);
-  font-family: inherit; font-size: 12px; padding: 8px 12px; white-space: nowrap;
-  cursor: pointer; max-width: 220px; overflow: hidden; text-overflow: ellipsis;
+  font-family: inherit; font-size: 10px; font-weight: 800; letter-spacing: .04em;
+  padding: 9px 12px; white-space: nowrap; cursor: pointer; max-width: 220px;
+  overflow: hidden; text-overflow: ellipsis;
 }
 .ch-chip.done { color: var(--accent2); border-color: var(--accent2); }
 .ch-section { border-bottom: 1px solid var(--faint); }
@@ -238,7 +239,11 @@ input[type=date], input[type=number], select, textarea { background: none; color
   font-size: 11px; font-weight: 800; display: flex; align-items: center; justify-content: center;
 }
 .ch-section.opened .ch-sec-num { border-color: var(--accent2); color: var(--accent2); }
-.ch-sec-title { flex: 1; font-size: 15px; font-weight: 700; color: var(--text); }
+/* The source heading is authored ALL-CAPS (same convention as every in-body
+   .th-head). At the 15px/700 a normal title would use, a whole line of raw caps
+   reads as shouting — small, tracked, semi-bold is how every other compact label
+   in this app (.chip, .pill, .tab) already carries caps without that effect. */
+.ch-sec-title { flex: 1; font-size: 12.5px; font-weight: 800; letter-spacing: .02em; line-height: 1.4; color: var(--text); }
 .ch-sec-time { flex: none; font-size: 10px; font-weight: 800; letter-spacing: .06em; color: var(--muted); }
 .ch-sec-arrow { flex: none; font-size: 16px; color: var(--muted); }
 .ch-section.opened .ch-sec-arrow { color: var(--accent2); }

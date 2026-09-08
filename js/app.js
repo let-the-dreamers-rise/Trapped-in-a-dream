@@ -575,15 +575,6 @@
 
   function levelFor(xp) { return Math.floor(Math.sqrt(xp / 40)) + 1; }
 
-  // ALL-CAPS is right for a heading sitting alone on the page (th-head already
-  // uppercases it via CSS regardless of source case) but reads as shouting when
-  // a dozen of them are stacked into a compact outline list — sentence case there
-  // scans the way a book's own table of contents does.
-  function sentenceCase(s) {
-    var lower = String(s).toLowerCase();
-    return lower.charAt(0).toUpperCase() + lower.slice(1);
-  }
-
   // ---------- TOPIC (theory) ----------
   function viewTopic(tid) {
     var e = topicById(tid); if (!e) return viewSubjects();
@@ -627,24 +618,36 @@
         '<div class="ch-outline" id="ch-outline">' +
         sections.map(function (s, i) {
           return '<button class="ch-chip' + (read[i] ? ' done' : '') + '" data-jump="' + i + '">' +
-            (read[i] ? '✓ ' : '') + esc(sentenceCase(s.heading || 'Section ' + (i + 1))) + '</button>';
+            (read[i] ? '✓ ' : '') + esc(s.heading || 'SECTION ' + (i + 1)) + '</button>';
         }).join('') + '</div>' +
         sections.map(function (s, i) {
           return '<div class="ch-section' + (read[i] ? ' opened' : '') + '" id="ch-sec-' + i + '">' +
             '<button class="ch-sec-head" data-toggle="' + i + '">' +
             '<span class="ch-sec-num">' + (i + 1) + '</span>' +
-            '<span class="ch-sec-title">' + esc(sentenceCase(s.heading || 'Section ' + (i + 1))) + '</span>' +
+            '<span class="ch-sec-title">' + esc(s.heading || 'SECTION ' + (i + 1)) + '</span>' +
             '<span class="ch-sec-time">' + readMins(s.body) + ' min</span>' +
             '<span class="ch-sec-arrow">' + (read[i] ? '✓' : '›') + '</span>' +
             '</button>' +
             '<div class="ch-sec-body" id="ch-body-' + i + '" hidden></div></div>';
         }).join('');
 
+      // renderTheory's own fallback (show any figure whose [[FIG:id]] marker never
+      // matched at the very end of the text) only works within whatever text it is
+      // handed — and now that a chapter is handed to it one section at a time,
+      // "the very end" would mean once per section, silently dropping a figure
+      // instead. Every chapter validates clean today (every figure's marker really
+      // is somewhere in its own text), but if that ever stops being true, the fix
+      // is to still show it rather than lose it — so any truly orphaned figure
+      // rides along with the last section instead of vanishing.
+      var allFigs = (t.theory && t.theory.figs) || [];
+      var orphanFigs = allFigs.filter(function (f) {
+        return !sections.some(function (s) { return s.body.indexOf('[[FIG:' + f.id + ']]') >= 0; });
+      });
       function renderInto(i) {
         var box = document.getElementById('ch-body-' + i);
         if (box.getAttribute('data-rendered')) return;
-        var allFigs = (t.theory && t.theory.figs) || [];
         var mine = allFigs.filter(function (f) { return sections[i].body.indexOf('[[FIG:' + f.id + ']]') >= 0; });
+        if (i === sections.length - 1) mine = mine.concat(orphanFigs);
         box.innerHTML = renderTheory(sections[i].body, mine);
         box.setAttribute('data-rendered', '1');
       }
@@ -654,7 +657,7 @@
         S.chapterRead[tid] = read; save();
         document.getElementById('ch-progress').innerHTML = progressHtml();
         var chip = $view.querySelectorAll('.ch-chip')[i];
-        if (chip) { chip.classList.add('done'); chip.textContent = '✓ ' + sentenceCase(sections[i].heading || 'Section ' + (i + 1)); }
+        if (chip) { chip.classList.add('done'); chip.textContent = '✓ ' + (sections[i].heading || 'SECTION ' + (i + 1)); }
         var arrow = document.querySelector('#ch-sec-' + i + ' .ch-sec-arrow');
         if (arrow) arrow.textContent = '✓';
       }
