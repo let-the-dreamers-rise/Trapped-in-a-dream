@@ -271,7 +271,7 @@ ITERATIVE INORDER WITH AN EXPLICIT STACK
 
 The recursive definitions above are the clearest way to state a traversal, but recursion is just an implicit stack managed by the call mechanism. Making that stack explicit lets you traverse iteratively — useful when recursion depth is a concern, and a common thing GATE asks you to trace by hand.
 
-The idea: to visit a node in inorder, you must first exhaust everything in its left subtree. So walk left from the current node, pushing every node you pass onto a stack, until you hit a null pointer. Then pop the stack (that popped node has no more unvisited left descendants, so it's next in inorder order), visit it, and move to ITS right child — repeating the same "walk left, pushing everything" process from there.
+The idea: to visit a node in inorder, you must first exhaust everything in its left subtree. So walk left from the current node, pushing every node you pass onto a stack, until you hit a null pointer. Then pop the stack (that popped node has no more unvisited left descendants, so it's next in inorder order), visit it, and move to its right child — repeating the same "walk left, pushing everything" process from there.
 
 Trace it on the same tree (root 1, left 2 with children 4 and 5, right 3):
 
@@ -303,9 +303,9 @@ Trace it: preorder = 1 2 4 5 3, inorder = 4 2 5 1 3 (the same tree traversed abo
 5. Recurse right: preorder [3], inorder [3]. A single node — 3 is a leaf, attached as the root's right child.
 6. Assemble: root 1, left child 2 (itself with left child 4, right child 5), right child 3. This is exactly the original tree.
 
-Postorder + inorder works by the mirror-image rule — postorder's LAST element is the root instead of the first — and the same splitting-and-recursing argument applies, so it is equally always sufficient.
+Postorder + inorder works by the mirror-image rule — postorder's last element is the root instead of the first — and the same splitting-and-recursing argument applies, so it is equally always sufficient.
 
-Preorder + postorder is NOT always sufficient, and the reason is specific: this pair cannot tell whether a node with only ONE child has that child on its left or its right. Take the smallest possible example — two nodes, a root R with a single child X. If X is R's LEFT child: preorder = R X, postorder = X R. If X is R's RIGHT child: preorder = R X, postorder = X R — identical in both cases. Two different trees, same preorder and same postorder. This ambiguity can only arise at a node with exactly one child; it disappears if the tree is guaranteed FULL (every node has 0 or 2 children), because then there is never a single child to be ambiguous about — in a full tree, preorder + postorder together ARE always sufficient.
+Preorder + postorder is NOT always sufficient, and the reason is specific: this pair cannot tell whether a node with only one child has that child on its left or its right. Take the smallest possible example — two nodes, a root R with a single child X. If X is R's LEFT child: preorder = R X, postorder = X R. If X is R's RIGHT child: preorder = R X, postorder = X R — identical in both cases. Two different trees, same preorder and same postorder. This ambiguity can only arise at a node with exactly one child; it disappears if the tree is guaranteed FULL (every node has 0 or 2 children), because then there is never a single child to be ambiguous about — in a full tree, preorder + postorder together are always sufficient.
 
 KEY: Preorder+inorder and postorder+inorder always determine a unique tree. Preorder+postorder only does so when the tree is additionally known to be full. Level-order alone, or level-order paired with anything but inorder, is generally NOT sufficient without explicit null markers for missing children.
 
@@ -410,7 +410,7 @@ KEY: The BST property is a statement about every node's ENTIRE subtree on each s
 
 SEARCHING A BST
 
-Because every node splits its subtree into "smaller" and "larger" halves, searching for a key needs to look at only ONE path from the root, never branching to explore both sides.
+Because every node splits its subtree into "smaller" and "larger" halves, searching for a key needs to look at only one path from the root, never branching to explore both sides.
 
 1. Start at the root. If the tree is empty, the key is not present — stop.
 2. Compare the target key to the current node's key. If equal, found — stop.
@@ -497,7 +497,7 @@ Case 2 — the node has exactly one child. Splice it out: connect the node's PAR
 
 Trace case 2 on a small tree: insert 50, 30, 70, 60 (60 becomes 70's left child, since 60 < 70). Now delete 70, which has exactly one child, 60. Splice: 60 takes 70's place directly as 50's right child. Resulting tree: root 50, left child 30, right child 60. The ordering still holds — 60 is still correctly greater than 50 and there is no longer a 70 to be greater than.
 
-Case 3 — the node has two children. Now there is no single child to promote without losing the other subtree, so instead REPLACE the node's key with its inorder successor (the minimum of its right subtree) or, symmetrically, its inorder predecessor (the maximum of its left subtree) — either choice preserves the ordering, since both are guaranteed to sit correctly between the node's original left and right subtrees. Then delete the ORIGINAL node that held that successor (or predecessor) value from its old position — which, being a minimum-of-a-right-subtree (or maximum-of-a-left-subtree), can itself have at most one child (a right child, in the successor case, since it has no left child by definition of being the minimum), so this second deletion always reduces to case 1 or case 2, never back to case 3.
+Case 3 — the node has two children. Now there is no single child to promote without losing the other subtree, so instead REPLACE the node's key with its inorder successor (the minimum of its right subtree) or, symmetrically, its inorder predecessor (the maximum of its left subtree) — either choice preserves the ordering, since both are guaranteed to sit correctly between the node's original left and right subtrees. Then delete the original node that held that successor (or predecessor) value from its old position — which, being a minimum-of-a-right-subtree (or maximum-of-a-left-subtree), can itself have at most one child (a right child, in the successor case, since it has no left child by definition of being the minimum), so this second deletion always reduces to case 1 or case 2, never back to case 3.
 
 Trace it on the BST built by inserting 50, 30, 70, 20, 40, 60, 80, 35, 45, 65 in order (giving 30 a left child 20 and a right child 40, and giving 40 in turn a left child 35 and a right child 45). Delete 30, using the inorder SUCCESSOR:
 
@@ -523,7 +523,7 @@ ceil(log2(n + 1)) − 1  ≤  h  ≤  n − 1
 
 The lower bound is the minimum-height formula derived earlier, achieved when the tree happens to be as balanced as a binary tree of that size can be. The upper bound, n − 1, is the fully degenerate chain, achieved by inserting n keys in already-sorted order — exactly the worst case traced above. A plain (unbalanced) BST offers NO guarantee of landing anywhere near the lower bound; it depends entirely on the order the keys arrived in.
 
-This is precisely the gap that AVL and red-black trees, covered below, exist to close: they add rebalancing rules so that h is GUARANTEED to stay O(log n) regardless of insertion order, rather than merely being O(log n) in the best case. Even without any rebalancing at all, if the n keys happen to arrive in a uniformly random order rather than an adversarial one, the EXPECTED height of the resulting BST is still only O(log n) (a known result puts it at roughly 2.99 log2 n) — worse than a balanced tree's guarantee, but far better than the worst case, and it explains why plain BSTs perform acceptably in practice on typical, non-adversarial data.
+This is precisely the gap that AVL and red-black trees, covered below, exist to close: they add rebalancing rules so that h is guaranteed to stay O(log n) regardless of insertion order, rather than merely being O(log n) in the best case. Even without any rebalancing at all, if the n keys happen to arrive in a uniformly random order rather than an adversarial one, the EXPECTED height of the resulting BST is still only O(log n) (a known result puts it at roughly 2.99 log2 n) — worse than a balanced tree's guarantee, but far better than the worst case, and it explains why plain BSTs perform acceptably in practice on typical, non-adversarial data.
 
 CHECKING WHETHER A SEQUENCE COULD BE A BST'S PREORDER
 
@@ -606,7 +606,7 @@ N(5) = N(4) + N(3) + 1 = 12 + 7 + 1 = 20
 
 Since N(h) grows at roughly the same rate as the Fibonacci sequence, which grows like φ^h (φ ≈ 1.618), inverting this relationship for a tree of n nodes gives the height bound h ≈ 1.44 × log2(n) (more precisely, h ≤ 1.44 × log2(n + 2) − 0.328) — still O(log n), just with a slightly larger constant than the absolute-minimum-height bound of a perfectly complete tree, because AVL trades a little extra height for the ability to rebalance cheaply.
 
-AVL deletion follows the same idea as insertion — remove the node using the ordinary BST deletion rules above, then check balance factors along the path from the deleted node's original position back up to the root, rotating wherever a violation appears. The difference from insertion is that a single rotation can fix an insertion-caused imbalance once and for all, but a deletion can require rebalancing at MULTIPLE ancestors on the way back up, since removing a node can shrink a subtree's height in a way that cascades upward rather than stopping at the first fix.
+AVL deletion follows the same idea as insertion — remove the node using the ordinary BST deletion rules above, then check balance factors along the path from the deleted node's original position back up to the root, rotating wherever a violation appears. The difference from insertion is that a single rotation can fix an insertion-caused imbalance once and for all, but a deletion can require rebalancing at multiple ancestors on the way back up, since removing a node can shrink a subtree's height in a way that cascades upward rather than stopping at the first fix.
 
 RED-BLACK TREES, IN BRIEF
 
@@ -626,7 +626,7 @@ Nothing about the vocabulary built at the start of this chapter — parent, chil
 
 n = m·i + 1   and   leaves = n − i = (m − 1)i + 1
 
-A general tree is awkward to store directly, since the number of child pointers a node needs varies from node to node. The left-child right-sibling (LCRS) representation fixes this by giving every node exactly two pointers, regardless of how many children it has in the original tree: a "left" pointer to its FIRST child, and a "right" pointer to its NEXT SIBLING (the next child of the SAME parent). Every other child is then reached by following a chain of "next sibling" pointers from the first child.
+A general tree is awkward to store directly, since the number of child pointers a node needs varies from node to node. The left-child right-sibling (LCRS) representation fixes this by giving every node exactly two pointers, regardless of how many children it has in the original tree: a "left" pointer to its FIRST child, and a "right" pointer to its NEXT SIBLING (the next child of the same parent). Every other child is then reached by following a chain of "next sibling" pointers from the first child.
 
 [[FIG:lcrs-general-tree]]
 

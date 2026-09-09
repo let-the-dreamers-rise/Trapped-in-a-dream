@@ -189,9 +189,9 @@ EXTRACTING THE BEST ELEMENT: SIFT-DOWN
 
 Removing the root is the whole reason the heap exists, so the operation has to both hand back the maximum and leave a valid heap behind, in O(log n).
 
-The maximum is easy to read — it is the root. The hard part is what replaces it, because deleting the root outright would break completeness at the top of the tree, and any of the interior nodes stepping up to fill it would leave a gap somewhere else. The trick: move the LAST element in the array into the root's position, and shrink the array by one. This costs O(1) and keeps the tree complete, because removing the last slot of a complete tree is always safe — it is precisely the slot completeness says must be filled last, so it is also safe to remove last.
+The maximum is easy to read — it is the root. The hard part is what replaces it, because deleting the root outright would break completeness at the top of the tree, and any of the interior nodes stepping up to fill it would leave a gap somewhere else. The trick: move the last element in the array into the root's position, and shrink the array by one. This costs O(1) and keeps the tree complete, because removing the last slot of a complete tree is always safe — it is precisely the slot completeness says must be filled last, so it is also safe to remove last.
 
-That moved element is very likely now violating the order property with its new children — it came from a leaf, where anything can be small. The repair, sift-down or bubble-down, is: compare it with BOTH children, find the larger of the two (in a max-heap), and if the moved element is smaller than that larger child, swap with that specific child (not the other one) and repeat one level down. Stop at a leaf or when the moved element is no longer smaller than either child.
+That moved element is very likely now violating the order property with its new children — it came from a leaf, where anything can be small. The repair, sift-down or bubble-down, is: compare it with both children, find the larger of the two (in a max-heap), and if the moved element is smaller than that larger child, swap with that specific child (not the other one) and repeat one level down. Stop at a leaf or when the moved element is no longer smaller than either child.
 
 GATE TRAP: Sift-down must compare against the LARGER of the two children, never just "the left child" or an arbitrary one. Swapping with the smaller child when the larger child also violates order fails to fix the violation at that position — the larger child would still be bigger than the newly placed parent. Always identify the larger child first, then compare once against it.
 
@@ -254,7 +254,7 @@ Trace it in full on the 8-element array [4, 10, 3, 5, 1, 15, 9, 2] (0-indexed, n
 
 Final heap, built entirely bottom-up: [15, 10, 9, 5, 1, 3, 4, 2]. Verify: index 0 (15) ≥ children 10, 9; index 1 (10) ≥ children 5, 1; index 2 (9) ≥ children 3, 4. Every internal node checks out — a valid max-heap, reached in 4 sift-down calls (indices 3, 2, 1, 0) rather than 8 sift-up insertions.
 
-WHY BUILD-HEAP IS O(n), NOT O(n log n)
+Why BUILD-HEAP IS O(n), NOT O(n log n)
 
 Each individual sift-down in Floyd's method can, in the worst case, cost as much as the height of the subtree it is called on — up to O(log n) if called at the root. So a naive bound on the whole build is (number of nodes) × (max cost per node) = O(n log n), the same as the insertion method. That bound is not tight, and finding the tight one is the actual argument, not a fact to accept on faith.
 
@@ -280,7 +280,7 @@ HEAPSORT
 
 Once you can build a heap in O(n) and extract its maximum in O(log n), a sorting algorithm falls out for free: build a max-heap of the whole array, then repeatedly extract the maximum and place it at the end of the still-unsorted portion, shrinking the heap by one each time. Because each extraction always removes the current largest remaining element and appends it just before the previous extraction, the array fills up sorted from the back forward.
 
-Concretely, extract-max already does most of this: it moves the last element of the (shrinking) heap to the root and sifts down. Heapsort reuses exactly that swap — swap the root with the last element of the CURRENT heap region, but instead of discarding that last slot, leave the old root sitting there, now correctly placed in final sorted position, and shrink the heap boundary to exclude it.
+Concretely, extract-max already does most of this: it moves the last element of the (shrinking) heap to the root and sifts down. Heapsort reuses exactly that swap — swap the root with the last element of the current heap region, but instead of discarding that last slot, leave the old root sitting there, now correctly placed in final sorted position, and shrink the heap boundary to exclude it.
 
 Trace the first three extractions on the max-heap built two sections ago: [15, 10, 9, 5, 1, 3, 4, 2] (n = 8, heap occupies indices 0–7).
 
@@ -308,7 +308,7 @@ kth smallest via full heap + k extractions = O(n + k log n)
 
 This beats sorting the whole array (O(n log n)) whenever k is small — for instance, k = O(1) or k = O(log n) — because the O(n) build and the O(k log n) extraction phase are both individually cheaper than a full sort, and their sum stays cheaper as long as k does not grow to be comparable to n.
 
-Method two, better when n is large or arrives as an unbounded stream and only k matters: maintain a max-heap of size AT MOST k to track the k smallest elements seen so far (or a min-heap of size k to track the k largest — the heap type is the opposite of what you are hunting for, because you want fast access to the WORST of your current top-k, to know instantly whether a new element is good enough to replace it). For each incoming element: if the heap has fewer than k elements, insert it (O(log k)); otherwise compare it against the heap's root — if it improves on the root, replace the root with it and sift-down (O(log k)), otherwise discard it with a single comparison. Total cost across n elements:
+Method two, better when n is large or arrives as an unbounded stream and only k matters: maintain a max-heap of size AT most k to track the k smallest elements seen so far (or a min-heap of size k to track the k largest — the heap type is the opposite of what you are hunting for, because you want fast access to the WORST of your current top-k, to know instantly whether a new element is good enough to replace it). For each incoming element: if the heap has fewer than k elements, insert it (O(log k)); otherwise compare it against the heap's root — if it improves on the root, replace the root with it and sift-down (O(log k)), otherwise discard it with a single comparison. Total cost across n elements:
 
 kth extreme via a size-k auxiliary heap = O(n log k)
 

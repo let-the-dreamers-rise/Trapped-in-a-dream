@@ -155,7 +155,7 @@ Call a state safe if there exists at least one order in which all currently-exis
 
 [[FIG:deadlock-states]]
 
-Every deadlocked state is unsafe — if processes are already stuck, plainly no order lets everyone finish. But the reverse is not true: an unsafe state is not necessarily deadlocked. Unsafe only means no order is GUARANTEED to let everyone finish, for every possible pattern of future requests. It is entirely possible that, in an unsafe state, the processes happen to request resources in a lucky order and everyone finishes anyway with no deadlock ever occurring. Unsafe is a risk, not a certainty.
+Every deadlocked state is unsafe — if processes are already stuck, plainly no order lets everyone finish. But the reverse is not true: an unsafe state is not necessarily deadlocked. Unsafe only means no order is guaranteed to let everyone finish, for every possible pattern of future requests. It is entirely possible that, in an unsafe state, the processes happen to request resources in a lucky order and everyone finishes anyway with no deadlock ever occurring. Unsafe is a risk, not a certainty.
 
 KEY: Unsafe does not mean deadlocked. It means the OS cannot GUARANTEE deadlock will be avoided if it keeps granting requests freely from here — it might still turn out fine depending on what gets requested next, but the OS is no longer able to promise it will. Deadlock avoidance works by never entering an unsafe state in the first place, which is a strictly stronger guarantee than merely avoiding a deadlocked one.
 
@@ -191,7 +191,7 @@ Max is a matrix: Max[i][j] is the maximum number of instances of resource type j
 
 Allocation is a matrix: Allocation[i][j] is how many instances of resource type j process i currently holds right now. This changes every time a request is granted or a resource is released; Available and Allocation always move in exactly opposite directions for the same amount, since a resource is either free or held by someone.
 
-Need is derived, not given directly: it is how much MORE process i could still ask for, over and above what it already holds.
+Need is derived, not given directly: it is how much more process i could still ask for, over and above what it already holds.
 
 Need[i][j] = Max[i][j] − Allocation[i][j]
 
@@ -248,7 +248,7 @@ All five processes finished. The state is safe, and <P1, P3, P4, P0, P2> is one 
 
 THE RESOURCE-REQUEST ALGORITHM
 
-The safety check above tells you whether the CURRENT state is safe. What you actually need, moment to moment, is to decide whether to grant a NEW request without breaking that safety. The resource-request algorithm wraps the safety check in two cheap filters first.
+The safety check above tells you whether the current state is safe. What you actually need, moment to moment, is to decide whether to grant a new request without breaking that safety. The resource-request algorithm wraps the safety check in two cheap filters first.
 
 For a request vector Request from process i:
 
@@ -266,7 +266,7 @@ Granted example. Continuing the system above, P1 requests (1,0,2). Check against
 
 Re-run safety on this hypothetical state. Work = (2,3,0). P1's new Need (0,2,0) fits: run P1, add (3,0,2), Work = (5,3,2). P3's Need (0,1,1) fits: run P3, add (2,1,1), Work = (7,4,3). P0's Need (7,4,3) fits exactly: run P0, add (0,1,0), Work = (7,5,3). P2's Need (6,0,0) fits: run P2, add (3,0,2), Work = (10,5,5). P4's Need (4,3,1) fits: run P4. Every process finishes — safe sequence <P1, P3, P0, P2, P4>. The request is granted.
 
-Denied example. From the ORIGINAL state (before P1's request above), suppose P4 requests (3,3,0) instead. Check against Need P4 = (4,3,1): 3≤4, 3≤3, 0≤1 — fits. Check against Available (3,3,2): 3≤3, 3≤3, 0≤2 — fits. Both cheap filters pass, so it looks fine so far — but do not stop here.
+Denied example. From the original state (before P1's request above), suppose P4 requests (3,3,0) instead. Check against Need P4 = (4,3,1): 3≤4, 3≤3, 0≤1 — fits. Check against Available (3,3,2): 3≤3, 3≤3, 0≤2 — fits. Both cheap filters pass, so it looks fine so far — but do not stop here.
 
 Tentatively grant: Available becomes (0,0,2); P4's Allocation becomes (3,3,2); P4's new Need becomes (1,0,1). Run safety on this hypothetical state. Work = (0,0,2). Check every unfinished process: P0 Need (7,4,3) fails on A. P1 Need (1,2,2) fails on A (1 > 0). P2 Need (6,0,0) fails on A. P3 Need (0,1,1) fails on B (1 > 0). P4's own new Need (1,0,1) fails on A (1 > 0). No process's Need fits Work — the scan finds nobody.
 
@@ -369,7 +369,7 @@ n(max, guaranteed safe) = floor[ (R − 1) / (k − 1) ]
 
 For example, with R = 10 total instances and each process needing at most k = 3: n ≤ (10−1)/(3−1) = 9/2 = 4.5, so n = 4 is the largest guaranteed-safe number of processes. Check it: 4 processes at n(k−1)+1 = 4(2)+1 = 9 ≤ 10, safe. Try n = 5: 5(2)+1 = 11 > 10 — not guaranteed, so 5 processes could deadlock in the worst case. The floor is doing real work here: it is the point where the formula first fails to fit inside the available supply.
 
-The formula also generalises to processes with DIFFERENT maximum needs, since the derivation never actually required them to be equal — it only required each process's worst-case holding to be one less than ITS OWN maximum. For processes with maxima Max_1, Max_2, ..., Max_n of the same resource type, the worst case is each process holding (Max_i − 1), and the same argument gives:
+The formula also generalises to processes with different maximum needs, since the derivation never actually required them to be equal — it only required each process's worst-case holding to be one less than ITS OWN maximum. For processes with maxima Max_1, Max_2, ..., Max_n of the same resource type, the worst case is each process holding (Max_i − 1), and the same argument gives:
 
 R (minimum, unequal needs) = (Max_1 − 1) + (Max_2 − 1) + ... + (Max_n − 1) + 1
 

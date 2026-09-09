@@ -36,7 +36,7 @@ THE GREEDY PARADIGM, STATED PRECISELY
 
 A greedy algorithm builds a solution incrementally. At each step it has a set of choices available, and it picks the one that is locally best according to some simple rule — largest ratio, earliest deadline, smallest weight, whatever the problem calls for. Once made, that choice is fixed for the rest of the algorithm: no step ever revisits an earlier decision to see if a different one would have done better.
 
-Contrast this with the other two strategies you know. Brute force would try every possible combination of choices and keep the best. Dynamic programming would consider both taking and not taking a choice, solve both resulting subproblems, and combine — but critically, it solves the SAME subproblem many times across different branches, which is why it memoises. Greedy solves exactly one subproblem after each choice: having chosen, there is only one way forward, not several branches to weigh.
+Contrast this with the other two strategies you know. Brute force would try every possible combination of choices and keep the best. Dynamic programming would consider both taking and not taking a choice, solve both resulting subproblems, and combine — but critically, it solves the same subproblem many times across different branches, which is why it memoises. Greedy solves exactly one subproblem after each choice: having chosen, there is only one way forward, not several branches to weigh.
 
 KEY: A greedy algorithm makes one irrevocable local choice per step and solves exactly one resulting subproblem — never several, never revisited. That is what makes it fast; it is also exactly what makes it risky.
 
@@ -54,13 +54,13 @@ In general, yes. Consider choosing a path down a small triangle of numbers where
 
 Greedy-by-largest-next-step takes 3, then 7 (bigger than 4), then must go to 2 or 4 below 7 — say 4: total 3 + 7 + 4 = 14. But the path 3, 4, 6 gives 3 + 4 + 6 = 13, and 3, 7, 2 gives 12 — so the greedy path of 14 does happen to win here, but change the bottom row to 2, 1, 6 and greedy is forced from 7 into 2 or 1 (total 3+7+2=12 at best), while 3, 4, 6 gives 13. The locally larger first step (7 over 4) foreclosed the better global path. This is exactly the failure this chapter is built to help you predict.
 
-So the question is never "does greedy sound reasonable" — it always sounds reasonable. The question is whether THIS problem has the special structure that makes local optimality accumulate into global optimality without ever needing to look ahead. Two properties, defined next, are exactly that structure.
+So the question is never "does greedy sound reasonable" — it always sounds reasonable. The question is whether this problem has the special structure that makes local optimality accumulate into global optimality without ever needing to look ahead. Two properties, defined next, are exactly that structure.
 
 THE GREEDY-CHOICE PROPERTY
 
 A problem has the greedy-choice property if there exists some globally optimal solution that begins with the greedy algorithm's first choice. Read that carefully: it does not say every optimal solution uses the greedy choice, only that at least one does — so making that choice never rules out reaching the optimum, even if it means abandoning some other, equally optimal solutions that did not start that way.
 
-Why does this matter operationally? Because it licenses the single most important simplification in this chapter: once you know some optimal solution starts with the greedy choice, you may lock that choice in and search only among solutions that agree with it. You have replaced "find the best solution" with "find the best solution GIVEN this first step" — a strictly smaller search — without losing anything, because the true optimum is still reachable inside that smaller search.
+Why does this matter operationally? Because it licenses the single most important simplification in this chapter: once you know some optimal solution starts with the greedy choice, you may lock that choice in and search only among solutions that agree with it. You have replaced "find the best solution" with "find the best solution given this first step" — a strictly smaller search — without losing anything, because the true optimum is still reachable inside that smaller search.
 
 Example where the property holds: activity selection (defined fully below). Among all optimal (maximum-size) sets of non-overlapping activities, at least one contains the activity that finishes earliest of all — because that activity, finishing before every other, can always be swapped into the earliest slot of any optimal schedule without bumping anything out. We prove this properly later; for now, take it as the shape of the claim.
 
@@ -72,11 +72,11 @@ OPTIMAL SUBSTRUCTURE
 
 The second requirement is one you already know from dynamic programming, but greedy needs a sharper version of it. A problem has optimal substructure if, once you fix an optimal first choice, the OPTIMAL solution to what remains — the residual problem, with that choice's effects removed — combines with the choice to give a global optimum.
 
-In DP this residual problem could still be large and could recur in many overlapping forms, which is why DP explores many first choices and memoises. In a correctly-greedy problem, the residual problem, after the greedy choice is fixed, is simply a smaller instance of the SAME problem: same type of input, one fewer element, no branching needed, because the greedy-choice property has already told us this branch contains an optimum.
+In DP this residual problem could still be large and could recur in many overlapping forms, which is why DP explores many first choices and memoises. In a correctly-greedy problem, the residual problem, after the greedy choice is fixed, is simply a smaller instance of the same problem: same type of input, one fewer element, no branching needed, because the greedy-choice property has already told us this branch contains an optimum.
 
 Example where it holds: after activity selection picks the earliest-finishing activity a1, the remaining problem — select a maximum set of activities from those starting at or after a1's finish — is again an activity-selection problem, just on a smaller set. Solve it the same way (greedily) and glue a1 to the front.
 
-Example where it is more subtle: 0/1 knapsack DOES have optimal substructure in the ordinary DP sense (the optimal solution restricted to items 2..n, given whatever decision was made on item 1, is optimal for the reduced problem) — its failure is purely in the greedy-choice property, not here. This is worth sitting with: optimal substructure is necessary for greedy but does not by itself make greedy correct. Both properties are required together.
+Example where it is more subtle: 0/1 knapsack does have optimal substructure in the ordinary DP sense (the optimal solution restricted to items 2..n, given whatever decision was made on item 1, is optimal for the reduced problem) — its failure is purely in the greedy-choice property, not here. This is worth sitting with: optimal substructure is necessary for greedy but does not by itself make greedy correct. Both properties are required together.
 
 KEY: Optimal substructure alone justifies dynamic programming (many candidate first choices, each leaving an optimal-substructure residual, best combined by trying all and remembering). Greedy-choice property PLUS optimal substructure together justify never branching at all — you only ever need to solve the one residual problem left by the single greedy choice.
 
@@ -186,7 +186,7 @@ This is the trap GATE returns to most often in this topic, so work it fully. Sam
 
 Ratio-greedy still proposes I1, I2 in ratio order: take I1 (weight 10, value 100), take I2 (weight 20, value 120) — total weight 30, value 220, remaining capacity 10. I3 needs weight 30 and cannot be split, so it is skipped entirely (10 kg of capacity is wasted). Greedy total = 220.
 
-Is 220 optimal for 0/1? Check the alternatives directly: {I1, I3} needs weight 10+30 = 40, fits exactly, value 100+120 = 220 — ties greedy. {I2, I3} needs weight 20+30 = 50 > 40, infeasible. {I3} alone: value 120, worse. So on THIS instance greedy happens to match the optimum (220) — but that is a coincidence of these numbers, not a guarantee, and the standard counterexample shows the guarantee does not exist.
+Is 220 optimal for 0/1? Check the alternatives directly: {I1, I3} needs weight 10+30 = 40, fits exactly, value 100+120 = 220 — ties greedy. {I2, I3} needs weight 20+30 = 50 > 40, infeasible. {I3} alone: value 120, worse. So on this instance greedy happens to match the optimum (220) — but that is a coincidence of these numbers, not a guarantee, and the standard counterexample shows the guarantee does not exist.
 
 Standard counterexample: capacity 10, items (weight 6, value 60), (weight 5, value 50), (weight 5, value 50). Ratios: 60/6 = 10, 50/5 = 10, 50/5 = 10 — all tied, but suppose ties break toward the first-listed item, so greedy takes the weight-6 item (value 60), leaving 4 kg of capacity — too little for either weight-5 item. Greedy total = 60. The optimal 0/1 solution takes the two weight-5 items together: weight 10 exactly, value 100. Greedy misses it because indivisibility means it cannot "trade back" 1 kg of the first item once taken — the exchange-argument swap of the fractional proof (moving an arbitrary small weight d between two items) is impossible when items are atomic.
 
@@ -261,7 +261,7 @@ KEY: The two smallest frequencies being merged first is not a heuristic — it i
 
 TIES: MULTIPLE VALID HUFFMAN TREES
 
-When two nodes in the pool have equal frequency, either may be picked first, and different tie-breaks can produce structurally different trees — different individual codeword lengths — while the TOTAL cost stays the same. Example: frequencies 2, 2, 2, 2. Merging (2,2) then the other (2,2), then combining the two 4s gives every leaf at depth 2, cost 4*2*2=16. There is no other shape possible here since all merges are forced to be symmetric, but with frequencies like 1,1,1,1,4 different pairings among the four 1s can give different-looking trees with the same total, because the sum-of-internal-nodes identity depends only on which frequencies get merged at which "level" of accumulated weight, and symmetric substitutions can preserve that.
+When two nodes in the pool have equal frequency, either may be picked first, and different tie-breaks can produce structurally different trees — different individual codeword lengths — while the total cost stays the same. Example: frequencies 2, 2, 2, 2. Merging (2,2) then the other (2,2), then combining the two 4s gives every leaf at depth 2, cost 4*2*2=16. There is no other shape possible here since all merges are forced to be symmetric, but with frequencies like 1,1,1,1,4 different pairings among the four 1s can give different-looking trees with the same total, because the sum-of-internal-nodes identity depends only on which frequencies get merged at which "level" of accumulated weight, and symmetric substitutions can preserve that.
 
 GATE TRAP: A question may show two different-looking Huffman trees for the same frequency set and ask which is "the" optimal one. If both are full binary trees with correct leaf frequencies and both give the same total cost, both ARE valid optimal Huffman trees — optimality is about minimum total cost, not about a unique tree. Only reject a proposed tree if its cost is not minimum, or if it is not a valid prefix tree at all (not full, or leaves not matching the frequency multiset).
 
@@ -283,7 +283,7 @@ THE RULE: PROFIT DESCENDING, LATEST FEASIBLE SLOT
 
 Sort jobs by decreasing profit. Process them in that order; for each job, scan its deadline slot backward (deadline, deadline-1, ..., 1) and place it in the LATEST free slot at or before its deadline; if no such slot is free, discard the job (it can never be scheduled — every slot up to its deadline is already occupied by a higher-profit job).
 
-Why latest free slot and not earliest? Placing a job as LATE as possible leaves every EARLIER slot open for jobs with tighter deadlines that have not been processed yet (since we go in decreasing-profit order, not increasing-deadline order, a later job in our processing sequence might have a very early deadline and need one of those slots). Placing greedily in the earliest free slot instead can waste an early slot on a job that did not need it, starving a later, tighter-deadlined job of the only slot it could have used.
+Why latest free slot and not earliest? Placing a job as LATE as possible leaves every earlier slot open for jobs with tighter deadlines that have not been processed yet (since we go in decreasing-profit order, not increasing-deadline order, a later job in our processing sequence might have a very early deadline and need one of those slots). Placing greedily in the earliest free slot instead can waste an early slot on a job that did not need it, starving a later, tighter-deadlined job of the only slot it could have used.
 
 FULL TRACE
 
@@ -305,7 +305,7 @@ A direct implementation scans up to d_i slots for each of n jobs, giving O(n^2) 
 
 WHEN LATEST-SLOT MATTERS: A CLOSE CALL
 
-Consider two remaining jobs with one free slot each at times 1 and 2: X(deadline 1, profit 50), Y(deadline 2, profit 50), processed in some tie order — say Y first. Latest-free-slot places Y in slot 2 (its only option, since it scans from 2 down and 2 is free), leaving slot 1 free for X, which then also gets placed — total profit 100. If instead an earliest-free-slot rule were used, Y would be scanned from slot 1 upward, land in slot 1 (the first free slot it meets), and then X (deadline 1) finds slot 1 taken and no slot before it — X is lost, total profit only 50. This is exactly why the standard algorithm scans DOWN from the deadline, not up from slot 1.
+Consider two remaining jobs with one free slot each at times 1 and 2: X(deadline 1, profit 50), Y(deadline 2, profit 50), processed in some tie order — say Y first. Latest-free-slot places Y in slot 2 (its only option, since it scans from 2 down and 2 is free), leaving slot 1 free for X, which then also gets placed — total profit 100. If instead an earliest-free-slot rule were used, Y would be scanned from slot 1 upward, land in slot 1 (the first free slot it meets), and then X (deadline 1) finds slot 1 taken and no slot before it — X is lost, total profit only 50. This is exactly why the standard algorithm scans down from the deadline, not up from slot 1.
 
 COIN CHANGE: WHEN GREEDY WORKS AND WHEN IT DOES NOT
 
@@ -331,7 +331,7 @@ For amount 6 with {1,3,4}: minCoins(0)=0, minCoins(1)=1, minCoins(2)=2, minCoins
 
 MINIMUM NUMBER OF PLATFORMS / INTERVAL PARTITIONING
 
-A related but distinct problem: instead of selecting a maximum subset of non-overlapping activities (throwing the rest away), schedule ALL n activities, using as few resources (platforms, rooms, machines) running in parallel as possible, such that no two activities sharing a resource overlap.
+A related but distinct problem: instead of selecting a maximum subset of non-overlapping activities (throwing the rest away), schedule all n activities, using as few resources (platforms, rooms, machines) running in parallel as possible, such that no two activities sharing a resource overlap.
 
 THE SWEEP ALGORITHM
 
@@ -353,7 +353,7 @@ Given n jobs (no deadlines here, all available at time 0) each with a processing
 
 The rule: process jobs in increasing order of processing time — shortest job first (SJF).
 
-Exchange-argument proof. Suppose an optimal schedule has some job with a LONGER processing time immediately before a job with a SHORTER one (an "inversion" relative to SJF order). Swapping these two adjacent jobs: every OTHER job's completion time is unaffected (the same total time is used before and after this pair, in total). Within the pair, let the long job have time L and the short job have time S, with L > S, both starting at the same moment t before the swap. Before the swap: long-then-short gives the long job completing at t+L, the short job completing at t+L+S. After the swap: short-then-long gives the short job completing at t+S, the long job completing at t+S+L. Sum before = (t+L)+(t+L+S) = 2t+2L+S. Sum after = (t+S)+(t+S+L) = 2t+2S+L. Difference (before - after) = (2L+S)-(2S+L) = L - S > 0, since L > S. So swapping strictly decreases the total. Any schedule with an inversion can be strictly improved, so an optimal schedule has no inversions — it is exactly SJF order.
+Exchange-argument proof. Suppose an optimal schedule has some job with a LONGER processing time immediately before a job with a SHORTER one (an "inversion" relative to SJF order). Swapping these two adjacent jobs: every other job's completion time is unaffected (the same total time is used before and after this pair, in total). Within the pair, let the long job have time L and the short job have time S, with L > S, both starting at the same moment t before the swap. Before the swap: long-then-short gives the long job completing at t+L, the short job completing at t+L+S. After the swap: short-then-long gives the short job completing at t+S, the long job completing at t+S+L. Sum before = (t+L)+(t+L+S) = 2t+2L+S. Sum after = (t+S)+(t+S+L) = 2t+2S+L. Difference (before - after) = (2L+S)-(2S+L) = L - S > 0, since L > S. So swapping strictly decreases the total. Any schedule with an inversion can be strictly improved, so an optimal schedule has no inversions — it is exactly SJF order.
 
 FULL TRACE
 
@@ -375,7 +375,7 @@ The rule: process jobs in increasing order of DEADLINE — earliest deadline fir
 
 [[FIG:edf-vs-sjf]]
 
-Exchange-argument proof (sketch, same shape as SJF's). Suppose an optimal schedule has an inversion — a job with a later deadline scheduled immediately before a job with an earlier deadline. Swapping them cannot increase the maximum lateness: the job now finishing earlier (the one with the earlier deadline) can only have its lateness decrease or stay the same (it finishes sooner than before), and the job now finishing later (the one with the later deadline) finishes at the same time the OTHER job used to finish at — no later than the point at which, before the swap, the pair as a whole was already accounted for, so its lateness against its own (later) deadline is no worse than the other job's lateness against the earlier deadline was, because deadline_now >= deadline_before-swap-partner. Repeated swapping removes every inversion without increasing the maximum lateness anywhere, showing an EDF-ordered schedule attains the minimum possible maximum lateness.
+Exchange-argument proof (sketch, same shape as SJF's). Suppose an optimal schedule has an inversion — a job with a later deadline scheduled immediately before a job with an earlier deadline. Swapping them cannot increase the maximum lateness: the job now finishing earlier (the one with the earlier deadline) can only have its lateness decrease or stay the same (it finishes sooner than before), and the job now finishing later (the one with the later deadline) finishes at the same time the other job used to finish at — no later than the point at which, before the swap, the pair as a whole was already accounted for, so its lateness against its own (later) deadline is no worse than the other job's lateness against the earlier deadline was, because deadline_now >= deadline_before-swap-partner. Repeated swapping removes every inversion without increasing the maximum lateness anywhere, showing an EDF-ordered schedule attains the minimum possible maximum lateness.
 
 FULL TRACE, SAME THREE JOBS, DIFFERENT OBJECTIVE
 
@@ -415,7 +415,7 @@ Building the pool as a min-heap makes this Theta(n log n), identical to Huffman:
 
 MST, KRUSKAL, PRIM AND DIJKSTRA AS GREEDY
 
-You met these three algorithms in the graph-algorithms topic; here the point is only to see them as members of THIS family, sharing one exchange argument, so you recognise the pattern rather than re-deriving them.
+You met these three algorithms in the graph-algorithms topic; here the point is only to see them as members of this family, sharing one exchange argument, so you recognise the pattern rather than re-deriving them.
 
 Kruskal's algorithm for minimum spanning tree makes the greedy choice "take the globally cheapest edge that does not create a cycle." Prim's algorithm makes the greedy choice "take the cheapest edge crossing the boundary of the tree built so far." Both are justified by the same fact, called the cut property: for any partition of the vertices into two non-empty sets, the minimum-weight edge crossing that partition belongs to SOME minimum spanning tree. This is the greedy-choice property for MST, and it plays the identical role that "earliest-finish activity is in some optimal schedule" played for activity selection — it is what licenses locking in the cheapest crossing edge without ever needing to reconsider.
 
