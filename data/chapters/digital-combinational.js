@@ -69,7 +69,7 @@ A HALF ADDER (two inputs, no carry-in support) computes Sum = A⊕B, Carry = A·
 
 A FULL ADDER (three inputs — A, B, and a carry-in Cin) computes Sum = A⊕B⊕Cin, and Cout = AB+BCin+ACin — this Cout expression is exactly the MAJORITY FUNCTION of the three inputs (true whenever AT least two of the three are true), which makes direct intuitive sense: a carry is generated out of this bit position exactly when at least two of the three quantities being combined (the two data bits and the incoming carry) are 1.
 
-A full adder can be built from TWO HALF ADDERS plus one OR GATE: the first half adder computes A⊕B (call it S₁) and AB (call it C₁); the second half adder computes S₁⊕Cin (giving the final Sum, since (A⊕B)⊕Cin = A⊕B⊕Cin exactly) and S₁·Cin (call it C₂); the final OR gate combines C₁+C₂ to produce Cout — verified algebraically: C₁+C₂ = AB + (A⊕B)Cin = AB + (AB′+A′B)Cin = AB+ABCin+A′BCin+... simplifying via the distributive and absorption laws recovers exactly AB+BCin+ACin, confirming the two-half-adder-plus-OR construction produces the correct majority function.
+A full adder can be built from TWO HALF ADDERS plus one OR GATE: the first half adder computes A⊕B (call it S₁) and AB (call it C₁); the second half adder computes S₁⊕Cin (giving the final Sum, since (A⊕B)⊕Cin = A⊕B⊕Cin exactly) and S₁·Cin (call it C₂); the final OR gate combines C₁+C₂ to produce Cout — verified algebraically: C₁+C₂ = AB + (A⊕B)Cin = AB + (AB′+A′B)Cin = AB+AB′Cin+A′BCin+... simplifying via the distributive and absorption laws recovers exactly AB+BCin+ACin, confirming the two-half-adder-plus-OR construction produces the correct majority function.
 
 RIPPLE-CARRY VS CARRY-LOOKAHEAD DELAY
 

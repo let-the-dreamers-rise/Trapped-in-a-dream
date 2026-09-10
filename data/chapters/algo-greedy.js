@@ -109,7 +109,7 @@ The correct rule is: sort activities by finish time, and greedily take each acti
 
 Earliest start time first. Counterexample: activity X = (0, 10) starts first of all but occupies the entire day, blocking five other activities that could each fit in a 2-hour slot elsewhere. Picking X first (because it starts earliest) yields a set of size 1; earliest-finish would instead pick the short activities and get 5 or more.
 
-Shortest duration first. Counterexample: activities (0, 1), (0.5, 2), (1, 2). The shortest is neither of the two compatible ones — take (2,3) duration 1 vs a pair like (2,3) and (3,4) each duration 1 that together beat a single long one, or concretely: A=(1,4) duration 3, B=(0,2) duration 2, C=(2,5) duration 3. Shortest-first picks B (duration 2), which is compatible with C — giving {B, C}, size 2, actually matching earliest-finish here; the standard breaking case is a short activity that straddles the gap between two other compatible activities, e.g. A=(0,5), B=(4,6) short duration 2 sitting across the middle, C=(5,10): shortest is B (duration 2), chosen first, and it conflicts with C's start at 5 only if B's finish exceeds 5 — set B=(3,6): now B conflicts with both A and C, and picking B first (shortest) leaves the set {B}, size 1, while earliest-finish picks A=(0,5) first (finishes at 5, tied or earlier), then C=(5,10), giving size 2.
+Shortest duration first. Counterexample: a short activity that straddles the gap between two other, otherwise-compatible activities. Take A=(0,5), B=(3,6), C=(5,10) — B has the shortest duration (3) but overlaps BOTH A and C. Shortest-first picks B first, which then conflicts with both A and C, leaving only {B}, size 1. Earliest-finish instead picks A=(0,5) first (finishing at 5, before B's finish at 6), which is compatible with C=(5,10), giving {A, C}, size 2 — strictly better than shortest-first's single activity.
 
 Fewest conflicts first. Counting how many other activities each one overlaps and taking the least-conflicted one first also fails: an activity can have few conflicts simply because few other activities exist in that region, while still being a poor structural choice compared to the one that frees the earliest time. Constructing a clean numeric counterexample takes a slightly larger instance (five or more activities clustered so that a low-conflict activity in a sparse region blocks a high-value cluster elsewhere), but the principle is the same as the other two failures: none of these rules directly optimises "leave the most room for what comes after," which is precisely what earliest-finish does.
 
@@ -327,7 +327,7 @@ GATE TRAP: A very common error is assuming greedy coin change is a general algor
 
 minCoins(v) = 1 + min over coins c <= v of minCoins(v - c)
 
-For amount 6 with {1,3,4}: minCoins(0)=0, minCoins(1)=1, minCoins(2)=2, minCoins(3)=1, minCoins(4)=1, minCoins(5)=min(1+minCoins(4), 1+minCoins(2))=min(2,3)=2, minCoins(6)=min(1+minCoins(5), 1+minCoins(3), 1+minCoins(2))=min(3,2,3)=2. Confirms the optimum is 2 coins (3+3), matching the direct check above.
+For amount 6 with {1,3,4}: minCoins(0)=0, minCoins(1)=1, minCoins(2)=2, minCoins(3)=1, minCoins(4)=1, minCoins(5)=min(1+minCoins(4), 1+minCoins(2), 1+minCoins(1))=min(2,3,2)=2, minCoins(6)=min(1+minCoins(5), 1+minCoins(3), 1+minCoins(2))=min(3,2,3)=2. Confirms the optimum is 2 coins (3+3), matching the direct check above.
 
 MINIMUM NUMBER OF PLATFORMS / INTERVAL PARTITIONING
 

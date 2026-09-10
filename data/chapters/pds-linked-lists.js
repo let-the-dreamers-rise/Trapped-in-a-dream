@@ -23,7 +23,7 @@ window.GATE_DATA.chapters['pds-linked-lists'] = {
     },
     {
       id: 'dll-insert',
-      caption: 'Inserting node N between A and B in a doubly linked list: the order of the four pointer writes matters.',
+      caption: 'Inserting node N between A and B in a doubly linked list: four pointer fields must be set correctly, though — unlike the singly linked case — their order does not actually matter here, since A and B are both already known directly.',
       svg: '<svg viewBox="0 0 340 170" width="100%" style="max-width:420px;height:auto" xmlns="http://www.w3.org/2000/svg"><defs><marker id="ah-dll" markerWidth="7" markerHeight="7" refX="5" refY="3" orient="auto"><path d="M0,0 L5,3 L0,6" fill="currentColor"/></marker></defs><g font-size="11" text-anchor="middle" fill="currentColor"><text x="20" y="16" text-anchor="start">before:</text></g><g stroke="currentColor" stroke-width="1.3" fill="none"><rect x="50" y="4" width="55" height="24"/><rect x="180" y="4" width="55" height="24"/><path d="M105 12 L178 12" marker-end="url(#ah-dll)"/><path d="M180 20 L107 20" marker-end="url(#ah-dll)"/></g><g font-size="10" text-anchor="middle" fill="currentColor"><text x="77" y="20">A</text><text x="207" y="20">B</text></g><g font-size="11" fill="currentColor"><text x="20" y="70" text-anchor="start">after (insert N between A, B):</text></g><g stroke="currentColor" stroke-width="1.3" fill="none"><rect x="50" y="90" width="45" height="24"/><rect x="145" y="90" width="45" height="24"/><rect x="240" y="90" width="45" height="24"/></g><g font-size="10" text-anchor="middle" fill="currentColor"><text x="72" y="106">A</text><text x="167" y="106">N</text><text x="262" y="106">B</text></g><g font-size="10" fill="currentColor"><text x="20" y="140" text-anchor="start">order: 1 N-&gt;next=B  2 N-&gt;prev=A  3 A-&gt;next=N  4 B-&gt;prev=N</text></g></svg>'
     }
   ],
@@ -567,7 +567,7 @@ void deleteDNode(struct dnode *p) {
 
 Trace deleting node B from A <-> B <-> C. p->prev (A) is not NULL, so A->next = p->next = C — A now points forward to C. p->next (C) is not NULL, so C->prev = p->prev = A — C now points backward to A. Free B. Result: A <-> C, correctly linked in both directions, found without walking anywhere, because both neighbours were already directly reachable from p.
 
-Insertion between two nodes, though, needs care with ORDER, because now there are four pointer fields to set (compare: two for singly linked insertion), and getting the order wrong loses information the same way it did earlier in the chapter.
+Insertion between two nodes, though, now involves FOUR pointer fields to set (compare: two for singly linked insertion) instead of two. When both neighbouring nodes are passed in directly, as in the function below, none of the four writes actually depends on a value another of the four writes would clobber first, so — unlike the singly linked case, where n->next must be set from p->next BEFORE p->next is overwritten — any order of these four assignments produces the same correct result here. The genuine care needed is instead about making sure all FOUR fields get set at all, since it is easy to update only the two fields on one side and forget the other two, leaving the list only correctly linked in one traversal direction.
 
 [[FIG:dll-insert]]
 

@@ -69,7 +69,7 @@ Trace it on a concrete 8-vertex directed graph. Vertices 1–8, edges: 1→2, 2�
 3. From 6, visit 7 — discover 7. From 7, visit 8 — discover 8. From 8, visit 6 — grey ancestor, back edge, skip. Finish 8.
 4. Finish 7, then finish 6, then finish 5, then finish 4.
 5. Back at 3: next neighbour is 4, already black — nothing to do. Finish 3.
-6. Back at 2: next neighbour is 6, already black — a cross edge, nothing to do. Finish 2. Finish 1.
+6. Back at 2: next neighbour is 6, already black — since 6 is a descendant of 2 in the DFS tree (not an unrelated, already-finished subtree), this is a FORWARD edge, not a cross edge — nothing to do either way. Finish 2. Finish 1.
 
 Finish times: 8→9, 7→10, 6→11, 5→12, 4→13, 3→14, 2→15, 1→16. Decreasing-finish-time order for pass two: 1, 2, 3, 4, 5, 6, 7, 8.
 
