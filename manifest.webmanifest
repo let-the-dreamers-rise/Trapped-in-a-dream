@@ -1,0 +1,12 @@
+{
+  "name": "GATE Rank 1 — 90 Day Mission",
+  "short_name": "GATE R1",
+  "description": "GATE CS&IT prep: full syllabus theory, infinite quizzes with explanations, 90-day plan, mocks.",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#0f1220",
+  "theme_color": "#0f1220",
+  "icons": [
+    { "src": "icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }
+  ]
+}

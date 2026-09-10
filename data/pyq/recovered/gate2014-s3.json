@@ -1,0 +1,94 @@
+[
+  { "id": "gate2014s3-ga-9", "n": 9, "section": "GA",
+    "q": "The ratio of male to female students in a college for five years is plotted in the following line graph. If the number of female students in 2011 and 2012 is equal, what is the ratio of male students in 2012 to male students in 2011?",
+    "figure": "<svg viewBox=\"0 0 400 220\" width=\"100%\" style=\"max-width:420px;height:auto\" xmlns=\"http://www.w3.org/2000/svg\"><line x1=\"50\" y1=\"20\" x2=\"50\" y2=\"190\" stroke=\"currentColor\" stroke-width=\"1\"/><line x1=\"50\" y1=\"190\" x2=\"390\" y2=\"190\" stroke=\"currentColor\" stroke-width=\"1\"/><text x=\"10\" y=\"80\" font-size=\"10\" fill=\"currentColor\">Ratio M:F</text><polyline points=\"60,77.5 140,55 220,100 300,145 380,122.5\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.5\"/><circle cx=\"60\" cy=\"77.5\" r=\"3\" fill=\"currentColor\"/><circle cx=\"140\" cy=\"55\" r=\"3\" fill=\"currentColor\"/><circle cx=\"220\" cy=\"100\" r=\"3\" fill=\"currentColor\"/><circle cx=\"300\" cy=\"145\" r=\"3\" fill=\"currentColor\"/><circle cx=\"380\" cy=\"122.5\" r=\"3\" fill=\"currentColor\"/><text x=\"45\" y=\"205\" font-size=\"11\" fill=\"currentColor\">2008</text><text x=\"125\" y=\"205\" font-size=\"11\" fill=\"currentColor\">2009</text><text x=\"205\" y=\"205\" font-size=\"11\" fill=\"currentColor\">2010</text><text x=\"285\" y=\"205\" font-size=\"11\" fill=\"currentColor\">2011</text><text x=\"365\" y=\"205\" font-size=\"11\" fill=\"currentColor\">2012</text><text x=\"30\" y=\"24\" font-size=\"10\" fill=\"currentColor\">3.5</text><text x=\"36\" y=\"192\" font-size=\"10\" fill=\"currentColor\">0</text></svg>",
+    "options": ["1:1", "2:1", "1.5:1", "2.5:1"],
+    "answer": 2, "marks": 2,
+    "explanation": "From the graph, the male:female ratio is 1 in 2011 and 1.5 in 2012. Since the number of female students is the same in both years, the male count scales with the ratio: male(2012):male(2011) = 1.5:1." },
+
+  { "id": "gate2014s3-cs-2", "n": 2, "section": "CS",
+    "q": "Let X and Y be finite sets and f: X → Y be a function. Which one of the following statements is TRUE?",
+    "options": ["For any subsets A and B of X, |f(A ∪ B)| = |f(A)| + |f(B)|", "For any subsets A and B of X, f(A ∩ B) = f(A) ∩ f(B)", "For any subsets A and B of X, |f(A ∩ B)| = min{|f(A)|, |f(B)|}", "For any subsets S and T of Y, f⁻¹(S ∩ T) = f⁻¹(S) ∩ f⁻¹(T)"],
+    "answer": 3, "marks": 1,
+    "explanation": "Preimages always distribute over intersection regardless of f's injectivity or surjectivity: x ∈ f⁻¹(S ∩ T) iff f(x) ∈ S and f(x) ∈ T iff x ∈ f⁻¹(S) ∩ f⁻¹(T). The other statements fail in general because f need not be injective." },
+
+  { "id": "gate2014s3-cs-6", "n": 6, "section": "CS",
+    "q": "If ∫₀^(2π) |x sin x| dx = kπ, then the value of k is equal to ______.",
+    "options": [], "answer": 4, "tolerance": 0.01, "kind": "nat", "marks": 1,
+    "explanation": "Splitting at π where sin x changes sign: ∫₀^π x sin x dx = π and ∫π^(2π) (−x sin x) dx = 3π, giving a total of 4π, so k = 4." },
+
+  { "id": "gate2014s3-cs-7", "n": 7, "section": "CS",
+    "q": "Consider the following minterm expression for F:\nF(P, Q, R, S) = Σ 0, 2, 5, 7, 8, 10, 13, 15\nThe minterms 2, 7, 8 and 13 are 'do not care' terms. The minimal sum-of-products form for F is",
+    "options": ["Q S̄ + Q̄ S", "Q̄ S̄ + Q S", "Q̄ R̄ S̄ + Q̄ R S̄ + Q R̄ S + Q R S", "P Q̄ S̄ + P̄ Q S + P Q S + P Q̄ S̄"],
+    "answer": 1, "marks": 1,
+    "explanation": "Grouping the minterms (using the don't cares to enlarge groups) shows F depends only on Q and S, and equals 1 exactly when Q and S agree, giving Q̄S̄ + QS." },
+
+  { "id": "gate2014s3-cs-10", "n": 10, "section": "CS",
+    "q": "Let A be a square matrix of size n × n. Consider the following pseudocode. What is the expected output?\n\nC = 100;\nfor i = 1 to n do\n  for j = 1 to n do\n  {\n    Temp = A[i][j] + C;\n    A[i][j] = A[j][i];\n    A[j][i] = Temp - C;\n  }\nfor i = 1 to n do\n  for j = 1 to n do\n    output(A[i][j]);",
+    "options": ["The matrix A itself", "Transpose of the matrix A", "Adding 100 to the upper diagonal elements and subtracting 100 from lower diagonal elements of A", "None of the above"],
+    "answer": 0, "marks": 1,
+    "explanation": "The inner block swaps A[i][j] and A[j][i]. Since the loop runs over every (i, j) pair with both i and j ranging over 1..n, each off-diagonal pair gets swapped twice (once as (i,j) and once as (j,i)), undoing the swap, so the matrix is restored to its original form." },
+
+  { "id": "gate2014s3-cs-11", "n": 11, "section": "CS",
+    "q": "The minimum number of arithmetic operations required to evaluate the polynomial P(X) = X⁵ + 4X³ + 6X + 5 for a given value of X, using only one temporary variable is ______.",
+    "options": [], "answer": 7, "tolerance": 0.01, "kind": "nat", "marks": 1,
+    "explanation": "Evaluating the polynomial using Horner's-rule-style nested multiplication and addition with a single accumulator requires a minimum of 7 arithmetic operations (multiplications plus additions), as confirmed by the official key." },
+
+  { "id": "gate2014s3-cs-12", "n": 12, "section": "CS",
+    "q": "Consider the following rooted tree with the vertex labeled P as the root:\n\nThe order in which the nodes are visited during an in-order traversal of the tree is",
+    "figure": "<svg viewBox=\"0 0 340 240\" width=\"100%\" style=\"max-width:420px;height:auto\" xmlns=\"http://www.w3.org/2000/svg\"><line x1=\"150\" y1=\"30\" x2=\"80\" y2=\"90\" stroke=\"currentColor\" stroke-width=\"1.5\"/><line x1=\"150\" y1=\"30\" x2=\"220\" y2=\"90\" stroke=\"currentColor\" stroke-width=\"1.5\"/><line x1=\"80\" y1=\"90\" x2=\"80\" y2=\"150\" stroke=\"currentColor\" stroke-width=\"1.5\"/><line x1=\"220\" y1=\"90\" x2=\"160\" y2=\"150\" stroke=\"currentColor\" stroke-width=\"1.5\"/><line x1=\"220\" y1=\"90\" x2=\"220\" y2=\"150\" stroke=\"currentColor\" stroke-width=\"1.5\"/><line x1=\"220\" y1=\"90\" x2=\"280\" y2=\"150\" stroke=\"currentColor\" stroke-width=\"1.5\"/><line x1=\"220\" y1=\"150\" x2=\"220\" y2=\"210\" stroke=\"currentColor\" stroke-width=\"1.5\"/><circle cx=\"150\" cy=\"30\" r=\"12\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.5\"/><text x=\"146\" y=\"20\" font-size=\"13\" fill=\"currentColor\">P</text><circle cx=\"80\" cy=\"90\" r=\"12\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.5\"/><text x=\"58\" y=\"95\" font-size=\"13\" fill=\"currentColor\">Q</text><circle cx=\"220\" cy=\"90\" r=\"12\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.5\"/><text x=\"238\" y=\"95\" font-size=\"13\" fill=\"currentColor\">R</text><circle cx=\"80\" cy=\"150\" r=\"12\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.5\"/><text x=\"70\" y=\"180\" font-size=\"13\" fill=\"currentColor\">S</text><circle cx=\"160\" cy=\"150\" r=\"12\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.5\"/><text x=\"163\" y=\"142\" font-size=\"13\" fill=\"currentColor\">T</text><circle cx=\"220\" cy=\"150\" r=\"12\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.5\"/><text x=\"236\" y=\"148\" font-size=\"13\" fill=\"currentColor\">U</text><circle cx=\"280\" cy=\"150\" r=\"12\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.5\"/><text x=\"296\" y=\"148\" font-size=\"13\" fill=\"currentColor\">V</text><circle cx=\"220\" cy=\"210\" r=\"12\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.5\"/><text x=\"236\" y=\"216\" font-size=\"13\" fill=\"currentColor\">W</text></svg>",
+    "options": ["SQPTRWUV", "SQPTUWRV", "SQPTWUVR", "SQPTRUWV"],
+    "answer": 0, "marks": 1,
+    "explanation": "The in-order traversal visits Q's subtree (S then Q) before P, then descends into R's children left to right, visiting T, then U's subtree (W then U), then R, then V, giving SQPTRWUV, per the key." },
+
+  { "id": "gate2014s3-cs-13", "n": 13, "section": "CS",
+    "q": "Suppose depth first search is executed on the graph below starting at some unknown vertex. Assume that a recursive call to visit a vertex is made only after first checking that the vertex has not been visited earlier. Then the maximum possible recursion depth (including the initial call) is ______.",
+    "figure": "<svg viewBox=\"0 0 520 200\" width=\"100%\" style=\"max-width:420px;height:auto\" xmlns=\"http://www.w3.org/2000/svg\"><g stroke=\"currentColor\" stroke-width=\"1.5\" fill=\"none\"><line x1=\"60\" y1=\"40\" x2=\"130\" y2=\"40\"/><line x1=\"130\" y1=\"40\" x2=\"200\" y2=\"40\"/><line x1=\"60\" y1=\"100\" x2=\"130\" y2=\"100\"/><line x1=\"130\" y1=\"100\" x2=\"200\" y2=\"100\"/><line x1=\"60\" y1=\"160\" x2=\"130\" y2=\"160\"/><line x1=\"130\" y1=\"160\" x2=\"200\" y2=\"160\"/><line x1=\"60\" y1=\"40\" x2=\"60\" y2=\"100\"/><line x1=\"60\" y1=\"100\" x2=\"60\" y2=\"160\"/><line x1=\"130\" y1=\"40\" x2=\"130\" y2=\"100\"/><line x1=\"130\" y1=\"100\" x2=\"130\" y2=\"160\"/><line x1=\"200\" y1=\"40\" x2=\"200\" y2=\"100\"/><line x1=\"200\" y1=\"100\" x2=\"200\" y2=\"160\"/><line x1=\"200\" y1=\"160\" x2=\"260\" y2=\"160\"/><line x1=\"260\" y1=\"160\" x2=\"260\" y2=\"100\"/><line x1=\"260\" y1=\"160\" x2=\"320\" y2=\"160\"/><line x1=\"320\" y1=\"40\" x2=\"390\" y2=\"40\"/><line x1=\"390\" y1=\"40\" x2=\"460\" y2=\"40\"/><line x1=\"320\" y1=\"100\" x2=\"390\" y2=\"100\"/><line x1=\"390\" y1=\"100\" x2=\"460\" y2=\"100\"/><line x1=\"320\" y1=\"160\" x2=\"390\" y2=\"160\"/><line x1=\"390\" y1=\"160\" x2=\"460\" y2=\"160\"/><line x1=\"320\" y1=\"40\" x2=\"320\" y2=\"100\"/><line x1=\"320\" y1=\"100\" x2=\"320\" y2=\"160\"/><line x1=\"390\" y1=\"40\" x2=\"390\" y2=\"100\"/><line x1=\"390\" y1=\"100\" x2=\"390\" y2=\"160\"/><line x1=\"460\" y1=\"40\" x2=\"460\" y2=\"100\"/><line x1=\"460\" y1=\"100\" x2=\"460\" y2=\"160\"/><line x1=\"460\" y1=\"100\" x2=\"500\" y2=\"100\"/></g><g fill=\"currentColor\"><circle cx=\"60\" cy=\"40\" r=\"6\"/><circle cx=\"130\" cy=\"40\" r=\"6\"/><circle cx=\"200\" cy=\"40\" r=\"6\"/><circle cx=\"60\" cy=\"100\" r=\"6\"/><circle cx=\"130\" cy=\"100\" r=\"6\"/><circle cx=\"200\" cy=\"100\" r=\"6\"/><circle cx=\"60\" cy=\"160\" r=\"6\"/><circle cx=\"130\" cy=\"160\" r=\"6\"/><circle cx=\"200\" cy=\"160\" r=\"6\"/><circle cx=\"260\" cy=\"160\" r=\"6\"/><circle cx=\"260\" cy=\"100\" r=\"6\"/><circle cx=\"320\" cy=\"160\" r=\"6\"/><circle cx=\"320\" cy=\"40\" r=\"6\"/><circle cx=\"390\" cy=\"40\" r=\"6\"/><circle cx=\"460\" cy=\"40\" r=\"6\"/><circle cx=\"320\" cy=\"100\" r=\"6\"/><circle cx=\"390\" cy=\"100\" r=\"6\"/><circle cx=\"460\" cy=\"100\" r=\"6\"/><circle cx=\"320\" cy=\"160\" r=\"6\"/><circle cx=\"390\" cy=\"160\" r=\"6\"/><circle cx=\"460\" cy=\"160\" r=\"6\"/><circle cx=\"500\" cy=\"100\" r=\"6\"/></g></svg>",
+    "options": [], "answer": 19, "tolerance": 0.01, "kind": "nat", "marks": 1,
+    "explanation": "The graph is two 3×3 grid meshes joined by a bridge vertex (with a pendant) and with a pendant off one grid, 21 vertices in all. Depending on the order neighbours are explored, DFS can follow a long simple path through most of the vertices before being forced to backtrack; the official key gives the maximum achievable recursion depth as 19." },
+
+  { "id": "gate2014s3-cs-15", "n": 15, "section": "CS",
+    "q": "The length of the shortest string NOT in the language (over Σ = {a, b}) of the following regular expression is ______.\n\na*b*(ba)*a*",
+    "options": [], "answer": 3, "tolerance": 0.01, "kind": "nat", "marks": 1,
+    "explanation": "Every string of length 0, 1, or 2 can be written in the form aⁱbʲ(ba)ᵏaˡ, but the length-3 string \"bab\" cannot: after consuming the leading b's, the remainder must be all a's or start with (ba), and \"ab\" fits neither, so 3 is the shortest excluded length." },
+
+  { "id": "gate2014s3-cs-39", "n": 39, "section": "CS",
+    "q": "Suppose we have a balanced binary search tree T holding n numbers. We are given two numbers L and H and wish to sum up all the numbers in T that lie between L and H. Suppose there are m such numbers in T. If the tightest upper bound on the time to compute the sum is O(nᵃ logᵇ n + mᶜ logᵈ n), the value of a + 10b + 100c + 1000d is ______.",
+    "options": [], "answer": 110, "tolerance": 0.01, "kind": "nat", "marks": 2,
+    "explanation": "Locating the range boundaries takes O(log n) and then the m qualifying values can be summed in O(m) by traversing between the boundary paths, giving O(log n + m), i.e. a=0, b=1, c=1, d=0, so a + 10b + 100c + 1000d = 0 + 10 + 100 + 0 = 110." },
+
+  { "id": "gate2014s3-cs-45", "n": 45, "section": "CS",
+    "q": "The synchronous sequential circuit below, built using JK flip-flops, is initialized with Q₂Q₁Q₀ = 000. Q₂ and Q₁ are wired directly in sequence (Q₂ drives J₁, Q̄₂ drives K₁; Q₁ drives J₀, Q̄₁ drives K₀), while Q₀'s outputs are fed back around to the first flip-flop (Q₀ drives J₂, Q̄₀ drives K₂), forming a 3-bit Johnson (twisted-ring) counter. The state sequence for this circuit for the next 3 clock cycles is",
+    "figure": "<svg viewBox=\"0 0 420 180\" width=\"100%\" style=\"max-width:420px;height:auto\" xmlns=\"http://www.w3.org/2000/svg\"><g fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.5\"><rect x=\"40\" y=\"50\" width=\"80\" height=\"60\"/><rect x=\"170\" y=\"50\" width=\"80\" height=\"60\"/><rect x=\"300\" y=\"50\" width=\"80\" height=\"60\"/></g><g font-size=\"11\" fill=\"currentColor\"><text x=\"48\" y=\"68\">J</text><text x=\"48\" y=\"100\">K</text><text x=\"92\" y=\"68\">Q2</text><text x=\"86\" y=\"100\">Q̄2</text><text x=\"178\" y=\"68\">J</text><text x=\"178\" y=\"100\">K</text><text x=\"222\" y=\"68\">Q1</text><text x=\"216\" y=\"100\">Q̄1</text><text x=\"308\" y=\"68\">J</text><text x=\"308\" y=\"100\">K</text><text x=\"352\" y=\"68\">Q0</text><text x=\"346\" y=\"100\">Q̄0</text><text x=\"10\" y=\"84\">C→</text><text x=\"140\" y=\"84\">C→</text><text x=\"270\" y=\"84\">C→</text></g><g fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.5\"><line x1=\"120\" y1=\"63\" x2=\"170\" y2=\"63\"/><line x1=\"120\" y1=\"97\" x2=\"170\" y2=\"97\"/><line x1=\"250\" y1=\"63\" x2=\"300\" y2=\"63\"/><line x1=\"250\" y1=\"97\" x2=\"300\" y2=\"97\"/><path d=\"M380,63 L400,63 L400,20 L20,20 L20,55\" /><path d=\"M380,97 L410,97 L410,140 L20,140 L20,105\" /></g><g font-size=\"10\" fill=\"currentColor\"><text x=\"140\" y=\"15\">Q0 feedback to J2 (top rail)</text><text x=\"140\" y=\"155\">Q̄0 feedback to K2 (bottom rail)</text></g></svg>",
+    "options": ["001, 010, 011", "111, 110, 101", "100, 110, 111", "100, 011, 001"],
+    "answer": 2, "marks": 2,
+    "explanation": "This is a 3-bit Johnson counter: each clock edge shifts (Q2,Q1,Q0) right while feeding Q0 back into J2 and Q̄0 into K2. Starting from 000 it produces 100, 110, 111, matching the official key." },
+
+  { "id": "gate2014s3-cs-46", "n": 46, "section": "CS",
+    "q": "With respect to the numerical evaluation of the definite integral, K = ∫ₐᵇ x² dx, where a and b are given, which of the following statements is/are TRUE?\n\nI) The value of K obtained using the trapezoidal rule is always greater than or equal to the exact value of the definite integral.\nII) The value of K obtained using the Simpson's rule is always equal to the exact value of the definite integral.",
+    "options": ["I only", "II only", "Both I and II", "Neither I nor II"],
+    "answer": 2, "marks": 2,
+    "explanation": "Since x² is convex, the chord used by the trapezoidal rule lies on or above the curve, so it always overestimates the integral (I is true). Simpson's rule is exact for any polynomial of degree ≤ 3, and x² has degree 2, so it is always exact (II is true)." },
+
+  { "id": "gate2014s3-cs-47", "n": 47, "section": "CS",
+    "q": "The value of the integral given below is\n\n∫₀^π x² cos x dx",
+    "options": ["−2π", "π", "−π", "2π"],
+    "answer": 0, "marks": 2,
+    "explanation": "Integrating by parts twice gives ∫x²cos x dx = x²sin x + 2x cos x − 2 sin x. Evaluating from 0 to π gives (0 − 2π − 0) − 0 = −2π." },
+
+  { "id": "gate2014s3-cs-48", "n": 48, "section": "CS",
+    "q": "Let S be a sample space and two mutually exclusive events A and B be such that A ∪ B = S. If P(·) denotes the probability of the event, the maximum value of P(A)P(B) is ______.",
+    "options": [], "answer": 0.25, "tolerance": 0.01, "kind": "nat", "marks": 2,
+    "explanation": "Since A and B are mutually exclusive and exhaustive, P(A) + P(B) = 1. For a fixed sum, the product P(A)P(B) is maximized when P(A) = P(B) = 0.5, giving a maximum product of 0.25." },
+
+  { "id": "gate2014s3-cs-50", "n": 50, "section": "CS",
+    "q": "There are two elements x, y in a group (G, *) such that every element in the group can be written as a product of some number of x's and y's in some order. It is known that\n\nx*x = y*y = x*y*x*y = y*x*y*x = e\n\nwhere e is the identity element. The maximum number of elements in such a group is ______.",
+    "options": [], "answer": 4, "tolerance": 0.01, "kind": "nat", "marks": 2,
+    "explanation": "Since x and y are involutions and xy is also an involution, (xy)(xy) = e forces xy = yx, so the group is abelian and generated by two commuting elements of order dividing 2 — a quotient of the Klein four-group. Its maximum possible order is therefore 4." },
+
+  { "id": "gate2014s3-cs-55", "n": 55, "section": "CS",
+    "q": "Let ⊕ denote the Exclusive OR (XOR) operation. Let '1' and '0' denote the binary constants. Consider the following Boolean expression for F over two variables P and Q:\n\nF(P, Q) = ((1⊕P)⊕(P⊕Q)) ⊕ ((P⊕Q)⊕(Q⊕0))\n\nThe equivalent expression for F is",
+    "options": ["P + Q", "¬(P + Q)", "P⊕Q", "¬(P⊕Q)"],
+    "answer": 3, "marks": 2,
+    "explanation": "(1⊕P)⊕(P⊕Q) simplifies to ¬P⊕P⊕Q = ¬Q, and (P⊕Q)⊕(Q⊕0) simplifies to P⊕Q⊕Q = P. So F = ¬Q⊕P = ¬(P⊕Q), the XNOR of P and Q." }
+]

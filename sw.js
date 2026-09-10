@@ -1,0 +1,112 @@
+// Offline cache — the whole app works with zero network after first load.
+var CACHE = 'gate-r1-v61';
+var ASSETS = [
+  './', './index.html', './css/style.css', './js/app.js', './js/generators.js',
+  './data/plan90.js', './data/astro.js', './icon.svg', './manifest.webmanifest',
+  './data/questions/engmath.js', './data/questions/digital.js', './data/questions/coa.js',
+  './data/questions/pds.js', './data/questions/algo.js', './data/questions/toc.js',
+  './data/questions/compiler.js', './data/questions/os.js', './data/questions/dbms.js',
+  './data/questions/cn.js', './data/questions/apti.js'
+];
+// CHAPTERS:START
+ASSETS = ASSETS.concat([
+  './data/chapters/algo-asymptotic.js',
+  './data/chapters/algo-divide-conquer.js',
+  './data/chapters/algo-dp.js',
+  './data/chapters/algo-graph.js',
+  './data/chapters/algo-greedy.js',
+  './data/chapters/algo-sorting-searching.js',
+  './data/chapters/apti-logical.js',
+  './data/chapters/apti-quant.js',
+  './data/chapters/apti-verbal.js',
+  './data/chapters/cn-application.js',
+  './data/chapters/cn-basics.js',
+  './data/chapters/cn-datalink.js',
+  './data/chapters/cn-network.js',
+  './data/chapters/cn-transport.js',
+  './data/chapters/coa-datapath.js',
+  './data/chapters/coa-instructions.js',
+  './data/chapters/coa-io.js',
+  './data/chapters/coa-memory.js',
+  './data/chapters/coa-pipelining.js',
+  './data/chapters/compiler-icg.js',
+  './data/chapters/compiler-lexical.js',
+  './data/chapters/compiler-optimization.js',
+  './data/chapters/compiler-parsing.js',
+  './data/chapters/compiler-runtime.js',
+  './data/chapters/compiler-sdt.js',
+  './data/chapters/dbms-er.js',
+  './data/chapters/dbms-indexing.js',
+  './data/chapters/dbms-normalization.js',
+  './data/chapters/dbms-ra-sql.js',
+  './data/chapters/dbms-transactions.js',
+  './data/chapters/digital-arithmetic.js',
+  './data/chapters/digital-boolean.js',
+  './data/chapters/digital-combinational.js',
+  './data/chapters/digital-number-systems.js',
+  './data/chapters/digital-sequential.js',
+  './data/chapters/engmath-calculus.js',
+  './data/chapters/engmath-combinatorics.js',
+  './data/chapters/engmath-discrete-logic.js',
+  './data/chapters/engmath-graph-theory.js',
+  './data/chapters/engmath-groups.js',
+  './data/chapters/engmath-linear-algebra.js',
+  './data/chapters/engmath-probability.js',
+  './data/chapters/engmath-sets-relations.js',
+  './data/chapters/os-deadlock.js',
+  './data/chapters/os-file-disk.js',
+  './data/chapters/os-memory.js',
+  './data/chapters/os-processes.js',
+  './data/chapters/os-scheduling.js',
+  './data/chapters/os-sync.js',
+  './data/chapters/os-virtual-memory.js',
+  './data/chapters/pds-c-basics.js',
+  './data/chapters/pds-graphs-rep.js',
+  './data/chapters/pds-hashing.js',
+  './data/chapters/pds-heaps.js',
+  './data/chapters/pds-linked-lists.js',
+  './data/chapters/pds-pointers.js',
+  './data/chapters/pds-recursion.js',
+  './data/chapters/pds-stacks-queues.js',
+  './data/chapters/pds-trees.js',
+  './data/chapters/toc-cfl.js',
+  './data/chapters/toc-decidability.js',
+  './data/chapters/toc-hierarchy.js',
+  './data/chapters/toc-regular.js',
+  './data/chapters/toc-turing.js'
+]);
+// CHAPTERS:END
+// PYQ:START
+ASSETS = ASSETS.concat([
+  './data/pyq/gate2014-s1.js',
+  './data/pyq/gate2014-s2.js',
+  './data/pyq/gate2014-s3.js',
+  './data/pyq/gate2016-s1.js',
+  './data/pyq/gate2016-s2.js',
+  './data/pyq/gate2018.js',
+  './data/pyq/gate2019.js',
+  './data/pyq/gate2022.js',
+  './data/pyq/gate2023.js',
+  './data/pyq/gate2024-s1.js',
+  './data/pyq/gate2024-s2.js',
+  './data/pyq/gate2025-s1.js',
+  './data/pyq/gate2025-s2.js'
+]);
+// PYQ:END
+self.addEventListener('install', function (e) {
+  e.waitUntil(caches.open(CACHE).then(function (c) { return c.addAll(ASSETS); }).then(function () { return self.skipWaiting(); }));
+});
+self.addEventListener('activate', function (e) {
+  e.waitUntil(caches.keys().then(function (keys) {
+    return Promise.all(keys.filter(function (k) { return k !== CACHE; }).map(function (k) { return caches.delete(k); }));
+  }).then(function () { return self.clients.claim(); }));
+});
+self.addEventListener('fetch', function (e) {
+  e.respondWith(
+    fetch(e.request).then(function (res) {
+      var copy = res.clone();
+      caches.open(CACHE).then(function (c) { c.put(e.request, copy); });
+      return res;
+    }).catch(function () { return caches.match(e.request); })
+  );
+});
