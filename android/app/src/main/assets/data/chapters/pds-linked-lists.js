@@ -23,7 +23,7 @@ window.GATE_DATA.chapters['pds-linked-lists'] = {
     },
     {
       id: 'dll-insert',
-      caption: 'Inserting node N between A and B in a doubly linked list: the order of the four pointer writes matters.',
+      caption: 'Inserting node N between A and B in a doubly linked list: four pointer fields must be set correctly, though — unlike the singly linked case — their order does not actually matter here, since A and B are both already known directly.',
       svg: '<svg viewBox="0 0 340 170" width="100%" style="max-width:420px;height:auto" xmlns="http://www.w3.org/2000/svg"><defs><marker id="ah-dll" markerWidth="7" markerHeight="7" refX="5" refY="3" orient="auto"><path d="M0,0 L5,3 L0,6" fill="currentColor"/></marker></defs><g font-size="11" text-anchor="middle" fill="currentColor"><text x="20" y="16" text-anchor="start">before:</text></g><g stroke="currentColor" stroke-width="1.3" fill="none"><rect x="50" y="4" width="55" height="24"/><rect x="180" y="4" width="55" height="24"/><path d="M105 12 L178 12" marker-end="url(#ah-dll)"/><path d="M180 20 L107 20" marker-end="url(#ah-dll)"/></g><g font-size="10" text-anchor="middle" fill="currentColor"><text x="77" y="20">A</text><text x="207" y="20">B</text></g><g font-size="11" fill="currentColor"><text x="20" y="70" text-anchor="start">after (insert N between A, B):</text></g><g stroke="currentColor" stroke-width="1.3" fill="none"><rect x="50" y="90" width="45" height="24"/><rect x="145" y="90" width="45" height="24"/><rect x="240" y="90" width="45" height="24"/></g><g font-size="10" text-anchor="middle" fill="currentColor"><text x="72" y="106">A</text><text x="167" y="106">N</text><text x="262" y="106">B</text></g><g font-size="10" fill="currentColor"><text x="20" y="140" text-anchor="start">order: 1 N-&gt;next=B  2 N-&gt;prev=A  3 A-&gt;next=N  4 B-&gt;prev=N</text></g></svg>'
     }
   ],
@@ -105,7 +105,7 @@ while (p != NULL) {
     p = p->next;
 }
 
-Trace this on 1 -> 2 -> 3 -> NULL. p starts at node 1: test p != NULL (true, p is node 1), print 1, advance p to node 2. Test again (true), print 2, advance to node 3. Test again (true), print 3, advance to node 3's next, which is NULL. Test again: p is NULL, the loop stops. Output "1 2 3", no crash, because the pointer is tested BEFORE it is dereferenced on every single pass, including the last one where it turns out to be NULL.
+Trace this on 1 -> 2 -> 3 -> NULL. p starts at node 1: test p != NULL (true, p is node 1), print 1, advance p to node 2. Test again (true), print 2, advance to node 3. Test again (true), print 3, advance to node 3's next, which is NULL. Test again: p is NULL, the loop stops. Output "1 2 3", no crash, because the pointer is tested before it is dereferenced on every single pass, including the last one where it turns out to be NULL.
 
 Now the trap. A very similar-looking loop tests the pointer's next field instead of the pointer itself:
 
@@ -114,7 +114,7 @@ while (p->next != NULL)
     p = p->next;
 return p;
 
-This does not visit every node; it stops one node early — at the last node, not past it — because it is asking "does the CURRENT node have a successor?" rather than "am I currently on a real node?". Trace it on 1 -> 2 -> 3 -> NULL. p starts at node 1: is 1's next (node 2) non-NULL? Yes, advance to node 2. Is 2's next (node 3) non-NULL? Yes, advance to node 3. Is 3's next (NULL) non-NULL? No — stop. p ends at node 3, the LAST node, and the function returns a pointer to it, never NULL.
+This does not visit every node; it stops one node early — at the last node, not past it — because it is asking "does the current node have a successor?" rather than "am I currently on a real node?". Trace it on 1 -> 2 -> 3 -> NULL. p starts at node 1: is 1's next (node 2) non-NULL? Yes, advance to node 2. Is 2's next (node 3) non-NULL? Yes, advance to node 3. Is 3's next (NULL) non-NULL? No — stop. p ends at node 3, the last node, and the function returns a pointer to it, never NULL.
 
 This is not a bug in general — walking to the last node this way is exactly how you find the tail when you have no tail pointer, and it is correct precisely because it stops one node before you would dereference NULL. The bug appears only when someone uses this idiom where the first one was needed, expecting to print or process every node and silently missing the last one, or uses the first idiom (testing p) expecting to land ON the last node and instead landing one step past it, on NULL.
 
@@ -182,7 +182,7 @@ void insertAfter(struct node *p, int val) {
     p->next = n;
 }
 
-Order matters here exactly as it did at the head. n->next = p->next must happen BEFORE p->next = n, because the second assignment overwrites the very value the first assignment needs to read. If you swapped them, p->next = n would run first, so by the time n->next = p->next executed, p->next would already equal n, and n->next would be set to n itself — the new node pointing at itself, and everything originally after p permanently lost.
+Order matters here exactly as it did at the head. n->next = p->next must happen before p->next = n, because the second assignment overwrites the very value the first assignment needs to read. If you swapped them, p->next = n would run first, so by the time n->next = p->next executed, p->next would already equal n, and n->next would be set to n itself — the new node pointing at itself, and everything originally after p permanently lost.
 
 1. Save what p currently points to next, into n's own next field: n->next = p->next.
 2. Only now overwrite p's next field to point at n: p->next = n.
@@ -203,7 +203,7 @@ struct node *deleteHead(struct node *head) {
     return head;
 }
 
-The order here is forced by a different concern than before: you must read head->next and save it (into the new head, via the assignment) BEFORE calling free on the old head node, because free does not erase the memory instantly in a way you can rely on, but treating a freed block as still valid is undefined behaviour — you must not touch toFree->next after it is freed. Saving the old pointer in toFree, THEN advancing head, THEN freeing toFree is the safe order: read everything you need from the old node before releasing it.
+The order here is forced by a different concern than before: you must read head->next and save it (into the new head, via the assignment) before calling free on the old head node, because free does not erase the memory instantly in a way you can rely on, but treating a freed block as still valid is undefined behaviour — you must not touch toFree->next after it is freed. Saving the old pointer in toFree, THEN advancing head, THEN freeing toFree is the safe order: read everything you need from the old node before releasing it.
 
 The empty-list check first is not optional: deleteHead on an empty list, without it, would dereference head->next where head is NULL, crashing.
 
@@ -211,7 +211,7 @@ DELETING A GIVEN NODE: THE PREVIOUS-NODE PROBLEM
 
 Deleting the head was easy because the thing that needs to change — head — is a variable you already have direct access to. Deleting an arbitrary node p from the middle of a singly linked list is different in kind, and this difference is the most important structural fact in this whole chapter.
 
-To remove p from the chain, some other node's next field must stop pointing at p and instead point at whatever p pointed to — p->next. But p's own next field tells you what comes AFTER p; nothing about p tells you what comes BEFORE it. A singly linked list only has forward pointers. So to delete p, you need the node whose next field currently equals p — call it prev — and you find prev only by starting at head and walking forward until you reach the node just before p. There is no shortcut; a singly linked list gives you no way to go backward.
+To remove p from the chain, some other node's next field must stop pointing at p and instead point at whatever p pointed to — p->next. But p's own next field tells you what comes after p; nothing about p tells you what comes before it. A singly linked list only has forward pointers. So to delete p, you need the node whose next field currently equals p — call it prev — and you find prev only by starting at head and walking forward until you reach the node just before p. There is no shortcut; a singly linked list gives you no way to go backward.
 
 struct node *deleteNode(struct node *head, struct node *target) {
     if (head == target) {
@@ -235,7 +235,7 @@ This walk to find prev is O(n) — in the worst case you scan almost the entire 
 
 THE COPY-TRICK: DELETING A NODE WHEN YOU ARE GIVEN ONLY ITS OWN POINTER
 
-A related but distinct puzzle: suppose a function is given ONLY a pointer to the node to delete — not the head, not the previous node, nothing else — and is still asked to delete it, in a singly linked list. You cannot find prev at all, because you have no way to start a walk from head (you were not given head). Is this possible?
+A related but distinct puzzle: suppose a function is given only a pointer to the node to delete — not the head, not the previous node, nothing else — and is still asked to delete it, in a singly linked list. You cannot find prev at all, because you have no way to start a walk from head (you were not given head). Is this possible?
 
 Yes, with a trick that sidesteps needing prev entirely, provided the target is NOT the last node. Instead of removing the target node itself, copy the data from its successor into it, then delete the successor instead:
 
@@ -252,7 +252,7 @@ GATE TRAP: This trick works only because a node's identity, from the rest of the
 
 DELETING THE TAIL, DELETION BY VALUE, SEARCH, LENGTH
 
-Deleting the last node is the previous-node problem in its purest form: even with a tail pointer telling you WHERE the last node is, you must still walk from head to find the SECOND-to-last node, because that is whose next field must become NULL.
+Deleting the last node is the previous-node problem in its purest form: even with a tail pointer telling you WHERE the last node is, you must still walk from head to find the second-to-last node, because that is whose next field must become NULL.
 
 struct node *deleteTail(struct node *head) {
     if (head == NULL) return NULL;
@@ -399,7 +399,7 @@ The idea: slow advances one node per iteration, fast advances two. Every iterati
 
 Trace on the six-node list 1 -> 2 -> 3 -> 4 -> 5 -> 6. Start: slow = fast = node 1. Check the guard: fast (node 1) is non-NULL and fast->next (node 2) is non-NULL — enter the loop. slow = node 2, fast = node 3 (node 1's next->next). Check: fast (3) and fast->next (4) both non-NULL — continue. slow = node 3, fast = node 5. Check: fast (5) and fast->next (6) both non-NULL — continue. slow = node 4, fast = node 6's next, which is NULL (fast->next->next with fast = node 5 means node 5's next (6) then its next, which is NULL). Check the guard again: fast is NULL, so the loop stops. slow rests on node 4.
 
-For a list of 6 (even length, 2k with k = 3), this guard delivers node 4 — the SECOND of the two middle nodes (positions 3 and 4 are the two middles of a 6-node list; this convention lands on position k+1). For an odd-length list, say 5 nodes, trace similarly: slow ends exactly on the true middle, position 3 of 5, with no ambiguity, because fast exhausts the list with fast->next becoming NULL rather than fast itself.
+For a list of 6 (even length, 2k with k = 3), this guard delivers node 4 — the second of the two middle nodes (positions 3 and 4 are the two middles of a 6-node list; this convention lands on position k+1). For an odd-length list, say 5 nodes, trace similarly: slow ends exactly on the true middle, position 3 of 5, with no ambiguity, because fast exhausts the list with fast->next becoming NULL rather than fast itself.
 
 GATE TRAP: The exact guard condition determines which of the two middle nodes an even-length list yields, and GATE varies it. The guard fast != NULL && fast->next != NULL (used above) yields the SECOND middle for even length. The guard fast->next != NULL && fast->next->next != NULL yields the FIRST middle instead, because it stops one iteration earlier. There is no substitute for tracing the specific guard given in a question rather than recalling "the answer is always node n/2".
 
@@ -446,7 +446,7 @@ If there is no cycle, fast reaches NULL (or fast->next does) within at most n/2 
 
 WHY THEY MUST MEET. Once both pointers have entered the cycle (which happens within a finite number of steps, since the non-cyclic "tail" leading into the cycle has finite length), think of the distance between fast and slow, measured going FORWARD around the cycle from slow to fast. Every iteration, slow advances by 1 and fast by 2, so fast's lead over slow, modulo the cycle's length C, increases by exactly 1 each iteration (fast gains one full step on slow, per iteration, once both are looping). A quantity that increases by 1 each step, modulo C, must eventually hit every residue including 0 — meaning fast's lead over slow becomes 0, i.e. they are at the same node. This must happen within at most C iterations once both are inside the cycle, so the two pointers are guaranteed to meet, and the total time is still O(n): O(n) to reach the cycle (if far), plus O(C) to meet inside it, and C ≤ n.
 
-FINDING WHERE THE CYCLE STARTS. Once slow and fast have met somewhere inside the cycle, a second phase locates the exact node where the cycle begins (the first repeated node). Let L be the length of the tail before the cycle (number of nodes from head to the cycle's entry point), and C the cycle's length. By the time they meet, it can be shown that the meeting point is exactly L nodes (mod C) into the cycle from its entry point. The classical result: if you now move ONE of the two pointers back to head, and from that point advance BOTH pointers one step at a time (both now moving at the same, single speed), they meet again — and this second meeting point is exactly the cycle's entry node.
+FINDING WHERE THE CYCLE STARTS. Once slow and fast have met somewhere inside the cycle, a second phase locates the exact node where the cycle begins (the first repeated node). Let L be the length of the tail before the cycle (number of nodes from head to the cycle's entry point), and C the cycle's length. By the time they meet, it can be shown that the meeting point is exactly L nodes (mod C) into the cycle from its entry point. The classical result: if you now move one of the two pointers back to head, and from that point advance both pointers one step at a time (both now moving at the same, single speed), they meet again — and this second meeting point is exactly the cycle's entry node.
 
 1. Detect the cycle: run slow/fast until they meet (as above), or conclude no cycle if fast reaches NULL.
 2. Reset one pointer (say slow) to head; leave the other (fast) at the meeting point.
@@ -486,7 +486,7 @@ struct node *mergeRec(struct node *a, struct node *b) {
     else                    { b->next = mergeRec(a, b->next); return b; }
 }
 
-The base cases say: merging anything with an empty list is just that anything. Otherwise, whichever of a and b has the smaller head must come first in the result, and what follows it is the merge of ITS remainder with the other list unchanged — a smaller version of the same problem, which is exactly what makes it a valid recursion (the argument to mergeRec strictly shrinks each call, so it terminates). O(n + m) time, but O(n + m) space for the call stack, versus O(1) for the iterative version — the same trade seen between iterative and recursive reversal.
+The base cases say: merging anything with an empty list is just that anything. Otherwise, whichever of a and b has the smaller head must come first in the result, and what follows it is the merge of its remainder with the other list unchanged — a smaller version of the same problem, which is exactly what makes it a valid recursion (the argument to mergeRec strictly shrinks each call, so it terminates). O(n + m) time, but O(n + m) space for the call stack, versus O(1) for the iterative version — the same trade seen between iterative and recursive reversal.
 
 SPLITTING A LIST
 
@@ -522,7 +522,7 @@ void removeDupsSorted(struct node *head) {
     }
 }
 
-The subtlety: curr only advances when NO duplicate was removed. If a duplicate is found and skipped, curr must stay put, because curr's NEW next (what used to be next->next) might ALSO equal curr->data — three or more copies of the same value in a row must all be removed by repeatedly rechecking the same curr, not by unconditionally moving on. O(n) time, O(1) space.
+The subtlety: curr only advances when NO duplicate was removed. If a duplicate is found and skipped, curr must stay put, because curr's new next (what used to be next->next) might also equal curr->data — three or more copies of the same value in a row must all be removed by repeatedly rechecking the same curr, not by unconditionally moving on. O(n) time, O(1) space.
 
 In an UNSORTED list, duplicates can be anywhere, so each node must be compared against every node before it. Without extra memory, this is the O(n²) approach: for each node, scan all earlier nodes for a match, delete on a hit. With an auxiliary hash set (O(n) extra space), each node's value is checked against the set — O(1) expected lookup — and inserted if new, giving O(n) time overall. This space-for-time trade — O(n²)/O(1) versus O(n)/O(n) — is a standard pattern the topic tests directly: know both, and know which resource (time or space) each buys back.
 
@@ -567,7 +567,7 @@ void deleteDNode(struct dnode *p) {
 
 Trace deleting node B from A <-> B <-> C. p->prev (A) is not NULL, so A->next = p->next = C — A now points forward to C. p->next (C) is not NULL, so C->prev = p->prev = A — C now points backward to A. Free B. Result: A <-> C, correctly linked in both directions, found without walking anywhere, because both neighbours were already directly reachable from p.
 
-Insertion between two nodes, though, needs care with ORDER, because now there are four pointer fields to set (compare: two for singly linked insertion), and getting the order wrong loses information the same way it did earlier in the chapter.
+Insertion between two nodes, though, now involves FOUR pointer fields to set (compare: two for singly linked insertion) instead of two. When both neighbouring nodes are passed in directly, as in the function below, none of the four writes actually depends on a value another of the four writes would clobber first, so — unlike the singly linked case, where n->next must be set from p->next BEFORE p->next is overwritten — any order of these four assignments produces the same correct result here. The genuine care needed is instead about making sure all FOUR fields get set at all, since it is easy to update only the two fields on one side and forget the other two, leaving the list only correctly linked in one traversal direction.
 
 [[FIG:dll-insert]]
 
@@ -607,7 +607,7 @@ This visits every node exactly once and stops after a full lap, because p return
 
 GATE TRAP: Using while (p != NULL) on a circular list is an infinite loop, not a crash — a very different failure mode from the singly linked traps seen earlier, and a common code-reading question is simply "what happens when this ordinary-looking traversal is run on a circular list instead of a linear one".
 
-The practical reason circular lists are used: keeping a single pointer to the LAST node (rather than the first) gives O(1) access to BOTH ends, because last->next is the first node, reachable in one hop.
+The practical reason circular lists are used: keeping a single pointer to the last node (rather than the first) gives O(1) access to both ends, because last->next is the first node, reachable in one hop.
 
 struct node *insertFrontCirc(struct node *last, int val) {
     struct node *n = malloc(sizeof(struct node));
@@ -624,10 +624,10 @@ struct node *insertRearCirc(struct node *last, int val) {
     if (last == NULL) { n->next = n; return n; }
     n->next = last->next;
     last->next = n;
-    return n;                /* n becomes the new LAST node: caller must update its last pointer */
+    return n;                /* n becomes the new last node: caller must update its last pointer */
 }
 
-Both insertions do the SAME two pointer writes (n->next = last->next; last->next = n;) — the only difference between "insert at front" and "insert at rear" of a last-node-anchored circular list is which node the caller subsequently treats as last. This is exactly why, with a last pointer, both front and rear insertion are O(1): there is no walk in either case, only a decision about which pointer variable to update afterward.
+Both insertions do the same two pointer writes (n->next = last->next; last->next = n;) — the only difference between "insert at front" and "insert at rear" of a last-node-anchored circular list is which node the caller subsequently treats as last. This is exactly why, with a last pointer, both front and rear insertion are O(1): there is no walk in either case, only a decision about which pointer variable to update afterward.
 
 GATE TRAP: Deleting the LAST node of a circular list anchored by a last pointer is still O(n), because — exactly as with a plain singly linked list's tail deletion — you must find the SECOND-to-last node (whose next must become the new last->next, wrapping to first) by walking almost the entire circle; last->next alone does not give you the node before last. This is precisely the asymmetry tested in q12 of this topic's question bank: three operations are O(1) with a last-node pointer (front insert, rear insert, front delete), one is not (rear delete).
 
@@ -639,7 +639,7 @@ THE HEADER (SENTINEL) NODE IDIOM
 
 Return to the head-update problem and look at it from a different angle: much of the special-casing throughout this chapter — "if the list is empty, do X, otherwise do Y", "if this is the first node, update head instead of a previous node's next" — exists because the FIRST real node has no predecessor to hold a pointer to it except the head variable itself, and an empty list has no nodes at all to operate on.
 
-A sentinel (or dummy header) node removes this asymmetry by ensuring there is ALWAYS at least one node before any real data node, even when the list is logically empty. The head pointer is set ONCE, at initialisation, to this sentinel, and is never reassigned again for the rest of the program's life — insertion and deletion at the "front" of the list become ordinary insertAfter(sentinel, val) and deleteNode-style operations on the node after the sentinel, using the exact same code path as insertion or deletion anywhere else in the list.
+A sentinel (or dummy header) node removes this asymmetry by ensuring there is always at least one node before any real data node, even when the list is logically empty. The head pointer is set once, at initialisation, to this sentinel, and is never reassigned again for the rest of the program's life — insertion and deletion at the "front" of the list become ordinary insertAfter(sentinel, val) and deleteNode-style operations on the node after the sentinel, using the exact same code path as insertion or deletion anywhere else in the list.
 
 struct node sentinel;
 sentinel.next = NULL;     /* logically-empty list: sentinel.next is the "real" list */
@@ -661,9 +661,9 @@ Pulling every result derived above into one table, for a list of n nodes:
 
 • Singly linked, head only — access k-th: O(k). Insert at head: O(1). Insert at tail: O(n) (walk required). Delete head: O(1). Delete tail: O(n) (walk to second-to-last). Delete given node pointer: O(n) (walk to find predecessor, or use the copy-trick in O(1) if not the last node). Search/length: O(n).
 • Singly linked, head AND tail pointer — insert at tail becomes O(1); everything else in the row above is unchanged, because tail helps only with reaching the END for INSERTION, not with finding a PREDECESSOR for deletion.
-• Doubly linked, head only — delete tail: O(1) (tail found by walking? no — actually still needs a tail pointer or a walk; a DLL with only head still needs O(n) to reach the last node without a tail pointer). Delete GIVEN node pointer: O(1) (the headline benefit of the extra prev pointer). Insert/delete at head: O(1).
+• Doubly linked, head only — delete tail: O(1) (tail found by walking? no — actually still needs a tail pointer or a walk; a DLL with only head still needs O(n) to reach the last node without a tail pointer). Delete given node pointer: O(1) (the headline benefit of the extra prev pointer). Insert/delete at head: O(1).
 • Doubly linked, head AND tail — every one of insert-front, insert-rear, delete-front, delete-rear, delete-given-node becomes O(1). Only access-by-position and search remain O(n), because reaching an arbitrary position still requires a walk regardless of how many pointers a node carries.
-• Circular singly linked, anchored by a LAST pointer — insert-front: O(1). Insert-rear: O(1). Delete-front: O(1). Delete-rear: O(n) (predecessor of last still needs a walk). Access/search: O(n).
+• Circular singly linked, anchored by a last pointer — insert-front: O(1). Insert-rear: O(1). Delete-front: O(1). Delete-rear: O(n) (predecessor of last still needs a walk). Access/search: O(n).
 • Circular doubly linked, anchored by any single node pointer — insert/delete at both ends: O(1), including delete-rear, because the doubly linked structure supplies the predecessor of any node (including the anchor) directly. This is the most operation-rich of all the variants, at the highest per-node memory cost.
 
 GATE TRAP: "Doubly linked" and "has a tail pointer" are independent upgrades that solve DIFFERENT problems — doubly linked buys O(1) deletion given a node's pointer (backward information), a tail pointer buys O(1) insertion at the end (forward reach without a walk). A question describing a structure with only one of the two must not be answered as if it had both; check exactly which pointers the question grants before answering an operation-cost question.
@@ -715,19 +715,19 @@ Each of these is a pattern that appears in the paper. Follow the working, not ju
        return f(p->next);
    }
 
-   Each call adds 1 exactly when the CURRENT node's data is even, and otherwise passes the count through unchanged; the base case contributes 0. So f computes the count of nodes with EVEN data. On 1,2,3,4,5: node 1 (odd) contributes 0 + f(rest); node 2 (even) contributes 1 + f(rest); node 3 (odd) contributes 0 + f(rest); node 4 (even) contributes 1 + f(rest); node 5 (odd) contributes 0 + f(NULL) = 0. Total = 1 (from node 2) + 1 (from node 4) = 2.
+   Each call adds 1 exactly when the current node's data is even, and otherwise passes the count through unchanged; the base case contributes 0. So f computes the count of nodes with even data. On 1,2,3,4,5: node 1 (odd) contributes 0 + f(rest); node 2 (even) contributes 1 + f(rest); node 3 (odd) contributes 0 + f(rest); node 4 (even) contributes 1 + f(rest); node 5 (odd) contributes 0 + f(NULL) = 0. Total = 1 (from node 2) + 1 (from node 4) = 2.
 
 3. A list is A -> B -> C -> D -> E. Write the deletion of node C, given only the head pointer and C's value, and show the state of prev and curr at the moment of deletion.
    Walk with prev = NULL, curr = head = A. curr->data != C, so prev = A, curr = B. Still no match: prev = B, curr = C. Now curr->data matches: stop walking (do not advance further, or the predecessor is lost). At this point prev = B, curr = C. Delete: prev->next = curr->next, i.e. B->next = D. Free C. Result: A -> B -> D -> E. Note prev was needed and was tracked one step behind curr throughout, which is the general shape of every previous-node deletion in a singly linked list.
 
 4. Run Floyd's algorithm on the list 1 -> 2 -> 3 -> 4 -> 5, where node 5's next points back to node 3 (a cycle of length 3: 3 -> 4 -> 5 -> 3). Trace until the pointers meet, then find the cycle's start.
-   Start: slow = fast = 1. Step 1: slow = 2, fast = 3. Step 2: slow = 3, fast = 5 (3's next is 4, 4's next is 5). Step 3: slow = 4, fast = 4 (5's next is 3, 3's next is 4) — slow and fast are BOTH at node 4: they meet. Now reset slow to head (node 1); leave fast at node 4. Advance both one step at a time: slow = 2, fast = 5. Again: slow = 3, fast = 3 (5's next is 3) — they meet at node 3. Node 3 is the cycle's entry point, matching the list's actual construction (3 -> 4 -> 5 -> 3 is exactly the cycle described).
+   Start: slow = fast = 1. Step 1: slow = 2, fast = 3. Step 2: slow = 3, fast = 5 (3's next is 4, 4's next is 5). Step 3: slow = 4, fast = 4 (5's next is 3, 3's next is 4) — slow and fast are both at node 4: they meet. Now reset slow to head (node 1); leave fast at node 4. Advance both one step at a time: slow = 2, fast = 5. Again: slow = 3, fast = 3 (5's next is 3) — they meet at node 3. Node 3 is the cycle's entry point, matching the list's actual construction (3 -> 4 -> 5 -> 3 is exactly the cycle described).
 
 5. Insert a new node N with value 15 between nodes A (value 10) and B (value 20) in a doubly linked list, writing the four pointer assignments in a safe order, and state what breaks if the order is reversed.
-   Safe order: n->next = B; n->prev = A; A->next = n; B->prev = n. After these four: A <-> N <-> B, both directions consistent. If instead A->next = n were done FIRST, followed by n->next = B — the assignment n->next = B still succeeds correctly here since B is passed in directly as a parameter and never derived through A, so this particular reordering happens not to lose information. The genuinely unsafe reordering is if n->prev and n->next were computed by reading them back off of A and B AFTER A and B had already been repointed at n (for instance, computing n->next as A->next after A->next had already been set to n) — that would set n->next to n itself, an immediate self-loop. The general rule stands: always finish setting the NEW node's own pointers using values that have not yet been overwritten, before splicing the new node into the existing chain.
+   Safe order: n->next = B; n->prev = A; A->next = n; B->prev = n. After these four: A <-> N <-> B, both directions consistent. If instead A->next = n were done FIRST, followed by n->next = B — the assignment n->next = B still succeeds correctly here since B is passed in directly as a parameter and never derived through A, so this particular reordering happens not to lose information. The genuinely unsafe reordering is if n->prev and n->next were computed by reading them back off of A and B after A and B had already been repointed at n (for instance, computing n->next as A->next after A->next had already been set to n) — that would set n->next to n itself, an immediate self-loop. The general rule stands: always finish setting the new node's own pointers using values that have not yet been overwritten, before splicing the new node into the existing chain.
 
 6. Compare: a singly linked list has both head and tail pointers. A doubly linked list has only a head pointer. For each of (a) insert at front, (b) insert at rear, (c) delete the last node given only its value, state the time complexity for each structure.
-   Singly linked with head+tail: (a) insert at front O(1) — two pointer writes at head, no walk. (b) insert at rear O(1) — tail pointer gives direct access, attach then move tail. (c) delete last node given its value O(n) — even knowing WHICH node to delete, its PREDECESSOR must still be found by walking from head, since a singly linked node holds no backward pointer, and a tail pointer does not help find the SECOND-to-last node.
+   Singly linked with head+tail: (a) insert at front O(1) — two pointer writes at head, no walk. (b) insert at rear O(1) — tail pointer gives direct access, attach then move tail. (c) delete last node given its value O(n) — even knowing WHICH node to delete, its PREDECESSOR must still be found by walking from head, since a singly linked node holds no backward pointer, and a tail pointer does not help find the second-to-last node.
    Doubly linked with only head: (a) insert at front O(1) — no walk needed at head regardless. (b) insert at rear O(n) — with no tail pointer, the last node must first be reached by walking from head, even though a doubly linked node WOULD support O(1) deletion once reached. (c) delete last node given its value O(n) to REACH it (search from head, since only head is kept) but O(1) to actually detach it once found, using node->prev directly — so the search dominates, giving O(n) overall, but for a different reason than the singly linked case: here the walk is to FIND the node, not to find its predecessor, since the node's own prev pointer supplies that. This question is testing whether "doubly linked" and "has a tail pointer" are correctly kept as two independent facts rather than assumed to always come together.
 
 7. A polynomial 4x^5 + 3x^2 + 7 is added to 2x^5 + 6x^3 + 1x^2 + 4. Give the result as a linked list of (coeff, exp) terms, showing which comparison rule fires at each step.

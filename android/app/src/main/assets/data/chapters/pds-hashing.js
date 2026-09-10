@@ -85,7 +85,7 @@ WHY THE TABLE SIZE SHOULD BE PRIME, NOT A POWER OF TWO
 
 Powers of two are a tempting table size because they make the mod operation cheap on a computer (k mod 2^p is just "keep the low p bits" — a bitwise AND, no division circuit needed). This convenience is exactly the trap. Derive what it costs.
 
-Write any key k in binary. If m = 2^p, then k mod m depends ONLY on the lowest p bits of k — every bit of k above position p is completely discarded by the remainder operation, because 2^p, 2^(p+1), 2^(p+2), and so on are all exact multiples of m and contribute nothing to the remainder.
+Write any key k in binary. If m = 2^p, then k mod m depends only on the lowest p bits of k — every bit of k above position p is completely discarded by the remainder operation, because 2^p, 2^(p+1), 2^(p+2), and so on are all exact multiples of m and contribute nothing to the remainder.
 
 1. Write k in binary as (higher bits)(lowest p bits).
 2. k = (higher bits) × 2^p + (lowest p bits).
@@ -126,7 +126,7 @@ MID-SQUARE AND FOLDING
 
 Two older, simpler ideas achieve a similar mixing effect and are worth knowing because they appear by name.
 
-Mid-square hashing squares the key and reads off the middle digits of the result. Squaring a number depends on ALL of its digits (unlike just taking a remainder, which as shown above can depend on only a few), so the middle digits of the square tend to depend on the whole key, giving a reasonably scrambled result cheaply.
+Mid-square hashing squares the key and reads off the middle digits of the result. Squaring a number depends on all of its digits (unlike just taking a remainder, which as shown above can depend on only a few), so the middle digits of the square tend to depend on the whole key, giving a reasonably scrambled result cheaply.
 
 Example: k = 44, table needs 2-digit addresses (m = 100). k² = 1936. The middle two digits of 1936 are "9" and "3" — read as 93. So h(44) = 93.
 
@@ -160,7 +160,7 @@ COLLISIONS ARE INEVITABLE
 
 However good the hash function, collisions cannot be avoided in general, and this is worth proving rather than asserting, because it changes what you should expect from a hash table.
 
-The universe of possible keys U is, in every realistic case, larger than the table size m — often vastly larger (four billion 32-bit integers into a table of a few thousand slots, say). By the pigeonhole principle, if you consider ALL |U| possible keys, at least two of them MUST map to the same slot, because there are more keys than slots to receive them. A hash function that avoided this entirely (a true one-to-one mapping) would need |U| ≤ m, which defeats the entire purpose of compressing a large universe into a small table.
+The universe of possible keys U is, in every realistic case, larger than the table size m — often vastly larger (four billion 32-bit integers into a table of a few thousand slots, say). By the pigeonhole principle, if you consider all |U| possible keys, at least two of them must map to the same slot, because there are more keys than slots to receive them. A hash function that avoided this entirely (a true one-to-one mapping) would need |U| ≤ m, which defeats the entire purpose of compressing a large universe into a small table.
 
 So collisions are not a symptom of a poorly chosen hash function; they are a mathematical certainty once |U| > m, for ANY hash function whatsoever. What a good hash function controls is not WHETHER collisions happen across the whole universe, but how EVENLY they are spread among the keys you actually insert — and, sharper still, HOW SOON you should expect the first one, which turns out to be a much smaller number of keys than intuition suggests.
 
@@ -220,7 +220,7 @@ REMEMBER: For separate chaining, α > 1 is not an error — it just means chains
 
 Assume simple uniform hashing: each of the n keys is equally likely to land in any of the m slots, independently. Then the expected length of any one chain is exactly n/m = α, by the definition of an average — n keys spread over m equally-likely bins average α keys per bin.
 
-An unsuccessful search — looking for a key that is not in the table — must walk the ENTIRE chain at its slot before concluding the key is absent, because there is no way to know it is missing without checking every node. The expected cost is therefore the O(1) hash computation plus the expected chain length:
+An unsuccessful search — looking for a key that is not in the table — must walk the entire chain at its slot before concluding the key is absent, because there is no way to know it is missing without checking every node. The expected cost is therefore the O(1) hash computation plus the expected chain length:
 
 Θ(1 + α) — expected cost of an unsuccessful chained search
 
@@ -244,7 +244,7 @@ Chaining never fails outright as α grows — but Θ(1 + α) still means the ave
 
 OPEN ADDRESSING
 
-Chaining pays for its flexibility with a second data structure per bucket (a linked list) and the pointer-chasing that comes with it. Open addressing avoids that entirely: every key lives directly inside the table array, with no auxiliary structure at all. When a slot is taken, the colliding key does not queue up behind it — it looks elsewhere in the SAME array, following a fixed rule called a probe sequence.
+Chaining pays for its flexibility with a second data structure per bucket (a linked list) and the pointer-chasing that comes with it. Open addressing avoids that entirely: every key lives directly inside the table array, with no auxiliary structure at all. When a slot is taken, the colliding key does not queue up behind it — it looks elsewhere in the same array, following a fixed rule called a probe sequence.
 
 [[FIG:probe-seq]]
 
@@ -290,7 +290,7 @@ E[unsuccessful search or insertion] ≈ ½ ( 1 + 1/(1−α)² )
 
 E[successful search] ≈ ½ ( 1 + 1/(1−α) )
 
-An unsuccessful search or a fresh insertion both behave the same way — they probe until they hit a genuinely empty slot — which is why they share a formula. A successful search, once again, tends to stop earlier, because it is retracing the (typically shorter) path that was taken when ITS key was originally inserted, rather than needing to reach all the way to empty space.
+An unsuccessful search or a fresh insertion both behave the same way — they probe until they hit a genuinely empty slot — which is why they share a formula. A successful search, once again, tends to stop earlier, because it is retracing the (typically shorter) path that was taken when its key was originally inserted, rather than needing to reach all the way to empty space.
 
 Evaluate both at three values of α to see the blow-up concretely.
 
@@ -316,11 +316,11 @@ Final table: slot 0 = 24, slot 3 = 10, slot 4 = 17, slots 1, 2, 5, 6 empty. Comp
 
 SECONDARY CLUSTERING AND THE GUARANTEE
 
-Quadratic probing eliminates primary clustering, but not all clustering: two keys that hash to the SAME home slot always follow the IDENTICAL sequence of offsets afterwards, because the offsets (c1·i + c2·i²) depend only on the probe number i, never on the key itself. Keys 10 and 17 above, both home slot 3, both tried offset 0 then offset 1 in exactly the same order — they only diverged because one of them found offset 1 already taken. This residual effect, where SAME-home-slot keys share a probe path (though DIFFERENT-home-slot keys do not merge into a shared run the way linear probing's do), is called secondary clustering. It is milder than primary clustering, but double hashing, further below, removes it too.
+Quadratic probing eliminates primary clustering, but not all clustering: two keys that hash to the same home slot always follow the identical sequence of offsets afterwards, because the offsets (c1·i + c2·i²) depend only on the probe number i, never on the key itself. Keys 10 and 17 above, both home slot 3, both tried offset 0 then offset 1 in exactly the same order — they only diverged because one of them found offset 1 already taken. This residual effect, where same-home-slot keys share a probe path (though different-home-slot keys do not merge into a shared run the way linear probing's do), is called secondary clustering. It is milder than primary clustering, but double hashing, further below, removes it too.
 
 Quadratic probing has a genuine failure mode worth deriving precisely, because it explains the guarantee that resolves it: for some choices of m, the sequence of offsets (i² mod m) does not cover every residue as i ranges over 0 to m−1 — it can get stuck cycling through a small subset of slots forever, leaving genuinely empty slots permanently unreachable from a given home slot. This happens for m = 8, for example, and it happens whenever m is not prime.
 
-The guarantee that avoids this is: if m is prime and α < 0.5, quadratic probing (with c1 = c2 = ½, or equivalently working with the standard offsets scaled appropriately) is ALWAYS guaranteed to find an empty slot. This is worth proving properly, because "m prime" alone is not sufficient without the load-factor condition too — the proof shows exactly why both are needed.
+The guarantee that avoids this is: if m is prime and α < 0.5, quadratic probing (with c1 = c2 = ½, or equivalently working with the standard offsets scaled appropriately) is always guaranteed to find an empty slot. This is worth proving properly, because "m prime" alone is not sufficient without the load-factor condition too — the proof shows exactly why both are needed.
 
 Claim: if m is prime, the first ⌈m/2⌉ probes (i = 0, 1, ..., ⌊m/2⌋) from any home slot land on ⌈m/2⌉ DISTINCT slots.
 
@@ -331,7 +331,7 @@ Claim: if m is prime, the first ⌈m/2⌉ probes (i = 0, 1, ..., ⌊m/2⌋) from
 5. Consider (i + j): since i, j ≤ ⌊m/2⌋, we have i + j ≤ 2⌊m/2⌋ ≤ m, with equality only possible if m is even and i = j = m/2 (impossible here since i < j) — and since m is prime and greater than 2, m is odd, so 2⌊m/2⌋ = m − 1 < m, meaning i + j ≤ m − 1 < m. So m cannot divide (i + j) unless i + j = 0, which forces i = j = 0, again contradicting i < j.
 6. Both cases lead to a contradiction, so no such i, j exist: the first ⌈m/2⌉ probes are all distinct slots.
 
-Now the load-factor half of the guarantee: if the table currently holds n keys with α < 0.5, then n < m/2 ≤ ⌈m/2⌉. The proof above shows the first ⌈m/2⌉ probes visit ⌈m/2⌉ distinct slots — strictly more slots than there are occupied slots in the whole table. By the pigeonhole principle, at least one of those ⌈m/2⌉ distinct probed slots CANNOT be among the n occupied ones, so it must be empty, and the probe sequence is guaranteed to reach it within the first ⌈m/2⌉ tries.
+Now the load-factor half of the guarantee: if the table currently holds n keys with α < 0.5, then n < m/2 ≤ ⌈m/2⌉. The proof above shows the first ⌈m/2⌉ probes visit ⌈m/2⌉ distinct slots — strictly more slots than there are occupied slots in the whole table. By the pigeonhole principle, at least one of those ⌈m/2⌉ distinct probed slots cannot be among the n occupied ones, so it must be empty, and the probe sequence is guaranteed to reach it within the first ⌈m/2⌉ tries.
 
 REMEMBER: The quadratic-probing guarantee needs BOTH conditions: m prime (so the first half of the probe sequence never repeats a slot) AND α < 0.5 (so there are provably fewer occupied slots than the number of distinct slots that first half visits). Drop either one and insertion can fail even with empty slots still sitting untouched elsewhere in the table.
 
@@ -341,7 +341,7 @@ Quadratic probing's offsets depend only on the probe number, which is why same-h
 
 h(k, i) = ( h1(k) + i · h2(k) ) mod m
 
-Two keys that happen to share the same h1(k) will, in general, have DIFFERENT h2(k) values, and so scatter along completely different probe paths rather than merging — eliminating both primary and secondary clustering, and making double hashing's actual behaviour the closest of the three schemes to the idealized "uniform probing" the formulas assume.
+Two keys that happen to share the same h1(k) will, in general, have different h2(k) values, and so scatter along completely different probe paths rather than merging — eliminating both primary and secondary clustering, and making double hashing's actual behaviour the closest of the three schemes to the idealized "uniform probing" the formulas assume.
 
 For the probe sequence to be able to reach every slot in the table (rather than cycling through a strict subset, exactly the failure quadratic probing can suffer), h2(k) must satisfy two conditions: it must never be 0 for any key (a step size of 0 would repeat the same slot forever, making zero progress), and it must be relatively prime to m — gcd(h2(k), m) = 1 — because multiplying by i and reducing mod m cycles through all m residues exactly once, without repetition, precisely when the step size shares no common factor with m (the same modular-arithmetic fact used in the quadratic-probing proof above, now applied to a single fixed step rather than a growing one).
 
@@ -354,7 +354,7 @@ Trace double hashing on m = 13 (prime), h1(k) = k mod 13, h2(k) = 1 + (k mod 11)
 3. Insert 59: h1(59) = 59 mod 13 = 7 (59 = 4×13 + 7). Slot 7 empty. Place 59 at slot 7.
 4. Insert 31: h1(31) = 31 mod 13 = 5 (31 = 2×13 + 5). Slot 5 occupied. Compute h2(31) = 1 + (31 mod 11) = 1 + 9 = 10. Probe i = 1: (5 + 1×10) mod 13 = 15 mod 13 = 2. Slot 2 empty. Place 31 at slot 2.
 
-Final table: slot 2 = 31, slot 5 = 18, slot 6 = 44, slot 7 = 59, all other slots empty. Both 44 and 31 collided with 18 at slot 5, but their DIFFERENT step sizes (h2(44) = 1, h2(31) = 10) sent them to completely different final slots — 6 and 2 respectively, nowhere near each other — exactly the scattering behaviour that eliminates clustering.
+Final table: slot 2 = 31, slot 5 = 18, slot 6 = 44, slot 7 = 59, all other slots empty. Both 44 and 31 collided with 18 at slot 5, but their different step sizes (h2(44) = 1, h2(31) = 10) sent them to completely different final slots — 6 and 2 respectively, nowhere near each other — exactly the scattering behaviour that eliminates clustering.
 
 DELETION IN OPEN ADDRESSING: THE TOMBSTONE
 
@@ -380,7 +380,7 @@ Final table: slot0=empty, slot1=empty, slot2=9, slot3=16, slot4=30, slot5=23, sl
 
 GATE TRAP: A NAIVE search implementation that treats a tombstone exactly like a genuinely empty slot — stopping there instead of continuing — silently reintroduces the exact bug the tombstone exists to prevent. The distinction is not "tombstones matter for insertion, not search" — it is the reverse emphasis that matters most: search is where a wrong tombstone treatment causes a real, silent correctness failure (reporting a present key as absent), while insertion's only job regarding a tombstone is knowing it MAY reuse it.
 
-Tombstones are not free, though: because search must probe past them just like occupied slots, a table with many deletions accumulates tombstones that make searches (including for keys that were never near those deleted ones) probe further than the CURRENT number of live keys would suggest, effectively inflating the EFFECTIVE load factor for search cost even as the true count of live keys, n, goes down. This is a second, independent reason (beyond simply α crossing a growth threshold) that heavily-deleted-from tables are periodically rehashed — a full rehash rebuilds the table with no tombstones at all, restoring the clean uniform-hashing-like behaviour the cost formulas assume.
+Tombstones are not free, though: because search must probe past them just like occupied slots, a table with many deletions accumulates tombstones that make searches (including for keys that were never near those deleted ones) probe further than the current number of live keys would suggest, effectively inflating the EFFECTIVE load factor for search cost even as the true count of live keys, n, goes down. This is a second, independent reason (beyond simply α crossing a growth threshold) that heavily-deleted-from tables are periodically rehashed — a full rehash rebuilds the table with no tombstones at all, restoring the clean uniform-hashing-like behaviour the cost formulas assume.
 
 CHAINING VERSUS OPEN ADDRESSING
 
@@ -419,7 +419,7 @@ Every hash function discussed so far is FIXED — the same function h is used fo
 
 PERFECT HASHING AND CUCKOO HASHING
 
-When the full set of keys is known in advance and will not change — a compiler's table of reserved keywords, for instance — perfect hashing constructs a hash function (or a two-level scheme of hash functions) tailored to that exact key set so that there are NO collisions at all, giving worst-case O(1) lookup rather than merely average-case, at the cost of needing to know the keys ahead of time and rebuild the scheme if the key set ever changes. Cuckoo hashing is a different open-addressing-family idea for a key set that DOES change: it keeps two (or more) hash functions and two tables, and if inserting a key would collide, it evicts the CURRENT occupant of that slot and reinserts the evicted key into ITS other possible slot (in the other table), possibly triggering a chain of evictions — trading a more complex insertion procedure for a worst-case O(1) guarantee on search, since a key can only ever be in one of two known places.
+When the full set of keys is known in advance and will not change — a compiler's table of reserved keywords, for instance — perfect hashing constructs a hash function (or a two-level scheme of hash functions) tailored to that exact key set so that there are NO collisions at all, giving worst-case O(1) lookup rather than merely average-case, at the cost of needing to know the keys ahead of time and rebuild the scheme if the key set ever changes. Cuckoo hashing is a different open-addressing-family idea for a key set that does change: it keeps two (or more) hash functions and two tables, and if inserting a key would collide, it evicts the current occupant of that slot and reinserts the evicted key into its other possible slot (in the other table), possibly triggering a chain of evictions — trading a more complex insertion procedure for a worst-case O(1) guarantee on search, since a key can only ever be in one of two known places.
 
 WORKED PROBLEMS
 
@@ -430,7 +430,7 @@ Each problem below is solved in full, exactly as you should show working on pape
    h(26) = 26 mod 11 = 4 (26 = 2×11 + 4). Slot 4 occupied, probe slot 5, empty, place 26 at slot 5.
    h(4) = 4. Slot 4 occupied, probe 5 occupied (26), probe slot 6, empty, place 4 at slot 6.
    h(37) = 37 mod 11 = 4 (37 = 3×11 + 4). Slot 4 occ, 5 occ, 6 occ (4), probe slot 7, empty, place 37 at slot 7.
-   h(5) = 5. Slot 5 occupied (26) — key 5's OWN home slot happens to be occupied by an unrelated displaced key — probe slot 6 occ (4), probe 7 occ (37), probe slot 8, empty, place key 5 at slot 8.
+   h(5) = 5. Slot 5 occupied (26) — key 5's own home slot happens to be occupied by an unrelated displaced key — probe slot 6 occ (4), probe 7 occ (37), probe slot 8, empty, place key 5 at slot 8.
    h(16) = 16 mod 11 = 5. Slot 5 occ, 6 occ, 7 occ, 8 occ (key 5), probe slot 9, empty, place 16 at slot 9.
    Final table (slots 0–10): slot4=15, slot5=26, slot6=4, slot7=37, slot8=5, slot9=16; slots 0,1,2,3,10 empty.
 
@@ -449,7 +449,7 @@ Each problem below is solved in full, exactly as you should show working on pape
    Final table: slot0=22, slot2=55, slot7=13, slot9=44; all other slots empty.
 
 4. COUNTING INSERTION ORDERS. Table size m = 11, h(k) = k mod 11. Keys 5, 16, 27 all have home slot 5 (16 mod 11 = 5, 27 mod 11 = 5), and key 8 has home slot 8, which the three-key chain starting at slot 5 can never reach (a chain of exactly 3 keys starting at slot 5 spans at most slots 5, 6, 7). The observed final table has slot5=5, slot6=16, slot7=27, slot8=8. In how many of the 4! = 24 possible insertion orders of these four keys does this EXACT final table result?
-   First isolate the constraint on {5, 16, 27}. Because all three share home slot 5, linear probing behaves as a strict first-come-first-served chain: whichever of the three is inserted FIRST lands at slot 5 (its shared home, empty at that point); whichever is inserted SECOND finds slot 5 taken and lands at slot 6; whichever is inserted THIRD finds slots 5 and 6 taken and lands at slot 7. The mapping from "insertion order among these three" to "final slot" is therefore a bijection — for the observed table (5 at slot 5, 16 at slot 6, 27 at slot 7) there is exactly ONE valid relative order among these three keys: 5 before 16 before 27. Any other relative order among them produces a different final assignment.
+   First isolate the constraint on {5, 16, 27}. Because all three share home slot 5, linear probing behaves as a strict first-come-first-served chain: whichever of the three is inserted FIRST lands at slot 5 (its shared home, empty at that point); whichever is inserted second finds slot 5 taken and lands at slot 6; whichever is inserted third finds slots 5 and 6 taken and lands at slot 7. The mapping from "insertion order among these three" to "final slot" is therefore a bijection — for the observed table (5 at slot 5, 16 at slot 6, 27 at slot 7) there is exactly one valid relative order among these three keys: 5 before 16 before 27. Any other relative order among them produces a different final assignment.
    Key 8 does not interact with this chain at all — its home slot, 8, sits outside every slot the three-key chain could ever reach, so wherever 8 is inserted relative to the other three, it always lands at slot 8 directly (empty, since nothing else ever reaches there) and never disturbs their relative placement.
    So a valid overall order is exactly: the three chain-keys appear in the one fixed relative order (5, then 16, then 27), with key 8 inserted at ANY of the 4 possible positions in the combined sequence of 4 insertions. The number of ways to interleave one freely-placed element into a sequence of 3 already-ordered elements is 4 (choose which of the 4 ordinal positions in the full order the free element takes): n! / (c1! · c2!) = 4! / (3! · 1!) = 24 / 6 = 4.
    The four valid orders are: (8,5,16,27), (5,8,16,27), (5,16,8,27), (5,16,27,8) — verify one: order (5,16,8,27): 5→slot5; 16→home5 occupied, probe slot6, empty, place; 8→home8, empty, place; 27→home5 occupied, probe6 occupied(16), probe7 empty, place. Result matches: slot5=5, slot6=16, slot7=27, slot8=8. ✓. This "n! divided by the factorial of each independent same-home chain's length" method applies whenever the chains do not overlap in the slots they could reach — when they do overlap, the count must be found by direct case-by-case simulation instead.
@@ -473,7 +473,7 @@ Each problem below is solved in full, exactly as you should show working on pape
    h(26)=26 mod 7=5, occupied, probe 6 occ, probe 0 occ (19), probe slot 1, empty, place 26 at slot 1.
    Table now: slot0=19, slot1=26, slot5=5, slot6=12; slots 2,3,4 empty.
    Delete 12 (at slot 6): mark slot 6 as a TOMBSTONE — not plain empty.
-   Search for 19: h(19)=5. Slot 5 holds 5, not a match, but occupied — keep probing (correct: 5 is real data, so probing must continue past it regardless). Probe slot 6: a TOMBSTONE — treated as "keep probing," since some key (as it turns out, 19 itself) may have been pushed further along BECAUSE this slot was full at insertion time. Probe slot 0: holds 19 — MATCH, found after 3 probes. Had the naive (incorrect) implementation stopped at the tombstone in slot 6, it would have wrongly reported 19 as absent.
+   Search for 19: h(19)=5. Slot 5 holds 5, not a match, but occupied — keep probing (correct: 5 is real data, so probing must continue past it regardless). Probe slot 6: a TOMBSTONE — treated as "keep probing," since some key (as it turns out, 19 itself) may have been pushed further along because this slot was full at insertion time. Probe slot 0: holds 19 — MATCH, found after 3 probes. Had the naive (incorrect) implementation stopped at the tombstone in slot 6, it would have wrongly reported 19 as absent.
    Insert 33: h(33)=33 mod 7=5 (33 = 4×7+5). Slot 5 occupied (5), probe slot 6: a TOMBSTONE — remembered as reusable, but probing continues to rule out 33 already being present further on — probe slot 0: occupied (19, not 33), probe slot 1: occupied (26, not 33), probe slot 2: empty — confirms 33 is genuinely new. Insertion reuses the remembered tombstone: 33 is placed at slot 6, not at the further empty slot 2.
    Final table: slot0=19, slot1=26, slot5=5, slot6=33; slots 2,3,4 empty.
 

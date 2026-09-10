@@ -206,6 +206,51 @@ input[type=date], input[type=number], select, textarea { background: none; color
 }
 .theory-body .th-step span:last-child { font-size: 15px; line-height: 1.55; color: rgba(243,242,242,.88); }
 
+/* ---- chapter accordion: a full textbook chapter (7,500-13,000+ words) is the
+   biggest wall-of-text risk in the app, so it never unrolls all at once. An
+   outline up top, one section body open at a time, and a visible opened-count
+   turn "read the whole chapter" into a list of small, individually startable
+   tasks instead of one long, undifferentiated scroll. ---- */
+.ch-summary {
+  display: flex; justify-content: space-between; align-items: baseline;
+  font-size: 10px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase;
+  color: var(--muted); margin-bottom: 8px;
+}
+.ch-summary span:last-child { color: var(--accent2); }
+.ch-outline {
+  display: flex; flex-wrap: nowrap; gap: 8px; overflow-x: auto; padding-bottom: 10px;
+  margin-bottom: 6px; -webkit-overflow-scrolling: touch;
+}
+.ch-chip {
+  flex: none; background: none; color: var(--muted); border: 1px solid var(--faint);
+  font-family: inherit; font-size: 10px; font-weight: 800; letter-spacing: .04em;
+  padding: 9px 12px; white-space: nowrap; cursor: pointer; max-width: 220px;
+  overflow: hidden; text-overflow: ellipsis;
+}
+.ch-chip.done { color: var(--accent2); border-color: var(--accent2); }
+.ch-section { border-bottom: 1px solid var(--faint); }
+.ch-section:first-child { border-top: 1px solid var(--faint); }
+.ch-sec-head {
+  width: 100%; display: flex; align-items: center; gap: 10px; background: none;
+  border: 0; padding: 14px 2px; font-family: inherit; text-align: left; cursor: pointer;
+}
+.ch-sec-num {
+  flex: none; width: 22px; height: 22px; border: 1px solid var(--faint); color: var(--muted);
+  font-size: 11px; font-weight: 800; display: flex; align-items: center; justify-content: center;
+}
+.ch-section.opened .ch-sec-num { border-color: var(--accent2); color: var(--accent2); }
+/* The source heading is authored ALL-CAPS (same convention as every in-body
+   .th-head). At the 15px/700 a normal title would use, a whole line of raw caps
+   reads as shouting — small, tracked, semi-bold is how every other compact label
+   in this app (.chip, .pill, .tab) already carries caps without that effect. */
+.ch-sec-title { flex: 1; font-size: 12.5px; font-weight: 800; letter-spacing: .02em; line-height: 1.4; color: var(--text); }
+.ch-sec-time { flex: none; font-size: 10px; font-weight: 800; letter-spacing: .06em; color: var(--muted); }
+.ch-sec-arrow { flex: none; font-size: 16px; color: var(--muted); }
+.ch-section.opened .ch-sec-arrow { color: var(--accent2); }
+.ch-sec-body { padding: 2px 2px 18px; }
+.ch-sec-body[hidden] { display: none; }
+.ch-section.open .ch-sec-head { background: rgba(243,242,242,.03); }
+
 /* ---- celebration toast: brief, physical, never blocking ---- */
 .celebrate {
   position: fixed; left: 50%; bottom: 110px; transform: translateX(-50%);

@@ -54,6 +54,20 @@
   }
   function esc(s) { return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
 
+  // A short, mostly-uppercase line is a section heading. Requires an actual word
+  // (3+ letters run together, not just 3 letters total) so a plain-text truth-
+  // table row like "F | T | F" (strips to "FTF") isn't mistaken for one. Allows
+  // a SHORT lowercase token here and there — a math variable ("n-BIT WORD"), a
+  // possessive ("TYPE 1's"), a plural suffix ("SDDs") — since real headings in
+  // this corpus often carry one, but draws the line at 4+ consecutive lowercase
+  // letters, which only shows up in genuine prose.
+  function isHeadingLine(line) {
+    var letters = line.replace(/[^A-Za-z]/g, '');
+    if (letters.length < 3 || !/[A-Za-z]{3,}/.test(line) || line.length >= 90) return false;
+    var upper = (line.match(/[A-Z]/g) || []).length;
+    return !/[a-z]{4,}/.test(line) && (upper / letters.length) >= 0.8;
+  }
+
   // ---------- question lookup ----------
   function allTopics() {
     var out = [];
@@ -430,9 +444,7 @@
         return;
       }
 
-      // A short all-caps line is a section heading.
-      var letters = line.replace(/[^A-Za-z]/g, '');
-      if (letters.length > 2 && line === line.toUpperCase() && line.length < 70) {
+      if (isHeadingLine(line)) {
         closeList();
         out.push('<h4 class="th-head">' + esc(line) + '</h4>');
         return;
@@ -519,6 +531,38 @@
     return e;
   }
 
+  // A full chapter is now a real textbook chapter — 7,500 to 13,000+ words — and
+  // handing all of it to renderTheory as one scroll is exactly the wall of text
+  // the rest of this file works so hard to avoid everywhere else. Cut it into its
+  // own ALL-CAPS sections (whole, unsplit — cutBeats' 750-char re-split is for the
+  // guided lesson's bite-size cards, not for this) so the chapter tab can offer an
+  // outline and open one section at a time instead of dumping the lot on load.
+  function splitChapterSections(text) {
+    if (!text) return [];
+    var out = [], cur = null;
+    String(text).split('\n').forEach(function (raw) {
+      var line = raw.trim();
+      if (!line) { if (cur) cur.lines.push(''); return; }
+      if (isHeadingLine(line)) {
+        cur = { heading: line, lines: [] };
+        out.push(cur);
+      } else {
+        if (!cur) { cur = { heading: '', lines: [] }; out.push(cur); }
+        cur.lines.push(line);
+      }
+    });
+    return out
+      .map(function (s) { return { heading: s.heading, body: s.lines.join('\n').trim() }; })
+      .filter(function (s) { return s.body; });
+  }
+
+  // ~180 words/minute — dense, worked-example-heavy technical prose reads slower
+  // than plain narrative text, so this runs a little under the usual 200-230wpm rule.
+  function readMins(text) {
+    var words = (String(text).match(/\S+/g) || []).length;
+    return Math.max(1, Math.round(words / 180));
+  }
+
   // Pull one question from the whole bank. Used by the low-friction modes where
   // choosing a subject is itself the barrier that stops a session starting.
   function anyQuestion(maxDifficulty) {
@@ -557,9 +601,103 @@
       (pyqCount(t) ? '<button class="btn block ghost" id="pyq-set" style="margin-top:8px">Exam-pattern set &mdash; ' + pyqCount(t) + ' questions</button>' : '');
     $view.innerHTML = html;
     var body = document.getElementById('tbody');
+    var sections = null; // computed once, lazily — most visits never leave the chapter tab
+
+    // A 7,500-13,000-word chapter dumped into one scroll is the single biggest
+    // wall of text in this app. Splitting it into a collapsed-by-default outline —
+    // one section open at a time, each with its own read time — turns "read this
+    // whole textbook chapter" into a list of small, individually startable tasks,
+    // which is the entire point of every other ADHD device in this file.
+    function showChapter() {
+      if (!sections) sections = splitChapterSections(t.theory.chapter);
+      S.chapterRead = S.chapterRead || {};
+      var read = S.chapterRead[tid] || {};
+      var totalMin = sections.reduce(function (n, s) { return n + readMins(s.body); }, 0);
+      var doneCount = Object.keys(read).filter(function (k) { return read[k] && +k < sections.length; }).length;
+
+      function progressHtml() {
+        var pct = sections.length ? Math.round(doneCount / sections.length * 100) : 0;
+        return '<div class="ch-summary"><span>' + sections.length + ' sections &middot; ~' + totalMin + ' min read</span>' +
+          '<span>' + doneCount + '/' + sections.length + ' opened</span></div>' +
+          '<div class="progress-track" style="margin:0 0 14px"><div class="progress-fill" style="width:' + pct + '%"></div></div>';
+      }
+
+      body.innerHTML = '<div id="ch-progress">' + progressHtml() + '</div>' +
+        '<div class="ch-outline" id="ch-outline">' +
+        sections.map(function (s, i) {
+          return '<button class="ch-chip' + (read[i] ? ' done' : '') + '" data-jump="' + i + '">' +
+            (read[i] ? '✓ ' : '') + esc(s.heading || 'SECTION ' + (i + 1)) + '</button>';
+        }).join('') + '</div>' +
+        sections.map(function (s, i) {
+          return '<div class="ch-section' + (read[i] ? ' opened' : '') + '" id="ch-sec-' + i + '">' +
+            '<button class="ch-sec-head" data-toggle="' + i + '">' +
+            '<span class="ch-sec-num">' + (i + 1) + '</span>' +
+            '<span class="ch-sec-title">' + esc(s.heading || 'SECTION ' + (i + 1)) + '</span>' +
+            '<span class="ch-sec-time">' + readMins(s.body) + ' min</span>' +
+            '<span class="ch-sec-arrow">' + (read[i] ? '✓' : '›') + '</span>' +
+            '</button>' +
+            '<div class="ch-sec-body" id="ch-body-' + i + '" hidden></div></div>';
+        }).join('');
+
+      // renderTheory's own fallback (show any figure whose [[FIG:id]] marker never
+      // matched at the very end of the text) only works within whatever text it is
+      // handed — and now that a chapter is handed to it one section at a time,
+      // "the very end" would mean once per section, silently dropping a figure
+      // instead. Every chapter validates clean today (every figure's marker really
+      // is somewhere in its own text), but if that ever stops being true, the fix
+      // is to still show it rather than lose it — so any truly orphaned figure
+      // rides along with the last section instead of vanishing.
+      var allFigs = (t.theory && t.theory.figs) || [];
+      var orphanFigs = allFigs.filter(function (f) {
+        return !sections.some(function (s) { return s.body.indexOf('[[FIG:' + f.id + ']]') >= 0; });
+      });
+      function renderInto(i) {
+        var box = document.getElementById('ch-body-' + i);
+        if (box.getAttribute('data-rendered')) return;
+        var mine = allFigs.filter(function (f) { return sections[i].body.indexOf('[[FIG:' + f.id + ']]') >= 0; });
+        if (i === sections.length - 1) mine = mine.concat(orphanFigs);
+        box.innerHTML = renderTheory(sections[i].body, mine);
+        box.setAttribute('data-rendered', '1');
+      }
+      function markRead(i) {
+        if (read[i]) return;
+        read[i] = true; doneCount++;
+        S.chapterRead[tid] = read; save();
+        document.getElementById('ch-progress').innerHTML = progressHtml();
+        var chip = $view.querySelectorAll('.ch-chip')[i];
+        if (chip) { chip.classList.add('done'); chip.textContent = '✓ ' + (sections[i].heading || 'SECTION ' + (i + 1)); }
+        var arrow = document.querySelector('#ch-sec-' + i + ' .ch-sec-arrow');
+        if (arrow) arrow.textContent = '✓';
+      }
+      function openSection(i, scroll) {
+        var sec = document.getElementById('ch-sec-' + i);
+        var box = document.getElementById('ch-body-' + i);
+        renderInto(i);
+        box.hidden = false;
+        sec.classList.add('open');
+        markRead(i);
+        if (scroll) sec.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+      function toggleSection(i) {
+        var sec = document.getElementById('ch-sec-' + i);
+        var box = document.getElementById('ch-body-' + i);
+        if (box.hidden) openSection(i, false);
+        else { box.hidden = true; sec.classList.remove('open'); }
+      }
+      $view.querySelectorAll('[data-toggle]').forEach(function (b) {
+        b.addEventListener('click', function () { toggleSection(+b.getAttribute('data-toggle')); });
+      });
+      $view.querySelectorAll('[data-jump]').forEach(function (b) {
+        b.addEventListener('click', function () { openSection(+b.getAttribute('data-jump'), true); });
+      });
+      // First-ever visit: open the first section so the page never looks empty.
+      if (!doneCount) openSection(0, false);
+    }
+
     function show(k) {
-      body.innerHTML = renderTheory(t.theory && t.theory[k], t.theory && t.theory.figs);
       $view.querySelectorAll('[data-tt]').forEach(function (b) { b.classList.toggle('active', b.getAttribute('data-tt') === k); });
+      if (k === 'chapter') { showChapter(); return; }
+      body.innerHTML = renderTheory(t.theory && t.theory[k], t.theory && t.theory.figs);
     }
     show(t.theory && t.theory.chapter ? 'chapter' : 'intro');
     $view.querySelectorAll('[data-tt]').forEach(function (b) {
@@ -622,8 +760,7 @@
     String(text).split('\n').forEach(function (raw) {
       var line = raw.trim();
       if (!line) { if (cur) cur.lines.push(''); return; }
-      var letters = line.replace(/[^A-Za-z]/g, '');
-      if (letters.length > 2 && line === line.toUpperCase() && line.length < 70) {
+      if (isHeadingLine(line)) {
         cur = { heading: line, lines: [], tab: tab };
         out.push(cur);
       } else {
@@ -635,16 +772,39 @@
     out.forEach(function (sec) {
       var body = sec.lines.join('\n').trim();
       if (!body) return;
-      // Long sections become several beats under the same heading, split only at
-      // blank lines so a paragraph is never cut in half.
+      // Long sections become several beats under the same heading, split at blank
+      // lines so a paragraph is never cut in half — except a paragraph that is
+      // ITSELF past the limit (a dense worked-example paragraph easily runs
+      // 1,000-1,700+ characters as a single unbroken block in these chapters, well
+      // past what a blank-line split alone can do anything about), which is first
+      // broken at sentence boundaries by the same splitter the plain chapter view
+      // already uses for exactly this, so no single lesson card ends up carrying
+      // an entire worked example's worth of text on its own.
       var LIMIT = 750;
       if (body.length <= LIMIT) { beats.push({ heading: sec.heading, body: body, tab: sec.tab }); return; }
-      var chunk = '', part = 0;
+      var pieces = [];
       body.split(/\n\s*\n/).forEach(function (para) {
-        if (chunk && (chunk.length + para.length) > LIMIT) {
+        if (para.length <= LIMIT) { pieces.push({ text: para, sep: '\n\n' }); return; }
+        var bySentence = splitLongParagraph(para, 420);
+        if (bySentence) { bySentence.forEach(function (c) { pieces.push({ text: c, sep: '\n\n' }); }); return; }
+        // A long block with no sentence boundary to split at is often a run of
+        // bullet or numbered-step lines instead (a comparison table written as
+        // several "•" points, or a case-by-case list as "1. ...", "2. ...", each
+        // individually short but with none of the blank lines a paragraph split
+        // needs) — split those point-by-point so one beat never has to carry an
+        // entire multi-point list at once, joining consecutive points back with
+        // a single newline so they still render as ONE continuous list rather
+        // than several short ones stacked with gaps between them.
+        var byBullet = para.split(/\n(?=•|\d{1,2}[.)]\s)/);
+        if (byBullet.length > 1) byBullet.forEach(function (c, i) { pieces.push({ text: c, sep: i === 0 ? '\n\n' : '\n' }); });
+        else pieces.push({ text: para, sep: '\n\n' });
+      });
+      var chunk = '', part = 0;
+      pieces.forEach(function (p) {
+        if (chunk && (chunk.length + p.text.length) > LIMIT) {
           beats.push({ heading: sec.heading, body: chunk.trim(), tab: sec.tab, part: ++part });
-          chunk = para;
-        } else chunk = chunk ? chunk + '\n\n' + para : para;
+          chunk = p.text;
+        } else chunk = chunk ? chunk + p.sep + p.text : p.text;
       });
       if (chunk.trim()) beats.push({ heading: sec.heading, body: chunk.trim(), tab: sec.tab, part: part ? ++part : 0 });
     });

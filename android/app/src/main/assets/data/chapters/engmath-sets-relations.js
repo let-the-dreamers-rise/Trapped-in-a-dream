@@ -215,7 +215,7 @@ Trace it on a 4-element relation R = {(1,2),(2,3),(3,4),(4,1)} — a 4-cycle —
 2. k=1: for which (i,j) does i→1 and 1→j both hold, adding a new (i,j)? Only 4→1 reaches vertex 1 (M[4][1]=1), and 1→2 leaves it (M[1][2]=1), so add M[4][2] = 1. New pair: (4,2).
 3. k=2: who reaches 2? Now rows 1 and 4 (M[1][2]=1, M[4][2]=1 from step 2). Vertex 2 goes to 3 (M[2][3]=1). So add M[1][3] = 1 and M[4][3] = 1 (already partly implied, confirm it's set). New pairs: (1,3), (4,3).
 4. k=3: who reaches 3? Rows 2, 1, 4 (M[2][3], M[1][3], M[4][3] all 1 now). Vertex 3 goes to 4 (M[3][4]=1). Add M[2][4]=1, M[1][4]=1, M[4][4]=1 (4 reaches 3 reaches 4 — a self-loop appears). New pairs: (2,4), (1,4), (4,4).
-5. k=4: who reaches 4? Rows 3,2,1,4 (all now have M[·][4]=1). Vertex 4 goes to 1 (M[4][1]=1, already known) and now also to 2,3,4 (from steps above). Add M[3][1]=1, M[2][1]=1, M[1][1]=1, M[2][2]=1, M[3][2]=1(already), M[3][3]=1, and complete the closure of the cycle: every vertex reaches every vertex.
+5. k=4: who reaches 4? Rows 3,2,1,4 (all now have M[·][4]=1). Vertex 4 goes to 1 (M[4][1]=1, already known) and now also to 2,3,4 (from steps above). Add M[3][1]=1, M[2][1]=1, M[1][1]=1, M[2][2]=1, M[3][2]=1 (newly set here, via vertex 3 reaching 4 and 4 reaching 2), M[3][3]=1, and complete the closure of the cycle: every vertex reaches every vertex.
 
 Since the underlying digraph is a single 4-cycle, every vertex can reach every other by going around, so the finished transitive closure is indeed the full 16-pair relation {1,2,3,4}×{1,2,3,4} — matching the earlier 3-cycle example's pattern, generalized. A relation whose digraph is a single cycle through all n vertices always closes to the complete relation on those n vertices.
 

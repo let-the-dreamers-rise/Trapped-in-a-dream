@@ -88,7 +88,7 @@ p → q has several equivalent English readings that all mean the identical thin
 • "p is sufficient for q"
 • "q is necessary for p"
 
-"p only if q" is the one that trips people up, because it sounds like it should point the other way. Read it as: p can be true ONLY IF q is also true — that is, p being true forces q to be true, which is exactly p → q, not q → p. Check it against the table: if q were false while p were true, the statement "p only if q" would be violated — matching row 2 (F) of p → q exactly.
+"p only if q" is the one that trips people up, because it sounds like it should point the other way. Read it as: p can be true only IF q is also true — that is, p being true forces q to be true, which is exactly p → q, not q → p. Check it against the table: if q were false while p were true, the statement "p only if q" would be violated — matching row 2 (F) of p → q exactly.
 
 "Unless" is the other common trap. "p unless q" means p is guaranteed UNLESS q happens — that is, p holds whenever q does not, which is ¬q → p. Because ¬q → p is logically equivalent to q ∨ p (shown later in this chapter), "p unless q" translates most simply as q ∨ p.
 
@@ -163,7 +163,7 @@ KEY: Tautology ⊂ Satisfiable. Every tautology is satisfiable, but a satisfiabl
 
 LOGICAL EQUIVALENCE
 
-Two compound propositions P and Q are LOGICALLY EQUIVALENT, written P ≡ Q, if they have identical truth tables — the same truth value in every row, for every combination of their shared variables. Equivalently (and this is the definition actually used to prove equivalences without building two full tables side by side): P ≡ Q exactly when P ↔ Q is a tautology, because P ↔ Q is true in a row precisely when P and Q agree in that row, and being true in EVERY row is exactly having identical values everywhere.
+Two compound propositions P and Q are LOGICALLY EQUIVALENT, written P ≡ Q, if they have identical truth tables — the same truth value in every row, for every combination of their shared variables. Equivalently (and this is the definition actually used to prove equivalences without building two full tables side by side): P ≡ Q exactly when P ↔ Q is a tautology, because P ↔ Q is true in a row precisely when P and Q agree in that row, and being true in every row is exactly having identical values everywhere.
 
 De Morgan's laws are the most-used equivalences in the whole syllabus, so prove one properly rather than just stating it. Claim: ¬(p ∧ q) ≡ ¬p ∨ ¬q.
 
@@ -187,7 +187,7 @@ Every law below is provable by the truth-table method just demonstrated (build t
 • DOUBLE NEGATION: ¬¬p ≡ p.
 • COMMUTATIVE LAWS: p ∨ q ≡ q ∨ p, and p ∧ q ≡ q ∧ p.
 • ASSOCIATIVE LAWS: (p ∨ q) ∨ r ≡ p ∨ (q ∨ r), and (p ∧ q) ∧ r ≡ p ∧ (q ∧ r).
-• DISTRIBUTIVE LAWS: p ∨ (q ∧ r) ≡ (p ∨ q) ∧ (p ∨ r), and p ∧ (q ∨ r) ≡ (p ∧ q) ∨ (p ∧ r). (Exactly like multiplication distributing over addition — but here BOTH directions distribute, which ordinary arithmetic does not allow: you cannot distribute + over ×.)
+• DISTRIBUTIVE LAWS: p ∨ (q ∧ r) ≡ (p ∨ q) ∧ (p ∨ r), and p ∧ (q ∨ r) ≡ (p ∧ q) ∨ (p ∧ r). (Exactly like multiplication distributing over addition — but here both directions distribute, which ordinary arithmetic does not allow: you cannot distribute + over ×.)
 • DE MORGAN'S LAWS: ¬(p ∧ q) ≡ ¬p ∨ ¬q, and ¬(p ∨ q) ≡ ¬p ∧ ¬q — proved above.
 • ABSORPTION LAWS: p ∨ (p ∧ q) ≡ p, and p ∧ (p ∨ q) ≡ p. Proof of the first by table: if p is T, both sides are T regardless of q; if p is F, the left side is F ∨ (F ∧ q) = F ∨ F = F, matching the right side F. Both rows check out.
 • NEGATION LAWS: p ∨ ¬p ≡ T (excluded middle — proved trivially: whichever value p takes, one disjunct is T), and p ∧ ¬p ≡ F (proved trivially the same way).
@@ -309,7 +309,7 @@ GATE TRAP: ∀ does NOT distribute over ∨, and ∃ does NOT distribute over �
 
 NESTED QUANTIFIERS
 
-When a statement has more than one quantifier, their relative order matters enormously — except when the two adjacent quantifiers are the SAME kind, in which case they commute freely: ∀x∀y P(x,y) ≡ ∀y∀x P(x,y), and ∃x∃y P(x,y) ≡ ∃y∃x P(x,y) (both are just re-orderings of the same giant conjunction or disjunction, and ∧ and ∨ are themselves commutative and associative, so the order of listing the variables makes no difference).
+When a statement has more than one quantifier, their relative order matters enormously — except when the two adjacent quantifiers are the same kind, in which case they commute freely: ∀x∀y P(x,y) ≡ ∀y∀x P(x,y), and ∃x∃y P(x,y) ≡ ∃y∃x P(x,y) (both are just re-orderings of the same giant conjunction or disjunction, and ∧ and ∨ are themselves commutative and associative, so the order of listing the variables makes no difference).
 
 Mixed quantifiers do NOT commute. Let L(x,y) mean "x loves y," over a domain of people.
 
@@ -325,7 +325,7 @@ KEY: ∃y∀x P(x,y) → ∀x∃y P(x,y) is always a valid one-way implication (
 
 RULES OF INFERENCE
 
-An ARGUMENT is a sequence of propositions called PREMISES, followed by a proposition called the CONCLUSION, with the claim that the conclusion follows from the premises. An argument is VALID exactly when the conditional (premise₁ ∧ premise₂ ∧ ... ∧ premiseₙ) → conclusion is a tautology — that is, in every row where ALL the premises happen to be true, the conclusion is also true. Validity says nothing about whether the premises themselves are actually true in the real world; it only says the reasoning from them to the conclusion is airtight.
+An ARGUMENT is a sequence of propositions called PREMISES, followed by a proposition called the CONCLUSION, with the claim that the conclusion follows from the premises. An argument is VALID exactly when the conditional (premise₁ ∧ premise₂ ∧ ... ∧ premiseₙ) → conclusion is a tautology — that is, in every row where all the premises happen to be true, the conclusion is also true. Validity says nothing about whether the premises themselves are actually true in the real world; it only says the reasoning from them to the conclusion is airtight.
 
 Each rule of inference below is a short valid argument form, provable by checking that (premises)→(conclusion) is a tautology, and each is given with a plain-English instance.
 
@@ -396,7 +396,7 @@ VACUOUS PROOF establishes p→q by showing p is simply false, which by the defin
 
 PROOF BY CASES splits the domain into an exhaustive set of cases, and proves the claim separately within each case — valid because if the cases genuinely cover every possibility, and the conclusion holds in each one individually, it holds everywhere. Example: prove n² ≥ n for every integer n, by cases: if n ≤ 0, then n² ≥ 0 ≥ n trivially (n² is never negative, and n itself is ≤0). If n ≥ 1, then multiplying both sides of n ≥ 1 by n (positive, so the inequality direction is preserved) gives n² ≥ n directly. These two cases (n≤0 and n≥1) cover every integer, so the claim holds everywhere.
 
-An EXISTENCE PROOF establishes ∃x P(x). A CONSTRUCTIVE existence proof exhibits an actual x and verifies P(x) holds for it. A NON-CONSTRUCTIVE existence proof establishes that such an x must exist without ever producing one explicitly — often via proof by contradiction (assume none exists, derive an absurdity). A UNIQUENESS PROOF, needed when a claim says "there is exactly one x with property P," requires proving BOTH existence (some x works) AND uniqueness (if x and y both work, then x = y) as two separate parts.
+An EXISTENCE PROOF establishes ∃x P(x). A CONSTRUCTIVE existence proof exhibits an actual x and verifies P(x) holds for it. A NON-CONSTRUCTIVE existence proof establishes that such an x must exist without ever producing one explicitly — often via proof by contradiction (assume none exists, derive an absurdity). A UNIQUENESS PROOF, needed when a claim says "there is exactly one x with property P," requires proving both existence (some x works) AND uniqueness (if x and y both work, then x = y) as two separate parts.
 
 A single COUNTEREXAMPLE is enough to disprove a universally-quantified claim ∀x P(x): since the claim asserts P(a) for every a, exhibiting one specific a with P(a) false is a direct and complete refutation — no further argument is needed. This is exactly the technique used twice already in this chapter (against ∀-over-∨ distribution, and against the ∀∃/∃∀ converse) and is often the fastest way to eliminate a wrong option on the exam.
 
@@ -408,7 +408,7 @@ Let a = "A is a knight" and b = "B is a knight" (each is either true or false, s
 
 Case a = TRUE (A is a knight): then A's statement must be TRUE (knights only tell the truth), so ¬a∨b must be true; since a is true, ¬a is false, forcing b to be true to make the disjunction true. Check consistency: a=T is consistent with the requirement that a knight's statement be true, and it forces b=T. Consistent case found: A is a knight, B is a knight.
 
-Case a = FALSE (A is a knave): then A's statement must be FALSE (knaves only lie), so ¬a∨b must be false. A disjunction is false only when BOTH disjuncts are false: ¬a false means a is true — but this case assumed a is false. Contradiction. This case is impossible.
+Case a = FALSE (A is a knave): then A's statement must be FALSE (knaves only lie), so ¬a∨b must be false. A disjunction is false only when both disjuncts are false: ¬a false means a is true — but this case assumed a is false. Contradiction. This case is impossible.
 
 Only the first case survives: A is a knight, and B is a knight.
 
@@ -451,7 +451,7 @@ WORKED PROBLEMS
 8. KNIGHTS AND KNAVES. B says: "A and I are of different types." What can be determined about A and B?
    Let a="A is a knight", b="B is a knight". B's statement in symbols is a⊕b (different types means their knight/knave statuses differ, i.e. XOR).
    Case b=TRUE (B is a knight, statement must be true): a⊕b=T with b=T requires a=F. So a=F, b=T is consistent (a knight, B, truthfully says they're different, and indeed A is a knave while B is a knight).
-   Case b=FALSE (B is a knave, statement must be false): a⊕b=F with b=F requires a=F. Check: a=F, b=F means both are knaves — but then B's statement "we are different" is indeed false (matching the requirement that a knave's statement is false, since they're actually the same, both knaves) — so a=F,b=F is ALSO internally consistent.
+   Case b=FALSE (B is a knave, statement must be false): a⊕b=F with b=F requires a=F. Check: a=F, b=F means both are knaves — but then B's statement "we are different" is indeed false (matching the requirement that a knave's statement is false, since they're actually the same, both knaves) — so a=F,b=F is also internally consistent.
    Two consistent solutions survive: either (A is a knave, B is a knight) or (A is a knave, B is a knave) — in both, A is unavoidably a knave, but B's type cannot be determined from this single statement alone. This is worth noting as its own lesson: not every knights-and-knaves puzzle pins down every person: some genuinely leave one person's type undetermined, and correctly recognising that ("B could be either") is the right answer, not a sign of an error in the working.
 
 CARRYING THIS FORWARD

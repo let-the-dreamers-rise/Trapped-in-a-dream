@@ -148,7 +148,7 @@ If the array starts at address base, then element a[i] starts at address base + 
 
 address(a[i]) = base + i · sizeof(element)
 
-WHY a[i] IS *(a+i) IS i[a]
+Why a[i] IS *(a+i) IS i[a]
 
 Once you know that an array name, in almost every expression, decays into a pointer to its first element (the exception list is next), the indexing notation a[i] is not a separate piece of syntax the language had to invent — it is defined purely in terms of pointer arithmetic and dereference, both of which you already have.
 
@@ -272,7 +272,7 @@ a[i], correspondingly, is *(a + i): dereferencing that row-pointer, which yields
 4. *(a + i) + j steps j elements into that row.
 5. The outer * dereferences to fetch the actual int at a[i][j].
 
-This chain of types is exactly why int **p cannot be used as a stand-in for a genuine 2D array int a[R][C]. int** is a pointer to a pointer to int: it holds one address, and following it once gives you another single address, which you follow again to reach one int. Nowhere in that chain is there a block of C contiguous ints that (*(p+i)) would step through — a[i] for a real 2D array is a whole row you can then index with [j] using ordinary pointer arithmetic within that row, but *p for an int** is a single pointer variable, not a row, and adding j to it steps by individual ints from wherever THAT pointer happens to point, which need not have any relationship to any other row at all.
+This chain of types is exactly why int **p cannot be used as a stand-in for a genuine 2D array int a[R][C]. int** is a pointer to a pointer to int: it holds one address, and following it once gives you another single address, which you follow again to reach one int. Nowhere in that chain is there a block of C contiguous ints that (*(p+i)) would step through — a[i] for a real 2D array is a whole row you can then index with [j] using ordinary pointer arithmetic within that row, but *p for an int** is a single pointer variable, not a row, and adding j to it steps by individual ints from wherever that pointer happens to point, which need not have any relationship to any other row at all.
 
 Concretely: int a[3][4]; genuinely is one contiguous block of 12 ints, and a[1][2] is found by arithmetic alone, with no memory access needed to find out where row 1 begins (it is always exactly 4 ints after row 0 begins). int **p, by contrast, requires actually reading the memory at p to find out where the first row is, then reading that row's own pointer arithmetic — there is no guarantee the rows referenced by different pointers are contiguous, or even that they are the same length. This is precisely the setup used when a 2D array is allocated dynamically as an array of separately malloc'd rows, covered fully below — that structure behaves somewhat like a 2D array through double indexing, but it is genuinely a different memory layout, with an extra layer of pointers and an extra memory access on every lookup.
 
@@ -460,7 +460,7 @@ THE CLASSIC OUTPUT-PREDICTION TRAPS
 
 A handful of expression shapes recur across nearly every "what does this print" question in this topic, and each one is resolved by the same discipline: work out precedence and evaluation order explicitly, never by the shape the expression "looks like" it should mean.
 
-*p++ versus (*p)++ versus *++p. Postfix ++ binds tighter than unary *, so *p++ parses as *(p++): p++ as a whole expression evaluates to p's OLD value (that is what postfix increment returns), and it is that old value that gets dereferenced — meanwhile, as a side effect, p itself is advanced to point one element further along. Net effect: you read the CURRENT element and move the pointer forward for next time, in one statement. (*p)++, by contrast, uses explicit parentheses to force the dereference first: it fetches the current pointed-to VALUE and increments that value in place — the pointer p itself never moves. *++p reads differently again: prefix ++ increments p FIRST (moving the pointer to the next element before anything else happens), and only then is the new location dereferenced — so this both advances the pointer and reads the NEW element it now points to, never the one it started on.
+*p++ versus (*p)++ versus *++p. Postfix ++ binds tighter than unary *, so *p++ parses as *(p++): p++ as a whole expression evaluates to p's OLD value (that is what postfix increment returns), and it is that old value that gets dereferenced — meanwhile, as a side effect, p itself is advanced to point one element further along. Net effect: you read the current element and move the pointer forward for next time, in one statement. (*p)++, by contrast, uses explicit parentheses to force the dereference first: it fetches the current pointed-to VALUE and increments that value in place — the pointer p itself never moves. *++p reads differently again: prefix ++ increments p FIRST (moving the pointer to the next element before anything else happens), and only then is the new location dereferenced — so this both advances the pointer and reads the new element it now points to, never the one it started on.
 
 int a[] = {5, 10, 15}; int *p = a; (*p)++; p++; printf("%d %d", a[0], *p); traces as: (*p)++ increments a[0] in place (5 becomes 6; p still points at a[0]); p++ then moves p to a[1] (no value changes); the final printf reads a[0] (now 6) and *p (a[1], still 10) — output "6 10".
 
@@ -482,7 +482,7 @@ Each of these follows the exact shapes GATE uses. Work through every step; do no
 
 3. The *p++ family. int a[4] = {1, 2, 3, 4}; int *p = a; int x = *p++; int y = (*p)++; int z = *++p; printf("%d %d %d %d", x, y, z, a[1]);
    x = *p++: postfix binds tighter, so this reads *p (a[0] = 1) into x, THEN advances p to a[1]. x = 1; p now points at a[1] (value 2).
-   y = (*p)++: parentheses force dereference first — the CURRENT value at p (a[1] = 2) is read into y and then a[1] itself is incremented in place. y = 2; a[1] becomes 3; p is unchanged, still pointing at a[1].
+   y = (*p)++: parentheses force dereference first — the current value at p (a[1] = 2) is read into y and then a[1] itself is incremented in place. y = 2; a[1] becomes 3; p is unchanged, still pointing at a[1].
    z = *++p: prefix increments p first, moving it from a[1] to a[2] (value 3), and dereferences the new location. z = 3; p now points at a[2].
    Final values: x = 1, y = 2, z = 3, a[1] = 3 (updated by the (*p)++ step). Output: "1 2 3 3".
 

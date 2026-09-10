@@ -115,7 +115,7 @@ LITTLE-O AND LITTLE-OMEGA: STRICT BOUNDS
 
 O and Omega allow f and g to have the same growth rate (n = O(n) is true). Little-o and little-omega are their strict versions, ruling that out.
 
-f(n) = o(g(n)) if for EVERY positive constant c, there exists n0 such that f(n) < c * g(n) for all n >= n0.
+f(n) = o(g(n)) if for every positive constant c, there exists n0 such that f(n) < c * g(n) for all n >= n0.
 
 The difference from Big-O is the quantifier on c: Big-O says "some c works"; little-o says "every c works, however small". That is only possible if f becomes vanishingly small relative to g, i.e. the ratio f(n)/g(n) tends to 0.
 
@@ -133,7 +133,7 @@ Theta iff both O and Omega. This is the definition of Theta restated, but it is 
 
 f = O(g) if and only if g = Omega(f). This is called transpose symmetry. Proof: if f(n) <= c*g(n) for all n >= n0 (the O statement), divide by c to get g(n) >= (1/c)*f(n) for all n >= n0 — this is exactly the Omega statement for g in terms of f, with constant 1/c. The argument reverses cleanly, so the "if and only if" holds both ways.
 
-f = Theta(g) if and only if g = Theta(f). Symmetry holds for Theta, and ONLY for Theta among the three non-strict notations. Proof: Theta's definition (c1*g <= f <= c2*g) is symmetric in f and g up to relabelling the constants (divide through by c1 and c2 to get bounds on g in terms of f), so it goes both ways.
+f = Theta(g) if and only if g = Theta(f). Symmetry holds for Theta, and only for Theta among the three non-strict notations. Proof: Theta's definition (c1*g <= f <= c2*g) is symmetric in f and g up to relabelling the constants (divide through by c1 and c2 to get bounds on g in terms of f), so it goes both ways.
 
 GATE TRAP: Symmetry does NOT hold for O or Omega individually. n = O(n^2) is true, but n^2 = O(n) is false (shown above by contradiction). So "f = O(g)" tells you nothing about whether "g = O(f)" — only Theta gives you the statement back in reverse.
 
@@ -223,7 +223,7 @@ log(f(n)) = log(n^(log log n)) = (log log n)*(log n) = (log x)*x.
 
 log(g(n)) = log((log n)^(log n)) = (log n)*(log(log n)) = x*(log x).
 
-These are the identical expression, x*(log x), written in a different order. So log(f(n)) = log(g(n)) EXACTLY, for every n — meaning f(n) and g(n) are not just comparable, they are actually equal (n^(log log n) = (log n)^(log n) as functions, given consistent bases throughout). Taking logs revealed an equality that was not at all obvious from the original forms.
+These are the identical expression, x*(log x), written in a different order. So log(f(n)) = log(g(n)) exactly, for every n — meaning f(n) and g(n) are not just comparable, they are actually equal (n^(log log n) = (log n)^(log n) as functions, given consistent bases throughout). Taking logs revealed an equality that was not at all obvious from the original forms.
 
 Compare f(n) = 2^n and g(n) = n^(log n) (again log base 2 throughout). Take logs: log(f(n)) = n. log(g(n)) = (log n)*(log n) = (log n)^2. Now compare n against (log n)^2 using the polylog-versus-polynomial fact (with eps = 1, k = 2): n grows faster than (log n)^2. So log(f(n)) eventually exceeds log(g(n)) by an unbounded margin, which means f(n) = 2^n eventually exceeds g(n) = n^(log n) by an ever-widening multiplicative gap: n^(log n) = o(2^n).
 
@@ -243,7 +243,7 @@ The geometric sum: sum from i=0 to n-1 of r^i, for a constant ratio r != 1. Mult
 
 sum(r^i, i=0..n-1) = (r^n - 1) / (r - 1)
 
-Two cases behave very differently. If r < 1 (e.g. r = 1/2), r^n tends to 0 as n grows, so the sum tends to the constant 1/(1-r) — the FIRST term (or rather the limiting total) dominates, and the whole sum is Theta(1), independent of n. If r > 1 (e.g. r = 2), r^n dominates the "-1", so the sum is Theta(r^n) — the LAST term dominates, since it alone is already almost as big as the whole sum (the last term is r^(n-1), and the sum is at most r/(r-1) times that).
+Two cases behave very differently. If r < 1 (e.g. r = 1/2), r^n tends to 0 as n grows, so the sum tends to the constant 1/(1-r) — the FIRST term (or rather the limiting total) dominates, and the whole sum is Theta(1), independent of n. If r > 1 (e.g. r = 2), r^n dominates the "-1", so the sum is Theta(r^n) — the last term dominates, since it alone is already almost as big as the whole sum (the last term is r^(n-1), and the sum is at most r/(r-1) times that).
 
 The harmonic sum: H_n = sum from i=1 to n of 1/i. This is Theta(log n), shown by grouping terms into blocks whose sizes double: (1) + (1/2) + (1/3 + 1/4) + (1/5+1/6+1/7+1/8) + ... Each block from 1/2^k+1 up to 1/2^(k+1) has 2^k terms, each at least 1/2^(k+1) and at most 1/2^k. So each block sums to between 1/2 and 1. There are log_2 n such blocks up to n, so the total is between (1/2)*log_2 n and log_2 n — sandwiched, giving H_n = Theta(log n).
 
@@ -281,7 +281,7 @@ Loop counting always follows the same method: identify what changes each iterati
 
 (e) for (i = 2; i <= n; i = i*i) { ... } — i takes the values 2, 4, 16, 256, ..., i.e. i = 2^(2^k) after k iterations. The loop stops once 2^(2^k) > n, i.e. 2^k > log_2 n, i.e. k > log_2(log_2 n). So the loop runs Theta(log log n) times — one exponent lower than pattern (a), because squaring i is a far more aggressive way to grow than doubling it.
 
-(f) for (i = 1; i <= n; i = 2*i) { for (j = 0; j < i; j++) { count++; } } — the outer variable takes the O(log n) values 1, 2, 4, ..., up to the largest power of 2 not exceeding n, and for EACH such value the inner loop contributes exactly that value to count. So count = 1 + 2 + 4 + ... + 2^k where 2^k <= n < 2^(k+1). This is a geometric sum with ratio 2 > 1, so it is dominated by its last term: the sum equals 2^(k+1) - 1, and since 2^k = Theta(n), the total is Theta(n) — a linear count, even though there is a doubling loop inside a loop, because the geometric sum collapses to be comparable to its single largest term.
+(f) for (i = 1; i <= n; i = 2*i) { for (j = 0; j < i; j++) { count++; } } — the outer variable takes the O(log n) values 1, 2, 4, ..., up to the largest power of 2 not exceeding n, and for each such value the inner loop contributes exactly that value to count. So count = 1 + 2 + 4 + ... + 2^k where 2^k <= n < 2^(k+1). This is a geometric sum with ratio 2 > 1, so it is dominated by its last term: the sum equals 2^(k+1) - 1, and since 2^k = Theta(n), the total is Theta(n) — a linear count, even though there is a doubling loop inside a loop, because the geometric sum collapses to be comparable to its single largest term.
 
 (g) for (i = 1; i <= n; i++) { for (j = 1; j <= i; j = j*2) { count++; } } — for each fixed i, the inner loop doubles j starting from 1 while j <= i, running floor(log_2 i) + 1 times (pattern (a) applied with n replaced by i). The total count is sum from i=1 to n of (floor(log_2 i) + 1), which is Theta(n log n): each term is Theta(log i), and summing Theta(log i) for i from 1 to n gives the same order as summing log(i) itself, which was shown above to be Theta(n log n).
 
@@ -342,7 +342,7 @@ A recursion tree draws the unrolling above as an actual tree: the root is the or
 
 For T(n) = 2T(n/2) + n: the root does n work and has 2 children, each of size n/2, each doing n/2 work — level 1 totals 2*(n/2) = n. Level 2 has 4 nodes of size n/4, each doing n/4 work, totaling 4*(n/4) = n. Every level, by the same pattern, totals exactly n, because doubling the number of nodes exactly compensates for halving each node's individual work. The tree has depth log_2(n) (halving n that many times reaches the base case 1), so there are Theta(log n) levels, each contributing n, giving total Theta(n log n) — matching the substitution-method answer derived earlier by a different route.
 
-Now the harder case: T(n) = T(n/3) + T(2n/3) + n, T(1) = 1. Here the two children of each node are DIFFERENT sizes — one branch shrinks to a third of its parent, the other to two-thirds — so the tree is unbalanced, and it is not obvious the "each level sums to n" pattern still holds. Check it directly: a node of size m does m work and splits into children of size m/3 and 2m/3. Those children's sizes add up to m/3 + 2m/3 = m exactly — none of the "problem size" is lost or duplicated in the split. Since every node's work equals its own size, and children's sizes always sum to the parent's size, EVERY level of the tree — however unevenly divided among its nodes — sums to exactly n, the same total as the root.
+Now the harder case: T(n) = T(n/3) + T(2n/3) + n, T(1) = 1. Here the two children of each node are different sizes — one branch shrinks to a third of its parent, the other to two-thirds — so the tree is unbalanced, and it is not obvious the "each level sums to n" pattern still holds. Check it directly: a node of size m does m work and splits into children of size m/3 and 2m/3. Those children's sizes add up to m/3 + 2m/3 = m exactly — none of the "problem size" is lost or duplicated in the split. Since every node's work equals its own size, and children's sizes always sum to the parent's size, every level of the tree — however unevenly divided among its nodes — sums to exactly n, the same total as the root.
 
 What differs from the balanced case is the depth. The tree is not uniform: some root-to-leaf paths are short, some are long.
 
@@ -397,7 +397,7 @@ GATE TRAP: Before applying any case, check ALL of its conditions — the exact f
 
 WHERE THE MASTER THEOREM GENUINELY RUNS OUT: n / log n
 
-T(n) = 2T(n/2) + n/log(n), T(1) = 1, sits in a deeper gap than the n*log(n) case above. Compare f(n) = n/log(n) to n^(log_2 2) = n: it is smaller than n, but only by a factor of log(n) — not by any n^eps factor, so Case 1 fails. It is also not of the extended Case 2 form n^1 * log^k(n) for a non-negative INTEGER k, because n/log(n) = n^1 * log^(-1)(n) has a NEGATIVE exponent on the log factor. None of the theorem's cases, basic or extended, apply.
+T(n) = 2T(n/2) + n/log(n), T(1) = 1, sits in a deeper gap than the n*log(n) case above. Compare f(n) = n/log(n) to n^(log_2 2) = n: it is smaller than n, but only by a factor of log(n) — not by any n^eps factor, so Case 1 fails. It is also not of the extended Case 2 form n^1 * log^k(n) for a non-negative INTEGER k, because n/log(n) = n^1 * log^(-1)(n) has a negative exponent on the log factor. None of the theorem's cases, basic or extended, apply.
 
 A recursion tree resolves it directly. At depth i there are 2^i subproblems, each of size n/2^i, each contributing (n/2^i) / log(n/2^i) work. The total at level i is 2^i * (n/2^i) / log(n/2^i) = n / log(n/2^i) = n / (log(n) - i). Summing over i = 0 up to log(n) - 1 (the tree's depth):
 
@@ -467,7 +467,7 @@ AMORTIZED ANALYSIS
 
 Some data structures have one kind of operation that is usually cheap but occasionally very expensive — and the worst-case cost of that one operation, quoted alone, badly overstates how expensive a long SEQUENCE of such operations actually is on average. Amortized analysis answers: what is the average cost per operation, over any sequence of n operations, guaranteed (not merely expected, and with no probability involved at all)? There are three standard techniques.
 
-The aggregate method bounds the TOTAL cost of any sequence of n operations directly, then divides by n to get the amortized cost per operation. It requires finding a global argument for why the total cannot be too large, even though individual operations can be expensive.
+The aggregate method bounds the total cost of any sequence of n operations directly, then divides by n to get the amortized cost per operation. It requires finding a global argument for why the total cannot be too large, even though individual operations can be expensive.
 
 The dynamic array doubling problem is the canonical example. An array starts at some small capacity and, whenever a push exceeds its current capacity, the whole array is doubled in size (a new array of twice the capacity is allocated and every existing element is copied over) before the new element is inserted. A single doubling push, on an array of current size n, costs Theta(n) to copy everything — looks expensive. But consider n pushes starting from an empty array: doublings happen when the array holds 1, 2, 4, 8, ..., elements — Theta(log n) doublings — and the copying costs at each are 1, 2, 4, ..., roughly n/2 (each doubling copies the array's current size). Summing these copying costs is a geometric series with ratio 2, dominated by its last term: 1+2+4+...+n/2 < n. Adding the n ordinary O(1) pushes themselves, the total cost of n pushes is O(n) + O(n) = O(n), so the amortized cost per push is O(n)/n = O(1) — constant, even though any single push can individually cost Theta(n).
 
@@ -475,7 +475,7 @@ The accounting method assigns each operation an AMORTIZED CHARGE that may be mor
 
 The potential method defines a single number — the potential function Phi, computed from the data structure's current state — that captures "stored-up energy" available to pay for future expensive operations. The amortized cost of an operation is defined as its actual cost plus the CHANGE in potential it causes: amortized cost = actual cost + Phi(after) - Phi(before). For dynamic array doubling, a natural potential is Phi = 2*(number of elements) - (current capacity), which is 0 right after a doubling and grows back up to (capacity) just before the next one. An ordinary push increases the element count by 1 (raising Phi by 2) at an actual cost of 1, giving amortized cost 1 + 2 = 3. A doubling push has actual cost Theta(current size) for copying, but it also resets Phi from a large value back down near 0, and that big DROP in potential exactly cancels the copying cost in the amortized-cost formula, leaving an O(1) amortized cost again — matching both other methods.
 
-The binary counter is the second classic amortized example. Incrementing a binary counter by 1 flips some trailing sequence of 1-bits to 0 and then flips the next 0-bit to 1 — potentially many bit-flips for one increment (incrementing 0111 to 1000 flips all 4 bits). But summed over a sequence of n increments starting from 0, bit 0 flips on EVERY increment (n times), bit 1 flips on every SECOND increment (n/2 times), bit i flips once every 2^i increments (n/2^i times). Total flips = sum from i=0 upward of n/2^i, a geometric series with ratio 1/2, bounded above by 2n. So n increments cost O(n) total bit-flips, an amortized O(1) flips per increment — exactly mirroring the dynamic array's argument, with "bit i flipping" playing the role of "an element being copied".
+The binary counter is the second classic amortized example. Incrementing a binary counter by 1 flips some trailing sequence of 1-bits to 0 and then flips the next 0-bit to 1 — potentially many bit-flips for one increment (incrementing 0111 to 1000 flips all 4 bits). But summed over a sequence of n increments starting from 0, bit 0 flips on every increment (n times), bit 1 flips on every second increment (n/2 times), bit i flips once every 2^i increments (n/2^i times). Total flips = sum from i=0 upward of n/2^i, a geometric series with ratio 1/2, bounded above by 2n. So n increments cost O(n) total bit-flips, an amortized O(1) flips per increment — exactly mirroring the dynamic array's argument, with "bit i flipping" playing the role of "an element being copied".
 
 KEY: Amortized analysis is a guarantee about a SEQUENCE, not about any one operation. A single multipop or a single array doubling or a single carry-cascading increment can cost Theta(n) in isolation — that is still its true worst-case cost as one operation — but no sequence of n such operations can cost more than O(n) TOTAL, so the amortized cost per operation, over any sequence, is O(1). "Worst case per operation" and "amortized cost per operation" answer different questions and can have different answers for the same data structure.
 
@@ -498,7 +498,7 @@ a=8, b=2, n^(log_2 8)=n^3. f(n)=n^2=O(n^(3-1)), polynomially smaller with eps=1 
 a=4, b=2, n^(log_2 4)=n^2. f(n)=n^2*log(n)=Theta(n^2 * log^1 n) — extended Case 2 with k=1. T(n) = Theta(n^2 * log^2 n).
 
 5. Solve T(n) = 5T(n/2) + n^2 by the Master theorem, verifying the regularity condition explicitly.
-a=5, b=2, n^(log_2 5) is n^2.322 approximately. f(n)=n^2 is polynomially SMALLER (2 < 2.322, eps ~= 0.322) — this is Case 1, not Case 3 (n^2 does not dominate n^(log_2 5); n^(log_2 5) dominates n^2), so no regularity check is even required here — Case 1 needs only the polynomial-smaller condition. T(n) = Theta(n^(log_2 5)), about Theta(n^2.322).
+a=5, b=2, n^(log_2 5) is n^2.322 approximately. f(n)=n^2 is polynomially smaller (2 < 2.322, eps ~= 0.322) — this is Case 1, not Case 3 (n^2 does not dominate n^(log_2 5); n^(log_2 5) dominates n^2), so no regularity check is even required here — Case 1 needs only the polynomial-smaller condition. T(n) = Theta(n^(log_2 5)), about Theta(n^2.322).
 
 6. Solve T(n) = 2T(n/2) + n^2 by the Master theorem.
 a=2, b=2, n^(log_2 2)=n. f(n)=n^2 is polynomially larger than n (eps=1). Regularity: a*f(n/b) = 2*(n/2)^2 = n^2/2 = 0.5*f(n) <= c*f(n) with c=0.5<1, holds. Case 3. T(n) = Theta(n^2).
@@ -512,7 +512,7 @@ a=3, b=9, n^(log_9 3) = n^(1/2) = sqrt(n) (since log_9 3 = 1/2, as 9^(1/2)=3). f
 
 9. Solve T(n) = 2T(sqrt(n)) + 1, T(2) = 1, by a change of variables.
 Let n = 2^m, S(m) = T(2^m). T(sqrt(n)) = T(2^(m/2)) = S(m/2). The recurrence becomes S(m) = 2*S(m/2) + 1. Master theorem on S: a=2, b=2, m^(log_2 2)=m. f(m)=1=O(m^(1-eps)) — Case 1. S(m) = Theta(m). Substitute back: T(n) = S(log_2 n) = Theta(log n).
-(Contrast this with T(n) = T(sqrt(n)) + 1, only ONE recursive call rather than two, which instead gives Theta(log log n) as derived earlier — the extra recursive call here changes Case behaviour entirely, from Case 2/log-log to a plain Case 1/log answer.)
+(Contrast this with T(n) = T(sqrt(n)) + 1, only one recursive call rather than two, which instead gives Theta(log log n) as derived earlier — the extra recursive call here changes Case behaviour entirely, from Case 2/log-log to a plain Case 1/log answer.)
 
 10. For n = 6, trace count = 0; for (i=1; i<=n; i++) for (j=1; j<=i; j=j*2) count++; and give the exact value, then state its asymptotic order.
 i=1: j=1 only (1<=1, next j=2>1 stops) — 1 iteration.
@@ -524,7 +524,7 @@ i=6: j=1,2,4 (next j=8>6 stops) — 3 iterations.
 Total: 1+2+2+3+3+3 = 14. This matches the general pattern (g) derived earlier, sum of floor(log_2 i)+1 for i=1..n, which is Theta(n log n) — 14 is the small, exact value at n=6, not to be confused with the asymptotic shape.
 
 11. A stack starts empty and undergoes n operations, each either a push or a multipop(k) (which pops min(k, current size) elements). Using the aggregate method, find the tight amortized cost per operation.
-Every element can be popped at most once for each time it was pushed, so across the entire sequence, the total number of pop operations performed by ALL multipops combined is at most the total number of pushes, which is at most n. So total work (pushes plus all pops, across the whole sequence) is at most n (pushes) + n (pops) = O(n), even though a single multipop can individually cost Theta(n) by popping the whole stack at once. Dividing total O(n) work by n operations gives an amortized cost of O(1) per operation.
+Every element can be popped at most once for each time it was pushed, so across the entire sequence, the total number of pop operations performed by all multipops combined is at most the total number of pushes, which is at most n. So total work (pushes plus all pops, across the whole sequence) is at most n (pushes) + n (pops) = O(n), even though a single multipop can individually cost Theta(n) by popping the whole stack at once. Dividing total O(n) work by n operations gives an amortized cost of O(1) per operation.
 
 12. A binary counter starts at 0 and is incremented 8 times, reaching binary 1000 (decimal 8). Count the total number of bit flips across all 8 increments.
 Simulate: 0000->0001 (1 flip), 0001->0010 (2), 0010->0011 (1), 0011->0100 (3), 0100->0101 (1), 0101->0110 (2), 0110->0111 (1), 0111->1000 (4). Total = 1+2+1+3+1+2+1+4 = 15.
