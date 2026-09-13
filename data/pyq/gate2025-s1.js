@@ -135,7 +135,7 @@ window.GATE_DATA.pyq.push({
       options: ["2^21","2^20","2^22","2^24"],
       answer: 0,
       marks: 1,
-      explanation: "With a 32-bit logical address and a page size of 2048 = 2^11 bytes, the number of pages (page table entries) is 2^32 / 2^11 = 2^21."
+      explanation: "1. The page table needs one entry for every possible page in the logical address space, so first find how many distinct pages that space is divided into. 2. The total logical address space size is determined by the address width: 32-bit logical addresses can address 2^32 distinct byte locations. 3. The page size is 2048 bytes = 2^11 bytes, and since the memory is byte-addressable, the low-order 11 bits of every logical address are the in-page offset, leaving the remaining bits to number the pages themselves. 4. The number of pages = (size of address space) / (page size) = 2^32 / 2^11 = 2^(32-11) = 2^21. 5. Since the (20-bit) physical address size only affects how large each page FRAME's physical location can be, not how many logical pages exist, it plays no role in this count — the maximum number of page table entries is 2^21."
     },
     {
       id: "gate2025s1-cs-15",
@@ -297,7 +297,7 @@ window.GATE_DATA.pyq.push({
       tolerance: 0.01,
       kind: "nat",
       marks: 1,
-      explanation: "Each I/O operation (the one scanf plus the 20 printf calls inside the loop) causes the process to leave and later re-enter the ready queue, giving 1 + 20 = 21 re-entries into the ready queue."
+      explanation: "1. Identify every I/O-related operation in the program, since the question states a context switch (and hence a trip out of and back into the ready queue) happens on every I/O request and every I/O completion. The program has: one scanf() call before the loop, and one printf() call inside the loop that repeats 20 times (i=0 to 19). That is 1 + 20 = 21 I/O operations in total. 2. Trace what happens around each I/O operation: when the process issues scanf (or printf), it requests I/O and is moved out of Running into the I/O/blocked queue (a context switch away from it); once that I/O completes, the process is moved from the blocked queue back into the READY queue (another context switch, and this is the event being counted) before eventually being scheduled to run again. 3. So each of the 21 I/O operations produces exactly one 're-entry into the ready queue' (the moment it comes back from I/O), and the problem explicitly says not to count the very first time the process enters the ready queue when the program starts running (i.e. before it has done any I/O at all). 4. Total ready-queue re-entries = number of I/O operations = 1 (scanf) + 20 (printf calls) = 21."
     },
     {
       id: "gate2025s1-cs-30",
@@ -399,7 +399,7 @@ window.GATE_DATA.pyq.push({
       options: ["9.00","8.75","6.50","7.50"],
       answer: 0,
       marks: 2,
-      explanation: "At t=0, P1 (top priority on M1) runs on M1 and P2 (top priority on M2) runs on M2. When P2 finishes at t=16, P3 (M2’s next priority) starts on M2. When P1 finishes at t=20, the only remaining process P4 starts on M1. Waiting times are 0, 0, 16, 20 for P1–P4, averaging (0+0+16+20)/4 = 9.00 ms."
+      explanation: "1. At t=0, both processors are free and all four processes are waiting, so each processor independently picks its own highest-priority waiting process: M1's priority order is P1 > P3 > P2 > P4, so M1 picks P1 (burst 20); M2's priority order is P2 > P3 > P4 > P1, so M2 picks P2 (burst 16). Both P1 and P2 start immediately at t=0 with zero waiting time. The two remaining processes, P3 and P4, must wait since both processors are now busy. 2. The next event is whichever processor finishes first: M2's P2 finishes at t=0+16=16, while M1's P1 is still running (finishes at t=20). At t=16, M2 becomes free with P3 and P4 still waiting; checking M2's priority order (P2>P3>P4>P1), P3 outranks P4 for M2, so P3 is dispatched to M2 at t=16 (having waited 16-0=16 ms). 3. The next event is M1 finishing P1 at t=20. At this point, only P4 remains unscheduled (P3 is already running on M2), so P4 is dispatched to M1 at t=20 (having waited 20-0=20 ms) — there's no priority contention since P4 is the only process left. 4. Collect the four waiting times: P1=0 (started immediately), P2=0 (started immediately), P3=16 (waited from t=0 to t=16), P4=20 (waited from t=0 to t=20). 5. Average waiting time = (0+0+16+20)/4 = 36/4 = 9.00 ms."
     },
     {
       id: "gate2025s1-cs-39",
@@ -575,7 +575,7 @@ window.GATE_DATA.pyq.push({
       tolerance: 0.01,
       kind: "nat",
       marks: 2,
-      explanation: "This is a limited-lookahead variant of optimal replacement: on each fault the OS evicts, from among the resident pages, the one referenced farthest within the next 4-reference window (or not referenced at all in it). Simulating the given reference string with 3 frames under this rule produces 6 page faults."
+      explanation: "The rule: on a fault, look at the NEXT 4 references starting from (and including) the current one; among the resident pages, evict whichever one either doesn't appear in that 4-reference window at all, or appears farthest into the future within it. Reference string (1-indexed): 1,3,2,4,2,3,1,2,4,3,1,4 with 3 empty frames. 1. Ref#1 (page1): fault (frame empty). Frames={1}. 2. Ref#2 (page3): fault. Frames={1,3}. 3. Ref#3 (page2): fault, frames now full: Frames={1,3,2}. 4. Ref#4 (page4): fault — need to evict. Look at the window starting here, refs #4-#7 = [4,2,3,1]: among the resident pages {1,3,2}, page1 next appears at #7, page3 at #6, page2 at #5 — all three appear in the window, so evict whichever is farthest away, which is page1 (at #7). Frames={3,2,4}. 5. Ref#5 (page2): hit (2 is resident) — no fault. 6. Ref#6 (page3): hit (3 is resident) — no fault. 7. Ref#7 (page1): fault (page1 was evicted) — need to evict from {3,2,4}. Window is refs #7-#10 = [1,2,4,3]: page3 next appears at #10, page2 at #8, page4 at #9 — all three appear, so evict the farthest, page3 (at #10). Frames={2,4,1}. 8. Ref#8 (page2): hit — no fault. 9. Ref#9 (page4): hit — no fault. 10. Ref#10 (page3): fault (page3 was evicted) — need to evict from {2,4,1}. Window is refs #10-#12 (only 3 refs remain: [3,1,4], since the string ends at #12) — checking the resident pages {2,4,1} against this remaining window: page1 appears at #11 and page4 appears at #12, but page2 does NOT appear anywhere in the rest of the string at all — since page2 is never needed again, it is evicted (the natural choice, just like true OPT would do for a page never used again). Frames={4,1,3}. 11. Ref#11 (page1): hit (1 is resident) — no fault. 12. Ref#12 (page4): hit (4 is resident) — no fault. Total faults occurred at references #1,2,3,4,7,10 — 6 page faults in total."
     },
     {
       id: "gate2025s1-cs-55",
