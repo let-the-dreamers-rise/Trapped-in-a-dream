@@ -173,6 +173,24 @@ The BRANCH PENALTY (in cycles) generally GROWS as a pipeline gets DEEPER (more s
 1. A branch resolving at stage j in a pipeline that fetches new instructions every cycle results in (j−1) WRONG-PATH (or simply not-yet-confirmed) instructions already having entered the pipeline by the time the branch's true outcome becomes known — a DEEPER pipeline (larger j, all else being equal) directly means MORE such instructions must potentially be FLUSHED on a misprediction, a LARGER penalty in cycles even though the UNDERLYING prediction logic and its accuracy have not changed at all.
 2. This is exactly why REAL high-performance, deeply-pipelined processors invest HEAVILY in sophisticated dynamic branch prediction (multi-bit counters, branch target buffers, and even more elaborate history-based predictors beyond the scope of this chapter) — the DEEPER the pipeline, the MORE cycles a single misprediction costs, and the MORE VALUABLE every fractional improvement in prediction accuracy becomes as a direct consequence.
 
+AMDAHL'S LAW: THE LIMIT IMPOSED BY THE UNENHANCED FRACTION
+
+Every speedup technique this chapter has covered — pipelining, superscalar/superpipelined execution, branch prediction — improves only PART of a program's execution, never all of it uniformly, and AMDAHL'S LAW quantifies exactly how much overall speedup is possible once that limitation is taken into account:
+
+Speedup = 1 / [(1−f) + f/s]
+
+where f is the FRACTION of the original execution time that the enhancement actually affects (and can therefore speed up), and s is the SPEEDUP FACTOR applied to that fraction specifically (how much faster that particular part runs once enhanced).
+
+1. The term (1−f) represents the UNENHANCED fraction of execution time, which runs at its ORIGINAL speed no matter how powerful the enhancement is — this unenhanced portion becomes an absolute FLOOR on total execution time that no amount of improving the enhanced portion can ever remove.
+2. AS s → ∞ (the enhanced portion becomes instantaneous, taking zero time), the formula's limiting value is Speedup → 1/(1−f) — this is the MAXIMUM possible speedup achievable from enhancing that specific fraction f, no matter how much faster s is pushed beyond that point; a question asking for "the theoretical maximum possible speedup" is asking for exactly this limiting value, not a speedup computed at some specific finite s.
+3. Amdahl's Law can be solved for ANY of its three quantities (f, s, or the overall speedup) given the other two, by ordinary algebraic rearrangement of the same formula — a question giving an OBSERVED overall speedup and asking "what fraction f was actually enhanced" (given a known s) is solved by substituting the known speedup and s into the formula and solving the resulting linear equation for f.
+
+GATE TRAP: computing "the maximum possible speedup" by plugging in some large but FINITE value of s (rather than taking the actual limit as s→∞, which gives 1/(1−f) directly) can produce a close but subtly WRONG numeric answer — always recognise "maximum possible speedup" as a request for the s→∞ limiting case specifically, solvable directly from f alone without needing any particular value of s at all.
+
+1. Worked example (Amdahl's Law, theoretical maximum, independently verified): a proposed enhancement can speed up 80% of a program's execution time (f=0.8) by an arbitrarily large factor. Find the theoretical maximum possible overall speedup. Using the limiting form 1/(1−f): 1/(1−0.8) = 1/0.2 = 5. No matter how large s is pushed, the overall speedup can never exceed 5, because the remaining unenhanced 20% of execution time is an absolute floor.
+
+2. Worked example (Amdahl's Law, solving for f, independently verified): an enhancement speeds up its targeted portion of a program by a factor of s=10, and the OBSERVED overall speedup is measured at 4. Find f, the fraction of execution time the enhancement actually affects. Substitute into the formula: 4 = 1/[(1−f)+f/10]. Take the reciprocal of both sides: 0.25 = (1−f)+f/10 = 1 − f + 0.1f = 1 − 0.9f. Solve: 0.9f = 1 − 0.25 = 0.75, so f = 0.75/0.9 = 5/6 ≈ 0.833 — approximately 83.3% of the program's original execution time was affected by the enhancement.
+
 WORKED PROBLEMS
 
 1. IDEAL SPEEDUP FOR A SMALL INSTRUCTION COUNT. A 4-stage pipeline processes only 6 instructions with no stalls. Compute the ideal speedup, and compare it to the theoretical maximum. Non-pipelined: 4×6=24 cycles. Pipelined: 4+6−1=9 cycles. Speedup: 24/9≈2.67 — noticeably BELOW the theoretical maximum of 4, since for such a SMALL n, the fixed fill/drain overhead (+3 cycles) represents a much LARGER fraction of the total pipelined time than it would for a large n, directly illustrating why the ideal speedup formula only APPROACHES k in the limit of a very long instruction stream.

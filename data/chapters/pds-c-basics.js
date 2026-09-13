@@ -381,6 +381,28 @@ Unspecified behaviour sits between the two: the standard allows more than one po
 
 KEY: Undefined behaviour promises nothing at all, not even a documented answer. Implementation-defined behaviour promises a fixed, documented answer, but different platforms may document different answers. Unspecified behaviour promises the computation is safe and every value is individually well defined, but does not commit to which of several allowed choices actually happened. When a question depends on any of these, look for a stated assumption before computing a specific number, and answer "undefined" honestly when none is given and the code genuinely depends on it.
 
+ENUMERATIONS
+
+An enum declares a set of named integer CONSTANTS. By default the first enumerator is 0, and each subsequent enumerator (with no explicit initializer of its own) is one MORE than the enumerator immediately before it — this "continue from the previous value" rule applies individually to each enumerator, not just to the very first one.
+
+enum Color { RED, GREEN = 5, BLUE };
+
+RED has no explicit initializer and is the first enumerator, so it takes the default starting value 0. GREEN is explicitly initialized to 5. BLUE has no explicit initializer, so it continues from the immediately PRECEDING enumerator's value (GREEN, which is 5), giving BLUE the value 5+1=6 — NOT 2 (which would be the case only if BLUE counted up from RED's default sequence, ignoring GREEN's explicit override entirely).
+
+KEY: an enumerator with no explicit initializer always takes "the immediately preceding enumerator's value, plus one" — this rule is applied locally, one enumerator at a time, and an explicit initializer anywhere in the list resets the counting baseline for every enumerator that follows it, regardless of what the earlier, unrelated enumerators' own values were.
+
+UNIONS AND TYPE REINTERPRETATION
+
+A union declares several members that all share the SAME memory location — unlike a struct, where every member gets its OWN separate storage, a union's total size is only as large as its LARGEST member, and writing to one member and then reading a DIFFERENT member reinterprets the same underlying bytes according to the second member's type, rather than converting the stored value.
+
+union U { int i; char c[4]; };
+
+Writing a value into u.i (assuming a 4-byte int) occupies the SAME 4 bytes that u.c[0] through u.c[3] also refer to — reading u.c[0] afterward returns whichever single BYTE of that stored int's representation happens to occupy the first byte position in memory, which depends directly on the machine's ENDIANNESS: on a LITTLE-ENDIAN machine, the LEAST significant byte of the int is stored FIRST (at the lowest address), so u.c[0] recovers the int's least-significant byte; on a BIG-ENDIAN machine, the MOST significant byte is stored first, so u.c[0] instead recovers the int's most-significant byte.
+
+GATE TRAP: assuming a specific endianness without the question stating one is a common error when reasoning about a union's byte-level reinterpretation — always check whether the question specifies little-endian or big-endian before determining which individual byte a char-array member of a union recovers from an int member's stored value; on the (very common in GATE) assumption of little-endian, the LOWEST-numbered array index recovers the LEAST significant byte, which is the opposite of what many students intuitively expect from reading the array left to right.
+
+1. Worked example (union byte reinterpretation, independently verified, assuming a little-endian machine and 4-byte int): given union U { int i; char c[4]; } u; and the assignment u.i = 258, find the value of u.c[0]. 258 in binary (as a 4-byte int) is 0x00000102 — in little-endian storage, the least significant byte (0x02) is stored at the lowest address, which is exactly where c[0] reads from. So u.c[0] = 2 (0x02).
+
 WORKED PROBLEMS
 
 Each of these traces every variable after every statement — do not skip a step, and do not accept a final answer that was not built this way.
