@@ -142,6 +142,61 @@ GATE TRAP: concluding a statement is "sufficient" merely because it provides SOM
 
 0. Worked example (analogy via a numeric-positional relationship, independently verified): "4 is to 16 as 5 is to ____?" The relationship in the first pair is squaring: 4²=16. Applying the identical relationship to the second pair: 5²=25. The answer is 25 — VERIFIED by confirming both pairs share the identical squaring relationship: 4→16 (4 squared) and 5→25 (5 squared), with no other simpler relationship (such as a fixed additive difference of 12, which fails to generalize consistently to other analogous number pairs of this same family) fitting the pattern as cleanly.
 
+CUBE PAINTING AND CUTTING PROBLEMS
+
+A cube (or cuboid) painted on its outer faces and cut into smaller unit cubes splits into fixed, countable classes based on how many painted faces each unit cube carries — the same underlying geometry as the painted-cube formulas covered in this book's Data Interpretation & Spatial Reasoning chapter, restated here because this reasoning family appears independently within the logical-reasoning question bank as well.
+
+1. For an n×n×n CUBE cut into unit cubes: CORNER cubes (3 painted faces) always number exactly 8; EDGE cubes (2 painted faces) number 12(n−2); FACE cubes (1 painted face) number 6(n−2)²; INTERIOR cubes (0 painted faces) number (n−2)³ — and all four counts sum exactly to n³, the total number of unit cubes, giving a built-in arithmetic check.
+2. For a CUBOID of dimensions l×b×h (not all equal), the SAME four categories exist but with adjusted formulas: corners are still always exactly 8; edges split across the three distinct edge-length groups as 4(l−2)+4(b−2)+4(h−2); faces split across the three distinct face-pair groups as 2(l−2)(b−2)+2(b−2)(h−2)+2(l−2)(h−2); interior is (l−2)(b−2)(h−2) — reducing to the cube formulas exactly when l=b=h=n.
+3. For "AT LEAST one face painted" questions, use the COMPLEMENT: (at least one painted) = (total unit cubes) − (fully interior, zero-painted cubes) = n³ − (n−2)³ for a cube — this is faster than summing the corner, edge, and face counts separately when only the "at least one" total is actually needed.
+4. For a MULTI-COLOUR painted cube (different colours on different, specified faces — for instance, opposite face-pairs painted in different colours), first identify the standard positional class (corner/edge/face/interior) of the unit cube being asked about, then separately determine which SPECIFIC colours meet at that unit cube's position based on which original faces it touches, since the colour composition depends on WHICH of the original faces contributed to that specific unit cube, not merely how many faces are painted.
+
+1. Worked example (cuboid face-count, independently verified): a cuboid measuring 4×3×3 units is painted on all outer faces and cut into 1-unit cubes. Find the number of unit cubes with exactly ONE painted face. Using the cuboid face formula with l=4, b=3, h=3: 2(l−2)(b−2) + 2(b−2)(h−2) + 2(l−2)(h−2) = 2(2)(1) + 2(1)(1) + 2(2)(1) = 4+2+4 = 10.
+
+2. Worked example (at-least-one-face complement, independently verified): a 6×6×6 cube is painted on all outer faces and cut into 216 unit cubes. Find the number of unit cubes with AT LEAST one painted face. Using the complement: total − fully interior = 6³ − (6−2)³ = 216 − 64 = 152.
+
+SYMBOLIC CODED FAMILY-RELATION CHAINS
+
+A hybrid question type combines CODING (each relationship is represented by an arbitrary symbol, not a plain English word) with BLOOD RELATIONS (the actual family-tree reasoning) — the technique is to first DECODE every symbol into its plain-English relationship, writing out the full chain in ordinary words, and only THEN apply the standard blood-relations family-tree-building technique from that section of this chapter.
+
+1. Read the symbol KEY given in the question first (for example, "P*Q means P is the father of Q", "P+Q means P is the mother of Q") and translate every symbolic statement in the puzzle into its plain-English equivalent before attempting any family-tree reasoning.
+2. Build the family tree exactly as in the ordinary Blood Relations section — draw each person as a node, and connect them with labelled parent/child/spouse relationships translated from the decoded symbols, tracking gender where the symbols specify it.
+3. Answer the actual question posed (e.g. "how is P related to R?") by tracing the completed, decoded tree exactly as in an ordinary (non-symbolic) blood-relations question — the symbolic layer is purely a decoding step, not a separate logical technique.
+
+1. Worked example (symbolic family-relation chain, independently verified): given P*Q means "P is the father of Q," and Q+R means "Q is the mother of R," how is P related to R? Decode first: P is the father of Q (so P is male, Q is P's child), and Q is the mother of R (so Q is female, R is Q's child). Since Q is P's child AND R is Q's child, R is P's grandchild, and since P is male, P is R's grandfather.
+
+RANKING AND COMPARISON CHAINS
+
+Some questions give several separate "taller than," "shorter than," "scored more than," or similar pairwise comparison clues among a group of people, and ask for one person's overall RANK or position once all clues are combined — the technique is to convert every clue into a single, unified ORDERING (a chain of inequalities), not to keep the clues as separate, unconnected facts.
+
+1. Convert every clue into a strict inequality between two named people (for example, "A is taller than B" becomes A > B in height).
+2. Chain the inequalities together into ONE single ordering by finding where each new clue's two people fit relative to people already placed in the chain — if a clue links two people neither of whom has been placed yet, hold it aside and revisit it once one of the two appears elsewhere in the chain.
+3. Once every person has been placed into a single consistent chain, read off the answer to whatever specific rank (tallest, second-shortest, etc.) the question asks for directly from the completed chain — do not re-derive it from the original clues each time if the unified chain has already been built.
+
+1. Worked example (ranking chain, independently verified): among five friends, A is taller than B, B is taller than C, D is taller than A, and C is taller than E. Who is the second-tallest? Chain the clues: D > A > B > C > E. Reading directly off this completed chain, D is tallest, and A is second-tallest.
+
+STATEMENT AND COURSES OF ACTION
+
+A distinct GATE-reasoning family from statement-and-conclusion SYLLOGISMS covered earlier in this chapter: here, a STATEMENT describes a problem or situation, followed by two suggested COURSES OF ACTION, and the question asks which course(s) of action logically FOLLOW as a reasonable, practical response — the judgment criterion is entirely different from a syllogism's strict logical validity test.
+
+1. A course of action "follows" if it is a PRACTICAL, DIRECT, and PROPORTIONATE response to the problem stated — not merely logically consistent with it (the syllogism criterion), and not an extreme, disproportionate, or only tangentially related response.
+2. REJECT a course of action that is too EXTREME or DISPROPORTIONATE relative to the scale of the stated problem (for example, "shut down the entire factory" as a response to "one machine reported a minor fault" fails this test, since the response is wildly out of proportion to the problem).
+3. REJECT a course of action that does not actually ADDRESS the specific problem stated, even if it sounds like generally sensible policy in the abstract — the action must respond to THIS stated problem specifically, not merely be good practice in general.
+4. Both courses of action can follow, neither can follow, or only one can follow — evaluate each course of action independently against the criteria above, exactly as with data-sufficiency's "evaluate each statement independently" discipline covered later in this chapter.
+
+1. Worked example (statement and courses of action, independently verified): Statement: "Several employees have complained that the office printer frequently runs out of toner without warning." Course of action I: "Install a toner-level monitoring system that alerts staff before the toner runs out." Course of action II: "Replace all office printers immediately with a different brand." Course I directly and proportionately addresses the stated problem (running out of toner without warning) — it follows. Course II is a disproportionate, extreme response to what is fundamentally a toner-monitoring problem, not a printer-hardware problem — it does not follow. The correct classification is "only course of action I follows."
+
+CIRCULAR PERMUTATIONS AND MULTI-DIE COUNTING
+
+Two counting techniques from combinatorics recur within the logical-reasoning question bank specifically (in addition to their coverage in the Quantitative Aptitude chapter's permutations section, which covers only LINEAR arrangements).
+
+1. CIRCULAR PERMUTATIONS: the number of distinct ways to arrange n distinct people or objects around a CIRCLE is (n−1)!, not n! — this is because, unlike a linear row where each rotation of the same relative order produces a genuinely different-looking arrangement, rotating everyone around a circle by one position produces a visually IDENTICAL arrangement (relative order preserved), so all n of the equivalent rotations of any single circular arrangement must be counted only ONCE, dividing the naive n! by n to give (n−1)!.
+2. MULTIPLE-DICE SUM COUNTING: for THREE standard six-sided dice rolled together, the number of ways to obtain a specific target sum is found by systematically counting every ordered triple (d1, d2, d3) with each die between 1 and 6 that sums to the target — for sums far from the extremes (3 or 18), this is typically done by fixing the first die's value and counting the number of ways the remaining two dice can sum to (target − first die's value), then summing across all valid values of the first die.
+
+1. Worked example (circular permutation, independently verified): in how many distinct ways can 6 people be seated around a circular table? Using (n−1)! with n=6: (6−1)! = 5! = 120.
+
+2. Worked example (three-dice sum counting, independently verified): in how many ways can three standard dice show a sum of 10? Fix the first die's value from 1 to 6, and count ways the remaining two dice sum to (10 − first die). First die=1: need sum 9 from two dice, giving 4 ways (3,6),(4,5),(5,4),(6,3). First die=2: need sum 8, giving 5 ways. First die=3: need sum 7, giving 6 ways. First die=4: need sum 6, giving 5 ways. First die=5: need sum 5, giving 4 ways. First die=6: need sum 4, giving 3 ways. Total = 4+5+6+5+4+3 = 27 ways.
+
 WORKED PROBLEMS: FULL SYNTHESIS
 
 1. COMBINED SERIES-AND-CODING REASONING. In a certain code, the word "TIGER" is written as "UJHFS" (each letter shifted forward by exactly one position in the alphabet). Using the SAME uniform-shift scheme, decode the word "MJOF" back to its original word. Since the shift used to ENCODE moves each letter FORWARD by one position, decoding requires moving each letter of the coded word BACKWARD by one position. M→L, J→I, O→N, F→E, giving the decoded word LINE. VERIFIED by re-encoding LINE with the SAME forward-by-one shift: L→M, I→J, N→O, E→F, exactly reproducing the original coded word MJOF, confirming both the shift amount and its direction were correctly identified.
