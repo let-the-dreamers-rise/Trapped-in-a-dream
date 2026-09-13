@@ -28,6 +28,22 @@ A parser's job is to take the TOKEN stream a lexer produces (this book's own pre
 
 [[FIG:topdown-vs-bottomup]]
 
+CLASSIFYING A GRAMMAR BY THE CHOMSKY HIERARCHY
+
+Before a grammar is even prepared for parsing, it belongs to one of four classes in the CHOMSKY HIERARCHY, based purely on the SHAPE its productions are restricted to — a classification worth stating explicitly here since it comes up when a question asks not "how do we parse this" but "how expressive/restrictive is this grammar to begin with."
+
+1. TYPE 0 (UNRESTRICTED): productions of the form α → β, with NO restriction at all on the left or right-hand side (α can be any nonempty string of terminals and nonterminals) — the most general class, corresponding to recursively enumerable languages, recognized by an unrestricted Turing machine.
+2. TYPE 1 (CONTEXT-SENSITIVE): productions of the form α → β where |β| ≥ |α| (the right-hand side is NEVER shorter than the left-hand side — a NONCONTRACTING grammar) — corresponding to context-sensitive languages, recognized by a linear-bounded automaton.
+3. TYPE 2 (CONTEXT-FREE): productions of the form A → β, where the LEFT-hand side is a SINGLE nonterminal (no context/surrounding symbols required on the left at all) — corresponding to context-free languages, recognized by a pushdown automaton; this is the class every parsing technique in the rest of this chapter (LL, SLR, LALR, LR) is built to handle.
+4. TYPE 3 (REGULAR): productions restricted further still, to the form A → aB or A → a (right-linear) or the symmetric left-linear form — corresponding to regular languages, recognized by a finite automaton.
+
+5. THE NONCONTRACTING TEST for distinguishing Type 1 from Type 0 (or from a grammar that merely LOOKS context-sensitive): check EVERY production individually — if even ONE production has a right-hand side STRICTLY SHORTER than its left-hand side (a genuinely CONTRACTING production, such as AB → ε or ABC → A), the grammar fails the Type 1 noncontracting requirement and must be classified as the more general Type 0 instead, regardless of how "structured" or restricted every OTHER production in the same grammar happens to look.
+6. THE CFL PUMPING LEMMA (established as a tool in this book's own Theory of Computation sequence) is the standard way to RULE OUT a Type-1-shaped grammar's language from actually being Type 2 (context-free) — if the LANGUAGE the grammar generates can be shown to violate the pumping lemma's own requirement (no valid pumping decomposition exists for some sufficiently long string in the language), the language is confirmed to be a GENUINE Type 1 language, strictly more powerful than any context-free grammar could generate, rather than merely an over-complicated way of writing an ordinary context-free language.
+
+GATE TRAP: classifying a grammar as context-sensitive purely because its productions "look complicated" or involve multiple symbols on the left-hand side, without actually checking the noncontracting length condition |β|≥|α| for EVERY production, risks misclassifying a genuinely Type 0 grammar (one containing even a single contracting production) as Type 1 — always verify the length condition production-by-production before assigning the Type 1 label.
+
+1. Worked example (Chomsky classification via the noncontracting test, independently verified): classify the grammar with productions S → aSBC | aBC, CB → BC, aB → ab, bB → bb, bC → bc, cC → cc. Check EVERY production's length: S→aSBC (RHS length 4 ≥ LHS length 1, OK), S→aBC (3≥1, OK), CB→BC (2≥2, OK), aB→ab (2≥2, OK), bB→bb (2≥2, OK), bC→bc (2≥2, OK), cC→cc (2≥2, OK) — EVERY production is noncontracting (RHS length ≥ LHS length). This grammar is Type 1 (context-sensitive). To confirm it is NOT also Type 2 (context-free), note its left-hand sides are not all single nonterminals (CB, aB, bB, bC, cC each have TWO symbols on the left) — a context-free grammar requires every left-hand side to be exactly one nonterminal, which this grammar violates directly, confirming it sits at Type 1 specifically, not Type 2.
+
 PREPARING A GRAMMAR FOR TOP-DOWN PARSING
 
 Before ANY top-down parsing technique can even be attempted, a grammar generally needs two specific transformations applied — both already introduced, in the context of Greibach Normal Form conversion, in this book's own second Theory of Computation chapter, now revisited here for their DIRECT practical parsing motivation.
