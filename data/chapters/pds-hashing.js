@@ -298,6 +298,21 @@ Evaluate both at three values of α to see the blow-up concretely.
 2. α = 0.75: unsuccessful = ½(1 + 1/(0.25)²) = ½(1 + 1/0.0625) = ½(1 + 16) = ½ × 17 = 8.5. Successful = ½(1 + 1/0.25) = ½(1 + 4) = ½ × 5 = 2.5.
 3. α = 0.9: unsuccessful = ½(1 + 1/(0.1)²) = ½(1 + 1/0.01) = ½(1 + 100) = ½ × 101 = 50.5. Successful = ½(1 + 1/0.1) = ½(1 + 10) = ½ × 11 = 5.5.
 
+THE IDEALIZED UNIFORM-PROBING MODEL: A DIFFERENT, SIMPLER FORMULA PAIR
+
+Knuth's formulas above are SPECIFIC to linear probing, and account directly for primary clustering's self-reinforcing run behaviour. A DIFFERENT, simpler pair of formulas applies to an IDEALIZED "uniform hashing" model of open addressing — one where EVERY one of the (n−i) remaining empty slots is assumed EQUALLY likely to be probed next at each step, with no clustering bias of any kind (a theoretical idealization no REAL probe sequence, including linear or even quadratic probing, actually achieves, since every real probe sequence is deterministic once the key and table are fixed):
+
+E[unsuccessful search, uniform hashing] ≈ 1/(1−α)
+
+E[successful search, uniform hashing] ≈ (1/α) × ln(1/(1−α))
+
+1. THESE uniform-hashing formulas are NOT restatements of the linear-probing formulas above — they describe a strictly BETTER-behaved (but purely idealized) probing model, and evaluate to SMALLER expected probe counts than Knuth's linear-probing formulas at the SAME α, precisely because linear probing's real clustering behaviour is worse than this idealized best case.
+2. ALWAYS check which specific model a question is asking about before selecting a formula — a question describing PLAIN linear probing specifically must use Knuth's clustering-aware formulas above; a question explicitly invoking "uniform hashing" or an idealized/theoretical open-addressing model (rather than linear probing specifically) uses this simpler pair instead.
+
+GATE TRAP: applying the uniform-hashing formulas (1/(1−α), and (1/α)ln(1/(1−α))) to an ordinary linear-probing question is a direct, understated error — it UNDERSTATES the true expected probe count, since it ignores primary clustering entirely; conversely, applying Knuth's linear-probing-specific formulas to a question that explicitly describes idealized uniform hashing overstates the cost. The two formula pairs are NOT interchangeable, and a question's own wording ("linear probing" versus "uniform hashing"/"ideal open addressing") is the deciding signal for which pair applies.
+
+1. Worked example (uniform-hashing formula applied, independently verified): evaluate the idealized uniform-hashing formulas at α=0.5. Unsuccessful = 1/(1−0.5) = 1/0.5 = 2. Successful = (1/0.5)×ln(1/(1−0.5)) = 2×ln(2) ≈ 2×0.693 ≈ 1.386. Compare directly against linear probing's OWN values at the same α=0.5 (computed above): unsuccessful=2.5, successful=1.5 — both LARGER than the idealized uniform-hashing values, confirming that linear probing's real clustering behaviour is indeed worse than the idealized model at the identical load factor.
+
 Between α = 0.5 and α = 0.9 — the table going from half full to nine-tenths full — the expected cost of an unsuccessful search rockets from 2.5 probes to 50.5 probes, a 20-fold increase, while α itself only grew by a factor of 1.8. The (1−α)² term in the denominator is the mechanism: as α → 1, (1−α) → 0, and squaring a small number makes it smaller still, so its reciprocal explodes even faster than the analogous chaining or successful-search formulas do. This is exactly why practical open-addressing tables are resized well before α gets anywhere near 0.9.
 
 QUADRATIC PROBING
