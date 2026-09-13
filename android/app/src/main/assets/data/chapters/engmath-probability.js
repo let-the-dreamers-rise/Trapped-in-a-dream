@@ -221,6 +221,35 @@ GATE TRAP: a "series system" (fails when the FIRST/weakest component fails) is g
 
 KEY: order statistics for independent identically distributed variables reduce to exactly two "all of them" / "none of them" factoring arguments — P(max≤x)=[F(x)]ⁿ from "every single one is at most x," and P(min>x)=[1−F(x)]ⁿ from "every single one exceeds x" — and both are direct, one-line consequences of independence turning a joint "for all i" event into a product; no separate order-statistic theory needs to be memorised beyond recognising which of these two mirror-image factoring arguments a given series/parallel-system question is actually asking for.
 
+EXPECTED WAITING TIME VIA STATE RECURSION
+
+Some expectation problems (typically "expected number of coin flips/dice rolls until a specific PATTERN first appears") cannot be solved by the plain linearity-of-expectation or geometric-distribution tools alone, because the pattern itself has internal structure — seeing a partial match toward the pattern changes the expected REMAINING wait, unlike a single-symbol geometric wait where every trial is identical and memoryless in the same simple way. The technique is to define one EXPECTATION VARIABLE per distinct "progress state" toward the pattern, and write a recursive equation for each state in terms of the others.
+
+1. Identify every distinct STATE of partial progress toward the target pattern (for a two-symbol pattern like "HH", the states are: "no progress" (state 0, or just starting), and "one H seen so far" (state 1)).
+2. For each state, write an equation for its expected remaining number of trials, by conditioning on the NEXT single trial's outcome: E(state) = 1 + (probability of each possible next outcome) × E(the resulting state after that outcome).
+3. Solve the resulting SYSTEM of linear equations in the state-expectations simultaneously — the equations are typically small (2-4 states for common patterns) and solvable by ordinary substitution.
+4. The final answer is the expectation of the STARTING state (state 0, before any trial has been made).
+
+1. Worked example (expected trials to see HH, independently verified): a fair coin is flipped repeatedly. Find the expected number of flips until "HH" (two heads in a row) first appears. Let E0 = expected remaining flips from "no progress," and E1 = expected remaining flips from "one H seen so far." From state 0: flip once (cost 1); with probability 1/2 it's Tails, returning to state 0; with probability 1/2 it's Heads, advancing to state 1. So E0 = 1 + (1/2)E0 + (1/2)E1. From state 1: flip once (cost 1); with probability 1/2 it's Tails, DROPPING BACK to state 0 (the single H is wasted, since "HH" requires the H to be immediately followed by another H); with probability 1/2 it's Heads, completing the pattern (0 further flips needed). So E1 = 1 + (1/2)E0 + (1/2)(0) = 1 + (1/2)E0. Substitute E1 into the first equation: E0 = 1 + (1/2)E0 + (1/2)[1+(1/2)E0] = 1 + (1/2)E0 + 1/2 + (1/4)E0 = 1.5 + (3/4)E0. Solve: E0 − (3/4)E0 = 1.5, so (1/4)E0 = 1.5, giving E0 = 6.
+
+THE REPRODUCTIVE (ADDITIVITY) PROPERTY OF THE POISSON DISTRIBUTION
+
+If X and Y are INDEPENDENT Poisson random variables with rates (means) λ₁ and λ₂ respectively, their SUM X+Y is itself Poisson-distributed, with rate λ₁+λ₂ — Poisson rates simply ADD under independent summation, with no correction term needed.
+
+1. This additivity is a direct consequence of the Poisson distribution modelling COUNTS of independent events over a fixed interval: if X counts events of one independent type at rate λ₁ and Y counts events of another independent type at rate λ₂ over the SAME interval, their combined count is exactly what a single Poisson process with the summed rate λ₁+λ₂ would produce.
+2. The property extends to any FINITE number of independent Poisson variables: the sum of X₁,...,Xₖ (independent, Poisson with rates λ₁,...,λₖ) is Poisson with rate λ₁+λ₂+...+λₖ.
+
+1. Worked example (Poisson additivity, independently verified): calls to a helpline arrive independently as two Poisson streams — technical-support calls at a rate of 3 per hour, and billing calls at a rate of 2 per hour. Find the distribution, and the mean, of the TOTAL number of calls (of either type) received in one hour. By additivity, the total is Poisson with rate 3+2=5, so the mean number of total calls per hour is 5.
+
+THE MODE OF A BINOMIAL DISTRIBUTION
+
+For a Binomial(n,p) distribution, the MODE (the value of k with the single highest probability mass) is given by ⌊(n+1)p⌋, EXCEPT in the special case where (n+1)p is itself an exact integer, in which case there are TWO modes, at (n+1)p−1 and (n+1)p, both carrying equal, maximal probability.
+
+1. This formula comes from examining the RATIO of consecutive probability terms P(X=k)/P(X=k−1) = [(n−k+1)/k]×[p/(1−p)], and finding the value of k at which this ratio crosses from greater-than-1 (probabilities still increasing) to less-than-1 (probabilities now decreasing) — the mode sits at the last k where the ratio is still ≥1.
+2. In practice, simply compute (n+1)p and take its FLOOR to get the mode directly, checking only whether (n+1)p happens to land on an exact integer (the rare tie case) before reporting a single mode value.
+
+1. Worked example (Binomial mode, independently verified): find the mode of a Binomial(n=10, p=0.3) distribution. Compute (n+1)p = 11×0.3 = 3.3, which is not an integer, so the mode is ⌊3.3⌋ = 3.
+
 WORKED PROBLEMS
 
 1. ADDITION RULE. In a class of 50 students, 30 study Physics, 25 study Chemistry, and 15 study both. Find the probability a randomly chosen student studies at least one of the two subjects. P(Physics)=30/50, P(Chemistry)=25/50, P(both)=15/50. P(at least one) = 30/50+25/50−15/50 = 40/50 = 4/5.

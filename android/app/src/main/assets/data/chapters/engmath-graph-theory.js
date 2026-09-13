@@ -214,6 +214,31 @@ Compute the number of labelled spanning trees of K4: n=4, so nⁿ⁻² = 4² = 1
 
 GATE TRAP: Cayley's formula counts LABELLED spanning trees — trees where the vertices are distinguishable individuals (vertex 1, vertex 2, ...), so two spanning trees with the same tree SHAPE but a different assignment of labels to positions count as different trees. This is why K4 (only 4 vertices) already has 16 distinct spanning trees despite there being only 2 fundamentally different tree SHAPES on 4 unlabelled vertices (a path, and a "star" with one centre connected to the other three) — the 16 counts every distinct way of assigning the 4 labels onto those shapes, not the number of shapes itself.
 
+THE HAVEL-HAKIMI ALGORITHM: TESTING GRAPHICALITY BY CONSTRUCTION
+
+The Erdős-Gallai inequality (covered earlier in this chapter) certifies whether a degree sequence is graphic by checking a family of inequalities, but it does not, by itself, hand you an actual construction. The HAVEL-HAKIMI ALGORITHM instead tests graphicality CONSTRUCTIVELY, by repeatedly reducing the sequence:
+
+1. Sort the degree sequence in NON-INCREASING order.
+2. Remove the LARGEST value, call it d, from the front of the sequence.
+3. SUBTRACT 1 from each of the NEXT d largest remaining values (this models "connecting the removed vertex to the d vertices with the next-highest degrees").
+4. If any value becomes NEGATIVE at this step, the sequence is NOT graphic — stop immediately.
+5. Re-sort the resulting (shorter) sequence in non-increasing order and repeat from step 2, until either a negative value appears (not graphic) or the sequence is reduced to all zeros (graphic).
+
+Havel-Hakimi and Erdős-Gallai always agree on WHETHER a sequence is graphic (both fully characterize the same graphic sequences), but Havel-Hakimi additionally shows HOW to build a valid graph, by recording, at each step, which vertex was connected to which — a useful distinction when a question specifically asks for a construction, or asks you to trace out the algorithm's own intermediate steps rather than just its final yes/no verdict.
+
+GATE TRAP: at each Havel-Hakimi step you must RE-SORT the sequence before repeating — skipping the re-sort and simply continuing to subtract from the "next d positions" in whatever order they happened to fall after the previous subtraction produces an incorrect trace, since the algorithm's correctness specifically depends on always connecting the current largest-degree vertex to the OTHER currently-largest-degree vertices at each stage.
+
+1. Worked example (Havel-Hakimi trace, independently verified): test whether (4,3,3,2,2) is graphic. Sorted: 4,3,3,2,2. Remove 4, subtract 1 from the next 4 values: 3−1,3−1,2−1,2−1 = 2,2,1,1. Re-sort: 2,2,1,1. Remove 2, subtract 1 from the next 2 values: 2−1,1−1 = 1,0. Sequence now: 1,1,0. Re-sort: 1,1,0. Remove 1, subtract 1 from the next 1 value: 1−1=0. Sequence now: 0,0. All zeros — the sequence IS graphic.
+
+BROOKS' THEOREM: A SHARPER BOUND ON CHROMATIC NUMBER
+
+The chapter's earlier chromatic-number bounds established χ(G) ≤ Δ(G)+1 always (greedy colouring). BROOKS' THEOREM sharpens this: for a CONNECTED graph G that is NEITHER a complete graph K_n NOR an odd cycle, χ(G) ≤ Δ(G) — one less than the greedy bound guarantees, in every other case.
+
+1. The two EXCEPTIONS are essential: a complete graph K_n genuinely needs χ(K_n)=n=Δ(K_n)+1 colours (every vertex is adjacent to every other, so no two can share a colour), and an odd cycle genuinely needs χ=3=Δ+1=2+1 (a cycle of odd length cannot be properly 2-coloured, since alternating two colours around an odd-length cycle always forces two adjacent vertices at the "seam" into the same colour).
+2. For every OTHER connected graph, Brooks' theorem guarantees a proper colouring exists using only Δ(G) colours — no separate greedy-colouring trace is needed to establish the BOUND itself, only to actually exhibit one such colouring if the question demands it.
+
+1. Worked example (Brooks' theorem applied, independently verified): the Petersen graph is a connected, 3-regular graph (Δ=3) that is neither complete nor an odd cycle (it has 10 vertices and girth 5, so it is not K_n for any n, and it is not a cycle at all, let alone an odd one). By Brooks' theorem, χ(Petersen graph) ≤ 3, directly without needing to explicitly construct a 3-colouring first, since Brooks' theorem is an EXISTENCE guarantee for any graph matching its stated conditions.
+
 PERFECT MATCHINGS
 
 A MATCHING is a set of edges with no shared endpoints (no vertex touched by more than one chosen edge). A PERFECT MATCHING is a matching that covers every vertex — possible only when the graph has an even number of vertices (an odd number of vertices can never be perfectly paired off, by a simple parity argument: each matched edge accounts for exactly 2 vertices).

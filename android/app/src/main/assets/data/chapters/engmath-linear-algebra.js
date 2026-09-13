@@ -244,6 +244,33 @@ Worked trace: apply Gram-Schmidt to v₁=(1,1,0) and v₂=(1,0,1). u₁=v₁=(1,
 
 KEY: Gram-Schmidt is the constructive proof that EVERY finite-dimensional inner product space has an orthonormal basis — it is worth recognising as the standard tool whenever a problem needs an orthogonal (or orthonormal) basis built from an arbitrary given spanning or independent set, and the projection-and-subtract pattern (subtract off everything already accounted for by the previous directions) is exactly the same "remove what's already explained, keep only what's genuinely new" idea that appears, in a different guise, in the residual-based thinking behind least-squares fitting.
 
+JORDAN NORMAL FORM: WHEN DIAGONALISATION FAILS
+
+The chapter has already established that a matrix with a REPEATED eigenvalue whose geometric multiplicity falls SHORT of its algebraic multiplicity is not diagonalisable (a "defective" eigenvalue). The JORDAN NORMAL FORM is the closest substitute available in that case: every square matrix, diagonalisable or not, is similar to a block-diagonal matrix made of JORDAN BLOCKS, where a Jordan block for eigenvalue λ of size k is a k×k matrix with λ on every diagonal entry, 1 on every entry immediately ABOVE the diagonal, and 0 everywhere else.
+
+1. A Jordan block of size 1 is simply [λ] — indistinguishable from an ordinary diagonal entry, which is why a fully diagonalisable matrix is exactly one whose Jordan form consists entirely of size-1 blocks.
+2. A defective eigenvalue (geometric multiplicity < algebraic multiplicity) forces at least one Jordan block of size 2 or larger for that eigenvalue — the GAP between algebraic and geometric multiplicity is made up precisely by the "extra" size contributed by larger blocks, and the NUMBER of Jordan blocks for a given eigenvalue equals its geometric multiplicity (the number of independent eigenvectors), while the SUM of those blocks' sizes equals its algebraic multiplicity.
+3. THE key computational payoff of Jordan form is computing POWERS of a defective matrix directly: for a 2×2 Jordan block J = [[λ,1],[0,λ]], the n-th power is Jⁿ = [[λⁿ, n·λ^(n−1)],[0, λⁿ]] — the off-diagonal entry picks up a factor of n multiplying λ^(n−1), a direct consequence of the block failing to diagonalise (an ordinary diagonal matrix's powers would never produce a term growing linearly in n like this).
+4. To compute Aⁿ for the ORIGINAL matrix A (not just its Jordan block J), use A = PJP⁻¹, so Aⁿ = PJⁿP⁻¹ — exactly the same similarity-transform trick already used for diagonalisable matrices in this chapter's own eigenvalue-power section, just with Jⁿ computed via the Jordan-block power rule above instead of an ordinary diagonal-matrix power.
+
+GATE TRAP: applying the ordinary diagonal-matrix power rule (raise each diagonal entry to the n-th power, leave off-diagonal entries as 0) directly to a JORDAN block is a serious error — the off-diagonal "1" in a Jordan block does NOT stay 0 under repeated powers; it grows into n·λ^(n−1), and skipping this term produces a Aⁿ formula that is correct only for n=1.
+
+1. Worked example (Jordan block power, independently verified): let J = [[3,1],[0,3]] be a 2×2 Jordan block with λ=3. Find J³. Using Jⁿ = [[λⁿ, nλ^(n−1)],[0,λⁿ]] with n=3, λ=3: top-left = 3³=27, top-right = 3×3²=3×9=27, bottom-right=27. So J³ = [[27,27],[0,27]]. VERIFY by direct multiplication: J²=J×J=[[9,6],[0,9]] (top-right: 3×1+1×3=6), and J³=J²×J=[[27, 9×1+6×3],[0,27]]=[[27,27],[0,27]], matching the formula exactly.
+
+THE VANDERMONDE DETERMINANT
+
+A VANDERMONDE MATRIX built from n scalars x₁,x₂,...,xₙ has row i equal to (1, xᵢ, xᵢ², ..., xᵢ^(n−1)) — that is, each row is the successive powers of one of the n scalars. Its determinant has a remarkably clean closed form:
+
+det(Vandermonde) = ∏_{i<j} (xⱼ − xᵢ)
+
+the product of every pairwise DIFFERENCE among the n scalars, taken with the larger index minus the smaller.
+
+1. This determinant is ZERO exactly when two of the xᵢ are EQUAL (since then the corresponding pairwise difference xⱼ−xᵢ is zero, making the whole product zero) — matching the direct linear-algebra fact that two IDENTICAL rows in any matrix force its determinant to zero, since a Vandermonde matrix with a repeated scalar has two literally identical rows.
+2. For n=2 scalars x₁,x₂: det = x₂−x₁ directly (a single pairwise difference), matching the direct 2×2 determinant computation of |[1,x₁],[1,x₂]| = 1×x₂ − x₁×1 = x₂−x₁.
+3. For n=3 scalars: det = (x₂−x₁)(x₃−x₁)(x₃−x₂) — the product of all C(3,2)=3 pairwise differences, which can be verified against a direct 3×3 determinant expansion for any specific numeric choice of x₁,x₂,x₃.
+
+1. Worked example (Vandermonde determinant, independently verified): find the determinant of the 3×3 Vandermonde matrix built from x₁=1, x₂=2, x₃=4 (rows (1,1,1),(1,2,4),(1,4,16)). Using the closed form: (x₂−x₁)(x₃−x₁)(x₃−x₂) = (2−1)(4−1)(4−2) = 1×3×2 = 6.
+
 WORKED PROBLEMS
 
 1. DETERMINANT SCALING. If A is a 4×4 matrix with det(A)=3, find det(2A). Using the kⁿ rule with n=4: det(2A)=2⁴·det(A)=16×3=48.

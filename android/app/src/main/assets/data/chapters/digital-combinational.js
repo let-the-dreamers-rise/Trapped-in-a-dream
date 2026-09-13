@@ -71,6 +71,18 @@ A FULL ADDER (three inputs — A, B, and a carry-in Cin) computes Sum = A⊕B⊕
 
 A full adder can be built from TWO HALF ADDERS plus one OR GATE: the first half adder computes A⊕B (call it S₁) and AB (call it C₁); the second half adder computes S₁⊕Cin (giving the final Sum, since (A⊕B)⊕Cin = A⊕B⊕Cin exactly) and S₁·Cin (call it C₂); the final OR gate combines C₁+C₂ to produce Cout — verified algebraically: C₁+C₂ = AB + (A⊕B)Cin = AB + (AB′+A′B)Cin = AB+AB′Cin+A′BCin+... simplifying via the distributive and absorption laws recovers exactly AB+BCin+ACin, confirming the two-half-adder-plus-OR construction produces the correct majority function.
 
+SUBTRACTORS: THE LOGIC-LEVEL VIEW
+
+Subtractor circuits mirror the adder circuits above exactly, with BORROW replacing CARRY as the quantity propagated between bit positions — the structural parallel is deliberate, since binary subtraction A−B is, bit by bit, the mirror image of binary addition.
+
+A HALF SUBTRACTOR (two inputs, no borrow-in) computes Difference = A⊕B (identical to the half adder's Sum, since XOR already captures "the bits differ" regardless of which operation is intended) and Borrow = A′B — a borrow is needed exactly when the minuend bit A is 0 but the subtrahend bit B is 1 (attempting to subtract a 1 from a 0 forces a borrow from the next higher bit position), which is precisely what A′B (NOT-A AND B) captures.
+
+A FULL SUBTRACTOR (three inputs — A, B, and a borrow-in Bin) computes Difference = A⊕B⊕Bin (structurally identical to the full adder's Sum expression) and Borrow-out = A′B + A′Bin + BBin — this Borrow-out expression is NOT the same majority function as the full adder's Cout, because the roles of A and B are asymmetric in subtraction (A−B is not the same operation as B−A) — a borrow is generated whenever A′ (A is 0) pairs with either B or Bin being 1, or when both B and Bin are already 1 regardless of A.
+
+GATE TRAP: assuming a full subtractor's Borrow-out expression is the SAME majority-function formula as a full adder's Cout (simply substituting Borrow for Carry) is a direct error — subtraction is not symmetric in A and B the way addition is, so the borrow-out expression A′B+A′Bin+BBin genuinely differs from the carry-out expression AB+BCin+ACin; always re-derive (or separately memorise) the subtractor's own truth table rather than assuming it mirrors the adder's formula term-for-term.
+
+1. Worked example (full subtractor truth-table check, independently verified): compute Difference and Borrow-out for A=0, B=1, Bin=1 (subtracting a subtrahend bit of 1, with an incoming borrow of 1, from a minuend bit of 0). Difference = A⊕B⊕Bin = 0⊕1⊕1 = 0. Borrow-out = A′B+A′Bin+BBin = (1)(1)+(1)(1)+(1)(1) = 1+1+1 = 1 (OR of 1's is still 1). So this bit position produces a difference of 0 and generates a borrow into the next higher position — matching direct arithmetic intuition: 0−1, with an additional 1 already being borrowed, requires borrowing again, and the resulting bit value (0−1−1 = −2, which in 2 bits borrowing twice becomes 0 with two borrows propagated) settles to a difference bit of 0.
+
 RIPPLE-CARRY VS CARRY-LOOKAHEAD DELAY
 
 A RIPPLE-CARRY ADDER chains n full adders together via their carry lines (stage i's carry-out feeds directly into stage i+1's carry-in) — the WORST-CASE delay to the FINAL carry-out grows LINEARLY with n, since stage i+1 genuinely cannot begin computing its own carry-out until stage i's carry-out has settled; this sequential dependency, ripping through every stage one after another, is exactly what gives the ripple-carry adder its name and its defining weakness.

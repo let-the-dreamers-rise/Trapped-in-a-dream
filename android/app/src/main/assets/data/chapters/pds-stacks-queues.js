@@ -602,6 +602,19 @@ Every implementation above is gathered here for reference, having been derived r
 
 REMEMBER: Whenever a structure's operation is described as "O(1) worst case," check what is being pushed under the rug — a two-stack queue's cheap dequeue is only O(1) amortised, not worst-case, and the difference (a single call spiking to O(n)) is exactly what a well-made question will ask you to notice.
 
+THE MIN-STACK: O(1) MINIMUM RETRIEVAL
+
+A MIN-STACK is an ordinary stack augmented to also answer "what is the CURRENT minimum element in the stack" in O(1) time, at every point, even as elements are pushed and popped — a plain stack alone offers no way to find the minimum faster than O(n) (scanning every element), since the minimum could be buried anywhere in the stack's structure and popping it off would require rebuilding the whole stack.
+
+1. THE AUXILIARY-STACK TECHNIQUE maintains a SECOND stack, min_stack, alongside the main data stack: on every PUSH of value v onto the main stack, ALSO push onto min_stack the value min(v, min_stack.top()) — the CURRENT minimum after this push — so min_stack.top() always reflects the minimum among every element currently on the main stack, mirrored one-to-one, same height.
+2. On every POP from the main stack, ALSO pop from min_stack — since the two stacks always grow and shrink in lockstep, min_stack.top() after any pop correctly reflects the minimum of whatever remains, with no extra bookkeeping needed.
+3. getMin() simply returns min_stack.top() directly, in O(1), since the correct current minimum is always sitting right there waiting, precomputed at push time rather than searched for at query time — trading O(n) extra SPACE (the auxiliary stack, sized identically to the main stack in the worst case) for O(1) time on every getMin() call.
+4. AN OPTIMISED variant pushes onto min_stack ONLY when a NEW minimum is actually set (i.e., only when the incoming value is ≤ the current minimum), rather than mirroring every single push — this reduces min_stack's typical size (it only grows on a genuinely new minimum), but requires care on POP: pop from min_stack too ONLY when the value being popped from the main stack EQUALS min_stack's current top, since popping min_stack on every main-stack pop (regardless of whether the popped value was actually the tracked minimum) would incorrectly discard a still-valid minimum that was never re-pushed under this optimised scheme.
+
+GATE TRAP: in the OPTIMISED (push-only-on-new-minimum) variant, popping min_stack unconditionally on every main-stack pop is a direct correctness bug — since min_stack in this variant does NOT mirror the main stack's height, popping it in lockstep would desynchronise the two stacks and could discard the true minimum prematurely; always compare the popped main-stack value against min_stack's top before deciding whether to also pop min_stack.
+
+1. Worked example (min-stack trace, independently verified, mirrored/basic variant): push 5, push 2, push 4, push 1, then pop twice, then call getMin(). Main stack after pushes: [5,2,4,1] (top=1). min_stack after pushes: push 5→min_stack=[5]; push 2→min(2,5)=2, min_stack=[5,2]; push 4→min(4,2)=2, min_stack=[5,2,2]; push 1→min(1,2)=1, min_stack=[5,2,2,1]. Pop main stack twice (removing 1, then 4) and pop min_stack twice in lockstep (removing 1, then 2): main stack now [5,2] (top=2), min_stack now [5,2] (top=2). getMin() returns min_stack.top() = 2, correctly matching the true minimum of the remaining elements {5,2}.
+
 WORKED PROBLEMS
 
 Each of these is a pattern that appears in the paper. Follow the working, not just the answer.

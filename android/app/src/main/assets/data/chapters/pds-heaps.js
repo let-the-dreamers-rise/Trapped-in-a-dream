@@ -421,6 +421,24 @@ Leftist heaps and skew heaps are two more mergeable heap structures worth knowin
 
 KEY: Every specialised heap in this section exists to answer one question: "binary heaps are O(log n) for almost everything, but O(n) to merge — can we do better?" Binomial heaps answer yes, in O(log n), with a structure close enough to a binary heap to still be simple. Fibonacci heaps push insert, merge, and decrease-key down to amortised O(1) at the cost of a more delicate implementation, and that specific improvement is what shortest-path algorithms are built to exploit.
 
+GENERALISING TO d-ARY HEAPS
+
+Every formula derived earlier in this chapter for a BINARY heap (each node has up to 2 children) generalises directly to a d-ARY heap, where every node has up to d children instead of 2, still stored in the same flat 0-indexed array with no pointers. The array-index arithmetic simply replaces every "2" with "d":
+    parent(i)     = floor((i − 1) / d)
+    child_k(i)    = d*i + k,   for k = 1, 2, ..., d      (the d children of node i)
+Setting d = 2 recovers exactly the binary-heap formulas from earlier in this chapter (parent(i) = floor((i−1)/2), children at 2i+1 and 2i+2), so nothing here is new machinery — only the branching factor has changed.
+
+The height formula generalises the same way: a complete d-ary tree of n nodes has height h = floor(log_d n), by the identical geometric-sum argument used for binary heaps, now with d children spreading each level d times wider instead of 2 times wider — level 0 holds 1 node, level 1 holds up to d, level 2 holds up to d^2, and so on, so n nodes span roughly log_d(n) levels rather than log_2(n).
+
+This wider branching creates a direct SIFT-UP vs SIFT-DOWN trade-off, which is the single fact GATE most likes to test on d-ary heaps:
+• SIFT-UP (insert, decrease-key) — a node has only ONE parent regardless of d, so each step of sift-up still does exactly one comparison, and the number of steps shrinks to O(log_d n) as d grows. Insert therefore gets FASTER as d increases.
+• SIFT-DOWN (extract-max/min, increase-key) — a node now has UP TO d children, so each step of sift-down must compare the node against ALL d children to find the largest (or smallest) before possibly swapping, costing O(d) work per level, over O(log_d n) levels, giving O(d log_d n) total. Extract therefore gets SLOWER as d grows, once d is large enough that the extra per-level comparison cost outweighs the shrinking height.
+KEY: A d-ary heap is a knob for trading insert speed against extract speed — larger d gives cheaper insert (O(log_d n), fewer levels) but costlier extract-max/min (O(d log_d n), more per-level comparisons). This is exactly why d-ary heaps (typically 4-ary) are used for workloads dominated by insertions and decrease-keys relative to extractions, such as some priority-queue-heavy graph algorithm implementations.
+
+WORKED EXAMPLE: a 4-ary heap (d = 4) stores n = 30 elements, 0-indexed. Node at index 5's parent is floor((5−1)/4) = floor(4/4) = 1. Node at index 5's children are at 4·5+1=21, 4·5+2=22, 4·5+3=23, 4·5+4=24. Its height is floor(log_4 30) = floor(2.45) = 2, so extract-min touches at most 2 levels, each requiring up to 4 comparisons among children — at most 8 comparisons total for the sift-down, versus a binary heap on the same 30 elements needing floor(log_2 30) = 4 levels of 1 comparison each for sift-down, but only 4 comparisons total for the equivalent binary sift-up versus the 4-ary heap's 2 (fewer levels to climb).
+
+GATE TRAP: do not assume "d-ary is strictly better because it is shallower" — the shallower tree (smaller log_d n) cuts BOTH sift-up and sift-down step counts, but sift-down's per-step cost grows by a factor of d (scanning d children instead of comparing against 1 parent), so the two effects partially cancel for extraction while compounding favourably for insertion. Always separate "how many levels" from "how much work per level" when comparing d-ary heaps of different d.
+
 BACK TO THE TREES CHAPTER: THE SAME COUNTING IDENTITIES
 
 None of this chapter's arithmetic is new mathematics — it is the trees chapter's counting identities for complete and full binary trees, applied to a specific use.

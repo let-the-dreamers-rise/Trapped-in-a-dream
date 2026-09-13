@@ -138,6 +138,16 @@ LEFT RECURSION AND ITS ELIMINATION
 
 1. Worked example (left-recursion elimination): eliminate left recursion from A → Aa | Ab | c. Here α₁=a, α₂=b, β₁=c (the sole non-A-starting alternative). Rewritten: A → cA', A' → aA' | bA' | ε. Verify equivalence on a small case: the original grammar generates strings of the form c followed by any sequence of a's and b's (c, ca, cb, caa, cab, cba, ...) — and the rewritten grammar generates exactly the same: A ⇒ cA' ⇒ caA' ⇒ caaA' ⇒ caa (via A'⇒ε), matching the string "caa" that the original grammar's own repeated left-recursive expansion A⇒Aa⇒Aaa⇒caa (via A⇒c initially, note reversed application order for a left-recursive derivation) would also eventually produce.
 
+COUNTING PARSE TREES: CATALAN NUMBERS
+
+A recurring counting question for AMBIGUOUS grammars asks for the exact NUMBER of distinct parse trees a given ambiguous string admits — for a specific, common family of ambiguous expression grammars (typically ones with a single associative, ambiguous binary operator and no precedence distinctions to break ties), this count is given directly by the CATALAN NUMBERS.
+
+1. THE k-th Catalan number is C_k = C(2k,k)/(k+1) = (2k)!/((k+1)!·k!) — the same sequence that counts balanced-parenthesis arrangements, the number of distinct binary trees on k internal nodes, and the number of ways to fully parenthesize a sequence of m=k+1 operands with a single associative binary operator.
+2. FOR a string containing m operands joined by an ambiguous, associative binary operator (so m−1 operator applications total, as in an expression like a+b+c+...+ with m−1 plus-signs), the number of DISTINCT parse trees is the (m−1)-th Catalan number, C_(m−1) — always anchor the formula to the OPERAND count m directly (never the operator count) to avoid an off-by-one slip.
+3. RECOGNIZING the question as Catalan-shaped is the key skill: "in how many ways can this expression, containing m operands joined by one ambiguous operator, be parsed" is immediately answered by looking up C_(m−1), rather than attempting to enumerate every parse tree by hand.
+
+1. Worked example (Catalan-number parse-tree count, independently verified): an ambiguous grammar generates the expression a+b+c+d — 4 operands (a,b,c,d) joined by 3 "+" signs. Find the number of distinct parse trees. Using C_(m−1) with m=4: C_3 = C(6,3)/4 = 20/4 = 5. Direct enumeration confirms exactly 5 distinct full parenthesizations: ((a+b)+c)+d, (a+(b+c))+d, a+((b+c)+d), a+(b+(c+d)), (a+b)+(c+d).
+
 WORKED PROBLEMS
 
 1. CNF PRODUCTION-TYPE IDENTIFICATION. Given the productions S → AB, A → a, B → BC, C → c, D → d, state which are CNF-compliant and which are not, and why. S → AB: compliant (two nonterminals). A → a: compliant (single terminal). B → BC: compliant (two nonterminals). C → c: compliant. D → d: compliant. All five are already valid CNF productions — this grammar happens to already be in CNF.
