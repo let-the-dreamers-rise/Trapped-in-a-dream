@@ -317,7 +317,7 @@ window.GATE_DATA.pyq.push({
       tolerance: 0.01,
       kind: "nat",
       marks: 1,
-      explanation: "From cylinder 100, SSTF services the nearest pending request each time: 100 (distance 0), then 105 (5), then 110 (10), before reaching 90 (10, tied but serviced next) — so 90 is serviced after 3 other requests."
+      explanation: "Apply SSTF step by step from the current head position, cylinder 100, always picking whichever pending request has the smallest |distance| from the head. 1. Pending requests and their distance from 100: 30(70), 85(15), 90(10), 100(0), 105(5), 110(10), 135(35), 145(45). The smallest is 100 itself at distance 0, so service cylinder 100 first (this is request #1 serviced). 2. Head is now at 100. Recompute distances for the remaining requests {30,85,90,105,110,135,145}: 30(70),85(15),90(10),105(5),110(10),135(35),145(45). Smallest is 105 at distance 5, so service 105 next (request #2). 3. Head is now at 105. Remaining {30,85,90,110,135,145}: distances 75,20,15,5,30,40. Smallest is 110 at distance 5, so service 110 next (request #3). 4. Head is now at 110. Remaining {30,85,90,135,145}: distances 80,25,20,25,35. Smallest is 90 at distance 20, so 90 is serviced next, as request #4 overall. 5. Since 100, 105 and 110 were each serviced before 90, exactly 3 requests were serviced ahead of it, giving the answer 3."
     },
     {
       id: "gate2014s1-cs-20",
@@ -327,7 +327,7 @@ window.GATE_DATA.pyq.push({
       options: ["User level threads are not scheduled by the kernel.","When a user level thread is blocked, all other threads of its process are blocked.","Context switching between user level threads is faster than context switching between kernel level threads.","Kernel level threads cannot share the code segment."],
       answer: 3,
       marks: 1,
-      explanation: "Kernel-level threads of the same process do share the code (and data) segment, so statement (D) is false; the others correctly describe user-level vs kernel-level threading."
+      explanation: "Evaluate each option against how user-level and kernel-level threads actually behave. (A) is TRUE: user-level threads are managed entirely by a user-space thread library, so the kernel has no knowledge of them and cannot schedule them individually — it only ever sees and schedules the one underlying kernel thread/process. (B) is TRUE for the classic many-to-one user-level threading model: if a user-level thread makes a blocking system call, the kernel blocks the single underlying kernel entity, which stalls every other user-level thread multiplexed on top of it, since the kernel is unaware other threads exist. (C) is TRUE: switching between user-level threads only requires saving/restoring a small amount of state in user space (no trap into the kernel, no mode switch, no TLB/cache effects from a full context switch), so it is significantly faster than a kernel-level context switch. (D) is FALSE, which is exactly why it is the odd one out and the correct answer: kernel-level threads belonging to the SAME process still share that process's address space, including its code segment and global data segment — only the per-thread stack, registers, and program counter are private to each kernel thread. So the statement 'kernel level threads cannot share the code segment' contradicts the fundamental definition of threads (as opposed to separate processes), making (D) the false statement."
     },
     {
       id: "gate2014s1-cs-21",
@@ -443,7 +443,7 @@ window.GATE_DATA.pyq.push({
       options: ["Only REQ1 can be permitted.","Only REQ2 can be permitted.","Both REQ1 and REQ2 can be permitted.","Neither REQ1 nor REQ2 can be permitted."],
       answer: 1,
       marks: 2,
-      explanation: "REQ1 asks for 2 units of Z but only 2 are available and P0's need for Z is 2, which would leave the system unable to guarantee a safe sequence, so REQ1 is denied; REQ2's request of 2 units of X is within limits and the resulting state is still safe, so only REQ2 can be permitted."
+      explanation: "First compute Need = Max − Allocation for every process. 1. P0: Max(8,4,3) − Alloc(0,0,1) = Need(8,4,2). P1: Max(6,2,0) − Alloc(3,2,0) = Need(3,0,0). P2: Max(3,3,3) − Alloc(2,1,1) = Need(1,2,2). Available = (3,2,2). 2. Test REQ1 (P0 wants (0,0,2)): check Need(8,4,2) ≥ (0,0,2) — OK — and Available(3,2,2) ≥ (0,0,2) — OK. Tentatively grant it: Alloc(P0) becomes (0,0,3), Available drops to (3,2,0), and P0's remaining Need becomes (8,4,0). 3. Run the safety check on this tentative state. Available=(3,2,0): P0 needs (8,4,0) — X is short, can't run. P1 needs (3,0,0) ≤ (3,2,0) — can run; finishing P1 releases its allocation (3,2,0), giving Available=(6,4,0). P2 needs (1,2,2) ≤ (6,4,0)? Z=0 available but 2 needed — fails. P0 needs (8,4,0) ≤ (6,4,0)? X still short — fails. No process can proceed further, so this tentative state is UNSAFE — REQ1 must be denied. 4. Now test REQ2 (P1 wants (2,0,0)) from the ORIGINAL state: Need(P1)=(3,0,0) ≥ (2,0,0) — OK — and Available(3,2,2) ≥ (2,0,0) — OK. Tentatively grant it: Alloc(P1) becomes (5,2,0), Available drops to (1,2,2), remaining Need(P1)=(1,0,0). 5. Safety check: Available=(1,2,2): P1 needs (1,0,0) ≤ (1,2,2) — can finish; releasing (5,2,0) gives Available=(6,4,2). P2 needs (1,2,2) ≤ (6,4,2) — can finish; releasing (2,1,1) gives Available=(8,5,3). P0 needs (8,4,2) ≤ (8,5,3) — can finish. All three processes finish in the order ⟨P1,P2,P0⟩, so this state IS safe — REQ2 can be granted. 6. Conclusion: only REQ2 can be permitted."
     },
     {
       id: "gate2014s1-cs-32",
@@ -455,7 +455,7 @@ window.GATE_DATA.pyq.push({
       tolerance: 0.01,
       kind: "nat",
       marks: 2,
-      explanation: "Simulating SRTF with preemption on arrival of a shorter job gives completion times leading to individual turnaround times that average to 7.2 ms."
+      explanation: "Simulate SRTF (Shortest Remaining Time First), re-comparing remaining burst times at every arrival. 1. t=0: only A is present (burst 6), so run A. 2. t=3: B arrives (burst 2). A's remaining time is 6−3=3, which is more than B's 2, so PREEMPT A and run B. 3. t=5: B finishes exactly as C arrives (burst 4). Now the ready processes are A (remaining 3) and C (remaining 4); A is shorter, so run A. 4. t=7: D arrives (burst 6) while A is running. A's remaining time is now 3−2=1 (it ran from 5 to 7), which is still the smallest among A(1), C(4), D(6), so A keeps running. 5. t=8: A finishes (it needed just 1 more ms). Ready processes are C (remaining 4) and D (remaining 6); C is shorter, so run C. 6. t=10: E arrives (burst 3) while C is running. C's remaining time is now 4−2=2, still smaller than D(6) and E(3), so C keeps running. 7. t=12: C finishes (it needed 2 more ms, from 10 to 12). Ready processes are D (remaining 6) and E (remaining 3); E is shorter, so run E. 8. t=15: E finishes (no more arrivals), so run D, the only process left, from 15 to 21. 9. Completion times: A=8, B=5, C=12, D=21, E=15. Turnaround time (completion − arrival): A=8−0=8, B=5−3=2, C=12−5=7, D=21−7=14, E=15−10=5. 10. Average turnaround = (8+2+7+14+5)/5 = 36/5 = 7.2 ms."
     },
     {
       id: "gate2014s1-cs-33",
@@ -467,7 +467,7 @@ window.GATE_DATA.pyq.push({
       tolerance: 0.01,
       kind: "nat",
       marks: 2,
-      explanation: "Simulating Belady's optimal replacement (always evict the page used farthest in the future, or never used again) on this reference string produces 7 page faults."
+      explanation: "Apply Belady's OPT rule: on a miss with all 3 frames full, evict whichever resident page is used farthest in the future (or never again). Reference string: 1,2,3,4,2,1,5,3,2,4,6 (positions 1–11). 1. Ref 1 (pos1): frames empty → FAULT. Frames={1}. 2. Ref 2 (pos2): FAULT (compulsory). Frames={1,2}. 3. Ref 3 (pos3): FAULT (compulsory, frames now full). Frames={1,2,3}. 4. Ref 4 (pos4): not resident → FAULT. Must evict one of {1,2,3}. Next-use positions looking ahead: 1 is next used at pos6, 2 is next used at pos5, 3 is next used at pos8 (or never — check: 3 does appear again at pos8). Since 3's next use (pos8) is farthest away, evict 3. Frames={1,2,4}. [4 faults so far] 5. Ref 2 (pos5): resident → HIT. 6. Ref 1 (pos6): resident → HIT. 7. Ref 5 (pos7): not resident → FAULT. Frames are {1,2,4}; looking ahead from pos7, page 1 is never referenced again (no future use), page 2 is next used at pos9, page 4 is next used at pos10. Since 1 has no future use at all, evict 1. Frames={5,2,4}. [5 faults] 8. Ref 3 (pos8): not resident → FAULT. Looking ahead from pos8: page 5 is never used again, page 2 is next used at pos9, page 4 is next used at pos10. Evict 5 (no future use). Frames={3,2,4}. [6 faults] 9. Ref 2 (pos9): resident → HIT. 10. Ref 4 (pos10): resident → HIT. 11. Ref 6 (pos11): not resident → FAULT (last reference, evict any page since none are needed again). [7 faults] Total page faults = 7."
     },
     {
       id: "gate2014s1-cs-34",
@@ -584,7 +584,7 @@ window.GATE_DATA.pyq.push({
       options: ["n/N","1/N","1/A","k/n"],
       answer: 0,
       marks: 2,
-      explanation: "With associativity at least k, LRU never evicts a block before it is reused, so only the very first (compulsory) access to each of the n unique addresses ever misses; the miss ratio is therefore n/N."
+      explanation: "Reason about what LRU eviction actually requires here, step by step. 1. Definition: the access sequence has length N total accesses, of which n are distinct block addresses, and any two consecutive accesses to the SAME block are separated by at most k other distinct blocks in between. 2. LRU evicts the block that has gone the longest without being accessed. With associativity A ≥ k, the cache can simultaneously hold at least k+1 distinct blocks (the ones seen since a given block's previous access, plus the block itself). 3. Since at most k distinct other blocks appear between two consecutive accesses to a block X, and the cache has room for at least k such blocks alongside X, X is never pushed out of the LRU cache before it is accessed again — it is always still resident when it recurs. 4. Therefore, EVERY access to a block after its first occurrence is guaranteed to be a hit; the ONLY misses are the very first (compulsory) access to each of the n distinct block addresses. 5. Number of misses = n (one compulsory miss per unique address). Total accesses = N. So miss ratio = misses/total = n/N, which is option (A)."
     },
     {
       id: "gate2014s1-cs-45",

@@ -320,7 +320,7 @@ window.GATE_DATA.pyq.push({
       tolerance: 0.01,
       kind: "nat",
       marks: 1,
-      explanation: "Simulating LRU with 3 frames: faults occur on 4, 7, 6, 1 (filling frames and first eviction), then 7, 6, 1 are hits, 2 faults (evicting 7), 7 faults again (evicting 6), and the final 2 is a hit — 6 faults total."
+      explanation: "Simulate LRU with 3 frames, tracking recency order (most-recently-used listed first). Reference string: 4, 7, 6, 1, 7, 6, 1, 2, 7, 2. 1. Ref 4: frames empty → FAULT. Frames={4}, order=[4]. 2. Ref 7: FAULT (compulsory). Frames={4,7}, order=[7,4]. 3. Ref 6: FAULT (compulsory, frames now full). Frames={4,7,6}, order=[6,7,4]. [3 faults] 4. Ref 1: not resident → FAULT. Evict the LRU page, which is 4 (last in the order list). Frames={7,6,1}, order=[1,6,7]. [4 faults] 5. Ref 7: resident → HIT. Move 7 to most-recently-used: order=[7,1,6]. 6. Ref 6: resident → HIT. Move 6 to front: order=[6,7,1]. 7. Ref 1: resident → HIT. Move 1 to front: order=[1,6,7]. 8. Ref 2: not resident → FAULT. Evict the LRU page, which is 7 (last in order). Frames={1,6,2}, order=[2,1,6]. [5 faults] 9. Ref 7: not resident → FAULT. Evict the LRU page, which is 6 (last in order). Frames={1,2,7}, order=[7,2,1]. [6 faults] 10. Ref 2: resident → HIT (final reference, order updated but doesn't matter). Total page faults = 6."
     },
     {
       id: "gate2014s3-cs-21",
@@ -436,7 +436,7 @@ window.GATE_DATA.pyq.push({
       tolerance: 0.01,
       kind: "nat",
       marks: 2,
-      explanation: "Using the standard safe-allocation bound, n processes each needing at most m resources require n(m-1)+1 units to guarantee no deadlock: 3(3-1)+1 = 7."
+      explanation: "Derive the guaranteed-safe resource count from first principles. 1. Deadlock (via circular wait over identical resource units) can only happen if it's possible for every one of the n processes to be simultaneously holding LESS than its maximum need, while collectively no single process can get the one more unit it needs to finish — i.e., every process is stuck holding (max−1) units and waiting for the last one. 2. Here n=3 processes, each needing a maximum of m=3 tape units. The worst case is each process grabbing (m−1)=2 units and then stalling, waiting for a 3rd. If exactly 3×2=6 units existed, this deadlock scenario (each process holds 2, none can reach 3) IS possible, so 6 units is NOT enough to guarantee safety. 3. If we add just ONE more unit, making the total 7, then even if all 3 processes are each holding their maximum 'stuck' amount of 2 units (using 6 of the 7), there is still 1 spare unit left over. That spare unit can be given to ANY one of the three processes, letting it reach its maximum of 3 and complete; upon completion it releases all 3 of its units, which is more than enough for the next process to finish, and so on — so deadlock becomes impossible. 4. This generalizes to the formula: minimum units to guarantee no deadlock = n×(m−1) + 1 = 3×(3−1) + 1 = 3×2 + 1 = 7."
     },
     {
       id: "gate2014s3-cs-32",
@@ -448,7 +448,7 @@ window.GATE_DATA.pyq.push({
       tolerance: 0.01,
       kind: "nat",
       marks: 2,
-      explanation: "Simulating SRTF gives completion times P1=27, P2=6, P3=12, P4=17. Waiting times are 15, 0, 3, 4 respectively, averaging (15+0+3+4)/4 = 5.5 ms."
+      explanation: "Simulate SRTF, re-comparing remaining burst times whenever a new process arrives. 1. t=0: only P1 (burst 12) is present, so run P1. 2. t=2: P2 arrives (burst 4). P1's remaining time is 12−2=10, more than P2's 4, so PREEMPT and run P2. 3. t=3: P3 arrives (burst 6) while P2 is running. P2's remaining time is now 4−1=3, still the smallest among P1(10), P2(3), P3(6), so P2 keeps running. 4. No more arrivals before P2 would finish, so P2 runs to completion: it needed 3 more ms from t=3, finishing at t=6. 5. At t=6, ready processes are P1 (remaining 10) and P3 (remaining 6, hasn't started). P3 is shorter, so run P3. 6. t=8: P4 arrives (burst 5) while P3 is running. P3's remaining time is now 6−2=4, still smaller than P1(10) and P4(5), so P3 keeps running. 7. P3 needs 4 more ms from t=8, finishing at t=12 (no more arrivals in between). 8. At t=12, ready processes are P1 (remaining 10) and P4 (remaining 5). P4 is shorter, so run P4; it runs uninterrupted to completion at t=12+5=17. 9. At t=17, only P1 remains with 10 ms left; run it to completion at t=17+10=27. 10. Completion times: P1=27, P2=6, P3=12, P4=17. Turnaround = completion − arrival: P1=27−0=27, P2=6−2=4, P3=12−3=9, P4=17−8=9. Waiting time = turnaround − burst: P1=27−12=15, P2=4−4=0, P3=9−6=3, P4=9−5=4. 11. Average waiting time = (15+0+3+4)/4 = 22/4 = 5.5 ms."
     },
     {
       id: "gate2014s3-cs-33",
@@ -460,7 +460,7 @@ window.GATE_DATA.pyq.push({
       tolerance: 0.01,
       kind: "nat",
       marks: 2,
-      explanation: "On a hit: 10+80=90 ms. On a miss: 10 (TLB) + 80 (page table) + 80 (data) = 170 ms. EMAT = 0.6(90) + 0.4(170) = 54 + 68 = 122 ms."
+      explanation: "Build the effective memory access time (EMAT) formula by considering the TLB hit and miss cases separately. 1. TLB hit case (happens with probability 0.6): the TLB is searched (10 ms) and, since the translation was found there, the physical memory is accessed directly to fetch the actual data (80 ms). Hit-case time = 10 + 80 = 90 ms. 2. TLB miss case (happens with probability 1 − 0.6 = 0.4): the TLB is searched first and comes up empty (10 ms), then the page table in physical memory must be consulted to get the translation (80 ms, since the page table lives in physical memory per the problem statement), and finally the actual data is fetched from physical memory using that translation (another 80 ms). Miss-case time = 10 + 80 + 80 = 170 ms. 3. EMAT is the probability-weighted average of these two cases: EMAT = (hit ratio × hit time) + (miss ratio × miss time) = 0.6 × 90 + 0.4 × 170. 4. Compute each term: 0.6 × 90 = 54, and 0.4 × 170 = 68. 5. EMAT = 54 + 68 = 122 ms."
     },
     {
       id: "gate2014s3-cs-34",
