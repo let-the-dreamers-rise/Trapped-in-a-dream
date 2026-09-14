@@ -13,7 +13,7 @@ window.GATE_DATA.pyq.push({
       options: ["phased","phrased","fazed","fused"],
       answer: 2,
       marks: 1,
-      explanation: "'Fazed' fits the increasing-intensity scale between 'bothered' and 'daunted'; 'phased', 'phrased', and 'fused' do not fit the meaning."
+      explanation: "1. The pattern is an increasing scale of intensity: walk (mild) → jog (moderate) → sprint (intense) are physical-effort words, each stronger than the last. 2. The target scale is bothered (mild annoyance) → ? → daunted (intense, feeling overwhelmed/intimidated), so the blank must mean a moderate degree of being troubled, between the two given words. 3. Check each option: 'phased' means arranged in stages (unrelated to being troubled); 'phrased' means put into words (unrelated); 'fused' means joined/melted together (unrelated); 'fazed' means disturbed or disconcerted, exactly the right level of trouble between 'bothered' and 'daunted'. 4. Hence 'fazed' (option C) is the only word that fits both the meaning and the intensity scale."
     },
     {
       id: "gate2024s2-ga-2",
@@ -23,7 +23,7 @@ window.GATE_DATA.pyq.push({
       options: ["24","48","16","12"],
       answer: 0,
       marks: 1,
-      explanation: "All possible orders of 4 distinct elements is 4! = 24, so each wizard independently makes 24 attempts."
+      explanation: "1. The spell requires mixing all four elements in an order, and each attempt uses one distinct ordering of all four. 2. The number of distinct orderings of 4 distinct items is 4! = 4×3×2×1 = 24. 3. Since each wizard works independently and exhausts every possible order before concluding the spell doesn't work, each wizard must make all 24 attempts. 4. Hence the answer is 24, option (A)."
     },
     {
       id: "gate2024s2-ga-3",
@@ -33,7 +33,7 @@ window.GATE_DATA.pyq.push({
       options: ["1,800","3,500","1,600","1,500"],
       answer: 0,
       marks: 1,
-      explanation: "Students liking at least one = 10000-1500 = 8500. Let core=x, other=4x. x+4x-500=8500 gives 5x=9000, x=1800."
+      explanation: "1. Total students = 10,000, and 1,500 like neither branch, so those who like at least one type = 10,000 - 1,500 = 8,500. 2. Let core = x; since this is 1/4th of those who like other branches, other = 4x. 3. By inclusion-exclusion, (core) + (other) - (both) = 8,500: x + 4x - 500 = 8,500. 4. Solving: 5x = 9,000, so x = 1,800. 5. Hence the number of students who like their core branches is 1,800, option (A)."
     },
     {
       id: "gate2024s2-ga-4",
@@ -53,7 +53,7 @@ window.GATE_DATA.pyq.push({
       options: ["25","21","18","20"],
       answer: 1,
       marks: 1,
-      explanation: "The differences form consecutive odd numbers 3, 5, 7, 9, 11: 6+3=9, 9+5=14, 14+7=21, 21+9=30, 30+11=41, so x=21."
+      explanation: "1. Compute the differences between the known consecutive terms: 9-6=3 and 41-30=11. 2. Guess these differences form consecutive odd numbers increasing by 2: 3,5,7,9,11. 3. Verify: 6+3=9 ✓, and check 9+5=14 ✓ (matches given 14, since 14-9=5). 4. Continue: the next difference should be 7, giving 14+7=21. 5. Check the rest: 21+9=30 ✓ (matches given 30), and 30+11=41 ✓ (matches given 41). 6. So x=21 is consistent with the full sequence of odd differences, option (B)."
     },
     {
       id: "gate2024s2-ga-6",
@@ -73,7 +73,7 @@ window.GATE_DATA.pyq.push({
       options: ["1% profit","2% profit","1% loss","2% loss"],
       answer: 2,
       marks: 2,
-      explanation: "Selling both at the same price S, cost prices are S/1.1 and S/0.9; total cost exceeds total selling price, giving a net loss of (10%)^2/100 = 1%."
+      explanation: "1. Let the common selling price of both items be S. 2. For the 10%-profit item: SP = CP × 1.1, so CP₁ = S/1.1. 3. For the 10%-loss item: SP = CP × 0.9, so CP₂ = S/0.9. 4. Using a concrete value S=99 (chosen to divide evenly): CP₁ = 99/1.1 = 90, CP₂ = 99/0.9 = 110, so total CP = 200, while total SP = 99+99 = 198. 5. Loss = 200-198 = 2, so % loss = (2/200)×100 = 1%. 6. In general this equals (common %)²/100 = 10²/100 = 1%, confirming a net 1% loss, option (C)."
     },
     {
       id: "gate2024s2-ga-8",
@@ -83,7 +83,7 @@ window.GATE_DATA.pyq.push({
       options: ["25%","50%","77.5%","62.5%"],
       answer: 3,
       marks: 2,
-      explanation: "Renewable share in 2007 = 30+5+5 = 40%; in 2023 = 35+20+10 = 65%. Percentage increase = (65-40)/40 × 100 = 62.5%."
+      explanation: "1. Renewable sources = Hydro + Solar + Wind. 2. In 2007: 30+5+5 = 40%. 3. In 2023: 35+20+10 = 65%. 4. Percentage increase = [(65-40)/40] × 100 = (25/40) × 100 = 62.5%. 5. Hence the increase in renewable share is 62.5%, option (D)."
     },
     {
       id: "gate2024s2-ga-9",
@@ -93,7 +93,7 @@ window.GATE_DATA.pyq.push({
       options: ["3","4","7","8"],
       answer: 0,
       marks: 2,
-      explanation: "Three mutually perpendicular cuts, one through the midplane along each axis, divide the cube into 8 equal pieces; this is the minimum possible."
+      explanation: "1. To split a cube into 8 equal smaller cubes (like a 2×2×2 split), make one full straight cut through the midplane perpendicular to each of the cube's three axes (x, y, z). 2. Each such cut passes completely through the solid, and one cut along each new axis doubles the piece count: 1 cut → 2 pieces, 2 cuts → 4 pieces, 3 cuts → 8 pieces. 3. Since each cut must go straight through without stopping (so pieces cannot be stacked and re-cut to save cuts), fewer than 3 cuts cannot produce 8 separate pieces, while exactly 3 achieves it. 4. Hence the minimum number of cuts is 3, option (A)."
     },
     {
       id: "gate2024s2-ga-10",
@@ -114,7 +114,7 @@ window.GATE_DATA.pyq.push({
       options: ["2,56,000","3,200","25,60,000","32,000"],
       answer: 2,
       marks: 1,
-      explanation: "Cycles used for DMA per second = 0.01 × 4,000,000 = 40,000. Each cycle transfers 8 bytes = 64 bits, giving 40,000 × 64 = 25,60,000 bits/sec."
+      explanation: "1. The 4 MHz clock executes 4,000,000 cycles per second. 2. Since 1% of these cycles are used for DMA cycle-stealing, DMA cycles per second = 0.01 × 4,000,000 = 40,000. 3. Each DMA cycle transfers 8 bytes = 64 bits. 4. Data transfer rate = 40,000 × 64 = 25,60,000 bits/sec. 5. Hence the DMA controller's transfer rate is 25,60,000 bits/sec, option (C)."
     },
     {
       id: "gate2024s2-cs-12",
@@ -124,7 +124,7 @@ window.GATE_DATA.pyq.push({
       options: ["q → ¬p","q → p","p → q","¬p → q"],
       answer: 0,
       marks: 1,
-      explanation: "The statement means \"if the student scores more than 50% (q), then fail grade cannot be given (¬p)\", i.e., q → ¬p."
+      explanation: "1. Let p: 'Fail grade can be given' and q: 'Student scores more than 50%'. 2. The statement 'Fail grade cannot be given when student scores more than 50%' has the form 'if [scores >50%], then [fail cannot be given]', i.e., q → ¬p. 3. Check the alternatives: 'q → p' would mean scoring >50% implies a fail CAN be given (opposite meaning) — wrong. 'p → q' reverses the direction, saying giving a fail implies the student scored >50% — wrong. '¬p → q' also has the wrong direction of implication. 4. Hence the correct representation is q → ¬p, option (A)."
     },
     {
       id: "gate2024s2-cs-13",
@@ -134,7 +134,7 @@ window.GATE_DATA.pyq.push({
       options: ["20101020","10202010","20102010","10201020"],
       answer: 0,
       marks: 1,
-      explanation: "Right-to-left evaluation of f’s arguments calls h(20) first (prints 20), then g(10) (prints 10); inside f, g(x) prints 10 and h(y) prints 20, giving 20 10 10 20."
+      explanation: "1. main() calls f(g(10), h(20)); with right-to-left argument evaluation, the SECOND argument h(20) is evaluated first: it prints '20' and returns 20. 2. Then the FIRST argument g(10) is evaluated: it prints '10' and returns 10. 3. So f is called as f(x=10, y=20). Inside f: g(x)=g(10) prints '10' again. 4. Then h(y)=h(20) prints '20' again. 5. Concatenating prints in the order they occur: '20' (from evaluating h(20)) + '10' (from evaluating g(10)) + '10' (from g(x) inside f) + '20' (from h(y) inside f) = \"20101020\". 6. Hence the output is 20101020, option (A)."
     },
     {
       id: "gate2024s2-cs-14",
@@ -154,7 +154,7 @@ window.GATE_DATA.pyq.push({
       options: ["T(n) = Θ(2^n)","T(n) = Θ(n·2^n)","T(n) = Θ(3^n)","T(n) = Θ(n·3^n)"],
       answer: 0,
       marks: 1,
-      explanation: "The characteristic equation r^2-5r+6=0 has roots 2 and 3; solving with T(0)=1, T(1)=2 gives coefficients 1 and 0, so T(n)=2^n=Θ(2^n)."
+      explanation: "1. Try a solution of the form T(n)=r^n for the linear recurrence T(n)=5T(n-1)-6T(n-2). 2. Substituting gives the characteristic equation r²-5r+6=0, which factors as (r-2)(r-3)=0, giving roots r=2 and r=3. 3. The general solution is T(n)=A·2^n+B·3^n. 4. Apply T(0)=1: A+B=1. Apply T(1)=2: 2A+3B=2. 5. From A=1-B: 2(1-B)+3B=2 gives 2+B=2, so B=0 and A=1. 6. So T(n)=1·2^n+0·3^n=2^n exactly, meaning T(n)=Θ(2^n), option (A)."
     },
     {
       id: "gate2024s2-cs-16",
@@ -164,7 +164,7 @@ window.GATE_DATA.pyq.push({
       options: ["0","1","2","−1"],
       answer: 1,
       marks: 1,
-      explanation: "Substituting x→2-x in the integral shows it equals ∫₀²(1-f(x))dx = 2 - I, so 2I=2 and I=1."
+      explanation: "1. Let I = ∫₀² f(x) dx. 2. Substitute u=2-x: as x goes 0→2, u goes 2→0, and dx=-du, so I=∫₂⁰f(2-u)(-du)=∫₀²f(2-u)du. 3. Renaming u back to x: I=∫₀²f(2-x)dx. 4. Using f(x)=1-f(2-x), we get f(2-x)=1-f(x), so I=∫₀²[1-f(x)]dx = 2 - I. 5. Solving 2I=2 gives I=1. 6. Hence the integral equals 1, option (B)."
     },
     {
       id: "gate2024s2-cs-17",
@@ -194,7 +194,7 @@ window.GATE_DATA.pyq.push({
       options: ["durability","atomicity","consistency","isolation"],
       answer: 0,
       marks: 1,
-      explanation: "Durability guarantees that once a transaction commits, its effects survive subsequent system crashes."
+      explanation: "1. The property described — a committed transaction's effects surviving a subsequent crash even before all changes reach disk — is the definition of durability, an ACID property. 2. Atomicity requires all-or-nothing execution of a transaction's operations, which is about failure DURING the transaction, not persistence after commit — not it. 3. Consistency requires the database to move between valid states preserving integrity constraints — unrelated to crash survival after commit. 4. Isolation requires concurrent transactions not to interfere with each other's intermediate state — also unrelated. 5. Hence the property is durability, option (A)."
     },
     {
       id: "gate2024s2-cs-20",
@@ -204,7 +204,7 @@ window.GATE_DATA.pyq.push({
       options: ["The weak entity set MUST have total participation in the identifying relationship","The owner entity set MUST have total participation in the identifying relationship","Both weak and owner entity sets MUST have total participation in the identifying relationship","Neither weak entity set nor owner entity set MUST have total participation in the identifying relationship"],
       answer: 0,
       marks: 1,
-      explanation: "A weak entity cannot exist without its owner via the identifying relationship, so it must have total participation in that relationship; the owner need not."
+      explanation: "1. A weak entity set has no key attributes sufficient to uniquely identify its own entities; it is identified only in combination with its owner entity via the identifying relationship. 2. This means every weak entity MUST be linked to exactly one owner entity through that relationship — it cannot exist independently — so the weak entity set must have total participation in the identifying relationship. 3. The owner entity set is not required to participate at all (an owner may exist with zero associated weak entities, e.g. an Employee with no Dependents), so it need not have total participation. 4. This rules out (B) 'owner MUST', (C) 'both MUST', and (D) 'neither MUST'. 5. Hence only the weak entity set must have total participation, option (A)."
     },
     {
       id: "gate2024s2-cs-21",
@@ -269,7 +269,7 @@ window.GATE_DATA.pyq.push({
       answers: [0,1],
       kind: "msq",
       marks: 1,
-      explanation: "A full scan reads all pages sequentially, which sorted and heap files support efficiently; unclustered indexes force random I/O per record, making them inefficient for a full scan."
+      explanation: "1. A 'scan' reads every record of the relation once, typically via sequential data-page reads. 2. In a sorted or heap file, all records live directly in the data pages, so a full scan just reads the file's pages in (near-)sequential disk order — I/O efficient since sequential disk reads are fast and each page is touched once. 3. An unclustered index (tree or hash) only stores pointers to records scattered across data pages in no correlated order; scanning all records via the index means looking up each entry and fetching its data page separately — one random I/O per record instead of sequential reads. 4. This makes unclustered indexes inefficient for full scans compared to sorted or heap files. 5. Hence Sorted (A) and Heap (B) are I/O efficient for scans, options 0 and 1."
     },
     {
       id: "gate2024s2-cs-27",
@@ -291,7 +291,7 @@ window.GATE_DATA.pyq.push({
       answers: [1,2],
       kind: "msq",
       marks: 1,
-      explanation: "In IPv4, any router along the path may fragment a datagram that exceeds the outgoing link MTU, and reassembly happens only at the final destination, never at intermediate routers."
+      explanation: "1. Statement (A) claims fragmentation happens only at the source, but any router along the path may fragment a datagram whose next-hop link MTU is smaller than the datagram — so (A) is FALSE. 2. Statement (B) is exactly this standard IPv4 behavior — TRUE. 3. Statement (C): reassembly is deliberately deferred to the final destination, since different fragments of the same datagram may take different paths through routers, so no single router can assume it has all fragments — TRUE. 4. Statement (D): intermediate routers do NOT reassemble fragments (that would need buffering and per-flow state, which IP avoids at the routing layer) — FALSE. 5. Hence the TRUE statements are (B) and (C), options 1 and 2."
     },
     {
       id: "gate2024s2-cs-29",
@@ -302,7 +302,7 @@ window.GATE_DATA.pyq.push({
       answers: [1,3],
       kind: "msq",
       marks: 1,
-      explanation: "L-attributed definitions can always be evaluated in a single depth-first, left-to-right traversal (making (B) false), and not every L-attributed SDD on an LR(1) grammar can be evaluated purely bottom-up (making (D) false); (A) and (C) are true statements about attribute grammars and synthesized attributes."
+      explanation: "1. Statement (A): an attribute grammar is defined as an SDD whose semantic-rule functions have no side effects — this is the standard definition, so (A) is TRUE, not one of the false statements. 2. Statement (B): by definition, every attribute of an L-attributed definition CAN always be evaluated during a single depth-first, left-to-right parse-tree traversal — that is precisely what 'L-attributed' means — so claiming it 'cannot always' be done this way is FALSE. 3. Statement (C): synthesized attributes depend only on child attribute values, so they can always be computed bottom-up as a bottom-up parser reduces productions — TRUE, not false. 4. Statement (D): not every L-attributed SDD on an LR(1) grammar can be evaluated purely bottom-up, since L-attributed definitions can need inherited attributes depending on left context that a pure bottom-up pass doesn't have directly available without extra machinery — so claiming ALL such definitions work bottom-up is FALSE. 5. Since the question asks which statements are FALSE, the answer is (B) and (D), options 1 and 3."
     },
     {
       id: "gate2024s2-cs-30",
@@ -313,7 +313,7 @@ window.GATE_DATA.pyq.push({
       answers: [1,2],
       kind: "msq",
       marks: 1,
-      explanation: "x+1 always equals 1 (not x), and x.x equals x (not 0), so (B) and (C) are false; (A) and (D) are standard true Boolean identities."
+      explanation: "1. Statement (A): x.1=x is the identity law for AND — TRUE. 2. Statement (B): x+1 should equal 1 for any x (domination law for OR), not x; check x=0: 0+1=1≠0=x — fails, so 'x+1=x' is FALSE. 3. Statement (C): x.x should equal x (idempotent law), not 0; check x=1: 1.1=1≠0 — fails, so 'x.x=0' is FALSE. 4. Statement (D): x+x̄=1 is the complement law for OR — TRUE. 5. Hence the FALSE statements are (B) and (C), options 1 and 2."
     },
     {
       id: "gate2024s2-cs-31",

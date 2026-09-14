@@ -13,7 +13,7 @@ window.GATE_DATA.pyq.push({
       options: ["I","II","III","IV"],
       answer: 3,
       marks: 1,
-      explanation: "\"Fell down\" is simple past, so the parallel verb describing the resulting completed action should also be simple past (\"lost consciousness\"), not the past continuous \"was losing consciousness\". Part IV is therefore inappropriate."
+      explanation: "1. The sentence describes a sequence of two actions that both already happened: falling down, then losing consciousness. 2. \"Fell down\" (part III) is simple past tense, describing a single completed event. 3. For the second action to be described consistently as a completed event following the first, the verb should also be simple past: \"lost consciousness,\" not the past continuous \"was losing consciousness\" (part IV), which wrongly implies an ongoing, incomplete action. 4. Parts I, II and III are grammatically fine, so part IV is the inappropriate one."
     },
     {
       id: "gate2014s3-ga-2",
@@ -23,7 +23,7 @@ window.GATE_DATA.pyq.push({
       options: ["knows, will have","knew, had","had known, could have","should have known, would have"],
       answer: 2,
       marks: 1,
-      explanation: "This is a third conditional (past hypothetical), which requires \"had known\" in the if-clause and \"could have done\" in the main clause."
+      explanation: "1. The sentence describes a hypothetical past situation, which requires the third-conditional structure: 'if + past perfect' in the if-clause and 'would/could + have + past participle' in the main clause. 2. Option A ('knows, will have') mixes present and future tense — wrong. 3. Option B ('knew, had') uses second-conditional past tense with a plain past participle in the main clause, not 'could have' — wrong. 4. Option D ('should have known, would have') changes the meaning (implying she should have known but didn't) rather than filling the conditional structure — wrong. 5. Option C ('had known, could have') gives 'if she had known ... she could have done', matching the third-conditional pattern exactly, so C is correct."
     },
     {
       id: "gate2014s3-ga-3",
@@ -33,7 +33,7 @@ window.GATE_DATA.pyq.push({
       options: ["sticky","well-connected","rambling","friendly"],
       answer: 2,
       marks: 1,
-      explanation: "\"Coherent\" means logically connected and easy to follow; \"rambling\" (disorganized, lacking clear structure) is its opposite."
+      explanation: "1. 'Coherent' means logically connected, consistent and easy to follow. 2. 'sticky' and 'friendly' are unrelated in meaning to coherence. 3. 'well-connected' is close to a synonym of coherent, not an opposite. 4. 'rambling' means disorganized and wandering without clear structure — the direct opposite of coherent. 5. So the answer is 'rambling'."
     },
     {
       id: "gate2014s3-ga-4",
@@ -43,7 +43,7 @@ window.GATE_DATA.pyq.push({
       options: ["17","37","64","26"],
       answer: 2,
       marks: 1,
-      explanation: "The series follows n^2 + 1 (2, 5, 10, 17, 26, 37, 50, 65). The 8th term should be 65, so 64 is the odd one out."
+      explanation: "1. Compute the differences between consecutive terms: 5-2=3, 10-5=5, 17-10=7, 26-17=9, 37-26=11, 50-37=13, 64-50=14. 2. The differences 3,5,7,9,11,13 increase by exactly 2 each time, so the next difference should also fit this pattern: 13+2=15. 3. Applying that expected difference to 50 gives 50+15=65, not 64. 4. This matches the closed form n²+1 (for n=1..8: 2,5,10,17,26,37,50,65), confirming the 8th term should be 65. 5. Since every other listed term fits n²+1 exactly and only the last one deviates, 64 is the term that does not belong."
     },
     {
       id: "gate2014s3-ga-5",
@@ -53,7 +53,7 @@ window.GATE_DATA.pyq.push({
       options: ["1.34","1.74","3.02","3.91"],
       answer: 2,
       marks: 1,
-      explanation: "Each question has 44 students (21+17+6 = 15+27+2 = 23+18+3 = 44). Total marks awarded = 21x2 + 15x3 + 23x2 = 42+45+46 = 133. Average = 133/44 ≈ 3.02."
+      explanation: "1. Verify each question has the same number of students: Q1: 21+17+6=44; Q2: 15+27+2=44; Q3: 23+18+3=44 — so there are 44 students in the class. 2. Total marks on Q1 = 21 correct × 2 marks = 42. 3. Total marks on Q2 = 15 correct × 3 marks = 45. 4. Total marks on Q3 = 23 correct × 2 marks = 46. 5. Total marks awarded across all questions = 42+45+46 = 133. 6. Average marks per student = 133/44 ≈ 3.02."
     },
     {
       id: "gate2014s3-ga-6",
@@ -63,7 +63,7 @@ window.GATE_DATA.pyq.push({
       options: ["Students should come at 9.00 a.m. and parents should come at 10.00 a.m.","Participating students should come at 9.00 a.m. accompanied by a parent, and other parents and students should come by 10.00 a.m.","Students who are not participating should come by 10.00 a.m. and they should not bring their parents. Participating students should come at 9.00 a.m.","Participating students should come before 9.00 a.m. Parents who accompany them should come at 9.00 a.m. All others should come at 10.00 a.m."],
       answer: 1,
       marks: 2,
-      explanation: "Only participating students need to arrive an hour early accompanied by a parent; everyone else should arrive at the regular start time. Option B states this precisely without adding extra unstated restrictions."
+      explanation: "1. The rule to convey has two parts: participating students must arrive an hour early (9:00 a.m.) accompanied by a parent, while everyone else (non-participating students and all other parents) should arrive at the normal start time (10:00 a.m.). 2. Option A drops the requirement that participating students be accompanied by a parent — incomplete. 3. Option C adds an unstated restriction (that non-participating students cannot bring parents) not supported by the scenario. 4. Option D unnecessarily separates the participating student's arrival ('before 9') from the accompanying parent's ('at 9'), a distinction not required. 5. Option B states exactly and only what is required, so B is correct."
     },
     {
       id: "gate2014s3-ga-7",
@@ -73,7 +73,7 @@ window.GATE_DATA.pyq.push({
       options: ["(i), (ii) and (iv)","(iii) only","(i) and (iv)","(iv) only"],
       answer: 3,
       marks: 2,
-      explanation: "The passage only supports that experimental evidence was decisive in confirming the paradigm shift (iv); it does not support the broader, overgeneralized claims in (i), (ii) or (iii)."
+      explanation: "1. The passage states only that experimental measurement of a star's position provided the clinching evidence for a paradigm shift; nothing broader is claimed. 2. (i) claims understanding always changes based on star positions — this over-generalizes far beyond the single example given. 3. (ii) claims paradigm shifts usually occur at the start of centuries — unsupported; the passage describes one instance near a century's start, not a general pattern. 4. (iii) claims stars are important objects in the universe generally — too broad a generalization to draw from one supporting measurement. 5. (iv) states experimental evidence was important in confirming the shift — this directly restates what the passage says. 6. Only (iv) is validly inferable, so the answer is 'iv only'."
     },
     {
       id: "gate2014s3-ga-8",
@@ -83,7 +83,7 @@ window.GATE_DATA.pyq.push({
       options: ["increased by 5%","decreased by 13%","decreased by 20%","decreased by 11%"],
       answer: 3,
       marks: 2,
-      explanation: "Original GDP in USD = G/50. New GDP in USD = 1.07G/60 ≈ 0.01783G, versus original 0.02G, a drop of about 10.8%, i.e. roughly an 11% decrease."
+      explanation: "1. Let the original GDP in Rupees be G. After 7% growth, the new GDP in Rupees is 1.07G. 2. Original GDP in USD = G/50 (using the original exchange rate Rs 50/USD). 3. New GDP in USD = 1.07G/60 (using the new exchange rate Rs 60/USD). 4. Ratio of new to original USD GDP = (1.07G/60)/(G/50) = (1.07×50)/60 = 53.5/60 ≈ 0.8917. 5. So the USD GDP becomes about 89.17% of its original value, a decrease of about 100−89.17 = 10.83% ≈ 11%. 6. The closest option is 'decreased by 11%'."
     },
     {
       id: "gate2014s3-ga-9",
@@ -94,7 +94,7 @@ window.GATE_DATA.pyq.push({
       options: ["1:1","2:1","1.5:1","2.5:1"],
       answer: 2,
       marks: 2,
-      explanation: "From the graph, the male:female ratio is 1 in 2011 and 1.5 in 2012. Since the number of female students is the same in both years, the male count scales with the ratio: male(2012):male(2011) = 1.5:1."
+      explanation: "1. Reading the graph, the male:female ratio is 1 (i.e. 1:1) in 2011 and 1.5 (i.e. 1.5:1) in 2012. 2. Let F be the number of female students, the same in both years. 3. Male students in 2011 = ratio(2011) × F = 1 × F = F. 4. Male students in 2012 = ratio(2012) × F = 1.5 × F. 5. Ratio of male(2012) to male(2011) = 1.5F / F = 1.5, i.e. 1.5:1."
     },
     {
       id: "gate2014s3-ga-10",
@@ -104,7 +104,7 @@ window.GATE_DATA.pyq.push({
       options: ["1634","1737","3142","3162"],
       answer: 2,
       marks: 2,
-      explanation: "(7526)_8 = 3926 and (4364)_8 = 2292 in decimal. Y = 3926 - 2292 = 1634 decimal, which converts to (3142)_8."
+      explanation: "1. Convert (7526)_8 to decimal: 7×8³+5×8²+2×8+6 = 3584+320+16+6 = 3926. 2. Convert (4364)_8 to decimal: 4×8³+3×8²+6×8+4 = 2048+192+48+4 = 2292. 3. From the equation 3926 − Y = 2292, so Y = 3926 − 2292 = 1634 (decimal). 4. Convert 1634 to octal: 1634 = 3×512 + 98 (digit 3, remainder 98); 98 = 1×64 + 34 (digit 1, remainder 34); 34 = 4×8 + 2 (digit 4, remainder 2); final digit 2. 5. So Y = (3142)_8."
     },
     {
       id: "gate2014s3-cs-1",

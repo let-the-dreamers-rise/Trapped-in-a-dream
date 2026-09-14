@@ -13,7 +13,7 @@ window.GATE_DATA.pyq.push({
       options: ["adopt to","adapt to","adept in","accept with"],
       answer: 1,
       marks: 1,
-      explanation: "\"Cope with\" means to deal successfully with something; \"adapt to\" (to adjust oneself to new conditions) is the closest match in meaning."
+      explanation: "1. \"Cope with\" means to deal successfully with a difficult situation. 2. Check each option: \"adopt to\" is not standard English (adopt takes a direct object, not \"to\"); \"adept in\" means skilled at, not deal with; \"accept with\" doesn't fit grammatically. 3. \"Adapt to\" means to adjust oneself to new conditions — exactly synonymous with coping with varied environments, so it is the closest match."
     },
     {
       id: "gate2014s1-ga-2",
@@ -23,7 +23,7 @@ window.GATE_DATA.pyq.push({
       options: ["superb","medium","mediocre","exhilarating"],
       answer: 2,
       marks: 1,
-      explanation: "The sentence needs a negative word to explain his disbelief at her winning; \"mediocre\" (average, not very good) fits, while the other options are all positive."
+      explanation: "1. The sentence sets up a contrast: the minister could not understand why the judges gave first prize, implying her performance did not deserve it. 2. This requires a word describing a below-par performance. 3. \"Superb\" and \"exhilarating\" are strongly positive and would justify winning, so they are eliminated; \"medium\" is a size/degree word, not naturally used to describe performance quality. 4. \"Mediocre\" (average, not very good) is the only word that creates the needed contrast with winning first prize, so it is correct."
     },
     {
       id: "gate2014s1-ga-3",
@@ -33,7 +33,7 @@ window.GATE_DATA.pyq.push({
       options: ["He wants all the money","He will return the money","He will assume final responsibility","He will resist all enquiries"],
       answer: 2,
       marks: 1,
-      explanation: "\"The buck stops here\" is an idiom meaning one accepts ultimate responsibility, rather than passing blame elsewhere."
+      explanation: "1. \"The buck stops here\" is an idiom meaning the speaker accepts ultimate responsibility rather than passing blame further along. 2. Check the other options: \"he wants all the money\" and \"he will return the money\" misread \"buck\" as literal money; \"he will resist all enquiries\" is the opposite of accepting responsibility. 3. So the minister is conveying that he will assume final responsibility, matching option (C)."
     },
     {
       id: "gate2014s1-ga-4",
@@ -45,7 +45,7 @@ window.GATE_DATA.pyq.push({
       tolerance: 0.01,
       kind: "nat",
       marks: 1,
-      explanation: "Expanding, (z + 1/z)^2 = z^2 + 2 + 1/z^2 = 98, so z^2 + 1/z^2 = 98 - 2 = 96."
+      explanation: "1. Expand (z+1/z)^2 = z^2 + 2·z·(1/z) + 1/z^2 = z^2 + 2 + 1/z^2. 2. Set this equal to 98: z^2 + 2 + 1/z^2 = 98. 3. Subtract 2 from both sides: z^2 + 1/z^2 = 98 - 2 = 96."
     },
     {
       id: "gate2014s1-ga-5",
@@ -55,7 +55,7 @@ window.GATE_DATA.pyq.push({
       options: ["no roots","2 real roots","3 real roots","4 real roots"],
       answer: 3,
       marks: 1,
-      explanation: "For x ≥ 0 the equation is identical to the original and contributes its 2 positive roots; for x < 0, |x| = -x gives a x^2 - b x + c = 0, whose roots are the negatives of the original (also real), contributing 2 more real roots — 4 real roots in total."
+      explanation: "1. For x ≥ 0, |x| = x, so the equation becomes ax^2+bx+c=0, identical to the original — its 2 given positive roots satisfy x≥0, so both carry over as roots of the modified equation. 2. For x < 0, |x| = -x, so the equation becomes ax^2 - bx + c = 0. If r is a positive root of the original ax^2+bx+c=0, substituting x=-r into ax^2-bx+c gives a·r^2 + b·r + c = 0, which holds, so -r (negative, since r is positive) is a root of the x<0 branch — both original roots give a corresponding negative root here, so 2 more real roots. 3. In total there are 2 (positive) + 2 (negative) = 4 real roots, matching option (D)."
     },
     {
       id: "gate2014s1-ga-6",
@@ -65,7 +65,7 @@ window.GATE_DATA.pyq.push({
       options: ["The Palghat gap is caused by high rainfall and high temperatures in southern Tamil Nadu and Kerala","The regions in Tamil Nadu and Kerala that are near the Palghat Gap are low-lying","The low terrain of the Palghat Gap has a significant impact on weather patterns in neighbouring parts of Tamil Nadu and Kerala","Higher summer temperatures result in higher rainfall near the Palghat Gap area"],
       answer: 2,
       marks: 2,
-      explanation: "The passage states that the low-lying gap causes both extra rainfall in Tamil Nadu and higher temperatures in Kerala, so it is the terrain that drives these regional weather effects."
+      explanation: "1. The passage states the low-lying Palghat Gap causes two distinct regional weather effects: more monsoon rainfall reaching Tamil Nadu, and higher summer temperatures in Kerala. 2. Check each option: (A) reverses cause and effect (rainfall/temperature don't cause the gap; the gap's terrain causes them); (B) is an unsupported overgeneralization that the whole neighbouring regions are low-lying, which the passage never claims; (D) reverses causality (claiming temperature causes rainfall), which is not stated. 3. (C) directly restates what the passage establishes: the gap's low terrain measurably affects the weather in the neighbouring parts of both states, so it is the correct inference."
     },
     {
       id: "gate2014s1-ga-7",
@@ -75,7 +75,7 @@ window.GATE_DATA.pyq.push({
       options: ["Strategies are now available for eliminating psychiatric illnesses","Certain psychiatric illnesses have a genetic basis","All human diseases can be traced back to genes and how they are expressed","In the future, genetics will become the only relevant field for identifying psychiatric illnesses"],
       answer: 1,
       marks: 2,
-      explanation: "The claim that gene therapy could eradicate these illnesses only makes sense if the illnesses actually have a genetic basis, which is the necessary underlying assumption."
+      explanation: "1. The argument's structure is: illnesses have genetic roots → gene therapy can eradicate them. 2. For this conclusion to follow, it must be assumed that the illnesses actually do have an exploitable genetic basis. 3. Checking the other options: (A) claims treatment strategies already exist, but the passage only says scientists are 'close to confirming', not that strategies exist yet; (C) overgeneralizes to ALL diseases, which the argument never claims; (D) claims genetics will be the ONLY relevant field, which is stronger than needed. 4. Only (B) — that certain psychiatric illnesses have a genetic basis — is the necessary assumption underlying the argument."
     },
     {
       id: "gate2014s1-ga-8",
@@ -87,7 +87,7 @@ window.GATE_DATA.pyq.push({
       tolerance: 0.01,
       kind: "nat",
       marks: 2,
-      explanation: "Round-trip fare per person is Rs 200, so for 5 people the total is Rs 1000. The 10% round-trip discount plus the 5% group discount together total 15% off Rs 1000, i.e. Rs 150 off, leaving Rs 850."
+      explanation: "1. One-way fare is Rs 100, so a round-trip fare per person is Rs 200. 2. For 5 people, the total fare before any discount is 5 × 200 = Rs 1000. 3. Both the round-trip discount (10%) and the group discount (5%, since the group has 4 or more people) apply to the total fare, giving a combined discount of 10%+5% = 15%. 4. 15% of 1000 = Rs 150. 5. The amount charged is 1000 − 150 = Rs 850."
     },
     {
       id: "gate2014s1-ga-9",
@@ -99,7 +99,7 @@ window.GATE_DATA.pyq.push({
       tolerance: 0.01,
       kind: "nat",
       marks: 2,
-      explanation: "Scooter owners are those in the \"Scooter\" and \"Both\" rows: (30+60) men + (20+46) women = 156. Out of 300 respondents, 300 - 156 = 144 do not own a scooter, which is 144/300 = 48%."
+      explanation: "1. Scooter owners are recorded in the \"Scooter\" row and the \"Both\" row: Men = 30 + 60 = 90; Women = 20 + 46 = 66. 2. Total scooter owners = 90 + 66 = 156. 3. Total respondents = 300, so respondents who do NOT own a scooter = 300 − 156 = 144. 4. As a percentage: 144/300 × 100 = 48%."
     },
     {
       id: "gate2014s1-ga-10",
@@ -111,7 +111,7 @@ window.GATE_DATA.pyq.push({
       tolerance: 0.01,
       kind: "nat",
       marks: 2,
-      explanation: "Each pair of the 4 lines from the interior point to the corners determines one plane; the number of such pairs is C(4,2) = 6."
+      explanation: "1. The interior point is connected to each of the 4 corners by a straight line, giving 4 line segments. 2. Any 2 of these 4 lines, since they share the common interior point, determine a unique plane. 3. The number of ways to choose 2 lines out of 4 is C(4,2) = 4×3/2 = 6. 4. So there are 6 new internal planes."
     },
     {
       id: "gate2014s1-cs-1",
