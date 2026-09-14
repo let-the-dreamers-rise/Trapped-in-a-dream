@@ -45,7 +45,7 @@ window.GATE_DATA.pyq.push({
       tolerance: 0.01,
       kind: "nat",
       marks: 1,
-      explanation: "1. Expand (z+1/z)^2 = z^2 + 2·z·(1/z) + 1/z^2 = z^2 + 2 + 1/z^2. 2. Set this equal to 98: z^2 + 2 + 1/z^2 = 98. 3. Subtract 2 from both sides: z^2 + 1/z^2 = 98 - 2 = 96."
+      explanation: "1. Use the algebraic identity for the square of a sum: (z+1/z)^2 = z^2 + 2·z·(1/z) + (1/z)^2. 2. Simplify the middle term: z·(1/z) = 1, so 2·z·(1/z) = 2. 3. This gives (z+1/z)^2 = z^2 + 2 + 1/z^2. 4. Set this equal to the given value 98: z^2 + 2 + 1/z^2 = 98. 5. Subtract 2 from both sides to isolate the target expression: z^2 + 1/z^2 = 98 - 2 = 96. 6. So the value of z^2 + 1/z^2 is 96, without needing to solve for z itself."
     },
     {
       id: "gate2014s1-ga-5",
