@@ -121,7 +121,7 @@ window.GATE_DATA.pyq.push({
       options: ["∀x: glitters(x) → ¬gold(x)","∀x: gold(x) → glitters(x)","∃x: gold(x) ∧ ¬glitters(x)","∃x: glitters(x) ∧ ¬gold(x)"],
       answer: 3,
       marks: 1,
-      explanation: "\"Not all that glitters is gold\" asserts that some glittering thing is not gold, i.e. there exists x such that glitters(x) ∧ ¬gold(x), which is (D)."
+      explanation: "1. The English sentence \"Not all that glitters is gold\" is NOT a universal claim about every glittering thing failing to be gold — it specifically asserts that AT LEAST ONE glittering thing is not gold, while leaving open that other glittering things might still be gold. 2. This existential reading translates directly to: there exists an x such that x glitters AND x is not gold, i.e. ∃x: glitters(x) ∧ ¬gold(x) — matching option D. 3. Option A (∀x: glitters(x)→¬gold(x)) would instead mean NOTHING that glitters is ever gold, a much stronger and different claim than the original sentence intends."
     },
     {
       id: "gate2014s1-cs-2",
@@ -133,7 +133,7 @@ window.GATE_DATA.pyq.push({
       tolerance: 0.015,
       kind: "nat",
       marks: 1,
-      explanation: "If the break point X is uniform on [0,1], the shorter piece has length min(X, 1-X), whose expected value is 1/4 = 0.25, which lies in the accepted key range."
+      explanation: "1. Let the break point be X, uniform on [0,1]. The two resulting pieces have lengths X and 1-X, and the shorter piece has length min(X, 1-X). 2. By symmetry around X=0.5, compute E[min(X,1-X)] = 2∫[0 to 0.5] x dx = 2×[x²/2] from 0 to 0.5 = 2×0.125 = 0.25. 3. So the expected length of the shorter stick is 0.25, matching the accepted numeric answer."
     },
     {
       id: "gate2014s1-cs-3",
@@ -143,7 +143,7 @@ window.GATE_DATA.pyq.push({
       options: ["G1 = (V, E1) where E1 = {(u,v) | (u,v) ∉ E}","G2 = (V, E2) where E2 = {(u,v) | (v,u) ∈ E}","G3 = (V, E3) where E3 = {(u,v) | there is a path of length ≤ 2 from u to v in E}","G4 = (V4, E) where V4 is the set of vertices in G which are not isolated"],
       answer: 1,
       marks: 1,
-      explanation: "Reversing every edge of G (G2) preserves exactly the same cycles and hence the same strongly connected components, since two vertices are mutually reachable in G iff they are mutually reachable in the reversed graph."
+      explanation: "1. Two vertices u and v belong to the same strongly connected component of G exactly when u can reach v AND v can reach u (mutual reachability). 2. Reversing every edge (G2, where (u,v) is an edge iff (v,u) was an edge in G) does not change WHETHER two vertices are mutually reachable — a path from u to v in G becomes a path from v to u in G2, and vice versa, so mutual reachability is preserved exactly. 3. Therefore G2 has the identical strongly connected components as G, matching option B. Options A, C, and D all change the actual reachability structure (complementing edges, adding length-2 paths, or dropping vertices) and do not preserve SCCs in general."
     },
     {
       id: "gate2014s1-cs-4",
@@ -155,7 +155,7 @@ window.GATE_DATA.pyq.push({
       tolerance: 0.01,
       kind: "nat",
       marks: 1,
-      explanation: "Although there are 4 equations in 3 unknowns, solving any 3 of them gives x = -2.2, y = 3.8, z = 1.4, and this triple also satisfies the 4th equation, so the system is consistent with a unique solution."
+      explanation: "1. There are 4 equations but only 3 unknowns (x, y, z), so the system is overdetermined — it has a solution only if the 4th equation is consistent with the other 3. 2. Solve any 3 of the equations (say the first three: 3x+2y=1, 4x+7z=1, x+y+z=3) simultaneously to get x=-2.2, y=3.8, z=1.4. 3. Substitute this triple into the 4th equation, x-2y+7z=0: -2.2-2(3.8)+7(1.4) = -2.2-7.6+9.8 = 0 — it checks out exactly, so the system is consistent. 4. Since a consistent system of 3 independent linear equations in 3 unknowns has exactly one solution, the answer is 1."
     },
     {
       id: "gate2014s1-cs-5",
@@ -167,7 +167,7 @@ window.GATE_DATA.pyq.push({
       tolerance: 0.01,
       kind: "nat",
       marks: 1,
-      explanation: "Eigenvectors of a symmetric matrix corresponding to distinct eigenvalues are orthogonal, so their dot product is always 0."
+      explanation: "1. A key theorem of linear algebra: for a SYMMETRIC matrix, eigenvectors corresponding to DIFFERENT (distinct) eigenvalues are always ORTHOGONAL to each other. 2. This holds for any symmetric matrix, and a symmetric positive definite matrix is a symmetric matrix, so the theorem applies directly here. 3. Orthogonal vectors have a dot product of exactly 0, so the answer is 0."
     },
     {
       id: "gate2014s1-cs-6",
@@ -177,7 +177,7 @@ window.GATE_DATA.pyq.push({
       options: ["I only","II only","Both I and II","Neither I nor II"],
       answer: 2,
       marks: 1,
-      explanation: "f(π/6) = f(π/3) = 0 since those rows repeat inside the determinant, so by Rolle's theorem f′ vanishes somewhere in between (I true); and since f is not identically zero on the whole interval, f′ cannot be identically zero either (II true)."
+      explanation: "1. f(θ) is a 3x3 determinant whose second and third rows are the FIXED values (sinπ/6,cosπ/6,tanπ/6) and (sinπ/3,cosπ/3,tanπ/3), with the first row varying as (sinθ,cosθ,tanθ). 2. At θ=π/6, the first row equals the second row exactly, so the determinant has two identical rows and f(π/6)=0. Similarly at θ=π/3, the first row equals the third row, so f(π/3)=0. 3. Since f is continuous and differentiable on [π/6,π/3] with f(π/6)=f(π/3)=0, Rolle's Theorem guarantees some θ in the open interval (π/6,π/3) where f′(θ)=0 — so statement I is TRUE. 4. f is not identically zero throughout the whole interval (it is only zero at the two endpoints, not in between, since the three rows only coincide exactly at those two points), so f′ cannot be identically zero either — some θ must have f′(θ)≠0, making statement II also TRUE. 5. Both I and II hold, matching option C."
     },
     {
       id: "gate2014s1-cs-7",
@@ -187,7 +187,7 @@ window.GATE_DATA.pyq.push({
       options: ["PQ + QR + QS","P + Q + R + S","P̄ + Q̄ + R̄ + S̄","P̄R + P̄RS + P"],
       answer: 0,
       marks: 1,
-      explanation: "Every product term of F contains Q, and factoring gives F = PQ + P̄Q(R + R̄S) = PQ + P̄Q(R+S) = Q(P+R) + QS = PQ + QR + QS, matching (A)."
+      explanation: "1. Every term in F=PQ+P̄QR+P̄QR̄S contains the literal Q, so factor Q out: F = Q(P + P̄R + P̄R̄S). 2. Inside the parentheses, apply the same factoring trick to the P̄ terms: P̄R+P̄R̄S = P̄(R+R̄S). Using the identity R+R̄S = R+S (since R̄S survives only when R is false, and R+S already covers that case), this becomes P̄(R+S). 3. So F = Q(P + P̄(R+S)) = Q(P + P̄R + P̄S). Using the absorption-style identity P+P̄X = P+X, this simplifies to Q(P+R+S) = PQ+QR+QS. 4. This is the minimal SOP form, matching option A."
     },
     {
       id: "gate2014s1-cs-8",
@@ -199,7 +199,7 @@ window.GATE_DATA.pyq.push({
       tolerance: 0.01,
       kind: "nat",
       marks: 1,
-      explanation: "In base b: 312_b = 3b²+b+2, 20_b = 2b, 13.1_b = b+3+1/b. Setting (3b²+b+2)/(2b) = b+3+1/b and clearing denominators gives 3b²+b+2 = 2b²+6b+2, i.e. b²-5b=0, so b=5."
+      explanation: "1. In base b, the digit string 312 represents 3b²+1b+2, the digit string 20 represents 2b+0=2b, and 13.1 represents 1b+3+1/b. 2. Set up the equation directly from 312/20=13.1: (3b²+b+2)/(2b) = b+3+1/b. 3. Multiply both sides by 2b to clear denominators: 3b²+b+2 = 2b(b+3) + 2 = 2b²+6b+2. 4. Simplify: 3b²+b+2-2b²-6b-2=0 → b²-5b=0 → b(b-5)=0, so b=5 (rejecting b=0, which is not a valid radix). 5. The base is 5."
     },
     {
       id: "gate2014s1-cs-9",
@@ -211,7 +211,7 @@ window.GATE_DATA.pyq.push({
       tolerance: 0.01,
       kind: "nat",
       marks: 1,
-      explanation: "64 registers need 6 bits each, so two register operands take 12 bits; 45 opcodes need at least 6 bits, leaving 32 - 12 - 6 = 14 bits for the immediate field, giving a maximum unsigned value of 2^14 - 1 = 16383."
+      explanation: "1. With 64 registers, each register operand needs ⌈log2(64)⌉=6 bits to encode, and the instruction has TWO register operands, using 6×2=12 bits total. 2. With 45 distinct instructions/opcodes to support, the opcode field needs ⌈log2(45)⌉=6 bits (since 2^5=32<45≤64=2^6). 3. Total instruction width is 32 bits, so the remaining bits for the immediate operand = 32-12-6=14 bits. 4. An unsigned 14-bit field's maximum value is 2^14-1=16383."
     },
     {
       id: "gate2014s1-cs-10",
@@ -221,7 +221,7 @@ window.GATE_DATA.pyq.push({
       options: ["Compilation fails.","Execution results in a run-time error.","On execution, the value printed is 5 more than the address of variable i.","On execution, the value printed is 5 more than the integer value entered."],
       answer: 3,
       marks: 1,
-      explanation: "pi points to i, so scanf reads the entered integer into i itself; the program then compiles, runs, and prints i+5, i.e. 5 more than the value entered."
+      explanation: "1. The pointer pi is initialized to point directly at the variable i (pi=&i). 2. scanf(\"%d\",pi) reads an integer from input and stores it at the address pi points to — which is the address of i itself, so the entered value is stored directly into i. 3. The program then executes printf(\"%d\\n\", i+5), which prints whatever value was read into i, plus 5. 4. There is no error: the code compiles and runs correctly, and the printed value is exactly 5 more than the integer the user entered, matching option D — options A and B are wrong since nothing here fails to compile or crashes, and option C confuses printing the VALUE of i with printing the ADDRESS of i."
     },
     {
       id: "gate2014s1-cs-11",
@@ -231,7 +231,7 @@ window.GATE_DATA.pyq.push({
       options: ["Θ(n)","Θ(n+m)","Θ(n²)","Θ(m²)"],
       answer: 2,
       marks: 1,
-      explanation: "With an adjacency matrix, finding the neighbours of a vertex takes Θ(n) regardless of the actual number of edges, so visiting all n vertices this way takes Θ(n²), independent of m."
+      explanation: "1. Depth-First Search visits each of the n vertices once, and at each vertex, must examine its neighbours to decide where to recurse next. 2. With an ADJACENCY MATRIX representation, finding all neighbours of one vertex requires scanning its ENTIRE row of the matrix — Θ(n) time — regardless of how many actual edges that vertex has. 3. Since this Θ(n) neighbour-scan happens once per vertex, and there are n vertices, the total running time is n×Θ(n)=Θ(n²). 4. This bound is TIGHT (achieved exactly, not merely an upper bound), and notably does NOT depend on m (the actual edge count) at all, since the matrix representation forces scanning empty entries too — matching option C, Θ(n²)."
     },
     {
       id: "gate2014s1-cs-12",
@@ -243,7 +243,7 @@ window.GATE_DATA.pyq.push({
       tolerance: 0.01,
       kind: "nat",
       marks: 1,
-      explanation: "By computing, at each node in a single bottom-up traversal, the (capped-at-4) count of ways its subtree contributes to a connected piece of size 4, the whole tree can be processed in O(n) time, so a=1 and b=0, giving a+10b = 1."
+      explanation: "1. To count subtrees with exactly 4 nodes, process the tree in a SINGLE bottom-up (post-order) traversal, visiting each node once. 2. At each node, using the counts already computed for its children (each child's subtree sizes CAPPED at 4, since a size larger than 4 is irrelevant to this specific count), combine them in constant additional work per node to determine how many size-4 connected pieces pass through this node. 3. Since every node is processed exactly once with O(1) extra work per node (thanks to capping subtree sizes at the small constant 4), the total running time is O(n) — so a=1 (the n^a factor) and b=0 (no log factor is needed at all). 4. a+10b = 1+0 = 1."
     },
     {
       id: "gate2014s1-cs-13",
@@ -254,7 +254,7 @@ window.GATE_DATA.pyq.push({
       options: ["The graph does not have any topological ordering.","Both PQRS and SRQP are topological orderings.","Both PSRQ and SPRQ are topological orderings.","PSRQ is the only topological ordering."],
       answer: 2,
       marks: 1,
-      explanation: "With edges P→Q, P→R, R→Q, S→R, S→Q, both orderings PSRQ and SPRQ place every vertex before all vertices it points to, so both are valid topological orderings, matching (C)."
+      explanation: "1. The graph has directed edges P→Q, P→R, R→Q, S→R, S→Q. A valid topological ordering must place every vertex BEFORE every vertex it points to. 2. Check ordering PSRQ (P,S,R,Q): P before Q ✓(pos 1<4), P before R ✓(1<3), R before Q ✓(3<4), S before R ✓(2<3), S before Q ✓(2<4) — all edges respected, so PSRQ is valid. 3. Check ordering SPRQ (S,P,R,Q): P before Q ✓(2<4), P before R ✓(2<3), R before Q ✓(3<4), S before R ✓(1<3), S before Q ✓(1<4) — all edges respected, so SPRQ is also valid. 4. Both orderings work, matching option C — and since the graph clearly HAS at least these valid orderings, option A (no ordering exists) is wrong, and since MULTIPLE distinct valid orderings exist beyond just PSRQ, option D (PSRQ is the ONLY one) is also wrong."
     },
     {
       id: "gate2014s1-cs-14",
@@ -264,7 +264,7 @@ window.GATE_DATA.pyq.push({
       options: ["t1 = 5","t1 < t2","t1 > t2","t1 = t2"],
       answer: 2,
       marks: 1,
-      explanation: "An already-sorted input makes first-element-pivot quicksort degrade to its worst case (10 comparisons for n=5), while [4 1 5 3 2] splits more evenly and needs fewer comparisons, so t1 > t2."
+      explanation: "1. Quicksort with the FIRST element as pivot degrades to its WORST CASE — Θ(n²) comparisons — specifically when the input is ALREADY sorted (or reverse-sorted), because every partition splits off just one element (the pivot) leaving n-1 elements on one side, the most unbalanced split possible. 2. For [1,2,3,4,5] (already sorted, n=5), this worst-case behavior gives the maximum possible comparison count for n=5, which is n(n-1)/2=10. 3. For [4,1,5,3,2], the first pivot (4) splits the remaining elements into {1,3,2} (less than 4) and {5} (greater than 4) — a much more BALANCED split than the sorted case, leading to noticeably FEWER total comparisons than the worst case. 4. Since t1 (sorted input) hits the worst case and t2 (this mixed input) does not, t1 > t2, matching option C."
     },
     {
       id: "gate2014s1-cs-15",
@@ -274,7 +274,7 @@ window.GATE_DATA.pyq.push({
       options: ["The language L = {a^n b^n | n ≥ 0} is regular.","The language L = {a^n | n is prime} is regular.","The language L = {w | w has 3k+1 b's for some k ∈ ℕ, with Σ = {a,b}} is regular.","The language L = {ww | w ∈ Σ*, with Σ = {0,1}} is regular."],
       answer: 2,
       marks: 1,
-      explanation: "Counting the number of b's modulo 3 only needs a finite-state counter, so the language of strings whose b-count is ≡1 (mod 3) is regular; the other three languages are classic non-regular languages (by the pumping lemma)."
+      explanation: "1. Option A, {aⁿbⁿ|n≥0}: NOT regular — this is the textbook pumping-lemma counterexample requiring unbounded memory to match equal counts of a's and b's. 2. Option B, {aⁿ|n is prime}: NOT regular — the gaps between consecutive primes grow without bound, so no finite-state machine (whose behavior must eventually become periodic) can track \"is this length prime\" correctly for all n. 3. Option C, {w | w has 3k+1 b's for some k}: this only requires tracking the COUNT of b's modulo 3 — a finite amount of information (3 possible remainder states) that a simple finite-state counter handles directly, so this language IS regular. 4. Option D, {ww | w∈{0,1}*}: NOT regular — verifying the first half of a string exactly repeats as the second half again requires unbounded memory (the pumping lemma rules this out too). 5. Only option C is regular."
     },
     {
       id: "gate2014s1-cs-16",
@@ -295,7 +295,7 @@ window.GATE_DATA.pyq.push({
       options: ["A basic block is a sequence of instructions where control enters the sequence at the beginning and exits at the end.","Available expression analysis can be used for common subexpression elimination.","Live variable analysis can be used for dead code elimination.","x = 4 * 5 ⇒ x = 20 is an example of common subexpression elimination."],
       answer: 3,
       marks: 1,
-      explanation: "Evaluating x = 4*5 to x = 20 is constant folding, not common subexpression elimination (which removes a repeated computation), so (D) is the false statement."
+      explanation: "1. Option A is TRUE by definition: a basic block is exactly a maximal sequence of instructions with control entering only at the start and leaving only at the end. 2. Option B is TRUE: available-expression analysis identifies expressions already computed earlier along every path, which is exactly the information common-subexpression elimination needs to avoid recomputing them. 3. Option C is TRUE: live-variable analysis identifies variables whose current value will never be used again, which is exactly what justifies removing (as dead code) an assignment to such a variable. 4. Option D is FALSE: evaluating x=4*5 directly to x=20 is CONSTANT FOLDING (computing a compile-time-known constant expression once), not common subexpression elimination (which specifically removes a REPEATED computation of the same expression appearing more than once) — so D is the false statement, matching the answer."
     },
     {
       id: "gate2014s1-cs-18",
@@ -337,7 +337,7 @@ window.GATE_DATA.pyq.push({
       options: ["{E, F}","{E, F, H}","{E, F, H, K, L}","{E}"],
       answer: 1,
       marks: 1,
-      explanation: "Starting from {E,F,H} and applying the FDs derives G, I, J, K, L, M, N — every attribute of R — while no proper subset of {E,F,H} closes to all attributes, so {E,F,H} is the (minimal) key."
+      explanation: "1. To find the key, compute the CLOSURE of the candidate set {E,F,H} under the given functional dependencies, one dependency at a time. 2. Starting set: {E,F,H}. Apply {E,F}→{G}: since E,F are both present, add G, giving {E,F,G,H}. 3. Apply {F}→{I,J}: F is present, add I,J, giving {E,F,G,H,I,J}. 4. Apply {E,H}→{K,L}: both E,H are present, add K,L, giving {E,F,G,H,I,J,K,L}. 5. Apply {K}→{M}: K is present, add M. Apply {L}→{N}: L is present, add N. Final closure: {E,F,G,H,I,J,K,L,M,N} — every attribute of R. 6. Since {E,F,H}'s closure covers all of R, and no PROPER SUBSET of {E,F,H} (checking {E,F}, {E,H}, {F,H} individually) closes to all of R, {E,F,H} is a MINIMAL set that determines everything — the key, matching option B."
     },
     {
       id: "gate2014s1-cs-22",
@@ -357,7 +357,7 @@ window.GATE_DATA.pyq.push({
       options: ["S1, S2, and S3 are all true.","S1, S2, and S3 are all false.","S1 and S2 are true, but S3 is false.","S1 and S3 are true, but S2 is false."],
       answer: 3,
       marks: 1,
-      explanation: "Link-state protocols do more computation (Dijkstra over the whole topology) and converge faster after a change, so S1 and S3 are true; split horizon only prevents simple two-node loops, not all persistent loops, so S2 is false."
+      explanation: "1. S1 (computational overhead): link-state protocols require EVERY router to run Dijkstra's algorithm over the ENTIRE network topology (500 nodes, 4000 links) after receiving link-state updates, while distance-vector routers only exchange and process their own neighbors' distance vectors — link-state is genuinely more computationally expensive, so S1 is TRUE. 2. S2 (loop avoidance): split horizon only prevents the SIMPLEST two-node routing loops (A telling B a route that goes back through B) — it does NOT prevent all possible persistent loops involving three or more routers, so the claim that distance-vector with split horizon avoids ALL persistent loops is FALSE, making S2 FALSE. 3. S3 (convergence speed): link-state protocols flood topology changes directly and each router independently recomputes shortest paths immediately, converging much faster than distance-vector's iterative neighbor-by-neighbor updates (which can suffer from slow count-to-infinity behavior) — so S3 is TRUE. 4. S1 and S3 true, S2 false, matching option D."
     },
     {
       id: "gate2014s1-cs-24",
@@ -367,7 +367,7 @@ window.GATE_DATA.pyq.push({
       options: ["P and R only","Q and R only","Q and S only","R and S only"],
       answer: 2,
       marks: 1,
-      explanation: "SHA-1 and MD5 are cryptographic hash functions used to produce message digests; RSA and DES are encryption algorithms, not digest functions."
+      explanation: "1. RSA is a PUBLIC-KEY ENCRYPTION algorithm, used for encrypting/decrypting data or for digital signatures — not itself a message-digest (hash) function. 2. DES is a SYMMETRIC-KEY ENCRYPTION algorithm — also not a digest function. 3. SHA-1 and MD5 are both CRYPTOGRAPHIC HASH FUNCTIONS, specifically designed to take an input message and produce a fixed-size \"digest\" or \"fingerprint\" of it. 4. Only Q (SHA-1) and S (MD5) generate message digests, matching option C."
     },
     {
       id: "gate2014s1-cs-25",
@@ -377,7 +377,7 @@ window.GATE_DATA.pyq.push({
       options: ["4,2,1,3","1,2,3,4","4,1,2,3","2,4,1,3"],
       answer: 0,
       marks: 1,
-      explanation: "The browser must first resolve the domain name (4), then establish a TCP connection (2), then send the HTTP request (1), and finally receive the response (3)."
+      explanation: "1. Before any communication can happen, the browser must first translate the human-readable domain name into an IP address — this is step 4 (DNS resolution), and it must happen FIRST since nothing else can proceed without knowing the server's address. 2. Once the IP address is known, the browser establishes a TCP connection to the server at that address — this is step 2, and it must happen before any HTTP messages can be exchanged over it. 3. With the TCP connection established, the browser sends its HTTP request for the webpage — this is step 1. 4. Finally, the server responds by sending the requested page back over the same connection — this is step 3, which can only happen after receiving the request. 5. The correct order is 4,2,1,3, matching option A."
     },
     {
       id: "gate2014s1-cs-26",
@@ -389,7 +389,7 @@ window.GATE_DATA.pyq.push({
       tolerance: 1,
       kind: "nat",
       marks: 2,
-      explanation: "The other 9 stations may each hold the token for up to 2 μs (18 μs total), plus the ring propagation delay of 2000 m / (2x10^8 m/s) = 10 μs, giving a wait time in the accepted range around 28-30 μs before the token is presumed lost."
+      explanation: "1. In a token ring, the monitoring station must wait long enough to account for the WORST CASE: every one of the other stations holding the token for its full allowed duration, plus the time for the token itself to physically travel all the way around the ring. 2. There are 10 stations total, so 9 OTHER stations (excluding the monitor) may each hold the token for up to 2 μs: 9×2=18 μs of total holding time. 3. The ring's total propagation delay (time for a signal to travel the full 2 km ring length) is distance/speed = 2000 m / (2×10⁸ m/s) = 1×10⁻⁵ s = 10 μs. 4. Total worst-case wait time = 18 μs (holding) + 10 μs (propagation) = 28 μs, matching the accepted numeric answer (within the small tolerance band GATE allows for numerical-answer questions)."
     },
     {
       id: "gate2014s1-cs-27",
@@ -413,7 +413,7 @@ window.GATE_DATA.pyq.push({
       tolerance: 0.01,
       kind: "nat",
       marks: 2,
-      explanation: "The required window size at 60% utilization works out to about 30 frames; since selective repeat needs a sequence-number space at least twice the window size, 5 bits (32 sequence numbers) is the minimum that suffices."
+      explanation: "1. Link utilization U = (useful transmission time)/(total round-trip cycle time). Transmission time per frame Tt = 1 KB / 1.5 Mbps = 8192 bits / 1.5×10⁶ bps ≈ 5.461 ms. 2. Round-trip time = 2×(one-way latency) = 2×50 ms = 100 ms. For a SINGLE frame sent and acknowledged with no pipelining, one full cycle = Tt + RTT ≈ 5.461+100 = 105.461 ms, giving very low utilization if only one frame is in flight at a time. 3. To reach 60% utilization via a sliding window (multiple frames in flight), the required window size W must satisfy W×Tt / (Tt+RTT) ≥ 0.6, giving W ≥ 0.6×105.461/5.461 ≈ 11.6, so at least 12 frames must be outstanding at once — but selective repeat's own maximum usable window is limited by its sequence-number space. 4. For selective repeat specifically, the window size can be AT MOST HALF the total sequence-number space (2^n / 2, where n is the number of sequence-number bits), to avoid ambiguity between old and new frames — so the sequence space must be at least 2×(required window), requiring n such that 2^(n-1) ≥ required window, giving n=5 (32 total sequence numbers, window up to 16) as the minimum bit-width that satisfies the requirement."
     },
     {
       id: "gate2014s1-cs-29",
@@ -423,7 +423,7 @@ window.GATE_DATA.pyq.push({
       options: ["r1(x); r2(x); w1(x); r3(x); w2(x)","r2(x); r1(x); w2(x); r3(x); w1(x)","r3(x); r2(x); r1(x); w2(x); w1(x)","r2(x); w2(x); r3(x); r1(x); w1(x)"],
       answer: 3,
       marks: 2,
-      explanation: "Building the precedence (conflict) graph for each schedule, only schedule (D) yields an acyclic graph among transactions T1, T2, T3, so only (D) is conflict serializable."
+      explanation: "1. A schedule is CONFLICT SERIALIZABLE if and only if its PRECEDENCE (conflict) graph — with one node per transaction, and an edge Ti→Tj whenever Ti's operation on some data item comes before a CONFLICTING operation by Tj on the SAME item — is ACYCLIC. 2. For schedule D, r2(x); w2(x); r3(x); r1(x); w1(x): trace the conflicts on x in order of occurrence — r2 before w2 is within T2 itself (no edge); w2 before r3 gives edge T2→T3 (write-then-read conflict); r3 before r1 is not a conflict (two reads never conflict); r1 before w1 is within T1 itself; but crucially, w2 (T2) occurs before r1 and w1 (T1), giving edge T2→T1 as well. The resulting graph has edges T2→T3 and T2→T1, with no edge creating a cycle back to T2 — this graph is ACYCLIC. 3. Checking schedules A, B, and C similarly (tracing each pair of conflicting read/write operations on x in their actual execution order) shows each of THEIR precedence graphs contains a cycle (for instance, both a T1→T2 style edge AND a T2→T1 style edge appear from different conflicting operations), meaning none of A, B, C are conflict serializable. 4. Only schedule D has an acyclic precedence graph, matching option D."
     },
     {
       id: "gate2014s1-cs-30",
@@ -477,7 +477,7 @@ window.GATE_DATA.pyq.push({
       options: ["a shift-reduce conflict and a reduce-reduce conflict.","a shift-reduce conflict but not a reduce-reduce conflict.","a reduce-reduce conflict but not a shift-reduce conflict.","neither a shift-reduce nor a reduce-reduce conflict."],
       answer: 3,
       marks: 2,
-      explanation: "Neither item has a dot immediately before the symbol <, so no shift action on < is generated by this item set, and hence there can be no shift-reduce or reduce-reduce conflict on that symbol."
+      explanation: "1. An LR item with the dot placed at some position indicates a SHIFT action is possible only on the grammar symbol that appears IMMEDIATELY AFTER the dot in that item. 2. Look at both items in this set: S→L.>R has the dot immediately before the symbol '>', not '<' — and Q→R. has the dot at the very END of the production (a REDUCE-only item, with no symbol after the dot at all). 3. Since NEITHER item has the dot positioned immediately before the input symbol '<', no SHIFT action on '<' is generated by this item set at all. 4. With no shift action possible on '<', there is no shift-reduce conflict (which requires a competing shift AND reduce on the same symbol) and no reduce-reduce conflict is indicated either (only Q→R. is a reduce item, and it doesn't apply specifically to lookahead '<' in a way that competes with anything else here) — so the answer is neither conflict, matching option D."
     },
     {
       id: "gate2014s1-cs-35",
@@ -487,7 +487,7 @@ window.GATE_DATA.pyq.push({
       options: ["Neither L nor L̄ is recursively enumerable (r.e.).","One of L and L̄ is r.e. but not recursive; the other is not r.e.","Both L and L̄ are r.e. but not recursive.","Both L and L̄ are recursive."],
       answer: 2,
       marks: 2,
-      explanation: "By Post's theorem, if both a language and its complement are recursively enumerable, the language must be recursive. So it is impossible for both L and L̄ to be r.e. but not recursive, making (C) not viable."
+      explanation: "1. POST'S THEOREM states: if BOTH a language L and its complement L̄ are recursively enumerable (r.e.), then L (and hence L̄) must actually be RECURSIVE (decidable) — this is the key fact needed to evaluate every option. 2. Option A (neither L nor L̄ is r.e.) is a genuinely possible situation — there exist languages where neither the language nor its complement can even be recognized by a Turing machine, so this is viable. 3. Option B (one of L, L̄ is r.e. but not recursive, the other not r.e. at all) is also genuinely possible and is, in fact, the STANDARD situation for undecidable-but-recognizable languages like the Halting Problem, so this is viable. 4. Option D (both L and L̄ are recursive) is trivially possible for any decidable language, so this is viable. 5. Option C (both L and L̄ are r.e. but NEITHER is recursive) directly CONTRADICTS Post's theorem — if both are r.e., the theorem forces L to be recursive, making \"both r.e. but not recursive\" a logical impossibility. Option C is the one that is NOT a viable possibility, matching the answer."
     },
     {
       id: "gate2014s1-cs-36",
@@ -532,7 +532,7 @@ window.GATE_DATA.pyq.push({
       tolerance: 0.5,
       kind: "nat",
       marks: 2,
-      explanation: "The optimal tournament-style algorithm needs ceil(3n/2) - 2 comparisons for n numbers; for n = 100 this is 3(100)/2 - 2 = 148, which falls within the accepted key range."
+      explanation: "1. The classic naive approach (find min and max independently, each via a separate linear scan) takes 2(n-1) comparisons for n elements — for n=100, that would be 198 comparisons. 2. The OPTIMAL algorithm instead processes elements in PAIRS: compare each pair against each other first (1 comparison per pair), then compare the SMALLER of each pair only against the running minimum, and the LARGER of each pair only against the running maximum — this way each element contributes to only ONE of the two comparisons (min-tracking or max-tracking), not both. 3. This optimal pairing approach needs exactly ⌈3n/2⌉-2 comparisons total. For n=100 (even, so no ceiling adjustment needed): 3(100)/2 - 2 = 150-2 = 148. 4. This value (148) falls within the small tolerance band GATE allows around the accepted numeric answer for this question."
     },
     {
       id: "gate2014s1-cs-40",
@@ -542,7 +542,7 @@ window.GATE_DATA.pyq.push({
       options: ["3, 0, and 1","3, 3, and 3","4, 0, and 1","3, 0, and 2"],
       answer: 0,
       marks: 2,
-      explanation: "Computing k mod 9 for each key gives chains of length 3 at slot 1 (28,19,10), length 2 at slot 6 (15,33), length 1 at slots 2,3,5,8, and length 0 at slots 0,4,7. Maximum is 3, minimum is 0, and average is 9 keys / 9 slots = 1."
+      explanation: "1. Compute h(k)=k mod 9 for every key in insertion order: 5 mod 9=5, 28 mod 9=1, 19 mod 9=1, 15 mod 9=6, 20 mod 9=2, 33 mod 9=6, 12 mod 9=3, 17 mod 9=8, 10 mod 9=1. 2. Group keys by their computed slot: slot 1 gets {28,19,10} (chain length 3), slot 5 gets {5} (length 1), slot 6 gets {15,33} (length 2), slot 2 gets {20} (length 1), slot 3 gets {12} (length 1), slot 8 gets {17} (length 1); slots 0, 4, 7 receive no keys at all (length 0). 3. Maximum chain length = 3 (slot 1). Minimum chain length = 0 (slots 0, 4, 7, which are empty). 4. Average chain length = total keys / total slots = 9/9 = 1 (this is always true for chaining regardless of distribution, since every key is in exactly one chain). 5. The answer is 3, 0, and 1, matching option A."
     },
     {
       id: "gate2014s1-cs-41",
@@ -552,7 +552,7 @@ window.GATE_DATA.pyq.push({
       options: ["maximum possible sum of elements in any sub-array of array E.","maximum element in any sub-array of array E.","sum of the maximum elements in all possible sub-arrays of array E.","the sum of all the elements in the array E."],
       answer: 0,
       marks: 2,
-      explanation: "The nested loops compute the sum Z of every contiguous sub-array E[i..j] and keep Y as the largest such sum seen so far (initialized to the sum of the whole array), i.e. the maximum sub-array sum."
+      explanation: "1. The FIRST loop computes Y = the sum of ALL elements in the array E (a plain linear-scan total). 2. The NESTED loops then iterate over every possible contiguous sub-array E[i..j] (all valid pairs i≤j), computing Z as the sum of that specific sub-array (via the innermost k-loop), and updating Y to Z whenever this sub-array's sum exceeds the CURRENT value of Y. 3. Since Y starts as the sum of the WHOLE array (itself one valid \"sub-array\"), and is then updated to the sum of any sub-array found to have an even LARGER sum, the final value of Y is exactly the MAXIMUM possible sum among all contiguous sub-arrays of E. 4. This matches option A — not option B (which would ask for the maximum single ELEMENT, not sum), and not option C or D, which describe entirely different aggregate computations."
     },
     {
       id: "gate2014s1-cs-42",
@@ -562,7 +562,7 @@ window.GATE_DATA.pyq.push({
       options: ["Half of the product of the 3 consecutive integers.","One-third of the product of the 3 consecutive integers.","One-sixth of the product of the 3 consecutive integers.","None of the above."],
       answer: 2,
       marks: 2,
-      explanation: "The number of (i,j,k) triples with 1<=i<=j<n<k<=n is a triangular-type count that works out to one-sixth of the product of three consecutive integers (n-1, n, n+1 in form), matching option (C)."
+      explanation: "1. The multiplication D=D*3 executes once for every valid combination of (i,j,k) satisfying 1≤i≤j<k≤n (since the innermost loop runs k from j+1 to n, meaning k is always strictly greater than j, and j≥i). 2. Counting the number of such triples (i,j,k) with i≤j<k is equivalent to choosing 3 positions out of a structured range — this specific triple-counting pattern (two possibly-equal indices i≤j, followed by a strictly-larger third index k) works out algebraically to exactly one-sixth of the product of three consecutive integers derived from n. 3. This matches option C, one-sixth of the product of the 3 consecutive integers."
     },
     {
       id: "gate2014s1-cs-43",
@@ -574,7 +574,7 @@ window.GATE_DATA.pyq.push({
       tolerance: 0.01,
       kind: "nat",
       marks: 2,
-      explanation: "Non-pipelined CPI is 6 (one cycle per stage executed sequentially); pipelined average CPI is 1 + 0.25x2 = 1.5. In steady state the speedup approaches 6/1.5 = 4."
+      explanation: "1. In a 6-stage pipeline with NO pipelining at all, each instruction would take all 6 stages sequentially, giving a non-pipelined CPI (cycles per instruction) of 6. 2. With pipelining, the STEADY-STATE CPI is 1 (one instruction completes per cycle) PLUS the extra stall cycles incurred by the fraction of instructions that stall: average CPI = 1 + (fraction stalling)×(stall cycles each) = 1 + 0.25×2 = 1+0.5 = 1.5. 3. Speedup = (non-pipelined CPI)/(pipelined CPI) = 6/1.5 = 4 (this steady-state approximation, ignoring pipeline fill/drain overhead, is the standard convention for this style of question)."
     },
     {
       id: "gate2014s1-cs-44",
@@ -595,7 +595,7 @@ window.GATE_DATA.pyq.push({
       options: ["P̄Q + QR̄ + PQ̄R","P̄Q + P̄QR̄ + PQR̄ + PQ̄R","P̄QR + P̄QR̄ + QR̄ + PQ̄R","PQR̄"],
       answer: 0,
       marks: 2,
-      explanation: "F = P̄Q̄·0 + P̄Q·1 + PQ̄·R + PQ·R̄ = P̄Q + PQ̄R + PQR̄. The true minterms are (P,Q,R) = 010, 011, 101, 110; grouping 010&011 gives P̄Q, grouping 010&110 gives QR̄, and 101 stands alone as PQ̄R, giving the minimal form P̄Q + QR̄ + PQ̄R, matching (A)."
+      explanation: "1. A 4-to-1 MUX outputs F = S1'S0'·(data0) + S1'S0·(data1) + S1S0'·(data2) + S1S0·(data3), where S1,S0 are the select lines. Here S1=P, S0=Q, and the data lines are data0=0, data1=1, data2=R, data3=R̄. 2. Substituting: F = P̄Q̄·0 + P̄Q·1 + PQ̄·R + PQ·R̄ = P̄Q + PQ̄R + PQR̄ (the P̄Q̄ term vanishes since it's multiplied by the constant 0). 3. List the minterms where F=1 by checking each (P,Q,R) combination: P̄Q term covers (0,1,0) and (0,1,1) [i.e. P̄Q regardless of R]; PQ̄R covers (1,0,1); PQR̄ covers (1,1,0). 4. Group these minterms on a K-map: (0,1,0) and (0,1,1) combine directly into P̄Q (already have this). (0,1,0) and (1,1,0) [both have Q=1,R=0] combine into QR̄. The remaining minterm (1,0,1) stands alone as PQ̄R. 5. Minimal SOP: F = P̄Q + QR̄ + PQ̄R, matching option A."
     },
     {
       id: "gate2014s1-cs-46",
@@ -607,7 +607,7 @@ window.GATE_DATA.pyq.push({
       tolerance: 0.01,
       kind: "nat",
       marks: 2,
-      explanation: "f'(x) = sin x + x cos x, f''(x) = 2cos x − x sin x, so f''(x) + f(x) = 2cos x − x sin x + x sin x = 2cos x. Setting 2cos x + t cos x = 0 for all x gives t = −2."
+      explanation: "1. Given f(x)=x·sin(x), compute the first derivative using the product rule: f'(x) = sin(x) + x·cos(x). 2. Compute the second derivative by differentiating f'(x) again: f''(x) = cos(x) + [cos(x) - x·sin(x)] = 2cos(x) - x·sin(x). 3. Compute f''(x)+f(x): [2cos(x) - x·sin(x)] + [x·sin(x)] = 2cos(x) (the x·sin(x) terms cancel exactly). 4. The given equation states f''(x)+f(x)+t·cos(x)=0, so substitute: 2cos(x) + t·cos(x) = 0 for ALL x, which requires (2+t)cos(x)=0 to hold identically — meaning 2+t=0, so t=-2."
     },
     {
       id: "gate2014s1-cs-47",
@@ -617,7 +617,7 @@ window.GATE_DATA.pyq.push({
       options: ["There exists a y in the interval (0,1) such that f(y) = f(y+1)","For every y in the interval (0,1), f(y) = f(2-y)","The maximum value of the function in the interval (0,2) is 1","There exists a y in the interval (0,1) such that f(y) = -f(2-y)"],
       answer: 0,
       marks: 2,
-      explanation: "Define g(y) = f(y) - f(y+1) on [0,1]; g(0) = f(0)-f(1) = -2 and g(1) = f(1)-f(2) = 2 have opposite signs, so by the Intermediate Value Theorem g(y) = 0 for some y in (0,1), i.e. f(y) = f(y+1)."
+      explanation: "1. Define a NEW function g(y) = f(y) - f(y+1) for y in [0,1] — this is continuous since f itself is continuous, and it directly tests whether f(y)=f(y+1) for some y (exactly what option A claims). 2. Evaluate g at the endpoints: g(0) = f(0)-f(1) = -1-1 = -2. g(1) = f(1)-f(2) = 1-(-1) = 2. 3. Since g(0)=-2 (negative) and g(1)=2 (positive) have OPPOSITE signs, the Intermediate Value Theorem guarantees some y in the OPEN interval (0,1) where g(y)=0, i.e. f(y)=f(y+1). 4. This confirms option A must be true; options B, C, D make claims not guaranteed by the given information (they would each require additional constraints on f beyond just its three given values)."
     },
     {
       id: "gate2014s1-cs-48",
@@ -629,7 +629,7 @@ window.GATE_DATA.pyq.push({
       tolerance: 0.01,
       kind: "nat",
       marks: 2,
-      explanation: "By symmetry, the number of ways to get sum 22 with four dice equals the number of ways to get sum 4x7-22=6; the number of ways to write 6 as an ordered sum of four values from 1-6 is C(5,3) = 10, so X = 10."
+      explanation: "1. Each of 4 dice can show a value from 1 to 6, and the total number of equally-likely outcomes for 4 dice is 6⁴=1296, matching the given denominator. 2. By the SYMMETRY of a standard die (values 1 through 6, symmetric around 3.5), the number of ways to get a sum of S with 4 dice equals the number of ways to get a sum of (4×7)-S = 28-S (replacing each die's value v with 7-v). For S=22, this means the count equals the count for sum 28-22=6. 3. Count the ways to write 6 as an ordered sum of 4 values, each from 1 to 6 (equivalently, writing 6-4=2 as an ordered sum of 4 non-negative integers, via the substitution vᵢ=xᵢ-1, since each die shows AT LEAST 1): this is the stars-and-bars count C(2+4-1,4-1)=C(5,3)=10. 4. So there are 10 ways to get sum 22, and X=10."
     },
     {
       id: "gate2014s1-cs-49",
@@ -641,7 +641,7 @@ window.GATE_DATA.pyq.push({
       tolerance: 0.1,
       kind: "nat",
       marks: 2,
-      explanation: "The count of n-pennants follows the Fibonacci recurrence f(n) = f(n-1) + f(n-2) (the last term is either 1 or 2), giving f(1)=1, f(2)=2, ..., f(10)=89."
+      explanation: "1. Let f(n) be the number of n-pennants (sequences of 1's and 2's summing to n). The LAST number in any n-pennant is either a 1 (in which case the remaining numbers form an (n-1)-pennant) or a 2 (in which case the remaining numbers form an (n-2)-pennant). 2. This gives the recurrence f(n) = f(n-1) + f(n-2) — exactly the Fibonacci recurrence — with base cases f(1)=1 (just the sequence (1)) and f(2)=2 (the sequences (2) and (1,1), matching the problem statement exactly). 3. Compute forward: f(1)=1, f(2)=2, f(3)=3, f(4)=5, f(5)=8, f(6)=13, f(7)=21, f(8)=34, f(9)=55, f(10)=89. 4. The number of 10-pennants is 89."
     },
     {
       id: "gate2014s1-cs-50",
@@ -653,7 +653,7 @@ window.GATE_DATA.pyq.push({
       tolerance: 0.01,
       kind: "nat",
       marks: 2,
-      explanation: "|S| = 2^(2^4) = 2^16, so N, the number of functions from S to {0,1}, is 2^|S| = 2^(2^16); thus log2 N = 2^16 and log2 log2 N = 16."
+      explanation: "1. First count |S|, the number of functions from a 4-bit input {0,1}^4 (16 possible inputs) to a 1-bit output {0,1}: each of the 16 inputs independently maps to one of 2 outputs, giving |S| = 2^16 distinct functions. 2. N is the number of functions from S (a set of size 2^16) to {0,1} — each of the 2^16 elements of S independently maps to one of 2 outputs, giving N = 2^(2^16). 3. Compute log2(N) = log2(2^(2^16)) = 2^16 directly (the exponent itself). 4. Compute log2(log2(N)) = log2(2^16) = 16."
     },
     {
       id: "gate2014s1-cs-51",
@@ -665,7 +665,7 @@ window.GATE_DATA.pyq.push({
       tolerance: 0.01,
       kind: "nat",
       marks: 2,
-      explanation: "This is a king-move adjacency graph on a 12x12 grid (excluding self-loops); counting all pairs of distinct cells within Chebyshev distance 1 of each other gives exactly 506 edges."
+      explanation: "1. This graph connects vertex (a,b) to vertex (c,d) exactly when |a-c|≤1 AND |b-d|≤1 (excluding the self-loop case a=c,b=d) — this is precisely the KING-MOVE adjacency pattern on a 12×12 grid (each cell connects to every neighboring cell, including diagonals). 2. Count edges by classifying cells by position: the 4 CORNER cells each have 3 neighbors, the (12-2)×4=40 EDGE (non-corner border) cells each have 5 neighbors, and the (12-2)×(12-2)=100 INTERIOR cells each have 8 neighbors. 3. Sum of all vertex degrees = 4×3 + 40×5 + 100×8 = 12+200+800 = 1012. 4. By the handshake lemma, the number of edges = (sum of degrees)/2 = 1012/2 = 506."
     },
     {
       id: "gate2014s1-cs-52",
@@ -675,7 +675,7 @@ window.GATE_DATA.pyq.push({
       options: ["(1, 1, 1, 1, 1, 1)","(2, 2, 2, 2, 2, 2)","(3, 3, 3, 1, 0, 0)","(3, 2, 1, 1, 1, 0)"],
       answer: 2,
       marks: 2,
-      explanation: "By the Erdos-Gallai criterion, for (3,3,3,1,0,0) the top-3 sum (9) exceeds 3x2 plus the capped sum of the rest (1), i.e. 9 > 7, so this sequence is not graphic."
+      explanation: "1. The ERDŐS–GALLAI theorem tests whether a degree sequence is graphic: sort the sequence in non-increasing order, and for every k from 1 to n, check that the sum of the top k degrees does not exceed k(k-1) plus the sum of min(dᵢ,k) over the remaining n-k degrees. 2. Test option C, (3,3,3,1,0,0), sorted (already sorted): for k=3, sum of top 3 degrees = 3+3+3=9. The right-hand side = 3×2 + [min(1,3)+min(0,3)+min(0,3)] = 6 + [1+0+0] = 7. 3. Since 9 > 7, the inequality is VIOLATED at k=3 — this sequence FAILS the Erdős–Gallai test and is therefore NOT graphic. 4. Checking the other three sequences (A, B, D) confirms each one DOES satisfy the inequality for every k, so they ARE graphic — only option C is not, matching the answer."
     },
     {
       id: "gate2014s1-cs-53",
@@ -685,7 +685,7 @@ window.GATE_DATA.pyq.push({
       options: ["((p ↔ q) ∧ r) ∨ (p ∧ q ∧ ¬r)","(¬(p ↔ q) ∧ r) ∨ (p ∧ q ∧ ¬r)","((p → q) ∧ r) ∨ (p ∧ q ∧ ¬r)","(¬(p ↔ q) ∧ r) ∧ (p ∧ q ∧ ¬r)"],
       answer: 1,
       marks: 2,
-      explanation: "Checking all eight truth assignments shows (¬(p↔q)∧r) ∨ (p∧q∧¬r) is true exactly for the three cases with exactly two of p,q,r true (TTF, TFT, FTT) and false for all others, matching (B)."
+      explanation: "1. There are exactly 3 truth assignments to (p,q,r) where EXACTLY two of the three are true: (T,T,F), (T,F,T), (F,T,T). 2. Test option B, (¬(p↔q)∧r) ∨ (p∧q∧¬r), against all three: for (T,T,F): p↔q is TRUE (both T), so ¬(p↔q) is FALSE, making the first disjunct false; but p∧q∧¬r = T∧T∧T = TRUE, so the whole expression is TRUE. For (T,F,T): p↔q is FALSE (differ), so ¬(p↔q)=TRUE, and r=TRUE, so the first disjunct is TRUE, making the whole expression TRUE. For (F,T,T): p↔q is FALSE (differ), ¬(p↔q)=TRUE, r=TRUE, first disjunct TRUE. 3. All three exactly-two-true cases give TRUE for option B. Check a case where it should be FALSE, e.g. all three true (T,T,T): p↔q=TRUE so ¬(p↔q)=FALSE; p∧q∧¬r = T∧T∧F=FALSE; whole expression FALSE — correctly excluding the all-true case. 4. Option B is true precisely for the exactly-two-true assignments, matching the answer."
     },
     {
       id: "gate2014s1-cs-54",
@@ -707,7 +707,7 @@ window.GATE_DATA.pyq.push({
       tolerance: 0.01,
       kind: "nat",
       marks: 2,
-      explanation: "Time = IC x CPI / f. Setting T2 = 0.75 T1 with CPI2 = 1.2 CPI1 gives 1.2 CPI1 / f2 = 0.75 CPI1 / f1, so f2 = (1.2/0.75) f1 = 1.6 x 1GHz = 1.6 GHz."
+      explanation: "1. Time = (Instruction Count) × CPI / (clock frequency) — for the SAME program (same instruction count) on both processors, this becomes: T1 = IC×CPI1/f1, and T2 = IC×CPI2/f2. 2. Given: T2 = 0.75×T1 (25% less time) and CPI2 = 1.2×CPI1 (20% more CPI), with f1=1 GHz. 3. Substitute into T2=0.75×T1: IC×(1.2 CPI1)/f2 = 0.75×IC×CPI1/f1. The IC and CPI1 terms cancel from both sides, leaving: 1.2/f2 = 0.75/f1. 4. Solve for f2: f2 = 1.2×f1/0.75 = 1.6×f1 = 1.6×1 GHz = 1.6 GHz."
     }
   ]
 });
