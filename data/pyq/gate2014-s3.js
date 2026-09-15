@@ -308,7 +308,7 @@ window.GATE_DATA.pyq.push({
       options: ["High cohesion and high coupling","High cohesion and low coupling","Low cohesion and high coupling","Low cohesion and low coupling"],
       answer: 1,
       marks: 1,
-      explanation: "1. COHESION measures how strongly the responsibilities WITHIN a single module relate to each other — HIGH cohesion means a module does ONE well-defined job, which is desirable for maintainability and clarity. 2. COUPLING measures how much DIFFERENT modules depend on each other's internal details — LOW coupling means modules can be changed, tested, and understood independently, which is also desirable. 3. The desirable combination for good modular software design is therefore HIGH cohesion (each module focused) combined with LOW coupling (modules independent), matching option B — the other three combinations each represent some form of poor design (unfocused modules, and/or excessive interdependence)."
+      explanation: "1. COHESION measures how strongly the responsibilities WITHIN a single module relate to each other — HIGH cohesion means a module does ONE well-defined job, which is desirable for maintainability and clarity. 2. COUPLING measures how much DIFFERENT modules depend on each other's internal details — LOW coupling means modules can be changed, tested, and understood independently, which is also desirable. 3. The desirable combination for good modular software design is therefore HIGH cohesion (each module focused) combined with LOW coupling (modules independent), matching option B — the other three combinations each represent some form of poor design (unfocused modules, and/or excessive interdependence). NOTE -- OUT OF SYLLABUS: this question tests Software Engineering (modular design: cohesion and coupling), which is no longer part of the GATE CS syllabus -- it appears in the 2014 papers but in NONE of the 2016-2025 papers included here. No chapter in this app covers it, and that is deliberate: do not go hunting for the theory and do not spend study time on this topic. The explanation above is self-contained if you are curious."
     },
     {
       id: "gate2014s3-cs-20",
@@ -599,7 +599,7 @@ window.GATE_DATA.pyq.push({
       options: ["I only","II only","Both I and II","Neither I nor II"],
       answer: 2,
       marks: 2,
-      explanation: "Since x² is convex, the chord used by the trapezoidal rule lies on or above the curve, so it always overestimates the integral (I is true). Simpson's rule is exact for any polynomial of degree ≤ 3, and x² has degree 2, so it is always exact (II is true)."
+      explanation: "Since x² is convex, the chord used by the trapezoidal rule lies on or above the curve, so it always overestimates the integral (I is true). Simpson's rule is exact for any polynomial of degree ≤ 3, and x² has degree 2, so it is always exact (II is true). NOTE -- OUT OF SYLLABUS: this question tests Numerical Methods (numerical integration), which is no longer part of the GATE CS syllabus -- it appears in the 2014 papers but in NONE of the 2016-2025 papers included here. No chapter in this app covers it, and that is deliberate: do not go hunting for the theory and do not spend study time on this topic. The explanation above is self-contained if you are curious."
     },
     {
       id: "gate2014s3-cs-47",

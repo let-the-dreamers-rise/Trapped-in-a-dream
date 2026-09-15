@@ -305,7 +305,7 @@ window.GATE_DATA.pyq.push({
       options: ["1-a, 2-b, 3-c, 4-d","1-d, 2-a, 3-b, 4-c","1-d, 2-b, 3-a, 4-c","1-c, 2-a, 3-b, 4-d"],
       answer: 1,
       marks: 1,
-      explanation: "The waterfall model rigidly partitions work into stages (d); the evolutionary model develops specifications incrementally (a); reusing pre-built components forces requirement compromises (b); and the spiral model explicitly builds in risk analysis (c)."
+      explanation: "The waterfall model rigidly partitions work into stages (d); the evolutionary model develops specifications incrementally (a); reusing pre-built components forces requirement compromises (b); and the spiral model explicitly builds in risk analysis (c). NOTE -- OUT OF SYLLABUS: this question tests Software Engineering (software process models), which is no longer part of the GATE CS syllabus -- it appears in the 2014 papers but in NONE of the 2016-2025 papers included here. No chapter in this app covers it, and that is deliberate: do not go hunting for the theory and do not spend study time on this topic. The explanation above is self-contained if you are curious."
     },
     {
       id: "gate2014s1-cs-19",
