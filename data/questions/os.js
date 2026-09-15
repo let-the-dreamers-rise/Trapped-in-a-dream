@@ -859,14 +859,13 @@ window.GATE_DATA.questions['os'] = {
         },
         {
           id: 'os-virtual-memory-q5',
-          q: 'The reference string 1, 2, 3, 4, 1, 2, 5, 1, 2, 3, 4, 5 produces 9 page faults under FIFO replacement with 3 frames. What happens to the number of FIFO page faults on this SAME string if the number of frames is increased to 4?',
-          options: ['It increases to 10 faults -- an example of Belady’s anomaly', 'It decreases to 6 faults, as expected with more memory', 'It stays exactly at 9 faults, unaffected by the extra frame', 'It becomes 0 faults since 4 frames can hold the entire working set'],
+          q: "The reference string 3, 1, 4, 5, 2, 1, 4, 3, 1, 4, 5, 2, 3 produces 10 page faults under FIFO replacement with 3 frames. What happens to the number of FIFO page faults on this SAME string if the number of frames is increased to 4?",
+          options: ["It increases to 11 faults -- an example of Belady's anomaly", "It decreases to 7 faults, as expected with more memory", "It stays exactly at 10 faults, unaffected by the extra frame", "It decreases to 5 faults, one per distinct page"],
           answer: 0,
           marks: 2,
           difficulty: 'hard',
           type: 'numerical',
-          explanation: 'Tracing FIFO with 4 frames: references 1,2,3,4 all fault, filling all 4 frames (4 faults). References 1 and 2 are hits (already resident). Reference 5 faults, evicting the oldest, 1 -- frames {2,3,4,5} (5 faults). Reference 1 faults, evicting oldest 2 -- {3,4,5,1} (6 faults). Reference 2 faults, evicting oldest 3 -- {4,5,1,2} (7 faults). Reference 3 faults, evicting oldest 4 -- {5,1,2,3} (8 faults). Reference 4 faults, evicting oldest 5 -- {1,2,3,4} (9 faults). Reference 5 faults again, evicting oldest 1 -- {2,3,4,5} (10 faults). This gives 10 total faults with 4 frames, MORE than the 9 faults with only 3 frames -- the textbook demonstration of Belady’s anomaly, which is possible specifically because FIFO is not a stack algorithm.'
-        },
+          explanation: "Re-simulate FIFO from scratch with 4 frames rather than assuming more memory must help. With 3 frames the string faults 10 times (given). With 4 frames, trace FIFO (evict the page that entered EARLIEST, regardless of how recently it was used): 3,1,4,5 fill the four empty frames (4 faults, frames [3,1,4,5]). Next 2 faults and evicts the oldest, 3 -> [1,4,5,2] (5). Next 1 is a HIT. Next 4 is a HIT. Next 3 faults, evicting oldest 1 -> [4,5,2,3] (6). Next 1 faults, evicting 4 -> [5,2,3,1] (7). Next 4 faults, evicting 5 -> [2,3,1,4] (8). Next 5 faults, evicting 2 -> [3,1,4,5] (9). Next 2 faults, evicting 3 -> [1,4,5,2] (10). Final 3 faults, evicting 1 -> [4,5,2,3] (11). Total 11 faults with 4 frames, versus 10 with 3 frames. So adding a frame made performance WORSE. This is BELADY'S ANOMALY: for FIFO specifically, increasing the number of frames can increase the fault count, because FIFO's eviction choice ignores usage entirely and a larger window can change the eviction order for the worse. Note that stack algorithms such as LRU and OPTIMAL provably never exhibit this -- on this same string LRU goes 11 faults down to 9, and OPTIMAL 8 down to 6, both improving as expected."},
         {
           id: 'os-virtual-memory-q6',
           q: 'What is "thrashing" in the context of virtual memory?',
@@ -919,14 +918,13 @@ window.GATE_DATA.questions['os'] = {
         },
         {
           id: 'os-virtual-memory-q11',
-          q: 'A process generates the page-reference sequence, in order: 2, 6, 1, 5, 7, 7, 7, 7, 5, 1 (positions 1 through 10). Using a working-set window of Delta = 4 (the current reference plus the previous 3), what is the working set W(t=10, Delta=4)?',
-          options: ['{7, 5, 1} (size 3)', '{2, 6, 1, 5} (size 4)', '{7} (size 1)', '{5, 1, 7, 7} (size 4, counting duplicates)'],
+          q: "A process generates the page-reference sequence, in order: 4, 7, 2, 9, 3, 3, 3, 5, 2, 3 (positions 1 through 10). Using a working-set window of Delta = 4 (the current reference plus the previous 3), what is the working set W(t=10, Delta=4)?",
+          options: ["{3, 5, 2} (size 3)", "{9, 3, 5, 2} (size 4)", "{3} (size 1)", "{5, 2, 3, 3} (size 4, counting duplicates)"],
           answer: 0,
           marks: 2,
           difficulty: 'hard',
           type: 'numerical',
-          explanation: 'A window of Delta = 4 at time t = 10 covers the 4 most recent references, which are positions 7, 8, 9, and 10 in the sequence: those references are 7, 7, 5, and 1 respectively. The working set is defined as the set of DISTINCT pages within this window, so duplicates collapse: {7, 7, 5, 1} becomes the distinct set {7, 5, 1}, giving a working-set size of 3. Note that this is different from simply looking at the first 4 references in the whole sequence (which would incorrectly give {2,6,1,5}) -- the window must always be measured backward from the current time t, not forward from the start of the reference string, and duplicate page numbers within the window must be counted only once.'
-        },
+          explanation: "The working set W(t, Delta) is the SET of DISTINCT pages referenced in the most recent Delta references, counting the current one. With t=10 and Delta=4, the window covers positions 7, 8, 9 and 10. Read those references off the sequence 4,7,2,9,3,3,3,5,2,3: position 7 is 3, position 8 is 5, position 9 is 2, position 10 is 3. So the window contains the references 3, 5, 2, 3. Now take the SET of these -- the page 3 appears twice but a set records it once -- giving W = {3, 5, 2}, of size 3. This size (the working-set size) is what the OS uses to estimate how many frames the process currently needs; note it is 3, strictly LESS than the window length 4, precisely because of that repeat. Option D is the standard error of counting the raw references rather than the distinct pages, which would wrongly report 4. Option B wrongly reaches back to position 6 (or includes the 9 from position 4), widening the window beyond Delta=4."},
         {
           id: 'os-virtual-memory-q12',
           q: 'What is the typical underlying cause that pushes a system into thrashing?',
@@ -1751,26 +1749,24 @@ window.GATE_DATA.questions['os'].topics.find(function(t){return t.id==='os-virtu
 },
 {
   id: 'os-virtual-memory-y5',
-  q: 'For the same page reference string 1,2,3,4,1,2,5,1,2,3,4,5 with exactly 3 frames (all initially empty), using LRU (Least Recently Used) page replacement, how many total page faults occur? (Enter your numerical answer.)',
+  q: "For the page reference string 3, 1, 4, 5, 2, 1, 4, 3, 1, 4, 5, 2, 3 with exactly 3 frames (all initially empty), using LRU (Least Recently Used) page replacement, how many total page faults occur? (Enter your numerical answer.)",
   options: [],
-  answer: 10,
+  answer: 11,
   kind: 'nat',
   marks: 2,
   difficulty: 'hard',
   type: 'numerical',
-  explanation: 'Trace with recency tracked (most-recent-first; fault count in brackets): ref1->fault,{1},recency[1][1]. ref2->fault,{1,2},recency[2,1][2]. ref3->fault,{1,2,3},recency[3,2,1][3]. ref4->fault, evict LRU=1, {2,3,4}, recency[4,3,2][4]. ref1->fault, evict LRU=2, {3,4,1}, recency[1,4,3][5]. ref2->fault, evict LRU=3, {4,1,2}, recency[2,1,4][6]. ref5->fault, evict LRU=4, {1,2,5}, recency[5,2,1][7]. ref1->HIT, recency becomes[1,5,2]. ref2->HIT, recency becomes[2,1,5]. ref3->fault, evict LRU=5, {1,2,3}, recency[3,2,1][8]. ref4->fault, evict LRU=1, {2,3,4}, recency[4,3,2][9]. ref5->fault, evict LRU=2, {3,4,5}, recency[5,4,3][10]. Total LRU page faults = 10 -- notably worse than FIFO\'s 9 faults on this particular string, illustrating that LRU is not universally better than FIFO fault-for-fault on every individual reference string, even though it is never worse in Belady\'s-anomaly-proof stack-algorithm sense across increasing frame counts.'
-},
+  explanation: "LRU evicts the page whose MOST RECENT use is furthest in the past. Trace with 3 frames, writing the resident set with the least-recently-used page first. 3 -> fault, [3]. 1 -> fault, [3,1]. 4 -> fault, [3,1,4] (frames now full). 5 -> fault, evict LRU 3, [1,4,5]. 2 -> fault, evict LRU 1, [4,5,2]. 1 -> fault, evict LRU 4, [5,2,1]. 4 -> fault, evict LRU 5, [2,1,4]. 3 -> fault, evict LRU 2, [1,4,3]. 1 -> HIT, 1 becomes most recent, [4,3,1]. 4 -> HIT, [3,1,4]. 5 -> fault, evict LRU 3, [1,4,5]. 2 -> fault, evict LRU 1, [4,5,2]. 3 -> fault, evict LRU 4, [5,2,3]. Counting the faults: references 1,2,3,4,5,6,7,8 fault, 9 and 10 hit, then 11,12,13 fault -- that is 8 + 3 = 11 page faults, with only 2 hits in the whole string. LRU does poorly here because the string keeps cycling through more distinct pages than the 3 frames can hold, so each page is evicted shortly before it is needed again."},
 {
   id: 'os-virtual-memory-y6',
-  q: 'For the same page reference string 1,2,3,4,1,2,5,1,2,3,4,5 with exactly 3 frames (all initially empty), using OPTIMAL (Belady\'s) page replacement, how many total page faults occur? (Enter your numerical answer.)',
+  q: "For the page reference string 3, 1, 4, 5, 2, 1, 4, 3, 1, 4, 5, 2, 3 with exactly 3 frames (all initially empty), using OPTIMAL (Belady's) page replacement, how many total page faults occur? (Enter your numerical answer.)",
   options: [],
-  answer: 7,
+  answer: 8,
   kind: 'nat',
   marks: 2,
   difficulty: 'hard',
   type: 'numerical',
-  explanation: 'Trace, always evicting the resident page used furthest in the future (or never again) (fault count in brackets): ref1->fault,{1}[1]. ref2->fault,{1,2}[2]. ref3->fault,{1,2,3}[3]. ref4->fault: among {1,2,3}, next uses are 1@pos5, 2@pos6, 3@pos10 -- evict 3 (farthest), {1,2,4}[4]. ref1(pos5)->HIT. ref2(pos6)->HIT. ref5(pos7)->fault: among {1,2,4}, next uses are 1@pos8, 2@pos9, 4=none (no future use) -- evict 4, {1,2,5}[5]. ref1(pos8)->HIT. ref2(pos9)->HIT. ref3(pos10)->fault: among {1,2,5}, 1 and 2 have no future use at all while 5 is used again at pos12 -- evict 1 (no future use), {2,5,3}[6]. ref4(pos11)->fault: among {2,5,3}, 2 and 3 have no future use while 5 is used at pos12 -- evict 2, {5,3,4}[7]. ref5(pos12)->HIT (5 still resident). Total optimal page faults = 7, confirming Optimal is provably the best possible (fewest faults) among all three algorithms compared on this string: FIFO=9, LRU=10, Optimal=7.'
-}
+  explanation: "OPTIMAL evicts the resident page whose NEXT use lies furthest in the future (evicting one never used again is best of all). Index the string 1..13: 3,1,4,5,2,1,4,3,1,4,5,2,3. Trace with 3 frames. Pos1 3 -> fault [3]. Pos2 1 -> fault [3,1]. Pos3 4 -> fault [3,1,4], full. Pos4 5: next uses are 3@8, 1@6, 4@7; furthest is 3, evict 3 -> fault [1,4,5]. Pos5 2: next uses 1@6, 4@7, 5@11; furthest is 5, evict 5 -> fault [1,4,2]. Pos6 1 -> HIT. Pos7 4 -> HIT. Pos8 3: next uses 1@9, 4@10, 2@12; furthest is 2, evict 2 -> fault [1,4,3]. Pos9 1 -> HIT. Pos10 4 -> HIT. Pos11 5: next uses 1 never again, so evict 1 -> fault [4,3,5]. Pos12 2: next uses 4 never again, evict 4 -> fault [3,5,2]. Pos13 3 -> HIT. Faults occur at positions 1,2,3,4,5,8,11,12 = 8 page faults, with 5 hits. Compare the same string under the other policies at 3 frames: FIFO gives 10 and LRU gives 11, so OPTIMAL beats both -- as it must, since no algorithm can fault fewer times than OPTIMAL, which is exactly why it is used as the unreachable lower-bound benchmark rather than as a real implementable policy (it requires knowing the future)."}
 );
 
 window.GATE_DATA.questions['os'].topics.find(function(t){return t.id==='os-file-disk';}).questions.push(
@@ -3066,15 +3062,14 @@ window.GATE_DATA.questions['os'].topics.find(function(t){return t.id==='os-virtu
 {
   id: 'os-virtual-memory-p1',
   pyqStyle: true,
-  q: 'A process references pages in the order: 1, 2, 3, 4, 1, 2, 5, 1, 2, 3, 4, 5. The system has exactly 3 page frames, all initially empty, and uses the FIFO page replacement algorithm. How many page faults occur in total? (Enter your numerical answer.)',
+  q: "A process references pages in the order: 6, 2, 4, 1, 2, 6, 3, 4, 1, 6, 2, 3. The system has exactly 3 page frames, all initially empty, and uses the FIFO page replacement algorithm. How many page faults occur in total? (Enter your numerical answer.)",
   options: [],
-  answer: 9,
+  answer: 11,
   kind: 'nat',
   marks: 2,
   difficulty: 'medium',
   type: 'pyq-style',
-  explanation: 'Simulating FIFO with 3 empty frames (oldest-loaded page is evicted first): ref 1,2,3 each fault, filling frames to [1,2,3]. Ref 4 faults, evicting 1 (the oldest), giving [2,3,4]. Ref 1 faults again, evicting 2, giving [3,4,1]. Ref 2 faults, evicting 3, giving [4,1,2]. Ref 5 faults, evicting 4, giving [1,2,5]. Ref 1 and ref 2 are now HITS (both present). Ref 3 faults, evicting 1 (oldest), giving [2,5,3]. Ref 4 faults, evicting 2, giving [5,3,4]. Ref 5 is a HIT. Counting: faults occur at references 1,2,3,4,1,2,5,3,4 -- that is 9 faults out of 12 references, with hits only at the two later occurrences of 1, 2, and the final 5. This reference string with 3 frames is the standard textbook example used to demonstrate Belady\'s Anomaly, since increasing the frame count to 4 actually increases the fault count under FIFO rather than reducing it.'
-},
+  explanation: "FIFO always evicts the page that has been resident LONGEST, regardless of how recently or how often it was used. Trace all 12 references with 3 frames, writing the resident set oldest-first. Ref 1 (6): fault, [6]. Ref 2 (2): fault, [6,2]. Ref 3 (4): fault, [6,2,4] -- frames now full. Ref 4 (1): fault, evict the oldest 6, [2,4,1]. Ref 5 (2): HIT (2 is resident; note FIFO does NOT refresh its age -- 2 stays the oldest). Ref 6 (6): fault, evict oldest 2, [4,1,6]. Ref 7 (3): fault, evict oldest 4, [1,6,3]. Ref 8 (4): fault, evict oldest 1, [6,3,4]. Ref 9 (1): fault, evict oldest 6, [3,4,1]. Ref 10 (6): fault, evict oldest 3, [4,1,6]. Ref 11 (2): fault, evict oldest 4, [1,6,2]. Ref 12 (3): fault, evict oldest 1, [6,2,3]. Every reference except ref 5 faults, giving 11 page faults and a single hit. The critical FIFO detail to notice at ref 5 is that a HIT does not change a page's position in the FIFO queue -- 2 had been loaded second, so it remained the second-oldest and was evicted at ref 6 anyway, even though it had just been used. That is exactly the weakness LRU fixes by refreshing a page's timestamp on every hit."},
 {
   id: 'os-virtual-memory-p2',
   pyqStyle: true,
@@ -3113,15 +3108,14 @@ window.GATE_DATA.questions['os'].topics.find(function(t){return t.id==='os-virtu
 {
   id: 'os-virtual-memory-p5',
   pyqStyle: true,
-  q: 'A process references pages in the order: 1, 2, 3, 4, 1, 2, 5, 1, 2, 3, 4, 5. The system has 3 page frames, all initially empty, and uses the OPTIMAL (Belady\'s optimal, OPT) page replacement algorithm, which always evicts the page that will not be used for the longest time in the future. How many page faults occur in total? (Enter your numerical answer.)',
+  q: "A process references pages in the order: 3, 1, 4, 5, 2, 1, 4, 3, 1, 4, 5, 2, 3. The system has 4 page frames, all initially empty, and uses LRU (Least Recently Used) page replacement. How many page faults occur in total? (Enter your numerical answer.)",
   options: [],
-  answer: 7,
+  answer: 9,
   kind: 'nat',
   marks: 2,
   difficulty: 'hard',
   type: 'pyq-style',
-  explanation: 'Tracing Optimal with 3 frames: ref 1,2,3 each fault, filling [1,2,3]. Ref 4 faults: looking ahead at the remaining string (1,2,5,1,2,3,4,5), page 1 is needed again very soon (next reference), page 2 is needed soon after, but page 3 is not needed again until much later (position 10) -- so Optimal evicts 3, giving [1,2,4]. Ref 1 and 2 are HITS. Ref 5 faults: looking ahead (1,2,3,4,5), page 1 and 2 are needed again very soon, but page 4 is not needed again until much later (position 11) -- so Optimal evicts 4, giving [1,2,5]. Ref 1 and 2 are HITS again. Ref 3 faults: looking ahead (4,5), page 1 is never referenced again, so Optimal evicts 1, giving [2,5,3]. Ref 4 faults: looking ahead (5), page 2 is never referenced again, so Optimal evicts 2, giving [5,3,4]. Ref 5 is a HIT. Counting faults: 1,2,3,4,5,3,4 -- exactly 7 faults, the fewest possible for any algorithm on this reference string with 3 frames, since Optimal is provably the best achievable (though it requires future knowledge and is not implementable in practice).'
-},
+  explanation: "LRU with 4 frames evicts the page least recently used. Trace, listing the resident set least-recently-used first. 3 -> fault [3]. 1 -> fault [3,1]. 4 -> fault [3,1,4]. 5 -> fault [3,1,4,5], frames now full. 2 -> fault, evict LRU 3 -> [1,4,5,2]. 1 -> HIT, 1 refreshed -> [4,5,2,1]. 4 -> HIT, refreshed -> [5,2,1,4]. 3 -> fault, evict LRU 5 -> [2,1,4,3]. 1 -> HIT -> [2,4,3,1]. 4 -> HIT -> [2,3,1,4]. 5 -> fault, evict LRU 2 -> [3,1,4,5]. 2 -> fault, evict LRU 3 -> [1,4,5,2]. 3 -> fault, evict LRU 1 -> [4,5,2,3]. Faults at positions 1,2,3,4,5,8,11,12,13 = 9 page faults. Worth comparing against the same string with only 3 frames, where LRU faults 11 times: going from 3 to 4 frames REDUCED the count from 11 to 9. That decrease is guaranteed, not luck -- LRU is a STACK algorithm, meaning the set of pages resident with k frames is always a subset of the set resident with k+1 frames, so extra memory can never cost extra faults. FIFO has no such guarantee, and on this very string FIFO instead rises from 10 faults to 11 (Belady's anomaly)."},
 {
   id: 'os-virtual-memory-p6',
   pyqStyle: true,
@@ -3230,20 +3224,14 @@ window.GATE_DATA.questions['os'].topics.find(function(t){return t.id==='os-virtu
 },
 {
   id: 'os-virtual-memory-h2',
-  q: 'For the reference string 1, 2, 3, 4, 1, 2, 5, 1, 2, 3, 4, 5 and page-replacement simulated with exactly 3 and then exactly 4 frames, which of the following statements are TRUE? (Select all that apply.)',
-  options: [
-    'With 3 frames, FIFO produces exactly 9 page faults',
-    'Going from 3 frames to 4 frames, FIFO produces MORE page faults, not fewer (Belady\'s anomaly)',
-    'Going from 3 frames to 4 frames, LRU\'s fault count also increases, so LRU exhibits the same anomaly as FIFO here',
-    'With 3 frames, OPTIMAL produces fewer faults than FIFO does with 3 frames'
-  ],
+  q: "For the reference string 3, 1, 4, 5, 2, 1, 4, 3, 1, 4, 5, 2, 3 and page replacement simulated with exactly 3 and then exactly 4 frames, which of the following statements are TRUE? (Select all that apply.)",
+  options: ["With 3 frames, FIFO produces exactly 10 page faults", "Going from 3 frames to 4 frames, FIFO produces MORE page faults, not fewer (Belady's anomaly)", "Going from 3 frames to 4 frames, LRU's fault count also increases, so LRU exhibits the same anomaly as FIFO here", "With 3 frames, OPTIMAL produces fewer faults than FIFO does with 3 frames"],
   answers: [0, 1, 3],
   marks: 2,
   difficulty: 'hard',
   type: 'msq',
   kind: 'msq',
-  explanation: 'Each option needs its own independent trace. Tracing FIFO with 3 frames: faults occur at 1,2,3,4(evict1),1(evict2),2(evict3... ) -- carrying it through carefully gives exactly 9 faults, so option A is TRUE. Tracing FIFO with 4 frames on the same string gives 10 faults -- MORE than with 3 frames, even though a larger cache should intuitively never do worse. This counter-intuitive increase is precisely Belady\'s anomaly, and it is a documented property of FIFO specifically, so option B is TRUE. Tracing LRU on the same string gives 10 faults with 3 frames and 8 faults with 4 frames -- the count DECREASES as expected, because LRU is a stack algorithm (the set of pages held with k frames is always a subset of the set held with k+1 frames), which mathematically guarantees LRU can never exhibit Belady\'s anomaly. So option C is FALSE. Tracing OPTIMAL with 3 frames gives 7 faults, which is indeed fewer than FIFO\'s 9 faults with the same 3 frames (OPT is provably optimal for any fixed frame count), so option D is TRUE. The question is deliberately built around the one reference string where FIFO genuinely misbehaves, specifically to test whether a student blindly assumes "more frames always means fewer or equal faults" -- true for stack algorithms like LRU and OPT, but famously false for FIFO.'
-},
+  explanation: "Simulate all three policies at both frame counts; the full counts are: at 3 frames FIFO=10, LRU=11, OPT=8; at 4 frames FIFO=11, LRU=9, OPT=6. Now check each statement. (A) TRUE: FIFO with 3 frames faults exactly 10 times. (B) TRUE: FIFO rises from 10 faults at 3 frames to 11 at 4 frames -- more memory made it worse, which is precisely Belady's anomaly. (C) FALSE, and this is the key discriminator: LRU FALLS from 11 faults to 9 when the fourth frame is added. LRU is a STACK algorithm (its resident set with k frames is always a subset of its resident set with k+1 frames), and stack algorithms provably cannot exhibit Belady's anomaly. The anomaly is specific to FIFO, which ignores usage when choosing a victim. (D) TRUE: at 3 frames OPTIMAL faults 8 times versus FIFO's 10, and OPTIMAL is a lower bound no algorithm can beat, so it can never do worse than FIFO on the same string and frame count."},
 {
   id: 'os-virtual-memory-h3',
   q: 'A process makes the following sequence of 12 page references, numbered by reference time t = 1 to 12: 1, 2, 3, 4, 5, 3, 4, 5, 6, 3, 4, 5. The working-set window size is delta = 4 (i.e., WS(t) is the set of distinct pages referenced during references t-3, t-2, t-1, t -- clipped at t=1 for the earliest references). What is the working-set size |WS(t)| at t = 5?',
@@ -3311,19 +3299,13 @@ window.GATE_DATA.questions['os'].topics.find(function(t){return t.id==='os-virtu
 },
 {
   id: 'os-virtual-memory-h9',
-  q: 'For the reference string 1, 2, 3, 4, 1, 2, 5, 1, 2, 3, 4, 5, when EXACTLY 5 frames are allocated (one frame per distinct page appearing in the entire string), which statement correctly describes the fault counts under FIFO, LRU, and OPTIMAL?',
-  options: [
-    'All three produce exactly 5 faults, since with enough frames for every distinct page, only the first (compulsory) reference to each page can ever fault',
-    'OPTIMAL produces fewer faults than FIFO and LRU because it can still evict early even when frames are unused',
-    'FIFO produces more faults than at 4 frames, repeating Belady\'s anomaly',
-    'LRU produces zero faults because every page has already been seen by the end of the string'
-  ],
+  q: "For the reference string 3, 1, 4, 5, 2, 1, 4, 3, 1, 4, 5, 2, 3, when EXACTLY 5 frames are allocated (one frame per distinct page appearing in the entire string), which statement correctly describes the fault counts under FIFO, LRU, and OPTIMAL?",
+  options: ["All three produce exactly 5 faults, since with enough frames for every distinct page, only the first (compulsory) reference to each page can ever fault", "OPTIMAL produces fewer faults than FIFO and LRU because it can still evict early even when frames are unused", "FIFO produces more faults than at 4 frames, repeating Belady's anomaly", "LRU produces zero faults because every page has already been seen by the end of the string"],
   answer: 0,
   marks: 2,
   difficulty: 'hard',
   type: 'concept',
-  explanation: 'The string contains exactly 5 distinct pages: 1, 2, 3, 4, 5. With 5 frames available, there is room to keep every distinct page resident simultaneously once it has been loaded -- no replacement algorithm ever needs to evict anything, because a frame never needs to be reused while an unused frame still exists. Under this condition, a fault can only occur the very FIRST time each distinct page is referenced (a "compulsory" or "cold-start" fault); once loaded, a page is never evicted, so every subsequent reference to it is guaranteed to be a hit. Since there are exactly 5 distinct pages, all three algorithms -- FIFO, LRU, and OPTIMAL -- must produce exactly 5 faults, no more and no less, regardless of their differing eviction policies, because eviction policy is irrelevant when no eviction ever actually happens. This is precisely confirmed by direct simulation. Option B is wrong because OPT never evicts unnecessarily either. Option C is wrong: Belady\'s anomaly requires an actual eviction-order effect, which cannot occur once frames exceed the number of distinct pages. Option D is wrong because "faults" and "having been seen" are unrelated to frame count exhaustion here -- every page still faults exactly once on its first appearance, LRU included.'
-},
+  explanation: "Count the DISTINCT pages in the string first: 3, 1, 4, 5 and 2 -- exactly 5 of them. With 5 frames available, every distinct page can be loaded into its own frame and NO eviction is ever required, because the frames never fill beyond capacity. A page therefore faults only on its very FIRST reference (a COMPULSORY or cold-start fault, unavoidable for any algorithm since the page has never been in memory), and every later reference to it is a hit. That gives exactly 5 faults, one per distinct page, and this is identical for FIFO, LRU and OPTIMAL -- the three differ only in WHICH page to evict, a decision none of them is ever forced to make here. Option B is wrong because no sane replacement policy evicts while a free frame exists. Option C is wrong because Belady's anomaly requires eviction decisions to differ, and at 5 frames there are none (FIFO drops from 11 faults at 4 frames to 5 at 5 frames). Option D is wrong because the FIRST reference to each page must still fault -- memory starts empty, and no algorithm can avoid a compulsory miss."},
 {
   id: 'os-virtual-memory-h10',
   q: 'A demand-paging system uses the Page-Fault-Frequency (PFF) scheme with an upper threshold U = 0.006 faults/reference (a frame is ADDED if the measured rate exceeds this) and a lower threshold L = 0.004 faults/reference (a frame is REMOVED if the measured rate falls below this; the allocation is left unchanged if the rate lies between L and U inclusive). A process currently holds 8 frames. Over the last monitoring window of 10,000 memory references, the process suffered exactly 30 page faults. What is the process\'s measured fault rate, and what action does PFF take?',
