@@ -1,0 +1,3612 @@
+window.GATE_DATA = window.GATE_DATA || {};
+window.GATE_DATA.questions = window.GATE_DATA.questions || {};
+window.GATE_DATA.questions['toc'] = {
+  subject: 'Theory of Computation',
+  topics: [
+    {
+      id: 'toc-regular',
+      name: 'Regular Languages & Finite Automata',
+      theory: {
+        intro: "Regular languages are the smallest class in the Chomsky hierarchy and the workhorse of GATE TOC scoring. They are exactly the languages accepted by finite automata (deterministic or nondeterministic) and exactly those described by regular expressions. The defining limitation is memory: a finite automaton can remember only which of finitely many states it is in, never an unbounded count. GATE tests this topic through minimal DFA state counting, DFA/NFA conversions, regular expression identities, closure properties, and proofs of non-regularity via the pumping lemma or Myhill-Nerode reasoning. Almost every year has at least one question asking for the number of states in a minimal DFA for a language defined by a modulo condition, a substring condition, or a suffix condition. Mastering the small toolbox here - state counting by tracking necessary information, product constructions, and distinguishing-string arguments - converts this topic into reliable marks.",
+        core: "A DFA is a 5-tuple (Q, Sigma, delta, q0, F) with exactly one transition per state per symbol. An NFA may have multiple choices and epsilon moves, and accepts if some computation path reaches a final state. Every NFA can be converted to a DFA by the subset construction: an NFA with n states yields a DFA with at most 2^n states, and this exponential blow-up is sometimes unavoidable (the classic witness is the language whose k-th symbol from the right is a fixed letter, which has an NFA with k+1 states but needs a DFA with 2^k states). So NFAs and DFAs are equal in power but can differ exponentially in size.\n\nRegular expressions built from union, concatenation, and Kleene star describe exactly the regular languages (Kleene's theorem). Useful identities: (r*)* = r*, (r + s)* = (r*s*)*, and emptyset* = epsilon.\n\n• Minimal DFA and state counting. The minimal DFA is unique up to renaming of states. To count its states, ask: what information about the prefix read so far is both necessary and sufficient to decide the future? For 'number of 1s congruent to r mod k' you need the count mod k: k states. For 'contains substring s' you track the longest prefix of s matched so far: |s| + 1 states. For 'ends with s' you similarly track suffix progress, often |s| + 1 states or fewer after merging. For a conjunction of independent conditions, take the product automaton and then check reachability and distinguishability - often all product states survive, e.g. (number of a's even) AND (number of b's divisible by 3) needs 2 x 3 = 6 states.\n\n• Myhill-Nerode theorem. Define x and y equivalent with respect to L when for every string z, xz is in L exactly when yz is in L. L is regular if and only if this relation has finitely many equivalence classes, and the number of classes equals the number of states of the minimal DFA. This gives both a minimality proof technique (exhibit k pairwise distinguishable strings to force at least k states) and a non-regularity technique (exhibit infinitely many pairwise distinguishable strings, e.g. a, aa, aaa, ... for {a^n b^n}, distinguished by suffixes b^n).\n\n• Pumping lemma. If L is regular there is a constant p such that every w in L with |w| >= p splits as xyz with |xy| <= p, y nonempty, and xy^i z in L for all i >= 0. The lemma is a necessary condition only: it can prove non-regularity but can never prove regularity, since some non-regular languages still satisfy the pumping property.\n\n• Closure properties. Regular languages are closed under union, intersection, complement, difference, concatenation, Kleene star, reversal, homomorphism, and inverse homomorphism. Complementation is trivial on a DFA (swap final and non-final states) but is NOT valid on an NFA. Also remember: every finite language is regular; a subset of a regular language need not be regular ({a^n b^n} is a subset of a*b*); and if L is regular then so is its complement with a minimal DFA of exactly the same size.",
+        strategy: "GATE patterns to expect: (1) 'Minimum number of states in the DFA for L' where L mixes a mod condition with a substring or suffix condition - build the product machine, then prune unreachable states and merge indistinguishable ones before answering. (2) 'Which of the following is regular' - scan each option for an unbounded comparison between two counts; any language forcing you to remember an unbounded number is suspect, but check for finiteness first, because {a^n b^n : n <= 100} is finite and therefore regular. (3) True/false combos on closure - remember NFA complementation by swapping final states is a trap, and 'satisfies pumping lemma implies regular' is always false.\n\nWorked mini-example: minimum DFA states for binary strings that end in 01. Track the useful suffix of what has been read: nothing useful, ends in 0, ends in 01. From 'ends in 01' reading 0 goes back to 'ends in 0', reading 1 goes to 'nothing useful'. All three states are pairwise distinguishable (test suffixes epsilon, 1, and 01), so the answer is 3.\n\nTime traps: do not hand-simulate subset construction fully when only the count is asked - reachable subsets are usually far fewer than 2^n. In Myhill-Nerode questions, counting equivalence classes is usually faster and safer than drawing the machine. When two conditions are dependent (e.g. length mod 2 and ends in a fixed symbol), the product bound is not tight - always verify distinguishability."
+      },
+      questions: [
+        {
+          id: 'toc-regular-q1',
+          q: 'An NFA has n states. In the worst case, how many states can the equivalent minimal DFA obtained via subset construction require?',
+          options: ['n', 'n^2', '2^n', 'n!'],
+          answer: 2,
+          marks: 1,
+          difficulty: 'easy',
+          type: 'concept',
+          explanation: "The subset construction makes each DFA state correspond to a set of NFA states, and there are 2^n subsets of an n-element set, so the DFA has at most 2^n states. This bound is actually achieved: for the language of strings whose n-th symbol from the right is 1, an NFA with n+1 states exists, but any DFA must remember the last n symbols read, forcing 2^n states (any two distinct n-length windows are distinguishable by an appropriate suffix). So the answer is 2^n, and the key takeaway is that NFAs add no expressive power but can be exponentially more succinct."
+        },
+        {
+          id: 'toc-regular-q2',
+          q: 'Which of the following languages over {a, b} is regular?',
+          options: ['{ a^n b^n : n >= 0 }', '{ w w^R : w in {a,b}* }', '{ a^n b^m : n >= 0, m >= 0 }', '{ a^p : p is prime }'],
+          answer: 2,
+          marks: 1,
+          difficulty: 'easy',
+          type: 'concept',
+          explanation: "Test each option for whether a machine with finite memory suffices. {a^n b^m} with independent n and m is just 'some a's followed by some b's', described by the regular expression a*b*, so it is regular - no comparison between the two counts is required. {a^n b^n} requires matching an unbounded count of a's against b's; the strings a, aa, aaa, ... are pairwise distinguishable (append b^n), so by Myhill-Nerode it is not regular. {w w^R}, the even palindromes, similarly needs unbounded memory of the first half. {a^p : p prime} fails the pumping lemma: pumping changes length arithmetically and must eventually land on a composite length. Hence option C."
+        },
+        {
+          id: 'toc-regular-q3',
+          q: 'The regular expression (0 + 1)* 0 (0 + 1)* over {0,1} denotes the set of all strings that',
+          options: ['end with 0', 'begin with 0', 'contain at least one 0', 'contain exactly one 0'],
+          answer: 2,
+          marks: 1,
+          difficulty: 'easy',
+          type: 'concept',
+          explanation: "Read the expression structurally: (0+1)* matches any string including the empty string, then a mandatory single 0, then again any string. So a string matches exactly when it can be split as (anything) 0 (anything), which means it has at least one occurrence of 0 somewhere. It need not end or begin with 0 because the surrounding (0+1)* parts absorb arbitrary prefixes and suffixes, and it can contain many 0s since the flanking parts may themselves contain 0s. This decomposition method - identify the mandatory core and what the starred parts absorb - is the standard way to read GATE regular expressions."
+        },
+        {
+          id: 'toc-regular-q4',
+          q: 'Which of the following statements about closure of regular languages is FALSE?',
+          options: ['Regular languages are closed under complementation', 'Regular languages are closed under intersection', 'Every subset of a regular language is regular', 'Regular languages are closed under reversal'],
+          answer: 2,
+          marks: 1,
+          difficulty: 'easy',
+          type: 'concept',
+          explanation: "Closure under complement holds: take a DFA (must be deterministic and complete) and swap final and non-final states. Closure under intersection follows from union and complement via De Morgan, or directly by the product construction. Reversal holds by reversing all transitions and swapping start/final roles (using an NFA). But 'every subset of a regular language is regular' confuses closure under an operation with closure under containment: a*b* is regular, yet its subset {a^n b^n : n >= 0} is not. In fact every language over {a,b} is a subset of the regular language (a+b)*, so if subsets were regular, all languages would be. Option C is false."
+        },
+        {
+          id: 'toc-regular-q5',
+          q: 'What is the number of states in the minimal DFA accepting the set of all strings over {0,1} in which the number of 1s is congruent to 2 modulo 3?',
+          options: ['2', '3', '4', '6'],
+          answer: 1,
+          marks: 1,
+          difficulty: 'medium',
+          type: 'numerical',
+          explanation: "The only information the machine needs about the prefix read so far is the count of 1s modulo 3, which takes values 0, 1, 2. Build states q0, q1, q2 for these residues: each 1 advances the residue cyclically, each 0 is a self-loop, start at q0, accept at q2. All three states are needed because they are pairwise distinguishable: from residue r the shortest accepted suffix is 1^((2-r) mod 3), which differs for each r, so no two states can be merged. Hence the minimal DFA has exactly 3 states. General rule: a 'count mod k' condition needs exactly k states, independent of which residue is accepting."
+        },
+        {
+          id: 'toc-regular-q6',
+          q: 'The minimum number of states in a DFA accepting all strings over {a,b} that contain the substring abb is',
+          options: ['3', '4', '5', '8'],
+          answer: 1,
+          marks: 1,
+          difficulty: 'medium',
+          type: 'numerical',
+          explanation: "For a 'contains substring s' language, the DFA tracks the longest prefix of s that is a suffix of the input read so far, giving |s| + 1 states. Here s = abb, so states are: matched nothing, matched a, matched ab, matched abb (accepting sink, since once the substring appears it stays present). Transitions handle fallback: from 'ab', reading a returns to 'a' (not to nothing), reading b completes abb. Distinguishability: the shortest accepting suffixes from the four states are abb, bb, b, epsilon respectively - all different lengths, so no merging is possible. Answer: 4 states."
+        },
+        {
+          id: 'toc-regular-q7',
+          q: 'The minimum number of states in a DFA that accepts exactly the set of binary strings ending in 01 is',
+          options: ['2', '3', '4', '5'],
+          answer: 1,
+          marks: 1,
+          difficulty: 'medium',
+          type: 'numerical',
+          explanation: "Track the longest suffix of the input that is a prefix of 01: state A (no useful suffix), state B (ends in 0), state C (ends in 01, accepting). Transitions: A on 0 goes to B, on 1 stays at A; B on 0 stays at B, on 1 goes to C; C on 0 goes to B (that 0 may start a new 01), on 1 goes to A. Check minimality by distinguishing suffixes: epsilon accepts only from C, the suffix 1 accepts only from B, so A, B, C are pairwise distinguishable. Therefore 3 states suffice and are necessary. Note the contrast with 'contains 01', which also needs 3 states but with an accepting sink."
+        },
+        {
+          id: 'toc-regular-q8',
+          q: 'Let L = { w in {a,b}* : w has an equal number of a and b }. Using Myhill-Nerode reasoning, which statement is correct?',
+          options: ['L is regular because each class of the equivalence relation is finite', 'L is not regular because the strings a, aa, aaa, ... are pairwise distinguishable', 'L is regular with a minimal DFA of 2 states', 'L is not regular because it fails to be closed under reversal'],
+          answer: 1,
+          marks: 2,
+          difficulty: 'medium',
+          type: 'concept',
+          explanation: "Myhill-Nerode says L is regular iff the relation 'x equivalent to y when xz in L exactly matches yz in L for all z' has finitely many classes. Consider a^i and a^j with i < j: the suffix b^i puts a^i b^i in L but a^j b^i has more a's than b's, so it is not in L. Thus every pair a^i, a^j is distinguished, giving infinitely many equivalence classes, so no finite automaton can exist - each class would need its own state. Option B states exactly this argument. Option D is irrelevant (L actually equals its own reversal class-wise, and reversal closure is a property of the regular family, not a test for one language)."
+        },
+        {
+          id: 'toc-regular-q9',
+          q: 'Which of the following statements about the pumping lemma for regular languages is TRUE?',
+          options: ['Every language satisfying the pumping condition is regular', 'The pumping lemma can be used to prove that a language is regular', 'If a language violates the pumping condition, it is not regular', 'The pumping lemma applies only to infinite regular languages'],
+          answer: 2,
+          marks: 1,
+          difficulty: 'medium',
+          type: 'concept',
+          explanation: "The pumping lemma has the form: L regular implies L satisfies the pumping condition. The contrapositive - violating the condition implies not regular - is the only valid use, which is option C. The converse fails: there exist non-regular languages that nevertheless satisfy the pumping condition, so satisfying it proves nothing (options A and B are false). Option D is false too: the lemma holds vacuously or trivially for finite languages (choose p longer than the longest string). Exam tip: any option claiming the pumping lemma establishes regularity, or that it is a sufficient condition, is automatically wrong; it is necessary, not sufficient."
+        },
+        {
+          id: 'toc-regular-q10',
+          q: 'L1 is regular and L2 is not regular. Which of the following is necessarily TRUE about L1 intersect L2?',
+          options: ['It is always regular', 'It is never regular', 'It may be regular or non-regular depending on the languages', 'It is always context-free but never regular'],
+          answer: 2,
+          marks: 2,
+          difficulty: 'medium',
+          type: 'concept',
+          explanation: "Closure properties only constrain operations within a class; mixing classes gives no guarantee either way, so test with examples. Take L1 = empty set (regular): the intersection is empty, which is regular. Take L1 = a*b* (regular) and L2 = {a^n b^n}: the intersection is {a^n b^n} itself, not regular. Both outcomes occur, so the correct answer is 'may be either'. Option D also fails: the intersection can even be non-context-free if L2 is (e.g. L1 = Sigma* and L2 = {a^n b^n c^n}). The general exam rule: 'regular op non-regular' questions almost always resolve to 'cannot be determined', verified by one example each way."
+        },
+        {
+          id: 'toc-regular-q11',
+          q: 'Consider L = set of strings over {0,1} in which every 0 is immediately followed by a 1. The number of states in the minimal (complete) DFA for L is',
+          options: ['2', '3', '4', '5'],
+          answer: 1,
+          marks: 2,
+          difficulty: 'medium',
+          type: 'numerical',
+          explanation: "Design by tracking obligations. State A (accepting): no pending obligation; on 1 stay at A, on 0 move to B because that 0 now owes an immediate 1. State B (non-accepting): on 1 the obligation is met, return to A; on 0 the previous 0 was followed by another 0, which violates the condition permanently, so go to dead state D. D loops to itself on both symbols. Minimality: A accepts epsilon, B accepts 1 but not epsilon, D accepts nothing - all pairwise distinguishable. A complete DFA therefore needs exactly 3 states. Note the dead state must be counted; forgetting it and answering 2 is the classic error."
+        },
+        {
+          id: 'toc-regular-q12',
+          q: 'The minimum number of states in a DFA accepting the set of binary strings whose third symbol from the right end is 1 is',
+          options: ['4', '6', '8', '16'],
+          answer: 2,
+          marks: 2,
+          difficulty: 'hard',
+          type: 'numerical',
+          explanation: "A DFA reads left to right and cannot know where the string ends, so at every moment it must be ready to answer using only stored information. Acceptance depends on the last three symbols, so the DFA must remember the last three symbols exactly: 2^3 = 8 possibilities. To see none can be merged, take two distinct 3-symbol windows u and v; they differ in some position i from the right, and appending i-1 further symbols shifts that differing bit into the third-from-right position, so some suffix distinguishes u from v. (Short prefixes of length under 3 also map into these 8 states consistently by padding with 0s.) Contrast with the NFA, which needs only 4 states by guessing where the final three symbols begin. Answer: 8."
+        },
+        {
+          id: 'toc-regular-q13',
+          q: 'What is the number of states in the minimal DFA for the language of strings over {a,b} in which the number of a is even AND the number of b is divisible by 3?',
+          options: ['3', '5', '6', '8'],
+          answer: 2,
+          marks: 2,
+          difficulty: 'hard',
+          type: 'numerical',
+          explanation: "Use the product construction: one component tracks the a-count mod 2 (2 states), the other tracks the b-count mod 3 (3 states), giving at most 2 x 3 = 6 product states, with (0,0) as the sole accepting state. Now verify no reduction is possible. Every pair (i, j) is reachable: read a^i b^j. Any two distinct pairs are distinguishable: if the a-parities differ, some suffix a^x b^y is accepted from one but not the other; similarly for differing b-residues, because the accepting condition constrains both coordinates independently. Since the two conditions are on disjoint symbols they are truly independent, so the product bound is tight: 6 states. When conditions share symbols (e.g. length mod 2 and ends in a), always re-check - the product is only an upper bound."
+        },
+        {
+          id: 'toc-regular-q14',
+          q: 'Which of the following languages over {a,b} IS regular?',
+          options: ['{ a^n b^n : n >= 0 }', '{ a^n b^n : 0 <= n <= 100 }', '{ w w : w in {a,b}* }', '{ a^m b^n : m and n differ by exactly 1 }'],
+          answer: 1,
+          marks: 2,
+          difficulty: 'hard',
+          type: 'concept',
+          explanation: "The trap is pattern-matching on the shape a^n b^n without reading the bound. Option B is a finite language - it contains exactly 101 strings - and every finite language is regular (union of finitely many singletons). Option A is the classic non-regular language: unbounded matching of counts. Option D, strings where the counts differ by exactly 1, still requires comparing two unbounded counts; the strings a, aa, aaa, ... are pairwise distinguishable via suffixes b^(n+1), so it is not regular. Option C, {ww}, is not even context-free. Rule of thumb: any bounded/finite restriction rescues regularity; any unbounded numeric relation between counts destroys it."
+        },
+        {
+          id: 'toc-regular-q15',
+          q: 'The minimal DFA for a regular language L has exactly n states. The minimal DFA for the complement of L (over the same alphabet) has',
+          options: ['exactly n states', 'at most n - 1 states', 'exactly n + 1 states', 'possibly exponentially many states'],
+          answer: 0,
+          marks: 2,
+          difficulty: 'hard',
+          type: 'concept',
+          explanation: "Take the minimal (hence complete and deterministic) DFA for L and swap final and non-final states; the result accepts exactly the complement, so the complement needs at most n states. Could it need fewer? No: two states are distinguishable for L exactly when they are distinguishable for the complement (a suffix separating membership separates non-membership identically), so the swapped machine is still minimal. Hence exactly n. The exponential-blow-up intuition belongs to NFA complementation: complementing via an NFA first requires determinization, which can cost 2^n. For DFAs the operation is free. This distinction - complement is trivial on DFAs, expensive from NFAs - is a frequent GATE true/false target."
+        }
+      ]
+    },
+    {
+      id: 'toc-cfl',
+      name: 'Context-Free Languages & Pushdown Automata',
+      theory: {
+        intro: "Context-free languages (CFLs) add one crucial capability beyond regular languages: a single unbounded stack. This lets a machine match nested, one-to-one correspondences - equal counts of a's and b's, balanced parentheses, palindromes - but not two independent correspondences at once. CFLs are generated by context-free grammars (CFGs) and accepted by pushdown automata (PDAs). GATE questions probe grammar design and ambiguity, normal forms (especially Chomsky Normal Form), the strict gap between deterministic CFLs (DCFLs) and general CFLs, the pumping lemma for CFLs, and above all closure properties - where CFLs behave very differently from regular languages: closed under union but not under intersection or complement. The single most-tested fact cluster is: {a^n b^n} is a DCFL, {w w^R} is a CFL but not a DCFL, and {a^n b^n c^n} is not a CFL at all. Keep those three anchors and most classification questions fall quickly.",
+        core: "A CFG has productions A -> alpha where A is a single nonterminal and alpha is any string of terminals and nonterminals. The language is everything derivable from the start symbol. A grammar is ambiguous if some string has two distinct leftmost derivations (equivalently, two parse trees). Ambiguity is a property of a grammar; a language is inherently ambiguous when every grammar for it is ambiguous - the standard example is { a^i b^j c^k : i = j or j = k }. Deciding whether a given CFG is ambiguous is undecidable.\n\n• Chomsky Normal Form (CNF): every production is A -> BC or A -> a (with S -> epsilon allowed only if epsilon is in L and S not on any right side). Every CFL has a CNF grammar. In CNF, deriving a string of length n takes exactly 2n - 1 production applications (n - 1 binary steps building structure and n terminal steps), a favorite numerical question. Greibach Normal Form (A -> a alpha) is the other named form.\n\n• PDAs. A PDA is a finite automaton plus one stack. Nondeterministic PDAs accept exactly the CFLs (by final state or by empty stack - equivalent for NPDAs). Deterministic PDAs accept the strictly smaller class DCFL. Examples: {a^n b^n} is DCFL (push a's, pop on b's). {w c w^R} is DCFL (the center marker c tells the machine when to switch from pushing to popping). {w w^R} without a marker is CFL but NOT DCFL - the machine must guess the midpoint. Every regular language is a DCFL, so Regular is strictly inside DCFL is strictly inside CFL.\n\n• Pumping lemma for CFLs: for a CFL L there is p such that any w in L with |w| >= p splits as uvxyz with |vxy| <= p, vy nonempty, and u v^i x y^i z in L for all i >= 0. Two portions pump in lockstep. This kills {a^n b^n c^n} (pumping cannot grow all three blocks), {a^i b^j c^k : i < j < k}, {ww}, and {a^(n^2)}. As with the regular case, it is necessary, not sufficient.\n\n• Closure properties - the heart of GATE scoring here. CFLs ARE closed under: union, concatenation, Kleene star, reversal, homomorphism, inverse homomorphism, substitution, and intersection with a regular language. CFLs are NOT closed under: intersection or complement. The standard witness: L1 = {a^n b^n c^m} and L2 = {a^m b^n c^n} are both CFLs, but L1 intersect L2 = {a^n b^n c^n} is not. Non-closure under complement then follows from De Morgan (closure under union plus complement would force closure under intersection). DCFLs behave almost oppositely: closed under complement, and under intersection with regular languages, but NOT closed under union, intersection, concatenation, Kleene star, or reversal.\n\n• Decidability interface: membership (CYK algorithm, O(n^3) with CNF), emptiness, and finiteness are decidable for CFGs; equivalence, universality (L(G) = Sigma*), ambiguity, and whether a CFL is inherently ambiguous are undecidable.",
+        strategy: "GATE patterns: (1) Classification chains - given four languages, mark each as regular / DCFL / CFL-not-DCFL / not-CFL. Anchor on the canonical examples: one matching relation with a clear trigger to switch phases means DCFL; a needed guess (midpoint, or an 'or' of two conditions) pushes to CFL-not-DCFL; two overlapping relations (three equal blocks, ww, i<j<k) mean not CFL. (2) Closure true/false combos - memorize the asymmetric table: CFL loses intersection and complement; DCFL keeps complement but loses union. A statement like 'complement of a CFL is never a CFL' is false: complements of DCFLs like {a^n b^n} are DCFLs, hence CFLs; non-closure only means it can fail sometimes. (3) CNF numericals - derivation of a length-n string uses 2n - 1 steps.\n\nWorked mini-example: is L = {a^i b^j : i differs from j} a DCFL? Yes: it is the complement (within a*b* handling) intuition - directly, a DPDA pushes a's, pops on b's, and accepts if the stack is nonempty at the end or b's arrive after the stack empties; no guessing needed. Contrast with {a^i b^j c^k : i = j or j = k}, where the machine must guess which equality to verify before seeing the c's - that one is inherently ambiguous and not deterministic.\n\nTraps: 'CFL intersect regular' is always a CFL (run PDA and DFA in parallel) - do not confuse it with CFL intersect CFL. And undecidability of grammar ambiguity does not make ambiguity questions unanswerable for a specific small grammar - exhibit two parse trees."
+      },
+      questions: [
+        {
+          id: 'toc-cfl-q1',
+          q: 'Which machine model accepts exactly the class of context-free languages?',
+          options: ['Deterministic pushdown automaton', 'Nondeterministic pushdown automaton', 'Linear bounded automaton', 'Finite automaton with two stacks'],
+          answer: 1,
+          marks: 1,
+          difficulty: 'easy',
+          type: 'concept',
+          explanation: "Nondeterministic PDAs characterize CFLs exactly: every CFG can be converted to an NPDA that simulates leftmost derivations on its stack, and conversely. Deterministic PDAs accept only the strictly smaller DCFL class - {w w^R} is a CFL no DPDA accepts, because the midpoint must be guessed. A linear bounded automaton accepts context-sensitive languages, a strictly larger class. A finite automaton with two stacks can simulate a Turing machine tape (one stack holds what is left of the head, the other what is right), so it accepts all recursively enumerable languages - far too powerful. Hence option B."
+        },
+        {
+          id: 'toc-cfl-q2',
+          q: 'The language L = { a^n b^n : n >= 0 } is',
+          options: ['regular', 'deterministic context-free but not regular', 'context-free but not deterministic context-free', 'not context-free'],
+          answer: 1,
+          marks: 1,
+          difficulty: 'easy',
+          type: 'concept',
+          explanation: "L is not regular: by Myhill-Nerode, a, aa, aaa, ... are pairwise distinguishable (a^i is completed to a member only by b^i). L is context-free via the grammar S -> a S b | epsilon. Moreover it is deterministic: a DPDA pushes a marker for each a, then on the first b switches phase and pops one marker per b, accepting when input and stack finish together - every move is forced by the current input symbol, no guessing. So L sits exactly in DCFL minus Regular, option B. This language is the standard anchor separating regular from deterministic context-free, worth memorizing alongside {w w^R} (CFL not DCFL) and {a^n b^n c^n} (not CFL)."
+        },
+        {
+          id: 'toc-cfl-q3',
+          q: 'In a grammar in Chomsky Normal Form, every production has the form',
+          options: ['A -> BC or A -> a', 'A -> aB or A -> a', 'A -> a alpha where alpha is any string of variables', 'A -> BC or A -> aB'],
+          answer: 0,
+          marks: 1,
+          difficulty: 'easy',
+          type: 'concept',
+          explanation: "CNF permits exactly two production shapes: a nonterminal producing two nonterminals (A -> BC) or a nonterminal producing a single terminal (A -> a), with the special allowance S -> epsilon when the language contains the empty string. Option B (A -> aB or A -> a) describes a right-linear regular grammar, and option C (A -> a alpha) describes Greibach Normal Form - both classic distractors. CNF matters because it makes parse trees binary, which powers the CYK membership algorithm and the counting fact that a string of length n needs exactly 2n - 1 derivation steps: n - 1 applications of A -> BC to create n leaves, then n applications of A -> a."
+        },
+        {
+          id: 'toc-cfl-q4',
+          q: 'Context-free languages are closed under which of the following operations?',
+          options: ['Intersection', 'Complementation', 'Union', 'Set difference'],
+          answer: 2,
+          marks: 1,
+          difficulty: 'easy',
+          type: 'concept',
+          explanation: "Union is easy for grammars: given grammars with start symbols S1 and S2 (renamed apart), add S -> S1 | S2. Intersection fails: {a^n b^n c^m} and {a^m b^n c^n} are both CFLs but intersect to {a^n b^n c^n}, which is not context-free. Complement then must also fail, by De Morgan: if CFLs were closed under complement, then union plus complement would give intersection, contradiction. Set difference fails too, since Sigma* minus L is exactly the complement. So the only survivor among the options is union. Memorize the pattern: CFLs keep the 'regular-expression operations' (union, concatenation, star) plus reversal and homomorphisms, and lose the Boolean ones (intersection, complement, difference)."
+        },
+        {
+          id: 'toc-cfl-q5',
+          q: 'The language { a^n b^n c^n : n >= 0 } is',
+          options: ['context-free but not regular', 'deterministic context-free', 'context-sensitive but not context-free', 'not recursively enumerable'],
+          answer: 2,
+          marks: 1,
+          difficulty: 'medium',
+          type: 'concept',
+          explanation: "A stack can verify one matching relation, but here two must hold simultaneously: count(a) = count(b) and count(b) = count(c). After popping the stack to match b's against a's, the count is gone and c's cannot be checked. Formally, the CFL pumping lemma kills it: in a long word a^p b^p c^p, the pumped window vxy spans at most two of the three blocks, so pumping unbalances the third. The language is easily context-sensitive (a linear bounded automaton can cross off one a, one b, one c per pass within the input space), and certainly recursive, hence RE. So it is context-sensitive but not context-free - the canonical inhabitant of that gap."
+        },
+        {
+          id: 'toc-cfl-q6',
+          q: 'Which of the following is TRUE about deterministic context-free languages (DCFLs)?',
+          options: ['DCFLs are closed under union', 'DCFLs are closed under complementation', 'DCFLs are closed under intersection', 'DCFLs are closed under reversal'],
+          answer: 1,
+          marks: 2,
+          difficulty: 'medium',
+          type: 'concept',
+          explanation: "Complementation is the signature closure of DCFLs: a DPDA can be normalized to always read its whole input and halt, and then its accepting condition can be inverted (the construction is delicate but standard). Union fails: {a^i b^j c^k : i = j} and {a^i b^j c^k : j = k} are DCFLs whose union is the inherently ambiguous language {i = j or j = k}, which no DPDA accepts. Intersection fails with the usual witness intersecting down to {a^n b^n c^n}. Reversal fails as well: a language can be deterministic reading left-to-right but require guessing when read reversed. Note the striking asymmetry with general CFLs, which keep union and reversal but lose complement - a favorite GATE contrast."
+        },
+        {
+          id: 'toc-cfl-q7',
+          q: 'Consider L1 = { w c w^R : w in {a,b}* } and L2 = { w w^R : w in {a,b}* }, where c is a distinct symbol. Which is correct?',
+          options: ['Both are deterministic context-free', 'L1 is DCFL; L2 is CFL but not DCFL', 'L1 is CFL but not DCFL; L2 is DCFL', 'Neither is context-free'],
+          answer: 1,
+          marks: 2,
+          difficulty: 'medium',
+          type: 'concept',
+          explanation: "Both are palindrome-style languages, so both are CFLs (push the first half, pop while matching the second half). The difference is whether the switch point is visible. In L1 the center marker c is explicit: a DPDA pushes symbols until it reads c, then deterministically pops and matches - every move forced, so L1 is DCFL. In L2 there is no marker; the machine must guess where the midpoint is, and different guesses matter for different inputs. It can be proven no DPDA accepts L2, making it the canonical CFL that is not deterministic. This 'marker makes it deterministic' principle resolves many GATE classification questions instantly."
+        },
+        {
+          id: 'toc-cfl-q8',
+          q: 'L1 = { a^n b^n c^m : n, m >= 0 } and L2 = { a^m b^n c^n : n, m >= 0 } are both context-free. The fact that L1 intersect L2 = { a^n b^n c^n } demonstrates that',
+          options: ['CFLs are not closed under union', 'CFLs are not closed under intersection', 'CFLs are not closed under concatenation', 'the pumping lemma fails for CFLs'],
+          answer: 1,
+          marks: 1,
+          difficulty: 'medium',
+          type: 'concept',
+          explanation: "Work out the intersection: a string in both languages must have its a-count equal to its b-count (from L1) and its b-count equal to its c-count (from L2), giving exactly {a^n b^n c^n}, which the CFL pumping lemma shows is not context-free. So we have two CFLs whose intersection leaves the class - precisely a counterexample to closure under intersection. It says nothing about union (CFLs are closed under union) or concatenation (also closed). This construction is worth internalizing because it is reused everywhere: it also proves non-closure under complement via De Morgan, and it is the template for building undecidability results about CFG intersection emptiness."
+        },
+        {
+          id: 'toc-cfl-q9',
+          q: 'Which of the following statements about ambiguity is TRUE?',
+          options: ['If a grammar is ambiguous, the language it generates is inherently ambiguous', 'An inherently ambiguous CFL has no unambiguous CFG generating it', 'Ambiguity of a CFG can always be removed algorithmically', 'A language generated by an unambiguous grammar may still be inherently ambiguous'],
+          answer: 1,
+          marks: 1,
+          difficulty: 'medium',
+          type: 'concept',
+          explanation: "Keep the grammar/language distinction sharp. Ambiguity is defined on grammars: some string has two parse trees. Inherent ambiguity is defined on languages: every grammar for the language is ambiguous - that is exactly option B. Option A is false because an ambiguous grammar may generate a language that some other, unambiguous grammar also generates (e.g. S -> S S | a is ambiguous, but a a* has unambiguous grammars). Option D contradicts the definition outright: exhibiting one unambiguous grammar certifies the language is not inherently ambiguous. Option C is false because deciding whether a CFG is ambiguous is undecidable, so no general removal algorithm can exist. Standard inherently ambiguous example: { a^i b^j c^k : i = j or j = k }."
+        },
+        {
+          id: 'toc-cfl-q10',
+          q: 'Which of the following languages is NOT context-free?',
+          options: ['{ a^i b^j : i differs from j }', '{ a^n b^n : n >= 0 }', '{ w w^R : w in {a,b}* }', '{ a^i b^j c^k : i < j < k }'],
+          answer: 3,
+          marks: 2,
+          difficulty: 'medium',
+          type: 'concept',
+          explanation: "Options A, B, C each need only one stack-checkable relation. For A, a PDA matches a's against b's and accepts precisely when they fail to cancel exactly. B and C are the standard stack languages. Option D requires maintaining two strict inequalities i < j and j < k simultaneously - two independent comparisons through the shared middle count j. Pumping confirms it: take a^p b^(p+1) c^(p+2); the window vxy touches at most two adjacent blocks. If it avoids the c-block, pump up to push i or j past the c-count; if it avoids the a-block, pump down to drag j or k down to the a-count. Every case breaks an inequality, so D is not a CFL."
+        },
+        {
+          id: 'toc-cfl-q11',
+          q: 'Which of the following statements is TRUE?',
+          options: ['Every regular language is a DCFL', 'Every CFL is a DCFL', 'A DPDA accepting by empty stack accepts all DCFLs', 'DCFLs are not closed under intersection with regular languages'],
+          answer: 0,
+          marks: 2,
+          difficulty: 'medium',
+          type: 'concept',
+          explanation: "A DFA is a DPDA that simply ignores its stack, so every regular language is deterministic context-free: option A. Option B collapses a strict hierarchy: {w w^R} is CFL but not DCFL. Option C is a subtle classic: for deterministic PDAs, empty-stack acceptance is strictly weaker than final-state acceptance - an empty-stack DPDA can only accept prefix-free languages (once the stack empties it must stop, so no accepted string can be a proper prefix of another). Since DCFLs like a* are not prefix-free, C fails. Option D is false: running a DPDA and a DFA in parallel stays deterministic, so DCFL intersect regular is DCFL. Answer: A."
+        },
+        {
+          id: 'toc-cfl-q12',
+          q: 'Consider L = { a^i b^j c^k : i = j or j = k }. Which of the following is TRUE?',
+          options: ['L is a DCFL', 'L is context-free and inherently ambiguous', 'L is not context-free', 'L is regular'],
+          answer: 1,
+          marks: 2,
+          difficulty: 'hard',
+          type: 'concept',
+          explanation: "L is a union of two CFLs - {i = j} with free k, and {j = k} with free i - and CFLs are closed under union, so L is context-free (option C is out; regularity is absurd since even {a^n b^n} inside it is not regular). But the union is troublesome: strings a^n b^n c^n satisfy both conditions, and it can be proven (Parikh/Ogden-style arguments) that any grammar must generate these strings through both 'branches', forcing two parse trees - L is the textbook inherently ambiguous language. It is also not deterministic: a DPDA would have to commit to checking i = j or j = k before seeing the c's. Hence option B, and this one example simultaneously witnesses DCFL non-closure under union."
+        },
+        {
+          id: 'toc-cfl-q13',
+          q: 'If L is a deterministic context-free language, then the complement of L is necessarily',
+          options: ['regular', 'a deterministic context-free language', 'context-free but possibly not deterministic', 'possibly not context-free'],
+          answer: 1,
+          marks: 2,
+          difficulty: 'hard',
+          type: 'concept',
+          explanation: "DCFLs are closed under complement: normalize the DPDA so it never gets stuck or loops forever on epsilon-moves (always consumes the entire input), then invert acceptance carefully at end-of-input. So the complement is again a DCFL - the strongest true statement, option B. Option C is true-but-weaker and therefore not the best answer under 'necessarily... strongest classification' - and more importantly it suggests determinism might be lost, which the closure theorem rules out. Option A is false: complement of {a^n b^n} is not regular (regular languages are closed under complement, so a regular complement would force L regular). This closure is precisely how one proves some CFLs are not DCFLs: if L were DCFL, its complement would be a CFL - contradiction when it is not."
+        },
+        {
+          id: 'toc-cfl-q14',
+          q: 'Let L = { w w : w in {a,b}* }. Which of the following is TRUE?',
+          options: ['L is context-free and its complement is not', 'Neither L nor its complement is context-free', 'L is not context-free but its complement is context-free', 'Both L and its complement are context-free'],
+          answer: 2,
+          marks: 2,
+          difficulty: 'hard',
+          type: 'concept',
+          explanation: "L = {ww} is not context-free: intersecting it with the regular set a*b*a*b* gives {a^i b^j a^i b^j}, which pumping destroys (a CFL intersected with a regular set must stay a CFL, so L cannot be one). Surprisingly, the complement IS context-free. Odd-length strings are all in the complement (easy). An even-length string x y with |x| = |y| differs from every ww exactly when some position i has x_i unequal to y_i; a nondeterministic PDA can guess i, use its stack to measure matching distances, and verify the mismatch. This 'ww versus its complement' inversion is a beloved GATE trap: the intuitive guess (D or A) is wrong in both directions."
+        },
+        {
+          id: 'toc-cfl-q15',
+          q: 'Under which of the following operations are context-free languages NOT closed?',
+          options: ['Reversal', 'Homomorphism', 'Intersection with a regular language', 'Intersection with another context-free language'],
+          answer: 3,
+          marks: 1,
+          difficulty: 'hard',
+          type: 'concept',
+          explanation: "Reversal: reverse every production body in the grammar; the language reverses. Homomorphism: substitute h(a) for each terminal a in the productions. Intersection with a regular language: run the PDA and the DFA as a product machine - one stack still suffices because the DFA needs none, so the result is a CFL (this is a heavily used lemma). But intersection of two CFLs can fail: {a^n b^n c^m} intersect {a^m b^n c^n} = {a^n b^n c^n}, not context-free - each PDA needs its own stack and two stacks equal Turing power. So the answer is D. Exam heuristic: 'with regular' is safe for both CFL and DCFL; 'with another CFL' is the standard failure."
+        }
+      ]
+    },
+    {
+      id: 'toc-turing',
+      name: 'Turing Machines, Recursive & Recursively Enumerable Languages',
+      theory: {
+        intro: "The Turing machine (TM) is the maximal model of effective computation: a finite control with an unbounded tape it can read, write, and traverse in both directions. Two language classes arise from it and dominate GATE questions. A language is recursive (REC, decidable) if some TM accepts every string in it and rejects every string outside it - halting on all inputs. A language is recursively enumerable (RE, semi-decidable) if some TM accepts exactly its members but may loop forever on non-members. Every recursive language is RE, and the containment is strict: the halting problem's language is RE but not recursive. GATE tests the robustness of the model (variants add no power), the complementation asymmetry between REC and RE, closure-property combos, the enumerator characterizations, and counting arguments showing most languages are not RE at all. These facts also feed directly into decidability questions, so this topic is foundational for the next.",
+        core: "TM variants and robustness. Multi-tape TMs, two-way infinite tape TMs, nondeterministic TMs, and TMs with multiple heads all accept exactly the same class of languages as the basic one-tape deterministic TM - constructions simulate each in the basic model (a multi-tape TM is simulated with quadratic slowdown; an NTM by breadth-first search over computation trees, with possibly exponential slowdown). Power is unchanged; only efficiency differs. In contrast, restricting the tape changes everything: read-only input gives finite automata, a single stack gives PDAs, tape bounded by input length gives linear bounded automata.\n\n• Recursive versus RE, precisely. L is recursive iff some TM halts on every input, answering yes/no correctly - an algorithm. L is RE iff some TM halts-and-accepts exactly on members; on non-members it may reject or loop. Equivalent characterization by enumerators: L is RE iff some TM can enumerate (print) all members of L in some order, possibly with repetition; L is recursive iff some enumerator prints L in nondecreasing length (canonical) order - because then to decide w you wait until w appears or a longer string appears.\n\n• The fundamental complement theorem. If L and its complement are both RE, then L is recursive: run the two semi-deciders in parallel (dovetailing); exactly one must eventually accept, giving a total decision procedure. Contrapositive forms are exam gold: if L is RE but not recursive, then complement of L is not RE; if L is undecidable but RE, its complement cannot even be enumerated.\n\n• Closure properties. REC is closed under: union, intersection, complement, concatenation, Kleene star, reversal, set difference. RE is closed under: union, intersection, concatenation, Kleene star, reversal, homomorphism - but NOT complement and NOT set difference (Sigma* minus L is the complement). The complement gap is the single most-tested line in this topic. For mixed cases reason from definitions: REC intersect RE is RE (intersection of two RE sets is RE) but need not be recursive (take L RE-not-REC intersected with Sigma*).\n\n• Countability and encodings. Every TM can be encoded as a finite binary string, so the set of all TMs is countably infinite, and so is the set of RE languages. But the set of ALL languages over {0,1} is uncountable (power set of a countable set, by diagonalization). Therefore languages exist that are not RE - in fact 'almost all' languages are not RE. This counting argument requires no specific construction and appears regularly as a conceptual question.\n\n• Canonical examples for placement: A_TM = { (M, w) : M accepts w } and HALT = { (M, w) : M halts on w } are RE but not recursive. Their complements are not RE. The set of encodings of TMs that are total (halt on all inputs) is not even RE. Every CFL and every CSL is recursive; containments Regular subset CFL subset CSL subset REC subset RE are all strict.",
+        strategy: "GATE patterns: (1) True/false batteries on closure - the fastest correct method is to recall the two rows (REC: all Boolean operations; RE: everything except complement/difference) and derive mixed statements from the complement theorem rather than memorizing them separately. (2) 'L is RE, complement of L is RE; what is L?' - answer recursive, by dovetailing. (3) Enumerator phrasing - 'listed by some procedure' means RE; 'listed in increasing/canonical order' means recursive. (4) Counting - TMs are countable, languages are not, so non-RE languages exist; any option claiming every language is RE or every undecidable language is still RE is false (witness: complement of the halting set).\n\nWorked mini-example: L1 is recursive, L2 is RE but not recursive. Classify L1 intersect L2. Both are RE and RE is closed under intersection, so the result is RE. Must it be recursive? No - choose L1 = Sigma*: the intersection is L2 itself, not recursive. Can it be recursive? Yes - choose L1 = empty set. So the strongest guaranteed classification is 'RE, not necessarily recursive'. GATE loves this 'strongest guarantee' framing; always test both extremes (empty set and Sigma*) as the regular-language slot.\n\nTraps: nondeterminism never adds language power to TMs (only speed); 'TM that may loop' describes a recognizer, not a decider; and a subset of a recursive language need not be recursive - subset relations preserve nothing here, exactly as with regular languages."
+      },
+      questions: [
+        {
+          id: 'toc-turing-q1',
+          q: 'Which of the following Turing machine variants accepts a class of languages strictly larger than the standard single-tape deterministic TM?',
+          options: ['Multi-tape deterministic TM', 'Nondeterministic TM', 'TM with a two-way infinite tape', 'None of these'],
+          answer: 3,
+          marks: 1,
+          difficulty: 'easy',
+          type: 'concept',
+          explanation: "All the listed variants are equivalent in language-accepting power to the basic model; this robustness is exactly why the Turing machine is taken as the definition of computability (Church-Turing thesis). A multi-tape TM is simulated on one tape by storing all tapes in interleaved tracks with marked head positions (quadratic slowdown). A two-way infinite tape folds into a one-way tape with two tracks. A nondeterministic TM is simulated by breadth-first search through the tree of configurations - possibly exponentially slower, but every accepted string is still found. Variants change efficiency, never the class of languages. So the answer is 'none of these'."
+        },
+        {
+          id: 'toc-turing-q2',
+          q: 'A language L is recursive if and only if',
+          options: ['some TM accepts every string in L and loops on strings not in L', 'some TM halts on every input, accepting exactly the strings of L', 'every TM that accepts L halts on all inputs', 'some TM accepts L and L is countable'],
+          answer: 1,
+          marks: 1,
+          difficulty: 'easy',
+          type: 'concept',
+          explanation: "Recursive means decidable: there exists a single TM that is total - it halts on every input - and answers correctly, accepting members and rejecting non-members. Option A describes only recognition with possible looping, which is the weaker RE property. Option C quantifies the wrong way: a recursive language always has some non-halting TMs accepting it too (add a gratuitous loop); the definition needs one good machine to exist, not all machines to behave. Option D is vacuous since every language over a finite alphabet is countable. The 'exists a total TM' phrasing in option B is the definition to lock in, because GATE options routinely swap the quantifiers."
+        },
+        {
+          id: 'toc-turing-q3',
+          q: 'A language is recursively enumerable if and only if',
+          options: ['it is accepted by some TM that may fail to halt on strings outside the language', 'it is accepted by some TM that halts on all inputs', 'its complement is recursive', 'it is finite or countably infinite'],
+          answer: 0,
+          marks: 1,
+          difficulty: 'easy',
+          type: 'concept',
+          explanation: "RE (semi-decidable) is defined by one-sided guarantees: a TM exists that halts and accepts on every member, while on non-members it may reject or run forever. That is option A. Option B is the definition of recursive - the stronger class. Option C is wrong in both directions: if the complement were recursive then L itself would be recursive (complement again), which is more than RE demands; and RE languages like the halting set have non-RE complements. Option D is a property of every language over a finite alphabet, so it distinguishes nothing. Equivalent characterization worth remembering: L is RE iff some enumerator prints exactly the strings of L, in any order, possibly with repetitions."
+        },
+        {
+          id: 'toc-turing-q4',
+          q: 'Which of the following statements is TRUE?',
+          options: ['Every recursively enumerable language is recursive', 'Every recursive language is recursively enumerable', 'Every language is recursively enumerable', 'No recursive language has a recursive complement'],
+          answer: 1,
+          marks: 1,
+          difficulty: 'easy',
+          type: 'concept',
+          explanation: "A decider is in particular a recognizer - a TM halting on all inputs certainly halts and accepts on members - so REC is a subset of RE: option B. The reverse (option A) fails: the halting set {(M, w) : M halts on w} is RE (simulate and accept if the simulation halts) but not recursive, by the classic diagonal argument. Option C fails by counting: TMs are countable, languages uncountable, so most languages have no recognizer at all. Option D is backwards: REC is closed under complement (swap the accept/reject answers of a total machine), so every recursive language has a recursive complement."
+        },
+        {
+          id: 'toc-turing-q5',
+          q: 'If a language L and its complement are both recursively enumerable, then',
+          options: ['L must be regular', 'L must be recursive', 'L must be RE but possibly not recursive', 'no conclusion can be drawn'],
+          answer: 1,
+          marks: 2,
+          difficulty: 'medium',
+          type: 'concept',
+          explanation: "Run the recognizer for L and the recognizer for its complement in parallel on input w (dovetail: alternate one step of each). Every string belongs to exactly one of the two sets, so exactly one recognizer eventually halts and accepts. When it does, answer accordingly. This combined procedure halts on every input and answers correctly, so it decides L: L is recursive - option B. This is a cornerstone theorem: it converts complementation facts into decidability facts. Its contrapositive is used constantly: since the halting set is RE but not recursive, its complement cannot be RE. Option A over-reaches (recursive languages are far beyond regular), and options C and D understate what the dovetailing construction proves."
+        },
+        {
+          id: 'toc-turing-q6',
+          q: 'Which of the following closure claims is FALSE?',
+          options: ['Recursive languages are closed under complementation', 'Recursive languages are closed under intersection', 'RE languages are closed under union', 'RE languages are closed under complementation'],
+          answer: 3,
+          marks: 1,
+          difficulty: 'medium',
+          type: 'concept',
+          explanation: "For recursive languages, a total TM's answer can simply be inverted (complement) or two total TMs run in sequence (intersection) - both stay total, so A and B are true. For RE union, dovetail the two recognizers and accept if either accepts - true. RE complementation fails, and the proof is the previous theorem in reverse: if RE were closed under complement, then for any RE language both it and its complement would be RE, forcing every RE language to be recursive - contradicting the existence of the halting set, which is RE but undecidable. So D is the false claim. The complement line is the sharpest dividing wall between REC and RE and the most frequently examined."
+        },
+        {
+          id: 'toc-turing-q7',
+          q: 'L1 and L2 are recursively enumerable. Which of the following is necessarily recursively enumerable?',
+          options: ['L1 intersect L2', 'complement of L1', 'L1 minus L2', 'complement of (L1 union L2)'],
+          answer: 0,
+          marks: 2,
+          difficulty: 'medium',
+          type: 'concept',
+          explanation: "Intersection: run both recognizers on the input (dovetailed) and accept only when both have accepted; members of the intersection make both halt-accept eventually, so this recognizes L1 intersect L2 - RE, option A. Complement of an RE language need not be RE (halting set). L1 minus L2 equals L1 intersect complement(L2), and since complement(L2) may fail to be RE, the difference may too - concretely, Sigma* minus HALT is the non-RE complement of the halting set. Option D is the complement of an RE language (union of RE sets is RE), so it fails the same way. Reduce every set expression to unions/intersections/complements and apply the two closure rows - that is the reliable method."
+        },
+        {
+          id: 'toc-turing-q8',
+          q: 'Regarding nondeterministic Turing machines (NTMs), which statement is TRUE?',
+          options: ['NTMs accept some languages that no deterministic TM accepts', 'Every NTM can be simulated by a deterministic TM, so both accept exactly the RE languages', 'NTMs are equivalent to PDAs in power', 'An NTM can decide the halting problem'],
+          answer: 1,
+          marks: 1,
+          difficulty: 'medium',
+          type: 'concept',
+          explanation: "A deterministic TM simulates an NTM by exploring the tree of possible computations breadth-first (depth-first risks descending an infinite branch and missing an accepting one elsewhere). If any branch accepts, the simulation finds it at some finite depth. Hence NTMs accept exactly the RE languages - no new power, option B. Option A confuses TMs with weaker models: nondeterminism strictly helps PDAs (CFL versus DCFL) and helps NFA succinctness, but never TM expressiveness. Option C is far off - PDAs cannot even accept {a^n b^n c^n}. Option D is false because the halting problem is undecidable for every model equivalent to TMs; nondeterminism does not breach undecidability (that is a semantic barrier, not a resource barrier)."
+        },
+        {
+          id: 'toc-turing-q9',
+          q: 'L is recursively enumerable and its complement is NOT recursively enumerable. Then L is',
+          options: ['recursive', 'RE but not recursive', 'not RE', 'regular'],
+          answer: 1,
+          marks: 2,
+          difficulty: 'medium',
+          type: 'concept',
+          explanation: "We are told L is RE, so options C is immediately out, and 'regular' would trivially make the complement regular hence RE - contradiction, killing D. Could L be recursive? If it were, its complement would also be recursive (REC closed under complement) and every recursive language is RE - but the complement is given as not RE. Contradiction. So L is RE but not recursive: option B. This is exactly the situation of the halting set. The reasoning template - push the assumption through closure properties until it collides with a given fact - solves most 'classify L given facts about its complement' questions, and it always pivots on the theorem that RE plus co-RE equals recursive."
+        },
+        {
+          id: 'toc-turing-q10',
+          q: 'Let HALT = { (M, w) : TM M halts on input w }. Which of the following is TRUE?',
+          options: ['HALT is recursive', 'HALT is RE and its complement is also RE', 'HALT is RE but its complement is not RE', 'HALT is not RE'],
+          answer: 2,
+          marks: 1,
+          difficulty: 'medium',
+          type: 'concept',
+          explanation: "HALT is RE: a universal TM simulates M on w and accepts the moment the simulation halts; for pairs where M runs forever, the simulation runs forever too - acceptable for a recognizer. HALT is not recursive: assuming a decider H exists, build D that on input (M) runs H on (M, M) and does the opposite (loops if H says halts, halts if H says loops); feeding D its own description yields a contradiction. Finally, since HALT is RE but not recursive, its complement cannot be RE - otherwise the parallel-recognizers theorem would make HALT recursive. So option C captures all three facts. This triple (RE, undecidable, co-set not RE) is the archetype for classification questions."
+        },
+        {
+          id: 'toc-turing-q11',
+          q: 'The set of all Turing machines is countable, while the set of all languages over {0,1} is uncountable. The correct conclusion is',
+          options: ['every language is accepted by some TM, possibly non-halting', 'there exist languages that are not recursively enumerable', 'every undecidable language is recursively enumerable', 'the set of RE languages is uncountable'],
+          answer: 1,
+          marks: 2,
+          difficulty: 'hard',
+          type: 'concept',
+          explanation: "Each TM has a finite description, so TMs can be listed - countably many. Each TM accepts exactly one language, so there are at most countably many RE languages (making option D false). But languages over {0,1} form the power set of the countable set of all strings, which Cantor's diagonal argument shows is uncountable. A countable collection cannot cover an uncountable one, so some language - indeed, all but countably many - has no accepting TM at all: not RE. That is option B, and it directly refutes option A. Option C is separately false by example: the complement of the halting set is undecidable yet not RE. The elegance here is that pure counting proves existence without constructing any specific language."
+        },
+        {
+          id: 'toc-turing-q12',
+          q: 'L1 is recursive and L2 is recursively enumerable but not recursive. The strongest claim that must hold for L1 intersect L2 is that it is',
+          options: ['recursive', 'recursively enumerable', 'context-sensitive', 'not recursively enumerable'],
+          answer: 1,
+          marks: 2,
+          difficulty: 'hard',
+          type: 'concept',
+          explanation: "Since every recursive language is RE and RE is closed under intersection, L1 intersect L2 is RE - that much is guaranteed. Now test whether anything stronger survives all choices. Take L1 = Sigma*: the intersection is L2, which is not recursive, so 'recursive' fails as a guarantee (and 'context-sensitive' fails with it, since CSLs are all recursive). Take L1 = empty set: the intersection is empty, which IS recursive - so option D ('not RE') is also wrong; the intersection can even be trivial. The strongest always-true classification is therefore RE, option B. Method: prove the upper bound by closure, then attack every stronger claim with the extreme choices Sigma* and empty set."
+        },
+        {
+          id: 'toc-turing-q13',
+          q: 'Which of the following characterizations is CORRECT?',
+          options: ['L is recursive iff some enumerator prints L in canonical (length-then-lexicographic) order', 'L is recursive iff some enumerator prints L in some arbitrary order', 'L is RE iff some enumerator prints L without ever repeating a string', 'L is RE iff L can be printed in canonical order'],
+          answer: 0,
+          marks: 2,
+          difficulty: 'hard',
+          type: 'concept',
+          explanation: "Enumeration in arbitrary order (repetitions allowed) characterizes RE: dovetail the recognizer over all strings and print each accepted one - and conversely, to recognize w, watch the enumeration for w. So option B claims too much (that is RE, not recursive) and option D too little (canonical order is stronger than RE). Canonical order characterizes recursive: to decide w, run the ordered enumerator until either w appears (accept) or some string beyond w in the ordering appears (reject - w can no longer show up). One subtlety: for infinite L this is exact; the standard theorem statement is option A. Non-repetition (option C) is a red herring - repetitions can always be filtered out and change nothing."
+        },
+        {
+          id: 'toc-turing-q14',
+          q: 'Let NOTHALT = { (M, w) : TM M does not halt on input w }. This language is',
+          options: ['recursive', 'RE but not recursive', 'not RE', 'RE and its complement is recursive'],
+          answer: 2,
+          marks: 2,
+          difficulty: 'hard',
+          type: 'concept',
+          explanation: "NOTHALT is the complement of HALT (over well-formed pairs). Suppose NOTHALT were RE. HALT is known to be RE. A language and its complement both RE forces the language to be recursive by parallel simulation - but HALT is provably undecidable. Contradiction. Therefore NOTHALT is not RE: option C. Intuition supports the algebra: to confirm non-halting you would need to observe infinitely many steps, and no finite computation certifies 'runs forever'; there is no finite witness, which is the hallmark of non-RE sets. Options A and B are eliminated because both imply RE. This makes NOTHALT the standard example of a language strictly outside RE, one level beyond mere undecidability."
+        }
+      ]
+    },
+    {
+      id: 'toc-decidability',
+      name: 'Decidability, Undecidability & Reductions',
+      theory: {
+        intro: "Decidability asks the sharpest question in computer science: which problems admit an algorithm that always halts with the correct answer? A problem (encoded as a language) is decidable if such a total algorithm exists, semi-decidable (RE) if a procedure can confirm yes-instances but may loop on no-instances, and undecidable otherwise. GATE tests three skills here: (1) recall of the standard catalogue - which questions about DFAs, CFGs, and TMs are decidable; (2) correct application of Rice's theorem, which wholesale condemns non-trivial semantic properties of TM languages; and (3) reduction logic - the direction of implication when problem A reduces to problem B. Most lost marks come from reversed reduction arrows and from applying Rice's theorem to syntactic properties where it does not apply. A small, precisely memorized catalogue plus two inference rules covers nearly every question this topic produces.",
+        core: "The catalogue, by machine class. For DFAs/regular languages, essentially everything is decidable: membership, emptiness, finiteness, universality (L = Sigma*), equivalence of two DFAs, and inclusion - all via reachability and product constructions on finite state graphs. For CFGs: membership (CYK), emptiness (mark generating symbols), and finiteness are decidable; but universality (L(G) = Sigma*), equivalence of two CFGs, inclusion, ambiguity of a grammar, inherent ambiguity, and whether the intersection of two CFLs is empty are all undecidable. Whether a CFG generates a regular language is also undecidable. For TMs, nearly everything semantic is undecidable: membership (A_TM), halting, emptiness of L(M), finiteness, regularity of L(M), equivalence of two TMs, and L(M) = Sigma*.\n\n• Rice's theorem. Every non-trivial property of the RE languages is undecidable. Unpacking: a 'property' here is a set of RE languages; a TM M 'has the property' when L(M) belongs to that set; 'non-trivial' means at least one RE language has it and at least one does not. So 'L(M) is empty', 'L(M) is finite', 'L(M) is regular', 'M accepts the string 101', 'L(M) contains at most 10 strings' - all undecidable. Rice's theorem says NOTHING about syntactic or behavioral properties of the machine itself: 'M has 15 states', 'M ever writes symbol 1', 'M halts within 100 steps on input w' (simulate 100 steps), 'M ever moves left on w within n steps' - such questions must be analyzed directly and are often decidable. The two-step test: (a) is it a property of the language L(M) only, invariant across machines with equal languages? (b) is it non-trivial? Both yes: undecidable by Rice.\n\n• Reductions. A many-one reduction from A to B (written A <=m B) is a computable total function f with: w in A iff f(w) in B. It transfers hardness FORWARD and easiness BACKWARD: if A <=m B and B is decidable, then A is decidable; contrapositive - if A is undecidable, then B is undecidable. The reverse inferences are invalid: A <=m B with A decidable says nothing about B, and B undecidable says nothing about A. Also: A <=m B implies complement(A) <=m complement(B) (the same f works), and A <=m B with B in RE puts A in RE. To prove a new problem P undecidable, reduce a known-undecidable problem (A_TM or HALT) TO P - never the other direction; reducing P to HALT only shows P is no harder than HALT.\n\n• Semi-decidability placements. A_TM and HALT are RE (semi-decidable) but undecidable; their complements are not RE. Emptiness E_TM = {M : L(M) = empty} is not RE, but its complement (L(M) nonempty) is RE: dovetail M over all strings and accept upon any acceptance - a finite witness exists. Totality (M halts on all inputs) and equivalence of TMs are neither RE nor co-RE. The pattern: a problem is RE exactly when a yes-answer has a finite checkable witness.",
+        strategy: "GATE patterns: (1) 'Which of the following is decidable?' with a CFG mix - the safe anchors are membership, emptiness, finiteness (decidable) versus universality, equivalence, ambiguity, intersection-emptiness (undecidable). (2) Rice-based options dressed in different words - rephrase each option as a statement about L(M); if it depends only on the language and is non-trivial, mark undecidable without further thought. If it mentions states, steps, tape symbols, or a bounded simulation window, Rice does not apply and it is usually decidable by direct simulation. (3) Reduction-direction MCQs - draw the arrow: hardness flows along A <=m B from A to B; decidability flows against it.\n\nWorked mini-example: is 'TM M halts on input w within 2^|w| steps' decidable? Yes: simulate exactly 2^|w| steps - a finite, computable bound - and report. The exponential cost is irrelevant; decidability ignores efficiency. Contrast 'M halts on w' with no bound: no simulation length suffices to conclude 'no', and it is undecidable.\n\nTraps: 'undecidable' does not mean 'not RE' - A_TM is undecidable yet RE; keep three levels (decidable / RE-but-undecidable / not-RE) distinct. 'Non-trivial' in Rice refers to the property having both an RE example and a non-example, not to the question feeling difficult. And a reduction FROM an undecidable problem proves undecidability; a reduction TO one proves nothing about hardness - the single most-tested logical trap in this topic."
+      },
+      questions: [
+        {
+          id: 'toc-decidability-q1',
+          q: 'Given a DFA D and a string w, the problem of deciding whether D accepts w is',
+          options: ['decidable', 'undecidable but semi-decidable', 'not even semi-decidable', 'decidable only when D has fewer than 100 states'],
+          answer: 0,
+          marks: 1,
+          difficulty: 'easy',
+          type: 'concept',
+          explanation: "Membership for a DFA is the easiest question in the catalogue: simulate D on w, one transition per symbol; after exactly |w| steps the machine is in a definite state, and acceptance is read off from whether that state is final. The simulation always terminates in linear time, so the problem is decidable outright - no size restrictions needed (option D invents one). In fact all the standard questions about DFAs - membership, emptiness (is a final state reachable?), universality, finiteness, and equivalence of two DFAs - are decidable, because a DFA is a finite graph and every question reduces to graph reachability or product-machine reachability. Undecidability phenomena only begin with more powerful machine models."
+        },
+        {
+          id: 'toc-decidability-q2',
+          q: 'The halting problem - given a TM M and input w, does M halt on w? - is',
+          options: ['decidable by a sufficiently powerful modern computer', 'undecidable, but semi-decidable', 'neither decidable nor semi-decidable', 'decidable for TMs with a single tape'],
+          answer: 1,
+          marks: 1,
+          difficulty: 'easy',
+          type: 'concept',
+          explanation: "The halting problem is the canonical undecidable problem: assuming a total decider H(M, w) exists, construct D that on input (M) asks H whether M halts on its own description and then does the opposite; running D on (D) contradicts either answer. No hardware power changes this - undecidability is a logical barrier, not a resource one (option A), and single-tape TMs are equivalent to all variants (option D). Yet the problem is semi-decidable: a universal TM simulates M on w and accepts if the simulation ever halts; yes-instances are confirmed in finite time, only no-instances loop. So it sits precisely at 'RE but not recursive': option B. Its complement, by contrast, is not even semi-decidable."
+        },
+        {
+          id: 'toc-decidability-q3',
+          q: 'Which of the following problems about two given DFAs D1 and D2 is decidable?',
+          options: ['Only whether L(D1) is empty', 'Only whether L(D1) = L(D2)', 'Both emptiness and equivalence', 'Neither emptiness nor equivalence'],
+          answer: 2,
+          marks: 1,
+          difficulty: 'easy',
+          type: 'concept',
+          explanation: "Emptiness of a DFA is graph reachability: L(D1) is nonempty iff some final state is reachable from the start state - checkable by BFS/DFS in finite time. Equivalence reduces to emptiness: build product automata for the symmetric difference (strings accepted by exactly one of D1, D2), which is again a DFA, and test it for emptiness; alternatively minimize both DFAs and compare, since the minimal DFA is unique up to isomorphism. Both procedures always terminate, so both problems are decidable - option C. This is worth contrasting with CFGs, where emptiness stays decidable but equivalence becomes undecidable, and with TMs, where even emptiness is undecidable. The dividing lines between the three levels form a standard GATE table."
+        }
+]},
+    {
+      id: 'toc-hierarchy',
+      name: 'Chomsky Hierarchy & Language Classification',
+      theory: {
+        intro: "The Chomsky hierarchy arranges the four grammar-defined language families - regular, context-free, context-sensitive, and recursively enumerable - into a strict containment chain, and adds recursive languages as an important intermediate class between context-sensitive and RE. GATE questions in this topic rarely ask you to derive a grammar from scratch; instead they hand you a language description or a set-builder definition and ask you to place it as precisely as possible in the hierarchy, or they hand you a closure-property claim and ask whether it holds for a named class. The whole topic reduces to knowing the containment chain cold, knowing what distinguishes each grammar type structurally, and knowing which classes are closed under which operations. Because the classes nest, 'is L context-free' and 'is L NOT regular' are often two separate true facts about the same language, and exam options are built to test whether you confuse tightest classification with any true classification.",
+        core: "Chomsky's four types are defined by restrictions on production rules alpha -> beta. Type 0 (unrestricted, recognized by Turing machines / RE languages): alpha can be any string containing at least one non-terminal, beta anything - no restriction at all. Type 1 (context-sensitive, recognized by linear-bounded automata): every production has |alpha| <= |beta| (non-contracting), with productions written as x A y -> x gamma y where gamma is nonempty (A is rewritten to something at least as long, only in the context x _ y); S -> epsilon is allowed if S never appears on a right-hand side. Type 2 (context-free, recognized by pushdown automata): every production has a single non-terminal on the left, A -> beta, with beta any string - the rewriting does not depend on surrounding context. Type 3 (regular, recognized by finite automata): every production is A -> aB, A -> a, or A -> epsilon (right-linear), or symmetrically all left-linear - each step consumes exactly one terminal and carries at most one non-terminal.\n\n• The containment chain. Regular is a strict subset of context-free (a^n b^n is CFL but not regular). Context-free is a strict subset of context-sensitive (a^n b^n c^n is CSL but not CFL - no PDA can check three counts with only one stack). Context-sensitive is a strict subset of recursive: every CSL is decided by an LBA which always halts (bounded tape forces termination), and there exist decidable languages that need unbounded working space and hence no LBA - so REC properly contains CSL. Recursive is a strict subset of recursively enumerable: the halting-adjacent languages (like A_TM) are RE but not recursive. Inside CFL there is also the strict chain deterministic CFL (DCFL, accepted by a deterministic PDA) is a strict subset of CFL, witnessed by languages like { a^n b^n } union { a^n b^2n } which is CFL but not deterministic (a DPDA cannot decide, without lookahead beyond the a-block, which count to match). So the full chain is: regular subset-of DCFL subset-of CFL subset-of CSL subset-of REC subset-of RE, each inclusion strict, and RE itself is a strict subset of all languages (which is uncountable while RE is only countable).\n\n• Classic classification anchors to memorize. { a^n b^n : n >= 0 } is CFL, not regular (one unbounded count, needs a stack). { a^n b^n c^n : n >= 0 } is CSL, not CFL (two independent unbounded counts). { a^n b^m c^n d^m : n,m >= 0 } is CFL (a stack can match a-d as outer nesting and hold b-c pairs is a common trap - actually this needs care: it IS context-free via a PDA that pushes a's, then on b's does nothing extra, matches d's against pushed a's - the b,c-matching separately needs its own bookkeeping; the safe GATE fact is that languages requiring exactly two independent unbounded equalities like a^n b^n c^n are CSL, while a single equality or two equalities in properly nested/separable positions are often still CFL - always test with a candidate PDA or the pumping lemma for CFLs rather than pattern-matching by symbol count). { ww : w in {a,b}* } is CSL, not CFL (matching two copies of an unbounded string defeats a single stack, provable by the CFL pumping lemma). { a^i b^j : i != j } is CFL (union/complement tricks on a^n b^n within a regular universe). { a^p : p prime } is neither regular nor context-free but is recursive (primality is decidable). L = { <M> : M is a TM that halts on empty input } is RE but not recursive. The complement of A_TM is not even RE.\n\n• Closure properties across classes (the standard comparison table). Union: closed for regular, CFL, CSL, REC, RE. Intersection: closed for regular, CSL, REC, RE, but CFL is NOT closed under intersection (two CFLs can intersect to a non-CFL, e.g. { a^n b^n c^m } intersect { a^m b^n c^n } = { a^n b^n c^n }). Complement: closed for regular, CSL, REC, but NOT for CFL, and NOT for RE (RE closed under complement would force RE = REC). Concatenation and Kleene star: closed for regular, CFL, CSL, REC, RE. Intersection with a regular language: CFL IS closed here (this is the one intersection closure CFLs keep - it powers many undecidability and non-regularity arguments). Since CFL is closed under union but not intersection or complement, by De Morgan's laws it cannot be closed under both intersection and complement simultaneously - a fact often tested as a single combined statement.",
+        strategy: "GATE patterns: (1) 'Which grammar type generates L' or 'L is best classified as' - always find the TIGHTEST true class, since a CFL is technically also CSL, REC, and RE, but exam answers want the smallest class containing it unless the question explicitly asks 'which of the following is true' with multiple non-exclusive options. (2) Containment true/false batteries - memorize the six-link chain regular subset DCFL subset CFL subset CSL subset REC subset RE and answer each link independently; a common trap flips CSL and REC's relationship or claims DCFL = CFL. (3) Closure-property tables presented as four statements about CFL (or another class) with exactly one false - the CFL non-closure trio to remember instantly is intersection, complement, and difference (complement of a CFL need not be CFL; if a CFL were closed under both intersection and complement it would be closed under the other by De Morgan, contradicting known counterexamples). (4) Set-builder classification questions - test candidates against three tools in order: can a DFA/regular expression describe it (bounded memory)? If not, can a single stack (one unbounded counter or matched nesting) describe it - try building a PDA or apply the CFL pumping lemma to rule it out? If not, is it still decidable (a Turing machine that always halts) even though no PDA suffices - that lands it in CSL or REC depending on whether a bounded-tape LBA suffices; GATE rarely forces you to distinguish CSL from REC precisely, so 'not CFL but still decidable' is often an acceptable landing spot.\n\nWorked mini-example: classify L = { a^n b^n c^n : n >= 0 }. Is it regular? No - Myhill-Nerode distinguishes a^n for all n via matching b^n c^n. Is it context-free? Apply the CFL pumping lemma: for any p, take w = a^p b^p c^p; any split uvxyz with |vxy| <= p and vy nonempty has vxy confined to at most two of the three symbol blocks (since |vxy| <= p means it cannot span from the a-block into the c-block), so pumping up breaks the equal-count balance among a, b, c - contradiction, hence not CFL. Is it decidable? Yes: a TM can scan and cross off one a, one b, one c repeatedly, accepting when all are exhausted simultaneously - this uses only space proportional to the input (in fact it can be done within the input's own tape in a context-sensitive-style bounded manner), so it is CSL and hence also REC. Final classification: CSL (and everything the chain implies above it), not CFL, not regular.\n\nTraps: 'not regular' does not mean 'not CFL' - always check both boundaries. Never assume closure results transfer from CFL to CSL or REC without separate justification; REC and CSL are closed under complement precisely because they can decide membership and simply flip the accept/reject verdict, which RE cannot do since RE machines may only loop on rejection."
+      },
+      questions: [
+        {
+          id: 'toc-hierarchy-q1',
+          q: 'Which of the following correctly orders the classes from smallest to largest, with every inclusion strict?',
+          options: [
+            'regular subset CFL subset CSL subset recursive subset RE',
+            'regular subset CSL subset CFL subset recursive subset RE',
+            'CFL subset regular subset recursive subset CSL subset RE',
+            'regular subset CFL subset recursive subset CSL subset RE'
+          ],
+          answer: 0,
+          marks: 1,
+          difficulty: 'easy',
+          type: 'concept',
+          explanation: "The standard Chomsky containment chain, from most restrictive grammar to least, is regular (Type 3) inside context-free (Type 2) inside context-sensitive (Type 1) inside recursive (decidable) inside recursively enumerable (Type 0), with every inclusion known to be strict via a witness language at each step: a^n b^n separates regular from CFL, a^n b^n c^n separates CFL from CSL, a decidable-but-not-context-sensitive language (one needing more than linear space) separates CSL from recursive, and A_TM separates recursive from RE. Option A states exactly this chain. Option B swaps CFL and CSL, option C is scrambled and even places CFL below regular, and option D swaps recursive and CSL - CSL is properly inside recursive, not the reverse, since every CSL is decided by an always-halting LBA."
+        },
+        {
+          id: 'toc-hierarchy-q2',
+          q: 'A grammar in which every production has the form x A y -> x gamma y, with A a single non-terminal and gamma a nonempty string (so |left side| <= |right side|), generates languages of which type?',
+          options: ['Type 3, regular', 'Type 2, context-free', 'Type 1, context-sensitive', 'Type 0, unrestricted'],
+          answer: 2,
+          marks: 1,
+          difficulty: 'easy',
+          type: 'concept',
+          explanation: "This is precisely the context-sensitive (Type 1) production format: a single non-terminal A is rewritten to a nonempty string gamma, but only in the context of x on the left and y on the right, and the rule is non-contracting since gamma is required to be nonempty, meaning the right-hand side is at least as long as the left. Context-free (Type 2) productions drop the surrounding context requirement (A -> beta unconditionally). Regular (Type 3) productions further restrict beta to a single terminal optionally followed by one non-terminal. Type 0 productions allow the left side itself to be an arbitrary string containing a non-terminal, with no length restriction at all. So the length-preserving, context-dependent rule described is the definition of Type 1: option C."
+        },
+        {
+          id: 'toc-hierarchy-q3',
+          q: 'L = { a^n b^n c^n : n >= 0 } is',
+          options: ['regular', 'context-free but not regular', 'context-sensitive but not context-free', 'not recursively enumerable'],
+          answer: 2,
+          marks: 2,
+          difficulty: 'medium',
+          type: 'concept',
+          explanation: "L fails the CFL pumping lemma: for any pumping length p, the string a^p b^p c^p has every valid decomposition uvxyz confined (since |vxy| <= p) to span at most two of the three symbol blocks, so pumping v and y up or down unbalances the equal counts of a, b, and c - hence L is not context-free. It is also clearly not regular, since it is not even context-free and regular is a subset of context-free. However, L is decidable: a linear-bounded automaton (or an ordinary TM using only linearly bounded space) can repeatedly cross off one a, one b, and one c and accept exactly when all three run out together, using space proportional to input length - which places it in the context-sensitive class. So the tightest correct classification is context-sensitive but not context-free: option C."
+        },
+        {
+          id: 'toc-hierarchy-q4',
+          q: 'Which of the following is the standard example of a language that is context-free but NOT regular?',
+          options: ['{ a^n : n is a perfect square }', '{ a^n b^n : n >= 0 }', '{ a^n b^n c^n : n >= 0 }', '{ ww : w in {a,b}* }'],
+          answer: 1,
+          marks: 1,
+          difficulty: 'easy',
+          type: 'concept',
+          explanation: "{ a^n b^n } is generated by the simple grammar S -> aSb | epsilon, so it is context-free, and it fails the regular pumping lemma (pumping the a-block in a string a^p b^p unbalances the counts), so it is not regular - the canonical CFL-not-regular witness, option B. Option A ({ a^n : n a perfect square }) is not even context-free - a unary language is regular if and only if it is eventually periodic, and perfect squares grow too irregularly, but proving it needs a unary pumping argument, and this is a distractor language many students misclassify as CFL when it is actually not CFL at all. Option C needs two independent counts and is CSL, not CFL, as shown above. Option D ({ ww }) requires matching two unbounded copies of an arbitrary string, which defeats a single stack and is also not context-free, only CSL."
+        },
+        {
+          id: 'toc-hierarchy-q5',
+          q: 'L = { ww : w in {a, b}* } is best classified as',
+          options: ['regular', 'context-free but not regular', 'not context-free, but context-sensitive', 'not recursively enumerable'],
+          answer: 2,
+          marks: 2,
+          difficulty: 'hard',
+          type: 'concept',
+          explanation: "L is not regular (Myhill-Nerode: for a fixed length, distinct prefixes of length n are pairwise distinguishable using an appropriate matching suffix). It is also not context-free: a PDA's single stack can verify a palindrome-style relationship (compare from both ends) but cannot verify that a string is literally two adjacent identical halves, since by the time the second half begins, the stack has already been used to remember the first half in reverse and comparing in the same order needed for ww (not the reversed order needed for ww^R) is precisely what a single LIFO stack cannot do - a rigorous CFL pumping lemma argument on a^p b^p a^p b^p confirms this. Yet L is decidable: a TM (or LBA, since it needs only linear space to hold and compare the two halves of the input) can split the string in half and compare position by position. So L sits in CSL, not CFL - option C. This is the standard example distinguishing 'requires matching an unbounded string against a later unbounded copy' (needs more than a stack) from 'requires matching an unbounded string against its own reverse' (a stack suffices, e.g. ww^R is a well-known CFL)."
+        },
+        {
+          id: 'toc-hierarchy-q6',
+          q: 'Which class of languages is NOT closed under intersection?',
+          options: ['Regular languages', 'Context-free languages', 'Recursive languages', 'Recursively enumerable languages'],
+          answer: 1,
+          marks: 2,
+          difficulty: 'medium',
+          type: 'concept',
+          explanation: "Regular languages are closed under intersection (product automaton construction), recursive languages are closed under intersection (run both deciders, accept if both accept, this always halts), and RE languages are closed under intersection (dovetail both recognizers, accept if both eventually accept). Context-free languages, however, are famously NOT closed under intersection: L1 = { a^n b^n c^m : n, m >= 0 } and L2 = { a^m b^n c^n : n, m >= 0 } are each context-free (single stack suffices for each individually, since only one pair of blocks needs matching in each), but their intersection is { a^n b^n c^n : n >= 0 }, which was already shown to not even be context-free. This single counterexample is the standard proof and the standard exam fact: option B."
+        },
+        {
+          id: 'toc-hierarchy-q7',
+          q: 'Consider the following two statements about context-free languages. S1: CFLs are closed under intersection with a regular language. S2: CFLs are closed under complementation. Which is correct?',
+          options: ['Both S1 and S2 are true', 'S1 is true, S2 is false', 'S1 is false, S2 is true', 'Both S1 and S2 are false'],
+          answer: 1,
+          marks: 2,
+          difficulty: 'medium',
+          type: 'concept',
+          explanation: "S1 is true: given a CFL L accepted by a PDA P and a regular language R accepted by a DFA D, build a product PDA that runs P and D in lockstep on the same input, using P's stack and accepting when both P and D would accept - this recognizes L intersect R, so CFLs ARE closed under intersection with a regular set (this is a genuinely useful closure, unlike general CFL-CFL intersection). S2 is false: if CFLs were closed under complement, then since they are already closed under union, De Morgan's law (L1 intersect L2 = complement(complement(L1) union complement(L2))) would make CFLs closed under general intersection too - but the previous question's counterexample shows they are not. So S1 true, S2 false: option B. This De Morgan argument - deriving non-closure under one operation from known non-closure under another plus known closure under a third - is a recurring proof pattern."
+        },
+        {
+          id: 'toc-hierarchy-q8',
+          q: 'Every context-sensitive language is accepted by some Turing machine that always halts (i.e., every CSL is recursive), but the converse fails. Which of the following best explains why some recursive languages are NOT context-sensitive?',
+          options: [
+            'Recursive languages allow productions that shrink the length of the derived string, which CSL grammars forbid',
+            'Some decidable languages provably require more than linear working space on every deciding Turing machine, exceeding what a linear-bounded automaton can use',
+            'Recursive languages are not required to be generated by any grammar at all',
+            'Context-sensitive languages must be finite, while recursive languages can be infinite'
+          ],
+          answer: 1,
+          marks: 2,
+          difficulty: 'hard',
+          type: 'concept',
+          explanation: "A CSL is exactly a language accepted by some linear-bounded automaton (LBA), a TM restricted to the tape space occupied by the input (times a constant). By the space hierarchy theorem, there exist decidable languages whose deciders provably need more than linear space (for instance, some language requiring space n log n or n^2 to decide by any algorithm) - such a language is recursive (some TM, using that much space, always halts and decides it) but cannot be squeezed into any LBA's linear tape bound, so it is not context-sensitive. This is exactly why the inclusion CSL subset recursive is strict: option B captures the real reason, a genuine space-complexity separation. Option A is false (CSL productions are explicitly non-contracting, they never shrink); option C is false (every recursive language IS generated by some unrestricted Type-0 grammar, and generally not by any Type-1 grammar as just discussed, but grammars for it do exist at the RE level); option D is false, since both recursive and context-sensitive languages can certainly be infinite."
+        },
+        {
+          id: 'toc-hierarchy-q9',
+          q: 'L = { a^i b^j c^k : i = j or j = k, i,j,k >= 0 } is',
+          options: ['regular', 'context-free but not regular', 'context-sensitive but not context-free', 'not decidable'],
+          answer: 1,
+          marks: 2,
+          difficulty: 'hard',
+          type: 'concept',
+          explanation: "Write L as the union of L1 = { a^i b^j c^k : i = j } and L2 = { a^i b^j c^k : j = k }. Each is context-free individually: a PDA for L1 pushes a's, pops one per b (ignoring the b/c boundary the trailing c's freely), then reads any number of c's unconstrained; symmetrically a PDA for L2 reads any a's freely, then pushes b's and pops one per c. CFLs are closed under union, so L1 union L2 = L is context-free. L is not regular: fixing j = k and letting i vary independently shows unbounded counting is needed (Myhill-Nerode distinguishes a^i for all i via a fixed suffix b^n c^n). The trap this question sets is assuming any language that 'looks like' the a^n b^n c^n pattern with three blocks must be context-sensitive-but-not-CFL; but here the two equality constraints are alternatives (OR), not simultaneous (AND), and it is exactly this OR-versus-AND distinction that keeps it inside CFL via closure under union - option B."
+        },
+        {
+          id: 'toc-hierarchy-q10',
+          q: 'Which of the following statements about the language classes is FALSE?',
+          options: [
+            'Every deterministic context-free language is context-free',
+            'Every regular language is a deterministic context-free language',
+            'Every context-free language is deterministic context-free',
+            'Every recursive language is recursively enumerable'
+          ],
+          answer: 2,
+          marks: 1,
+          difficulty: 'medium',
+          type: 'concept',
+          explanation: "DCFL (languages accepted by some deterministic PDA) is a strict subset of CFL - a standard witness is L = { a^n b^n } union { a^n b^2n : n >= 0 }, which is context-free (union of two simple CFLs, each with its own PDA, combined nondeterministically by guessing which disjunct applies) but not deterministic: a DPDA reading the a-block cannot commit, without unbounded lookahead, to whether it should later expect n or 2n b's, so no single deterministic machine handles both cases with one pass. This makes option C false, since not every CFL is DCFL. Option A is trivially true (DCFL is defined as a subset of CFL). Option B is true: every DFA is already a trivial DPDA that ignores its stack. Option D is the standard recursive-subset-of-RE fact and is true. The false statement is C."
+        },
+        {
+          id: 'toc-hierarchy-q11',
+          q: 'L = { a^p : p is a prime number } is',
+          options: [
+            'regular',
+            'context-free but not regular',
+            'not context-free, but recursive',
+            'not recursively enumerable'
+          ],
+          answer: 2,
+          marks: 2,
+          difficulty: 'medium',
+          type: 'concept',
+          explanation: "L is unary, and a fundamental theorem states a unary language is regular if and only if it is eventually periodic (ultimately a finite union of arithmetic-progression-like residue classes). The primes have gaps that grow without any periodic bound (by the prime number theorem, gaps between consecutive primes are unbounded), so L is not regular; the same argument, refined, also rules out context-freeness for unary languages via the CFL pumping lemma applied to a sufficiently large prime exponent - pumping by a bounded amount from a prime length p (for p larger than the pumping length) always lands on a non-prime length for some choice of pump count, but a careful argument shows no valid split can keep every pumped length prime, so L is not context-free either. However, primality is decidable (trial division, or any of several polynomial-time primality tests) so a TM can decide membership in finite time for every input - L is recursive. Not RE is wrong since recursive implies RE. The tightest classification is 'not context-free, but recursive': option C."
+        },
+        {
+          id: 'toc-hierarchy-q12',
+          q: 'Which of the following is true about the relationship between recursive (REC) and recursively enumerable (RE) languages?',
+          options: [
+            'REC = RE for all languages',
+            'A language L is recursive if and only if both L and its complement are recursively enumerable',
+            'Every RE language has an RE complement',
+            'A language whose complement is not RE must itself be recursive'
+          ],
+          answer: 1,
+          marks: 2,
+          difficulty: 'medium',
+          type: 'concept',
+          explanation: "This is the key theorem linking the two classes: if both L and complement(L) are RE, run their two recognizers in parallel on the same input - exactly one of them is guaranteed to eventually accept (since every string is in exactly one of L, complement(L)), giving a total decision procedure, so L is recursive; conversely if L is recursive, simply running the decider and flipping the answer decides complement(L), so complement(L) is RE too (and indeed recursive). This is option B, the standard 'RE and co-RE implies recursive' characterization. Option A is false - A_TM is RE but not recursive, a strict inclusion. Option C is false - A_TM's complement is provably not RE. Option D reverses the direction of the theorem: a complement failing to be RE tells you nothing extra beyond confirming L itself is not recursive (since recursive would force the complement to be RE too), it does not force L to BE recursive - if anything it is evidence against it."
+        },
+        {
+          id: 'toc-hierarchy-q13',
+          q: 'A language L over a single-letter alphabet {a} is regular if and only if',
+          options: [
+            'L is finite',
+            'L is context-free',
+            'the set of lengths of strings in L is eventually periodic',
+            'L is decidable'
+          ],
+          answer: 2,
+          marks: 1,
+          difficulty: 'medium',
+          type: 'concept',
+          explanation: "For unary languages there is a clean characterization: L (viewed as a set of lengths, since the alphabet has only one letter) is regular if and only if that set of lengths is eventually periodic - meaning there exist thresholds N and a period k such that for all n >= N, n is in the length-set exactly when n + k is. This follows from the pumping lemma structure of a unary DFA, which after entering a cycle of length k repeats membership with period k forever. Option A is too strong - infinite unary languages like { a^2n : n >= 0 } (even lengths) are still regular, just not finite. Option B is unrelated context-freeness. Option D is far too weak: many decidable unary languages (like the primes example) are not eventually periodic and hence not regular, even though they are decidable. Option C, eventual periodicity, is the precise iff condition."
+        },
+        {
+          id: 'toc-hierarchy-q14',
+          q: 'Given that L1 is context-free and L2 is regular, which of the following is guaranteed to be context-free?',
+          options: ['L1 intersect L2', 'complement of L1', 'L1 intersect complement(L1)', 'L2 minus L1'],
+          answer: 0,
+          marks: 1,
+          difficulty: 'easy',
+          type: 'concept',
+          explanation: "CFLs are closed under intersection with a regular language (build a product of L1's PDA and L2's DFA, running in lockstep and accepting on mutual acceptance) - this is one of the few intersection-type closures CFLs actually enjoy, so L1 intersect L2 is guaranteed context-free: option A. Complement of L1 (option B) is not guaranteed CFL, since CFLs are not closed under complement in general. L1 intersect complement(L1) (option C) is simply the empty set, which happens to be regular/CFL/everything trivially, but this is a degenerate coincidence, not a guarantee derivable from the stated closure properties, and the question intends the general, non-degenerate guarantee. L2 minus L1 equals L2 intersect complement(L1); since complement(L1) need not be CFL, this difference is not guaranteed to be CFL by any standard closure rule. The clean, always-applicable guarantee is option A."
+        },
+        {
+          id: 'toc-hierarchy-q15',
+          q: 'Which single fact correctly explains why the set of all languages over {0, 1} is NOT equal to the set of recursively enumerable languages?',
+          options: [
+            'Some RE languages are not recursive',
+            'The set of all TMs is countably infinite, but the set of all languages over {0,1} is uncountable',
+            'RE languages are not closed under complement',
+            'Every RE language is generated by a Type-0 grammar'
+          ],
+          answer: 1,
+          marks: 2,
+          difficulty: 'medium',
+          type: 'concept',
+          explanation: "Every RE language is the language of some Turing machine, and Turing machines have finite string descriptions, so they can be enumerated - there are only countably many TMs and hence only countably many RE languages. But the collection of all languages over {0,1} is the power set of the (countably infinite) set of all binary strings, which Cantor's diagonal argument proves is uncountable. A countable set cannot equal an uncountable one, so RE languages are a proper (indeed vanishingly small) subset of all possible languages - option B is the direct cardinality reason. Option A is true but explains a different fact (REC subset RE strictly), not why RE is not everything. Option C is true but is a closure-property fact, not a cardinality argument, and does not by itself imply RE is a proper subset of all languages. Option D is simply the definition of RE and explains nothing about the size comparison."
+        }
+      ]
+    }
+]};
+
+window.GATE_DATA.questions['toc'].topics.find(function(t){return t.id==='toc-regular';}).theory.deep = "FORMAL DEFINITIONS\n\n• DFA: M = (Q, Σ, δ, q0, F) where δ: Q × Σ → Q is a TOTAL function (exactly one transition per symbol per state). Language accepted L(M) = {w : δ*(q0, w) ∈ F}.\n• NFA: M = (Q, Σ, δ, q0, F) where δ: Q × Σ → 2^Q (may be empty, may have multiple targets). w accepted if SOME path ends in F.\n• ε-NFA: adds δ: Q × {ε} → 2^Q, transitions on empty string with no input consumed. ECLOSE(q) = set of states reachable from q via ε-moves only.\n• Equivalence: DFA = NFA = ε-NFA in expressive power (all define exactly the regular languages), proved by subset construction (NFA→DFA) and ε-elimination (ε-NFA→NFA).\n\nSUBSET CONSTRUCTION AND STATE-COUNT BOUNDS\n\n• Given NFA with n states, the equivalent DFA has states = subsets of Q, so at most 2^n states (power set), but only the REACHABLE subsets from {q0} (or ECLOSE(q0) for ε-NFA) need be built — often far fewer are reachable.\n• Tight bound: 2^n is achievable (not just an upper bound) — there exist n-state NFAs whose minimal equivalent DFA genuinely needs 2^n states. Classic witness: language of strings over {0,1} whose n-th symbol from the end is 1 needs an n-state NFA but 2^n states in any DFA.\n• Practical exam rule: DFA states ≤ 2^(NFA states); NFA states ≤ DFA states (trivially, DFA is already an NFA).\n\nREGEX IDENTITIES (memorize for simplification questions)\n\n• ∅* = ε ; ε* = ε ; (r*)* = r*\n• r + r = r ; r∅ = ∅r = ∅ ; rε = εr = r\n• (r + s)* = (r*s*)* = (r* + s*)*\n• r*r* = r* ; r(sr)* = (rs)*r\n• (r + s) t = rt + st (distributive over concatenation, right and left)\n• Empty language ∅ vs empty string ε are DIFFERENT: ∅ matches nothing, ε matches only the empty string.\n\nMINIMAL DFA STATE-COUNTING RECIPES (high-yield for GATE numericals)\n\n• MOD-k COUNTER (accept strings where, e.g., number of 1's ≡ 0 mod k): exactly k states, one per residue class 0..k-1, cycling on the counted symbol and looping on the other symbol.\n• \"CONTAINS SUBSTRING w\" (|w| = m): minimal DFA needs exactly m+1 states — one state per length of the longest prefix of w matched so far (0 through m), with the m-th (final) state a sink that also loops on itself once found. Built via KMP-style failure links for the fallback transitions.\n• \"ENDS WITH w\" (|w| = m): also needs exactly m+1 states by the same prefix-matching construction, EXCEPT the final state is not a sink — it must still track ongoing suffix matches (transition out of the accepting state based on overlap of w with itself), since a later mismatch could break a currently-accepted suffix.\n• \"k-TH SYMBOL FROM THE END IS 1\" (|w| ≥ k, check symbol at position n-k): trivial (k+1)-state NFA (nondeterministically guess \"this is the k-th-from-last symbol\", then count k-1 more symbols to confirm end-of-string) but the EQUIVALENT MINIMAL DFA needs 2^k states — the DFA must remember the last k symbols seen as a sliding window (2^k possible windows), giving the canonical exponential NFA-to-DFA blowup example.\n• \"FIRST SYMBOL IS 1\" needs only 2 states (trivial, no blowup) — the asymmetry between first-symbol and last-symbol conditions is a classic GATE trap.\n\nMYHILL-NERODE THEOREM AS A COUNTING TOOL\n\n• Statement: define x ≡_L y iff for all z, xz ∈ L ⟺ yz ∈ L (x and y are \"Myhill-Nerode equivalent\" w.r.t. L). L is regular iff ≡_L has FINITELY many equivalence classes, and the number of classes EQUALS the number of states in the minimal DFA for L.\n• Worked example: L = {0^n 1^n : n ≥ 0} over {0,1}. Take strings 0^i for i = 0,1,2,.... Claim 0^i and 0^j (i ≠ j) are inequivalent: pick z = 1^i; then 0^i 1^i ∈ L but 0^j 1^i ∉ L (since j ≠ i). So {0^i : i ≥ 0} gives infinitely many pairwise-inequivalent strings ⇒ infinitely many equivalence classes ⇒ L is NOT regular. This IS the standard alternative to the pumping lemma for proving non-regularity, and is often faster/cleaner for GATE.\n• Worked example 2 (counting states): L = strings over {0,1} with an even number of 1's. Equivalence classes: [ε] (even count so far) and [1] (odd count so far) — exactly 2 classes ⇒ minimal DFA has exactly 2 states. This matches the direct construction.\n\nPUMPING LEMMA FOR REGULAR LANGUAGES\n\n• Statement: If L is regular, there exists a constant p (pumping length, ≥ number of states in DFA) such that every string w ∈ L with |w| ≥ p can be split w = xyz where (1) |xy| ≤ p, (2) |y| ≥ 1, (3) for all i ≥ 0, xy^i z ∈ L.\n• CORRECT usage template to prove L is NOT regular (proof by contradiction): (a) Assume L is regular, let p be its pumping length. (b) CHOOSE a specific string w ∈ L with |w| ≥ p (choose it cleverly, often depending on p, e.g. w = 0^p 1^p). (c) The adversary (not you) chooses ANY split w = xyz satisfying |xy| ≤ p and |y| ≥ 1 — you must handle ALL such splits. (d) Show that for SOME i ≥ 0 (usually i = 0 or i = 2), xy^i z ∉ L, for every possible split. (e) Contradiction ⇒ L is not regular.\n• GATE TRAP: pumping lemma only gives a NECESSARY condition for regularity — satisfying the pumping property does NOT prove a language IS regular (some non-regular languages still satisfy it, e.g. {0^i 1^j 0^k : i+k ≥ j... } style crafted counterexamples). It can only be used to prove non-regularity, never regularity.\n\nFULL CLOSURE PROPERTIES OF REGULAR LANGUAGES\n\n• Regular languages ARE closed under: union, intersection, complement, difference (set minus), concatenation, Kleene star, Kleene plus, reversal, homomorphism, inverse homomorphism, and quotient with any language.\n• This is the richest closure list among the Chomsky classes — regular languages are closed under EVERY common operation, which is itself an exam fact (contrast with CFL, which fails intersection and complement).\n\nWORKED EXAMPLES\n\n1. Build minimal DFA for \"strings over {a,b} containing 'ab' as substring\": states q0 (start, no progress), q1 (last char seen was 'a'), q2 (found 'ab', accepting sink). δ(q0,a)=q1, δ(q0,b)=q0, δ(q1,a)=q1, δ(q1,b)=q2, δ(q2,a)=q2, δ(q2,b)=q2. Exactly |ab|+1 = 3 states, matching the recipe.\n2. Prove L = {ww : w ∈ {0,1}*} is not regular via pumping lemma: let p be the pumping length, choose w = 0^p 1 0^p 1 (length 2p+2, and w ∈ L since it's of form uu with u = 0^p1). Any split with |xy| ≤ p forces xy to lie entirely within the first 0^p block, so y = 0^k for some k ≥ 1. Pumping down (i=0) removes k zeros from the first block only, giving 0^(p-k) 1 0^p 1, which is no longer of the form uu (block lengths mismatch) — contradiction, so L is not regular.\n\nGATE TRAPS\n\n• Confusing \"contains substring w\" (m+1 states, sink accepting state) with \"ends with substring w\" (m+1 states, NON-sink, must keep checking overlaps) — a very common numerical trap.\n• Believing pumping lemma proves regularity when satisfied — it only proves non-regularity when violated; passing it proves nothing.\n• Forgetting DFA transition function must be TOTAL (every state needs a transition for every input symbol) — NFAs are allowed partial/multiple transitions, this difference is frequently tested directly.\n• Assuming subset construction always blows up to 2^n states — it is only an upper bound; many NFAs convert to far fewer DFA states (e.g., an NFA that's already deterministic converts 1:1).\n• Mixing up ∅* (= {ε}, one string) with ∅ (empty set, no strings) in regex simplification questions.\n• Thinking Myhill-Nerode classes count is an upper bound on DFA size — it is EXACT (equals minimal DFA states), which is often more useful than the pumping lemma for a fast informal regularity check.";
+
+window.GATE_DATA.questions['toc'].topics.find(function(t){return t.id==='toc-cfl';}).theory.deep = "FORMAL DEFINITIONS\n\n• Context-Free Grammar (CFG): G = (V, Σ, R, S) where V is nonterminals, Σ is terminals, R is a finite set of productions of the form A → α with A ∈ V (single nonterminal on left) and α ∈ (V ∪ Σ)*, S is the start symbol. L(G) = {w ∈ Σ* : S ⇒* w}.\n• Pushdown Automaton (PDA): M = (Q, Σ, Γ, δ, q0, Z0, F) where Γ is the stack alphabet, Z0 the initial stack symbol, δ: Q × (Σ ∪ {ε}) × Γ → finite subsets of Q × Γ*. Acceptance can be by FINAL STATE or by EMPTY STACK — these two acceptance modes are PROVABLY EQUIVALENT for PDAs (any PDA accepting by one mode can be converted to accept the same language by the other).\n• CFG ≡ PDA (nondeterministic): every CFL has an equivalent PDA and vice versa (via standard construction: each grammar derivation step simulated by stack replace). This equivalence is exactly analogous to CFG defining context-free languages the way regex/DFA/NFA define regular languages.\n\nAMBIGUITY AND INHERENT AMBIGUITY\n\n• A CFG is AMBIGUOUS if some string in L(G) has two or more distinct parse trees (equivalently, two distinct leftmost derivations).\n• A CFL is INHERENTLY AMBIGUOUS if EVERY grammar generating it is ambiguous — no unambiguous grammar exists for it at all. Classic example: L = {a^i b^j c^k : i=j or j=k} is inherently ambiguous (strings with i=j=k can be parsed via either the \"i=j\" rule-branch or the \"j=k\" rule-branch).\n• GATE TRAP: ambiguity is a property of a GRAMMAR, inherent ambiguity is a property of a LANGUAGE. \"This grammar is ambiguous\" does NOT mean the language is inherently ambiguous — an equivalent unambiguous grammar may still exist (e.g., the classic dangling-else / expression grammars can usually be rewritten unambiguously using precedence layers).\n\nCHOMSKY NORMAL FORM (CNF) AND GREIBACH NORMAL FORM (GNF) CONVERSION\n\n• CNF: every production is either A → BC (two nonterminals) or A → a (single terminal), plus possibly S → ε if ε ∈ L(G) (only the start symbol may derive ε, and only if S does not appear on any RHS).\n• CNF conversion steps (in strict order): (1) add new start symbol S0 → S to remove S from any RHS. (2) Eliminate ε-productions (compute nullable nonterminals, add all productions with nullable symbols removed in every combination). (3) Eliminate unit productions (A → B), by transitively copying B's productions to A. (4) Eliminate/replace terminals inside longer RHS with fresh nonterminals (X_a → a). (5) Break RHS with >2 symbols into a chain of binary productions using fresh nonterminals.\n• GNF: every production is A → aα where a is a single terminal and α ∈ V* (terminal first, followed by zero or more nonterminals). GNF conversion typically goes CFG → CNF → GNF, using the substitution technique to eliminate left recursion and reorder productions by nonterminal index so each production starts with a terminal (uses the standard \"left-recursion elimination + back-substitution\" algorithm, related to the matrix/Greibach lemma).\n• Every derivation in GNF form of a string of length n takes EXACTLY n derivation steps (one terminal produced per step) — this is a useful GATE numerical fact (a string of length n derived via a GNF grammar needs precisely n steps).\n\nCFL PUMPING LEMMA (WORKED NON-CFL PROOF)\n\n• Statement: If L is a CFL, there exists p such that every z ∈ L with |z| ≥ p can be written z = uvwxy where (1) |vwx| ≤ p, (2) |vx| ≥ 1 (v and x not both empty), (3) for all i ≥ 0, u v^i w x^i y ∈ L. (Note: v and x are pumped TOGETHER, in tandem, unlike the single y of the regular pumping lemma.)\n• Worked example proving L = {a^n b^n c^n : n ≥ 0} is NOT context-free: let p be the pumping length, choose z = a^p b^p c^p (length 3p, z ∈ L). Any decomposition uvwxy with |vwx| ≤ p means vwx cannot simultaneously touch all three of a, b, c blocks (since |vwx| ≤ p < block-spanning distance) — so vwx contains symbols from AT MOST TWO of the three types. Consider pumping up (i=2): u v^2 w x^2 y increases the count of at most two symbol types while leaving the third type's count unchanged, which breaks the required equal-count invariant a^n b^n c^n — the pumped string is no longer in L. Since this holds for EVERY valid decomposition, contradiction — L is not context-free.\n\nDCFL VS CFL DIFFERENCES\n\n• DCFL (Deterministic CFL) = languages accepted by a DETERMINISTIC PDA (DPDA): at most one applicable transition per configuration, and typically requires acceptance by final state (empty-stack acceptance and final-state acceptance are NOT equivalent for DPDAs, unlike for general PDAs).\n• DCFL ⊊ CFL strictly: every DCFL is a CFL, but not conversely. Classic witness: L = {ww^R : w ∈ {0,1}*} (even palindromes) is a CFL but NOT a DCFL, because a DPDA cannot deterministically guess the midpoint of the string without lookahead.\n• Every DCFL is unambiguous (has an unambiguous grammar) but not every unambiguous CFL is deterministic — being unambiguous is a WEAKER property than being deterministic.\n\nCLOSURE PROPERTY TABLE (memorize exactly — get every cell right)\n\n• CFL IS closed under: union, concatenation, Kleene star (and plus), reversal, homomorphism, and INTERSECTION WITH A REGULAR LANGUAGE (build product of the CFL's PDA with the regular language's DFA, running them in lockstep).\n• CFL is NOT closed under: intersection (of two general CFLs), complement, and (as a direct consequence, since if it were closed under complement and union it would be closed under intersection by De Morgan) set difference in general.\n• DCFL IS closed under: complement (flip accept/non-accept states of the DPDA — this works specifically because determinism guarantees a unique run per string).\n• DCFL is NOT closed under: union, intersection, concatenation, Kleene star, or reversal (in general) — this asymmetry (closed under complement but not union) is one of the most frequently tested GATE facts in this whole topic, precisely because it is counterintuitive (normally complement-closure plus union-closure would give intersection-closure, but DCFL is NOT closed under union, so no contradiction arises).\n\nWORKED EXAMPLES\n\n1. Convert G: S → AB, A → aA | ε, B → bB | ε to CNF. Step: eliminate ε-productions for A and B (nullable), producing S → AB | A | B | ε (if S nullable, add S0 → S | ε separately). Then eliminate remaining unit productions and replace terminals as needed, yielding a fully binary/terminal CNF grammar equivalent to {a^i b^j : i,j ≥ 0}.\n2. Show L1 ∩ L2 can fail to be a CFL: let L1 = {a^n b^n c^m : n,m ≥ 0} (CFL, via matching a's and b's, c's unconstrained) and L2 = {a^m b^n c^n : n,m ≥ 0} (CFL, via matching b's and c's). Then L1 ∩ L2 = {a^n b^n c^n : n ≥ 0}, which was proved above to be non-context-free — demonstrating CFL is not closed under intersection using two perfectly ordinary CFLs.\n\nGATE TRAPS\n\n• Assuming CFL is closed under intersection like regular languages are — it is NOT; only intersection WITH A REGULAR language is guaranteed to stay context-free.\n• Forgetting DCFL is closed under complement — a fact that feels backward since CFL itself is not closed under complement.\n• Confusing \"ambiguous grammar\" with \"inherently ambiguous language\" — a language having one ambiguous grammar does not make it inherently ambiguous.\n• Misapplying the CFL pumping lemma by pumping v and x independently — they MUST be pumped together (both raised to the same power i) in every iteration, unlike regular pumping lemma's single substring.\n• Believing final-state and empty-stack acceptance are equivalent for DETERMINISTIC PDAs — this equivalence holds for general (nondeterministic) PDAs but breaks for DPDAs, which is exactly why DCFL is defined using final-state acceptance by convention.\n• Thinking every unambiguous CFL is deterministic — unambiguous is strictly weaker than deterministic (DCFL ⊊ unambiguous CFL ⊊ CFL).\n• Miscounting GNF derivation steps — a string of length n from a GNF grammar takes exactly n steps, a fact often used to compute derivation-count numericals.\n</content>";
+
+window.GATE_DATA.questions['toc'].topics.find(function(t){return t.id==='toc-turing';}).theory.deep = "FORMAL DEFINITION OF A TURING MACHINE\n\n• TM: M = (Q, Σ, Γ, δ, q0, q_accept, q_reject) where Σ is the input alphabet, Γ ⊇ Σ ∪ {␣} is the tape alphabet (includes the blank symbol), and δ: Q × Γ → Q × Γ × {L, R} is the (partial, for deterministic TMs) transition function reading/writing a symbol and moving the head Left or Right on a single infinite tape.\n• A TM computation on input w either (a) HALTS AND ACCEPTS (reaches q_accept), (b) HALTS AND REJECTS (reaches q_reject or gets stuck with no valid move), or (c) LOOPS FOREVER (never halts) — this three-way outcome (as opposed to a DFA/PDA's guaranteed halting) is the entire source of undecidability in the theory.\n\nVARIANTS AND THEIR EQUIVALENCE\n\n• Multi-tape TM, nondeterministic TM (NTM), TM with a 2-way infinite tape, TM with a stay-put option, multi-track TM — ALL are equivalent in POWER to the standard single-tape deterministic TM (same class of languages, Turing-recognizable/decidable sets are identical). This is the Church-Turing \"robustness\" fact.\n• They are NOT equivalent in EFFICIENCY: a k-tape TM can be simulated by a 1-tape TM with at most QUADRATIC (O(t^2)) time slowdown; an NTM with running time t can be simulated by a deterministic TM in time 2^O(t) (exponential blowup, believed necessary — this is exactly the P vs NP question in disguise for TM time classes).\n• GATE TRAP: \"equivalent power\" (same languages decidable/recognizable) is a completely different claim from \"equivalent time complexity\" — do not conflate the two when a question asks about efficiency vs decidability.\n\nREC (DECIDABLE) VS RE (RECOGNIZABLE) — DEFINITIONS\n\n• A language L is RECURSIVELY ENUMERABLE (RE), a.k.a. Turing-recognizable, if there exists a TM M such that M accepts every w ∈ L (halts in q_accept) and for w ∉ L, M either rejects OR loops forever (no guarantee of halting on non-members).\n• A language L is RECURSIVE (REC), a.k.a. Turing-decidable, if there exists a TM M that HALTS ON EVERY INPUT, accepting w ∈ L and rejecting w ∉ L. Decidable is strictly stronger — it demands halting on ALL inputs, not just members.\n• REC ⊊ RE strictly: every decidable language is recognizable (trivially, use the same TM), but the Halting Problem is the classic witness of an RE language that is not REC.\n• co-RE = {L : complement(L) is RE}.\n\nCLOSURE PROPERTIES OF REC AND RE\n\n• REC is closed under: union, intersection, complement, concatenation, Kleene star, and (crucially) COMPLEMENT — since you can just swap accept/reject in the halting decider.\n• RE is closed under: union (run both TMs in parallel/dovetail, accept if either accepts), intersection (run both TMs in parallel, accept if both accept — both must halt-accept, which for the intersection case both eventually will if the string is in both), concatenation, Kleene star, homomorphism.\n• RE is NOT closed under complement in general (else Halting Problem's complement would also be RE, and RE ∩ co-RE would give REC for everything, collapsing the hierarchy — contradiction, since Halting Problem is not decidable).\n\nTHE CENTRAL THEOREM: L RE AND COMPLEMENT(L) RE ⟹ L IS REC\n\n• Statement: If a language L is RE and its complement is also RE, then L is RECURSIVE (decidable).\n• Proof idea: Let M1 recognize L (halts-accepts iff w ∈ L) and M2 recognize complement(L) (halts-accepts iff w ∉ L). Build M: on input w, run M1 and M2 in parallel (dovetailing steps of each). Since w is EITHER in L or in complement(L) (never neither, by definition of complement), exactly one of M1, M2 is guaranteed to eventually halt-accept. Whichever halts first tells you the answer (accept if M1 halts first, reject if M2 halts first) — M always halts on every input, so L is decidable.\n• Corollary (used constantly in decidability proofs): if L is RE but NOT REC, then complement(L) is guaranteed NOT RE (else the theorem would make L recursive, a contradiction). This is exactly how one shows, e.g., that the complement of the Halting Problem is not RE.\n\nWORKED EXAMPLES\n\n1. Prove the Halting Problem HALT_TM = {⟨M,w⟩ : M halts on w} is RE but not REC: RE because a universal TM U can simulate M on w and accept exactly when M halts (if M loops, U loops too — fine, RE only requires correct behavior on YES instances). Not REC by the classic diagonalization argument (assume a decider H exists for HALT_TM, construct D that runs H on ⟨D,D⟩ and does the opposite of what H predicts — contradiction either way). Since HALT_TM is RE but not REC, by the central theorem above, complement(HALT_TM) is NOT RE either — so HALT_TM sits properly inside RE, outside REC, with its complement outside RE too (this triple fact is a favorite GATE question).\n2. Show REC is closed under intersection: given deciders M1 for L1 and M2 for L2 (both always halt), construct M3 that on input w runs M1(w) then M2(w) sequentially (both terminate, since each is a decider) and accepts iff both accept. M3 always halts (finite sum of two halting computations) so L1 ∩ L2 is decidable — this simple \"run deciders in sequence\" trick is the standard closure proof template for REC (contrast with RE closure proofs, which require dovetailing/parallel simulation since RE machines might not halt on all inputs).\n\nGATE TRAPS\n\n• Confusing \"RE\" (recognizable, one-sided halting guarantee) with \"REC/decidable\" (halts on all inputs, two-sided guarantee) — nearly every decidability MCQ hinges on this distinction.\n• Believing RE is closed under complement — it is not, and this is precisely why the Halting Problem's complement is not RE, a fact tested constantly.\n• Applying the \"run in parallel/dovetail\" closure proof to REC problems where the simpler sequential-run proof suffices, or vice versa applying \"run sequentially\" where machines might not halt (only valid for REC, not for RE, since an RE machine may loop before ever reaching the second check).\n• Forgetting that equivalence of TM variants (multi-tape, nondeterministic, etc.) is about LANGUAGE CLASS only, not running time — nondeterministic TMs can decide the same languages as deterministic ones but potentially with exponential time overhead when simulated deterministically.\n• Misremembering the central RE+co-RE⟹REC theorem's direction — it does NOT say \"REC implies RE and co-RE are both nonempty-interesting\"; it specifically says having BOTH L and its complement RE is what forces decidability, and this is the single most reliable tool for classifying a language's exact position in the RE/REC/co-RE landscape.\n• Assuming an NTM's nondeterministic \"accept if some branch accepts\" rule changes the recognizable/decidable class — it does not; NTMs are equivalent in power (not efficiency) to DTMs for both RE and REC.\n</content>";
+
+window.GATE_DATA.questions['toc'].topics.find(function(t){return t.id==='toc-decidability';}).theory.deep = "FULL DECIDABILITY CATALOGUE (verify every cell carefully — this is the highest-stakes table in the whole subject)\n\nFOR DFA / REGULAR LANGUAGES (all DECIDABLE):\n• MEMBERSHIP (does DFA M accept w?): DECIDABLE — simulate M on w, DFA always halts after |w| steps.\n• EMPTINESS (is L(M) = ∅?): DECIDABLE — reachability check: is any accepting state reachable from q0 in the state graph?\n• FINITENESS (is L(M) finite?): DECIDABLE — check whether the reachable-and-co-reachable part of the state graph has a cycle; finite iff no such cycle exists.\n• EQUIVALENCE (do two DFAs accept the same language?): DECIDABLE — build the symmetric difference automaton (via product construction) and test its emptiness.\n• UNIVERSALITY (is L(M) = Σ*?): DECIDABLE — complement M (DFAs are closed under complement) and test emptiness of the complement.\n• ALL of these decidability results EXTEND to NFAs as well, since NFA→DFA conversion is always effective/computable (subset construction always terminates).\n\nFOR CFG / CONTEXT-FREE LANGUAGES (mixed — memorize which is which):\n• MEMBERSHIP (does CFG G generate w?): DECIDABLE — CYK algorithm (via CNF conversion) decides this in O(n^3) time.\n• EMPTINESS (is L(G) = ∅?): DECIDABLE — a simple \"generating nonterminal\" reachability/productivity check on the grammar.\n• FINITENESS (is L(G) finite?): DECIDABLE — check the grammar's dependency graph for a nonterminal that can derive itself via a nonempty terminal-containing path (a \"self-embedding\" cycle); finite iff no such cycle exists among useful/reachable nonterminals.\n• EQUIVALENCE (do two CFGs generate the same language?): UNDECIDABLE — this is a landmark undecidable problem, reduced from Post's Correspondence Problem (PCP).\n• UNIVERSALITY (is L(G) = Σ*?): UNDECIDABLE — reduces from PCP as well; note this immediately implies equivalence is undecidable too (universality is equivalence-to-Σ* as a special case), and this also implies CFG-COMPLEMENT and CFG-INTERSECTION-EMPTINESS type questions are frequently undecidable since CFLs are not closed under those operations.\n• AMBIGUITY (is a given CFG ambiguous?): UNDECIDABLE.\n• INHERENT AMBIGUITY (is L(G) inherently ambiguous?): UNDECIDABLE.\n• REGULARITY (is L(G) regular?): UNDECIDABLE.\n\nFOR TM (all UNDECIDABLE except membership-with-halting-guarantee is meaningless; be precise about wording):\n• MEMBERSHIP / ACCEPTANCE (does TM M accept w? — the \"Acceptance Problem\" A_TM): UNDECIDABLE (but RE — you can simulate M on w and accept if it halts-accepts; you just can't detect non-acceptance reliably).\n• EMPTINESS (is L(M) = ∅?): UNDECIDABLE — reduces from A_TM (E_TM).\n• FINITENESS (is L(M) finite?): UNDECIDABLE.\n• EQUIVALENCE (do two TMs accept the same language?): UNDECIDABLE (EQ_TM) — in fact EQ_TM is not even RE or co-RE in general (it sits outside both, one of the \"hardest\" classical undecidable problems, decidable by neither a \"yes\"-recognizer nor a \"no\"-recognizer).\n• UNIVERSALITY (is L(M) = Σ*?): UNDECIDABLE.\n• HALTING (does M halt on w?): UNDECIDABLE — the original Halting Problem, RE but not REC.\n• The ONLY \"decidable-flavored\" TM question that is actually decidable is a BOUNDED/RESOURCE-LIMITED version, e.g. \"does M halt on w within k steps?\" — DECIDABLE (just simulate k steps; this is a common trick option in MCQs to test whether students blindly mark \"undecidable\" for anything mentioning a TM).\n\nRICE'S THEOREM\n\n• Statement: Let P be any property of the LANGUAGE recognized by a TM (i.e., P is a property of RE languages, not of the machine's syntax/structure) that is NONTRIVIAL (some RE languages have property P, and some RE languages don't). Then the problem \"given a TM M, does L(M) have property P?\" is UNDECIDABLE.\n• Applicability test (3-step check before invoking Rice's): (1) Is the property about the LANGUAGE the machine recognizes (semantic), not about the machine's states/transitions/code (syntactic)? Must be semantic. (2) Is the property NONTRIVIAL — does at least one RE language have it and at least one RE language lack it? If either \"all languages have it\" or \"no language has it,\" Rice's does not apply (the problem is trivially decidable — just always answer yes or always answer no). (3) If both checks pass, the problem is undecidable, full stop — no further argument needed.\n• Examples where Rice's APPLIES (undecidable): \"is L(M) empty?\", \"is L(M) regular?\", \"is L(M) finite?\", \"does L(M) contain the string 'ab'?\", \"is L(M) = Σ*?\", \"is L(M) decidable/recursive?\" — all are nontrivial semantic properties.\n• NON-EXAMPLES where Rice's does NOT apply (these look similar but are NOT covered, and often ARE decidable): \"does M have exactly 5 states?\" (syntactic, about the machine's description, not its language — decidable, just count states). \"does M halt on a GIVEN input w within k steps?\" (a property of a specific computation, not of the language as a whole, and it's a bounded/simulatable check — decidable). \"is L(M) empty OR non-empty?\" (this is the trivial property — ALWAYS true — so it's decidable trivially, not covered by Rice's since it fails the nontriviality check). GATE loves to disguise a syntactic or trivial property to bait a false \"Rice's applies, so undecidable\" answer.\n\nREDUCTION DIRECTION LOGIC (the core technique, get the arrows right)\n\n• To prove a problem B is UNDECIDABLE, reduce a KNOWN undecidable problem A to B (write A ≤ B, \"A reduces to B\"), meaning: if you HAD a decider for B, you could BUILD a decider for A using it. Since A is known undecidable, B cannot be decidable either (else A would become decidable via the reduction — contradiction).\n• Template: \"Suppose (for contradiction) B is decidable via decider D_B. Construct decider D_A for A as follows: on input x for A, transform x into an appropriate instance f(x) of B (this transformation must be COMPUTABLE), run D_B on f(x), and return D_B's answer directly (or its negation, depending on direction) as the answer for x. Since A is undecidable, no such D_A can exist, so D_B cannot exist either — B is undecidable.\"\n• Direction discipline: you reduce FROM the already-known-undecidable problem TO the new problem you want to classify — never the reverse (reducing a decidable problem to an unknown one proves nothing about the unknown one).\n• To prove a problem is DECIDABLE, you do NOT reduce from an undecidable problem — instead you give a direct algorithm/decider, or reduce the new problem TO an already-known-decidable problem (in the opposite role: show the new problem can be SOLVED USING a decider for a known-decidable one).\n\nWORKED EXAMPLES\n\n1. Prove E_TM = {⟨M⟩ : L(M) = ∅} is undecidable via reduction from A_TM = {⟨M,w⟩ : M accepts w}. Assume decider D for E_TM exists. Build decider D' for A_TM: on input ⟨M,w⟩, construct a new machine M' that on any input x, first erases x, then simulates M on w (ignoring its own input), accepting iff M accepts w. Run D on ⟨M'⟩: if D says L(M') = ∅ then M does NOT accept w (reject); if D says L(M') ≠ ∅ then M does accept w (since M' would accept everything or nothing based purely on whether M accepts w) — accept. This computable transformation gives a decider for A_TM, contradicting A_TM's known undecidability, so E_TM is undecidable.\n2. Apply Rice's theorem test to \"is L(M) infinite?\": (1) semantic — yes, purely about the language, not the machine's code. (2) nontrivial — yes, some RE languages are infinite (e.g. Σ*) and some are finite (e.g. {a}). Both checks pass ⇒ undecidable, immediately, no need for a custom reduction.\n\nGATE TRAPS\n\n• Marking CFG-EQUIVALENCE or CFG-UNIVERSALITY as decidable by wrongly assuming CFL closure properties mirror regular languages' — they are UNDECIDABLE, unlike the DFA versions which ARE decidable.\n• Marking CFG-EMPTINESS or CFG-FINITENESS as undecidable — these ARE decidable (grammar reachability/productivity and self-embedding checks respectively); do not blanket-apply \"CFG problems are usually undecidable.\"\n• Applying Rice's theorem to a SYNTACTIC property (state count, number of transitions, specific machine structure) — Rice's theorem covers only semantic (language-based) properties.\n• Applying Rice's theorem to a TRIVIAL property (true for all RE languages or false for all) — must check nontriviality first.\n• Getting reduction direction backwards — reducing a decidable problem to an unclassified one proves nothing; you must reduce a KNOWN undecidable problem INTO the target to show the target is undecidable.\n• Forgetting that EQ_TM (TM equivalence) is not just undecidable but not even RE/co-RE — a step above problems like A_TM (which is at least RE).\n• Confusing \"undecidable\" with \"not RE\" — the Acceptance Problem A_TM is undecidable but IS RE; being undecidable does not mean a problem lacks any algorithmic handle at all (a semi-decider may still exist).\n</content>";
+
+window.GATE_DATA.questions['toc'].topics.find(function(t){return t.id==='toc-hierarchy';}).theory.deep = "FULL CHOMSKY HIERARCHY TABLE\n\n• TYPE 0 — Unrestricted / Recursively Enumerable grammars: production form α → β with α ∈ (V∪Σ)* V (V∪Σ)* (at least one nonterminal on the left, otherwise no restriction) and β ∈ (V∪Σ)* (any string). Machine: TURING MACHINE (full power, may loop forever). Languages: RECURSIVELY ENUMERABLE (RE) languages.\n• TYPE 1 — Context-Sensitive grammars: production form αAβ → αγβ where γ ≠ ε (length-non-decreasing overall: |LHS| ≤ |RHS| for every production, except S → ε is allowed if S never appears on any RHS). Machine: LINEAR BOUNDED AUTOMATON (LBA — a TM whose tape is restricted to exactly the length of the input, i.e., a TM with a finite, input-proportional amount of tape). Languages: CONTEXT-SENSITIVE LANGUAGES (CSL).\n• TYPE 2 — Context-Free grammars: production form A → α, single nonterminal on the left, α ∈ (V∪Σ)* unrestricted on the right. Machine: PUSHDOWN AUTOMATON (PDA, nondeterministic version — note NPDA is strictly more powerful than DPDA, unlike the regular/TM cases where determinism doesn't cost power). Languages: CONTEXT-FREE LANGUAGES (CFL).\n• TYPE 3 — Regular grammars: RIGHT-LINEAR form A → aB or A → a (or LEFT-LINEAR form A → Ba or A → a, but not mixed within one grammar) — at most one nonterminal, and it must be at the same end (right or left) throughout. Machine: FINITE AUTOMATON (DFA/NFA, equal power). Languages: REGULAR LANGUAGES.\n\nSTRICT CONTAINMENTS AND WITNESS LANGUAGES PER GAP\n\n• REGULAR ⊊ CFL (strict): witness L = {0^n 1^n : n ≥ 0} is context-free (S → 0S1 | ε) but not regular (proved via pumping lemma or Myhill-Nerode, infinitely many equivalence classes).\n• CFL ⊊ CSL (strict): witness L = {a^n b^n c^n : n ≥ 0} is context-sensitive (a context-sensitive grammar can enforce three-way equal counts using a linear-bounded \"marking and checking\" construction with productions like the classical CS grammar for a^nb^nc^n) but is NOT context-free (proved via the CFL pumping lemma, shown above cannot simultaneously balance three blocks).\n• CSL ⊊ RE (strict): witness is any UNDECIDABLE-but-RE language, e.g., the Acceptance Problem's encoded language A_TM = {⟨M,w⟩ : M accepts w}. Every CSL is DECIDABLE (an LBA has only finitely many distinct configurations — bounded by tape length × states × alphabet-size^tape-length — so a deciding LBA can detect non-halting via configuration-repetition and reject, meaning CSL ⊆ REC), but A_TM is RE and NOT decidable, so it cannot be context-sensitive — proving the containment strict.\n• REC (decidable languages) sits STRICTLY between CSL and RE: CSL ⊊ REC ⊊ RE. This extra \"REC\" layer is not one of the 4 classical Chomsky types but is essential to know: every CSL is decidable (LBA halting is guaranteed by the configuration-counting argument above), every decidable language is RE (trivial), and both containments are strict (CSL ⊊ REC witnessed by a decidable-but-not-context-sensitive-provable language such as certain languages requiring super-linear space; REC ⊊ RE witnessed by the Halting Problem).\n• Overall chain: REGULAR ⊊ CFL ⊊ CSL ⊊ REC ⊊ RE ⊊ (all languages over Σ*, uncountably many, by Cantor's diagonal argument since RE is only countable).\n\nADDITIONAL STRUCTURAL FACTS PER LEVEL\n\n• DCFL (deterministic CFL, machine = DPDA) sits strictly between Regular and CFL: REGULAR ⊊ DCFL ⊊ CFL, witnessed by {ww^R} (CFL, not DCFL, shown in the CFL topic) and {0^n1^n} (both DCFL and CFL, but not regular).\n• Every regular language is trivially context-free (right-linear grammars are already valid context-free grammars, since A → aB and A → a fit the \"single nonterminal on LHS\" restriction).\n• Every context-free language is trivially context-sensitive PROVIDED it doesn't require S → ε special handling issues — technically CFLs-with-ε need the same \"S never on RHS\" caveat as CSLs, but modulo that technicality, CFG productions A → α already satisfy the non-length-decreasing property whenever |α| ≥ 1 (if α = ε it needs the special S-only exception, matching CSL's own exception).\n• Every context-sensitive language is decidable specifically BECAUSE the LBA's tape is bounded by the input length — this gives a FINITE configuration space (bounded number of tape contents × head positions × states), so a simulating decider can track visited configurations and reject if any configuration repeats (guaranteeing termination, since an infinite computation on finite configurations must eventually repeat one).\n\nWORKED EXAMPLES\n\n1. Classify L = {a^n b^n : n ≥ 0} ∪ {a^n b^2n : n ≥ 0} at the tightest hierarchy level: this is context-free (CFL is closed under union, and each piece is individually a simple CFL via S1 → aS1b | ε and S2 → aS2bb | ε, so S → S1 | S2 generates the union) but it is NOT regular (apply pumping lemma or Myhill-Nerode on the first piece's structure, standard 0^n1^n-style argument extends). Tightest classification: CFL, strictly above regular.\n2. Show CSL ⊊ RE using the strictness argument concretely: A_TM is RE (a universal TM simulates M on w and accepts iff M halts-accepts — always representable by a Type-0 grammar since Type-0 = RE exactly). If A_TM were context-sensitive, it would be decidable by an LBA (since CSL ⊆ REC, via the configuration-bound argument above). But A_TM is a landmark UNDECIDABLE problem. Contradiction ⇒ A_TM is not context-sensitive, proving CSL is a proper (strict) subset of RE, with A_TM as the concrete separating witness.\n\nGATE TRAPS\n\n• Assuming NPDA and DPDA are equally powerful (as NFA/DFA are for regular languages) — they are NOT; NPDA (defining CFL) is strictly more powerful than DPDA (defining DCFL), a key asymmetry versus the regular-language case.\n• Forgetting the extra REC layer between CSL and RE — many students only recite \"Regular ⊊ CFL ⊊ CSL ⊊ RE\" and skip decidable languages, which is an important intermediate class frequently tested (e.g., \"is CSL decidable\" — yes; \"is CSL = REC\" — no, strict subset).\n• Believing every CFG production A → α with |α| ≥ 1 is automatically context-sensitive-compliant without checking the special ε-production exception rules that both CFG and CSL share.\n• Confusing LBA (bounded, input-length tape, decides CSL, always halts) with a full unrestricted TM (unbounded tape, decides/recognizes RE, may loop forever) — the tape-boundedness is exactly what forces CSL ⊆ decidable.\n• Mixing up right-linear and left-linear regular grammars WITHIN one grammar (e.g., some productions A → aB and others A → Ba in the same grammar) — a grammar mixing both forms may define a language OUTSIDE the regular class (loses the regularity guarantee); each individual production set must stick to one direction consistently.\n• Misclassifying an inherently ambiguous or intersection-derived language (like a^n b^n c^n) as \"still CFL because it looks like a small tweak on a CFL\" — always re-verify via the CFL pumping lemma; such languages are classic CSL-not-CFL witnesses.\n</content>";
+
+window.GATE_DATA.questions['toc'].topics.find(function(t){return t.id==='toc-regular';}).questions.push(
+{
+  id: 'toc-regular-x1',
+  q: 'The minimum number of states in a DFA over {a,b} accepting all strings whose total length is congruent to 0 modulo 4 is',
+  options: ['2', '3', '4', '5'],
+  answer: 2,
+  marks: 1,
+  difficulty: 'easy',
+  type: 'numerical',
+  explanation: "Length modulo 4 is a mod-k counter where every input symbol, regardless of whether it is a or b, advances the count by one. Build states q0, q1, q2, q3 for the four residues, with both a and b moving q_i to q_(i+1) mod 4, start and accept at q0. Each state is reachable (read that many symbols) and pairwise distinguishable, since the shortest accepting suffix from q_i has length (4-i) mod 4, which differs for each i. This is the same reasoning as a mod-k count of a single symbol; here the 'symbol being counted' is simply 'any symbol', so the answer is exactly k = 4 states, independent of the alphabet size."
+},
+{
+  id: 'toc-regular-x2',
+  q: 'For the language over {0,1} in which the 4th symbol from the right end is 1 (defined only for strings of length at least 4), an NFA can be built with 5 states by guessing the start of the last four symbols. How many states does the minimal DFA require?',
+  options: ['5', '8', '16', '32'],
+  answer: 2,
+  marks: 2,
+  difficulty: 'hard',
+  type: 'pyq-style',
+  explanation: "A DFA reading left to right never knows how many symbols remain, so to decide the condition it must remember the last 4 symbols it has seen, since any of them could turn out to be the 4th-from-last once the string ends. There are 2^4 = 16 possible 4-symbol windows, and each is reachable. Two different windows are always distinguishable: they differ in some position, and padding with exactly enough symbols to push that differing bit into the 4th-from-end slot yields a suffix accepted from one window but not the other. So the minimal DFA needs exactly 16 states, while the NFA needs only 5 - the standard exponential blow-up witness for 'k-th symbol from the end' style languages, with 2^k always the tight DFA bound."
+},
+{
+  id: 'toc-regular-x3',
+  q: 'Which of the following regular expressions denotes the same language as (a* b*)* over {a,b}?',
+  options: ['a*b*', '(a+b)*', 'a*+b*', '(ab)*'],
+  answer: 1,
+  marks: 1,
+  difficulty: 'easy',
+  type: 'concept',
+  explanation: "a*b* generates strings that are a block of a's followed by a block of b's, and it always contains the empty string. Starring a language that already contains epsilon and can be concatenated with itself lets you produce any interleaving: to get a string like 'aba', take the pieces 'a', 'b', 'a' - wait, each piece must itself match a*b*, and a single 'b' or single 'a' matches a*b* trivially, so concatenating one-symbol pieces reproduces any string over {a,b}. Hence (a*b*)* equals (a+b)*, all strings. This is a standard regex-identity trap: starring a 'restricted shape' language that contains epsilon and is closed under the alphabet symbols individually collapses it to the universal language."
+},
+{
+  id: 'toc-regular-x4',
+  q: 'Let L be a regular language over Sigma, and define L/a = { x in Sigma* : xa is in L } for a fixed symbol a in Sigma (the right quotient of L by the string "a"). Which statement is correct?',
+  options: ['L/a is always regular', 'L/a is regular only if L is finite', 'L/a is context-free but generally not regular', 'L/a is regular only if a does not appear in L'],
+  answer: 0,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'concept',
+  explanation: "Given a DFA M = (Q, Sigma, delta, q0, F) for L, build a DFA for L/a with the same states and transitions but a new final-state set F' = { q in Q : delta(q, a) is in F }. Then M' accepts x exactly when delta(q0, x) is a state from which reading a lands in F, i.e. exactly when xa is in L. This construction works for every regular L and every fixed string (quotient by a longer fixed string just chains the same idea), so regular languages are closed under quotient by any fixed string, with no dependence on finiteness of L or on whether a occurs in strings of L. Hence option A."
+},
+{
+  id: 'toc-regular-x5',
+  q: 'Let L be regular with a minimal DFA of n states. What is the tightest general upper bound on the number of states in the minimal DFA for L^R (the reversal of L), and is this bound achievable?',
+  options: ['n states, always achievable exactly', 'n+1 states, always achievable exactly', '2^n states, and this bound is achievable for some L', '2^n states, but no regular language ever needs this many'],
+  answer: 2,
+  marks: 2,
+  difficulty: 'hard',
+  type: 'concept',
+  explanation: "To build a machine for L^R, reverse every transition of the minimal DFA for L and swap the roles of the start state and the final states; this yields an NFA (not necessarily deterministic, since multiple states may now have edges into a common target reversed, and there may be multiple start states) with exactly n states. Determinizing this NFA via subset construction can cost up to 2^n states in the worst case, and there are known regular languages for which the minimal DFA of the reversal genuinely needs exponentially many states relative to n. So the correct bound is 2^n, and unlike the abstract subset-construction bound, this specific reversal blow-up is known to be tight for suitably constructed witness languages, ruling out option D."
+},
+{
+  id: 'toc-regular-x6',
+  q: 'Let h be a homomorphism from {a,b}* to {0,1}* with h(a) = 01 and h(b) = 1. If L over {a,b} is regular, which statement about h(L) = { h(w) : w in L } is TRUE?',
+  options: ['h(L) is always regular', 'h(L) is regular only if h is length-preserving', 'h(L) may fail to be regular even though L is regular', 'h(L) is regular only if L is finite'],
+  answer: 0,
+  marks: 1,
+  difficulty: 'easy',
+  type: 'concept',
+  explanation: "Regular languages are closed under homomorphism. Given an NFA for L, replace every transition labeled by a symbol x with a chain of transitions spelling out h(x) (introducing intermediate states for multi-symbol images such as h(a) = 01), keeping the same start and final states. The resulting NFA accepts exactly h(L). This works for any homomorphism, regardless of whether it is length-preserving or the source language is finite, so options B and D impose unnecessary conditions and option C contradicts the closure theorem. (Note the companion fact: regular languages are also closed under inverse homomorphism, via a different product-style construction on the DFA side.)"
+},
+{
+  id: 'toc-regular-x7',
+  q: 'The minimum number of states in a (complete) DFA over {a,b} accepting exactly the strings that begin with the prefix ab is',
+  options: ['2', '3', '4', '5'],
+  answer: 2,
+  marks: 1,
+  difficulty: 'medium',
+  type: 'numerical',
+  explanation: "Track progress against the fixed prefix 'ab': state q0 (start, nothing read), q1 (first symbol was a, prefix still possible), qAcc (prefix ab confirmed, accepting sink since nothing later can undo it), and qDead (prefix already violated, permanent reject sink). From q0, reading b goes straight to qDead since the first symbol must be a; from q1, reading a (instead of the required b) also goes to qDead. All four states are pairwise distinguishable: their shortest accepting suffixes are epsilon (qAcc), 'b' (q1), 'ab' (q0), and never (qDead). Unlike a 'contains' condition, a prefix condition never needs fallback transitions, since one mismatch kills the string forever - hence a clean |prefix|+1 = 4 states."
+},
+{
+  id: 'toc-regular-x8',
+  q: 'The minimum number of states in a DFA over {a,b} accepting all strings that contain "bab" as a substring is',
+  options: ['3', '4', '5', '8'],
+  answer: 1,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'numerical',
+  explanation: "Track the longest prefix of 'bab' that is a suffix of the input read so far: state 0 (none), 1 (matched 'b'), 2 (matched 'ba'), 3 (matched 'bab', accepting sink). The only subtlety is the fallback transitions: from state 1, reading another b keeps you at state 1 (the new b could still start a fresh match, since 'b' is both a prefix and this new b is itself a length-1 match); from state 2, reading a fails the pattern but the trailing 'a' matches nothing of 'bab' as a prefix, so it falls back to state 0. These fallback edges are exactly what the Knuth-Morris-Pratt failure function computes. All four states have distinct shortest accepting suffixes (bab, ab, b, epsilon), so 4 states is minimal, matching the general |pattern|+1 rule."
+},
+{
+  id: 'toc-regular-x9',
+  q: 'What is the minimum number of states in a DFA over {a,b} accepting the language { w : (number of a in w) - (number of b in w) is congruent to 0 modulo 3 }?',
+  options: ['2', '3', '6', '9'],
+  answer: 1,
+  marks: 2,
+  difficulty: 'hard',
+  type: 'pyq-style',
+  explanation: "Only the value of (count of a - count of b) mod 3 matters, which lives in Z_3 = {0,1,2}. Reading an a adds 1 mod 3, reading a b subtracts 1 (i.e. adds 2 mod 3); this is a walk on a 3-cycle. Build states q0, q1, q2 for the three residues, start and accept at q0. All three are reachable (q0 by epsilon, q1 by 'a', q2 by 'aa' or 'b'), and pairwise distinguishable because the shortest suffix that returns residue i to 0 has different length for each i (0, 2, or 1 extra a's respectively, or symmetric b combinations) - concretely the suffix a^(3-i) mod 3 accepts from exactly one of the three. So exactly 3 states, illustrating that a difference-of-counts-mod-k condition needs only k states, same as a single-symbol mod-k counter, because the automaton only ever needs the running residue, never the actual counts."
+},
+{
+  id: 'toc-regular-x10',
+  q: 'What is the minimum number of states in a complete DFA over {0,1} for the language of strings of length at least 5 whose 5th symbol from the LEFT is 1?',
+  options: ['5', '6', '7', '32'],
+  answer: 2,
+  marks: 2,
+  difficulty: 'hard',
+  type: 'numerical',
+  explanation: "Unlike conditions on the k-th symbol from the RIGHT end, a condition on a fixed position from the START never causes exponential blow-up, because the DFA can simply count symbols read so far up to the trigger position - it need not remember their values. Use counting states s0, s1, s2, s3, s4 for 'exactly 0, 1, 2, 3, 4 symbols read', none of which need branch on symbol value yet since positions 1 through 4 are irrelevant to the answer. From s4 (four symbols read, the 5th is about to arrive), reading 1 goes to an accepting sink A and reading 0 goes to a permanent reject sink R, since once the 5th symbol is fixed no later symbol can change the verdict; A and R self-loop afterward. That gives s0, s1, s2, s3, s4, A, R = 7 states, and all are pairwise distinguishable since their shortest accepting suffixes have strictly decreasing lengths 5, 4, 3, 2, 1, 0 for s0 through A, with R never accepting. Answer: 7, matching the general pattern of k counting states plus 2 sinks for a condition on the k-th symbol from the start."
+},
+{
+  id: 'toc-regular-x11',
+  q: 'Consider languages of the form { a^n b^m : n, m >= 0 and R(n, m) } for a relation R. Which choice of R makes the language regular?',
+  options: ['R: n = m', 'R: n < m', 'R: n = 5 (m arbitrary)', 'R: n and m differ by exactly 1'],
+  answer: 2,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'concept',
+  explanation: "A relation that pins one of the two counts to a fixed constant removes the need to compare two unbounded quantities: 'n = 5' describes exactly the strings matching a^5 b*, a plain regular expression, so a DFA just counts up to 5 a's (rejecting if it sees a 6th) and then accepts freely on b's. The other three options all force an unbounded comparison between n and m: 'n = m' is the classical {a^n b^n}; 'n < m' and 'the counts differ by exactly 1' both require tracking an unbounded running difference to verify at the b*'s end, and in each case the strings a, aa, aaa, ... are pairwise distinguishable by an appropriate suffix of b's, giving infinitely many Myhill-Nerode classes. Only fixing one count to a constant (or to a bounded range) preserves regularity."
+},
+{
+  id: 'toc-regular-x12',
+  q: 'Is the language L = { a^n b^m : n >= 0, m >= 0, n is congruent to m modulo 2 } regular?',
+  options: ['Yes, because parity of each count is trackable with finite memory', 'No, because it compares two unbounded counts', 'Yes, but only because the alphabet has just two symbols', 'No, because it fails the pumping lemma for every choice of pumping length'],
+  answer: 0,
+  marks: 2,
+  difficulty: 'hard',
+  type: 'concept',
+  explanation: "This is the key trap that separates 'comparing two unbounded counts' from 'comparing two unbounded counts modulo a fixed k'. The automaton does not need n and m themselves, only their parities, and each parity only ever takes two values regardless of how large n or m grows. Build a DFA with states tracking (parity of a's seen so far) while reading a's, then (parity of b's seen so far) while reading b's, accepting when the two parities match once the string ends; this needs only a handful of states (essentially 2 for tracking a-parity plus 2 for tracking b-parity, reachable and distinguishable by short suffixes). Since finite memory suffices, L is regular - contrast sharply with n = m exactly, which is not regular. The pumping lemma does not rule this out, since pumping any block only flips or preserves parity in a way the language tolerates."
+},
+{
+  id: 'toc-regular-x13',
+  q: 'Is the language L = { a^n b^m : n, m >= 0, n is not equal to m } regular?',
+  options: ['Yes, since it is the complement within a*b* of a non-regular set', 'No, it is not regular', 'Yes, with a minimal DFA of 2 states', 'Cannot be determined without knowing the alphabet size'],
+  answer: 1,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'concept',
+  explanation: "Apply Myhill-Nerode directly. Take strings a^i for i = 0, 1, 2, .... For i not equal to j, the suffix z = b^i puts a^i z = a^i b^i outside L (since n = m there), while a^j z = a^j b^i lies inside L (since j is not equal to i). So every pair a^i, a^j is distinguished by some suffix, giving infinitely many equivalence classes, which forces non-regularity by Myhill-Nerode. Intuitively, deciding 'not equal' still requires knowing the exact counts well enough to detect equality, so it carries the same unbounded-memory burden as {a^n b^n} itself; complementing within a restricted universe does not rescue regularity, since a*b* minus a non-regular set is generally still non-regular (regularity is not closed under 'complement relative to a smaller universe' in this naive sense)."
+},
+{
+  id: 'toc-regular-x14',
+  q: 'Which statement about the subset construction (NFA to DFA conversion) is TRUE?',
+  options: ['The resulting DFA always has exactly 2^n states for an n-state NFA', 'The resulting DFA has at most 2^n states, but only reachable subsets need be constructed, often giving far fewer states', 'The resulting DFA is nondeterministic unless the original NFA had no epsilon-transitions', 'The subset construction fails whenever the NFA has more than one accepting state'],
+  answer: 1,
+  marks: 1,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: "The 2^n bound counts all possible subsets of the n NFA states, but a DFA state is only created for subsets actually reachable from the start subset (or its epsilon-closure) via some input string; many NFAs reach only a small fraction of the power set. For example, an NFA that already happens to be deterministic converts one-to-one, needing only n states, not 2^n. The bound 2^n is an upper bound, tight only for specially constructed languages such as the k-th-symbol-from-the-end family. The subset construction always produces a genuine DFA (deterministic by design, since each state is a fixed set and transitions are computed as unions), regardless of epsilon-transitions or the number of accepting states in the original NFA - both misconceptions in options C and D."
+},
+{
+  id: 'toc-regular-x15',
+  q: 'What is the minimum number of states in a DFA over {a,b} accepting strings that contain at least one a AND have even length?',
+  options: ['2', '3', '4', '6'],
+  answer: 2,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'numerical',
+  explanation: "This is a product of two independent finite-memory conditions: 'has an a appeared yet' (2 states: not-yet, and yes-seen which becomes a sink for that component since seeing one a is permanent) and 'current length is even or odd' (2 states, toggling on every symbol regardless of its identity). The product has at most 2 x 2 = 4 states, and here all four survive: every combination (seen-a?, parity) is reachable (e.g. read a to get seen-a with odd parity, then b to fix parity to even), and each combination is distinguishable from the others because the two coordinates affect acceptance independently - a suffix can adjust parity without introducing an a, and a single a flips only the first coordinate. So the tight product bound of 4 states holds, exactly as with the earlier mod-2/mod-3 product example, since the two conditions here are also on independent aspects of the string."
+}
+);
+
+window.GATE_DATA.questions['toc'].topics.find(function(t){return t.id==='toc-cfl';}).questions.push(
+{
+  id: 'toc-cfl-x1',
+  q: 'Consider the grammar S -> aSb | SS | epsilon. Which of the following is TRUE about the string "abab"?',
+  options: ['It has a unique parse tree, so the grammar is unambiguous', 'It has at least two distinct leftmost derivations, showing the grammar is ambiguous', 'It cannot be derived by this grammar at all', 'It can only be derived using the production S -> aSb'],
+  answer: 1,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'concept',
+  explanation: "The string 'abab' equals 'ab' concatenated with 'ab', and each 'ab' comes from S -> aSb with the inner S -> epsilon. Using S -> SS, this concatenation can be built with two different parse-tree shapes. Flat split: S -> SS where the left S directly derives 'ab' and the right S directly derives 'ab' - two sibling leaves. Nested split: S -> SS where the left S derives epsilon (the empty string) and the right S itself expands via S -> SS into 'ab' followed by 'ab' - a deeper, right-leaning tree producing the same string 'abab'. These are genuinely different parse trees (different bracketing of the same concatenation), so 'abab' has at least two distinct leftmost derivations. This left/right-associativity ambiguity is exactly the same phenomenon as the classic minimal example S -> SS | a being ambiguous for strings like 'aaa'. Hence option B: the grammar is ambiguous."
+},
+{
+  id: 'toc-cfl-x2',
+  q: 'A grammar has productions S -> aS | aSbS | epsilon. The language it generates is best described as',
+  options: ['{ a^n b^n : n >= 0 }', 'strings where every prefix has at least as many a as b, and total a-count exceeds total b-count except when both are zero', 'all strings over {a,b}', 'strings with equal numbers of a and b'],
+  answer: 1,
+  marks: 2,
+  difficulty: 'hard',
+  type: 'concept',
+  explanation: "Read the productions as a recipe: S -> aS appends an 'a' with no matching 'b' yet required; S -> aSbS inserts one 'a', then some S-generated block, then a mandatory 'b', then another S-generated block - this is the classic template for strings where a's must stay ahead of b's when scanned left to right (like a run of unmatched open brackets counted as a, closed as b, requiring a surplus of opens). Every derivation starts by producing at least one more a than the b's it commits to at that level, so no prefix can ever have more b's than a's, and the string cannot be all b's or balanced overall from empty productions alone. This is a strictly larger language than {a^n b^n} (it also includes 'aab', 'aaabb', etc. with a-surplus) and is not simply 'equal counts' or 'everything'. Option B captures the surplus-of-a's-in-every-prefix structural invariant."
+},
+{
+  id: 'toc-cfl-x3',
+  q: 'Classify each language: L1 = { a^n b^n : n >= 0 }, L2 = { w w^R : w in {a,b}* }, L3 = { a^n b^n c^n : n >= 0 }, L4 = { a^i b^j c^k : i, j, k >= 0 }. Which classification is correct?',
+  options: ['L1: DCFL, L2: CFL not DCFL, L3: not CFL, L4: regular', 'L1: regular, L2: DCFL, L3: CFL, L4: not CFL', 'L1: CFL not DCFL, L2: DCFL, L3: regular, L4: CFL', 'All four are DCFL'],
+  answer: 0,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'concept',
+  explanation: "L1 is the anchor DCFL: push a's, pop deterministically on b's, no guessing needed. L2 is the anchor CFL-but-not-DCFL: matching a string against its own reverse needs a midpoint guess since there is no marker, so no DPDA suffices, though an NPDA works by nondeterministically choosing when to switch from pushing to popping. L3 needs two simultaneous matching relations (a-count to b-count and b-count to c-count) which a single stack cannot maintain, and the CFL pumping lemma confirms it is not context-free at all. L4 has no relation between the counts whatsoever - it is simply a*b*c*, describable by a straightforward regular expression, hence regular (and every regular language is trivially a DCFL too, but the option specifically separates it as regular). Only option A assigns all four correctly."
+},
+{
+  id: 'toc-cfl-x4',
+  q: 'Which of the following pairs of PDA acceptance modes are equivalent in the power of the languages they define?',
+  options: ['Nondeterministic PDA by final state and nondeterministic PDA by empty stack accept exactly the same class of languages', 'Deterministic PDA by final state and deterministic PDA by empty stack accept exactly the same class of languages', 'Only deterministic PDAs can accept by empty stack', 'Empty-stack acceptance is strictly more powerful than final-state acceptance for any PDA'],
+  answer: 0,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'concept',
+  explanation: "For general (nondeterministic) PDAs, final-state acceptance and empty-stack acceptance are interchangeable: given a PDA accepting by final state, add a new bottom-of-stack marker and epsilon-transitions from every final state that pop everything to achieve empty-stack acceptance without accidentally accepting other strings, and the converse conversion (empty-stack to final-state) similarly adds a marker and a new final state detecting when only the marker remains. This equivalence is exactly why 'PDA accepts exactly the CFLs' can be stated without specifying acceptance mode. The equivalence breaks specifically for DETERMINISTIC PDAs: empty-stack DPDAs can only accept prefix-free languages (since the machine must halt when the stack empties, a string cannot be a proper prefix of another accepted string), while final-state DPDAs define the full DCFL class, which includes non-prefix-free languages like a*. So option A is correct and option B is the classic false companion."
+},
+{
+  id: 'toc-cfl-x5',
+  q: 'Convert the grammar S -> AB, A -> aA | a, B -> bB | b to Chomsky Normal Form. How many terminal-producing productions (of the form X -> a single terminal) appear in a correct CNF version?',
+  options: ['1', '2', '3', '4'],
+  answer: 3,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'numerical',
+  explanation: "Only productions whose right-hand side mixes a terminal with another symbol need substitution. A -> aA has length 2 and mixes terminal a with nonterminal A, so it must become A -> Xa A with a new helper Xa -> a; likewise B -> bB becomes B -> Xb B with Xb -> b. But A -> a and B -> b already have a single terminal on the right-hand side, which is already legal CNF (RHS must be two nonterminals or one terminal) - they are left completely unchanged, NOT rewritten to A -> Xa or B -> Xb (doing so would create a unit production A -> Xa, which is disallowed in CNF and would just have to be eliminated straight back to A -> a anyway). So the final CNF grammar is: S -> AB, A -> Xa A, A -> a, B -> Xb B, B -> b, Xa -> a, Xb -> b. The terminal-producing productions are A -> a, B -> b, Xa -> a, and Xb -> b - four distinct productions, one pre-existing per nonterminal (A, B) plus one newly introduced per terminal symbol (Xa, Xb). The common mistake is forgetting that the original A -> a and B -> b survive unchanged alongside the new helper productions, undercounting 2 instead of 4."
+},
+{
+  id: 'toc-cfl-x6',
+  q: 'Which of the following is a correct example demonstrating that context-free languages are NOT closed under complementation?',
+  options: ['{a^n b^n c^n} is not context-free, so its complement proves non-closure', 'There exist CFLs L1, L2 with L1 union L2 not context-free', 'If CFLs were closed under complement, then closure under union would give closure under intersection via De Morgan, contradicting the known counterexample for intersection', 'Every DCFL complement fails to be context-free'],
+  answer: 2,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'concept',
+  explanation: "The cleanest proof of non-closure under complement is indirect, via De Morgan's law: L1 intersect L2 = complement(complement(L1) union complement(L2)). CFLs are known to be closed under union. If CFLs were also closed under complement, the right-hand side would always be a CFL, forcing L1 intersect L2 to always be a CFL whenever L1, L2 are - but the standard witness {a^n b^n c^m} intersect {a^m b^n c^n} = {a^n b^n c^n} shows intersection can leave the class. This contradiction is exactly option C's reasoning. Option A is false framing (that specific language being non-CFL says nothing directly about complementation of CFLs). Option B is false as stated (union of CFLs is always context-free). Option D is false: DCFLs are actually closed under complement, and every DCFL is also a CFL, so complementing a DCFL yields another CFL, not a counterexample."
+},
+{
+  id: 'toc-cfl-x7',
+  q: 'A pushdown automaton P accepts by final state and never empties its stack to zero symbols except possibly at acceptance. Which class of languages can P define?',
+  options: ['Only regular languages', 'Exactly the deterministic or nondeterministic context-free languages, matching whether P is deterministic', 'Only languages accepted by empty-stack PDAs', 'Only finite languages'],
+  answer: 1,
+  marks: 1,
+  difficulty: 'easy',
+  type: 'concept',
+  explanation: "Final-state acceptance is one of the two standard PDA acceptance conventions, and it does not restrict expressive power: nondeterministic PDAs accepting by final state define exactly the context-free languages, the same class as empty-stack nondeterministic PDAs (the two conventions are interconvertible for nondeterministic machines). If P happens to be deterministic, final-state acceptance defines exactly the DCFL class, which is the standard and more expressive convention for determinism (recall empty-stack DPDAs are restricted to prefix-free languages, a strictly weaker guarantee). So the class P defines depends only on whether P is deterministic or nondeterministic, giving either DCFL or CFL respectively - option B. There is no forced restriction to regular or finite languages, and the empty-stack requirement in option C is not what final-state acceptance means."
+},
+{
+  id: 'toc-cfl-x8',
+  q: 'Which of the following languages is context-free?',
+  options: ['{ a^n b^n c^n d^n : n >= 0 }', '{ a^i b^j c^k d^l : i = k and j = l }', '{ a^n b^n c^n : n >= 0 }', '{ w in {a,b,c}* : w has equal numbers of a, b, and c }'],
+  answer: 1,
+  marks: 2,
+  difficulty: 'hard',
+  type: 'concept',
+  explanation: "A single stack can enforce one matching relation across a string as long as the two related blocks are not interleaved with an unrelated third comparison. Here i = k relates the a-block to the c-block, and j = l relates the b-block to the d-block, but these are two SEPARATE and non-interacting comparisons - a PDA can push a's, then on seeing b's switch to pushing those on a second conceptual track (simulated via combined stack symbols or two synchronized passes using the grammar S -> a S c | T, no - more directly, a grammar S -> A B with A -> aAc | epsilon enforcing i=k independently of B -> bBd | epsilon enforcing j=l) generates exactly this language, since the two equalities never need to be checked against each other. Options A, C, and D all require comparing three or more counts simultaneously (or, for D, effectively two independent equalities PLUS everything interleaved so no clean stack separation exists), and all three fail the CFL pumping lemma. Hence option B is the CFL."
+},
+{
+  id: 'toc-cfl-x9',
+  q: 'Which of the following statements about deciding properties of a given CFG G is TRUE?',
+  options: ['Testing whether L(G) is empty is undecidable', 'Testing whether a specific string w is in L(G) is undecidable', 'Testing whether L(G) is finite is decidable', 'Testing whether G is ambiguous is decidable'],
+  answer: 2,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'concept',
+  explanation: "CFG emptiness is decidable via a simple bottom-up productivity check: mark which nonterminals can derive at least one terminal string, and L(G) is empty exactly when the start symbol is never marked. Membership is decidable by the CYK algorithm (after converting to CNF) in time O(n^3), so it is very much a solvable, practical algorithm, not undecidable. Finiteness is decidable by checking the grammar's nonterminal dependency graph for a cycle that can produce a nonempty terminal string on a path from a nonterminal back to itself (self-embedding); no such cycle among useful nonterminals means only finitely many derivations, hence a finite language. Ambiguity, in contrast, is undecidable in general - there is no algorithm that takes an arbitrary CFG and correctly determines ambiguity for all cases. So the only true statement is option C."
+},
+{
+  id: 'toc-cfl-x10',
+  q: 'L1 = { a^i b^j : i = j } and L2 = { b^i c^j : i = j } are both DCFLs. What can be said about L1 . L2 (concatenation) and L1 union L2?',
+  options: ['Both are guaranteed to be DCFL', 'The union is guaranteed CFL but not guaranteed DCFL; the concatenation is guaranteed CFL but not guaranteed DCFL', 'Both are guaranteed to be regular', 'Neither is even guaranteed to be context-free'],
+  answer: 1,
+  marks: 2,
+  difficulty: 'hard',
+  type: 'concept',
+  explanation: "DCFLs are always CFLs, and CFLs are closed under both concatenation and union, so L1 . L2 and L1 union L2 are certainly context-free. But DCFL itself is NOT closed under concatenation or union in general: to accept the union deterministically, a DPDA reading a string of a's would need to know in advance whether it is looking at an L1-style or L2-style string, which for a run of leading a's followed by b's is fine, but the combined recognition can require lookahead a DPDA cannot always get without knowing where the string ends; the standard counterexample pattern (like the earlier {i=j or j=k} case) shows a DPDA construction can fail even when each piece alone is deterministic. So the safe, provable statement is CFL-guaranteed but not DCFL-guaranteed for both operations, matching option B; options claiming regularity or non-context-freeness are simply wrong given each L1, L2 individually is already a CFL analog of a^n b^n."
+},
+{
+  id: 'toc-cfl-x11',
+  q: 'How many steps (production applications) does it take to derive a string of length 7 from a grammar in Chomsky Normal Form (with no epsilon productions)?',
+  options: ['7', '13', '14', '15'],
+  answer: 1,
+  marks: 1,
+  difficulty: 'medium',
+  type: 'numerical',
+  explanation: "In CNF every internal parse-tree node is binary (from A -> BC rules) and every leaf comes from a unary terminal rule (A -> a). For a string of length n, the parse tree has exactly n leaves, and a binary tree with n leaves has exactly n - 1 internal (branching) nodes. Each internal node corresponds to one application of a binary rule, and each leaf corresponds to one application of a terminal rule, so the total number of production applications is (n - 1) + n = 2n - 1. For n = 7, this gives 2(7) - 1 = 13. This 2n - 1 count is a frequently tested CNF numerical fact, contrasting with Greibach Normal Form, where each derivation step produces exactly one terminal, so a length-n string needs exactly n steps there instead."
+},
+{
+  id: 'toc-cfl-x12',
+  q: 'Which of the following correctly completes the sentence: "A deterministic PDA that accepts by empty stack can only accept a language that is..."',
+  options: ['finite', 'prefix-free (no accepted string is a proper prefix of another accepted string)', 'regular', 'closed under Kleene star'],
+  answer: 1,
+  marks: 2,
+  difficulty: 'hard',
+  type: 'concept',
+  explanation: "Empty-stack acceptance forces the machine to halt exactly when its stack becomes empty - there is no way to continue reading input afterward, since the stack (together with the state) determines all future behavior and an empty stack signals termination of the run. If a string w is accepted (stack empties right after reading w) and w is a proper prefix of some longer string w', then the stack was already empty after w, so the deterministic machine cannot process the remaining suffix of w' at all - w' could never be accepted by continuing that same run. Hence every accepted string must be prefix-free with respect to every other accepted string. This is not a claim about finiteness or regularity (many infinite, non-regular languages like {a^n b^n} are still prefix-free and accepted by empty-stack DPDAs), and it says nothing about Kleene-star closure. It exactly explains why final-state acceptance is the standard, more general convention used to define DCFL."
+},
+{
+  id: 'toc-cfl-x13',
+  q: 'Consider the CFG S -> aSa | bSb | a | b | epsilon. The language generated is',
+  options: ['{ a^n b^n : n >= 0 }', 'all palindromes over {a,b}', 'strings with equal numbers of a and b', '{ w w^R : w in {a,b}* }, the even-length palindromes only'],
+  answer: 1,
+  marks: 1,
+  difficulty: 'easy',
+  type: 'concept',
+  explanation: "Each application of S -> aSa or S -> bSb wraps a matching symbol on both the left and right ends of whatever S eventually generates in the middle, building a palindrome outside-in. The base cases S -> a and S -> b supply the exact middle symbol needed for an ODD-length palindrome, while S -> epsilon supplies the middle for an EVEN-length palindrome. So this grammar generates every string that reads the same forwards and backwards over {a,b}, both even and odd length - the full palindrome language, not just the even-length subset (which would drop the S -> a | b base cases) and not the unrelated {a^n b^n} or equal-count languages, which have no palindromic symmetry requirement at all. Answer: option B, all palindromes."
+},
+{
+  id: 'toc-cfl-x14',
+  q: 'Which of the following statements correctly distinguishes CFL closure properties from DCFL closure properties?',
+  options: ['CFL is closed under intersection but DCFL is not', 'CFL is closed under complement but DCFL is not', 'DCFL is closed under complement but CFL is not, while CFL is closed under union but DCFL is not (in general)', 'Both classes are closed under exactly the same set of operations'],
+  answer: 2,
+  marks: 2,
+  difficulty: 'hard',
+  type: 'pyq-style',
+  explanation: "The two classes have almost opposite closure signatures, which is precisely what makes this topic a favorite for GATE true/false batteries. General CFLs keep the 'grammar-friendly' operations - union (combine start symbols), concatenation, Kleene star, reversal, homomorphism - but lose the Boolean operations intersection and complement (witnessed by {a^n b^n c^m} intersect {a^m b^n c^n} = {a^n b^n c^n}, and complement failing by De Morgan from that). DCFLs behave oppositely: a DPDA's behavior on a string is a single deterministic run that can be complemented by careful accept/reject inversion, giving closure under complement, but DCFLs are NOT closed under union (or intersection, concatenation, Kleene star, reversal) since combining two deterministic recognitions can reintroduce the need to guess which sub-language a string belongs to. So the accurate pairing is option C; options claiming CFL keeps intersection or complement, or that the two classes match exactly, invert or erase this asymmetry."
+},
+{
+  id: 'toc-cfl-x15',
+  q: 'Let L be an inherently ambiguous context-free language. Which of the following must be TRUE?',
+  options: ['Every CFG generating L is ambiguous', 'L is not context-free', 'L has no PDA accepting it', 'L must involve three or more symbols in its alphabet'],
+  answer: 0,
+  marks: 1,
+  difficulty: 'medium',
+  type: 'concept',
+  explanation: "Inherent ambiguity is defined precisely as: L is a CFL (so it is context-free and some PDA does accept it - ruling out options B and C), but EVERY grammar that generates L, no matter how cleverly designed, has at least one string with two distinct parse trees. This is a strictly stronger and rarer condition than a single grammar happening to be ambiguous, since for most CFLs an equivalent unambiguous grammar can always be found even if some particular grammar for it is ambiguous. There is no requirement on alphabet size; the classic example { a^i b^j c^k : i = j or j = k } uses only three symbols but that is incidental to the definition, not a general requirement. So the only statement that must hold by definition is option A."
+}
+);
+
+window.GATE_DATA.questions['toc'].topics.find(function(t){return t.id==='toc-turing';}).questions.push(
+{
+  id: 'toc-turing-x1',
+  q: 'If L is recursively enumerable (RE) but NOT recursive, which of the following statements about complement(L) must be TRUE?',
+  options: ['complement(L) is RE', 'complement(L) is recursive', 'complement(L) is not RE', 'complement(L) is finite'],
+  answer: 2,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'concept',
+  explanation: "Use the central theorem: if L and complement(L) were both RE, then L would be recursive (run recognizers for both in parallel; exactly one halts, telling you the answer, and this always terminates). We are given L is RE but NOT recursive, so complement(L) cannot also be RE - if it were, the theorem would force L to be recursive, contradicting the hypothesis. So complement(L) is definitely not RE. It is also therefore not recursive (recursive implies RE), ruling out option B. Nothing about finiteness follows from this argument, ruling out option D. This is exactly the reasoning used to show complement(Halting Problem) is not RE, since the Halting Problem itself is the standard example of RE-but-not-recursive."
+},
+{
+  id: 'toc-turing-x2',
+  q: 'Which of the following statements about closure of the class RE (recursively enumerable languages) is FALSE?',
+  options: ['RE is closed under union', 'RE is closed under intersection', 'RE is closed under complementation', 'RE is closed under concatenation'],
+  answer: 2,
+  marks: 1,
+  difficulty: 'easy',
+  type: 'concept',
+  explanation: "Union: run recognizers for L1 and L2 by dovetailing their steps; accept as soon as either halts and accepts, which happens whenever the input is in L1 union L2. Intersection: run both recognizers to completion (dovetailed), accept only once both have halted and accepted, which happens exactly for L1 intersect L2 (if the input is not in the intersection, at least one recognizer may never halt, but that only means the combined machine loops on non-members, which is exactly allowed for RE). Concatenation and Kleene star also have standard RE-preserving constructions. Complementation fails: if RE were closed under complement, then together with closure under intersection it would give closure under complement of intersection etc., eventually forcing every RE language's complement to be RE too, making every RE-but-not-recursive language impossible by the central RE+co-RE=REC theorem - contradicting the Halting Problem's known status. So complementation, option C, is the false closure claim."
+},
+{
+  id: 'toc-turing-x3',
+  q: 'Which of the following is a correct characterization of a "Turing enumerator" (an enumeration machine that prints out members of a language one by one, possibly with repeats, on a separate output tape)?',
+  options: ['A language has an enumerator if and only if it is recursive', 'A language has an enumerator if and only if it is recursively enumerable', 'Every language, decidable or not, has an enumerator', 'An enumerator can only print finite languages'],
+  answer: 1,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'concept',
+  explanation: "The standard theorem states: a language L is recursively enumerable exactly when some enumerator machine prints exactly the strings of L (in some order, possibly with repetition, running forever if L is infinite). Direction one: given an enumerator E, build a recognizer for L that on input w runs E and accepts if w ever gets printed - this halts and accepts precisely on members of L (and may loop forever on non-members, which is the RE contract). Direction two: given a recognizer M for L, build an enumerator that dovetails M's execution on all strings in some systematic order (e.g. by length then lexicographic), printing w whenever the simulated run of M on w halts and accepts. This equivalence is with RE, not specifically with the strictly smaller recursive class (a recursive language trivially has an enumerator too, since recursive implies RE, but the equivalence names the larger class exactly). Options C and D misstate the scope and behavior of enumerators."
+},
+{
+  id: 'toc-turing-x4',
+  q: 'Which of the following sets is countably infinite?',
+  options: ['The set of all languages over {0,1}', 'The set of all Turing machines (over a fixed finite description alphabet)', 'The power set of the set of all binary strings', 'The set of all functions from binary strings to {0,1}'],
+  answer: 1,
+  marks: 1,
+  difficulty: 'easy',
+  type: 'concept',
+  explanation: "Every Turing machine has a finite string description (its states, transition table, and so on encoded over a fixed finite alphabet), so the set of all such descriptions can be listed in order of increasing length (and lexicographically within each length), giving a bijection with the natural numbers - the set of TMs is countably infinite. In contrast, the set of all languages over {0,1} is the power set of the countably infinite set of all binary strings, and Cantor's diagonal argument proves any power set of an infinite set is strictly larger (uncountable) than the original set. The set of all functions from binary strings to {0,1} is exactly the same size as this power set (each function corresponds to its characteristic set), so it too is uncountable. This size mismatch - countably many machines versus uncountably many languages - is precisely why most languages have no Turing machine at all, let alone a decider."
+},
+{
+  id: 'toc-turing-x5',
+  q: 'Given that the set of Turing machines is countable and the set of languages over {0,1} is uncountable, which conclusion correctly follows?',
+  options: ['Every recursively enumerable language has infinitely many equivalent Turing machines', 'There exist languages over {0,1} that are not recursively enumerable, in fact "almost all" languages are not RE', 'Every Turing machine recognizes a unique language not recognized by any other machine', 'The Halting Problem is the only non-recursive language'],
+  answer: 1,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: "Since RE languages are exactly the languages of some Turing machine, and there are only countably many machines, there are at most countably many RE languages. But the collection of ALL languages over {0,1} is uncountable (the power set of a countably infinite set of strings). A countable set can never exhaust an uncountable one, so there must exist languages with no recognizing Turing machine at all - they are not RE, let alone recursive. In fact, in the precise cardinality sense, the RE languages form a 'measure zero' sliver: countably many RE languages versus uncountably many possible languages overall. Option A is true incidentally (infinitely many machines can recognize the same language, e.g. by adding useless states) but is not the conclusion that follows from the cardinality mismatch. Option D is false - there are uncountably many non-recursive languages, the Halting Problem is just one famous example."
+},
+{
+  id: 'toc-turing-x6',
+  q: 'Suppose A ≤ B (A reduces to B) using a computable, always-terminating reduction function, and A is known to be RE but not recursive. Which conclusion about B is correct?',
+  options: ['B must also be RE but not recursive', 'B cannot be recursive, but B might or might not be RE', 'B must be recursive', 'No conclusion about B follows from this information'],
+  answer: 1,
+  marks: 2,
+  difficulty: 'hard',
+  type: 'concept',
+  explanation: "A reduction A <= B where a decider for B would yield a decider for A (the standard mapping/many-one reduction used in undecidability proofs) means: if B were recursive, then A would be recursive too (compose the reduction with B's decider). Since A is NOT recursive, B cannot be recursive either - that direction is solid. However, the reduction does not by itself guarantee B is RE: reductions used to prove undecidability only transfer the 'not decidable' property, not full RE-ness, unless the reduction is specifically constructed to also preserve RE membership (which many standard reductions do, but not automatically merely from 'A reduces to B' in the abstract). So the safe, always-correct conclusion is that B is not recursive, while B's own RE status needs separate verification - option B. Claiming B must be RE (option A) overreaches beyond what a generic reduction guarantees."
+},
+{
+  id: 'toc-turing-x7',
+  q: 'Which of the following is TRUE about REC (the class of recursive/decidable languages) in relation to RE?',
+  options: ['REC = RE', 'REC is a strict subset of RE, and RE minus REC is nonempty', 'RE is a strict subset of REC', 'REC and RE are incomparable classes, neither contains the other'],
+  answer: 1,
+  marks: 1,
+  difficulty: 'easy',
+  type: 'concept',
+  explanation: "Every recursive language trivially has a recognizer (the same decider, since halting on every input certainly halts and accepts on members), so REC is a subset of RE. The containment is strict: the Halting Problem is a well-known language that is RE (a universal machine can simulate and accept whenever the simulated machine halts and accepts) but not recursive (no machine can decide it for all inputs, by the standard diagonalization argument). So RE minus REC is nonempty, witnessed at least by the Halting Problem, confirming option B and ruling out the other three options, which either equate the classes or reverse/scramble the containment direction."
+},
+{
+  id: 'toc-turing-x8',
+  q: 'Let L1 and L2 both be recursive (decidable) languages over the same alphabet. Which of the following is guaranteed to be recursive?',
+  options: ['L1 intersect L2 only', 'L1 union L2 only', 'complement(L1) only', 'L1 intersect L2, L1 union L2, and complement(L1), all three'],
+  answer: 3,
+  marks: 1,
+  difficulty: 'easy',
+  type: 'concept',
+  explanation: "REC is closed under all the standard Boolean operations, unlike RE which loses complementation. Given deciders M1 for L1 and M2 for L2 (both guaranteed to halt on every input), build a decider for the intersection by running M1 then M2 in sequence and accepting only if both accept - this always halts since each component always halts. The union is similar, accepting if either accepts. The complement of L1 is decided by simply running M1 and flipping its accept/reject verdict, since M1 already halts on everything. All three constructions rely critically on the fact that recursive machines are guaranteed to halt, which is exactly why REC (unlike RE) is closed under complement - the sequential 'run to completion, then decide' technique works cleanly. So all three listed operations stay recursive: option D."
+},
+{
+  id: 'toc-turing-x9',
+  q: 'A "linear bounded automaton" (LBA) is a Turing machine whose tape usage is restricted to the length of the input (plus perhaps a small constant). Which statement about LBAs and decidability is TRUE?',
+  options: ['Every language accepted by an LBA is undecidable', 'The halting problem for LBAs (does an LBA halt on a given input) is decidable, because the LBA has only finitely many distinct configurations', 'LBAs can simulate any Turing machine without restriction', 'LBA emptiness is undecidable, just like general TM emptiness'],
+  answer: 1,
+  marks: 2,
+  difficulty: 'hard',
+  type: 'concept',
+  explanation: "Because an LBA's tape is bounded by the input length, the total number of distinct configurations (combination of state, head position, and tape contents) is finite - bounded by (number of states) x (input length) x (alphabet size ^ input length). If the LBA runs longer than this finite bound without halting, it must have repeated a configuration, and from that point on it would loop forever, so a decider can simulate the LBA up to that bound and safely declare non-halting (equivalently reject) if the bound is exceeded without halting. This makes the LBA halting problem decidable, in sharp contrast to the undecidable general Turing machine halting problem where the tape is unbounded and configurations are infinite in number. This configuration-counting argument is also exactly why every context-sensitive language (accepted by an LBA) is decidable. Options A, C, and D all contradict this: LBAs accept plenty of decidable languages, cannot simulate unbounded-tape TMs in general, and LBA emptiness is in fact decidable by exhaustive bounded search."
+},
+{
+  id: 'toc-turing-x10',
+  q: 'Which statement correctly relates nondeterministic Turing machines (NTMs) to deterministic Turing machines (DTMs) regarding decidability and recognizability?',
+  options: ['NTMs can decide/recognize strictly more languages than DTMs', 'NTMs and DTMs decide and recognize exactly the same classes of languages, but NTMs may run exponentially faster in the worst case', 'NTMs cannot be simulated by any DTM', 'NTMs are equivalent to DTMs in running time but not in language class'],
+  answer: 1,
+  marks: 1,
+  difficulty: 'easy',
+  type: 'concept',
+  explanation: "Any NTM can be simulated by a DTM that performs a breadth-first (dovetailed) exploration of all of the NTM's nondeterministic branches; the simulating DTM accepts if it ever finds an accepting branch, and this simulation preserves both the recursive and the recursively enumerable status of the language exactly. So NTMs add no language-class power over DTMs - the equivalence is exact for both RE and REC. What NTMs can do is solve problems asymptotically faster: a nondeterministic computation running in time t can require up to time 2^O(t) for the deterministic simulation to explore all branches (this exponential gap is the heart of the P versus NP question, phrased in complexity-class rather than decidability terms). So option B correctly separates the 'same power, different possible speed' relationship, while the other options incorrectly claim a difference in what is computable at all."
+},
+{
+  id: 'toc-turing-x11',
+  q: 'Which of the following is an example of a set that is RE but for which no algorithm is known (or provably possible) to also recognize its complement?',
+  options: ['The set of syntactically valid C programs', 'The Halting Problem HALT_TM = { <M, w> : M halts on w }', 'The set of even-length binary strings', 'The set of binary strings representing prime numbers'],
+  answer: 1,
+  marks: 1,
+  difficulty: 'easy',
+  type: 'concept',
+  explanation: "HALT_TM is RE: a universal machine can simulate M on w and accept the moment M halts (looping forever if M never halts is acceptable behavior for an RE recognizer). Its complement, 'M does not halt on w', is provably NOT RE: if it were, then together with HALT_TM's own RE recognizer, the central theorem would make HALT_TM recursive, contradicting the classical diagonalization proof that no algorithm decides halting for all machine-input pairs. So this is not merely 'no known algorithm' but a proven impossibility - a genuine example where complement-RE fails. The other three options are all straightforwardly decidable (checking C syntax, string length parity, and primality of a given binary number can all be done by ordinary terminating algorithms), so their complements are recursive too, making them poor examples of this asymmetry."
+},
+{
+  id: 'toc-turing-x12',
+  q: 'True or False batch: (i) If L is recursive, then L is also RE. (ii) If L is RE, then L is also recursive. (iii) If both L and complement(L) are RE, then L is recursive. (iv) If L is not RE, then complement(L) must be RE. Which combination is correct?',
+  options: ['(i) True, (ii) False, (iii) True, (iv) False', '(i) True, (ii) True, (iii) True, (iv) True', '(i) False, (ii) True, (iii) False, (iv) True', '(i) True, (ii) False, (iii) False, (iv) True'],
+  answer: 0,
+  marks: 2,
+  difficulty: 'hard',
+  type: 'pyq-style',
+  explanation: "(i) is true by definition: a decider is in particular a recognizer, since halting-and-accepting on members is all RE requires, and deciders also halt on non-members which is extra, not a violation. (ii) is false: the Halting Problem is the standard counterexample, RE but not recursive. (iii) is the central theorem of this topic and is true: dovetail recognizers for L and its complement, exactly one is guaranteed to halt first since every string is in exactly one of the two sets, giving a decider. (iv) is false: 'not RE' says nothing that forces the complement to be RE - in fact, EQ_TM (Turing machine equivalence) is a well-known language that is neither RE nor co-RE, so both it and its complement fail to be RE simultaneously, directly refuting (iv). So the correct combination is option A."
+},
+{
+  id: 'toc-turing-x13',
+  q: 'Which of the following correctly describes the relationship between "L is recognized by some Turing machine" and "L is generated by some Type-0 (unrestricted) grammar"?',
+  options: ['These are two independent, unrelated notions', 'They characterize exactly the same class of languages: the recursively enumerable languages', 'Type-0 grammars generate a strictly larger class than Turing machines can recognize', 'Turing machines recognize a strictly larger class than Type-0 grammars can generate'],
+  answer: 1,
+  marks: 1,
+  difficulty: 'easy',
+  type: 'concept',
+  explanation: "This is one of the foundational equivalence theorems bridging grammars and machines: given any Type-0 grammar, a Turing machine can be built that nondeterministically guesses a derivation sequence and checks whether it produces the input string, accepting exactly when some derivation matches, which recognizes precisely the language generated by the grammar. Conversely, given any Turing machine, a Type-0 grammar can be constructed that simulates the machine's computation history as a rewriting process, generating exactly the strings the machine accepts. Both directions are effective and exact, so 'recursively enumerable' is simultaneously defined as 'has a Turing machine recognizer' and 'is generated by some unrestricted grammar' - these are not competing definitions but two equivalent characterizations of the very same language class, ruling out any claim that one class is strictly larger than the other."
+},
+{
+  id: 'toc-turing-x14',
+  q: 'Which of the following statements is a correct application of the fact that RE is closed under intersection but not under complementation?',
+  options: ['If L1 and L2 are RE, then L1 intersect L2 is guaranteed RE, but complement(L1) is not guaranteed RE even if L1 is', 'If L1 is RE, then complement(L1) intersect L1 must be RE', 'RE closure under intersection implies RE closure under complementation by De Morgan', 'Since RE is closed under intersection, RE must also be closed under union of complements'],
+  answer: 0,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'concept',
+  explanation: "Closure under intersection for RE holds via the parallel-simulation construction (run both recognizers, accept only when both eventually halt-accept). This is a genuinely independent fact from complementation, and there is no valid De Morgan-style shortcut here the way there is for regular or recursive languages, precisely because De Morgan's law (A intersect B = complement(complement(A) union complement(B))) requires closure under BOTH complement and union to connect intersection and union; RE has union and intersection but is missing complement, breaking the chain that would otherwise force complement-closure. So option A correctly states the two facts as independent: intersection stays RE, but complementation of a single RE language is not generally RE (e.g. HALT_TM intersect HALT_TM = HALT_TM stays RE, but complement(HALT_TM) is famously not RE). Options C and D wrongly assume the De Morgan chain completes without the missing complement-closure link, and option B's expression complement(L1) intersect L1 is simply the empty set, always trivially RE for uninteresting reasons unrelated to the closure question."
+},
+{
+  id: 'toc-turing-x15',
+  q: 'Consider the diagonalization argument showing the set of all languages over {0,1} is uncountable. Which of the following best describes the technique used?',
+  options: ['List all Turing machines and show two of them accept the same language', 'Assume a bijection exists between binary strings and languages over {0,1}, then construct a language differing from the n-th listed language on the n-th string, giving a contradiction', 'Show that every language can be described by a finite regular expression', 'Count the number of DFA states needed for each language and show it grows without bound'],
+  answer: 1,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'concept',
+  explanation: "This is Cantor's classic diagonal argument adapted to languages: identify each language over {0,1} with its characteristic function (or, since binary strings can be enumerated w1, w2, w3, ..., identify a language with an infinite binary sequence of membership bits). Suppose for contradiction that all languages could be listed L1, L2, L3, .... Construct a new language D by flipping the membership of the n-th string relative to L_n: w_n is in D exactly when w_n is NOT in L_n. Then D differs from every L_n in the list (specifically at string w_n), so D cannot appear anywhere in the supposedly complete list - contradicting the assumption that the list was exhaustive. This proves no such enumeration of all languages exists, i.e. the set of languages over {0,1} is uncountable, which is exactly the cardinality gap that forces most languages to have no Turing machine at all (since TMs are only countably many)."
+}
+);
+
+window.GATE_DATA.questions['toc'].topics.find(function(t){return t.id==='toc-decidability';}).questions.push(
+{
+  id: 'toc-decidability-x1',
+  q: 'Which of the following properties of a given DFA M is DECIDABLE?',
+  options: ['Whether L(M) = Sigma* (M accepts every string)', 'Whether L(M) is context-free', 'Whether M has an equivalent PDA with fewer states', 'None of the above; all DFA properties are undecidable'],
+  answer: 0,
+  marks: 1,
+  difficulty: 'easy',
+  type: 'concept',
+  explanation: "Universality for DFAs is decidable: complement M by swapping final and non-final states (DFAs are closed under complement), then test the complement for emptiness using a simple reachability check for an accepting state - M is universal exactly when its complement is empty. Every regular language is trivially context-free, so 'is L(M) context-free' is a trivial YES for every DFA, technically decidable but a strange/trick question (still decidable, just not the intended distractor purpose here); the more interesting and directly useful decidable fact is universality, singled out in option A. Comparing to 'an equivalent PDA with fewer states' invokes a state-minimization question across different machine models that is not a standard decidable question in this form. In general, essentially every natural DFA/NFA property (emptiness, finiteness, universality, equivalence) is decidable, unlike the analogous TM properties."
+},
+{
+  id: 'toc-decidability-x2',
+  q: 'Which of the following properties of a given CFG G is UNDECIDABLE?',
+  options: ['Whether L(G) is empty', 'Whether a specific string w is in L(G)', 'Whether L(G) is regular', 'Whether L(G) is finite'],
+  answer: 2,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'concept',
+  explanation: "Emptiness is decidable via a productivity/reachability sweep over the grammar's nonterminals. Membership is decidable via the CYK algorithm after CNF conversion. Finiteness is decidable via a self-embedding cycle check in the nonterminal dependency graph. But testing whether L(G) is REGULAR is undecidable - there is no algorithm that, given an arbitrary CFG, always correctly determines whether the language it generates happens to also be regular. This sits alongside CFG equivalence, universality, and ambiguity as one of the well-known undecidable CFG properties, all typically established via a reduction from Post's Correspondence Problem. The key exam skill here is not lumping every CFG question into 'probably undecidable' - emptiness and finiteness are genuine, useful, decidable algorithms taught explicitly, while regularity, equivalence, universality, and ambiguity are the undecidable side of the table."
+},
+{
+  id: 'toc-decidability-x3',
+  q: 'Which of the following properties of a given Turing machine M is DECIDABLE?',
+  options: ['Whether M halts on the empty input within a specified number of k steps', 'Whether M halts on the empty input (with no step bound)', 'Whether L(M) is empty', 'Whether L(M) = Sigma*'],
+  answer: 0,
+  marks: 1,
+  difficulty: 'easy',
+  type: 'concept',
+  explanation: "A bounded simulation is always decidable: simulate M on the empty input for exactly k steps and check whether it has reached an accepting (or halting) configuration within that budget - this simulation itself always terminates after at most k steps, regardless of what M does afterward, so the answer is always computable. Removing the step bound turns this into the classical Halting Problem restricted to a fixed input, which is undecidable (a straightforward corollary of the general Halting Problem). Emptiness and universality of L(M) are both undecidable by Rice's theorem, since 'the language is empty' and 'the language is everything' are both nontrivial semantic properties. This question is designed to catch the common exam trap of reflexively marking every TM-related question as undecidable - adding an explicit step bound is exactly what makes option A the decidable one."
+},
+{
+  id: 'toc-decidability-x4',
+  q: 'Which of the following properties is NOT covered by Rice\'s theorem (i.e., Rice\'s theorem does not apply to determine its decidability status)?',
+  options: ['Whether L(M) contains at least one string of length 5', 'Whether L(M) is empty', 'Whether M has more than 100 states in its transition table', 'Whether L(M) is finite'],
+  answer: 2,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'concept',
+  explanation: "Rice's theorem applies only to properties of the LANGUAGE a machine recognizes (semantic properties), and only when the property is nontrivial (true for some RE languages and false for others). 'L(M) contains a string of length 5', 'L(M) is empty', and 'L(M) is finite' are all genuinely about the language, and each is nontrivial (some languages have length-5 strings, some don't; some are empty, some aren't; some are finite, some aren't) - Rice's theorem correctly declares all three undecidable. But 'M has more than 100 states' is a SYNTACTIC property of the machine's own description/code, not a property of the language it recognizes - two completely different-looking machines with different state counts can recognize the exact same language. Rice's theorem simply does not speak to this kind of question, and in fact it is trivially decidable: just count the states listed in M's description."
+},
+{
+  id: 'toc-decidability-x5',
+  q: 'Which of the following is TRUE regarding the reduction A ≤ B (A reduces to B via a computable transformation), used to prove undecidability?',
+  options: ['If A is undecidable and A ≤ B, then B is undecidable', 'If B is decidable and A ≤ B, then A is decidable', 'If A ≤ B and B is undecidable, then A must also be undecidable', 'Both option A and option B are correct consequences of A ≤ B'],
+  answer: 3,
+  marks: 2,
+  difficulty: 'hard',
+  type: 'concept',
+  explanation: "A <= B means a decider for B could be used (via the computable transformation) to build a decider for A. Two valid consequences follow from this single implication: (1) contrapositive-forward - if A is undecidable, B cannot be decidable either, since decidable B would make A decidable, a contradiction; this is option A, the standard way reductions PROVE new problems undecidable. (2) direct - if B actually is decidable, then A is decidable too, by literally running the construction; this is option B, the standard way reductions transfer decidability downward. Option C reverses the valid direction: A <= B and B undecidable tells you NOTHING about A (A might still be perfectly decidable; the reduction only promises that solving B would help solve A, not the other way). Since both A and B (the options) are individually valid and neither contradicts the other, the fully correct answer is option D, both valid consequences together, while option C is the classic backwards-reduction trap."
+},
+{
+  id: 'toc-decidability-x6',
+  q: 'Consider the property P(M): "the string 0110 appears somewhere in the transition table description of M written in a fixed encoding." Is the problem "given M, does P(M) hold" decidable?',
+  options: ['Undecidable by Rice\'s theorem since it is a nontrivial property', 'Decidable, because it is a syntactic property of M\'s description, not a semantic property of L(M)', 'Undecidable because it depends on the encoding scheme used', 'Decidable only if M is guaranteed to halt on all inputs'],
+  answer: 1,
+  marks: 2,
+  difficulty: 'hard',
+  type: 'concept',
+  explanation: "Rice's theorem is strictly about properties of the RECOGNIZED LANGUAGE, and explicitly does not apply to properties of the machine's own textual description or code. Whether the specific bit pattern 0110 literally occurs in M's encoded transition table is a purely syntactic, mechanical, string-matching question about a finite string (the encoding of M) - you can just scan the finite description for the substring 0110 directly, which always halts and gives a correct yes/no answer. This is decidable regardless of what language M happens to recognize, and regardless of whether M halts on any particular input, since the question never runs M at all - it only reads M's static description. This is exactly the kind of question designed to test whether a student over-applies Rice's theorem to any statement merely because it mentions a Turing machine; the correct habit is to first ask 'is this about the language, or about the code?'."
+},
+{
+  id: 'toc-decidability-x7',
+  q: 'Which of the following statements about EQ_TM = { <M1, M2> : L(M1) = L(M2) } is TRUE?',
+  options: ['EQ_TM is decidable', 'EQ_TM is RE but not decidable', 'EQ_TM is undecidable, and in fact not even RE or co-RE', 'EQ_TM is decidable exactly when both M1 and M2 always halt'],
+  answer: 2,
+  marks: 2,
+  difficulty: 'hard',
+  type: 'concept',
+  explanation: "EQ_TM is one of the strongest undecidability results in the standard syllabus. It is certainly undecidable by Rice's theorem, since 'the two machines recognize the same language' is a nontrivial semantic property when phrased via a fixed reference machine. But it is even worse than problems like the Acceptance Problem: EQ_TM is not RE (there is no algorithm that merely confirms 'yes, equal' whenever it is true, since confirming equality of two possibly-infinite languages cannot be done by any finite positive certificate scheme in general), and it is also not co-RE (no algorithm merely confirms 'no, not equal' either, since witnessing an actual difference could require unbounded search when both languages are complex). This puts EQ_TM in neither RE nor co-RE, a class strictly harder than problems like the Halting Problem, which is at least RE. Option D is a nonsensical restriction with no basis in the actual result."
+},
+{
+  id: 'toc-decidability-x8',
+  q: 'Which of the following statements about the property "L(M) is decidable (recursive)", as a property of a Turing machine M, is TRUE?',
+  options: ['This property is trivial, so it is automatically decidable to test', 'This property is nontrivial and semantic, so by Rice\'s theorem the problem "given M, is L(M) recursive?" is undecidable', 'This property can never apply since L(M) is always RE by definition of M being a Turing machine', 'This property is decidable specifically because recursive languages have deciders'],
+  answer: 1,
+  marks: 2,
+  difficulty: 'hard',
+  type: 'concept',
+  explanation: "Check the Rice's theorem conditions carefully. The property is about the LANGUAGE L(M), so it is semantic, not about M's code - condition one holds. Is it nontrivial? Yes: some Turing machines recognize recursive languages (e.g. a machine that always halts, recognizing a trivially decidable language), and other Turing machines recognize RE-but-not-recursive languages (e.g. a machine that simulates the universal machine to recognize the Halting Problem) - both possibilities genuinely occur among RE languages, so the property is neither always true nor always false. Both Rice's theorem conditions are satisfied, so the problem 'given an arbitrary M, is L(M) recursive?' is undecidable. This is a subtle and commonly missed case, since it feels like it should be answerable by 'just check if M always halts' - but that check itself (does M halt on every input) is exactly as undecidable, by an equivalent Rice's theorem argument, ruling out options A, C, and D."
+},
+{
+  id: 'toc-decidability-x9',
+  q: 'Which of the following statements is TRUE about reductions used to prove decidability (as opposed to undecidability)?',
+  options: ['To prove a problem B is decidable, reduce a known undecidable problem to B', 'To prove a problem B is decidable, exhibit a direct algorithm, or reduce B to a problem already known to be decidable, in that direction', 'Decidability can only be proven by reducing FROM B to the halting problem', 'Every problem that reduces to an undecidable problem is itself undecidable'],
+  answer: 1,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'concept',
+  explanation: "Proving decidability requires either giving an explicit terminating algorithm, or showing B can be solved USING a decider for some already-known-decidable problem C (i.e. reduce B to C, the opposite direction from the standard undecidability-proof template). Option A describes exactly the undecidability-proof pattern, not decidability - reducing a known-undecidable problem TO B shows B is at least as hard as that problem, hence undecidable, the opposite conclusion. Option C is a fabricated, overly narrow restriction with no basis in the actual proof technique (there is no requirement to specifically target the halting problem). Option D is false and is precisely the classic 'backwards reduction' fallacy: a problem reducing INTO an undecidable problem tells you nothing, since B <= (some undecidable problem) says solving the undecidable problem would help solve B, which is no information at all about B's own difficulty - B could easily still be decidable on its own."
+},
+{
+  id: 'toc-decidability-x10',
+  q: 'Consider two questions about a Turing machine M with a designated state q5. (i) Given M and a specific input w, does M\'s computation on w ever enter state q5? (ii) Given only M\'s transition table, with no reference to any input, is q5 reachable from q0 by following some sequence of transitions in the state-transition diagram (treated as a plain directed graph)? Which combination correctly states their decidability?',
+  options: ['(i) decidable, (ii) decidable', '(i) undecidable, (ii) decidable', '(i) decidable, (ii) undecidable', '(i) undecidable, (ii) undecidable'],
+  answer: 1,
+  marks: 2,
+  difficulty: 'hard',
+  type: 'pyq-style',
+  explanation: "Question (i) requires actually simulating M on w to see whether q5 ever comes up during a computation that may run forever; it is undecidable, by a direct reduction from the acceptance problem A_TM - build M' from M so that M' enters q5 exactly when the original M would accept w, then a decider for (i) applied to M' and w would decide A_TM, which is impossible. Question (ii), in contrast, never mentions running M on anything - it only asks about the static transition diagram, treating states as graph nodes and transitions as edges regardless of tape symbols or input. This is answered by an ordinary reachability search (BFS or DFS) from q0 in a finite graph, which always terminates and is fully decidable. The contrast is exactly the syntactic-versus-semantic distinction: (ii) is a question about M's fixed, finite code structure, while (i) is a question about an unbounded, possibly nonterminating computation."
+},
+{
+  id: 'toc-decidability-x11',
+  q: 'Which of the following is the correct decidability status of "given TM M and string w, does M loop forever on w (never halts)"?',
+  options: ['Decidable, by simulating M on w and checking if it halts within a computed bound', 'Undecidable, since it is the complement of the halting problem restricted to this instance, and complement(HALT_TM) is not RE', 'Decidable, because looping forever is the negation of a decidable property', 'Undecidable, but it is at least RE'],
+  answer: 1,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'concept',
+  explanation: "Whether M halts on w (HALT_TM) is RE but not recursive. Its complement - 'M does NOT halt on w', exactly the looping question here - is therefore not RE (by the central theorem: if it were RE alongside HALT_TM's own RE recognizer, HALT_TM would become recursive, a contradiction). Not being RE means there isn't even a one-sided semi-algorithm that correctly confirms 'yes, it loops' whenever that is true; you cannot get partial credit for this problem the way you can for HALT_TM itself. So it is undecidable and NOT RE, worse than being merely undecidable-but-RE, ruling out option D. There is no computable universal bound to simulate up to (that is exactly what makes the original halting problem hard), so no simulation-based decision procedure exists, ruling out options A and C."
+},
+{
+  id: 'toc-decidability-x12',
+  q: 'Which of the following statements correctly applies the fact "if A ≤ B and A is undecidable, then B is undecidable" to conclude that the problem E_TM = { <M> : L(M) = empty set } is undecidable?',
+  options: ['Reduce E_TM to A_TM (the acceptance problem) to show A_TM is undecidable', 'Reduce A_TM to E_TM: build M\' that ignores its input and simulates M on w, so L(M\') is empty exactly when M does not accept w; a decider for E_TM would then decide A_TM', 'Show that E_TM and A_TM are the same problem under renaming', 'Reduce the regular-language emptiness problem to E_TM'],
+  answer: 1,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'concept',
+  explanation: "The correct reduction direction is FROM the already-known-undecidable problem A_TM TO the target problem E_TM. Construct M' that, on any input x, ignores x entirely and instead simulates M on the fixed string w; M' accepts x if and only if M accepts w. Then L(M') is either empty set (if M does not accept w) or all of Sigma* (if M does accept w) - either way, testing 'is L(M') empty?' via a hypothetical decider for E_TM directly answers 'does M accept w?', which is exactly A_TM. Since A_TM is known undecidable, this shows E_TM cannot be decidable either (option B). Option A reduces in the useless backwards direction. Option C is false, they are genuinely different problems even though related by this construction. Option D reduces a decidable problem (regular emptiness) to E_TM, which establishes nothing about E_TM's difficulty, since a decidable-to-anything reduction is uninformative."
+},
+{
+  id: 'toc-decidability-x13',
+  q: 'Given a CFG G and a DFA R for a regular language over the same alphabet, which of the following correctly states the decidability of the two questions "is L(G) a subset of L(R)?" and "is L(G) = L(R)?"',
+  options: ['Subset is decidable; equality is undecidable in general', 'Both are decidable', 'Both are undecidable', 'Subset is undecidable; equality is decidable'],
+  answer: 0,
+  marks: 2,
+  difficulty: 'hard',
+  type: 'concept',
+  explanation: "L(G) is a subset of L(R) exactly when L(G) intersect complement(L(R)) is empty. Complementing the DFA for R is free (swap final states), so complement(L(R)) is regular, and CFL intersected with a regular language is again context-free (run the PDA for G and the DFA for complement(R) in lockstep). CFG emptiness is decidable, so this subset question is decidable. Equality is a different matter: taking R to be the specific DFA accepting Sigma* itself, 'L(G) = L(R)' becomes exactly 'L(G) = Sigma*', the CFG universality problem, which is a landmark UNDECIDABLE problem (reduces from Post's Correspondence Problem). Since general CFG-versus-regular equality would in particular have to solve this special case, equality testing cannot be decidable in general, even though the one-directional subset test is. This subset-versus-equality asymmetry is a subtle and easily-missed distinction."
+},
+{
+  id: 'toc-decidability-x14',
+  q: 'A problem X is known to be RE but not recursive. Which of the following CANNOT be concluded about X directly from this information alone?',
+  options: ['X is undecidable', 'X has a semi-decider (a machine halting-and-accepting on every yes-instance)', 'complement(X) is RE', 'X is not recursive'],
+  answer: 2,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'concept',
+  explanation: "By definition, RE-but-not-recursive already directly gives: X is undecidable (options A, D restate 'not recursive' in different words, both correctly following) and X has a semi-decider (that is exactly what RE means - a recognizer halting-and-accepting on every member, though it need not halt on non-members). But complement(X) being RE does NOT follow - in fact, by the central RE+co-RE=REC theorem, if complement(X) were also RE, X would have to be recursive, directly contradicting the given hypothesis that X is not recursive. So complement(X) being RE is not just unconfirmed but actually impossible given the stated facts, making option C the one that cannot (indeed must not) be concluded. This question tests precise handling of what a hypothesis does and does not entail, a common source of GATE errors when students assume unrelated closure facts transfer automatically."
+},
+{
+  id: 'toc-decidability-x15',
+  q: 'Which of the following is the correct decidability status of the problem: "given two DFAs M1 and M2, is L(M1) intersect L(M2) infinite?"',
+  options: ['Undecidable, since it requires reasoning about an infinite intersection', 'Decidable: build the product DFA for the intersection, then check the product automaton\'s reachable-and-co-reachable graph for a cycle', 'Decidable only when both M1 and M2 are acyclic', 'Undecidable, by Rice\'s theorem'],
+  answer: 1,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'concept',
+  explanation: "Regular languages are closed under intersection via the standard product construction, so L(M1) intersect L(M2) is itself regular, recognized by a product DFA whose states are pairs of states from M1 and M2. Finiteness of a regular language is decidable: a regular language is infinite exactly when its minimal (or any) accepting automaton has a cycle that lies on some path from the start state to an accepting state (a state that is both reachable from the start and can reach an accepting state). This is a straightforward graph algorithm on the product automaton, giving a fully decidable procedure - option B. Rice's theorem (option D) applies only to Turing machine language properties, not to finite-automaton properties, which is a common category confusion; DFA-based questions are essentially always decidable, in sharp contrast to their Turing-machine analogues."
+}
+);
+
+window.GATE_DATA.questions['toc'].topics.find(function(t){return t.id==='toc-hierarchy';}).questions.push(
+{
+  id: 'toc-hierarchy-x1',
+  q: 'Which of the following is a valid example of a context-sensitive language that is NOT context-free?',
+  options: ['{ a^n b^n c^n : n >= 0 }', '{ a^n b^n : n >= 0 }', '{ a^n b^m : n, m >= 0 }', '{ w in {a,b}* : w is a palindrome }'],
+  answer: 0,
+  marks: 1,
+  difficulty: 'easy',
+  type: 'concept',
+  explanation: "{ a^n b^n c^n } is the standard textbook witness of the CFL-to-CSL gap: a context-sensitive grammar can enforce all three counts being equal using a linear-bounded, mark-and-check strategy (cross off one a, one b, one c per sweep of the tape, which never exceeds the input's length), so the language is context-sensitive, but the CFL pumping lemma proves no single stack can maintain two independent matching relations at once, ruling out context-freeness. The other three options are all comfortably context-free: {a^n b^n} and palindromes each need only one stack-checkable relation, and {a^n b^m} with independent n, m is simply a*b*, which is even regular. So option A is the only genuine CSL-not-CFL example among the four."
+},
+{
+  id: 'toc-hierarchy-x2',
+  q: 'Which of the following statements about context-sensitive languages (CSL) is TRUE?',
+  options: ['CSL is closed under union, intersection, and complement', 'CSL is closed under union and intersection but not complement', 'Whether a given CSL grammar generates the empty language is decidable in general', 'Every context-sensitive language is regular'],
+  answer: 0,
+  marks: 2,
+  difficulty: 'hard',
+  type: 'concept',
+  explanation: "CSLs are closed under union, intersection, AND complementation - complementation closure for CSLs is a genuinely deep result (the Immerman-Szelepcsenyi theorem, originally proved in the complexity-theory setting for nondeterministic space classes, which context-sensitive languages coincide with via linear bounded automata). This makes CSL closure properties richer than CFL's (which loses both intersection and complement) even though CSL sits above CFL in the hierarchy - closure properties do not simply get worse as a class grows. Emptiness for CSGs is actually UNDECIDABLE (unlike CFG emptiness), since a CSG can simulate enough of a Turing machine's bounded behavior to encode the acceptance problem restricted to linear space, making option C false. CSLs are certainly not all regular; {a^n b^n c^n} itself is a non-regular CSL, ruling out option D."
+},
+{
+  id: 'toc-hierarchy-x3',
+  q: 'For which of the following classes in the Chomsky hierarchy is the MEMBERSHIP problem ("does this string belong to the language generated/accepted by this description?") DECIDABLE?',
+  options: ['Regular (DFA/regex) only', 'Regular and context-free only', 'Regular, context-free, and context-sensitive, but not unrestricted (Type-0)', 'All four classes, including Type-0'],
+  answer: 2,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'concept',
+  explanation: "Membership is decidable for regular languages (simulate the DFA, which always halts after reading the input), for context-free languages (the CYK algorithm runs in O(n^3) after CNF conversion, always terminating), and for context-sensitive languages (simulate the linear bounded automaton, which has only finitely many configurations bounded by the input length, so either it halts within that bound or it must be looping and can be safely rejected). For unrestricted Type-0 grammars, however, membership is exactly the Turing machine acceptance problem, and there is no length bound on the tape or the number of derivation steps, so membership is undecidable in general (though it remains recursively enumerable - you can always semi-decide by search). This progression - decidable for the first three, only semi-decidable for the last - is a key structural fact distinguishing bounded-resource models (finite automaton, PDA, LBA) from the unbounded Turing machine."
+},
+{
+  id: 'toc-hierarchy-x4',
+  q: 'Which grammar production shape correctly identifies a Type-1 (context-sensitive) grammar, distinguishing it from Type-0?',
+  options: ['Every production has the form alpha A beta -> alpha gamma beta, with gamma nonempty (length never decreases, except possibly S -> epsilon with S not on any right side)', 'Every production has exactly one nonterminal on the left and any string on the right', 'Every production is of the form A -> BC or A -> a', 'Every production has a single terminal at the start of the right-hand side'],
+  answer: 0,
+  marks: 1,
+  difficulty: 'easy',
+  type: 'concept',
+  explanation: "Type-1 productions have the noncontracting form alpha A beta -> alpha gamma beta, where A is rewritten to a nonempty string gamma only in the context surrounded by alpha and beta (hence 'context-sensitive'), and crucially |gamma| >= 1 ensures the right-hand side is never shorter than the left-hand side - the only allowed exception is S -> epsilon, permitted solely when S never appears on the right side of any other production. This length-nondecreasing property is exactly what a linear bounded automaton exploits: since no derivation step ever shrinks the string, generating a string of length n requires the working tape never to exceed length n. Option B describes Type-2 (context-free, single nonterminal on the left, but the right side is unrestricted so it can shrink or grow freely), option C describes CNF specifically (a normal form of Type-2), and option D describes Greibach Normal Form, not a hierarchy level at all."
+},
+{
+  id: 'toc-hierarchy-x5',
+  q: 'Which of the following correctly places recursive (decidable) languages, REC, in the standard hierarchy?',
+  options: ['REC is one of the four classical Chomsky types, sitting between Type-1 and Type-2', 'REC is not one of the four classical Chomsky types, but it sits strictly between CSL and RE: CSL is a proper subset of REC, which is a proper subset of RE', 'REC is identical to CSL', 'REC is identical to RE'],
+  answer: 1,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'concept',
+  explanation: "The four classical Chomsky types are exactly Regular, Context-Free, Context-Sensitive, and Type-0 (RE); REC (decidable languages) is not one of the original four grammar-defined types, but it is an essential extra layer that sits strictly between CSL and RE. Every CSL is decidable, because a linear bounded automaton has only finitely many configurations bounded by input length, so a decider can detect non-halting via configuration repetition; but there exist decidable languages that are not context-sensitive (since some decidable languages require more than linear space to recognize, by direct diagonalization over space-bounded machines), so CSL is a strict subset of REC. And REC is a strict subset of RE, witnessed classically by the Halting Problem, which is RE but not decidable. So the correct full chain is Regular subset CFL subset CSL subset REC subset RE, with REC as an added, non-grammar-type layer - option B."
+},
+{
+  id: 'toc-hierarchy-x6',
+  q: 'Which of the following is the standard witness demonstrating that CSL is a strict (proper) subset of RE?',
+  options: ['{ a^n b^n c^n : n >= 0 }, since it is not regular', 'The Acceptance Problem A_TM, since it is RE but provably not decidable, hence not context-sensitive (as every CSL is decidable)', 'The empty language, since it is trivially in every class', '{ w w^R : w in {a,b}* }, since it is not a DCFL'],
+  answer: 1,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'concept',
+  explanation: "To prove CSL is a PROPER subset of RE, you need a language that IS in RE but demonstrably is NOT in CSL. A_TM (or the Halting Problem) fits perfectly: it is RE (a universal machine can simulate and accept whenever the simulated machine halts-accepts), but it is provably undecidable by diagonalization. Since every context-sensitive language is decidable (via the linear-bounded-automaton configuration-counting argument - finitely many configurations bounded by input length means a decider can detect and reject non-terminating simulation loops), and A_TM is not decidable, A_TM cannot be context-sensitive. This is exactly the separation needed. The other options either separate the wrong pair of classes ({a^n b^n c^n} separates CFL from CSL, not CSL from RE) or are trivial/irrelevant to a strictness argument (the empty language belongs to every level, proving nothing about separation)."
+},
+{
+  id: 'toc-hierarchy-x7',
+  q: 'Which of the following grammars is a valid regular (Type-3) grammar in strict right-linear form?',
+  options: ['S -> aA | b, A -> aS | b', 'S -> aA | Ab, A -> b', 'S -> AB, A -> a, B -> b', 'S -> aSa | b'],
+  answer: 0,
+  marks: 1,
+  difficulty: 'medium',
+  type: 'concept',
+  explanation: "Strict right-linear form requires every production to be A -> aB (a single terminal followed by at most one nonterminal, appearing at the RIGHT end) or A -> a (or A -> epsilon for the start symbol). Option A fits perfectly: every right-hand side has the nonterminal, if present, in the rightmost position after a leading terminal, consistently throughout the whole grammar. Option B mixes forms within a single grammar: S -> aA is right-linear (nonterminal on the right) but S -> Ab is left-linear (nonterminal on the left) - mixing the two forms in one grammar can define non-regular languages, which is exactly why the definition insists on choosing one direction consistently for the entire grammar. Option C has two nonterminals on one right-hand side (A -> BC shape), which is Type-2 (context-free), not Type-3. Option D, S -> aSa | b, wraps a terminal on BOTH sides of the nonterminal, which is neither strictly right- nor left-linear - it actually generates {a^n b a^n}, a non-regular language, confirming it falls outside Type-3."
+},
+{
+  id: 'toc-hierarchy-x8',
+  q: 'Which of the following correctly identifies the grammar type (Chomsky classification) for the production set S -> aSBC, S -> abc, CB -> BC, bB -> bb, bC -> bc, cC -> cc?',
+  options: ['Type-3 (regular), since the alphabet is small', 'Type-2 (context-free), because every left-hand side is a single nonterminal', 'Type-1 (context-sensitive), because productions like CB -> BC and bB -> bb are noncontracting but not single-nonterminal-on-the-left', 'Type-0, because no restriction can classify this grammar at all'],
+  answer: 2,
+  marks: 2,
+  difficulty: 'hard',
+  type: 'concept',
+  explanation: "Scan every production for its shape. S -> aSBC and S -> abc have a single nonterminal on the left, fitting Type-2's requirement alone, but the remaining productions - CB -> BC, bB -> bb, bC -> bc, cC -> cc - all have MULTIPLE symbols on the left-hand side (two symbols each), which immediately disqualifies the grammar from Type-2 (context-free requires strictly one nonterminal on the left in EVERY production). Check the Type-1 requirement instead: is every production noncontracting (right-hand side length >= left-hand side length)? CB -> BC has length 2 -> 2 (equal, fine), bB -> bb has length 2 -> 2 (fine), bC -> bc and cC -> cc are similarly length-preserving, and S -> aSBC grows the string. Since no production ever shrinks the string, the whole grammar is noncontracting, exactly the defining property of Type-1 (context-sensitive) grammars - and in fact this specific grammar is the classical CSG that generates { a^n b^n c^n : n >= 1 } using the CB -> BC commutation trick to reorder markers before converting them to terminals in the correct count."
+},
+{
+  id: 'toc-hierarchy-x9',
+  q: 'Which of the following statements about the STRICTNESS of the containment CFL subset CSL is correctly justified?',
+  options: ['It follows immediately because CFL is closed under intersection while CSL is not', 'It is witnessed by { a^n b^n c^n : n >= 0 }, which is context-sensitive (generable by a noncontracting grammar / accepted by an LBA) but fails the CFL pumping lemma so cannot be context-free', 'It cannot be proven; the two classes are conjectured but not known to be different', 'It follows because every CSL grammar has strictly more productions than any CFG'],
+  answer: 1,
+  marks: 1,
+  difficulty: 'medium',
+  type: 'concept',
+  explanation: "Strictness proofs need a concrete witness language belonging to the larger class but demonstrably excluded from the smaller one. {a^n b^n c^n} is exactly such a witness for CFL versus CSL: it has a noncontracting (Type-1) grammar and is decidable by a linear bounded automaton within input-length space, so it is context-sensitive; but it fails the context-free pumping lemma (any candidate split uvwxy with |vwx| bounded can touch at most two of the three blocks, so pumping unbalances the third), ruling out context-freeness entirely. Option A misapplies a closure-property fact (which does hold, CFL lacks intersection-closure that CSL enjoys via Immerman-Szelepcsenyi-style results) as if it were itself a direct strictness proof, when a genuine separating witness language is the actual standard method. This hierarchy gap is thoroughly established, not merely conjectured, ruling out option C; option D is simply not a meaningful or valid separation criterion between grammar classes."
+},
+{
+  id: 'toc-hierarchy-x10',
+  q: 'Which of the following is TRUE regarding deciding "is a given language in class X regular" for various X in the Chomsky hierarchy?',
+  options: ['Given a DFA, deciding if the language is regular is trivially always yes; given a CFG, deciding if L(G) is regular is undecidable', 'Given a CFG, deciding if L(G) is regular is decidable using the pumping lemma directly', 'Given a DFA, deciding if the language is regular is undecidable', 'Regularity testing is undecidable for every input representation, including DFAs'],
+  answer: 0,
+  marks: 1,
+  difficulty: 'easy',
+  type: 'concept',
+  explanation: "A DFA already IS a finite automaton, so the language it accepts is regular by definition - there is nothing to test, the answer is trivially always 'yes' (a slightly degenerate but correct decidable fact, since a constant-yes function is a valid, terminating decision procedure). But given an arbitrary CFG, deciding whether L(G) happens to also be regular is a genuinely undecidable problem, sitting alongside CFG equivalence, universality, and ambiguity as one of the classical undecidable CFG properties. The pumping lemma alone (option B) cannot decide this in general - it can sometimes show a specific language is NOT regular by exhibiting a violation, but it cannot be turned into a general algorithm that correctly answers the regularity question for every possible CFG, since satisfying the pumping property is only necessary, never sufficient, for regularity, and there is no algorithmic way to check 'does this CFG's language satisfy the pumping property for all sufficiently long strings' in finite time for every case."
+},
+{
+  id: 'toc-hierarchy-x11',
+  q: 'Which of the following is the correct machine model / grammar type correspondence?',
+  options: ['Type-0 grammars correspond to Turing machines; Type-1 to linear bounded automata; Type-2 to pushdown automata; Type-3 to finite automata', 'Type-0 grammars correspond to pushdown automata; Type-1 to Turing machines; Type-2 to linear bounded automata; Type-3 to finite automata', 'All four types correspond to Turing machines, differing only in their allowed running time', 'Type-3 grammars correspond to pushdown automata, and Type-2 to finite automata'],
+  answer: 0,
+  marks: 1,
+  difficulty: 'easy',
+  type: 'concept',
+  explanation: "This is the foundational Chomsky-Schutzenberger correspondence to memorize cold: Type-0 (unrestricted) grammars generate exactly the languages recognized by (unbounded-tape) Turing machines - the RE languages. Type-1 (context-sensitive, noncontracting) grammars correspond exactly to linear bounded automata, Turing machines restricted to tape length proportional to the input. Type-2 (context-free) grammars correspond exactly to (nondeterministic) pushdown automata. Type-3 (regular, right- or left-linear) grammars correspond exactly to finite automata (DFA/NFA, equal power). Each level's machine model is progressively more restricted in its memory resource (unbounded tape, linear tape, a single stack, no auxiliary memory at all beyond finite states), which is precisely why each level's language class is progressively smaller, giving the strict containment chain Regular subset CFL subset CSL subset RE."
+},
+{
+  id: 'toc-hierarchy-x12',
+  q: 'Consider the language L = { a^n b^n : n >= 0 } union { a^n b^(2n) : n >= 0 }. What is the tightest level of the Chomsky hierarchy that correctly classifies L?',
+  options: ['Regular', 'Context-free but not regular', 'Context-sensitive but not context-free', 'Recursively enumerable but not context-sensitive'],
+  answer: 1,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'concept',
+  explanation: "Each piece is individually a simple, standard CFL: {a^n b^n} via S1 -> aS1b | epsilon, and {a^n b^(2n)} via S2 -> aS2bb | epsilon. CFLs are closed under union, so combining them with S -> S1 | S2 gives a valid CFG for the whole union, confirming L is context-free. It is not regular: apply Myhill-Nerode directly to L using the strings a^i for i = 0, 1, 2, .... For i not equal to j, the suffix z = b^i puts a^i z = a^i b^i into L (via the first piece), while a^j z = a^j b^i is neither of the form a^n b^n (since j is not equal to i) nor of the form a^n b^(2n) (since i is not equal to 2j in general) - so a^j z falls outside L. This distinguishes every pair a^i, a^j, giving infinitely many equivalence classes, so L needs unbounded memory and is not regular. A single stack (via the union grammar) suffices for generation, giving the tightest classification: context-free but not regular, option B."
+},
+{
+  id: 'toc-hierarchy-x13',
+  q: 'True/False: (i) The class of context-sensitive languages is closed under complementation. (ii) The class of context-sensitive languages is closed under Kleene star. (iii) Every context-sensitive language is decidable. (iv) Every decidable language is context-sensitive. Which combination is correct?',
+  options: ['(i) True, (ii) True, (iii) True, (iv) False', '(i) False, (ii) True, (iii) True, (iv) True', '(i) True, (ii) False, (iii) False, (iv) True', '(i) False, (ii) False, (iii) False, (iv) False'],
+  answer: 0,
+  marks: 2,
+  difficulty: 'hard',
+  type: 'pyq-style',
+  explanation: "(i) is true, and famously nontrivial: CSL closure under complement is the Immerman-Szelepcsenyi theorem, proved via nondeterministic space-bounded computation techniques rather than a simple direct construction. (ii) is also true: CSLs are closed under concatenation and Kleene star using standard grammar-combination techniques adapted to keep productions noncontracting. (iii) is true, and is the key fact linking CSL to the wider hierarchy: an LBA has only finitely many configurations bounded by input length, so a decider can detect looping via configuration repetition and safely reject, guaranteeing every CSL is decidable. (iv) is FALSE: there exist decidable languages that require more than linear space to even write down a certificate or run a natural decision procedure, so REC is a strictly larger class than CSL (CSL is a proper subset of REC, not equal to it) - a decidable language need not be recognizable within input-bounded tape. So the correct combination is option A."
+},
+{
+  id: 'toc-hierarchy-x14',
+  q: 'Which of the following grammars correctly has productions that would be classified as Type-2 (context-free) but NOT Type-3 (regular)?',
+  options: ['S -> aA, A -> bB, B -> c', 'S -> aSb | epsilon', 'S -> aA | b, A -> a', 'S -> a | b'],
+  answer: 1,
+  marks: 1,
+  difficulty: 'easy',
+  type: 'concept',
+  explanation: "S -> aSb | epsilon has a nonterminal S appearing in the MIDDLE of the right-hand side, sandwiched between two terminals (a on the left, b on the right) - this shape (A -> alpha B beta with both alpha, beta possibly nonempty and containing terminals on both sides of the nonterminal) is not expressible as either strict right-linear (A -> aB) or strict left-linear (A -> Ba) form, yet it is perfectly valid as a general context-free production (a single nonterminal on the left, anything on the right). Indeed this specific grammar generates {a^n b^n : n >= 0}, the canonical non-regular CFL. The other three options are all straightforward right-linear regular grammars (nonterminal only ever appears as the rightmost symbol, if at all), generating regular languages, so they fail to be examples of 'CFL but not regular' grammar shapes."
+},
+{
+  id: 'toc-hierarchy-x15',
+  q: 'Which of the following correctly ranks the four classical language classes together with REC, from smallest to largest?',
+  options: ['Regular ⊆ CFL ⊆ CSL ⊆ REC ⊆ RE', 'Regular ⊆ CSL ⊆ CFL ⊆ REC ⊆ RE', 'REC ⊆ Regular ⊆ CFL ⊆ CSL ⊆ RE', 'Regular ⊆ CFL ⊆ REC ⊆ CSL ⊆ RE'],
+  answer: 0,
+  marks: 1,
+  difficulty: 'easy',
+  type: 'concept',
+  explanation: "The chain, from most restricted machine model (and smallest language class) to least restricted, runs: Regular (finite memory only) is a subset of Context-Free (finite memory plus one unbounded stack) is a subset of Context-Sensitive (memory bounded linearly in the input length) is a subset of Recursive/decidable (any amount of memory, but the computation is guaranteed to halt) is a subset of Recursively Enumerable (any amount of memory, computation may run forever on non-members). Each containment is strict, with standard witnesses: {a^n b^n} separates Regular from CFL, {a^n b^n c^n} separates CFL from CSL, a super-linear-space-requiring decidable language separates CSL from REC, and the Halting Problem separates REC from RE. Option A states this chain in the correct order; the other three options scramble the CFL/CSL order or misplace REC relative to CSL."
+}
+);
+
+window.GATE_DATA.questions['toc'].topics.find(function(t){return t.id==='toc-regular';}).questions.push(
+{
+  id: 'toc-regular-y1',
+  q: 'Which of the following languages over {a, b} are regular? (Select ALL that apply)',
+  options: ['{ w : w has an even number of a\'s and an even number of b\'s }', '{ w : |w| is a multiple of 3 }', '{ a^n b^n : n >= 0 }', '{ w : w contains the substring aab }'],
+  answers: [0, 1, 3],
+  marks: 2,
+  difficulty: 'medium',
+  type: 'concept',
+  explanation: "Option A is regular: a 4-state product DFA tracking (parity of a's, parity of b's) suffices, since both counts only ever need to be tracked mod 2 - finite memory, no unbounded comparison. Option B is regular: a 3-state counter tracking length mod 3 decides this with no reference to symbol identity at all. Option D is regular: it is a standard 'contains substring aab' language, needing a 4-state DFA that tracks the longest matched prefix of aab, exactly like the abb example in the theory. Option C is the classic non-regular language: by Myhill-Nerode the strings a^0, a^1, a^2, ... are pairwise distinguishable (append b^i to separate a^i from a^j), giving infinitely many equivalence classes, so no finite automaton can accept it. Hence A, B, D are regular and C is not."
+},
+{
+  id: 'toc-regular-y2',
+  q: 'Which of the following statements about NFAs and DFAs are TRUE? (Select ALL that apply)',
+  options: ['Every NFA can be converted to an equivalent DFA', 'An NFA can have more than one transition out of a state on the same input symbol', 'The minimal DFA for a regular language is unique up to renaming of states', 'NFA complementation is achieved simply by swapping accepting and non-accepting states'],
+  answers: [0, 1, 2],
+  marks: 2,
+  difficulty: 'medium',
+  type: 'concept',
+  explanation: "A is true: the subset construction converts any NFA into an equivalent DFA (possibly with exponentially more states), which is exactly Kleene/Rabin-Scott's theorem of NFA-DFA equivalence. B is true by definition of nondeterminism - an NFA's transition function maps to a SET of states, so multiple outgoing edges on the same symbol are allowed (this is precisely what distinguishes it from a DFA). C is true: Myhill-Nerode guarantees the minimal DFA is unique up to a renaming/isomorphism of its states, since the states correspond exactly to the equivalence classes of the indistinguishability relation, and this partition is uniquely determined by the language. D is FALSE and is the classic trap: swapping final/non-final states only gives the complement when the machine is deterministic and complete (every state has an outgoing transition on every symbol); on an NFA a string can fail to reach any final state through some paths and reach one through others, and swapping states does not correctly flip acceptance, so NFA complementation instead requires first converting to a DFA."
+},
+{
+  id: 'toc-regular-y3',
+  q: 'Let L1 and L2 be regular languages. Which of the following languages are guaranteed to be regular? (Select ALL that apply)',
+  options: ['L1 union L2', 'L1 intersection L2', 'L1 - L2 (set difference)', 'L1^R (reversal of L1)'],
+  answers: [0, 1, 2, 3],
+  marks: 1,
+  difficulty: 'easy',
+  type: 'concept',
+  explanation: "Regular languages form a Boolean algebra together with closure under reversal, concatenation, and Kleene star, so ALL four operations listed preserve regularity. Union: build a DFA on the product of states of DFAs for L1 and L2, accepting when either component is accepting. Intersection: same product construction, accepting only when both components are accepting. Set difference L1 - L2 equals L1 intersect (complement of L2), and since regular languages are closed under both complement (swap final states on a complete DFA) and intersection, the difference is regular too. Reversal: reverse every transition of an NFA for L1 and swap the roles of the start and final states (making the old final states the new start states via a fresh epsilon-start, and the old start state the new sole final state), which is again a valid NFA construction. So all four options are correct - this question tests exhaustive closure, unlike questions that hunt for a single false closure claim."
+},
+{
+  id: 'toc-regular-y4',
+  q: 'Consider the language L = { w in {0,1}* : w does NOT contain 000 as a substring }. Which of the following statements about L are TRUE? (Select ALL that apply)',
+  options: ['L is regular', 'The minimal DFA for L has 4 states (including a dead/reject state)', 'The complement of L is also regular', 'L is a finite language'],
+  answers: [0, 1, 2],
+  marks: 2,
+  difficulty: 'medium',
+  type: 'concept',
+  explanation: "L is regular (A true): 'avoiding a fixed substring' is always regular because it can be checked by tracking, at each point, the longest suffix of input read so far that is a prefix of 000, with a single dead state entered once three consecutive 0's appear. Concretely the DFA has states for 'last run of 0's has length 0', 'length 1', 'length 2' (all accepting, since 000 hasn't appeared yet), plus a dead non-accepting state for '000 has appeared' (a sink, since once absent-000 fails it fails forever) - that is exactly 4 states, and none can be merged since exiting distinguishing suffixes exist (e.g. the dead state accepts nothing while the others still can), so B is true. Regular languages are closed under complement (C true) - complementing swaps the accepting labels on this same DFA to get 'contains 000'. L is NOT finite (D false): plenty of long strings like (01)^k avoid 000 for arbitrarily large k, so L is infinite."
+},
+{
+  id: 'toc-regular-y5',
+  q: 'A DFA over {0,1} accepts a string if and only if the number of 0s in it is congruent to 1 mod 2 AND the number of 1s in it is congruent to 0 mod 3. What is the minimum number of states in this DFA? Enter your numerical answer.',
+  options: [],
+  answer: 6,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'medium',
+  type: 'numerical',
+  explanation: "The two conditions are independent: parity of the count of 0's (2 possibilities: even, odd) and residue of the count of 1's mod 3 (3 possibilities: 0, 1, 2). Since 0's and 1's are counted independently by disjoint symbol classes, no interaction between the two trackers is possible, so build the product automaton with state space {even, odd} x {0, 1, 2}, giving 2 x 3 = 6 states. Reachability: starting at (even, 0), every combination of parity and residue is reachable by choosing an appropriate mix of 0's and 1's, so all 6 states are reachable. Distinguishability: for any two distinct pairs (p1, r1) != (p2, r2), one can always append a suffix that makes exactly one of them reach the accepting condition (odd, 0) while the other does not, e.g. differing parities are distinguished by an odd vs even number of further 0's while 1's are held at a multiple of 3, and differing residues are distinguished symmetrically. So no states can be merged, confirming the minimum is 6."
+},
+{
+  id: 'toc-regular-y6',
+  q: 'Consider the NFA with states {q0, q1, q2}, start state q0, accepting state q2, alphabet {a, b}, and transitions: delta(q0, a) = {q0, q1}, delta(q0, b) = {q0}, delta(q1, b) = {q2}, and all other transitions empty. Using subset construction, how many DISTINCT reachable states does the equivalent DFA have (including any dead/trap state, if reachable)? Enter your numerical answer.',
+  options: [],
+  answer: 3,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'hard',
+  type: 'numerical',
+  explanation: "Run subset construction starting from S0 = {q0}. On a: q0 contributes {q0,q1}, so S0 -a-> S1 = {q0,q1}. On b: q0 contributes {q0}, so S0 -b-> S0. From S1 = {q0,q1}: on a, q0 contributes {q0,q1} and q1 contributes nothing (delta(q1,a) is undefined/empty), so the union is {q0,q1} = S1 (self-loop). On b, q0 contributes {q0} and q1 contributes {q2}, so the union is {q0,q2} = S2, a new state. From S2 = {q0,q2}: on a, q0 contributes {q0,q1} and q2 contributes nothing (q2 has no outgoing transitions at all), so the result is {q0,q1} = S1. On b, q0 contributes {q0} and q2 contributes nothing, so the result is {q0} = S0. No new subsets appear from S2, so the closure is complete. The reachable DFA states are exactly S0={q0}, S1={q0,q1}, S2={q0,q2} - three states. The empty-set trap state is never reached because q0 is present in every reachable subset and always has an outgoing transition on both a and b, so no combination of NFA states ever maps to the empty set. Hence the answer is 3, illustrating that the 2^n upper bound (here 2^3 = 8) is frequently far from tight - only reachable subsets matter."
+}
+);
+
+window.GATE_DATA.questions['toc'].topics.find(function(t){return t.id==='toc-cfl';}).questions.push(
+{
+  id: 'toc-cfl-y1',
+  q: 'Which of the following languages are context-free? (Select ALL that apply)',
+  options: ['{ a^n b^n c^m : n, m >= 0 }', '{ a^n b^n c^n : n >= 0 }', '{ w w^R : w in {a,b}* }', '{ a^i b^j : i, j >= 0 } (all strings of a\'s followed by b\'s)'],
+  answers: [0, 2, 3],
+  marks: 2,
+  difficulty: 'medium',
+  type: 'concept',
+  explanation: "A is context-free (in fact only one relation, n = count of leading a's = count of following b's, needs checking; m is completely free), via S -> A C, A -> aAb | epsilon, C -> cC | epsilon. C is the classic CFL palindrome language, matched by pushing the first half and popping while comparing the second half; it is CFL (though not DCFL, since the midpoint must be guessed). D is actually regular (hence automatically also context-free, since Regular is a subset of CFL) via a*b* - a trap for students who only think 'CFL' and forget regular languages qualify too. B is the only non-context-free option: it requires two simultaneous matching relations (a-count = b-count AND b-count = c-count), which the CFL pumping lemma rules out, since any pumped window can only stretch two of the three blocks in lockstep. So A, C, D are context-free; B is not."
+},
+{
+  id: 'toc-cfl-y2',
+  q: 'Which of the following statements about closure properties of CFLs and DCFLs are TRUE? (Select ALL that apply)',
+  options: ['CFLs are closed under union', 'CFLs are closed under intersection with a regular language', 'DCFLs are closed under complementation', 'DCFLs are closed under union'],
+  answers: [0, 1, 2],
+  marks: 2,
+  difficulty: 'medium',
+  type: 'concept',
+  explanation: "A is true: combine two grammars under a fresh start symbol S -> S1 | S2. B is true: run a PDA for the CFL and a DFA for the regular language in parallel as a product machine; only one stack is used (the DFA contributes no stack), so the result stays a CFL - this is a heavily-tested lemma distinct from CFL-intersect-CFL, which fails. C is true and is the signature DCFL closure: a normalized DPDA (always consuming its whole input, never looping on epsilon-moves) can have its accept/reject decision inverted at end of input. D is FALSE: the union of the two DCFLs {a^i b^j c^k : i=j} and {a^i b^j c^k : j=k} is the inherently ambiguous, non-deterministic language {i=j or j=k}, so DCFLs lose closure under union even though general CFLs keep it - this asymmetry (DCFL keeps complement, loses union; CFL keeps union, loses complement) is a favorite GATE trap."
+},
+{
+  id: 'toc-cfl-y3',
+  q: 'Which of the following are TRUE statements about Chomsky Normal Form (CNF) and pushdown automata? (Select ALL that apply)',
+  options: ['Every context-free language (possibly including epsilon) has an equivalent CNF grammar', 'In a CNF grammar with no epsilon-production, deriving a string of length n requires exactly 2n - 1 production applications', 'Nondeterministic PDAs and CFGs are equivalent in expressive power', 'Every deterministic PDA can be converted to an equivalent CFG that is unambiguous'],
+  answers: [0, 1, 2],
+  marks: 2,
+  difficulty: 'hard',
+  type: 'concept',
+  explanation: "A is true (with the standard caveat that if epsilon is in L, a separate rule S -> epsilon is added and S is barred from any right-hand side) - every CFL has a CNF grammar. B is true: a CNF derivation tree for a length-n string is a binary tree with n leaves (each leaf a terminal-producing rule) and n-1 internal binary-branching nodes, giving n + (n-1) = 2n-1 total production applications - a frequently tested numerical fact. C is true, this is the fundamental CFG-PDA equivalence theorem (via simulating leftmost derivations on a stack, and conversely). D is FALSE and is a subtle trap: converting a DPDA to a CFG certainly gives a CFG for the same DCFL, but that CFG need not be unambiguous in general conversions, though it is a separate (true) fact that every DCFL DOES have SOME unambiguous grammar - the claim as stated (that the specific conversion procedure yields an unambiguous grammar) overstates what the standard construction guarantees, so this option is not a safe blanket truth to select."
+},
+{
+  id: 'toc-cfl-y4',
+  q: 'Which of the following statements correctly distinguish CFL from DCFL? (Select ALL that apply)',
+  options: ['Every regular language is a DCFL', 'Every DCFL is closed under complementation, but not every CFL is', 'The language { w c w^R } is DCFL, but { w w^R } is CFL but not DCFL', 'Every CFL can be accepted by some deterministic PDA'],
+  answers: [0, 1, 2],
+  marks: 2,
+  difficulty: 'medium',
+  type: 'concept',
+  explanation: "A is true: a DFA is trivially a DPDA that ignores its stack. B is true and is the headline asymmetry: DCFLs close under complement (normalize the DPDA to always finish reading input, then invert its decision) while general CFLs do not (the standard witness intersects two CFLs to get {a^n b^n c^n}, and non-closure under complement then follows by De Morgan from closure under union). C is true: the explicit center marker c in {w c w^R} lets a DPDA know exactly when to switch from pushing to popping (deterministic), whereas {w w^R} with no marker forces the machine to guess the midpoint, and it is a proven theorem that no DPDA can accept it, even though an NPDA (which may guess) accepts it fine. D is FALSE: this is exactly the statement that CFL equals DCFL, which is false precisely because of examples like {w w^R} - DCFL is a strict subset of CFL."
+},
+{
+  id: 'toc-cfl-y5',
+  q: 'A context-free grammar in Chomsky Normal Form is used to derive a string of length 15 (no epsilon-productions are used). How many total production (rule) applications does the derivation use? Enter your numerical answer.',
+  options: [],
+  answer: 29,
+  kind: 'nat',
+  marks: 1,
+  difficulty: 'easy',
+  type: 'numerical',
+  explanation: "In CNF (excluding the S -> epsilon special case), every production is either A -> BC (binary branching, builds internal tree structure) or A -> a (terminal-producing, creates exactly one leaf). A derivation tree for a string of length n has exactly n leaves, one per terminal symbol produced by an A -> a rule, so there are n applications of terminal rules. Since every internal node of a binary tree with n leaves has exactly n - 1 internal (branching) nodes, there are n - 1 applications of A -> BC rules. Total production applications = n (terminal rules) + (n - 1) (binary rules) = 2n - 1. For n = 15: 2(15) - 1 = 30 - 1 = 29."
+},
+{
+  id: 'toc-cfl-y6',
+  q: 'Let L1 = { a^n b^n c^m d^m : n, m >= 0 } and L2 = { a^n b^m c^m d^n : n, m >= 0 }, both over the alphabet {a,b,c,d}. Consider L1 intersect L2. What is the minimum number of pairwise DISTINCT independent counting constraints (equalities among the four block lengths, i.e. count of a = count of b, etc.) that must simultaneously hold for a string to belong to L1 intersect L2? Enter your numerical answer.',
+  options: [],
+  answer: 3,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'hard',
+  type: 'numerical',
+  explanation: "A string of the form a^p b^q c^r d^s lies in L1 exactly when p = q and r = s (two constraints). It lies in L2 exactly when p = s and q = r (two more constraints). For the string to lie in the intersection, ALL of p=q, r=s, p=s, q=r must hold simultaneously. But these four are not independent: from p=q and p=s we get q=s, and combined with r=s we get q=r automatically, and similarly all four counts collapse to being equal to one single value, i.e. p=q=r=s. The independent constraints needed to force p=q=r=s from four free variables are exactly 3 (e.g. p=q, q=r, r=s pin down all four to a common value; any fourth equation among them is then redundant, being implied by the other three via transitivity). So although 4 named equalities are listed across the two grammars, only 3 independent constraints are needed, and the intersection is exactly {a^n b^n c^n d^n : n >= 0} - not context-free, illustrating again how intersecting two CFLs can force an arbitrarily large number of simultaneous matching relations that a single stack cannot track."
+}
+);
+
+window.GATE_DATA.questions['toc'].topics.find(function(t){return t.id==='toc-turing';}).questions.push(
+{
+  id: 'toc-turing-y1',
+  q: 'Which of the following statements about recursive (REC) and recursively enumerable (RE) languages are TRUE? (Select ALL that apply)',
+  options: ['Every recursive language is recursively enumerable', 'REC is closed under complementation', 'RE is closed under complementation', 'If L and its complement are both RE, then L is recursive'],
+  answers: [0, 1, 3],
+  marks: 2,
+  difficulty: 'medium',
+  type: 'concept',
+  explanation: "A is true: a total TM (decider) is in particular a recognizer, since halting-and-accepting on members while halting-and-rejecting on non-members certainly satisfies the weaker RE requirement of halting-and-accepting on members. B is true: given a total TM for L, swap its accept/reject verdicts to get a total TM for the complement, so REC is closed under complement. D is true and is the cornerstone dovetailing theorem: run recognizers for L and its complement in parallel, and since every string is in exactly one of the two, one of them halts and accepts, yielding a decider for L. C is FALSE: if RE were closed under complement, then combined with the fact that RE is already closed under intersection, every RE language would automatically have both itself and its complement RE, forcing it recursive by the theorem in D - but the halting set A_TM is a known counterexample (RE but not recursive), so RE cannot be closed under complement."
+},
+{
+  id: 'toc-turing-y2',
+  q: 'Which of the following statements about Turing machine variants and their power are TRUE? (Select ALL that apply)',
+  options: ['A multi-tape TM accepts exactly the same class of languages as a single-tape TM', 'A nondeterministic TM accepts exactly the same class of languages as a deterministic TM', 'A TM with a two-way infinite tape accepts a strictly larger class of languages than a one-way infinite tape TM', 'Every language accepted by some TM variant can be accepted by a standard single-tape deterministic TM, possibly with a slowdown'],
+  answers: [0, 1, 3],
+  marks: 2,
+  difficulty: 'medium',
+  type: 'concept',
+  explanation: "A is true: a multi-tape TM is simulated by a single-tape TM using interleaved tracks to represent all tapes and marked head positions, at the cost of a quadratic slowdown - the class of languages accepted is identical. B is true: nondeterminism is eliminated by breadth-first simulation over the tree of possible computations on a deterministic TM, at the cost of possibly exponential slowdown - again, same language class (this contrasts sharply with PDAs, where nondeterminism DOES add power). D is true and is the general robustness statement summarizing the whole family of equivalences - this is precisely why the Church-Turing thesis treats 'Turing machine' as a single robust notion of computability regardless of variant. C is FALSE: a two-way infinite tape can be simulated on a one-way infinite tape by folding it into two tracks (representing the left and right halves), so it too accepts exactly the same class - no variant in this list adds power, only the efficiency of computation differs."
+},
+{
+  id: 'toc-turing-y3',
+  q: 'Let A_TM = { (M, w) : TM M accepts w }. Which of the following statements about A_TM are TRUE? (Select ALL that apply)',
+  options: ['A_TM is recursively enumerable', 'A_TM is recursive', 'The complement of A_TM is recursively enumerable', 'A_TM can be reduced to the halting problem HALT via a computable total function'],
+  answers: [0, 3],
+  marks: 2,
+  difficulty: 'hard',
+  type: 'concept',
+  explanation: "A is true: a universal TM U simulates M on w and accepts if and only if the simulation accepts, so A_TM is recognized (though U may loop forever if M loops on w, which is acceptable for RE). D is true: define f(M, w) = (M', w) where M' behaves like M but, upon reaching any reject state, enters an infinite loop instead - then M accepts w iff M' halts on w, and f is computable and total, giving A_TM <=m HALT. B is FALSE: A_TM is the canonical undecidable problem, proved by a diagonalization argument (assume a decider H for A_TM exists, build D that runs H on (D, D) and does the opposite of what H reports, yielding a contradiction when D is run on itself). C is FALSE: since A_TM is RE but not recursive, if its complement were also RE, the dovetailing theorem would force A_TM to be recursive - contradiction. So the complement of A_TM is not RE."
+},
+{
+  id: 'toc-turing-y4',
+  q: 'L1 is recursively enumerable but not recursive, and L2 is recursive. Which of the following statements are ALWAYS TRUE regardless of the specific choice of L1 and L2? (Select ALL that apply)',
+  options: ['L1 union L2 is recursively enumerable', 'L1 intersect L2 is recursively enumerable', 'The complement of L2 is recursive', 'L1 union L2 is always recursive'],
+  answers: [0, 1, 2],
+  marks: 2,
+  difficulty: 'hard',
+  type: 'concept',
+  explanation: "A is true: RE is closed under union (dovetail both recognizers, accept if either halts and accepts), and since L1 is RE and L2 is recursive (hence also RE), their union is RE regardless of which specific such L1, L2 are chosen. B is true similarly: RE is closed under intersection (dovetail both, accept only when both halt and accept), and recursive implies RE, so the intersection of an RE set and a recursive set is always RE. C is true unconditionally: REC is closed under complementation (invert the total decider's accept/reject verdicts), so the complement of ANY recursive language is recursive - this has nothing to do with L1 at all. D is FALSE as an ALWAYS-true claim: taking L2 = Sigma* forces L1 union L2 = Sigate*, which is recursive, but taking L2 = empty set forces L1 union L2 = L1, which is RE but NOT recursive by hypothesis - so recursiveness of the union is not guaranteed across all choices, only RE-ness is (as captured correctly by option A)."
+},
+{
+  id: 'toc-turing-y5',
+  q: 'Consider a Turing machine M with exactly 3 states {q0, q1, q2} (q0 the start state) and tape alphabet {0, 1, blank}. Counting only the (current state, tape symbol) combinations for which a transition must be specified to make M a fully-defined (total transition function) TM, how many distinct (state, symbol) pairs require a transition entry? Enter your numerical answer.',
+  options: [],
+  answer: 9,
+  kind: 'nat',
+  marks: 1,
+  difficulty: 'easy',
+  type: 'numerical',
+  explanation: "A Turing machine's transition function delta maps (state, tape symbol) pairs to (state, tape symbol, direction) triples. To be fully defined (total) over all states, a transition entry is needed for every combination of one of the 3 states and one of the 3 tape alphabet symbols (0, 1, blank). This is a simple counting problem: number of pairs = (number of states) x (number of tape symbols) = 3 x 3 = 9. Note this counts transition table entries only, independent of whether some states are designated accepting/halting (a halting state typically needs no outgoing transitions listed, but the question asks for the pairs required to make the function fully defined over all non-halting states, so the direct product count of 9 is what full-table completeness requires here)."
+},
+{
+  id: 'toc-turing-y6',
+  q: 'A single-tape deterministic Turing machine simulates a k-tape deterministic Turing machine using the standard interleaved-tracks construction. If the k-tape machine runs for n steps on some input, the single-tape simulation takes O(n^c) steps, where c is a constant independent of k (for the standard construction). What is the value of c? Enter your numerical answer.',
+  options: [],
+  answer: 2,
+  marks: 1,
+  difficulty: 'medium',
+  type: 'numerical',
+  explanation: "In the standard simulation, the single tape stores all k tapes as interleaved tracks, with special markers recording each tape's head position. To simulate one step of the k-tape machine, the single-tape machine must sweep across the entire used portion of the tape once to read all k virtual head positions and determine the move, then sweep again to update all k tracks accordingly. After n steps of the k-tape machine, the used tape length is at most O(n) (each step moves at most one cell), so each simulated step costs O(n) real steps on the single tape. Simulating all n steps therefore costs O(n) times O(n) = O(n^2) total steps. Hence c = 2: a quadratic slowdown, independent of k. This is the standard robustness result showing multi-tape and single-tape TMs are polynomially equivalent, and it is why the two models are considered equally powerful for the purposes of decidability (only efficiency, not computability, differs)."
+}
+);
+
+window.GATE_DATA.questions['toc'].topics.find(function(t){return t.id==='toc-decidability';}).questions.push(
+{
+  id: 'toc-decidability-y1',
+  q: 'Which of the following problems are DECIDABLE? (Select ALL that apply)',
+  options: ['Given a DFA D, is L(D) empty?', 'Given a CFG G, is L(G) empty?', 'Given a CFG G, is L(G) = Sigma*?', 'Given a TM M, is L(M) empty?'],
+  answers: [0, 1],
+  marks: 2,
+  difficulty: 'medium',
+  type: 'concept',
+  explanation: "Emptiness for a DFA is decidable by simple reachability: check whether any final state can be reached from the start state via a finite graph search. Emptiness for a CFG is also decidable: mark all 'generating' nonterminals (those that can derive some terminal string) bottom-up in finite time, and L(G) is empty iff the start symbol is never marked generating - the standard algorithm always terminates. But universality of a CFG - whether L(G) = Sigma* - is undecidable (it can encode the Post Correspondence Problem), so option C is out. Emptiness for a TM is also undecidable (E_TM is a classic Rice's-theorem casualty: 'L(M) is empty' is a non-trivial property of the language, since some RE languages are empty and some are not), so option D is out too. So only A and B are decidable."
+},
+{
+  id: 'toc-decidability-y2',
+  q: 'By Rice\'s theorem, which of the following properties of a Turing machine M (referring to L(M), the language it accepts) are UNDECIDABLE? (Select ALL that apply)',
+  options: ['L(M) is empty', 'L(M) is a finite language', 'M has exactly 10 states', 'L(M) contains the string 0101'],
+  answers: [0, 1, 3],
+  marks: 2,
+  difficulty: 'medium',
+  type: 'concept',
+  explanation: "Rice's theorem states every non-trivial property of the language accepted by a TM (as opposed to a property of the machine's syntax/behavior) is undecidable. 'L(M) is empty' is non-trivial (some TMs accept the empty language, some do not) and depends only on L(M), so it is undecidable - option A. 'L(M) is finite' is similarly non-trivial and language-only, so undecidable - option B. 'L(M) contains the string 0101' is non-trivial (some accepted languages contain it, some do not) and depends only on L(M) - undecidable, option D. Option C, 'M has exactly 10 states', is NOT covered by Rice's theorem at all: it is a syntactic property of the machine's description, not of the language it accepts (two machines with different state counts can accept the very same language), and it is trivially decidable - just count the states listed in M's description. This distinction (property of L(M) vs. property of M's structure) is the key to correctly applying Rice's theorem."
+},
+{
+  id: 'toc-decidability-y3',
+  q: 'Suppose problem A many-one reduces to problem B (A <=m B). Which of the following inferences are VALID? (Select ALL that apply)',
+  options: ['If B is decidable, then A is decidable', 'If A is undecidable, then B is undecidable', 'If A is decidable, then B is decidable', 'If B is undecidable, then A is undecidable'],
+  answers: [0, 1],
+  marks: 2,
+  difficulty: 'hard',
+  type: 'concept',
+  explanation: "A <=m B means there is a computable total function f such that w is in A iff f(w) is in B - so deciding A can be done by computing f(w) and then deciding B. If B is decidable (option A valid): compose the computable f with B's decider to get a decider for A - this is exactly how reductions transfer easiness backward. If A is undecidable (option B valid, and it is just the contrapositive of the first rule): were B decidable, A would be too by the same composition, contradiction - so B must be undecidable. This is the standard tool for proving new problems undecidable: reduce a KNOWN undecidable problem TO the new one. Options C and D are the classic reversed-direction traps: A being decidable says nothing about B (B might still be harder, since the reduction only shows A is NO HARDER than B, not that B is no harder than A), and B being undecidable says nothing about A (A could be trivially decidable, e.g., always reducing to a fixed 'yes' instance of B). Only the forward-hardness / backward-easiness directions are valid."
+},
+{
+  id: 'toc-decidability-y4',
+  q: 'Which of the following statements correctly apply the RE / not-RE / decidable trichotomy? (Select ALL that apply)',
+  options: ['A_TM (does M accept w?) is RE but not decidable', 'The complement of A_TM is not RE', 'E_TM (is L(M) empty?) is not RE, but its complement (is L(M) nonempty?) is RE', 'Every undecidable language is also not RE'],
+  answers: [0, 1, 2],
+  marks: 2,
+  difficulty: 'hard',
+  type: 'concept',
+  explanation: "A_TM is RE (a universal machine can simulate and confirm acceptance) but undecidable (the classic diagonalization argument), so option A is correct. Since A_TM is RE but not decidable, its complement cannot be RE either - otherwise the dovetailing/parallel-simulation theorem would make A_TM decidable, contradiction - so option B is correct. E_TM (emptiness of L(M)) is not RE: confirming emptiness would require verifying NO input is ever accepted, which has no finite positive witness; but its complement, 'L(M) is nonempty', IS RE, because a finite witness exists - dovetail M over all possible inputs and accept as soon as any single one is accepted, giving option C. Option D is FALSE and is an important distinction to keep straight: 'undecidable' only means 'no total decider exists' - it does NOT imply 'not RE'. A_TM itself is the standard counterexample: it is undecidable YET still RE. The three-level hierarchy (decidable, properly RE, not RE at all) must be kept distinct."
+},
+{
+  id: 'toc-decidability-y5',
+  q: 'Consider the following four problems about a given CFG G: (1) Is L(G) empty? (2) Is a given string w in L(G)? (3) Is L(G) finite? (4) Is L(G) = Sigma*? How many of these four problems are DECIDABLE? Enter your numerical answer.',
+  options: [],
+  answer: 3,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'medium',
+  type: 'numerical',
+  explanation: "Go through each: (1) Emptiness of a CFG is decidable via the generating-symbols marking algorithm (mark nonterminals that can derive some terminal string, bottom-up; L(G) is empty iff the start symbol is never marked) - decidable. (2) Membership of a specific string w in L(G) is decidable via the CYK algorithm (assuming G is converted to Chomsky Normal Form first), running in O(n^3) time for |w| = n - decidable. (3) Finiteness of L(G) is decidable: convert G to CNF and check whether the resulting grammar's dependency graph among nonterminals contains a cycle reachable from and co-reachable to a generating, reachable nonterminal - a standard, terminating graph algorithm - decidable. (4) Universality, L(G) = Sigma*, is UNDECIDABLE: it can be shown equivalent in difficulty to the Post Correspondence Problem, which has no algorithm. So exactly 3 of the 4 listed problems (emptiness, membership, finiteness) are decidable, and only universality is not - matching the standard GATE catalogue for CFGs."
+},
+{
+  id: 'toc-decidability-y6',
+  q: 'Problem P is known to be RE. Problem Q is known to be RE. It is also known that Q <=m complement(P) (Q many-one reduces to the complement of P). Using only the standard closure and reduction rules, how many of the two problems {P, Q} can be forced to be RECURSIVE (decidable) by this information? Enter your numerical answer.',
+  options: [],
+  answer: 0,
+  marks: 2,
+  difficulty: 'hard',
+  type: 'numerical',
+  explanation: "Trace the reasoning carefully. We know Q <=m complement(P). This reduction rule tells us: if complement(P) is decidable, then Q is decidable; and if Q is undecidable, then complement(P) is undecidable (hence P is undecidable too, since REC is closed under complement, so P decidable would force complement(P) decidable). But we are NOT given that Q is undecidable, nor that complement(P) is decidable - we only know both P and Q are RE. Being RE alone does not force decidability (the halting set A_TM is the standard counterexample: RE but not recursive). The reduction Q <=m complement(P) does not, by itself, pin down complement(P)'s status either, since it only transfers a KNOWN undecidability or a KNOWN decidability, and neither is given here for either P or Q directly. So from the given information alone, NEITHER P nor Q can be forced to be recursive - both could simultaneously be genuinely non-recursive RE languages (e.g., P = A_TM and a suitably constructed Q), consistent with every stated fact. Hence the answer is 0: no language is forced to be recursive by this information alone."
+}
+);
+
+window.GATE_DATA.questions['toc'].topics.find(function(t){return t.id==='toc-hierarchy';}).questions.push(
+{
+  id: 'toc-hierarchy-y1',
+  q: 'Which of the following statements about the Chomsky hierarchy are TRUE? (Select ALL that apply)',
+  options: [
+    'Every regular language is also context-free, context-sensitive, recursive, and recursively enumerable',
+    'DCFL (deterministic context-free languages) is a strict subset of CFL',
+    'Every recursive language is generated by some context-sensitive grammar',
+    'Recursively enumerable languages are closed under complementation'
+  ],
+  answers: [0, 1],
+  marks: 2,
+  difficulty: 'medium',
+  type: 'concept',
+  explanation: "Option A is true: the hierarchy is a nested chain of inclusions, so membership in a smaller class always implies membership in every larger class above it - a regular language is automatically CFL, CSL, recursive, and RE simultaneously; only the TIGHTEST classification is usually asked for, but the looser ones remain true statements. Option B is true: DCFL (languages accepted by a deterministic PDA) is a strict subset of CFL, witnessed by a language like { a^n b^n } union { a^n b^2n }, which is context-free but has no deterministic PDA since a DPDA cannot decide without unbounded lookahead which of the two count-patterns to match. Option C is FALSE: this reverses the true containment - every context-sensitive language is recursive, but not every recursive (decidable) language is context-sensitive, since some decidable languages provably require more than linear space on every deciding machine and so admit no linear-bounded automaton or CSL grammar at all. Option D is FALSE: RE is famously NOT closed under complementation - if it were, then since A_TM is RE, its complement would be RE too, and an RE language whose complement is also RE is always decidable (run both semi-deciders in parallel), which would make A_TM decidable, contradicting the classic diagonalization undecidability proof. So only A and B are true."
+},
+{
+  id: 'toc-hierarchy-y2',
+  q: 'For each pair of language classes below, closure under intersection HOLDS for the pair. Which of the following pairs correctly have this closure property? (Select ALL that apply)',
+  options: [
+    'Regular intersect Regular',
+    'CFL intersect CFL',
+    'CFL intersect Regular',
+    'Recursive intersect Recursive'
+  ],
+  answers: [0, 2, 3],
+  marks: 2,
+  difficulty: 'medium',
+  type: 'concept',
+  explanation: "Regular intersect Regular is regular via the standard product-DFA construction (option A holds). CFL intersect CFL is NOT guaranteed to be a CFL in general - the classic counterexample intersects { a^n b^n c^m } with { a^m b^n c^n } to get { a^n b^n c^n }, which is not context-free, so option B fails as a general closure claim. CFL intersect Regular IS always context-free: run a PDA for the CFL and a DFA for the regular language in lockstep on the same input, using only the PDA's stack, and accept when both accept - this is a genuinely useful closure property that survives even though general CFL-CFL intersection does not (option C holds). Recursive intersect Recursive is recursive: run both deciders to completion (both always halt) and accept iff both accept, which itself always halts, so the intersection is decidable (option D holds). So the pairs with guaranteed closure are A, C, and D; only general CFL-CFL intersection (B) fails."
+},
+{
+  id: 'toc-hierarchy-y3',
+  q: 'Consider the language L = { a^i b^j c^k : i, j, k >= 0 and (i = j or j = k) }. Which of the following statements about L are TRUE? (Select ALL that apply)',
+  options: [
+    'L can be written as the union of two languages, each individually context-free',
+    'L itself is context-free',
+    'L is context-sensitive but not context-free',
+    'L is regular'
+  ],
+  answers: [0, 1],
+  marks: 2,
+  difficulty: 'hard',
+  type: 'concept',
+  explanation: "Write L = L1 union L2 where L1 = { a^i b^j c^k : i = j } (b's matched to a's, c's free) and L2 = { a^i b^j c^k : j = k } (b's matched to c's, a's free). Each of L1 and L2 individually needs only ONE unbounded matching relation, so each is context-free by itself: a PDA for L1 pushes a's, pops one per b, then reads any number of c's freely, and symmetrically for L2 (read a's freely, then push b's and pop one per c). So option A is true. Since CFLs are closed under union, L1 union L2 = L is therefore also context-free - option B is true. Crucially, L is NOT the same trap as {a^n b^n c^n}: that language requires i = j AND j = k SIMULTANEOUSLY (a genuine conjunction demanding two independent counts to agree at once, which defeats a single stack), whereas L only requires i = j OR j = k (a disjunction of two separately-CFL conditions, which a single PDA can handle by nondeterministically guessing up front which disjunct to try to satisfy and running the matching stack-based check for that disjunct, falling through to the other on failure - equivalently, by CFL union closure as shown). So option C (CSL but not CFL) is false - the AND/OR distinction is exactly what changes the classification here. L is also clearly not regular (fixing the OR-branch for i=j alone already needs an unbounded stack-count, e.g. by intersecting L with the regular set a*b*c (a single trailing c) to get {a^n b^n c : n>=0}, which is a non-regular CFL, and closure of CFL under intersection with regular sets keeps the pumping argument sound) - so option D is false."
+},
+{
+  id: 'toc-hierarchy-y4',
+  q: 'Which of the following are valid TYPE-1 (context-sensitive) productions under the standard non-contracting definition, given non-terminals A, B, S and terminals a, b? (Select ALL that apply)',
+  options: [
+    'A -> aA',
+    'AB -> BA',
+    'S -> epsilon (assuming S never appears on the right-hand side of any production)',
+    'aA -> a'
+  ],
+  answers: [0, 1, 2],
+  marks: 2,
+  difficulty: 'medium',
+  type: 'concept',
+  explanation: "The defining requirement for Type-1 (context-sensitive) productions is non-contraction: the length of the right-hand side must be at least the length of the left-hand side (|alpha| <= |beta|), aside from the single explicit exception for the start symbol. 'A -> aA' has left length 1 and right length 2, so it is non-contracting and valid (option A). 'AB -> BA' has left length 2 and right length 2 - equal lengths are allowed since the requirement is <=, not strict <, so this permutation-style rule is valid (option B) and is in fact commonly used to reorder symbols in CSL grammar constructions. 'S -> epsilon' is valid ONLY under the special carve-out that S (the start symbol) never appears on the right-hand side of any production in the grammar - the question explicitly states this condition holds, so option C is valid. 'aA -> a' has left length 2 and right length 1, which SHRINKS the string, violating the non-contracting requirement with no exception available (the epsilon exception applies only to the start symbol on its own, not to a rule with additional context) - so option D is invalid, this is a Type-0 (unrestricted) style production, not Type-1. So A, B, and C are valid Type-1 productions."
+},
+{
+  id: 'toc-hierarchy-y5',
+  q: 'A language L over a single-letter (unary) alphabet {a} is known to be context-free. What is the maximum number of DISTINCT language classes among {regular, DCFL, CFL} that L could fail to belong to, given this fact alone? Enter your numerical answer.',
+  options: [],
+  answer: 0,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'hard',
+  type: 'numerical',
+  explanation: "A deep and often-tested fact is that every context-free language over a SINGLE-LETTER (unary) alphabet is automatically regular. This is a classical theorem (sometimes attributed to Parikh's theorem applied to the unary case): unary CFLs collapse to regular languages because there is no way to encode non-regular structure using only one symbol - the Parikh image (the vector of symbol counts) of a unary CFL is a semilinear set of natural numbers, and any semilinear subset of the naturals is eventually periodic, which is exactly the condition for a unary language to be regular. Since L is regular, it is automatically also DCFL (every regular language is accepted by a DFA, which is trivially a deterministic PDA that ignores its stack) and automatically CFL (regular is a subset of CFL). So L in fact belongs to ALL THREE of {regular, DCFL, CFL} - it cannot fail to belong to any of them. The maximum number of these classes L could fail to belong to, given only that it is a unary CFL, is therefore 0."
+},
+{
+  id: 'toc-hierarchy-y6',
+  q: 'Let A be a language known to be context-free but not regular, and let B be a language known to be regular. Consider L = A intersect B. How many of the following are POSSIBLE outcomes for the tightest classification of L (that is, for some valid choice of A and B satisfying the stated conditions, L attains that classification)? (i) L is empty (hence regular). (ii) L is a nonempty regular language. (iii) L is context-free but not regular. (iv) L is not context-free at all. Enter your numerical answer.',
+  options: [],
+  answer: 3,
+  marks: 2,
+  difficulty: 'hard',
+  type: 'numerical',
+  explanation: "CFL is closed under intersection with a regular language, so L = A intersect B is GUARANTEED to be context-free no matter what A and B are (this rules out outcome (iv) entirely - it is never possible, since intersecting a CFL with a regular set can never escape CFL). Now check whether (i), (ii), and (iii) are each achievable: (i) is possible - let A = {a^n b^n : n>=0} and B = {b} (a single string), a finite hence regular language; then L = A intersect B is empty (or at most the single string 'b' if n=0,1 aligns - choosing B = {aa} for instance forces L = empty since aa is not of form a^n b^n for n>=1, and empty is regular), giving outcome (i). (ii) is possible - let A = {a^n b^n} and B = a*b (a single a followed by a single b, i.e. the regular set {ab}); L = A intersect B = {ab} if n=1 satisfies both, a finite (hence regular) nonempty language, giving outcome (ii). (iii) is possible - let A = {a^n b^n} and B = a*b* (the regular language of all a's-then-b's, i.e. Sigma* essentially restricted to that shape); then L = A intersect B = A itself = {a^n b^n}, which is context-free but not regular, giving outcome (iii). So (i), (ii), and (iii) are all achievable while (iv) is impossible by the closure theorem - exactly 3 of the 4 listed outcomes are possible."
+}
+);
+
+window.GATE_DATA.questions['toc'].topics.find(function(t){return t.id==='toc-regular';}).questions.push(
+{
+  id: 'toc-regular-z7',
+  q: 'What is the minimum number of states in a DFA over {0,1} accepting strings where (the number of 1s is even) AND (the string does NOT contain the substring "00")?',
+  options: ['4', '5', '6', '8'],
+  answer: 1,
+  marks: 2,
+  difficulty: 'hard',
+  type: 'concept',
+  explanation: "Build the two component automata and take the product, then prune. Component 1 ('even number of 1s') needs 2 states: E (even so far), O (odd so far). Component 2 ('no 00 substring, and reject permanently once 00 appears') needs 3 states: S (start / last char not 0, or empty), Z (last char was a single 0), D (dead - 00 has occurred). The naive product has 2 x 3 = 6 states, but the dead state D is a single absorbing trap regardless of the parity component - once 00 occurs the string is rejected forever no matter how many further 1s arrive, so (D, E) and (D, O) merge into ONE dead state (they are behaviorally identical: both reject every extension). This merges 6 states down to 5: (S,E), (S,O), (Z,E), (Z,O), and the single merged dead state Dead. Checking distinguishability of the remaining 5: (S,E) is the only accepting state reachable that also has 'no 00 yet and even 1s' as the accept condition - actually only (S,E) and (Z,E) are accepting (even 1-count, and not yet dead); these two differ in whether the last symbol was 0 (needed to detect an upcoming 00), so they're distinguishable by feeding a 0 next (from (Z,E) a 0 goes to Dead - rejecting forever - while from (S,E) a 0 goes to (Z,E) - still alive), confirming both are needed and no further merging is possible among the 5. So the minimal DFA has 5 states."
+},
+{
+  id: 'toc-regular-z8',
+  q: 'Language L over {0,1} accepts strings whose length is a multiple of 3 AND that end in the bit 1. Reduction from the given description to a minimal DFA - which of the following statements about this DFA is TRUE?',
+  options: [
+    'It needs exactly 3 states, since only length mod 3 matters',
+    'It needs exactly 6 states: the product of a 3-state length-mod-3 tracker and a 2-state last-symbol tracker, and no states merge because the two conditions are independent yet both must be checked jointly at acceptance',
+    'It needs exactly 2 states, since ending in 1 alone determines acceptance',
+    'It needs exactly 9 states, since some information must be duplicated across both conditions'
+  ],
+  answer: 1,
+  marks: 2,
+  difficulty: 'hard',
+  type: 'concept',
+  explanation: "Track two independent pieces of information simultaneously: (a) current length mod 3, one of {0, 1, 2} - 3 states - and (b) whether the last symbol read was 1 or 0 (or 'no symbol yet', which behaves like 'last was 0' for acceptance purposes but must be tracked from the empty string) - effectively 2 states once you fold the start state into 'last symbol was 0' since the empty string does not end in 1 regardless. The product automaton has 3 x 2 = 6 states, one for each (length mod 3, last symbol) pair. Verify no merging is possible: accepting states are exactly (length mod 3 = 0, last = 1). Any two of the 6 states are distinguishable - e.g., (0,0) and (0,1) differ immediately (one accepts on empty-suffix continuation check, formally distinguished by the suffix epsilon after already being at length-mod-3 = 0, since (0,1) is accepting and (0,0) is not), and states with different length-mod-3 values are distinguished by an appropriate-length suffix of 1's forced to hit the right residue while ending in 1. Since both the residue and the last-symbol are genuinely independent and both are needed right up to the final decision, all 6 reachable product states remain pairwise distinguishable, and the minimal DFA needs exactly 6 states - confirming option B and refuting the naive shortcuts in A and C, and the overcount in D (9 would require 3 independent trackers, but there are only 2)."
+}
+);
+
+window.GATE_DATA.questions['toc'].topics.find(function(t){return t.id==='toc-cfl';}).questions.push(
+{
+  id: 'toc-cfl-z7',
+  q: 'Let L1 = { a^n b^n c^m d^m : n, m >= 0 } and L2 = { a^n b^m c^m d^n : n, m >= 0 }. Which of the following statements is TRUE?',
+  options: [
+    'Both L1 and L2 are context-free, but L1 intersect L2 is not context-free',
+    'L1 is context-free but L2 is not',
+    'Both L1 and L2 are context-free, and L1 intersect L2 is also context-free',
+    'Neither L1 nor L2 is context-free'
+  ],
+  answer: 0,
+  marks: 2,
+  difficulty: 'hard',
+  type: 'concept',
+  explanation: "L1 needs only two SEPARATE, non-interacting matches: match the a-block against the b-block, then independently match the c-block against the d-block - a single stack handles this sequentially (push a's, pop on b's, then since the stack is now empty, push c's, pop on d's), so L1 is context-free. L2 needs a NESTED match: outer a's-vs-d's and inner b's-vs-c's, which is exactly the classic nested-stack pattern (push a's, then push b's, pop b's against c's, then pop a's against d's) - also perfectly stack-realizable, so L2 is context-free too. But L1 intersect L2 forces n = n (trivial), and requires SIMULTANEOUSLY: from L1's constraint, first block count equals second block count (a's=b's) and third equals fourth (c's=d's); from L2's constraint, a's=d's and b's=c's. Combining all four equalities collapses everything to a single shared value k, giving exactly { a^k b^k c^k d^k : k >= 0 }, which needs three independent equal counts to hold at once - by the same style of CFL pumping lemma argument used for {a^n b^n c^n}, any decomposition confined to a window of length <= p cannot span all four blocks, so pumping breaks the four-way balance, and the intersection is provably not context-free. So option A is correct: this is the four-symbol generalization of the classic {a^n b^n c^m} intersect {a^m b^n c^n} = {a^n b^n c^n} non-closure witness."
+},
+{
+  id: 'toc-cfl-z8',
+  q: 'A pushdown automaton P has a single stack and processes input in one left-to-right pass with no restriction on nondeterminism. Which of the following languages CANNOT be accepted by P, i.e., is not context-free?',
+  options: [
+    '{ a^n b^n : n >= 0 } union { a^n b^2n : n >= 0 }',
+    '{ w in {a,b}* : w has equal numbers of a and b }',
+    '{ a^i b^j c^k : i = j or j = k, i,j,k >= 0 }',
+    '{ a^i b^j c^k d^l : i = k and j = l, i,j,k,l >= 0 }'
+  ],
+  answer: 3,
+  marks: 2,
+  difficulty: 'hard',
+  type: 'concept',
+  explanation: "Option A is a UNION of two individually-CFL languages, hence CFL by closure under union (a PDA can nondeterministically guess which disjunct to verify) - note it is NOT deterministic-CFL (no DPDA exists, since telling the two cases apart requires unbounded lookahead past the a-block), but it IS context-free, so this is not the answer. Option B (equal a's and b's) is a classic CFL, countable by a single up-down stack counter (push on a, pop on b, treat pop failure or leftover stack as reject, but since order is irrelevant the standard construction pushes a's and b's onto a signed counter effectively - accept iff the net count returns to zero, realizable with one stack). Option C, as shown in a related hierarchy question, is a disjunction of two singly-matched conditions and is CFL (union of two CFLs). Option D requires TWO INDEPENDENT SIMULTANEOUS matches that are interleaved in a non-nested, non-sequential way: i must equal k (blocks 1 and 3, separated by block 2) AND j must equal l (blocks 2 and 4) at the same time, with the four blocks in strictly increasing position so a single stack cannot both hold the a-count for later comparison against c AND separately hold the b-count for later comparison against d without the two counts interfering - a pumping-lemma argument on a^p b^p c^p d^p (any window of length <= p touches at most two of the four blocks, and pumping breaks one of the two required equalities while such small windows can't be confined to preserve both) confirms this is NOT context-free. So option D is the correct answer - the one that cannot be accepted by any PDA."
+}
+);
+
+window.GATE_DATA.questions['toc'].topics.find(function(t){return t.id==='toc-turing';}).questions.push(
+{
+  id: 'toc-turing-z7',
+  q: 'Which of the following statements about Turing machine variants and equivalence is TRUE?',
+  options: [
+    'A nondeterministic TM can decide strictly more languages than any deterministic TM',
+    'A multi-tape TM can be simulated by a single-tape TM with only a polynomial (not exponential) blow-up in running time',
+    'A TM with a two-way infinite tape can accept languages that no standard one-way-infinite-tape TM can accept',
+    'A TM that can only move its head right (never left) is equivalent in power to a standard TM'
+  ],
+  answer: 1,
+  marks: 2,
+  difficulty: 'hard',
+  type: 'concept',
+  explanation: "Option A is false: nondeterministic and deterministic TMs are equivalent in DECIDING power (every NTM has an equivalent DTM, via breadth-first simulation of the computation tree with the standard subset/dovetailing construction) - they differ only in efficiency (potentially exponential slowdown), not in which languages are recognizable/decidable. Option B is TRUE: the standard interleaved-tracks simulation of a k-tape TM by a single-tape TM incurs only a QUADRATIC (O(n^2)) slowdown, as established by the standard construction - each of the n steps requires an O(n) sweep, giving O(n^2) total, which is polynomial, not exponential; this is the basis for the 'multitape and single-tape TMs are polynomially equivalent' robustness claim underlying the Church-Turing-style equivalence of reasonable computational models up to polynomial factors. Option C is false: a two-way-infinite-tape TM can be simulated by a standard one-way-infinite-tape TM by folding the tape (interleaving the left-half and right-half onto two tracks of a one-way tape), so they accept exactly the same class of languages. Option D is false: a head that can only move right can never re-read or revise earlier symbols meaningfully in the way needed for general computation, and a right-only TM is in fact equivalent only to a much weaker model (essentially equivalent to a DFA / regular language recognizer in the deciding-power sense for many formalizations, definitely NOT as powerful as a standard two-directional TM) - it cannot simulate arbitrary bidirectional computation."
+},
+{
+  id: 'toc-turing-z8',
+  q: 'Consider two Turing machines M1 and M2. It is known that M1 always halts on every input (M1 is a decider) and that L(M2) = complement(L(M1)) as sets. Which of the following must be TRUE?',
+  options: [
+    'M2 must also always halt on every input',
+    'L(M1) is recursive (decidable)',
+    'L(M2) cannot be recursively enumerable',
+    'M1 must be nondeterministic'
+  ],
+  answer: 1,
+  marks: 2,
+  difficulty: 'hard',
+  type: 'concept',
+  explanation: "Since M1 always halts on every input and accepts exactly L(M1), M1 is by definition a total decider for L(M1), so L(M1) is recursive - option B is guaranteed true directly from the definition of 'always halts' (decider), independent of anything about M2. Option A is not guaranteed: we are only told L(M2) equals the complement of L(M1) AS A SET; this says nothing about M2's own halting behavior - M2 could be some inefficiently- or badly-constructed machine that happens to accept exactly the complement set but loops on some inputs it should reject (recall that RECOGNIZING a language, accepting exactly the strings in it, does not by itself require always halting - only DECIDING does). It is true that SOME decider for L(M2) must exist (since L(M1) is recursive, REC is closed under complement, so complement(L(M1)) = L(M2) is also recursive and thus has a total decider) but the SPECIFIC machine M2 given need not itself be that decider. Option C is false: since L(M1) is recursive, its complement L(M2) is also recursive, and every recursive language is automatically recursively enumerable (recursive is a subset of RE) - so L(M2) certainly CAN be, and in fact must be, RE, directly contradicting option C. Option D is false: nothing forces M1 to be nondeterministic - deciders are very commonly deterministic, and 'always halts' says nothing about determinism either way. So only option B is a guaranteed truth."
+}
+);
+
+window.GATE_DATA.questions['toc'].topics.find(function(t){return t.id==='toc-decidability';}).questions.push(
+{
+  id: 'toc-decidability-z7',
+  q: 'Define the language D = { <M> : M is a TM, and M does NOT accept its own encoding <M> }. Which of the following is the correct conclusion about D?',
+  options: [
+    'D is decidable',
+    'D is recursively enumerable but not decidable',
+    'D is not recursively enumerable (this is the diagonalization language used to prove A_TM is undecidable / that not all languages are RE)',
+    'D equals A_TM'
+  ],
+  answer: 2,
+  marks: 2,
+  difficulty: 'hard',
+  type: 'concept',
+  explanation: "D is the classical diagonalization language: D = { <M> : M does not accept <M> }, built by negating the diagonal of the (machine, its-own-encoding) acceptance table. Suppose for contradiction D were RE, recognized by some TM T. Ask: does T accept <T>? If T accepts <T>, then by T's own definition of D, <T> is in D means T does NOT accept <T> - contradiction. If T does not accept <T>, then <T> satisfies the defining condition of D (M does not accept <M>), so <T> should be in D, meaning T SHOULD accept <T> - contradiction again. Either way we reach a contradiction, so no such T can exist: D is not even recursively enumerable, let alone decidable. This is the direct diagonalization argument that also underlies the undecidability of A_TM (D is closely related to - essentially the complement-flavored twin of - the self-referential trick used there), and it is the standard proof that RE is a strict subset of all languages (some languages, like D, are not RE at all). Options A and B both incorrectly assume D has at least a recognizer, and option D is false since A_TM = {<M,w> : M accepts w} is a different (two-part encoding) language that IS RE, unlike D."
+},
+{
+  id: 'toc-decidability-z8',
+  q: 'Let HALT_ALL = { <M> : M halts on every input w in Sigma* }. Which reduction correctly shows HALT_ALL is undecidable?',
+  options: [
+    'Reduce HALT_ALL to A_TM by constructing, from <M,w>, a machine M\' that ignores its input and simulates M on w, then checking if M\' is in HALT_ALL',
+    'Reduce A_TM to HALT_ALL by constructing, from <M,w>, a machine M\' that ignores its own input, simulates M on the fixed string w, and halts if and only if that simulation halts (accepting or rejecting) - then <M,w> is in A_TM related question (M halts on w) if and only if <M\'> is in HALT_ALL, since M\' either halts on ALL inputs (if M halts on w) or LOOPS on all inputs (if M loops on w)',
+    'HALT_ALL is decidable, so no reduction proving undecidability is needed',
+    'Reduce EQ_TM to HALT_ALL directly using the same machine M\' with no modification'
+  ],
+  answer: 1,
+  marks: 2,
+  difficulty: 'hard',
+  type: 'concept',
+  explanation: "The correct undecidability proof for HALT_ALL reduces a KNOWN undecidable problem (the halting problem HALT_TM, i.e., does M halt on w) TO HALT_ALL, showing HALT_ALL is at least as hard. Construction: given <M, w>, build M' that ignores whatever input it is actually given and instead simulates M running on the FIXED string w; M' halts (on any input) if and only if that internal simulation of M on w halts. Then: if M halts on w, M' halts on every possible input (since M' always performs the same halting simulation regardless of its own input) - so <M'> is in HALT_ALL. If M loops forever on w, M' loops forever on every input (never finishing the simulation) - so <M'> is NOT in HALT_ALL. This gives a valid many-one reduction HALT_TM <=m HALT_ALL: <M,w> in HALT_TM iff <M'> in HALT_ALL, and the map <M,w> to <M'> is clearly computable (just wrap M and w into M's description). Since HALT_TM is undecidable and reduces to HALT_ALL, HALT_ALL must be undecidable too (if HALT_ALL were decidable, composing with the computable reduction would decide HALT_TM, contradiction). Option A reduces in the wrong direction (reducing the target back to a known problem proves nothing about the target's hardness), option C is factually false, and option D references an unrelated problem (EQ_TM) with no valid construction given."
+}
+);
+
+window.GATE_DATA.questions['toc'].topics.find(function(t){return t.id==='toc-hierarchy';}).questions.push(
+{
+  id: 'toc-hierarchy-z7',
+  q: "Let L = { a^n b^n c^n : n >= 0 } and R = a*b*c* (the regular language of any number of a's, then b's, then c's). Consider M = L union complement(R). Which of the following is the tightest correct classification of M?",
+  options: [
+    'M is regular',
+    'M is context-free but not regular',
+    'M is context-sensitive (or recursive) but not context-free',
+    'M is not recursively enumerable'
+  ],
+  answer: 2,
+  marks: 2,
+  difficulty: 'hard',
+  type: 'concept',
+  explanation: "complement(R) is regular, since regular languages are closed under complement (swap accept/reject states of R's DFA) - it consists of every string NOT of the form a*b*c*, i.e., every string with a symbol out of order. Now M = L union complement(R): every string is either in the 'wrong order' set complement(R), or is of the correct a*b*c* shape - and among the correctly-shaped strings a^i b^j c^k, M additionally includes exactly those with i=j=k (from L). So M accepts a string if and only if EITHER it is out of order, OR it has the exact form a^n b^n c^n. Suppose M were context-free; since CFL is closed under intersection with a regular language, M intersect R would also be context-free. But M intersect R = (L union complement(R)) intersect R = (L intersect R) union (complement(R) intersect R) = (L intersect R) union empty = L intersect R. Since L is already a subset of R (every a^n b^n c^n is of shape a*b*c*), L intersect R = L = {a^n b^n c^n}, which is known to NOT be context-free. This contradicts the closure property, so M cannot be context-free either. M is, however, still decidable/context-sensitive: a TM can first check the a*b*c* shape (regular, trivial) and if it fails, accept immediately (complement(R) case); if the shape holds, count and compare the three blocks using only linear space, exactly as for L itself. So the tightest classification is context-sensitive (equivalently recursive here) but not context-free - option C. This is a good illustration of using CFL's one useful intersection-closure property (with regular sets) IN REVERSE, as a non-closure detector for a more complex constructed language."
+},
+{
+  id: 'toc-hierarchy-z8',
+  q: 'True or False, with justification required: "If L1 is context-free and L2 is context-free, and L1 is a subset of L2, then L2 minus L1 (the set difference) must also be context-free." Which of the following is the correct verdict?',
+  options: [
+    'True: CFLs are closed under set difference whenever a subset relationship holds',
+    'False: even with L1 subset of L2 and both context-free, L2 - L1 can fail to be context-free, because CFLs are not closed under set difference in general (difference can be rewritten using complement and intersection, both of which CFL lacks) and the subset condition does not repair this',
+    'True: because L2 - L1 = L2 intersect complement(L1), and CFL is closed under intersection with any CFL',
+    'False: L2 - L1 is always regular whenever L1 is a subset of L2'
+  ],
+  answer: 1,
+  marks: 2,
+  difficulty: 'hard',
+  type: 'concept',
+  explanation: "General set difference for CFLs fails because L2 - L1 = L2 intersect complement(L1), and CFL is closed under NEITHER general complementation NOR general intersection (only the special case of intersection with a REGULAR set is safe) - so there is no free closure argument available, subset condition or not. Concrete verified witness: over Sigma = {a,b,c}, let L1 = { a^i b^j c^k : i != j or j != k } (i,j,k >= 0). Each disjunct alone is context-free (a PDA can verify i != j using its stack by nondeterministically guessing whether i < j or i > j and checking the mismatch, and symmetrically for j != k), and CFL is closed under union, so L1 is context-free. Let L2 = Sigma* = {a,b,c}* (the full set of all strings over the alphabet), which is trivially regular and hence context-free, and L1 is obviously a subset of L2. Now L2 - L1 = complement(L1) restricted to Sigma*, which equals exactly the strings where NEITHER i != j NOR j != k holds, i.e., i = j AND j = k simultaneously - this is precisely { a^n b^n c^n : n >= 0 }, the canonical language already established to be non-context-free (it fails the CFL pumping lemma, since any window of length <= p in a^p b^p c^p touches at most two of the three blocks). So here L1 and L2 are both context-free, L1 is a subset of L2, yet L2 - L1 is not context-free - a fully verified counterexample. This is in fact the standard textbook proof that CFL is not closed under complementation (taking L2 = Sigma* makes L2 - L1 literally equal complement(L1)), repurposed here to also refute the subset-repairs-difference-closure claim. So the correct verdict is option B."
+}
+);
+
+window.GATE_DATA.questions['toc'].topics.find(function(t){return t.id==='toc-regular';}).questions.push(
+{
+  id: 'toc-regular-f1',
+  q: 'The DFA shown below is defined over the alphabet {a, b}. Which language does it accept?',
+  figure: '<svg viewBox="0 0 400 190" width="100%" style="max-width:420px;height:auto" xmlns="http://www.w3.org/2000/svg"><defs><marker id="ah1" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" fill="currentColor"/></marker></defs><line x1="30" y1="90" x2="76" y2="90" stroke="currentColor" stroke-width="1.5" marker-end="url(#ah1)"/><text x="18" y="78" font-size="12" fill="currentColor">start</text><circle cx="100" cy="90" r="20" fill="none" stroke="currentColor" stroke-width="1.5"/><text x="92" y="95" font-size="13" fill="currentColor">q0</text><circle cx="300" cy="90" r="20" fill="none" stroke="currentColor" stroke-width="1.5"/><circle cx="300" cy="90" r="15" fill="none" stroke="currentColor" stroke-width="1.5"/><text x="292" y="95" font-size="13" fill="currentColor">q1</text><path d="M118,78 C170,40 230,40 282,78" fill="none" stroke="currentColor" stroke-width="1.5" marker-end="url(#ah1)"/><text x="192" y="42" font-size="13" fill="currentColor">a</text><path d="M282,102 C230,140 170,140 118,102" fill="none" stroke="currentColor" stroke-width="1.5" marker-end="url(#ah1)"/><text x="192" y="152" font-size="13" fill="currentColor">a</text><path d="M87,74 C72,42 100,25 113,70" fill="none" stroke="currentColor" stroke-width="1.5" marker-end="url(#ah1)"/><text x="72" y="30" font-size="13" fill="currentColor">b</text><path d="M287,70 C300,25 328,42 313,74" fill="none" stroke="currentColor" stroke-width="1.5" marker-end="url(#ah1)"/><text x="303" y="30" font-size="13" fill="currentColor">b</text></svg>',
+  options: ['Strings with an odd number of a symbols', 'Strings with an even number of a symbols', 'Strings with an odd number of b symbols', 'Strings that end with the symbol a'],
+  answer: 0,
+  marks: 1,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: "Read the diagram as a parity counter on the symbol a: q0 is the start state and represents an even count of a symbols seen so far (zero counts as even), while q1 is the only final state (drawn with a double circle) and represents an odd count. Every a-transition flips between q0 and q1 (q0 to q1 and q1 back to q0), while every b-transition is a self-loop that leaves the current state unchanged, so b symbols never affect the count of a symbols and are simply ignored. Tracing example strings confirms this: the empty string stays at q0 (even, rejected, correctly zero a's is even); the string a moves once to q1 (accepted, one a is odd); the string ab moves to q1 on a and self-loops on b, ending at q1 (accepted); the string aa moves to q1 then back to q0 (rejected, two a's is even). Since acceptance depends only on parity of a-count and b's are irrelevant, the accepted language is exactly the strings with an odd number of a symbols, so option A is correct. Option D is wrong because ending in a is unrelated to the total count parity, and options B and C misidentify which symbol and which parity is tracked."
+},
+{
+  id: 'toc-regular-f2',
+  q: 'The DFA shown below is defined over {a, b}, with q0 and q1 both final states (double circles) and qd a trap state. Which of the following strings does this DFA accept?',
+  figure: '<svg viewBox="0 0 400 190" width="100%" style="max-width:420px;height:auto" xmlns="http://www.w3.org/2000/svg"><defs><marker id="ah2" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" fill="currentColor"/></marker></defs><line x1="18" y1="90" x2="58" y2="90" stroke="currentColor" stroke-width="1.5" marker-end="url(#ah2)"/><text x="8" y="78" font-size="12" fill="currentColor">start</text><circle cx="80" cy="90" r="20" fill="none" stroke="currentColor" stroke-width="1.5"/><circle cx="80" cy="90" r="15" fill="none" stroke="currentColor" stroke-width="1.5"/><text x="72" y="95" font-size="13" fill="currentColor">q0</text><circle cx="220" cy="90" r="20" fill="none" stroke="currentColor" stroke-width="1.5"/><circle cx="220" cy="90" r="15" fill="none" stroke="currentColor" stroke-width="1.5"/><text x="212" y="95" font-size="13" fill="currentColor">q1</text><circle cx="360" cy="90" r="20" fill="none" stroke="currentColor" stroke-width="1.5"/><text x="350" y="95" font-size="13" fill="currentColor">qd</text><path d="M100,78 C140,50 180,50 200,78" fill="none" stroke="currentColor" stroke-width="1.5" marker-end="url(#ah2)"/><text x="145" y="52" font-size="13" fill="currentColor">a</text><path d="M200,102 C180,130 140,130 100,102" fill="none" stroke="currentColor" stroke-width="1.5" marker-end="url(#ah2)"/><text x="145" y="140" font-size="13" fill="currentColor">b</text><path d="M66,75 C50,42 78,25 93,72" fill="none" stroke="currentColor" stroke-width="1.5" marker-end="url(#ah2)"/><text x="48" y="30" font-size="13" fill="currentColor">b</text><path d="M240,78 C280,50 320,50 340,78" fill="none" stroke="currentColor" stroke-width="1.5" marker-end="url(#ah2)"/><text x="285" y="52" font-size="13" fill="currentColor">a</text><path d="M346,75 C330,42 358,25 373,72" fill="none" stroke="currentColor" stroke-width="1.5" marker-end="url(#ah2)"/><text x="360" y="30" font-size="13" fill="currentColor">a,b</text></svg>',
+  options: ['aab', 'abab', 'baa', 'aabb'],
+  answer: 1,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: "Trace each option through the diagram. From q0: reading a goes to q1, reading b stays at q0 (self-loop). From q1: reading b goes back to q0, but reading a goes to qd, the trap state, which self-loops on both a and b forever and is not a final state (single circle, not double). So the DFA only ever moves to qd the moment it reads two a symbols in a row, meaning it accepts precisely the strings over {a,b} that never contain the substring aa. Check aab: a to q1, a to qd (aa seen) -> rejected. Check baa: b stays q0, a to q1, a to qd -> rejected. Check aabb: a to q1, a to qd immediately -> rejected. Check abab: a to q1, b to q0, a to q1, b to q0, ending at q0 which is final and no aa ever occurred -> accepted. So option B, abab, is the only accepted string, since it alternates and never repeats a consecutively, while every other option contains aa somewhere."
+},
+{
+  id: 'toc-regular-f3',
+  q: 'The DFA below is defined over {0,1} with q1 as the only final state. How many states does the minimal DFA equivalent to this machine have?',
+  figure: '<svg viewBox="0 0 400 200" width="100%" style="max-width:420px;height:auto" xmlns="http://www.w3.org/2000/svg"><defs><marker id="ah3" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" fill="currentColor"/></marker></defs><line x1="18" y1="90" x2="58" y2="90" stroke="currentColor" stroke-width="1.5" marker-end="url(#ah3)"/><text x="6" y="78" font-size="12" fill="currentColor">start</text><circle cx="80" cy="90" r="20" fill="none" stroke="currentColor" stroke-width="1.5"/><text x="70" y="95" font-size="13" fill="currentColor">qA</text><circle cx="220" cy="90" r="20" fill="none" stroke="currentColor" stroke-width="1.5"/><text x="210" y="95" font-size="13" fill="currentColor">qB</text><circle cx="360" cy="90" r="20" fill="none" stroke="currentColor" stroke-width="1.5"/><circle cx="360" cy="90" r="15" fill="none" stroke="currentColor" stroke-width="1.5"/><text x="352" y="95" font-size="13" fill="currentColor">q1</text><path d="M100,78 C140,50 180,50 200,78" fill="none" stroke="currentColor" stroke-width="1.5" marker-end="url(#ah3)"/><text x="145" y="52" font-size="13" fill="currentColor">1</text><path d="M95,72 C170,10 290,10 345,72" fill="none" stroke="currentColor" stroke-width="1.5" marker-end="url(#ah3)"/><text x="215" y="20" font-size="13" fill="currentColor">0</text><path d="M240,78 C280,50 320,50 340,78" fill="none" stroke="currentColor" stroke-width="1.5" marker-end="url(#ah3)"/><text x="285" y="52" font-size="13" fill="currentColor">0</text><path d="M206,75 C190,42 218,25 233,72" fill="none" stroke="currentColor" stroke-width="1.5" marker-end="url(#ah3)"/><text x="195" y="30" font-size="13" fill="currentColor">1</text><path d="M346,75 C330,42 358,25 373,72" fill="none" stroke="currentColor" stroke-width="1.5" marker-end="url(#ah3)"/><text x="358" y="30" font-size="13" fill="currentColor">0</text><path d="M345,108 C300,150 180,150 95,108" fill="none" stroke="currentColor" stroke-width="1.5" marker-end="url(#ah3)"/><text x="205" y="163" font-size="13" fill="currentColor">1</text></svg>',
+  options: ['2', '3', '4', '5'],
+  answer: 0,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: "Read the transitions: qA on 0 goes to q1, on 1 goes to qB. qB on 0 goes to q1, on 1 self-loops to qB. q1 on 0 self-loops to q1, on 1 goes to qA. Both qA and qB are non-final, and both transition to the same target on 0 (namely q1) and to the same target on 1 (namely qB, since qA-1->qB and qB-1->qB land in the same state). Because qA and qB agree on every future behavior for every input string, they are Myhill-Nerode equivalent and can be merged into a single non-final state, call it p. The merged machine has states {p, q1}: p on 0 goes to q1, p on 1 stays at p, q1 on 0 stays at q1, q1 on 1 goes to p. This is exactly the minimal 2-state DFA for the language of strings over {0,1} that end in 0 (verify: input 0 ends at q1, accepted; input 1 ends at p, rejected; input 10 ends at q1, accepted). Since qA and qB were the only mergeable pair and no further reduction is possible in a 2-state machine with both q1 and p distinguishable, the minimal equivalent DFA has exactly 2 states."
+},
+{
+  id: 'toc-regular-f4',
+  q: 'The NFA shown below over {a, b} recognizes strings containing the substring ab, using q0 as start and q2 as the only final state. Starting the subset construction from {q0}, how many distinct states are reachable in the resulting DFA?',
+  figure: '<svg viewBox="0 0 400 190" width="100%" style="max-width:420px;height:auto" xmlns="http://www.w3.org/2000/svg"><defs><marker id="ah4" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" fill="currentColor"/></marker></defs><line x1="18" y1="90" x2="58" y2="90" stroke="currentColor" stroke-width="1.5" marker-end="url(#ah4)"/><text x="6" y="78" font-size="12" fill="currentColor">start</text><circle cx="80" cy="90" r="20" fill="none" stroke="currentColor" stroke-width="1.5"/><text x="70" y="95" font-size="13" fill="currentColor">q0</text><circle cx="220" cy="90" r="20" fill="none" stroke="currentColor" stroke-width="1.5"/><text x="210" y="95" font-size="13" fill="currentColor">q1</text><circle cx="360" cy="90" r="20" fill="none" stroke="currentColor" stroke-width="1.5"/><circle cx="360" cy="90" r="15" fill="none" stroke="currentColor" stroke-width="1.5"/><text x="352" y="95" font-size="13" fill="currentColor">q2</text><path d="M66,75 C50,42 78,25 93,72" fill="none" stroke="currentColor" stroke-width="1.5" marker-end="url(#ah4)"/><text x="45" y="30" font-size="13" fill="currentColor">a,b</text><path d="M100,78 C140,50 180,50 200,78" fill="none" stroke="currentColor" stroke-width="1.5" marker-end="url(#ah4)"/><text x="145" y="52" font-size="13" fill="currentColor">a</text><path d="M240,78 C280,50 320,50 340,78" fill="none" stroke="currentColor" stroke-width="1.5" marker-end="url(#ah4)"/><text x="278" y="52" font-size="13" fill="currentColor">b</text><path d="M346,75 C330,42 358,25 373,72" fill="none" stroke="currentColor" stroke-width="1.5" marker-end="url(#ah4)"/><text x="356" y="30" font-size="13" fill="currentColor">a,b</text></svg>',
+  options: ['3', '4', '5', '8'],
+  answer: 1,
+  marks: 2,
+  difficulty: 'hard',
+  type: 'pyq-style',
+  explanation: "The NFA reads: q0 self-loops on a and b (guessing where ab might start), q0 nondeterministically also moves to q1 on a, q1 moves to q2 only on b (q1 has no transition on a, so that branch dies), and q2 self-loops on a and b once the substring ab has been confirmed. Apply subset construction starting from {q0}. On a: q0 contributes q0 and q1, giving {q0,q1}. On b from {q0}: only q0's self-loop fires, giving {q0}. From {q0,q1}: on a, q0 gives {q0,q1} again (q1 has no a-move, so it contributes nothing) giving {q0,q1}; on b, q0 gives {q0} and q1 gives {q2}, giving {q0,q2}. From {q0,q2}: on a, q0 gives {q0,q1} and q2 gives {q2}, giving {q0,q1,q2}; on b, q0 gives {q0} and q2 gives {q2}, giving {q0,q2}. From {q0,q1,q2}: on a gives {q0,q1,q2} again, on b gives q0 to {q0}, q1 to {q2}, q2 to {q2}, giving {q0,q2}. So the reachable subsets are exactly {q0}, {q0,q1}, {q0,q2}, {q0,q1,q2} - four distinct states, and no new subsets appear beyond this closed set. The answer is 4."
+},
+{
+  id: 'toc-regular-f5',
+  q: 'In the DFA shown below over {0,1} with start state q0 and final state q1, which state can never be reached from q0 on any input, making it redundant?',
+  figure: '<svg viewBox="0 0 420 280" width="100%" style="max-width:420px;height:auto" xmlns="http://www.w3.org/2000/svg"><defs><marker id="ah5" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" fill="currentColor"/></marker></defs><line x1="10" y1="150" x2="58" y2="150" stroke="currentColor" stroke-width="1.5" marker-end="url(#ah5)"/><text x="2" y="138" font-size="12" fill="currentColor">start</text><circle cx="80" cy="150" r="20" fill="none" stroke="currentColor" stroke-width="1.5"/><text x="70" y="155" font-size="13" fill="currentColor">q0</text><circle cx="250" cy="70" r="20" fill="none" stroke="currentColor" stroke-width="1.5"/><circle cx="250" cy="70" r="15" fill="none" stroke="currentColor" stroke-width="1.5"/><text x="240" y="75" font-size="13" fill="currentColor">q1</text><circle cx="250" cy="230" r="20" fill="none" stroke="currentColor" stroke-width="1.5"/><text x="240" y="235" font-size="13" fill="currentColor">q2</text><circle cx="390" cy="150" r="20" fill="none" stroke="currentColor" stroke-width="1.5"/><text x="380" y="155" font-size="13" fill="currentColor">q3</text><line x1="97" y1="136" x2="230" y2="84" stroke="currentColor" stroke-width="1.5" marker-end="url(#ah5)"/><text x="150" y="100" font-size="13" fill="currentColor">0</text><line x1="97" y1="164" x2="230" y2="216" stroke="currentColor" stroke-width="1.5" marker-end="url(#ah5)"/><text x="150" y="205" font-size="13" fill="currentColor">1</text><line x1="255" y1="90" x2="255" y2="210" stroke="currentColor" stroke-width="1.5" marker-end="url(#ah5)"/><text x="262" y="155" font-size="13" fill="currentColor">1</text><path d="M240,50 C220,25 260,15 262,48" fill="none" stroke="currentColor" stroke-width="1.5" marker-end="url(#ah5)"/><text x="215" y="20" font-size="13" fill="currentColor">0</text><path d="M240,250 C220,275 260,275 262,248" fill="none" stroke="currentColor" stroke-width="1.5" marker-end="url(#ah5)"/><text x="220" y="278" font-size="13" fill="currentColor">0,1</text><line x1="372" y1="136" x2="270" y2="84" stroke="currentColor" stroke-width="1.5" marker-end="url(#ah5)"/><text x="330" y="100" font-size="13" fill="currentColor">0</text><line x1="372" y1="164" x2="103" y2="156" stroke="currentColor" stroke-width="1.5" marker-end="url(#ah5)"/><text x="330" y="185" font-size="13" fill="currentColor">1</text></svg>',
+  options: ['q0', 'q1', 'q2', 'q3'],
+  answer: 3,
+  marks: 1,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: "To find unreachable states, look at which states have incoming edges from other states (or the start arrow) and trace outward from q0. The start arrow points only to q0. From q0, reading 0 leads to q1 and reading 1 leads to q2, so both q1 and q2 are reachable in one step. From q1, reading 1 goes to q2 (already reachable) and reading 0 self-loops. From q2, both symbols self-loop, so q2 is a dead trap state but it is still reachable, just non-final and inescapable. Now look at q3: its two outgoing edges go to q1 (on 0) and back to q0 (on 1), but scanning every arrow in the figure, no edge from q0, q1, or q2 ever points into q3, and the start arrow points to q0, not q3. Since nothing in the machine's reachable set {q0, q1, q2} ever transitions into q3, q3 can never be visited during any run of the DFA regardless of the input string, making it a fully unreachable and redundant state that could be deleted without changing the accepted language. Hence the answer is q3."
+},
+{
+  id: 'toc-regular-f6',
+  q: 'The DFA below reads a binary string one bit at a time, most significant bit first, starting in q0 (the only final state). Which language over {0,1} does it accept?',
+  figure: '<svg viewBox="0 0 400 260" width="100%" style="max-width:420px;height:auto" xmlns="http://www.w3.org/2000/svg"><defs><marker id="ah6" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" fill="currentColor"/></marker></defs><circle cx="200" cy="50" r="20" fill="none" stroke="currentColor" stroke-width="1.5"/><circle cx="200" cy="50" r="15" fill="none" stroke="currentColor" stroke-width="1.5"/><text x="192" y="55" font-size="13" fill="currentColor">q0</text><line x1="200" y1="5" x2="200" y2="28" stroke="currentColor" stroke-width="1.5" marker-end="url(#ah6)"/><text x="160" y="15" font-size="12" fill="currentColor">start</text><circle cx="90" cy="210" r="20" fill="none" stroke="currentColor" stroke-width="1.5"/><text x="80" y="215" font-size="13" fill="currentColor">q1</text><circle cx="310" cy="210" r="20" fill="none" stroke="currentColor" stroke-width="1.5"/><text x="300" y="215" font-size="13" fill="currentColor">q2</text><path d="M182,35 C160,10 205,0 216,33" fill="none" stroke="currentColor" stroke-width="1.5" marker-end="url(#ah6)"/><text x="155" y="10" font-size="13" fill="currentColor">0</text><line x1="184" y1="64" x2="103" y2="195" stroke="currentColor" stroke-width="1.5" marker-end="url(#ah6)"/><text x="130" y="120" font-size="13" fill="currentColor">1</text><path d="M108,196 C160,140 240,140 292,196" fill="none" stroke="currentColor" stroke-width="1.5" marker-end="url(#ah6)"/><text x="195" y="145" font-size="13" fill="currentColor">1</text><line x1="107" y1="222" x2="293" y2="222" stroke="currentColor" stroke-width="1.5" marker-end="url(#ah6)"/><text x="195" y="245" font-size="13" fill="currentColor">0</text><line x1="292" y1="195" x2="216" y2="65" stroke="currentColor" stroke-width="1.5" marker-end="url(#ah6)"/><text x="270" y="120" font-size="13" fill="currentColor">0</text><path d="M330,196 C355,160 355,255 320,222" fill="none" stroke="currentColor" stroke-width="1.5" marker-end="url(#ah6)"/><text x="345" y="230" font-size="13" fill="currentColor">1</text></svg>',
+  options: ['Binary strings representing a number divisible by 3', 'Binary strings representing a number divisible by 2', 'Binary strings with equal numbers of 0s and 1s', 'Binary strings representing a number divisible by 4'],
+  answer: 0,
+  marks: 2,
+  difficulty: 'hard',
+  type: 'pyq-style',
+  explanation: "This is the standard remainder-tracking DFA for divisibility, where state qr represents the value read so far being congruent to r modulo 3, and reading a new bit b updates the remainder to (2*old + b) mod 3, since appending a bit to a binary number doubles the old value and adds the bit. Reading the edges confirms this: q0 (remainder 0) on 0 stays at q0 (2*0+0=0), and on 1 goes to q1 (2*0+1=1). q1 (remainder 1) on 0 goes to q2 (2*1+0=2 mod 3), and on 1 goes to q0 (2*1+1=3 mod 3=0). q2 (remainder 2) on 0 goes to q1 (2*2+0=4 mod 3=1), and on 1 goes to q2 (2*2+1=5 mod 3=2). Only q0 is final, so the machine accepts exactly when the final remainder mod 3 is 0. Verify with 110 (decimal 6): q0-1->q1-1->q0-0->q0, ends at q0, accepted, and 6 is divisible by 3. Verify with 101 (decimal 5): q0-1->q1-0->q2-1->q2, ends at q2, rejected, and 5 is not divisible by 3. So the accepted language is binary strings representing numbers divisible by 3, option A."
+}
+);
+
+window.GATE_DATA.questions['toc'].topics.find(function(t){return t.id==='toc-cfl';}).questions.push(
+{
+  id: 'toc-cfl-f1',
+  q: 'The PDA shown below (stack starts with Z, accepts by final state q2) operates over {0,1}. Which language does it recognize?',
+  figure: '<svg viewBox="0 0 420 220" width="100%" style="max-width:420px;height:auto" xmlns="http://www.w3.org/2000/svg"><defs><marker id="ahp1" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" fill="currentColor"/></marker></defs><line x1="10" y1="90" x2="58" y2="90" stroke="currentColor" stroke-width="1.5" marker-end="url(#ahp1)"/><text x="0" y="78" font-size="12" fill="currentColor">start</text><circle cx="80" cy="90" r="20" fill="none" stroke="currentColor" stroke-width="1.5"/><text x="70" y="95" font-size="13" fill="currentColor">q0</text><circle cx="240" cy="90" r="20" fill="none" stroke="currentColor" stroke-width="1.5"/><text x="230" y="95" font-size="13" fill="currentColor">q1</text><circle cx="380" cy="90" r="20" fill="none" stroke="currentColor" stroke-width="1.5"/><circle cx="380" cy="90" r="15" fill="none" stroke="currentColor" stroke-width="1.5"/><text x="370" y="95" font-size="13" fill="currentColor">q2</text><path d="M65,75 C48,42 78,25 95,70" fill="none" stroke="currentColor" stroke-width="1.5" marker-end="url(#ahp1)"/><text x="8" y="35" font-size="11" fill="currentColor">0,Z/AZ</text><text x="8" y="50" font-size="11" fill="currentColor">0,A/AA</text><path d="M100,80 C150,55 190,55 220,80" fill="none" stroke="currentColor" stroke-width="1.5" marker-end="url(#ahp1)"/><text x="130" y="55" font-size="11" fill="currentColor">1,A/e</text><path d="M225,72 C260,20 340,20 375,68" fill="none" stroke="currentColor" stroke-width="1.5" marker-end="url(#ahp1)"/><text x="270" y="18" font-size="11" fill="currentColor">e,Z/Z</text><path d="M225,110 C260,140 340,140 375,112" fill="none" stroke="currentColor" stroke-width="1.5" marker-end="url(#ahp1)"/><text x="270" y="158" font-size="11" fill="currentColor">e,Z/Z</text><path d="M255,75 C230,40 250,25 262,68" fill="none" stroke="currentColor" stroke-width="1.5" marker-end="url(#ahp1)"/><text x="248" y="30" font-size="11" fill="currentColor">1,A/e</text></svg>',
+  options: ['{ 0^n 1^n : n >= 0 }', '{ 0^n 1^m : n, m >= 0 }', '{ 0^n 1^n : n >= 1 }', '{ w w^R : w in {0,1}* }'],
+  answer: 0,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: "Trace the PDA using e to denote epsilon. In q0, every 0 pushes an A onto the stack (0,Z/AZ on the first 0, then 0,A/AA for each subsequent 0), so after n zeros the stack holds n copies of A above the bottom marker Z - this is the counting phase. The move labelled e,Z/Z from q0 directly to the final state q2 fires only when the stack is still just Z, i.e., zero 0s have been read, which correctly accepts the empty string (n=0 case). Once a 1 is read, the machine takes 1,A/e from q0 to q1, popping one A; thereafter q1 loops on 1,A/e, popping one A per 1. Each 1 can only be matched if an A is available, so exactly as many 1s as 0s can be consumed. Finally, the e,Z/Z move from q1 to q2 fires only once all the A's have been popped and only Z remains, confirming the counts matched exactly. So the PDA accepts a string only when the number of 1s following the block of 0s exactly equals the number of 0s, giving the language { 0^n 1^n : n >= 0 }, option A. Options C and D are wrong since n=0 is accepted and no reversal check exists."
+},
+{
+  id: 'toc-cfl-f2',
+  q: 'The parse tree shown below is built using the grammar E -> E + E | E * E | id. Reading its leaves from left to right, which string does this parse tree derive?',
+  figure: '<svg viewBox="0 0 400 260" width="100%" style="max-width:420px;height:auto" xmlns="http://www.w3.org/2000/svg"><text x="192" y="35" font-size="14" fill="currentColor">E</text><text x="92" y="105" font-size="14" fill="currentColor">E</text><text x="192" y="105" font-size="14" fill="currentColor">+</text><text x="292" y="105" font-size="14" fill="currentColor">E</text><text x="82" y="175" font-size="13" fill="currentColor">id</text><text x="242" y="175" font-size="13" fill="currentColor">E</text><text x="292" y="175" font-size="13" fill="currentColor">*</text><text x="342" y="175" font-size="13" fill="currentColor">E</text><text x="232" y="235" font-size="13" fill="currentColor">id</text><text x="332" y="235" font-size="13" fill="currentColor">id</text><line x1="198" y1="40" x2="98" y2="92" stroke="currentColor" stroke-width="1.5"/><line x1="200" y1="40" x2="198" y2="92" stroke="currentColor" stroke-width="1.5"/><line x1="204" y1="40" x2="298" y2="92" stroke="currentColor" stroke-width="1.5"/><line x1="96" y1="112" x2="88" y2="163" stroke="currentColor" stroke-width="1.5"/><line x1="298" y1="112" x2="248" y2="163" stroke="currentColor" stroke-width="1.5"/><line x1="300" y1="112" x2="298" y2="163" stroke="currentColor" stroke-width="1.5"/><line x1="304" y1="112" x2="348" y2="163" stroke="currentColor" stroke-width="1.5"/><line x1="246" y1="182" x2="238" y2="223" stroke="currentColor" stroke-width="1.5"/><line x1="346" y1="182" x2="338" y2="223" stroke="currentColor" stroke-width="1.5"/></svg>',
+  options: ['id + id * id', 'id * id + id', 'id + id + id', 'id * id * id'],
+  answer: 0,
+  marks: 1,
+  difficulty: 'easy',
+  type: 'pyq-style',
+  explanation: "Read the tree top-down: the root E expands into three children, E, the terminal +, and E, so the top-level structure is (left subtree) + (right subtree). The left child E expands directly into the single leaf id, contributing just id. The right child E expands into three children: E, the terminal *, and E, giving (sub-left) * (sub-right), and both of those sub-children are leaves labelled id. So the right subtree yields id * id. Concatenating the leaves strictly left to right across the whole tree gives id, then +, then id, then *, then id, which is the string id + id * id. This matches option A. The tree structure itself also reveals the grouping the parser used, here treating the entire expression as an addition whose right operand is a multiplication (i.e., id + (id * id)), which is one of the two possible interpretations of this ambiguous string under this grammar, though the question only asks for the yielded string, which is unambiguous regardless of grouping: id + id * id."
+},
+{
+  id: 'toc-cfl-f3',
+  q: 'The two parse trees below are both derived from the grammar E -> E + E | E * E | id for the very same input string id + id * id (nodes labelled + and * are operator applications, id nodes are leaves). What does the existence of these two distinct parse trees for one string prove about the grammar?',
+  figure: '<svg viewBox="0 0 420 210" width="100%" style="max-width:420px;height:auto" xmlns="http://www.w3.org/2000/svg"><text x="92" y="35" font-size="15" fill="currentColor">+</text><text x="42" y="105" font-size="13" fill="currentColor">id</text><text x="132" y="105" font-size="15" fill="currentColor">*</text><text x="102" y="175" font-size="13" fill="currentColor">id</text><text x="162" y="175" font-size="13" fill="currentColor">id</text><line x1="90" y1="40" x2="48" y2="92" stroke="currentColor" stroke-width="1.5"/><line x1="98" y1="40" x2="136" y2="92" stroke="currentColor" stroke-width="1.5"/><line x1="128" y1="112" x2="108" y2="163" stroke="currentColor" stroke-width="1.5"/><line x1="138" y1="112" x2="168" y2="163" stroke="currentColor" stroke-width="1.5"/><line x1="205" y1="105" x2="215" y2="105" stroke="currentColor" stroke-width="1"/><text x="300" y="35" font-size="15" fill="currentColor">*</text><text x="260" y="105" font-size="15" fill="currentColor">+</text><text x="360" y="105" font-size="13" fill="currentColor">id</text><text x="230" y="175" font-size="13" fill="currentColor">id</text><text x="290" y="175" font-size="13" fill="currentColor">id</text><line x1="296" y1="40" x2="264" y2="92" stroke="currentColor" stroke-width="1.5"/><line x1="306" y1="40" x2="358" y2="92" stroke="currentColor" stroke-width="1.5"/><line x1="256" y1="112" x2="236" y2="163" stroke="currentColor" stroke-width="1.5"/><line x1="266" y1="112" x2="296" y2="163" stroke="currentColor" stroke-width="1.5"/></svg>',
+  options: ['The grammar is ambiguous', 'The grammar is not context-free', 'The language it generates is not context-free', 'The grammar is regular'],
+  answer: 0,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: "Read both trees and confirm they yield the identical string. The left tree has root + with left leaf id and right subtree * (with leaves id, id), yielding id + id * id via the grouping id + (id * id) - addition applied last. The right tree has root * with left subtree + (with leaves id, id) and right leaf id, yielding the same left-to-right string id + id * id but via the grouping (id + id) * id - multiplication applied last. Both trees are legitimate derivations under the same grammar E -> E+E | E*E | id, both start from the same nonterminal E, and both produce the same terminal string, yet they impose different structures (and hence different operator precedence and different computed values, 3 versus 4 if all id equal 1... more precisely different semantic groupings). By definition, a context-free grammar is ambiguous exactly when some string in its language has two or more distinct parse trees (equivalently, two distinct leftmost derivations). That is exactly what is exhibited here, so the correct conclusion is option A: the grammar is ambiguous. This says nothing about whether the grammar or language could be context-free (they clearly are, since PDAs and CFGs exist for arithmetic expressions), ruling out options B and C, and expression grammars with recursive +/* are never regular, ruling out D."
+}
+);
+
+window.GATE_DATA.questions['toc'].topics.find(function(t){return t.id==='toc-turing';}).questions.push(
+{
+  id: 'toc-turing-f1',
+  q: 'The Turing machine below operates on strings over {a} (tape blank symbol B), starting in q0 with the head at the leftmost cell. qacc is the only accepting state and qrej is a rejecting halt state. What does this machine do?',
+  figure: '<svg viewBox="0 0 420 260" width="100%" style="max-width:420px;height:auto" xmlns="http://www.w3.org/2000/svg"><defs><marker id="aht1" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" fill="currentColor"/></marker></defs><line x1="10" y1="150" x2="58" y2="150" stroke="currentColor" stroke-width="1.5" marker-end="url(#aht1)"/><text x="0" y="138" font-size="12" fill="currentColor">start</text><circle cx="80" cy="150" r="20" fill="none" stroke="currentColor" stroke-width="1.5"/><text x="70" y="155" font-size="13" fill="currentColor">q0</text><circle cx="230" cy="150" r="20" fill="none" stroke="currentColor" stroke-width="1.5"/><text x="220" y="155" font-size="13" fill="currentColor">q1</text><circle cx="380" cy="70" r="20" fill="none" stroke="currentColor" stroke-width="1.5"/><circle cx="380" cy="70" r="15" fill="none" stroke="currentColor" stroke-width="1.5"/><text x="362" y="75" font-size="12" fill="currentColor">qacc</text><circle cx="380" cy="230" r="20" fill="none" stroke="currentColor" stroke-width="1.5"/><text x="362" y="235" font-size="12" fill="currentColor">qrej</text><path d="M100,138 C140,110 180,110 212,138" fill="none" stroke="currentColor" stroke-width="1.5" marker-end="url(#aht1)"/><text x="130" y="112" font-size="11" fill="currentColor">a/a,R</text><path d="M212,162 C180,190 140,190 100,162" fill="none" stroke="currentColor" stroke-width="1.5" marker-end="url(#aht1)"/><text x="130" y="205" font-size="11" fill="currentColor">a/a,R</text><line x1="96" y1="138" x2="362" y2="80" stroke="currentColor" stroke-width="1.5" marker-end="url(#aht1)"/><text x="180" y="95" font-size="11" fill="currentColor">B/B,R</text><line x1="246" y1="138" x2="362" y2="88" stroke="currentColor" stroke-width="1.5" marker-end="url(#aht1)"/><text x="290" y="105" font-size="11" fill="currentColor">B/B,R</text></svg>',
+  options: ['Accepts unary strings a^n where n is even', 'Accepts unary strings a^n where n is odd', 'Accepts every input string', 'Never halts on any input'],
+  answer: 0,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: "Track the state as a parity flag. q0 represents an even count of a's consumed so far, and reading an a sends control to q1 (a/a,R), which represents an odd count; reading another a from q1 sends control back to q0 (a/a,R), toggling parity with every a. When the head reaches the blank B that follows the input, the transition taken depends on which state control is in at that moment: from q0, B/B,R moves to qacc, and from q1, B/B,R moves to qrej. Since q0 is only occupied when an even number of a's (including zero) have been read, reaching the blank while in q0 means n is even and the machine accepts; reaching the blank while in q1 means n is odd and the machine rejects. Trace n=2: q0-a->q1-a->q0, then B seen in q0, goes to qacc: accepted, consistent with even. Trace n=3: q0-a->q1-a->q0-a->q1, then B seen in q1, goes to qrej: rejected, consistent with odd. So this machine decides parity of the unary input length, accepting exactly when n is even, option A."
+},
+{
+  id: 'toc-turing-f2',
+  q: 'The Turing machine below has only the single state q0 shown, with no accept or reject state defined anywhere. Given the input string aa (followed by blanks) with the head starting at the leftmost a, what happens when this machine is run?',
+  figure: '<svg viewBox="0 0 400 220" width="100%" style="max-width:420px;height:auto" xmlns="http://www.w3.org/2000/svg"><defs><marker id="aht2" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" fill="currentColor"/></marker></defs><circle cx="200" cy="110" r="24" fill="none" stroke="currentColor" stroke-width="1.5"/><text x="188" y="116" font-size="14" fill="currentColor">q0</text><path d="M182,92 C160,40 240,40 218,92" fill="none" stroke="currentColor" stroke-width="1.5" marker-end="url(#aht2)"/><text x="155" y="35" font-size="12" fill="currentColor">a/a,R</text><path d="M182,128 C160,180 240,180 218,128" fill="none" stroke="currentColor" stroke-width="1.5" marker-end="url(#aht2)"/><text x="150" y="195" font-size="12" fill="currentColor">B/B,L</text></svg>',
+  options: ['The machine runs forever and never halts', 'The machine halts and accepts after 2 steps', 'The machine halts and rejects immediately', 'The machine erases the tape and then halts'],
+  answer: 0,
+  marks: 1,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: "Since only q0 exists and it has no transitions besides a self-loop on a (write a, move right, stay in q0) and a self-loop on blank B (write B, move left, stay in q0), the machine can never leave q0 and there is no accepting or rejecting halt state anywhere in the machine. Trace the run on aa: at the first a, write a and move right (still on the second a); at the second a, write a and move right (now on the first blank past the input); at this blank, write B and move left (back onto the second a); at that a, move right again reaching the same blank; at the blank, move left again. This produces an infinite oscillation between the last input cell and the first blank cell, repeating forever. Because there is no state other than q0, and a Turing machine only halts when it enters a designated halt/accept/reject state or has no applicable transition (which never happens here, since every symbol has a defined rule), the machine can never halt on this input, or in fact on any input containing at least one non-blank symbol. So the correct answer is option A: it runs forever."
+},
+{
+  id: 'toc-turing-f3',
+  q: 'The Turing machine below starts in state q0 with its head at the leftmost cell of the tape containing aaa (followed by blanks B). What does the tape look like after exactly 3 steps?',
+  figure: '<svg viewBox="0 0 400 170" width="100%" style="max-width:420px;height:auto" xmlns="http://www.w3.org/2000/svg"><defs><marker id="aht3" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" fill="currentColor"/></marker></defs><line x1="10" y1="90" x2="58" y2="90" stroke="currentColor" stroke-width="1.5" marker-end="url(#aht3)"/><text x="0" y="78" font-size="12" fill="currentColor">start</text><circle cx="120" cy="90" r="22" fill="none" stroke="currentColor" stroke-width="1.5"/><text x="108" y="96" font-size="13" fill="currentColor">q0</text><circle cx="320" cy="90" r="22" fill="none" stroke="currentColor" stroke-width="1.5"/><circle cx="320" cy="90" r="16" fill="none" stroke="currentColor" stroke-width="1.5"/><text x="300" y="96" font-size="12" fill="currentColor">qacc</text><path d="M100,68 C80,20 160,20 140,68" fill="none" stroke="currentColor" stroke-width="1.5" marker-end="url(#aht3)"/><text x="85" y="18" font-size="12" fill="currentColor">a/x,R</text><line x1="142" y1="90" x2="298" y2="90" stroke="currentColor" stroke-width="1.5" marker-end="url(#aht3)"/><text x="185" y="80" font-size="12" fill="currentColor">B/B,S</text></svg>',
+  options: ['xxx', 'xxa', 'xaa', 'aaa'],
+  answer: 0,
+  marks: 1,
+  difficulty: 'easy',
+  type: 'pyq-style',
+  explanation: "The single self-loop on q0 reads a, writes x in its place, and moves the head right, staying in q0; only when the head reads a blank B does it write B, stay put (S for stay), and move to qacc to halt. Trace step by step on tape a a a (cells 0,1,2) with head at cell 0: step 1 reads a at cell 0, writes x, moves right to cell 1, tape is now x a a; step 2 reads a at cell 1, writes x, moves right to cell 2, tape is now x x a; step 3 reads a at cell 2, writes x, moves right to cell 3 (the first blank cell), tape is now x x x. So after exactly 3 steps every one of the three original a symbols has been overwritten with x, giving tape content xxx, and the head is now sitting on the blank at cell 3 about to trigger the halting transition to qacc on the next (fourth) step. The correct answer is option A, xxx; the machine has not yet halted after 3 steps, but every a has already been converted."
+}
+);
+
+window.GATE_DATA.questions['toc'].topics.find(function(t){return t.id==='toc-regular';}).questions.push(
+{
+  id: 'toc-regular-p1',
+  pyqStyle: true,
+  q: "What is the minimum number of states in a DFA over {0,1} that accepts exactly those strings whose THIRD symbol from the right end is a 1 (the string must have length at least 3)? Enter your numerical answer.",
+  options: [],
+  answer: 8,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'hard',
+  type: 'pyq-style',
+  explanation: "This is the classic exponential-blowup family: to know the symbol that is exactly k positions from the right end, a DFA must remember the last k symbols read, because any future input could end at any point and the decision depends on that whole trailing window. With k=3 there are 2^3 = 8 possible windows (000,001,010,...,111), so the state needs to encode which of the 8 windows is the current suffix; on reading a new symbol c the state shifts left and appends c, dropping the oldest bit, exactly like a shift register. All 8 states are reachable (any 3-bit pattern can be built by an appropriate 3-symbol prefix) and pairwise distinguishable (from window w1 != w2, appending the same 2 more symbols exposes their differing leading bit as the new third-from-end symbol, so some suffix accepts from one window and rejects from the other). Hence the minimal DFA needs exactly 8 states, matching the general 2^k pattern for 'kth symbol from the end' languages, one of GATE's favorite state-counting traps because it looks like it should need only k+1 states but actually needs 2^k."
+},
+{
+  id: 'toc-regular-p2',
+  pyqStyle: true,
+  q: "Consider the NFA over {0,1} with states {q0,q1,q2,q3}, start state q0, and accepting state q3, recognizing strings that END with the pattern 101. Transitions: delta(q0,1)={q0,q1}, delta(q0,0)={q0}, delta(q1,0)={q2}, delta(q2,1)={q3}, and all other transitions empty (no state has any other move). Applying subset construction starting from {q0}, how many DISTINCT states does the resulting DFA have (count only states reachable from the start, and do not add a separate dead state unless the construction actually reaches the empty set)? Enter your numerical answer.",
+  options: [],
+  answer: 4,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: "Trace subset construction carefully. Start set S0={q0}. On 0: only q0 has a 0-move, to {q0}, so S0 stays S0. On 1: q0 moves to {q0,q1}, call this S1. From S1 on 0: q0->{q0}, q1->{q2}, union={q0,q2}=S2. From S1 on 1: q0->{q0,q1}, q1 has no 1-move, union={q0,q1}=S1 (no change). From S2 on 0: q0->{q0}, q2 has no 0-move, union={q0}=S0. From S2 on 1: q0->{q0,q1}, q2->{q3}, union={q0,q1,q3}=S3. From S3 on 0: q0->{q0}, q1->{q2}, q3 has no 0-move, union={q0,q2}=S2. From S3 on 1: q0->{q0,q1}, q1 and q3 have no 1-moves, union={q0,q1}=S1. Every transition lands in one of {S0,S1,S2,S3}, none ever produces the empty set, so exactly 4 distinct reachable DFA states result, with S3 (the only one containing q3) as the sole accepting state. This matches the general fact that a minimal DFA for strings ending in a fixed pattern of length m needs exactly m+1 states, here m=3."
+},
+{
+  id: 'toc-regular-p3',
+  pyqStyle: true,
+  q: "Consider these four languages over {a,b}: (I) L1 = { a^i b^j : i,j >= 0 and (i+j) mod 4 = 0 }. (II) L2 = { a^n b^n : n >= 0 }. (III) L3 = { a^n : n is a perfect square }. (IV) L4 = { a^i b^j : i,j >= 0 and i <= 5 } (any number of a's from 0 to 5, followed by any number of b's). Which of these languages are REGULAR? (Select ALL that apply)",
+  options: ['L1', 'L2', 'L3', 'L4'],
+  answers: [0, 3],
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: "L1 is regular: counting (i+j) mod 4 needs only 4 states cycling on every a or every b, regardless of how a's and b's are ordered internally in this set-builder description, since it is only the total symbol count that matters -- a simple mod-4 counter DFA suffices, so L1 is regular. L4 is regular: since i is capped at a small constant (at most 5), a DFA can count a's up to 5 (going to a dead state if a 6th a arrives before any b), then freely accept any run of b's -- bounding one of the counters by a constant is exactly what keeps a language regular despite looking like a counting condition. L2 = a^n b^n is the textbook non-regular language: by the pumping lemma or the infinite Myhill-Nerode equivalence classes on a^n (each n needs a different number of subsequent b's to reach acceptance), it fails to be regular. L3 (a^n for n a perfect square) is also non-regular: pumping any string a^p with p >= pumping length by inserting extra a's produces lengths that skip out of the sparse perfect-square set for large enough pump counts, since consecutive perfect squares grow farther apart than the fixed pump amount, violating the pumping lemma. So only L1 and L4 are regular."
+},
+{
+  id: 'toc-regular-p4',
+  pyqStyle: true,
+  q: "What is the minimum number of states in a DFA over {0,1} that accepts a string if and only if BOTH of the following hold: the number of 1's in the string is even, AND the string does NOT end with the substring 00? Enter your numerical answer.",
+  options: [],
+  answer: 6,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'hard',
+  type: 'pyq-style',
+  explanation: "The two conditions are tracked by independent finite trackers that must be combined via a product construction. Tracker 1 (parity of 1's) needs 2 states: Even, Odd, toggling on every 1 and self-looping on every 0. Tracker 2 (does the string currently end in 00) needs 3 states: S (does not end in 0 at all, or is empty), A (ends in exactly one 0), B (ends in 00 or more), where reading a 1 always resets to S, and reading a 0 advances S->A->B->B. Since these two trackers read completely disjoint information from the same symbol (parity only cares about 1's, the suffix-tracker only cares about the pattern of 0's and resets on 1's) but both must be evaluated on every symbol, the minimal combined DFA is their product: 2 x 3 = 6 states, one per (parity, suffix-state) pair. All 6 combinations are reachable from (Even,S) by mixing 0's and 1's freely, and no two are equivalent: differing parity is always eventually distinguished by an odd-length suffix of 1's, and differing suffix-state is distinguished by an immediate 0 or 00 (e.g. (Even,S) accepts the empty continuation while (Even,A) does not, since appending a single 0 sends (Even,S) to the still-accepting (Even,A) but sends (Even,A) to the rejecting (Even,B)). Accepting states are exactly (Even,S) and (Even,A). Minimum is 6."
+},
+{
+  id: 'toc-regular-p5',
+  pyqStyle: true,
+  q: "Which of the following statements about regular languages are TRUE? (Select ALL that apply)",
+  options: ['The class of regular languages is closed under intersection', 'The class of regular languages is closed under the Kleene star operation', 'The class of regular languages is closed under arbitrary (possibly infinite) unions of regular languages', 'The class of regular languages is closed under reversal (reversing every string in the language)'],
+  answers: [0, 1, 3],
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: "Intersection (A true): build the product automaton of the two DFAs and accept where both components accept; this is a standard closure proof, so A holds. Kleene star (B true): standard NFA construction adds epsilon transitions from every accepting state back to a new start state, staying within regular languages, so B holds. Reversal (D true): reverse every transition of the DFA, swap start and accept roles (make old accept states the new start via epsilon transitions, old start state the new unique accept state); the resulting NFA still recognizes a regular language, so D holds. Arbitrary infinite union (C false) is the trap: regular languages are closed only under FINITE unions, not infinite ones. Concretely, each singleton set L_n = { a^n b^n } is trivially a finite, hence regular, language for every fixed n, but the infinite union of all L_n over n=0,1,2,... is exactly { a^n b^n : n >= 0 }, the textbook non-regular language. So an infinite union of regular languages can escape regularity, making C false; only finite unions are guaranteed to preserve regularity."
+},
+{
+  id: 'toc-regular-p6',
+  pyqStyle: true,
+  q: "To prove L = { a^n b^n : n >= 0 } is not regular using the pumping lemma, we let p be the pumping length and pick w = a^p b^p, then consider any decomposition w = xyz satisfying |xy| <= p and |y| >= 1. What can we conclude about y itself under this constraint?",
+  options: ['y must consist only of a symbols (y = a^k for some k >= 1)', 'y must consist of a mix of a symbols followed by b symbols', 'y must consist only of b symbols', 'y must be the empty string'],
+  answer: 0,
+  marks: 1,
+  difficulty: 'easy',
+  type: 'pyq-style',
+  explanation: "Since w = a^p b^p has its first p symbols all equal to a (the entire a-block has length exactly p), the constraint |xy| <= p forces the substring xy to lie entirely within this leading a-block, because any position up to index p in w is still inside the a's. Consequently y, being a nonempty substring of xy, is also entirely within the a-block, so y cannot contain any b symbols at all -- it must be of the form a^k for some k with 1 <= k <= p (nonempty because the pumping lemma requires |y| >= 1). This is exactly why the pumping argument works: pumping y up (repeating it, i.e. taking i=2) produces a string with MORE a's than b's, namely a^(p+k) b^p, which is no longer of the form a^n b^n, contradicting the assumption that all pumped strings must remain in L. Since this contradiction arises for every possible valid decomposition, L cannot be regular. Options B and C are impossible given the length restriction, and D violates the pumping lemma's own requirement that |y| >= 1."
+},
+{
+  id: 'toc-regular-p7',
+  pyqStyle: true,
+  q: "What is the minimum number of states in a DFA over {0,1} that accepts exactly those strings ENDING in the pattern 01? Enter your numerical answer.",
+  options: [],
+  answer: 3,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: "Build the string-matching automaton for pattern P=01 using the standard technique: state i (0<=i<=2) means the longest suffix of the input read so far that is also a prefix of P has length i, with state 2 being the accepting 'full match just occurred' state. From state 0 (no progress): reading 0 advances to state 1 (matches prefix '0'); reading 1 keeps it at state 0 (no prefix of '01' ends in 1). From state 1 (matched '0'): reading 0 stays at state 1 (the new suffix '00' still has longest P-prefix-suffix overlap equal to '0'); reading 1 completes the match, advancing to state 2. From state 2 (just matched '01', accepting): reading 0 falls back to state 1 (new suffix ends in '0', matching prefix '0' again); reading 1 falls back to state 0 (new suffix ends in '1', which is not a prefix of '01'). This gives exactly 3 states (0,1,2), all reachable and pairwise distinguishable since they represent genuinely different amounts of pattern progress. In general, the minimal DFA recognizing 'ends with a fixed pattern of length m' always has exactly m+1 states via this construction (closely related to the KMP failure-function automaton), regardless of whether the pattern has internal self-overlaps."
+},
+{
+  id: 'toc-regular-p8',
+  pyqStyle: true,
+  q: "Consider the epsilon-NFA over {a,b} with states {p0,p1,p2}, start state p0 (accepting state p2), and moves: p0 has an epsilon-move to p1, p0 has a self-loop on a, p0 has a self-loop on b, p1 has a move to p2 on a (p1 has no move on b), and p2 has a self-loop on a (p2 has no move on b). Applying the standard epsilon-closure subset construction, how many DISTINCT reachable DFA states does the equivalent DFA have? Enter your numerical answer.",
+  options: [],
+  answer: 2,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: "Start state of the DFA is ECLOSE(p0) = {p0,p1} (following the epsilon-move), call it S1. From S1 on a: p0 self-loops to p0, and p1 moves to p2, giving the raw set {p0,p2}; taking epsilon-closure adds p1 (reachable from p0 via epsilon), giving {p0,p1,p2}, call it S2. From S1 on b: only p0 has a b-move, to p0 (p1 has no b-move), giving {p0}, whose epsilon-closure is {p0,p1} = S1 again. From S2 on a: p0->p0, p1->p2, p2->p2 (self-loop), raw union {p0,p2}, epsilon-closure adds p1, giving {p0,p1,p2} = S2 (no change). From S2 on b: only p0 has a b-move (to p0), p1 and p2 have none, giving {p0}, epsilon-closure {p0,p1} = S1. So every transition stays within {S1,S2} and the empty set is never produced -- exactly 2 distinct reachable DFA states, with S2 (the only one containing p2) being the sole accepting state."
+},
+{
+  id: 'toc-regular-p9',
+  pyqStyle: true,
+  q: "Which of the following statements about regular languages are TRUE? (Select ALL that apply)",
+  options: ['If L1 and L2 are both regular, then L1 intersect L2 is regular', 'If L1 is regular and L2 is not regular, then L1 union L2 can never be regular', 'If L is regular, then { w w : w is in L } is always regular', 'The class of regular languages is closed under set difference (L1 minus L2 is regular whenever L1 and L2 are)'],
+  answers: [0, 3],
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: "A is a standard closure property (product automaton), true. D follows algebraically: L1 - L2 = L1 intersect complement(L2); since regular languages are closed under both complement (swap DFA accept/reject labels) and intersection, the difference is also regular, so D is true. B is a classic trap and is FALSE: a regular L1 unioned with a non-regular L2 need not stay non-regular -- take L1 = Sigma* (the whole alphabet's strings, trivially regular) and let L2 be any non-regular language over the same alphabet; then L1 union L2 = Sigma*, which is regular, directly contradicting the claim that the union 'can never be regular'. C is also FALSE in general: even when L is regular, doubling every string via { w w : w is in L } does not preserve regularity in general -- the extreme case L = Sigma* itself gives { w w : w is any string }, which is the well-known non-regular 'squaring' language (an infinite Myhill-Nerode argument, or pumping lemma on w=a^p b a^p b style strings, shows no DFA can verify that the second half exactly repeats the first for unboundedly long w). So only A and D are guaranteed true in general."
+},
+{
+  id: 'toc-regular-p10',
+  pyqStyle: true,
+  q: "A DFA over {0,1} has states {A,B,C,D}, start state A, accepting states {C,D}, and transitions: A on 0 goes to B, A on 1 goes to C; B on 0 goes to B, B on 1 goes to D; C on 0 goes to D, C on 1 goes to C; D on 0 goes to C, D on 1 goes to D. Using the table-filling (Myhill-Nerode partition refinement) method to minimize this DFA, how many states does the MINIMAL equivalent DFA have? Enter your numerical answer.",
+  options: [],
+  answer: 2,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: "First separate by acceptance: {A,B} (non-accepting) versus {C,D} (accepting) -- this is round 0 of the partition. Check whether A and B stay together: on 0, A goes to B (in the non-accepting group) and B goes to B (also non-accepting group) -- same group; on 1, A goes to C (accepting group) and B goes to D (also accepting group) -- same group. So A and B always transition to the same partition-group on every symbol, meaning the current partition already distinguishes them from nothing new -- A and B are equivalent and can be merged into a single state, call it S0. Now check C and D: on 0, C goes to D (accepting group) and D goes to C (accepting group) -- same group; on 1, C goes to C (accepting group) and D goes to D (accepting group) -- same group. C and D also always land in the same group as each other, so they merge into a single accepting state S1. Refining further with these merged groups changes nothing (both S0 and S1's transitions stay consistently within {S0,S1} exactly as before), so the partition is stable at 2 classes: {A,B} and {C,D}. The minimized DFA therefore has exactly 2 states, essentially recognizing 'does this string end with the transitions leading to an accepting label', collapsing to the language of strings containing at least one 1 with valid odd/even-agnostic reach -- regardless of the exact language, the state count after minimization is 2."
+},
+{
+  id: 'toc-regular-p11',
+  pyqStyle: true,
+  q: "For each n, there exists an n-state NFA over {0,1} such that every equivalent DFA needs at least 2^n states -- this is the standard witness family used to show the subset construction's exponential blowup is TIGHT (not just an upper bound). Which language family is this classic witness?",
+  options: ['The language of strings whose n-th symbol from the right end is a fixed value (e.g. 1)', 'The language a^n b^n', 'The language of strings of even length', 'The language of strings containing the substring aba'],
+  answer: 0,
+  marks: 1,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: "The 'n-th symbol from the end' family is the standard tight-bound witness for the NFA-to-DFA exponential blowup. An NFA can guess, upon reading each symbol, whether it might be the n-th-from-last one, spawning parallel guesses along the input using only n+1 states (one to stay in the 'not yet guessed' mode, plus a chain of n states counting down after a guess is made, accepting if the guessed symbol matches and exactly n more symbols follow) -- so only around n states suffice nondeterministically. But any DFA must deterministically track the entire trailing window of the last n symbols to answer correctly regardless of how the string might end, requiring one state per possible n-bit window, i.e. genuinely 2^n states, all reachable and pairwise distinguishable (as reasoned in the third-from-end example). This proves the 2^n subset-construction bound is not a loose artifact of the construction but is actually achieved, unlike languages such as a^n b^n (not even regular, so it does not illustrate a DFA/NFA size gap at all), even-length strings (only needs 2 states for both NFA and DFA), or substring-containment languages (blowup for those is typically only linear in pattern length, not exponential)."
+},
+{
+  id: 'toc-regular-p12',
+  pyqStyle: true,
+  q: "What is the minimum number of states in a DFA over {0,1} recognizing the language described by the regular expression (0+1)* 11 (0+1)*, i.e. all strings containing 11 as a substring somewhere? Enter your numerical answer.",
+  options: [],
+  answer: 3,
+  kind: 'nat',
+  marks: 1,
+  difficulty: 'easy',
+  type: 'pyq-style',
+  explanation: "This is 'contains substring 11', matched by the string-matching automaton for pattern P=11 with states tracking longest matched prefix-suffix overlap: state 0 (no progress, e.g. just read a 0 or nothing yet), state 1 (just read a single 1, one symbol of progress toward '11'), and state 2 (accepting, '11' has been seen; it is a sink/absorbing accept state since once the substring has appeared anywhere, the string stays accepted forever). Transitions: state 0 on 1 goes to state 1, on 0 stays at state 0; state 1 on 1 goes to state 2 (match complete), on 0 falls back to state 0 (the run of 1's was broken); state 2 self-loops on both 0 and 1 (already accepted, additional symbols cannot un-accept it). All three states are reachable and pairwise distinguishable (state 0 versus state 1 are told apart by appending '1' -- one needs one more 1 to reach acceptance, the other needs zero more; state 2 is told apart from both by already being accepting on the empty suffix). So the minimal DFA needs exactly 3 states, matching the general rule that 'contains pattern of length m as substring' needs m+1 states (here m=2)."
+},
+{
+  id: 'toc-regular-p13',
+  pyqStyle: true,
+  q: "What is the minimum number of states in a DFA over {a,b} that accepts a string if and only if the number of a's in it is congruent to 0 mod 4 (the b's may occur anywhere and do not affect acceptance)? Enter your numerical answer.",
+  options: [],
+  answer: 4,
+  kind: 'nat',
+  marks: 1,
+  difficulty: 'easy',
+  type: 'pyq-style',
+  explanation: "Since only the count of a's modulo 4 matters and b's are entirely irrelevant to acceptance, a standard mod-k counter suffices: one state per residue class 0,1,2,3 representing the current count of a's seen so far modulo 4, with state 0 being the unique accepting state (the initial state, since 0 a's satisfies 0 mod 4 = 0). Reading an a advances the residue by 1 (cycling 0->1->2->3->0), while reading a b self-loops on the current state (leaving the residue unchanged, since b's do not count). All 4 states are clearly reachable (feed 0,1,2, or 3 a's from the start) and pairwise distinguishable (from residue r1 != r2, appending (4 - r1) more a's reaches the accepting state 0 from r1 but reaches residue (r2 + 4 - r1) mod 4 != 0 from r2, since r1 != r2 implies this difference is nonzero mod 4), so no states can be merged. The minimum is exactly 4, matching the general mod-k counting rule of k states for a single independent counted symbol."
+},
+{
+  id: 'toc-regular-p14',
+  pyqStyle: true,
+  q: "Which of the following statements about the pumping lemma for regular languages are TRUE? (Select ALL that apply)",
+  options: ['If a language satisfies the pumping lemma condition (some valid pumping length p exists with the usual decomposition property), the language must be regular', 'If a language FAILS the pumping lemma condition (no valid p works for every long-enough string), the language cannot be regular', 'The pumping lemma is used to PROVE that a language is regular, by exhibiting a valid pumping decomposition for every string in it', 'Every finite language automatically satisfies the pumping lemma condition, because a sufficiently large pumping length can be chosen so that no string in the language is long enough to require decomposition'],
+  answers: [1, 3],
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: "The pumping lemma states a NECESSARY (not sufficient) condition for regularity: every regular language satisfies it, but satisfying it does not guarantee regularity. So A is FALSE -- there exist famous non-regular languages that still happen to satisfy the pumping lemma's pumping property for some choice of decompositions (constructing such examples is a standard advanced exercise), meaning the pumping lemma alone can never be used to prove regularity, which also makes C FALSE for the same underlying reason (the lemma's proper use is strictly to prove NON-regularity by contradiction: assume regularity, invoke the lemma, then exhibit that no valid decomposition can satisfy the pumping requirement, contradicting the assumption). B is the lemma's actual valid use and is TRUE: the contrapositive of 'regular implies pumpable' is 'not pumpable implies not regular', which is exactly the logically sound direction. D is TRUE: for a finite language, choose the pumping length p to exceed the length of every string in the language; then the pumping lemma's requirement only concerns strings of length >= p, and since none exist in a finite language, the condition holds vacuously (true because there is nothing to check), which is why finite languages trivially and always satisfy the pumping lemma despite the lemma normally being used to rule languages OUT."
+}
+);
+
+window.GATE_DATA.questions['toc'].topics.find(function(t){return t.id==='toc-cfl';}).questions.push(
+{
+  id: 'toc-cfl-p1',
+  pyqStyle: true,
+  q: "Consider L = { a^n b^n c^m : n,m >= 0 }, i.e. equal numbers of a's and b's followed by any number of c's. Which of the following BEST classifies L?",
+  options: ['L is not context-free', 'L is context-free but every pushdown automaton for it must be nondeterministic', 'L is deterministic context-free (a DPDA can accept it)', 'L is regular'],
+  answer: 2,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: "L is not regular, since fixing m=0 recovers { a^n b^n }, the textbook non-regular language, ruling out option D. However L IS context-free, generated by S -> A C, A -> a A b | epsilon, C -> c C | epsilon, ruling out option A. The key subtlety is determinism: a deterministic PDA can accept L directly and without any guessing, because every decision point is forced by the input symbol seen so far -- push a marker for each a, pop one marker for each b (rejecting outright if a b arrives with an empty stack, or if an a arrives after any b has been seen), and once the stack empties exactly at the a/b boundary, deterministically switch to reading c's freely with an empty stack, accepting at end of input if the stack is empty. At no point does the machine need to guess where the a-block ends or nondeterministically choose between competing moves -- the transition from counting to free-c-reading is triggered unambiguously by seeing the first c or end of input with an empty stack. So L is deterministic context-free, making option C correct and B incorrect."
+},
+{
+  id: 'toc-cfl-p2',
+  pyqStyle: true,
+  q: "Consider the CFG (after eliminating useless symbols) with productions: S -> A S A | S A | A S | a B | a ; A -> B | S ; B -> b. After fully converting this grammar to Chomsky Normal Form (eliminating epsilon-productions where needed, eliminating unit productions, and binarizing/isolating terminals), how many total productions does the resulting CNF grammar have? Enter your numerical answer.",
+  options: [],
+  answer: 14,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'hard',
+  type: 'pyq-style',
+  explanation: "This grammar already has no epsilon-productions to remove (it was pre-simplified for this exercise) and no useless symbols, so the only remaining steps are unit-production elimination followed by binarization. Unit productions present are A -> B and A -> S. Resolving A -> B (B's only production is B -> b) adds A -> b. Resolving A -> S (S's productions are A S A, S A, A S, a B, a) adds A -> A S A, A -> S A, A -> A S, A -> a B, A -> a, then both unit productions are deleted. This leaves: S -> A S A | S A | A S | a B | a (5 rules) and A -> b | A S A | S A | A S | a B | a (6 rules) and B -> b (1 rule), totalling 12 productions before CNF binarization. Now enforce strict CNF form: the two length-3 rules S -> A S A and A -> A S A each need one binarization helper, so introduce X1 -> S A once and rewrite both as S -> A X1 and A -> A X1 (reusing the same helper, adding 1 new production for X1). The two 'a B' rules mix a terminal with a nonterminal in a length-2 body, which CNF disallows, so introduce Ta -> a once and rewrite both S -> a B and A -> a B as S -> Ta B and A -> Ta B (adding 1 new production for Ta). Counting the final CNF rule set: S has 5 (A X1, S A, A S, Ta B, a), A has 6 (b, A X1, S A, A S, Ta B, a), B has 1 (b), plus X1 -> S A and Ta -> a, giving 5+6+1+1+1 = 14 total CNF productions."
+},
+{
+  id: 'toc-cfl-p3',
+  pyqStyle: true,
+  q: "Consider the grammar S -> a S b S | b S a S | epsilon, intended to generate all strings over {a,b} with an equal number of a's and b's. Which statement correctly describes this grammar?",
+  options: ['The grammar is unambiguous, and it correctly generates exactly the equal-count language', 'The grammar is ambiguous, even though it does correctly generate exactly the equal-count language', 'The grammar generates strings that do NOT always have equal numbers of a and b', 'The language generated is not context-free'],
+  answer: 1,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: "First confirm the language: every production preserves or maintains equal counts (aSbS and bSaS each add exactly one a and one b relative to their two S placeholders, and epsilon adds none), and by induction every derivable string has equal numbers of a's and b's; conversely every equal-count string is reachable by this style of recursive decomposition, so the grammar does generate exactly the intended equal-count language, ruling out option C (and this is a genuine CFL so D is false too). But the grammar is ambiguous: take the string abab. One derivation is S => aSbS => ab S => ab aSbS => ab a(eps)b(eps) = abab (expanding the first S via aSbS, leaving epsilon, then expanding the second S again via aSbS). A second, structurally distinct derivation reaches the same string abab by instead expanding the first S with the OTHER alternative bSaS partway through combined with different epsilon placements, yielding a differently shaped parse tree for the identical terminal string abab. Since at least one string has two genuinely different parse trees, the grammar is ambiguous by definition, making option B correct over option A."
+},
+{
+  id: 'toc-cfl-p4',
+  pyqStyle: true,
+  q: "Let L = { a^i b^j c^k : i,j,k >= 0 and (i = j OR j = k) }. Which of the following is TRUE about L?",
+  options: ['L is context-free but not regular', 'L is regular', 'L is not context-free', 'The complement of L is regular'],
+  answer: 0,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: "L is the union of two individually simple context-free languages: L1 = { a^i b^j c^k : i = j } (a PDA pushes for each a and pops for each b, then reads any c's freely) and L2 = { a^i b^j c^k : j = k } (a PDA reads a's freely, then pushes for each b and pops for each c). Since context-free languages are closed under union, L = L1 union L2 is context-free, ruling out option C. L is not regular: intersecting L with the regular set a*b* (forcing k=0) leaves { a^i b^j : i=j or j=0 }, which still contains the non-regular a^i b^i pattern (whenever j is not 0), so by closure of regular languages under intersection (if L were regular, this intersection would have to be regular too, but it is not), L itself cannot be regular, ruling out option B. Since L is not regular, its complement (if regular languages included it) is not directly implied to be regular either, and in fact this L is a classical example used to show CFLs are not closed under intersection (intersecting L1 and L2 directly, rather than unioning, recovers essentially a^n b^n c^n), so D is not something we can conclude. The correct classification is option A: context-free but not regular."
+},
+{
+  id: 'toc-cfl-p5',
+  pyqStyle: true,
+  q: "Which of the following closure properties of context-free languages are TRUE? (Select ALL that apply)",
+  options: ['Context-free languages are closed under union', 'Context-free languages are closed under intersection (the intersection of two CFLs is always context-free)', 'Context-free languages are closed under complementation', 'Context-free languages are closed under concatenation'],
+  answers: [0, 3],
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: "Union (A true) and concatenation (D true) are among the standard CFL closure properties: given two grammars/PDAs for L1 and L2, a new start symbol branching to either grammar's start (for union) or a new start symbol sequencing both grammars (for concatenation) directly constructs a CFG for the combined language, and these constructions always stay within CFL. Intersection (B false) is the classic non-closure: taking L1 = { a^n b^n c^m : n,m >= 0 } and L2 = { a^m b^n c^n : n,m >= 0 }, both individually context-free, their intersection is exactly { a^n b^n c^n : n >= 0 }, which is famously NOT context-free (provable via the CFL pumping lemma, since any pumpable substring of bounded length can touch at most two of the three equal-length blocks, so pumping breaks the three-way equality). Complementation (C false) follows from B by De Morgan's law combined with the fact that CFLs ARE closed under union: if CFLs were also closed under complement, then L1 intersect L2 could be rewritten as complement(complement(L1) union complement(L2)), which would force intersection to be CFL-closed too, contradicting the counterexample above -- so complementation must fail to preserve context-freeness in general."
+},
+{
+  id: 'toc-cfl-p6',
+  pyqStyle: true,
+  q: "Consider L = { w w^R : w is in {a,b}* }, the language of even-length palindromes formed by a string immediately followed by its own reverse. Which of the following BEST classifies L?",
+  options: ['L is deterministic context-free (DCFL)', 'L is context-free but NOT deterministic context-free', 'L is not context-free at all', 'L is regular'],
+  answer: 1,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: "L is context-free: a nondeterministic PDA pushes symbols while nondeterministically guessing the midpoint of the input, then switches to popping and matching each remaining input symbol against the top of the stack, accepting if the stack empties exactly when input ends -- equivalently the grammar S -> a S a | b S b | epsilon generates exactly this language. L is not regular, since intersecting with a*b*a*b*-style patterns or a direct pumping-lemma argument on strings like a^p b a^p b shows no finite memory suffices to verify the exact reversal for unboundedly long w, ruling out option D. The subtlety is determinism: unlike { a^n b^n c^m : n=j or j=k }-style languages where the switch point is signalled by a distinct symbol, here there is NO marker separating w from w^R -- the machine must correctly guess exactly where the midpoint falls without any signal (since w w^R over the same alphabet {a,b} looks locally identical near the middle for many strings), and it is a proven theorem that no deterministic PDA can make this guess correctly for all inputs (a DPDA must commit to one deterministic choice per configuration, so it cannot correctly locate an unmarked midpoint in general). Hence L is CFL but not DCFL, making option B correct, while option C is wrong since we explicitly built a PDA for it, and option A is wrong precisely because of the unmarked-midpoint argument."
+},
+{
+  id: 'toc-cfl-p7',
+  pyqStyle: true,
+  q: "Consider the grammar S -> A, A -> B, B -> C, C -> a C | b (a chain of unit productions ending in one non-unit rule with two alternatives). After eliminating ALL unit productions (replacing each with the appropriate non-unit productions inherited transitively, and removing the unit productions themselves), how many total productions remain in the grammar (summed across all four nonterminals S, A, B, C)? Enter your numerical answer.",
+  options: [],
+  answer: 8,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: "The unit-production chain is S -> A -> B -> C, and C's own non-unit productions are C -> a C and C -> b (2 productions). Unit-elimination works by transitive closure: for every nonterminal X with a unit-derivation chain reaching C, add all of C's non-unit productions directly as productions of X, then discard every unit production. Since S reaches C (via S=>A=>B=>C), S inherits both of C's productions, giving S -> a C and S -> b (2 productions). Since A reaches C (via A=>B=>C), A inherits both, giving A -> a C and A -> b (2 productions). Since B reaches C directly (B=>C), B inherits both, giving B -> a C and B -> b (2 productions). C keeps its own original 2 productions, C -> a C and C -> b. After discarding all the unit productions (S->A, A->B, B->C), the final production count is 2 (for S) + 2 (for A) + 2 (for B) + 2 (for C) = 8 total productions, with every nonterminal now able to directly generate a string starting with a's followed by a b, matching the original language exactly (since all four nonterminals were only ever unit-equivalent to C)."
+},
+{
+  id: 'toc-cfl-p8',
+  pyqStyle: true,
+  q: "The standard algorithm for converting an arbitrary context-free grammar (that does not generate the empty string) into Chomsky Normal Form requires which of the following preprocessing steps, in general?",
+  options: ['Only eliminating unit productions is required', 'Only eliminating epsilon-productions is required', 'Only removing useless (unreachable or non-generating) symbols is required', 'All three: removing useless symbols, eliminating epsilon-productions, AND eliminating unit productions may be required, typically in that order, before final binarization'],
+  answer: 3,
+  marks: 1,
+  difficulty: 'easy',
+  type: 'pyq-style',
+  explanation: "The standard CNF conversion pipeline has several stages because each stage can introduce artifacts that the next stage must clean up. First remove useless symbols (nonterminals that can never be reached from S, or that can never derive any terminal string) so the grammar does not waste effort converting dead productions. Next eliminate epsilon-productions (except possibly S -> epsilon if the empty string must genuinely be in the language, kept as a special-cased exception), since CNF's core A -> BC | a form cannot represent A -> epsilon directly, and removing epsilon-productions naturally creates new unit productions (e.g. A -> B C becomes A -> C when B was nullable and omitted). This is exactly why unit-production elimination must come AFTER epsilon-removal -- the newly created unit productions need to be resolved too. Finally, after both of those, remaining productions are binarized (long right-hand sides broken into chains of new nonterminals) and terminals mixed with nonterminals in length-2+ bodies are isolated via helper nonterminals (X -> a). Skipping any of the three preprocessing steps can leave productions that CNF conversion cannot correctly express, so option D (all three, in that order) is correct."
+},
+{
+  id: 'toc-cfl-p9',
+  pyqStyle: true,
+  q: "To prove L = { a^n b^n c^n : n >= 0 } is not context-free using the CFL pumping lemma, we pick w = a^p b^p c^p for pumping length p, and consider any decomposition w = uvxyz with |vxy| <= p and |vy| >= 1. Because of the |vxy| <= p restriction, at most how many of the three distinct symbols (a, b, c) can appear WITHIN the substring vxy?",
+  options: [],
+  answer: 2,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: "The string w = a^p b^p c^p consists of exactly three contiguous blocks, each of length p, laid out as p a's, then p b's, then p c's. Since |vxy| <= p, the substring vxy spans a contiguous window of at most p characters. Because each individual block already has length exactly p, a window of length at most p can straddle at most ONE block boundary -- if it started strictly inside the a-block and extended into the b-block, it could cover the tail of the a-block and the head of the b-block (touching 2 distinct symbols), but it cannot reach far enough to also touch any part of the c-block, since that would require crossing two full boundaries within a span of only p characters, which is impossible given each block itself already has length p. So vxy can contain at most 2 of the 3 distinct symbols. This is precisely the insight that breaks the language: since vxy misses at least one symbol type entirely, pumping v and y (repeating them, i.e. taking i=2) increases the count of at most two of the three symbol types while leaving the third symbol's count exactly at p, destroying the required three-way equality n=n=n and producing a string outside L, which is the contradiction that proves non-context-freeness."
+},
+{
+  id: 'toc-cfl-p10',
+  pyqStyle: true,
+  q: "Using the CYK (Cocke-Younger-Kasami) dynamic programming algorithm to test membership of a length-5 string in a CNF grammar's language, the algorithm fills a triangular table where the cell for each contiguous substring (of every possible length from 1 up to 5, at every possible starting position) is computed. How many total substrings (i.e. table cells) does this triangular table have for a string of length n=5? Enter your numerical answer.",
+  options: [],
+  answer: 15,
+  kind: 'nat',
+  marks: 1,
+  difficulty: 'easy',
+  type: 'pyq-style',
+  explanation: "The CYK table has one cell for every contiguous substring of the input, and a string of length n has exactly n substrings of length 1 (each individual symbol), n-1 substrings of length 2, n-2 substrings of length 3, and so on down to exactly 1 substring of length n (the whole string itself). Summing these counts gives n + (n-1) + (n-2) + ... + 1 = n(n+1)/2, the standard triangular number formula. For n=5, this is 5 x 6 / 2 = 15. Each cell must be filled by checking, for every way of splitting that substring into two adjacent pieces, whether some CNF rule A -> B C allows combining a nonterminal already found for the left piece with a nonterminal already found for the right piece (plus the base case of single-symbol cells being filled directly from CNF's A -> a rules), and the total work is exactly these 15 cells for n=5, which is the basis for CYK's well-known O(n^3) time complexity (n^2 cells, each needing up to O(n) split points to check)."
+},
+{
+  id: 'toc-cfl-p11',
+  pyqStyle: true,
+  q: "Consider L = { a^n b^m : n,m >= 0 and n is NOT equal to m }, the language of strings with an unequal number of a's and b's. Which of the following BEST classifies L?",
+  options: ['L is deterministic context-free (DCFL)', 'L is context-free but not deterministic context-free', 'L is not context-free', 'L is regular'],
+  answer: 0,
+  marks: 2,
+  difficulty: 'hard',
+  type: 'pyq-style',
+  explanation: "L is not regular (its complement within a*b*, namely { a^n b^n }, is the textbook non-regular language, and regular languages are closed under complement and intersection with regular sets, so if L were regular this would force a^n b^n to be regular too, a contradiction), ruling out option D. Perhaps surprisingly, L IS deterministic context-free, which is a classic and slightly counterintuitive textbook result: a DPDA can process a^n b^m by first pushing a marker for every a, then popping one marker per b while symbols remain equal, and crucially it can DETECT which case it is in deterministically -- if b's run out while markers remain on the stack (n > m), or if the stack empties while b's are still arriving (n < m, detected by then reading extra b's with an empty stack using a distinct 'now definitely unequal, accept the rest' mode), the machine commits to accepting once inequality becomes certain, and this decision is always forced by the next input symbol and current stack state, never requiring a guess between competing moves. Because DCFLs are closed under complement (a DPDA can always be normalized to read all its input then flip its accept/reject decision) and { a^n b^n } is DCFL, its complement RESTRICTED to a*b* (which is exactly this unequal-count language) is also DCFL, making option A correct rather than B."
+},
+{
+  id: 'toc-cfl-p12',
+  pyqStyle: true,
+  q: "Consider these four languages: (I) { a^n b^2n : n >= 0 }. (II) { a^n b^n c^n : n >= 0 }. (III) { w w : w is in {a,b}* }. (IV) { a^i b^j : i,j >= 0 and i <= j }. Which of these are CONTEXT-FREE (but not regular)? (Select ALL that apply)",
+  options: ['Language I', 'Language II', 'Language III', 'Language IV'],
+  answers: [0, 3],
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: "Language I ({a^n b^2n}) is context-free via S -> a S b b | epsilon, which pushes one marker per a and pops two markers per b -- a straightforward single-counter CFL, not regular because the fixed 1:2 ratio requirement cannot be tracked by any finite-state DFA for unbounded n (standard pumping-lemma argument mirrors a^n b^n). Language IV ({a^i b^j : i <= j}) is context-free via a PDA that pushes for each a, then pops one marker per b while available, then continues accepting any further b's once the stack is empty (allowing j to exceed i freely) -- also not regular, since restricting to i=j recovers the non-regular a^n b^n as a special case, so the general inequality language cannot be regular either (if it were, intersecting with the regular set where every a is matched by exactly one b via a different regular constraint would force a^n b^n to be regular too). Language II ({a^n b^n c^n}) is the classic NON-context-free language (provable via the CFL pumping lemma, since any pumpable window of bounded length can touch at most two of the three equal blocks), so it is excluded. Language III ({w w}) is also famously NOT context-free (the CFL pumping lemma similarly fails for strings like a^p b a^p b, since pumping any bounded window either desynchronizes the two halves or fails to affect both copies identically), so it is excluded too. Only I and IV qualify."
+},
+{
+  id: 'toc-cfl-p13',
+  pyqStyle: true,
+  q: "Consider L = { a^n b^n a^n : n >= 0 }, i.e. a block of n a's, then n b's, then n more a's, all with the SAME count n. Which of the following BEST classifies L?",
+  options: ['L is regular', 'L is context-free but not regular', 'L is not context-free', 'L is context-sensitive but the exact classification is undecidable in general'],
+  answer: 2,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: "This is a classic 'cross-serial dependency' style language that fails to be context-free, closely analogous in difficulty to a^n b^n c^n despite reusing the same symbol a on both ends. Apply the CFL pumping lemma with w = a^p b^p a^p for pumping length p: any decomposition w = uvxyz with |vxy| <= p and |vy| >= 1 forces vxy to lie within a window of length at most p, which (by the same block-boundary argument as the classic a^n b^n c^n proof) can only overlap with at most two of the three blocks -- either touching only the first a-block and part of the b-block, only the b-block and part of the second a-block, or (if positioned exactly at a boundary) parts of two adjacent blocks, but it can never simultaneously touch all three blocks including both separated a-blocks, since they are separated by a full length-p block of b's in between. This means pumping (repeating vxy, taking i=2 or deleting it, taking i=0) is guaranteed to change the count of a's in only ONE of the two a-blocks (or change only the b-count) while leaving the other a-block's count fixed, breaking the required three-way equality between both a-counts and the b-count. This produces a string outside L for every possible decomposition, proving L is NOT context-free (it requires full context-sensitive power, since a linear-bounded automaton can verify all three counts using bounded extra tape). Option C is correct."
+},
+{
+  id: 'toc-cfl-p14',
+  pyqStyle: true,
+  q: "A context-free language L is said to be INHERENTLY AMBIGUOUS when:",
+  options: ['Every context-free grammar that generates L is ambiguous (no unambiguous grammar for L exists at all)', 'At least one grammar that generates L happens to be ambiguous, even though some other grammar for L might be unambiguous', 'L cannot be generated by any context-free grammar whatsoever', 'L is not a context-free language at all'],
+  answer: 0,
+  marks: 1,
+  difficulty: 'easy',
+  type: 'pyq-style',
+  explanation: "Ambiguity, as usually discussed, is a property of a specific GRAMMAR (some string in the language has two or more distinct parse trees under that particular grammar) -- and it is common for a language to have both an ambiguous grammar and a completely different, equivalent, unambiguous grammar generating the exact same language, in which case the language itself is not inherently ambiguous, just described awkwardly by one particular grammar (option B describes this ordinary, resolvable situation, not inherent ambiguity). Inherent ambiguity is the much stronger property of the LANGUAGE itself: it means that absolutely no context-free grammar for L can ever be unambiguous, no matter how it is constructed -- every possible CFG generating exactly L is forced to have some string with multiple parse trees. This is a real, provable phenomenon (a classical example is the union-based language { a^i b^j c^k : i=j or j=k }, which can be shown to be inherently ambiguous using a counting argument on how many derivations must exist for large strings satisfying both i=j and j=k simultaneously). Options C and D are simply false definitions (inherent ambiguity presupposes L IS context-free, generated by many possible grammars, all of which are ambiguous), so option A is the correct definition."
+}
+);
+
+window.GATE_DATA.questions['toc'].topics.find(function(t){return t.id==='toc-turing';}).questions.push(
+{
+  id: 'toc-turing-p1',
+  pyqStyle: true,
+  q: "A Turing machine is said to DECIDE a language L (as opposed to merely RECOGNIZE/ACCEPT it). What additional requirement does 'decide' impose that plain 'accept' does not?",
+  options: ['The machine must halt on EVERY input, entering an accept state for strings in L and a reject state (or otherwise halting without accepting) for strings not in L', 'The machine only needs to halt and accept on inputs that are in L, and may behave arbitrarily (including looping forever) on inputs not in L', 'The machine must halt only on inputs not in L', 'There is no difference between deciding and accepting a language'],
+  answer: 0,
+  marks: 1,
+  difficulty: 'easy',
+  type: 'pyq-style',
+  explanation: "Acceptance (giving rise to the recursively enumerable, RE, languages) only requires that the machine eventually halt in an accepting state for every string that IS in L; for strings NOT in L, the machine is allowed to reject, or to loop forever without ever halting -- there is no requirement to detect non-membership. Deciding (giving rise to the recursive, or decidable/REC, languages) is strictly stronger: the machine must halt on EVERY possible input string, without exception, and correctly classify it by ending in an accepting configuration for strings in L or a rejecting configuration (or any non-accepting halt) for strings not in L. This distinction is exactly why some languages, like the Acceptance Problem A_TM, are recognizable (build a universal simulator that accepts if the simulated machine halts and accepts) but not decidable (there is no way to also guarantee detecting and correctly halting-with-rejection on every input where the simulated machine would loop forever). Option A correctly captures this 'halts on all inputs, in both directions' requirement."
+},
+{
+  id: 'toc-turing-p2',
+  pyqStyle: true,
+  q: "Which of the following statements relating RE (recursively enumerable) and REC (recursive/decidable) languages are TRUE? (Select ALL that apply)",
+  options: ['If L is decidable (in REC), then the complement of L is also decidable', 'If L is RE, then the complement of L is always also RE', 'If both L and the complement of L are RE, then L must be decidable (in REC)', 'Every RE language is automatically decidable'],
+  answers: [0, 2],
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: "A is TRUE: if L is decidable via some machine M that halts on all inputs, simply flip M's accept/reject verdict to get a decider for the complement -- decidable languages are always closed under complement, since the halting-on-everything guarantee transfers directly. C is TRUE and is a foundational theorem: given a recognizer M1 for L (halts-and-accepts exactly on L, may loop elsewhere) and a recognizer M2 for the complement of L (halts-and-accepts exactly outside L), run both machines in parallel (e.g. by interleaving their steps) on the same input -- exactly one of them is guaranteed to eventually halt and accept (since every string is in either L or its complement), so this interleaved simulation always halts, giving a decider for L. B is FALSE: this is precisely the property that distinguishes RE from REC -- if every RE language's complement were also RE, then by the theorem just proved in C, every RE language would be decidable, collapsing the RE and REC classes together, which is known to be false (A_TM is a standard RE language whose complement is provably not RE). D is FALSE for the identical reason -- RE strictly contains REC as a proper subset, with A_TM again the standard witness of an RE-but-undecidable language."
+},
+{
+  id: 'toc-turing-p3',
+  pyqStyle: true,
+  q: "Consider the Halting Problem H = { <M,w> : Turing machine M halts on input w (regardless of whether it accepts or rejects) }. Which of the following correctly classifies H?",
+  options: ['H is decidable', 'H is recursively enumerable (RE) but not decidable', 'H is co-RE (its complement is RE) but H itself is not RE', 'H is neither RE nor co-RE'],
+  answer: 1,
+  marks: 1,
+  difficulty: 'easy',
+  type: 'pyq-style',
+  explanation: "H is RE: build a machine that, on input <M,w>, simulates M on w step by step, and halts-and-accepts the moment the simulation halts (whether M's simulated run ends by accepting or by rejecting, the outer simulator halts and accepts either way, since H only asks whether M halts at all, not what verdict it reaches) -- this correctly accepts every <M,w> pair where M halts on w, confirming H is RE. H is NOT decidable: this is the original, historically first proof of undecidability (Turing's diagonalization argument), typically shown by first proving the closely related Acceptance Problem A_TM is undecidable via self-referential diagonalization, then noting H is at least as hard (a decider for H could be used to build a decider for A_TM by first checking whether M halts on w using the H-decider, and if so, actually running M on w to see whether it accepts, since it is now guaranteed to terminate). Since H is RE but not decidable, its complement cannot be RE either (if both H and complement(H) were RE, H would be decidable by the RE+co-RE-implies-decidable theorem), so H is RE but not co-RE, matching option B exactly and ruling out C and D."
+},
+{
+  id: 'toc-turing-p4',
+  pyqStyle: true,
+  q: "For each of the following properties of an arbitrary Turing machine M, decide whether determining that property (given M's description) is DECIDABLE or UNDECIDABLE. Select the properties that are UNDECIDABLE. (Select ALL that apply)",
+  options: ['Does M have at least 10 states (counting from its formal description)?', 'Does L(M) contain at least one string of length exactly 10?', 'Does M halt within 100 steps when run on the empty input string?', 'Is L(M) the empty language?'],
+  answers: [1, 3],
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: "Options A and C describe DECIDABLE properties, so they are correctly excluded from this 'undecidable' selection. Option A ('at least 10 states') is a purely SYNTACTIC property of M's own textual description -- just parse the machine's formal specification and count the listed states directly, no simulation or Rice's theorem involved, so it is trivially decidable. Option C ('halts within 100 steps on a specific input') is a bounded computation -- simply simulate M on the empty string for up to 100 steps and observe whether it halts within that budget, which always terminates in a finite, predictable amount of work, so it is decidable (this bounded-step trick is a common way GATE disguises a decidable problem to look superficially like a halting question). Options B and D are genuinely UNDECIDABLE by Rice's theorem: both are semantic properties of the LANGUAGE L(M) (not the machine's code), and both are nontrivial (some RE languages contain a length-10 string, others do not; some RE languages are empty, others are not), so Rice's theorem directly applies and declares both undecidable, with 'is L(M) empty' being the canonical E_TM problem."
+},
+{
+  id: 'toc-turing-p5',
+  pyqStyle: true,
+  q: "To prove that the problem 'given a Turing machine M and input w, does M ever write a non-blank symbol on the tape while running on w' is undecidable, the standard proof technique is to construct a computable reduction FROM which known undecidable problem?",
+  options: ['The Acceptance Problem A_TM = { <M,w> : M accepts w }', 'The Emptiness Problem for DFAs', 'Post’s Correspondence Problem, applied directly without any TM construction', 'No reduction is needed, since the property is actually decidable by direct simulation'],
+  answer: 0,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: "The standard reduction template is: assume (for contradiction) a decider D exists for the target problem (here, 'does M ever write a non-blank symbol on w'). Build a decider for A_TM as follows: given an instance <M,w> of A_TM, construct a new machine M' that first simulates M on w exactly, WITHOUT writing anything to its own tape during the simulation phase (using extra internal states to track M's simulated tape/head position abstractly, or a separate track, rather than physically writing on the real tape), and only if/when the simulated M accepts w does M' finally write a single non-blank symbol and halt. Then run D on <M', anything>: D answers 'yes, writes non-blank' exactly when M' eventually reaches its accepting-simulation branch, which happens exactly when M accepts w. This computable transformation converts a decider for the target problem into a decider for A_TM, which is known to not exist, so the target problem cannot be decidable either. The DFA emptiness problem (option B) is itself decidable and would prove nothing, and PCP (option C) is a different family of reductions typically used for CFG/grammar undecidability results, not this kind of direct TM-behavior question."
+},
+{
+  id: 'toc-turing-p6',
+  pyqStyle: true,
+  q: "The Post Correspondence Problem (PCP) is a fundamental undecidable problem primarily used as the starting point for proving undecidability results about which class of formalisms?",
+  options: ['Properties of DFAs and regular expressions', 'Properties of context-free grammars, such as CFG ambiguity, CFG equivalence, and CFG universality', 'Only the Halting Problem for Turing machines directly, with no other applications', 'None of the above; PCP has no standard applications in formal language theory'],
+  answer: 1,
+  marks: 1,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: "While PCP is itself undecidable and closely tied to Turing machine computations (an instance of PCP can simulate a TM's computation history), its most common and celebrated use in a formal-language-theory course is as the reduction source for proving several CFG-related problems undecidable, precisely because a PCP instance can be encoded into a pair of grammars (or a single grammar checked for ambiguity) such that a solution to the PCP instance corresponds exactly to an ambiguous derivation, or to two grammars generating overlapping/equal languages. This gives the landmark results that CFG-equivalence (do two CFGs generate the same language) is undecidable, CFG-universality (does a CFG generate all of Sigma*) is undecidable, and whether a given CFG is ambiguous is undecidable -- none of which follow directly from simpler TM-halting reductions alone, making PCP the essential bridging tool. DFA properties (option A) are all decidable and need no such reduction, and PCP's applications extend well beyond just the Halting Problem itself (option C), making option B the best answer."
+},
+{
+  id: 'toc-turing-p7',
+  pyqStyle: true,
+  q: "For a Linear Bounded Automaton (LBA) M and input string w, is the membership problem (does M accept w?) decidable?",
+  options: ['Yes, it is always decidable, because an LBA has only finitely many possible configurations (bounded by input length), so a simulation can detect and halt on configuration-repetition instead of looping forever', 'No, it is always undecidable, exactly like the analogous problem for unrestricted Turing machines', 'It is decidable only when M happens to be deterministic, but undecidable for nondeterministic LBAs', 'It is undecidable in general but is at least recursively enumerable (RE)'],
+  answer: 0,
+  marks: 1,
+  difficulty: 'easy',
+  type: 'pyq-style',
+  explanation: "An LBA is a Turing machine restricted to using only the portion of tape occupied by the input itself (a constant multiple of the input length, in the general definition, but the key fact is that the usable tape is BOUNDED as a function of |w|, not unbounded like a general TM). This boundedness means the total number of distinct configurations (combinations of tape contents, head position, and control state) reachable during any run is FINITE -- explicitly bounded by (number of states) x (input length) x (tape alphabet size)^(input length), a large but finite number. A simulator can therefore run M on w while recording every configuration visited; if M ever halts, simulation naturally stops and reports the answer, and if M would otherwise loop forever, it is mathematically guaranteed to revisit some earlier configuration exactly (by pigeonhole, since there are only finitely many possible configurations but infinitely many steps if it never halts), at which point the simulator can safely conclude M will loop forever on w and reject. This configuration-repetition detection trick makes LBA membership fully decidable, unlike the unbounded-tape TM case (option B is wrong), regardless of determinism (option C is wrong, this argument works for nondeterministic LBAs too by tracking all reachable configurations across all nondeterministic branches, still finite), and it is not merely RE but fully decidable (option D undersells it)."
+},
+{
+  id: 'toc-turing-p8',
+  pyqStyle: true,
+  q: "Which of the following is a language that is UNDECIDABLE but IS recursively enumerable (RE)?",
+  options: ['A_TM = { <M,w> : Turing machine M accepts input w }', 'EQ_TM = { <M1,M2> : L(M1) = L(M2) }, which is known to be neither RE nor co-RE', 'The complement of A_TM, which is known to not be RE at all', 'The empty language over any alphabet, which is trivially decidable'],
+  answer: 0,
+  marks: 1,
+  difficulty: 'easy',
+  type: 'pyq-style',
+  explanation: "A_TM is the canonical example of a language that is RE but not decidable: it is RE because a universal machine can simulate <M,w> step by step and halt-accept exactly when the simulated M halts and accepts (this simulator may loop forever if M loops forever on w, which is fine for RE recognition, just not for deciding), and it is provably not decidable by Turing's classic diagonalization argument (assuming a decider H for A_TM exists leads to a machine that produces a logical contradiction when run on its own encoding). Option B (EQ_TM) is a real language but describes something even harder than 'undecidable but RE' -- it is a landmark example that sits OUTSIDE both RE and co-RE entirely (it cannot even be semi-decided in either direction), so while the classification stated in option B is correct as a fact, it does not answer the question of finding an RE-but-undecidable language. Option C is also a true fact but is the wrong example for this question (the complement of A_TM is undecidable and NOT RE, making it a co-RE-only example, not an RE example). Option D describes a decidable language, not an undecidable one. So option A is the correct and standard answer."
+},
+{
+  id: 'toc-turing-p9',
+  pyqStyle: true,
+  q: "To prove that a newly encountered problem X is undecidable by reduction from a known undecidable problem A, which direction of reduction is required?",
+  options: ['Construct a computable transformation converting any instance of A into a corresponding instance of X (written A reduces to X), so that a decider for X would yield a decider for A', 'Construct a computable transformation converting any instance of X into a corresponding instance of A (written X reduces to A)', 'Either direction of reduction proves the same thing about X, so it does not matter which way it is done', 'No formal reduction is required; showing that X merely resembles A informally is sufficient to conclude X is undecidable'],
+  answer: 0,
+  marks: 1,
+  difficulty: 'easy',
+  type: 'pyq-style',
+  explanation: "The correct and only valid direction is A reduces to X (option A): the logical structure of the proof is 'if X were decidable via some decider D_X, then we could build a decider D_A for A by transforming any A-instance into an X-instance and calling D_X on it, contradicting the fact that A is already known to be undecidable; therefore no decider D_X can exist, so X is undecidable.' This requires the transformation to go FROM A's instances TO X's instances, because the whole point is to route a would-be solution for X back into solving A. Reducing in the opposite direction (option B, X reduces to A) proves nothing about X's undecidability -- it would only show that A is at least as hard as X, which, since A is already known to be hard, tells us nothing new about X (X could easily be decidable even while some undecidable problem A happens to reduce-away-from it in the wrong direction). This exact backwards-reduction mistake is one of the most common conceptual errors students make, which is why GATE frequently tests the direction explicitly, confirming option A is correct and options C and D are false."
+},
+{
+  id: 'toc-turing-p10',
+  pyqStyle: true,
+  q: "Consider the following four decision problems. Which of them are DECIDABLE? (Select ALL that apply)",
+  options: ['Given a context-free grammar G, is L(G) equal to Sigma* (i.e. is G universal)?', 'Given two DFAs M1 and M2, do they accept the same language?', 'Given a context-free grammar G, is L(G) empty?', 'Given a Turing machine M, is L(M) equal to Sigma*?'],
+  answers: [1, 2],
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: "Option B (DFA equivalence) is DECIDABLE: build the symmetric-difference automaton via a product construction that accepts exactly the strings on which M1 and M2 disagree, then check its emptiness (a simple reachability check on a finite graph) -- if empty, the two DFAs are equivalent. Option C (CFG emptiness) is DECIDABLE: compute the set of 'generating' nonterminals (those that can eventually derive some string of terminals only) via a straightforward fixed-point/reachability computation on the grammar's productions; L(G) is empty exactly when the start symbol is not generating. Option A (CFG universality) is UNDECIDABLE: this is a landmark result proved by reduction from the Post Correspondence Problem, and it immediately implies CFG-equivalence is undecidable too (universality is just equivalence to the special grammar generating Sigma*). Option D (TM universality) is UNDECIDABLE by Rice's theorem: 'is L(M) equal to Sigma*' is a nontrivial semantic property of the language recognized (some RE languages equal Sigma*, most do not), so Rice's theorem directly declares it undecidable, consistent with essentially every non-trivial semantic question about an arbitrary TM's language being undecidable. So only B and C, the DFA and CFG problems with the DECIDABLE flavor from the standard catalogue, are correct."
+},
+{
+  id: 'toc-turing-p11',
+  pyqStyle: true,
+  q: "Consider the following four decision problems. Which of them are DECIDABLE? (Select ALL that apply)",
+  options: ['Given a CFG G and a string w, does G generate w? (the CFG membership problem)', 'Given two CFGs G1 and G2, do they generate the same language?', 'Given a Turing machine M, does M halt on every possible input (the Totality Problem)?', 'Given a DFA M, is L(M) an infinite language?'],
+  answers: [0, 3],
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: "Option A (CFG membership) is DECIDABLE: after converting G to Chomsky Normal Form, the CYK dynamic-programming algorithm decides whether G generates w in polynomial time (O(n^3) in the length of w), by systematically building up which nonterminals can derive every substring of w. Option D (DFA infiniteness) is DECIDABLE: a DFA's language is infinite if and only if its state transition graph (restricted to states reachable from the start state and able to reach an accepting state) contains a cycle -- a simple, efficiently checkable graph property, since a cycle allows arbitrarily long accepted strings while its absence bounds the longest accepted string by the number of states. Option B (CFG equivalence) is UNDECIDABLE, a landmark result proved via reduction from the Post Correspondence Problem, precisely because unlike DFA equivalence, there is no symmetric-difference-automaton trick available (CFLs are not closed under complement or intersection in general). Option C (TM Totality, 'halts on every input') is UNDECIDABLE by Rice's theorem style reasoning extended to a slightly different formulation (it is a nontrivial property of the machine's overall behavior across all inputs, provable undecidable via reduction from A_TM by constructing a machine that ignores its real input and simulates M on a fixed w, making totality equivalent to M accepting w). So only A and D are decidable."
+},
+{
+  id: 'toc-turing-p12',
+  pyqStyle: true,
+  q: "Which of the following properties of an arbitrary Turing machine's language L(M) is TRIVIAL (true for every possible RE language, or false for every possible RE language), meaning Rice's theorem does NOT apply and the property is trivially decidable regardless?",
+  options: ['L(M) is the empty set', 'L(M) contains an even number of strings', 'L(M) is recursively enumerable', 'L(M) is a finite language'],
+  answer: 2,
+  marks: 1,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: "By definition, whatever language L(M) a Turing machine M recognizes is ALWAYS a recursively enumerable language -- this is not a meaningful constraint that varies from machine to machine, it is a universal truth built into what it means for M to be a TM recognizing some language at all. So the property 'L(M) is RE' holds for every possible M with no exceptions, making it a TRIVIAL property (true for 100% of RE languages, since being RE-recognized is exactly what defines membership in the RE class in the first place) -- Rice's theorem explicitly requires NONTRIVIALITY (the property must be true for some RE languages and false for others) to apply, so this property fails that requirement and Rice's theorem says nothing about it; it is trivially decidable because the answer is always simply 'yes', regardless of M. In contrast, options A ('L(M) is empty'), B ('contains an even number of strings', which is false for infinite languages and can be true or false among finite ones, hence nontrivial), and D ('L(M) is finite') are all genuinely nontrivial semantic properties (some RE languages have them, some do not), so Rice's theorem correctly declares all three of those undecidable. Only option C is trivial."
+},
+{
+  id: 'toc-turing-p13',
+  pyqStyle: true,
+  q: "A Universal Turing Machine U is designed to take as input an encoding <M,w> of some other Turing machine M together with a string w. What does U do when run on this input?",
+  options: ['U simulates M running on w step by step, and behaves exactly as M would (accepting if M accepts, rejecting if M rejects, and looping forever if M loops forever on w)', 'U always halts within a fixed number of steps regardless of what M and w are', 'U only works correctly when M happens to be a decider (halts on all inputs); for other M it always crashes with an error', 'A Universal Turing Machine cannot be constructed for an arbitrary M, only for specific restricted classes of machines'],
+  answer: 0,
+  marks: 1,
+  difficulty: 'easy',
+  type: 'pyq-style',
+  explanation: "The Universal Turing Machine is one of the most important theoretical results in computability: a single, fixed Turing machine U can take ANY other machine's description <M> together with an input w, and faithfully simulate M's exact step-by-step behavior on w by reading M's transition rules from the encoded description and applying them one at a time to a simulated tape (using its own tape to represent both M's current tape contents and M's current state as part of the encoding). This means U's own behavior on <M,w> exactly mirrors whatever M would do on w: if M would accept, U accepts; if M would reject (halt in a non-accepting way), U rejects; and crucially, if M would loop forever without ever halting, U also loops forever, faithfully reproducing that non-halting behavior rather than crashing or artificially terminating (which is precisely WHY the Halting Problem is hard -- U itself provides no shortcut to predict in advance whether the simulation will ever stop). This universal simulation capability works for ANY Turing machine M, not just deciders, directly refuting options B, C, and D, and is the theoretical basis for the very existence of general-purpose stored-program computers."
+},
+{
+  id: 'toc-turing-p14',
+  pyqStyle: true,
+  q: "Consider the following four decision problems about an arbitrary Turing machine M. Which of them are UNDECIDABLE? (Select ALL that apply)",
+  options: ['Given M, does M halt when run on the empty input string?', 'Given M and a specific number k, does M halt on the empty input string within k steps?', 'Given M, does M halt on EVERY possible input string (the Totality Problem)?', 'Given M, does M fail to halt (i.e. loop forever) on AT LEAST ONE input string?'],
+  answers: [0, 2, 3],
+  marks: 2,
+  difficulty: 'hard',
+  type: 'pyq-style',
+  explanation: "Option B is the only DECIDABLE one here: bounding the number of steps to a specific finite k turns this into a direct, terminating simulation -- just run M on the empty string for at most k steps and observe whether it halts within that budget, which always finishes (this bounded-simulation trick is a recurring theme distinguishing decidable from undecidable TM questions). Option A ('halts on the empty input', a specific instance of the general Halting Problem restricted to one particular input) is UNDECIDABLE, provable by reduction from A_TM (given any <M,w>, construct M' that ignores its own input, hardcodes w, and simulates M on w; then M' halts on the empty string exactly when M halts on w). Option C (Totality, halting on ALL inputs) is UNDECIDABLE, also provable by reduction from A_TM using a similar hardcoding trick (M' ignores its real input and simulates M on a fixed w; M' is total, i.e. halts on every input, exactly when M halts on that one w, reducing A_TM to totality). Option D ('loops forever on at least one input') is the logical negation of totality -- since totality is undecidable and this is essentially its complement-flavored restatement (a nontrivial nonempty proper subset of the semantic behavior of M), it is also UNDECIDABLE by the same underlying reduction, just phrased as the existential negation rather than the universal statement."
+}
+);
+
+window.GATE_DATA.questions['toc'].topics.find(function(t){return t.id==='toc-decidability';}).questions.push(
+{
+  id: 'toc-decidability-p1',
+  pyqStyle: true,
+  q: "Which of the following FINITENESS-related questions are DECIDABLE? (Select ALL that apply)",
+  options: ['Given a DFA M, is L(M) finite?', 'Given a CFG G, is L(G) finite?', 'Given a Turing machine M, is L(M) finite?', 'Given a CFG G, is L(G) infinite (i.e. NOT finite)?'],
+  answers: [0, 1, 3],
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: "DFA finiteness (A) is decidable: L(M) is infinite exactly when the state graph, restricted to states reachable from the start and able to reach an accepting state, contains a cycle -- a simple graph check. CFG finiteness (B) is decidable: L(G) is infinite exactly when the grammar's nonterminal dependency graph (restricted to useful, reachable-and-generating nonterminals) contains a cycle through a nonempty terminal-producing path (a 'self-embedding' nonterminal that can derive a string containing itself again) -- also a checkable graph property on the finite grammar. Option D (CFG infiniteness) is simply the logical negation of option B, and since finiteness is already established as decidable for CFGs, its negation, infiniteness, is trivially decidable too (a decider for one gives a decider for the other by flipping the answer), so D is correctly decidable. Option C (TM finiteness) is UNDECIDABLE by Rice's theorem: 'is L(M) finite' is a nontrivial semantic property of the recognized language (some RE languages are finite, some are not), so Rice's theorem directly applies and rules this one undecidable, in sharp contrast to the DFA and CFG cases where finiteness has direct combinatorial algorithms available."
+},
+{
+  id: 'toc-decidability-p2',
+  pyqStyle: true,
+  q: "For an arbitrary Turing machine M, which of the following questions about M are UNDECIDABLE? (Select ALL that apply)",
+  options: ['Is L(M) a regular language?', 'Does M have an even number of states, as listed in its formal description?', 'Is L(M) equal to the empty set OR equal to Sigma* (i.e. is L(M) one of these two extreme, trivial-looking languages)?', 'Does M move its tape head to the left at some point during the first 5 steps of its run on the empty input?'],
+  answers: [0, 2],
+  marks: 2,
+  difficulty: 'hard',
+  type: 'pyq-style',
+  explanation: "Option A ('is L(M) regular') is a classic Rice's theorem application: it is a semantic property of the language (not the machine's code), and it is nontrivial (some RE languages are regular, e.g. any DFA-recognizable language trivially embedded into a TM, and some RE languages, like A_TM, are not regular), so Rice's theorem declares it undecidable. Option C is more subtle but still undecidable: the property 'L(M) is empty OR L(M) is all of Sigma*' is a semantic property of the language, and crucially it IS nontrivial despite sounding like it covers 'extreme' cases -- some RE languages satisfy it (the empty language, or a machine accepting everything) while many RE languages do not (any language properly between empty and Sigma*, like a language containing exactly the strings of even length), so nontriviality holds and Rice's theorem applies, making it undecidable. Options B and D are DECIDABLE: B is purely syntactic (count states directly from M's description, no simulation needed), and D is a bounded, directly simulatable question (just run M for 5 steps on the empty string and observe whether a left-move occurs), both falling outside Rice's theorem's scope entirely since neither is a property of the language recognized."
+},
+{
+  id: 'toc-decidability-p3',
+  pyqStyle: true,
+  q: "Which of the following statements about REC (decidable) and RE (recursively enumerable) languages are TRUE? (Select ALL that apply)",
+  options: ['The class REC (decidable languages) is closed under complementation', 'The class RE is closed under complementation', 'The class RE is closed under union and under intersection', 'The class REC is closed under union and under intersection'],
+  answers: [0, 2, 3],
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: "REC is closed under complement (A true): given a decider for L that halts on all inputs, simply flip its accept/reject output to decide the complement, which also halts on all inputs. RE is closed under union and intersection (C true): given two recognizers M1 (for L1) and M2 (for L2), simulate both on the input in parallel for union (accept as soon as either one accepts), or run both to completion and accept only if both eventually accept for intersection (this may take longer but still correctly recognizes the intersection, accepting exactly when the input is in both languages, and looping if either fails to accept). REC is closed under union and intersection (D true): given deciders for L1 and L2, run both to completion (both are guaranteed to halt), then combine their answers with OR (for union) or AND (for intersection) -- this always halts and is correct. RE is NOT closed under complementation (B false): this is the crucial asymmetry that distinguishes RE from REC -- if RE were closed under complement, then for any RE language L, complement(L) would also be RE, and by the theorem that 'L and complement(L) both RE implies L decidable', every RE language would become decidable, collapsing RE into REC, which is false (A_TM is the standard counterexample, RE but with a complement that is not RE)."
+},
+{
+  id: 'toc-decidability-p4',
+  pyqStyle: true,
+  q: "Suppose it is known that both a language L and its complement (over the same alphabet) are recursively enumerable (RE). What can we conclude about L?",
+  options: ['L must be decidable (in REC)', 'L must be undecidable', 'L cannot be RE itself (contradiction)', 'L must be a regular language'],
+  answer: 0,
+  marks: 1,
+  difficulty: 'easy',
+  type: 'pyq-style',
+  explanation: "This is one of the most important and frequently tested theorems in computability theory: if both L and its complement have Turing machines that recognize them (i.e. halt and accept exactly on their respective languages, though possibly looping forever on the other language's strings), then L is guaranteed to be decidable. The construction is direct: run the recognizer for L and the recognizer for complement(L) simultaneously, interleaving their execution steps one at a time; since every string is in exactly one of L or complement(L), exactly one of the two parallel simulations is mathematically guaranteed to eventually halt and accept, and whichever one does so first tells you definitively whether the input was in L or not, giving a machine that halts on every input, i.e. a decider. This directly rules out option B (undecidable directly contradicts the theorem) and option C (there is no contradiction; RE and co-RE overlapping exactly IS what forces decidability, this is not a paradox). Option D is unwarranted: the theorem gives decidability, a strictly weaker and more general property than regularity, so L could be decidable yet still context-free-but-not-regular, or even decidable but not context-free, without contradicting anything."
+},
+{
+  id: 'toc-decidability-p5',
+  pyqStyle: true,
+  q: "Which of the following properties of an arbitrary Turing machine M is DECIDABLE (Rice's theorem does NOT apply)?",
+  options: ['Is L(M) empty?', 'Does M have a transition defined on the input symbol a from its designated start state, as written in its formal transition table?', 'Is L(M) finite?', 'Is L(M) equal to Sigma* (does M accept every string)?'],
+  answer: 1,
+  marks: 1,
+  difficulty: 'easy',
+  type: 'pyq-style',
+  explanation: "Options A, C, and D are all classic Rice's-theorem applications: each asks about a semantic property of the language L(M) that the machine recognizes (emptiness, finiteness, and universality respectively), and each is nontrivial (some RE languages are empty and some are not; some are finite and some are not; some equal Sigma* and some do not), so Rice's theorem correctly and immediately declares all three undecidable, with no need for a custom reduction argument once the semantic-and-nontrivial checklist is confirmed. Option B, however, asks something entirely different in character: whether the machine's OWN transition table, as literally written down in its formal description, happens to contain a specific entry (a transition defined on symbol a from the start state). This is a purely SYNTACTIC question about the machine's code/structure, not about the language it recognizes -- two machines that look completely different in their transition tables (one having this specific transition, one not) can still recognize the exact same language, or conversely the same transition table structure could theoretically appear across machines recognizing very different languages, showing this property is not even a function of L(M) alone. Since Rice's theorem only restricts SEMANTIC properties, it says nothing about B, and B is trivially decidable by directly inspecting the machine's description, making option B the correct answer here."
+},
+{
+  id: 'toc-decidability-p6',
+  pyqStyle: true,
+  q: "To prove EQ_TM = { <M1,M2> : L(M1) = L(M2) } is undecidable, a standard technique reduces from E_TM = { <M> : L(M) = empty set }. Given an instance <M1> of E_TM, which construction correctly reduces it to an instance of EQ_TM?",
+  options: ['Fix M2 to be a specific machine that rejects every input (so L(M2) is the empty language), and output <M1,M2>; then M1 is in E_TM if and only if <M1,M2> is in EQ_TM', 'Fix M2 to be a machine that simulates M1 on every possible input simultaneously', 'Fix M2 to be a machine that always accepts every input immediately', 'Fix M2 to be M1 itself, unmodified, and output <M1,M1>'],
+  answer: 0,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: "The reduction must produce, from any E_TM-instance <M1>, a computable EQ_TM-instance whose membership exactly mirrors whether L(M1) is empty. Fixing M2 as a trivial machine that immediately rejects every input it is given (never entering an accept state, regardless of the input) guarantees L(M2) = the empty set, a fixed, easily-constructed reference language. Then <M1,M2> is in EQ_TM (meaning L(M1) = L(M2)) if and only if L(M1) also equals the empty set, which is exactly the condition <M1> is in E_TM. This transformation (writing down the description of this fixed always-rejecting M2 alongside M1's own unchanged description) is clearly computable in a simple, mechanical way. If a decider for EQ_TM existed, running it on <M1,M2> would then decide E_TM, contradicting E_TM's known undecidability (E_TM is itself undecidable by a similar reduction from A_TM), so no decider for EQ_TM can exist either. Option D reduces to a trivially-always-true statement (M1 always equals itself) and proves nothing; options B and C use constructions that do not correspond to a fixed, known reference language matching the empty-language condition being tested."
+},
+{
+  id: 'toc-decidability-p7',
+  pyqStyle: true,
+  q: "Which of the following decidability questions, involving combinations of DFAs and context-free grammars, are DECIDABLE? (Select ALL that apply)",
+  options: ['Given two DFAs M1 and M2, is L(M1) a subset of L(M2)?', 'Given a DFA M, is L(M) equal to Sigma* (universality)?', 'Given a CFG G and a DFA M, is L(G) a subset of L(M) (i.e. does the DFA accept every string the grammar generates)?', 'Given a CFG G and a DFA M, is L(M) a subset of L(G) (i.e. does the grammar generate every string the DFA accepts)?'],
+  answers: [0, 1, 2],
+  marks: 2,
+  difficulty: 'hard',
+  type: 'pyq-style',
+  explanation: "A is decidable: L(M1) subset of L(M2) iff L(M1) intersect complement(L(M2)) is empty; DFAs are closed under complement and intersection, and DFA emptiness is a decidable reachability check, so the whole test is decidable. B is decidable similarly: complement M (DFA closure under complement), then test emptiness of the complement. C is the subtle but DECIDABLE direction: L(G) subset of L(M) iff L(G) intersect complement(L(M)) is empty; complement(L(M)) is still regular (DFA complement), and CFL intersected with a regular language is always still a CFL (a standard closure property, built via a product-style construction combining the PDA and the DFA), and CFL emptiness is decidable (generating-nonterminal computation), so this composed check is fully decidable. D is the DECEPTIVE one and is actually UNDECIDABLE in general: checking L(M) subset of L(G) is equivalent to asking whether complement(L(G)) intersect L(M) is empty, but complement(L(G)) is generally NOT context-free (CFLs are not closed under complement), so this construction breaks down; in fact, choosing M to accept Sigma* reduces this exact question to the CFG universality problem (is L(G) = Sigma*?), which is a landmark UNDECIDABLE problem, so D cannot be decidable in general."
+},
+{
+  id: 'toc-decidability-p8',
+  pyqStyle: true,
+  q: "Suppose L is a language that is known to be RE (recursively enumerable) but UNDECIDABLE. What can we conclude about the complement of L?",
+  options: ['The complement of L must always be RE', 'The complement of L can never be RE (it is guaranteed to NOT be RE)', 'The complement of L might be RE or might not be RE, depending on the specific language, and there is no way to determine which without more information', 'The complement of L must be a regular language'],
+  answer: 1,
+  marks: 1,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: "This follows directly and necessarily from the RE-plus-co-RE-implies-decidable theorem: if the complement of L WERE also RE, then both L and its complement would be RE simultaneously, which by that theorem would force L to be decidable -- but L is explicitly given as undecidable, a direct contradiction. Therefore, whenever L is RE but undecidable, its complement is logically guaranteed to NOT be RE, with no exceptions and no case-by-case uncertainty; this is a hard mathematical necessity, not merely a common pattern, ruling out both option A (the opposite conclusion) and option C (falsely suggesting ambiguity or case-dependence where none exists). This exact relationship is precisely what makes A_TM such an important example: A_TM is RE but undecidable, and consequently its complement (the set of pairs <M,w> where M does NOT accept w, including cases where M rejects or loops forever) is provably NOT RE, illustrating that not being RE is a real and reachable classification, not just a theoretical possibility. Option D is unwarranted, since nothing in this reasoning implies regularity; the complement is simply 'not RE', which is a much weaker classification than being irregular specifically."
+},
+{
+  id: 'toc-decidability-p9',
+  pyqStyle: true,
+  q: "Is the problem 'given a Turing machine M, is L(M) NON-empty?' (i.e. NE_TM, the logical negation of the standard emptiness problem E_TM) decidable?",
+  options: ['Yes, it is decidable, since it is just the negation of a well-understood problem', 'No, it is undecidable, since nonemptiness is also a nontrivial semantic property of L(M), and Rice’s theorem applies to it exactly as it does to emptiness', 'It is decidable only when M is known in advance to be a decider', 'The nonemptiness question is always trivially true, so it requires no algorithm at all'],
+  answer: 1,
+  marks: 1,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: "A common misconception is that negating an undecidable problem should somehow make it decidable, but this reasoning is invalid: decidability requires a machine that HALTS on all inputs and gives the correct answer, and simply relabeling 'accept' as 'reject' and vice versa on an existing UNDECIDABLE problem's hypothetical decider does not create new decidability out of nothing -- if E_TM (emptiness) were decidable, then flipping its verdict WOULD decide NE_TM too, and vice versa, meaning E_TM and NE_TM are decidable exactly together or undecidable exactly together, they cannot differ in decidability status. Since E_TM is a well-established undecidable problem (a canonical Rice's theorem application, as 'L(M) is empty' is a nontrivial semantic property), NE_TM ('L(M) is nonempty') must also be undecidable, which is independently confirmed by Rice's theorem directly: nonemptiness is itself a nontrivial semantic property too (some RE languages are nonempty, some are empty), so Rice's theorem applies to it on its own terms as well, without even needing the negation argument. Note that NE_TM, while undecidable, IS still RE (simulate M on every string in some fair, dovetailed order, accepting as soon as any simulation halts-and-accepts), just not decidable."
+},
+{
+  id: 'toc-decidability-p10',
+  pyqStyle: true,
+  q: "Given the formal transition function of a Pushdown Automaton P, is it decidable to check whether P satisfies the definition of a DETERMINISTIC PDA (no state has both an applicable epsilon-move and an applicable input-symbol move simultaneously, and for every state, input symbol, and stack-top symbol combination, at most one transition applies)?",
+  options: ['Yes, this is decidable, because determinism is a purely syntactic/structural property directly inspectable from the transition function itself, requiring no simulation or Rice’s-theorem-style reasoning at all', 'No, this is undecidable, since it is a semantic property of the language P accepts and Rice’s theorem applies', 'This is decidable only for PDAs equivalent to some DFA', 'This is undecidable because it reduces to the CFG-ambiguity problem'],
+  answer: 0,
+  marks: 1,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: "Determinism, as defined for PDAs, is entirely a property of the machine's own transition function written down in its formal description -- for every combination of current state, next input symbol (or epsilon), and stack-top symbol, one simply checks the listed transitions and confirms there is never more than one applicable move, and never a simultaneous epsilon-move alongside an input-consuming move from the same configuration. This check requires no execution, no simulation of the machine on any input, and no reasoning whatsoever about the LANGUAGE the PDA ends up accepting -- it is a finite, mechanical inspection of a finite transition table, exactly analogous to checking B in an earlier question (does M have a specific transition listed). This is precisely the contrast Rice's theorem is meant to highlight: Rice's theorem restricts only SEMANTIC properties (properties of L(M) itself, invariant across all equivalent machines), while purely SYNTACTIC/structural properties of a machine's own description, like determinism here, always remain decidable by direct inspection, regardless of how complex or undecidable questions about the accepted language might be. Options B, C, and D all incorrectly try to force this syntactic check into a semantic-property or reduction framework where it does not belong."
+},
+{
+  id: 'toc-decidability-p11',
+  pyqStyle: true,
+  q: "A problem X is proven undecidable by exhibiting a computable reduction from A_TM to X (i.e. A_TM reduces to X). What does this reduction actually demonstrate?",
+  options: ['If X were decidable, then A_TM would also be decidable, which is a contradiction, so X must be undecidable', 'If A_TM were decidable, then X would also be decidable', 'X and A_TM are logically unrelated problems, and no conclusion about X follows', 'X must be recursively enumerable (RE), simply because A_TM happens to be RE'],
+  answer: 0,
+  marks: 1,
+  difficulty: 'easy',
+  type: 'pyq-style',
+  explanation: "The entire logical force of a reduction A_TM reduces to X comes from the contrapositive argument: the reduction provides a computable transformation turning any A_TM-instance into a corresponding X-instance such that the A_TM-instance is a 'yes' exactly when the X-instance is a 'yes'. If we assume, for the sake of contradiction, that a decider D_X for X exists, we could feed every A_TM-instance through the transformation and then through D_X, producing a working decider for A_TM -- but A_TM is already firmly established as undecidable, so this is impossible, meaning our assumption that D_X exists must be false. Therefore X has no decider, i.e. X is undecidable. Option B states the logically backwards and useless direction (assuming the PREMISE, A_TM decidable, is already known false, so this conditional statement, while technically not incorrect as a vacuous implication, is not what the reduction is actually used to conclude or demonstrate about X's own decidability status). Option C is wrong since the reduction explicitly establishes a precise, deliberate relationship between the two problems. Option D is a non sequitur -- being built from A_TM via reduction says nothing automatically about whether X itself is RE; that would need to be established separately, if true at all, from X's own definition."
+},
+{
+  id: 'toc-decidability-p12',
+  pyqStyle: true,
+  q: "Which of the following correctly orders these language classes by strict inclusion (using SUBSET-OF, where each class is a proper/strict subset of the next)?",
+  options: ['REGULAR is a strict subset of CFL, which is a strict subset of CSL, which is a strict subset of REC (decidable languages), which is a strict subset of RE', 'REGULAR is a strict subset of CSL, which is a strict subset of CFL, which is a strict subset of REC, which is a strict subset of RE', 'CFL is a strict subset of REGULAR, which is a strict subset of CSL, which is a strict subset of RE, which is a strict subset of REC', 'RE is a strict subset of REC, which is a strict subset of CSL, which is a strict subset of CFL, which is a strict subset of REGULAR'],
+  answer: 0,
+  marks: 1,
+  difficulty: 'easy',
+  type: 'pyq-style',
+  explanation: "The correct and standard containment chain, from least to most expressive, is REGULAR strictly inside CFL (witnessed by a^n b^n, which is context-free but not regular), CFL strictly inside CSL (witnessed by a^n b^n c^n, which is context-sensitive but not context-free), CSL strictly inside REC (every context-sensitive language is decidable, since a Linear Bounded Automaton's finite configuration space guarantees a halting simulation via configuration-repetition detection, but there exist decidable languages that cannot be generated by any context-sensitive grammar, keeping the containment strict), and finally REC strictly inside RE (the Halting Problem and A_TM are standard witnesses of RE-but-undecidable languages, showing decidable languages are a genuine proper subset of recognizable ones). This REC layer is easy to forget when reciting the classical four Chomsky types, but it is an essential and frequently tested intermediate class sitting strictly between CSL and RE. Option B swaps CFL and CSL's order incorrectly, and options C and D either misorder the classes or reverse the entire direction of containment, none of which match the correct, verified chain in option A."
+},
+{
+  id: 'toc-decidability-p13',
+  pyqStyle: true,
+  q: "For each of the following, decide whether the described question is DECIDABLE. Which of them are DECIDABLE? (Select ALL that apply)",
+  options: ['Given a Turing machine M, is L(M) itself a decidable (REC) language?', 'Given a DFA M, is L(M) a decidable (REC) language?', 'Given a CFG G, is L(G) a decidable (REC) language?', 'Given a Turing machine M, is L(M) a context-free language?'],
+  answers: [1, 2],
+  marks: 2,
+  difficulty: 'hard',
+  type: 'pyq-style',
+  explanation: "Options B and C are DECIDABLE, but for a subtle reason unrelated to Rice's theorem: since EVERY regular language is automatically decidable (REGULAR is a strict subset of REC, as any DFA can be simulated to completion on any input, always halting), the answer to 'is L(M) decidable' for a DFA M is ALWAYS simply 'yes', with no exceptions -- making this a TRIVIAL question whose answer never depends on the specific M at all, hence trivially decidable (a machine that always outputs 'yes' regardless of input is a valid, if unhelpful-looking, decider). The exact same reasoning applies to option C: since every context-free language is also decidable (CFL is a strict subset of REC), 'is L(G) decidable' for a CFG G is likewise ALWAYS 'yes', trivially decidable. Options A and D, however, are genuinely UNDECIDABLE Rice's-theorem applications: for an arbitrary Turing machine M, 'is L(M) decidable' and 'is L(M) context-free' are both authentically NONTRIVIAL semantic properties (some RE languages recognized by TMs are decidable and some are not; some are context-free and some are not), so Rice's theorem correctly applies and declares both undecidable, in sharp contrast to the trivially-always-true DFA and CFG versions of essentially the same-sounding question."
+},
+{
+  id: 'toc-decidability-p14',
+  pyqStyle: true,
+  q: "A language L is said to be recursively enumerable but NOT recursive (i.e. RE but not REC). What does this precisely mean?",
+  options: ['There exists a Turing machine that halts and accepts on every string in L (but may reject or loop forever on strings not in L), yet no Turing machine can be built that halts on EVERY input and correctly decides membership in L for all strings', 'There exists a Turing machine that halts on every possible input string and correctly decides membership in L', 'L must be a finite language', 'L must be a regular language, since regular languages are the simplest kind of recursively enumerable language'],
+  answer: 0,
+  marks: 1,
+  difficulty: 'easy',
+  type: 'pyq-style',
+  explanation: "This precisely captures the defining gap between the RE and REC classes. Being RE means a recognizer exists that correctly halts and accepts every string genuinely in L, giving positive confirmation whenever the answer is 'yes', but such a recognizer is explicitly permitted to behave unhelpfully on strings NOT in L, either by halting and rejecting, or (crucially, and this is the source of the asymmetry) by looping forever and never producing any answer at all. Being additionally NOT recursive (not REC) means that no matter how cleverly one tries to build a machine, it is provably impossible to also guarantee a halt on every input across the board, meaning there is no way to reliably detect and confirm the 'no' case in finite time for at least some non-member strings. Option B describes full decidability (REC), the opposite of what is being asked about (a language failing to be REC explicitly lacks this property). Options C and D are false generalizations: RE-but-not-REC languages, like A_TM, are typically infinite and are never regular, since every regular language is automatically decidable, making 'RE but not REC' and 'regular' mutually exclusive descriptions rather than compatible ones."
+}
+);
+
+window.GATE_DATA.questions['toc'].topics.find(function(t){return t.id==='toc-hierarchy';}).questions.push(
+{
+  id: 'toc-hierarchy-p1',
+  pyqStyle: true,
+  q: "Consider L = { a^n b^n c^n d^n : n >= 0 }, a language requiring four blocks of equal length. What is the tightest correct classification of L in the Chomsky hierarchy?",
+  options: ['L is regular', 'L is context-free but not regular', 'L is context-sensitive but not context-free', 'L cannot be recognized by any Turing machine'],
+  answer: 2,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: "L is not regular, since restricting to fixed b,c,d-lengths (e.g. considering the projection onto just the a and b blocks) recovers non-regular equal-count sub-patterns similar to a^n b^n. L is not context-free either: applying the CFL pumping lemma to w = a^p b^p c^p d^p, any decomposition with |vxy| <= p forces the pumped substring to lie within a window that can touch at most two of the four equal-length blocks (since each block already has length p, a window of length at most p cannot span three or four separated blocks), so pumping is guaranteed to disturb at most two of the four counts while leaving at least one other count fixed, breaking the required four-way equality n=n=n=n and producing a string outside L for every possible decomposition -- this is the direct four-block generalization of the classic a^n b^n c^n non-context-freeness proof. However, L IS context-sensitive: a context-sensitive grammar (equivalently, a Linear Bounded Automaton) can mark and cross-check all four counts using space proportional to the input length, similarly to how a^n b^n c^n is handled, by systematically 'cancelling' one symbol from each block per pass while staying within bounded tape. Since L is recognizable at all (it is even decidable, being context-sensitive, hence certainly Turing-recognizable), option D is false, making option C the correct tightest classification."
+},
+{
+  id: 'toc-hierarchy-p2',
+  pyqStyle: true,
+  q: "Consider L = { a^i b^j c^k : i,j,k >= 0 and i < j < k }, requiring three counts in strictly increasing order. Is L context-free?",
+  options: ['Yes, L is context-free (though not regular)', 'No, L is not context-free (it requires context-sensitive or greater power)', 'Yes, L is even regular', 'The context-freeness of L is undecidable in general'],
+  answer: 1,
+  marks: 2,
+  difficulty: 'hard',
+  type: 'pyq-style',
+  explanation: "This language fails to be context-free for essentially the same structural reason as a^n b^n c^n: it demands a simultaneous three-way numerical relationship across three separated blocks, which exceeds what a single stack (the only memory a PDA has) can verify. Apply the CFL pumping lemma with w = a^p b^{p+1} c^{p+2} (satisfying i=p < j=p+1 < k=p+2, a valid member of L for the chosen pumping length p). Any decomposition uvxyz with |vxy| <= p and |vy| >= 1 forces vxy into a window touching at most two of the three blocks, exactly as in the classic proof. Consider the pumping-down case (i=0, deleting v and y): this removes some symbols from at most two of the three blocks while leaving the third block's count completely unchanged. Careful case analysis shows that in every possible position of vxy (within the a-block, within the b-block, within the c-block, or straddling one boundary), deleting v and y either fails to decrease any count sufficiently to preserve strict inequality, or decreases counts in a way that violates i < j < k (for instance, if vxy lies entirely in the b-block, deleting it decreases j while leaving i and k fixed, and since j started as p+1 with i=p, decreasing j risks making j <= i, violating i < j). Careful pumping-lemma casework (a standard but detailed exercise) confirms no decomposition survives all pump amounts, so L is not context-free, requiring at least context-sensitive power (a linear bounded automaton can verify the two consecutive strict-inequality checks digit by digit using bounded tape)."
+},
+{
+  id: 'toc-hierarchy-p3',
+  pyqStyle: true,
+  q: "Consider L = { a^n b^m : n,m >= 0 and (n = 2m OR m = 2n) }, the union of two proportional-count conditions. What is the tightest correct classification of L?",
+  options: ['L is regular', 'L is context-free but not regular', 'L is not context-free', 'L is finite'],
+  answer: 1,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: "L is the union of two individually simple context-free languages: L1 = { a^n b^m : n = 2m } (a PDA pushes two markers for every a and pops one marker per b, or equivalently pushes one marker per a and pops two per b depending on direction of counting) and L2 = { a^n b^m : m = 2n } (symmetric construction with roles reversed). Each of L1 and L2 individually is a simple single-counter CFL generated by grammars like S1 -> a a S1 b | epsilon (for n=2m, reading two a's per one eventual b) and S2 -> a S2 b b | epsilon (for m=2n, reading one a per two eventual b's), and since context-free languages are closed under union, L = L1 union L2 is context-free. L is not regular: restricting to just L1 (by additionally requiring, say, that m is always paired correctly which the pumping lemma can isolate) reduces to a fixed-ratio counting language directly analogous to a^n b^n, which fails the pumping lemma exactly as the classic equal-count case does (pumping the a's or b's alone breaks the required 2:1 or 1:2 ratio for arbitrarily large strings), so L cannot be regular. L is also clearly infinite (option D false, since arbitrarily large n and m satisfying either ratio condition exist), leaving option B, context-free but not regular, as the correct tightest classification."
+},
+{
+  id: 'toc-hierarchy-p4',
+  pyqStyle: true,
+  q: "A grammar has every production restricted to the forms A -> a B or A -> a (where A, B are nonterminals and a is a terminal symbol, with the nonterminal always immediately preceding, if present, on the right). What Chomsky hierarchy TYPE does this grammar belong to?",
+  options: ['Type 3 (regular grammar)', 'Type 2 (context-free grammar) but not Type 3', 'Type 1 (context-sensitive grammar) but not Type 2', 'Type 0 (unrestricted grammar) but not Type 1'],
+  answer: 0,
+  marks: 1,
+  difficulty: 'easy',
+  type: 'pyq-style',
+  explanation: "The production forms A -> aB and A -> a are exactly the defining forms of a RIGHT-LINEAR grammar: each production has a single nonterminal on the left-hand side, and the right-hand side consists of at most one terminal symbol followed by at most one nonterminal symbol (with the nonterminal, if present, positioned at the rightmost end of the string). This is precisely the Type 3 (regular grammar) restriction in the Chomsky hierarchy, and right-linear grammars are known to generate exactly the regular languages, equivalent in power to finite automata (a direct translation exists: each nonterminal becomes a state, each production A -> aB becomes a transition on symbol a from state A to state B, and each production A -> a becomes a transition on symbol a from state A directly to a designated accepting state). Since every regular grammar is trivially also a valid context-free grammar (Type 2), and every context-free grammar is (modulo epsilon-handling technicalities) generally expressible within Type 1 restrictions, and Type 1 is contained within Type 0, this grammar technically satisfies all of Type 2, Type 1, and Type 0's restrictions as well -- but the question asks for its TYPE in the sense of the tightest/most specific classification it satisfies, which is Type 3, making option A the intended and correct answer."
+},
+{
+  id: 'toc-hierarchy-p5',
+  pyqStyle: true,
+  q: "Which class of machines exactly characterizes the context-sensitive languages (Type 1 in the Chomsky hierarchy)?",
+  options: ['Pushdown Automata (PDA)', 'Linear Bounded Automata (LBA)', 'Finite Automata (DFA/NFA)', 'Unrestricted Turing Machines with no tape bound'],
+  answer: 1,
+  marks: 1,
+  difficulty: 'easy',
+  type: 'pyq-style',
+  explanation: "A Linear Bounded Automaton is precisely a Turing machine whose tape usage is restricted to a fixed linear multiple of the input length (in the most common definition, the machine may only use the tape cells originally occupied by the input itself, though variants allowing a constant multiplicative bound are equivalent in power) -- it cannot ever write outside this bounded region, unlike a general Turing machine which has access to unbounded tape. This exact restriction corresponds precisely to the Type 1 (context-sensitive) grammar restriction, where every production is length-non-decreasing (the right-hand side is never shorter than the left-hand side, aside from a special-cased S -> epsilon exception when S never appears on any right-hand side), meaning any string derivable by such a grammar can be verified/generated using only space proportional to its own final length -- exactly what an LBA's bounded tape allows. Pushdown Automata (option A) instead exactly characterize the strictly weaker Type 2 (context-free) languages, using only a single unbounded stack rather than general bounded tape access. Finite Automata (option C) characterize the even weaker Type 3 (regular) languages. Unrestricted, unbounded-tape Turing Machines (option D) characterize the strictly more powerful Type 0 (recursively enumerable) languages, since they may use arbitrarily much tape and may even fail to halt, unlike the always-halting LBA."
+},
+{
+  id: 'toc-hierarchy-p6',
+  pyqStyle: true,
+  q: "Which language is the standard textbook WITNESS used to prove that CFL is a STRICT (proper) subset of CSL, i.e. a language that is context-sensitive but demonstrably NOT context-free?",
+  options: ['L = { a^n b^n : n >= 0 }', 'L = { a^n b^n c^n : n >= 0 }', 'L = { w w : w is in {a,b}* }', 'L = { a^n : n is a prime number }'],
+  answer: 1,
+  marks: 1,
+  difficulty: 'easy',
+  type: 'pyq-style',
+  explanation: "L = { a^n b^n c^n : n >= 0 } is the canonical strict-separation witness between CFL and CSL. It fails to be context-free by the standard CFL pumping lemma argument (any pumpable window of bounded length, given the pumping-length constraint |vxy| <= p, can touch at most two of the three equal-length blocks in the string a^p b^p c^p, so pumping is guaranteed to break the required three-way equality for some choice of decomposition), which is a foundational, frequently re-derived proof in every formal languages course. Yet it IS context-sensitive: a length-non-decreasing grammar can be constructed (using a classical technique involving auxiliary nonterminals that 'shepherd' one a, one b, and one c through the derivation together per round, using productions that never shrink the overall string length, consistent with the Type 1 restriction) to generate exactly this language, and correspondingly a Linear Bounded Automaton can verify it directly using bounded tape. Option A ({a^n b^n}) is itself context-free, so it cannot witness this particular separation (it instead witnesses the REGULAR-versus-CFL gap). Option C ({ww}) is also not context-free, but it is a less standard choice for this specific CFL-vs-CSL separation in most textbook treatments compared to the extremely standard three-block a^n b^n c^n example. Option D is a sparse non-regular, non-context-free set less commonly used as the canonical CSL-separation witness."
+},
+{
+  id: 'toc-hierarchy-p7',
+  pyqStyle: true,
+  q: "Which statement about the relative power of deterministic and nondeterministic pushdown automata is TRUE?",
+  options: ['DPDA and NPDA are equally powerful, exactly as DFA and NFA are equally powerful for regular languages', 'NPDA is STRICTLY more powerful than DPDA: the class of languages accepted by NPDAs (CFL) is a proper superset of the class accepted by DPDAs (DCFL)', 'DPDA is strictly more powerful than NPDA', 'Neither DPDA nor NPDA can be meaningfully compared, since they accept incomparable classes of languages'],
+  answer: 1,
+  marks: 1,
+  difficulty: 'easy',
+  type: 'pyq-style',
+  explanation: "This is one of the most important asymmetries in automata theory, and a common point of confusion precisely because it contradicts the analogous (and much better known) equivalence between DFA and NFA. For finite automata, allowing nondeterminism does NOT increase expressive power -- the subset construction always converts any NFA into an equivalent DFA. For pushdown automata, however, nondeterminism genuinely adds power: the class DCFL (languages accepted by some deterministic PDA) is a STRICT, proper subset of CFL (languages accepted by some, possibly nondeterministic, PDA). The standard witness demonstrating this strictness is { w w^R : w in {a,b}* } (even-length palindromes), which is accepted by a nondeterministic PDA (which can freely guess where the midpoint of the input falls, then switch from pushing to popping and match the reversed second half against the stack), but which provably cannot be accepted by ANY deterministic PDA (since there is no symbol or marker signalling the midpoint, and a DPDA must commit deterministically without the ability to guess). This makes option B correct, and firmly rules out both the false equal-power claim (option A, which would only be true for finite automata) and the reversed-power claim (option C, which is never true, since every DPDA is trivially also a valid NPDA, so NPDA's class can only be as large or larger, never smaller)."
+},
+{
+  id: 'toc-hierarchy-p8',
+  pyqStyle: true,
+  q: "A grammar has all of its productions restricted to the general form alpha A beta -> alpha gamma beta (where alpha, beta are arbitrary strings of terminals and nonterminals, A is a single nonterminal, and gamma is a NONEMPTY string), so that overall the right-hand side of every production is never shorter than the left-hand side. What Chomsky hierarchy TYPE does this restriction correspond to?",
+  options: ['Type 0 (unrestricted)', 'Type 1 (context-sensitive)', 'Type 2 (context-free)', 'Type 3 (regular)'],
+  answer: 1,
+  marks: 1,
+  difficulty: 'easy',
+  type: 'pyq-style',
+  explanation: "This exact production form, alpha A beta -> alpha gamma beta with gamma required to be nonempty, is precisely the standard definition of a Type 1 (context-sensitive) grammar: the nonterminal A can only be rewritten to the nonempty string gamma when it appears in the specific surrounding CONTEXT of alpha immediately before it and beta immediately after it (hence the name 'context-sensitive', as opposed to context-free grammars where a nonterminal can be rewritten regardless of its surrounding context). The nonempty requirement on gamma directly enforces the length-non-decreasing property that characterizes the entire class (|left-hand side| <= |right-hand side| always, aside from the special S -> epsilon exception when S never appears on any right-hand side), which is exactly what allows a Linear Bounded Automaton to verify derivations using only tape space proportional to the final string's length. Type 0 (option A) permits arbitrary length-DEcreasing productions too (using an unrestricted Turing machine with full tape access), so it is strictly more permissive than this restriction. Type 2 (option C) drops the context requirement entirely, allowing A -> gamma unconditionally regardless of surrounding symbols. Type 3 (option D) is even more restrictive, requiring right-linear or left-linear forms specifically. So option B, Type 1, is the exact match."
+},
+{
+  id: 'toc-hierarchy-p9',
+  pyqStyle: true,
+  q: "Where does the class REC (recursive, i.e. decidable languages) sit relative to CSL (context-sensitive languages) and RE (recursively enumerable languages) in the language-class hierarchy?",
+  options: ['REC is exactly equal to CSL (they are the same class)', 'REC sits strictly between CSL and RE: CSL is a proper subset of REC, which is itself a proper subset of RE', 'REC sits strictly between REGULAR and CFL', 'REC is exactly equal to RE (they are the same class)'],
+  answer: 1,
+  marks: 1,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: "Although REC is not one of the four classical Chomsky grammar types, it is an essential intermediate class that fits precisely between CSL and RE in the overall containment chain. Every context-sensitive language is guaranteed to be decidable: a Linear Bounded Automaton's tape usage is bounded by the input length, giving it only finitely many possible configurations, so a simulator can detect non-halting via configuration-repetition and safely reject, guaranteeing the LBA always effectively halts one way or another -- this proves CSL is a subset of REC. This containment is STRICT (there exist decidable languages that require more than context-sensitive/linear-bounded resources to generate via any context-sensitive grammar, keeping CSL a proper subset). Separately, REC is a strict subset of RE: every decidable language is trivially recognizable (the decider itself already serves as a valid recognizer), but the Halting Problem and A_TM are standard witnesses of languages that are RE yet not decidable, keeping this containment strict as well. So the correct positioning is CSL properly-inside REC properly-inside RE, matching option B, while options A, C, and D each misplace REC relative to the wrong pair of classes or falsely equate distinct classes."
+},
+{
+  id: 'toc-hierarchy-p10',
+  pyqStyle: true,
+  q: "Which of the following statements about the Chomsky hierarchy are TRUE? (Select ALL that apply)",
+  options: ['L = { a^n b^n : n >= 0 } is a regular language', 'L = { a^n b^n c^n : n >= 0 } is context-sensitive', 'L = { a^n b^n c^n : n >= 0 } is context-free', 'Every context-free language is also context-sensitive (modulo the standard epsilon-production technicality)'],
+  answers: [1, 3],
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: "Option A is FALSE: { a^n b^n } is the textbook example of a language that is context-free but explicitly NOT regular (provable via the pumping lemma for regular languages or via an infinite count of Myhill-Nerode equivalence classes on the a-prefixes), so calling it regular is a direct misclassification. Option B is TRUE: { a^n b^n c^n } is context-sensitive, generated by a length-non-decreasing grammar (a classical construction using auxiliary nonterminals to shepherd matching a's, b's, and c's through the derivation together while never shrinking overall string length) and recognizable by a Linear Bounded Automaton using bounded tape to cross off one symbol from each of the three blocks per verification pass. Option C is FALSE: this same language is the standard example proving CFL is a strict subset of CSL, since the CFL pumping lemma shows no context-free grammar or pushdown automaton can enforce the three-way equal-count requirement (any pumpable substring within a bounded window touches at most two of the three separated blocks). Option D is TRUE: every context-free production A -> alpha with |alpha| >= 1 already satisfies the length-non-decreasing requirement of context-sensitive grammars trivially (since the left side has length exactly 1 and the right side has length >= 1), and CFG's own epsilon-production handling exception (only S -> epsilon, when S never appears on a right-hand side) exactly parallels the same exception CSL requires, so CFL is properly nested inside CSL with this caveat consistently applied."
+},
+{
+  id: 'toc-hierarchy-p11',
+  pyqStyle: true,
+  q: "A grammar contains a mixture of both right-linear productions (of the form A -> aB or A -> a) AND left-linear productions (of the form A -> Ba or A -> a) within the SAME grammar (for example, some rules are right-linear while other, different rules in the same grammar are left-linear). What can we correctly conclude about the language generated by such a mixed grammar?",
+  options: ['It is still always guaranteed to be regular, since both individual forms (right-linear and left-linear) are each regular on their own', 'It may FAIL to be regular; mixing right-linear and left-linear productions within one grammar is not guaranteed to preserve regularity, so the language must be checked/derived independently rather than assumed regular by default', 'It is always context-free but is guaranteed to never be regular in this mixed case', 'The language generated becomes automatically undecidable'],
+  answer: 1,
+  marks: 2,
+  difficulty: 'medium',
+  type: 'pyq-style',
+  explanation: "This is a classic and important trap: while a grammar that is PURELY right-linear (all productions use the A -> aB / A -> a form consistently) is guaranteed regular, and a grammar that is PURELY left-linear (all productions use A -> Ba / A -> a consistently) is also guaranteed regular, a grammar that MIXES both styles within the same rule set loses this guarantee. The formal definition of a Type 3 (regular) grammar specifically requires consistency: either every production is right-linear, or every production is left-linear, but not an arbitrary mixture of the two forms within one grammar. When productions of both kinds are combined and allowed to interact freely (a nonterminal reachable via a right-linear rule from one part of the grammar and via a left-linear rule from another part, potentially forcing nonterminals in the 'middle' of derivations rather than consistently at one end), the resulting derivations can in principle build up structure that a finite automaton cannot track, potentially generating a non-regular language, so no blanket guarantee of regularity applies anymore -- each specific mixed grammar must be analyzed on its own merits. Option A is the tempting but false generalization this question is designed to catch; options C and D are unwarranted overcorrections with no general justification."
+},
+{
+  id: 'toc-hierarchy-p12',
+  pyqStyle: true,
+  q: "Which of the following languages requires the full generative power of an unrestricted (Type 0) grammar in the sense that it is recursively enumerable (RE) but NOT decidable, and hence cannot be generated by any context-sensitive (Type 1) grammar?",
+  options: ['A_TM = { <M,w> : Turing machine M accepts input w }', 'L = { a^n b^n c^n : n >= 0 }', 'L = { w w : w is in {a,b}* }', 'Any finite language over a fixed alphabet'],
+  answer: 0,
+  marks: 1,
+  difficulty: 'easy',
+  type: 'pyq-style',
+  explanation: "A_TM is the standard example of a language sitting at the very top boundary of the classical hierarchy: it is recursively enumerable (a universal Turing machine can simulate <M,w> and halt-accept exactly when the simulated M halts and accepts), but it is provably NOT decidable (by Turing's diagonalization argument), and since every context-sensitive language is guaranteed to be decidable (via the Linear Bounded Automaton configuration-repetition argument), A_TM being undecidable immediately proves it cannot be context-sensitive either -- it genuinely requires the unrestricted, unbounded-tape power of a full Type 0 grammar/Turing machine, with no bound on tape usage or guaranteed halting. In contrast, options B and C, while both requiring more than context-free power in some cases (well, {a^n b^n c^n} is definitely not context-free) or exactly context-free power (actually {ww} is not context-free either, both need at least context-sensitive power), are both still decidable and hence context-sensitive (LBAs can verify both using bounded, input-proportional tape), placing them well below the RE-but-undecidable tier that A_TM occupies. Option D, any finite language, is always trivially regular (a simple union of exact-match paths), the simplest possible classification, nowhere near requiring Type 0 power."
+},
+{
+  id: 'toc-hierarchy-p13',
+  pyqStyle: true,
+  q: "Consider L = { a^n b^n : n >= 0 } UNION { a^n c^n : n >= 0 }, i.e. either an equal block of a's and b's, or an equal block of a's and c's (but not both patterns mixed in the same string). What is the tightest correct classification of L?",
+  options: ['L is regular', 'L is context-free but not regular', 'L is not context-free', 'L is undecidable'],
+  answer: 1,
+  marks: 1,
+  difficulty: 'easy',
+  type: 'pyq-style',
+  explanation: "L is the union of two individually simple, well-known context-free languages, L1 = { a^n b^n } and L2 = { a^n c^n }, each generated by a straightforward single-counter grammar (S1 -> a S1 b | epsilon and S2 -> a S2 c | epsilon respectively). Since context-free languages are closed under union (a standard closure property, constructed by adding a new start symbol S -> S1 | S2 branching to either sub-grammar's own start symbol), L = L1 union L2 is guaranteed to be context-free, ruling out option C. L is not regular: intersecting L with the regular language a*b* isolates exactly L1 = { a^n b^n } (since no string of L2's form a^n c^n, other than the trivial empty string case, can also be in a*b* once n > 0), and since regular languages are closed under intersection, if L were regular then L1 would have to be regular too -- but L1 = { a^n b^n } is the textbook non-regular language (via the standard pumping lemma argument), giving a direct contradiction, so L cannot be regular either, ruling out option A. L is also clearly decidable (any context-free language is decidable via CYK-style algorithms), ruling out option D. So option B, context-free but not regular, is the correct tightest classification."
+},
+{
+  id: 'toc-hierarchy-p14',
+  pyqStyle: true,
+  q: "Which type of automaton exactly corresponds to (is equivalent in power to) Type 1 (context-sensitive) grammars in the classical Chomsky hierarchy?",
+  options: ['Pushdown Automaton (PDA)', 'Pushdown Automaton with two independent stacks', 'Linear Bounded Automaton (LBA)', 'Unrestricted Turing Machine with unbounded tape'],
+  answer: 2,
+  marks: 1,
+  difficulty: 'easy',
+  type: 'pyq-style',
+  explanation: "The Linear Bounded Automaton is the machine model exactly matched to Type 1 context-sensitive grammars: an LBA is defined as a (possibly nondeterministic) Turing machine restricted to using only tape space proportional to (typically exactly equal to, in the standard definition) the length of its input, and this bounded-tape restriction corresponds precisely to context-sensitive grammars' length-non-decreasing production restriction, since both formalisms guarantee that any valid derivation/computation for a string of length n can be carried out using only O(n) space. A plain single-stack Pushdown Automaton (option A) instead corresponds exactly to the strictly weaker Type 2 (context-free) languages, using unbounded stack memory but with the strict last-in-first-out access discipline of a single stack, which cannot enforce cross-checking three or more independent counts simultaneously. Interestingly, a Pushdown Automaton augmented with TWO independent stacks (option B) is actually far MORE powerful than a single-stack PDA -- a two-stack PDA is exactly as powerful as a full, unbounded-tape Turing Machine (Type 0), since two stacks can simulate an arbitrary Turing machine tape, so option B is not the correct match for context-sensitive languages either. An unrestricted Turing Machine with unbounded tape (option D) corresponds instead to the strictly more powerful Type 0 (recursively enumerable) languages, since it has no tape-usage bound and may fail to halt, unlike the always-effectively-halting LBA."
+}
+);
+
+window.GATE_DATA.questions['toc'].topics.find(function(t){return t.id==='toc-decidability';}).questions.push(
+{
+  id: 'toc-decidability-h1',
+  q: 'Which of the following statements are TRUE? (Select ALL that apply)',
+  options: ['Given a DFA D, deciding whether L(D) = empty set is decidable.', 'Given two context-free grammars G1 and G2, deciding whether L(G1) = L(G2) is decidable.', 'Given a context-free grammar G, deciding whether L(G) = Sigma* (universality) is decidable.', 'Given a Turing machine M, deciding whether L(M) is finite is decidable.'],
+  answers: [0],
+  marks: 2,
+  difficulty: 'hard',
+  type: 'concept',
+  explanation: "Each option names a different (machine class, property) pair and must be checked on its own. A is TRUE: DFA emptiness is decided by checking, via a simple graph reachability search on the state diagram, whether any final state is reachable from the start state - a purely mechanical, always-terminating procedure. B is FALSE: CFG equivalence is undecidable in general - although CFG emptiness and CFG-vs-regular equivalence are decidable, comparing two arbitrary CFGs for language equality is not, since it would let you decide CFG universality (take G2 to generate Sigma*) which is itself undecidable. C is FALSE: CFG universality is a classical undecidable problem, typically proved by reducing from the Post Correspondence Problem - you cannot mechanically check whether a context-free grammar generates every string. D is FALSE: TM finiteness is undecidable by Rice's theorem, since 'the language recognized is finite' is a non-trivial semantic property of L(M) (some RE languages are finite, some are not), and Rice's theorem says every non-trivial semantic property of the language recognized by a TM is undecidable. The key lesson: emptiness, equivalence, universality, and finiteness behave very differently depending on whether you're looking at DFAs (all decidable), CFGs (emptiness decidable, equivalence/universality undecidable), or TMs (essentially everything semantic is undecidable)."
+},
+{
+  id: 'toc-decidability-h2',
+  q: 'Which of the following are TRUE? (Select ALL that apply)',
+  options: ['Given a context-free grammar G, deciding whether L(G) = empty set is decidable.', 'Given a context-free grammar G, deciding whether L(G) is finite is decidable.', 'Given a Turing machine M, deciding whether L(M) = empty set is decidable.', 'Given the textual description of a Turing machine M, deciding whether M has exactly 7 states is decidable.'],
+  answers: [0, 1, 3],
+  marks: 2,
+  difficulty: 'hard',
+  type: 'concept',
+  explanation: "A is TRUE: CFG emptiness is decided by computing the set of 'generating' nonterminals bottom-up (a nonterminal generates some terminal string) and checking whether the start symbol is generating - a terminating fixed-point computation over a finite set of nonterminals. B is TRUE: CFG finiteness is also decidable - after removing useless symbols, convert to Chomsky Normal Form and build a dependency graph on the surviving nonterminals; L(G) is infinite exactly when this graph has a cycle reachable from and reaching back to a nonterminal that itself derives a terminal string, which is a checkable graph property. C is FALSE: TM emptiness is undecidable, provable by reducing the (undecidable) halting problem to it - given machine M and input w, build M' that ignores its own input, simulates M on w, and accepts only if M accepts; then L(M') is non-empty iff M halts and accepts w, so deciding TM-emptiness would decide halting/acceptance, a contradiction. D is TRUE and illustrates the crucial Rice's theorem boundary: 'has exactly 7 states' is a SYNTACTIC property of the machine's description (just count entries in the state set listed in the encoding), not a semantic property of the language L(M) it computes - Rice's theorem applies only to properties of the recognized language, never to properties of the machine's own textual representation, so this is trivially decidable by direct inspection/parsing of the encoding."
+},
+{
+  id: 'toc-decidability-h3',
+  q: "By Rice's theorem, which of the following are TRUE? (Select ALL that apply)",
+  options: ["For any non-trivial property P of recursively enumerable languages (true for at least one but not all RE languages), deciding whether L(M) has property P is undecidable.", "Determining whether a given Turing machine's transition table has more than 100 entries is undecidable.", "Determining whether L(M) contains at least one string of even length is undecidable.", "Determining whether L(M) = L(M) (i.e., comparing a machine's language against itself) is undecidable."],
+  answers: [0, 2],
+  marks: 2,
+  difficulty: 'hard',
+  type: 'concept',
+  explanation: "A is TRUE - this is the exact statement of Rice's theorem: any property of the recognized language that is non-trivial (not shared by every RE language, and not absent from every RE language) is undecidable to test given a TM. B is FALSE: counting entries in the transition table is a SYNTACTIC property of the machine's own description, checkable by direct inspection with no need to reason about the language it recognizes or ever run the machine - Rice's theorem never applies to properties of the encoding itself, only to properties of L(M). C is TRUE: 'contains a string of even length' is a genuine semantic property of the language - some RE languages have such a string (e.g. Sigma*) and some do not (e.g. the singleton language of one odd-length string), so it is non-trivial, and Rice's theorem makes it undecidable. D is FALSE and tests the non-triviality clause precisely: 'L(M) = L(M)' is a property that is TRUE for every single TM without exception (it is a tautology, not a genuine constraint on which language is recognized), so it is a TRIVIAL property. Rice's theorem explicitly excludes trivial properties (those true for all RE languages or false for all RE languages) because they are always decidable - you can just always output 'yes' without even examining M, since every machine satisfies a tautological property. This distinction between non-trivial and trivial properties is exactly what makes Rice's theorem non-vacuous yet correctly bounded."
+},
+{
+  id: 'toc-decidability-h4',
+  q: 'Suppose language A many-one reduces to language B (written A <=m B). Which of the following are VALID logical conclusions? (Select ALL that apply)',
+  options: ['If B is decidable, then A is decidable.', 'If A is undecidable, then B is undecidable.', 'If A is decidable, then B is decidable.', 'If B is undecidable, then A is undecidable.'],
+  answers: [0, 1],
+  marks: 2,
+  difficulty: 'hard',
+  type: 'concept',
+  explanation: "A <=m B means there is a computable function f such that for every string w, w is in A if and only if f(w) is in B. This gives a one-way transfer of decidability, and each option must be checked against the correct direction. A is TRUE: if B is decidable, compute f(w) and then run B's decider on f(w); this correctly decides membership in A, so A is decidable too - decidability flows backward along the reduction, from B to A. B is TRUE and is exactly the contrapositive of A: if A is undecidable, then B cannot be decidable either (otherwise A would be decidable by the argument in A, a contradiction), so B is undecidable. C is FALSE: knowing A is decidable tells you nothing about B in general, because the reduction only uses A's decidability to help decide A itself via B - it says nothing about whether B has extra strings or extra behavior beyond what the reduction touches; a trivial example is any decidable A reducing to any undecidable B via a reduction that only ever needs to distinguish 'yes' instances mapped into B's known-decidable substructure, which is not actually required to exist, so no valid inference holds. D is FALSE, the mirror trap of C: B being undecidable does not force A to be undecidable, since A could still be an easy (decidable) language that happens to reduce into a harder B (reductions can go from easy problems into hard ones without transferring hardness backward). Only the two directions that transfer decidability 'downhill' along the reduction arrow (B decidable implies A decidable, and its contrapositive) are valid; the reverse direction is never guaranteed."
+},
+{
+  id: 'toc-decidability-h5',
+  q: 'Which of the following are TRUE? (Select ALL that apply)',
+  options: ['Given two DFAs D1 and D2, checking L(D1) = L(D2) is decidable.', 'Given a DFA D and a context-free grammar G, checking L(D) = L(G) is decidable.', 'Given a context-free grammar G and a DFA D, checking L(G) intersect L(D) = empty set is decidable.', 'Given two context-free grammars G1 and G2, checking L(G1) intersect L(G2) = empty set is decidable.'],
+  answers: [0, 2],
+  marks: 2,
+  difficulty: 'hard',
+  type: 'concept',
+  explanation: "A is TRUE: DFA equivalence is decidable by building a product automaton tracking (state of D1, state of D2) and checking that no reachable pair has exactly one of the two components accepting (symmetric difference emptiness), a finite, terminating check. B is FALSE, and this is the subtle one: checking whether a CFL equals a given regular language generalizes the CFG universality problem exactly when D is chosen to be a DFA for Sigma* (checking L(G) = Sigma*), and CFG universality is undecidable, so this equivalence check must be undecidable too - a naive attempt to fix it using closure under intersection with regular languages does not work, because that only handles containment one way and requires complementing the CFL, which CFLs are not closed under. C is TRUE: CFLs are closed under intersection with regular languages (run the CFG's PDA and the DFA in parallel, using only the PDA's stack), so L(G) intersect L(D) is itself a CFL, and CFL emptiness is decidable via the generating-symbols algorithm - chain these two facts together to decide the whole question. D is FALSE: CFL is NOT closed under intersection with another CFL in general, and CFG-CFG intersection emptiness is the classical undecidable problem proved by reduction from the Post Correspondence Problem (PCP) - two specifically constructed CFGs encode PCP dominoes, and their languages intersect exactly when a valid PCP match sequence exists."
+},
+{
+  id: 'toc-decidability-h6',
+  q: 'Which of the following are TRUE? (Select ALL that apply)',
+  options: ['Given a Turing machine M, deciding whether M halts on every input (totality) is undecidable.', 'Given the transition table of a Turing machine M, deciding whether it contains any transition reading the blank symbol is decidable.', "Given a Turing machine M, deciding whether M makes at least one left-move within the first 10 steps of its computation starting from a blank tape is decidable.", 'Given a Turing machine M, deciding whether L(M) is co-finite (its complement is finite) is decidable.'],
+  answers: [0, 1, 2],
+  marks: 2,
+  difficulty: 'hard',
+  type: 'concept',
+  explanation: "A is TRUE: the totality problem (does M halt on every input) is undecidable, proved by reducing the acceptance problem to it - given M and w, build M' that ignores its actual input, first simulates M on the fixed string w, and then loops forever unless that simulation accepts, after which M' halts on every input; M' is total if and only if M accepts w, so deciding totality would decide acceptance, a contradiction. B is TRUE: whether the transition table contains any rule keyed on the blank symbol is a purely SYNTACTIC scan over the finitely many entries in the machine's own description - no simulation of the machine's behavior is needed at all, just direct inspection of the encoding, so this is trivially decidable and outside the reach of Rice's theorem (which only restricts properties of the language recognized, never properties of the description). C is TRUE: simulating one fixed machine for exactly 10 steps from a fixed starting configuration (blank tape) examines only finitely many configurations and is guaranteed to terminate after those 10 steps regardless of whether M itself ever halts - bounding the number of steps turns an otherwise semantic question into a finite, always-terminating computation, so it is decidable. D is FALSE: co-finiteness of L(M) (whether Sigma* minus L(M) is finite) is a non-trivial semantic property of the language recognized - some RE languages are co-finite (e.g. Sigma* itself) and some are not (e.g. the empty language) - so by Rice's theorem this is undecidable, contradicting the option's claim that it is decidable. The general lesson: syntactic checks on the machine's own description (B) and any bounded-step simulation (C) are always decidable, while unbounded semantic behavior questions about the full, possibly infinite computation (A, D) are governed by Rice's theorem or direct halting-problem reductions and are typically undecidable unless the property is trivial."
+},
+{
+  id: 'toc-decidability-h7',
+  q: 'Consider the following five decidability questions:\n1. Given a DFA D, is L(D) = empty set?\n2. Given a context-free grammar G, is L(G) = empty set?\n3. Given a Turing machine M, is L(M) = empty set?\n4. Given two context-free grammars G1 and G2, is L(G1) a subset of L(G2)?\n5. Given a DFA D and a context-free grammar G, is L(D) a subset of L(G)?\nHow many of these five problems are DECIDABLE? Enter your numerical answer.',
+  options: [],
+  answer: 2,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'hard',
+  type: 'numerical',
+  explanation: "Problem 1 is decidable: DFA emptiness is a simple reachability check from the start state to any final state on the finite state graph. Problem 2 is decidable: CFG emptiness is computed via the standard bottom-up fixed-point algorithm that marks nonterminals capable of generating some terminal string, then checks whether the start symbol is marked. Problem 3 is undecidable: TM emptiness reduces from the halting/acceptance problem (build M' that simulates M on a fixed input w and accepts only if M does; L(M') is non-empty iff M accepts w). Problem 4 is undecidable: CFG-in-CFG containment generalizes CFG equivalence (equivalence is containment in both directions), and CFG equivalence is a well-known undecidable problem; concretely, choosing G2 to generate Sigma* turns this into the CFG universality problem for G1, which is undecidable via a Post Correspondence Problem reduction. Problem 5 is also undecidable for the identical reason: choosing D to be a DFA that accepts Sigma* reduces this directly to CFG universality for G, so checking regular-in-CFG containment in general is undecidable even though the CFL side is 'only' a regular language, because the regular language can itself be the entire universe of strings. So exactly problems 1 and 2 are decidable, giving the count 2. The key discriminator across all five: DFA-only questions are always decidable (finite-state reachability suffices); anything that can encode CFG universality as a special case - CFG-CFG containment, DFA-in-CFG containment - inherits its undecidability, while CFG emptiness alone stays decidable because it does not require checking against every string, only whether some string is generated."
+}
+);
+
+window.GATE_DATA.questions['toc'].topics.find(function(t){return t.id==='toc-turing';}).questions.push(
+{
+  id: 'toc-turing-h1',
+  q: 'Which of the following closure statements are TRUE? (Select ALL that apply)',
+  options: ['REC is closed under complementation.', 'REC is closed under intersection.', 'RE is closed under complementation.', 'RE is closed under intersection.'],
+  answers: [0, 1, 3],
+  marks: 2,
+  difficulty: 'hard',
+  type: 'concept',
+  explanation: "Each closure claim must be checked against its own construction. A is TRUE: given a decider for L, swap its accept and reject outcomes (it always halts, so this is well-defined) to decide the complement - REC is closed under complement. B is TRUE: given deciders for L1 and L2, run both on the input (both are guaranteed to halt) and accept iff both accept - this always halts and correctly decides the intersection, so REC is closed under intersection. C is FALSE and is the single most important asymmetry in this area: RE is NOT closed under complementation - if it were, then for any RE language L, both L and its complement would be RE, and the classical theorem states that whenever a language and its complement are both RE, the language must be REC; since there exist RE languages that are not REC (such as the acceptance problem A-TM), RE cannot be closed under complement, or else every RE language would collapse into REC. D is TRUE: given semi-deciders (enumerators or programs that halt-and-accept exactly on membership, otherwise loop) for L1 and L2, run both in parallel on the input and accept as soon as both have accepted; this correctly semi-decides the intersection, so RE is closed under intersection. The pattern to remember: REC behaves like a well-behaved Boolean algebra (closed under all of union, intersection, complement), while RE keeps union and intersection but specifically loses complementation."
+},
+{
+  id: 'toc-turing-h2',
+  q: 'Which of the following are TRUE? (Select ALL that apply)',
+  options: ["If L is RE and its complement is also RE, then L is REC.", "If L is REC, then its complement is also REC.", "If L is RE but not REC, then its complement cannot also be RE.", "If a language L is not RE, then its complement must be RE."],
+  answers: [0, 1, 2],
+  marks: 2,
+  difficulty: 'hard',
+  type: 'concept',
+  explanation: "A is TRUE and is the central theorem of this topic: run the two semi-deciders (for L and for its complement) in parallel on the input; since every string is in exactly one of L or its complement, one of the two semi-deciders is guaranteed to eventually accept, and whichever does tells you the correct membership answer - this gives a total decision procedure, so L is REC. B is TRUE: REC is closed under complementation, since flipping the accept/reject output of an always-halting decider still always halts and decides the complement correctly. C is TRUE and is exactly the contrapositive of A: if the complement of L were also RE while L is RE, then by A, L would have to be REC, contradicting the assumption that L is not REC - so the complement of a non-REC RE language can never itself be RE. This is precisely why A-TM (RE, not REC) has a complement, co-A-TM, that is provably not RE. D is FALSE and is the trap this whole group is built around: it is tempting to think 'RE' and 'not RE' partition languages into two complementary halves the way REC and 'not REC' loosely do for decidability among RE languages, but that is wrong - there exist languages where NEITHER L nor its complement is RE at all (this follows from a counting argument: there are only countably many RE languages in total, since each is described by some Turing machine, but there are uncountably many languages overall, and even after accounting for every RE language and every complement of an RE language, only countably many languages are covered, leaving uncountably many that are 'non-RE on both sides')."
+},
+{
+  id: 'toc-turing-h3',
+  q: 'Which of the following are TRUE? (Select ALL that apply)',
+  options: ['The set of all Turing machines (equivalently, all finite strings that encode a Turing machine) is countably infinite.', 'The set of all languages over a fixed finite alphabet Sigma (all subsets of Sigma*) is countably infinite.', 'Since there are only countably many Turing machines but uncountably many languages, there must exist languages that are not recursively enumerable.', 'Every language that is not recursively enumerable can be proved so by exhibiting an explicit reduction from a known undecidable problem.'],
+  answers: [0, 2],
+  marks: 2,
+  difficulty: 'hard',
+  type: 'concept',
+  explanation: "A is TRUE: every Turing machine can be encoded as a finite string over a fixed finite alphabet (its full description - states, transitions, and so on, written out symbol by symbol), and the set of all finite strings over a finite alphabet is countably infinite (enumerate them by length, then lexicographically within each length); since every TM corresponds to at least one such string, the set of TMs is countable, and it is infinite since there are TMs of arbitrarily large description size, so it is countably infinite. B is FALSE: the set of all subsets of the countably infinite set Sigma* is its power set, which by Cantor's theorem has strictly larger cardinality than Sigma* itself - it is uncountable (cardinality 2 to the aleph-null), not countably infinite. C is TRUE and is the classical existence argument: each RE language is defined by some Turing machine, so the number of distinct RE languages is at most countable (bounded by the countable set of machines); but by B there are uncountably many languages total, so by a simple counting/pigeonhole argument, the vast majority of languages cannot correspond to any Turing machine at all - they are not recursively enumerable, purely because there are 'not enough' machines to enumerate them all, with no need to name a specific example. D is FALSE: this exactly misses the point of the counting argument in C, which proves the EXISTENCE of non-RE languages non-constructively, without exhibiting any specific one or any reduction; in fact the 'generic' non-RE language produced by this cardinality argument typically has no finite description, no defining property, and no reduction at all - it is simply one of the 'leftover' subsets of Sigma* that no machine happens to enumerate, discovered purely by counting, not by construction."
+},
+{
+  id: 'toc-turing-h4',
+  q: 'Regarding Turing machine enumerators (machines that print, in some order, exactly the strings of a language, running forever), which of the following are TRUE? (Select ALL that apply)',
+  options: ['A language L is recursively enumerable if and only if some enumerator prints exactly the strings of L (in some order, possibly with repetition).', 'A language L is decidable (REC) if and only if some enumerator prints the strings of L in non-decreasing (e.g. length-then-lexicographic) order.', 'If a language L has an enumerator, then its complement must also have an enumerator.', 'The empty language has no enumerator, since an enumerator must print at least one string.'],
+  answers: [0, 1],
+  marks: 2,
+  difficulty: 'hard',
+  type: 'concept',
+  explanation: "A is TRUE: this is the standard enumerator characterization of RE - given an enumerator, you can semi-decide membership by running it and comparing each printed string against the input, accepting the moment a match appears; conversely, given a semi-decider for L, you can build an enumerator by dovetailing (simulating the semi-decider on all strings in parallel, printing whichever ones it accepts, in whatever order they finish). B is TRUE: an enumerator that outputs strings in a fixed, computable, non-decreasing order lets you decide membership of any string w - simply run the enumerator, and since it produces strings in increasing order, you can stop and answer 'no' as soon as it produces a string that is strictly past w without having printed w itself; this turns semi-decision into full decision, exactly capturing REC. C is FALSE: if every RE language's complement were also guaranteed an enumerator, every RE language would (by the 'L and complement both RE implies REC' theorem) be decidable, collapsing RE into REC entirely - but RE strictly contains REC (witnessed by A-TM), so this cannot hold in general; the acceptance problem has an enumerator, but its complement, co-A-TM, provably does not. D is FALSE: the empty language IS recursively enumerable - trivially, an enumerator for it is a machine that runs forever without ever printing anything, which vacuously satisfies 'prints exactly the strings of L' when L has no strings to print; there is no rule that an enumerator must produce output, only that whatever it does produce is exactly L."
+},
+{
+  id: 'toc-turing-h5',
+  q: 'Which of the following are TRUE? (Select ALL that apply)',
+  options: ['If L1 is RE but not REC, then L1 union (complement of L1) is always decidable (in fact it equals Sigma*).', 'If L1 is RE but not REC, then L1 intersect (complement of L1) is always decidable (it is empty).', 'If L1 and L2 are both REC, then L1 minus L2 (set difference) is REC.', 'If L1 is REC and L2 is RE but not REC, then L1 union L2 is always REC.'],
+  answers: [0, 1, 2],
+  marks: 2,
+  difficulty: 'hard',
+  type: 'concept',
+  explanation: "These options test whether trivial SET identities can override apparent complexity. A is TRUE: for ANY language L1 whatsoever, L1 union (complement of L1) equals Sigma*, the set of all strings, purely as a matter of basic set algebra - this holds regardless of whether L1 itself is decidable, so the union is trivially decidable (a decider just always says 'yes'), even when L1 individually is a genuinely undecidable language like A-TM. B is TRUE by the same logic: L1 intersect (complement of L1) is always the empty set for ANY L1, again trivially decidable (a decider that always says 'no'), independent of how hard L1 is. C is TRUE via ordinary closure: L1 minus L2 equals L1 intersect (complement of L2); REC is closed under complement (decide L2, flip the answer) and closed under intersection (decide both, AND the results), so composing these two closure facts shows L1 minus L2 is REC whenever L1 and L2 both are. D is FALSE: the union of a decidable language and an RE-not-REC language is only guaranteed to be RE (closure of RE under union suffices for that), not necessarily REC - concretely, if L1 is chosen to be the empty language (certainly REC), then L1 union L2 simply equals L2, which is RE but not REC by assumption, so the union fails to be decidable in this case, disproving the blanket claim. The teaching point: always check whether a set identity (like X union complement(X) = everything) trivializes the decidability question before assuming you need to reason about the individual language's own complexity."
+},
+{
+  id: 'toc-turing-h6',
+  q: 'How many of the following 6 statements are TRUE?\n1. Every finite language is REC.\n2. The complement of every REC language is REC.\n3. The complement of every RE language is RE.\n4. Every regular language is REC.\n5. If A many-one reduces to B and B is RE, then A is RE.\n6. If A many-one reduces to B and A is not RE, then B is not RE.\nEnter your numerical answer.',
+  options: [],
+  answer: 5,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'hard',
+  type: 'numerical',
+  explanation: "Statement 1 is TRUE: a finite language can always be decided by a machine with the finite set of members hardcoded into its finite control, simply comparing the input against each member in turn and halting with the correct answer - finiteness always implies decidability. Statement 2 is TRUE: REC is closed under complement, since flipping the accept/reject output of an always-halting decider still always halts and gives the correct complementary answer. Statement 3 is FALSE: this is the key asymmetry of the RE class - RE is not closed under complementation in general (e.g. A-TM is RE but its complement, co-A-TM, is not RE), so this blanket claim about 'every' RE language fails. Statement 4 is TRUE: every regular language is decided by simulating its DFA, which always halts after reading the input, so REG is a subset of REC. Statement 5 is TRUE: if f is the computable reduction function witnessing A <=m B, and B has a semi-decider, then composing - compute f(w), then run B's semi-decider on f(w), accepting iff it accepts - correctly semi-decides A, since w is in A iff f(w) is in B; this shows A is RE whenever B is. Statement 6 is TRUE and is exactly the contrapositive of statement 5: if A is not RE, then B cannot be RE either, since if B were RE, statement 5 would force A to be RE too, a contradiction. Counting the true statements: 1, 2, 4, 5, and 6 are true (five statements), while only statement 3 is false, giving a final count of 5."
+},
+{
+  id: 'toc-turing-h7',
+  q: 'The Post Correspondence Problem (PCP) is a classical example of a problem that is recursively enumerable but not decidable. Which of the following correctly describes the recursive enumerability status of its complement, co-PCP ("no valid match sequence exists for this PCP instance")?',
+  options: ['co-PCP is recursively enumerable, and in fact PCP is decidable after all, since both PCP and co-PCP being RE would make PCP recursive.', 'co-PCP is not known and cannot in principle ever be determined to be RE or not, since PCP itself involves an infinite search space.', 'co-PCP is not recursively enumerable, because if it were, then together with the known RE-ness of PCP itself, PCP would have to be decidable, contradicting the established undecidability of PCP.', 'co-PCP is recursively enumerable via the same enumeration technique used for PCP itself, just checking a different condition on each generated candidate sequence.'],
+  answer: 2,
+  marks: 2,
+  difficulty: 'hard',
+  type: 'concept',
+  explanation: "PCP itself is RE: an algorithm can systematically generate every finite sequence of domino indices in increasing order of length (a dovetailed search over an infinite space is still a valid semi-decision procedure) and check, for each one, whether the top and bottom concatenations match; if a matching sequence exists, this search is guaranteed to find it eventually and halt-accept, so PCP is semi-decidable. However, PCP is a well-established undecidable problem - no algorithm exists that always halts and correctly reports for every instance whether a match exists or not, a fact proved by reduction from the halting problem. Now apply the fundamental theorem linking RE, co-RE, and REC: if a language L and its complement are BOTH recursively enumerable, then L must be recursive (decidable), since running both semi-deciders in parallel is guaranteed to have one of them halt, correctly resolving membership either way. Since PCP is RE but is proven NOT to be decidable, it cannot be the case that co-PCP is also RE - if it were, the theorem would force PCP to be decidable, directly contradicting its known undecidability. So co-PCP is a genuine, well-known example of a language that is not recursively enumerable at all: there is no algorithm that can even semi-decide 'this PCP instance has no solution', since confirming the absence of a match would require an exhaustive search over an infinite space with no way to know when to safely stop and declare failure. This makes options A and D self-contradictory (they would force PCP to be decidable) and option B simply wrong (the status is well established, not 'unknowable' as a matter of principle)."
+}
+);
+
+window.GATE_DATA.questions['toc'].topics.find(function(t){return t.id==='toc-regular';}).questions.push(
+{
+  id: 'toc-regular-h1',
+  q: "A DFA over {a,b} accepts a string if and only if the number of a's in it is congruent to 0 mod 3 AND the string ends with the substring 'ab'. Construct the product automaton (mod-3 counter for a's, times the 3-state suffix tracker for 'ab') and minimize it. What is the minimum number of states in this DFA? Enter your numerical answer.",
+  options: [],
+  answer: 5,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'hard',
+  type: 'numerical',
+  explanation: "Build the product of two trackers: r in {0,1,2} for (count of a's) mod 3, and s in {q0,q1,q2} for suffix progress toward 'ab' (q0 = no useful suffix seen, q1 = last symbol was 'a', q2 = last two symbols were 'ab', accepting only when combined with r=0). This raw product has 9 reachable states, since every combination of r and s can be reached by suitable strings. However, minimizing this product (via Moore's partition-refinement / distinguishing-string method) reveals that it is NOT already minimal - a naive '3 times 3 = 9' answer is a classic trap here. The subtlety is that once r is not 0, the FUTURE acceptance behavior of the three suffix states s=q0, q1, q2 becomes identical: whichever suffix state you are in, the only strings that will ever lead to acceptance are ones that steer r back to 0 in step with reaching s=q2, and it turns out that for a fixed nonzero r, every future string leads to the same accept/reject verdict regardless of which of q0, q1, q2 the suffix tracker started in - so all three suffix states merge into a single class for each nonzero r. Concretely, minimization collapses the 9 states into exactly 5 classes: the three states with r=0 (paired with s=q0, q1, q2) remain pairwise distinguishable because acceptance is imminent-or-not depending on the exact suffix state, but for r=1 all three suffix states merge into one class, and likewise for r=2 all three merge into another single class. This gives 3 (from r=0) + 1 (from r=1) + 1 (from r=2) = 5 states total. This question exists specifically to show that after building a product automaton for a combined condition, you must always run an actual minimization/distinguishability check rather than assuming the raw product size (rows times columns) is already the final answer - shared alphabet symbols driving both trackers simultaneously can cause unexpected merges that independent, disjoint-alphabet trackers (like tracking 0s and 1s separately) would not exhibit."
+},
+{
+  id: 'toc-regular-h2',
+  q: 'Which of the following claims about minimal DFA state counts are TRUE? (Select ALL that apply)',
+  options: ["The minimal DFA for {w in {a,b}* : (number of a's in w) is even AND w ends in the symbol b} has 4 states.", "The minimal DFA for {w in {a,b}* : (number of a's mod 2) = (number of b's mod 2)} (equivalently, |w| is even) has 2 states.", "The minimal DFA for {w in {a,b}* : w contains 'aba' as a substring} has 4 states.", "The minimal DFA for {w in {a,b}* : (number of a's mod 3) = 0 AND w ends in 'ab'} has 9 states."],
+  answers: [1, 2],
+  marks: 2,
+  difficulty: 'hard',
+  type: 'concept',
+  explanation: "Each claim requires its own product-construction-then-minimize verification. A is FALSE: the naive product of the 2-state a-parity tracker and the 2-state 'ends in b' tracker gives 4 raw states, but minimizing it collapses to only 3 - specifically, the two states with odd a-parity (regardless of whether the last symbol was b) become indistinguishable, because from an odd-parity position the machine can never immediately accept and future behavior does not depend on which sub-case it is in; only 3 classes survive after merging, not 4. B is TRUE: since every single symbol (a or b) flips the parity of the total length, and 'a-count mod 2 equals b-count mod 2' is exactly equivalent to 'total length is even' (because a-count + b-count = length, and two numbers have equal parity exactly when their sum is even), this needs only 2 states (even-length-so-far, odd-length-so-far), and these two are clearly distinguishable (the empty string is accepted from 'even' but not from 'odd'). C is TRUE: the standard substring-matching automaton for a pattern of length 3 needs at most 4 states (progress 0, 1, 2 matched characters, plus the sink/accepting state once the full pattern 'aba' has appeared), and for 'aba' specifically all 4 states are pairwise distinguishable, giving exactly 4 - this is the standard KMP-style automaton construction. D is FALSE: as shown by direct construction and minimization (see the companion question on this exact language), the true minimal count for the mod-3-a's-AND-ends-in-ab language is 5, not 9 - the raw reachable product has 9 states, but three-way merges among the nonzero-residue states collapse it down to 5."
+},
+{
+  id: 'toc-regular-h3',
+  q: "Consider the NFA over {0,1} with states q0 (start, non-accepting), q1, q2, q3 (accepting), and transitions: delta(q0,0) = {q0,q1}, delta(q0,1) = {q0}, delta(q1,1) = {q2}, delta(q2,0) = {q3}, delta(q3,0) = {q3}, delta(q3,1) = {q3} (all unlisted transitions go to the empty set). Using subset construction, how many DISTINCT reachable states does the equivalent DFA have (including any dead/trap state, if it is actually reachable)? Enter your numerical answer.",
+  options: [],
+  answer: 6,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'hard',
+  type: 'numerical',
+  explanation: "Run subset construction starting from S0 = {q0}. From S0: on 0, q0 contributes {q0,q1}, giving S1 = {q0,q1}; on 1, q0 contributes {q0}, giving S0 itself (self-loop). From S1 = {q0,q1}: on 0, q0 contributes {q0,q1} and q1 contributes nothing, giving S1 again (self-loop); on 1, q0 contributes {q0} and q1 contributes {q2}, giving a new set S2 = {q0,q2}. From S2 = {q0,q2}: on 0, q0 contributes {q0,q1} and q2 contributes {q3}, giving a new set S3 = {q0,q1,q3}; on 1, q0 contributes {q0} and q2 contributes nothing, giving S0 again. From S3 = {q0,q1,q3}: on 0, q0 contributes {q0,q1} and q3 contributes {q3} (q3 self-loops on 0), giving a new set S4 = {q0,q1,q3} - wait, checking carefully, q1 contributes nothing on 0, so the union is {q0,q1} from q0 plus {q3} from q3, giving {q0,q1,q3} = S3 itself (self-loop); on 1, q0 contributes {q0}, q1 contributes {q2}, and q3 contributes {q3}, giving a new set S4 = {q0,q2,q3}. From S4 = {q0,q2,q3}: on 0, q0 contributes {q0,q1}, q2 contributes {q3}, q3 contributes {q3}, giving {q0,q1,q3} = S3 again; on 1, q0 contributes {q0} and q3 contributes {q3}, giving a new set S5 = {q0,q3}. From S5 = {q0,q3}: on 0, q0 contributes {q0,q1} and q3 contributes {q3}, giving S3 = {q0,q1,q3} again; on 1, q0 contributes {q0} and q3 contributes {q3}, giving S5 itself (self-loop). No further new subsets appear, so the complete reachable state set is {S0, S1, S2, S3, S4, S5} - exactly 6 distinct reachable DFA states. Notice the empty-set trap state is never reached, since q0 is present in every reachable subset (it always contributes itself under both symbols), confirming once again that the crude 2^4 = 16 upper bound from subset construction is far from tight in practice."
+},
+{
+  id: 'toc-regular-h4',
+  q: "The language L = { w in {a,b}* : |w| >= 2 and the second-to-last symbol of w is 'a' } is regular. By constructing its minimal DFA (tracking, at each point, the useful information about the last two symbols read), how many Myhill-Nerode equivalence classes does L have? Enter your numerical answer.",
+  options: [],
+  answer: 4,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'hard',
+  type: 'numerical',
+  explanation: "To decide membership after reading any prefix, the only information that matters going forward is the last two symbols read so far (once at least two symbols have been read), since one more symbol will make the current last symbol become the new second-to-last symbol. Track states by the suffix of length up to 2 seen so far: the empty prefix, single-symbol prefixes 'a' and 'b', and once two or more symbols have been read, one of the four two-symbol suffixes 'aa', 'ab', 'ba', 'bb' (accepting exactly when the suffix is 'aa' or 'ab', i.e. the OLDER of the two symbols is 'a'). Running Myhill-Nerode partition refinement (equivalently, minimizing the resulting 7-state raw construction: empty, a, b, aa, ab, ba, bb) merges several of these: the empty prefix, the single-symbol prefix 'b', and the two-symbol suffix 'bb' all turn out to be language-equivalent (from each of these, appending any string z leads to acceptance under exactly the same condition on z, since none of them carry the information 'second-to-last symbol is a' yet, and the path to eventually satisfying that condition is identical regardless of which of these three states you start from); similarly, the single-symbol prefix 'a' merges with the two-symbol suffix 'ba' (both have not-yet-determined second-to-last-is-a status, one symbol away from a decision, once again with identical future behavior). The two-symbol suffixes 'aa' (accepting) and 'ab' (accepting) remain separate from each other and from the merged classes, since 'aa' and 'ab' behave differently going forward (they matter to whether the NEXT-to-be-read symbol will complete a fresh accepting-relevant pair). After merging, exactly 4 distinct equivalence classes survive, matching the minimal DFA size of 4."
+},
+{
+  id: 'toc-regular-h5',
+  q: 'Which of the following statements about the Myhill-Nerode theorem are TRUE? (Select ALL that apply)',
+  options: ['If a language L has exactly k Myhill-Nerode equivalence classes, then every DFA accepting L (not only the minimal one) must have at least k states.', 'The number of states in the minimal DFA for L equals the number of Myhill-Nerode equivalence classes of L, but only when L is a finite language.', 'Two strings x and y are Myhill-Nerode equivalent with respect to L exactly when, for every string z (including the empty string), xz is in L if and only if yz is in L.', 'If an NFA with n states happens to have a minimal equivalent DFA with exactly n states, the original NFA must actually have been deterministic all along.'],
+  answers: [0, 2],
+  marks: 2,
+  difficulty: 'hard',
+  type: 'concept',
+  explanation: "A is TRUE: this is one direction of the Myhill-Nerode theorem - any DFA that correctly accepts L must assign each of the k pairwise-distinguishable equivalence classes to a DIFFERENT state (two strings from different classes are, by definition, distinguished by some suffix, so mapping them to the same DFA state would force the DFA to behave incorrectly on that distinguishing suffix for one of them), so at least k states are required, and the minimal DFA is exactly the one that achieves this lower bound with no waste. B is FALSE: the equality between minimal DFA size and the number of Myhill-Nerode classes is a fully GENERAL fact of the theorem, holding for every regular language whether finite or infinite - there is no special restriction to finite languages; for instance, {a^n b^n} is not even regular precisely because it has infinitely many Myhill-Nerode classes, and plenty of infinite regular languages (like a*, with exactly 1 class) satisfy the equality just as finite ones do. C is TRUE: this is the precise definition of the Myhill-Nerode equivalence relation, and taking z to be the empty string as one of the 'every string z' cases correctly recovers that x and y must agree on membership in L itself (x is in L iff y is in L) as a special case, consistent with the full definition. D is FALSE: nondeterminism in an NFA is a WORST-CASE risk of blow-up, not a guarantee of it - it is entirely possible to write a needlessly nondeterministic-looking NFA whose language happens to be extremely simple (for example, one that still only recognizes Sigma*, needing just 1 minimal DFA state) while having many states itself; coincidentally matching state counts between an NFA and its minimal DFA says nothing about whether the NFA's transition function happened to be deterministic."
+},
+{
+  id: 'toc-regular-h6',
+  q: 'Which of the following languages over {a,b} are regular? (Select ALL that apply)',
+  options: ["{ a^n b^m : (n mod 2) = (m mod 3) }", "{ a^n b^n : n is a multiple of 1000 }", "{ a^i b^j c^k : i + j = k } (over alphabet {a,b,c})", "{ a^n : n is a multiple of 5 OR n is a multiple of 7 }"],
+  answers: [0, 3],
+  marks: 2,
+  difficulty: 'hard',
+  type: 'concept',
+  explanation: "A is TRUE and is easy to misjudge as requiring unbounded comparison: the condition only ever compares two BOUNDED quantities, n mod 2 (only 2 possible values) and m mod 3 (only 3 possible values), never n and m themselves - a DFA can track the a-count mod 2 while reading the a-block, then track the b-count mod 3 while reading the b-block, and accept exactly when the two bounded residues match at the end; since both trackers only need finitely many states, this is fully regular (6 states suffice: 2 residues times 3 residues). B is FALSE: despite the extra 'multiple of 1000' restriction, this language still requires exactly matching the UNBOUNDED count of a's against the unbounded count of b's (just restricted to multiples of 1000), so the standard pumping lemma argument still applies - pick n = 1000 times a large enough k, pump the middle segment, and the equality n(a) = n(b) breaks, proving non-regularity; restricting to a sparser infinite set of n values does not rescue regularity. C is FALSE: the condition i + j = k requires comparing the SUM of two unbounded counts against a third unbounded count, which a finite-state machine cannot track (it would need to remember i+j exactly, an unbounded quantity) - a pumping lemma argument on strings a^i b^j c^{i+j} for large i confirms non-regularity (this language is in fact context-free via a suitable nested-counting grammar, but not regular). D is TRUE: 'multiple of 5' is tracked by a 5-state mod-5 counter and 'multiple of 7' by a 7-state mod-7 counter; the language is a finite union (in this case, two languages combined by OR) of regular languages, and regular languages are closed under union, so the product automaton with an OR-accept condition (at most 35 states, likely fewer after minimization) recognizes it - regularity survives combining independent modular conditions with boolean operations, as long as no unbounded cross-comparison is introduced."
+},
+{
+  id: 'toc-regular-h7',
+  q: 'What is the minimum number of states in a DFA that accepts binary strings representing (in standard binary notation, most significant bit first, with the empty string representing the value 0) a non-negative integer that is divisible by 5?',
+  options: ['4', '5', '6', '10'],
+  answer: 1,
+  marks: 2,
+  difficulty: 'hard',
+  type: 'concept',
+  explanation: "Track the running remainder of the binary number read so far when divided by 5, using the standard rule that reading one more bit b updates the value as new_value = 2*old_value + b, so the remainder updates as new_remainder = (2*r + b) mod 5. This gives exactly 5 possible remainder states, r = 0,1,2,3,4, with the start state being r = 0 (representing the empty prefix, value 0, which is divisible by 5) and the accepting state being exactly r = 0 again (reached after reading a full binary string whose value mod 5 is 0). Verifying minimality: all 5 remainder states are reachable (since 2 and 5 are coprime, repeatedly doubling and adding 0 or 1 lets you reach every residue), and all 5 are pairwise distinguishable, because from any two distinct residues r1 and r2, appending an appropriate suffix (enough bits to reach the value 0 mod 5 from one but not the other, which is always possible since the doubling map is a bijection mod 5 as gcd(2,5)=1) produces different accept/reject outcomes - so no two states can be merged. This is a classic instance of the general fact that recognizing 'binary value divisible by k' needs exactly k states whenever the base (here 2) and k share no common factor greater than 1, since the doubling-based transition function then acts as a well-behaved permutation-like structure over all k residues rather than collapsing some of them together. The answer is 5, matching option B."
+}
+);
+
+window.GATE_DATA.questions['toc'].topics.find(function(t){return t.id==='toc-cfl';}).questions.push(
+{
+  id: 'toc-cfl-h1',
+  q: 'Which of the following languages are context-free? (Select ALL that apply)',
+  options: ["{ a^n b^n c^m : n,m >= 0 }", "{ a^n b^m c^n : n,m >= 0 }", "{ a^n b^n c^n : n >= 0 }", "{ w w : w in {a,b}* }"],
+  answers: [0, 1],
+  marks: 2,
+  difficulty: 'hard',
+  type: 'concept',
+  explanation: "These four languages look superficially similar but only two are context-free. A is CFL: use S -> A C, A -> a A b | epsilon, C -> c C | epsilon; the a-block and b-block are matched by a single stack discipline (push a's, pop on b's) while the c-block is completely free of any constraint, so one stack suffices. B is CFL: use S -> a S c | T, T -> b T | epsilon; here the OUTER a...c wrapping is matched by the stack (push a's, and each c pops one a), while the middle b-block is generated freely with its own independent count - again only one matching relationship (a-count equals c-count) needs a stack, and the b-count is unconstrained. C is NOT context-free: this requires two SIMULTANEOUS matching relations (a-count equals b-count, AND b-count equals c-count), and the standard CFL pumping lemma proof shows any candidate grammar or PDA fails - pumping a substring in a suffciently long string of a^n b^n c^n can only preserve two of the three counts in lockstep, never all three, since a single stack can enforce at most one equality constraint (or a nested chain of them) at a time, not two independent equalities pinned to the same three-way split. D is NOT context-free: the 'exact literal repetition' language {ww} is the classic non-CFL example, provable via the pumping lemma by choosing a string like a^p b^p a^p b^p and showing every possible pumping decomposition either breaks the a^p b^p structure or breaks the repetition, since a single stack cannot both remember an unboundedly long first half AND verify it against an independently positioned second half without a marker."
+},
+{
+  id: 'toc-cfl-h2',
+  q: 'Which of the following are TRUE regarding CFL vs DCFL? (Select ALL that apply)',
+  options: ["{ a^n b^n : n >= 0 } is DCFL.", "{ a^i b^j : i != j } is DCFL.", "{ w c w^R : w in {a,b}*, c a distinguished marker symbol } is DCFL.", "{ w w^R : w in {a,b}* } (no marker) is DCFL."],
+  answers: [0, 1, 2],
+  marks: 2,
+  difficulty: 'hard',
+  type: 'concept',
+  explanation: "A is TRUE: a deterministic PDA can push one symbol per 'a' and pop one symbol per 'b', deterministically accepting exactly when the stack empties right as the input ends - no guessing is ever needed since the language's fixed a-block-then-b-block shape tells the machine exactly when to switch from pushing to popping. B is TRUE, and is a good test of deeper understanding: since the language is restricted to the format a^i b^j (a's then b's, guaranteed by the language definition), a DPDA can deterministically count a's while pushing, then pop while reading b's; if the stack empties exactly when the b's end, then i = j and the string is REJECTED (since the language demands i != j); if b's run out first (stack still has symbols) or the stack empties before the b's run out (extra b's remain), the machine deterministically knows i > j or i < j respectively and accepts - no guessing about which case applies is needed, it is discovered mechanically while scanning, so DCFL. C is TRUE: the explicit marker c tells a DPDA exactly, without any guessing, when to stop pushing symbols of w and start popping them to compare against the reversed second half - this determinism-enabling role of an explicit center marker is the textbook example separating marked from unmarked reversal languages. D is FALSE: without a marker, a machine reading w w^R must somehow guess where the midpoint is (since w can have any length), and it is a proven theorem that no deterministic PDA can correctly guess this midpoint for all inputs - {w w^R} is a CFL (accepted by a NONdeterministic PDA that guesses the midpoint at every step and verifies only one guess leads to acceptance) but is not a DCFL, making it the classic witness that DCFL is a strict subset of CFL."
+},
+{
+  id: 'toc-cfl-h3',
+  q: 'Let L = { w in {a,b,c}* : the number of a\'s, b\'s, and c\'s in w are all equal }. Which of the following correctly uses closure of CFLs under intersection with a regular language to prove L is NOT context-free?',
+  options: [
+    "Intersect L with the regular language a*b*c* to get { a^n b^n c^n : n >= 0 }, which is a well-known non-CFL; since CFL is closed under intersection with a regular language, if L were CFL then L intersect a*b*c* would have to be CFL too - a contradiction, so L is not CFL.",
+    "Intersect L with the regular language (abc)* to get (abc)*, which is regular and hence CFL; since this intersection is CFL, L itself must also be CFL by the same closure property.",
+    "Since { a^n b^n c^n : n >= 0 } is a subset of L (taking only the sorted-order strings), and a subset of a CFL need not itself be CFL, this alone already proves L is not context-free.",
+    "L is invariant under permuting the a's, b's, and c's of any of its strings, while { a^n b^n c^n } is not; this proves L is not regular, but says nothing about whether L is context-free."
+  ],
+  answer: 0,
+  marks: 2,
+  difficulty: 'hard',
+  type: 'concept',
+  explanation: "The correct proof technique (option A) uses the closure property CORRECTLY and in the right logical direction: CFL is closed under intersection with a REGULAR language (this is a genuine theorem, provable by running the CFL's PDA and the regular language's DFA in parallel using only the PDA's single stack). So IF L were context-free, intersecting it with the regular language a*b*c* would necessarily produce another context-free language. But that intersection is exactly { a^n b^n c^n : n >= 0 }, which is proven non-context-free by the standard pumping lemma argument. This is a direct contradiction, so the assumption that L is CFL must be false. Option B fails logically: closure under intersection with a regular language tells you that CFL-ness of L would force CFL-ness of the intersection, not the reverse implication - knowing the intersection happens to be regular (and hence trivially CFL) tells you nothing about L itself, since plenty of non-CFLs can still intersect a poorly chosen regular language down to something simple. Option C states a true general fact ('subset of CFL need not be CFL') but draws an invalid conclusion from it - merely being a superset of a non-CFL does not by itself prove non-CFL-ness (a CFL can certainly contain non-CFL-looking subsets that are secretly still fine, so this reasoning is not a valid derivation and skips the actual closure argument). Option D's premise is true but irrelevant to context-freeness - closure under permutation is a fact about symmetry, and non-regularity says nothing about the strictly stronger CFL hierarchy question being asked."
+},
+{
+  id: 'toc-cfl-h4',
+  q: 'Which of the following statements about ambiguity in context-free grammars and languages are TRUE? (Select ALL that apply)',
+  options: [
+    "The grammar S -> aSbS | bSaS | epsilon, generating all strings with an equal number of a's and b's, is an ambiguous grammar (some strings, such as 'abab', have more than one distinct parse tree).",
+    "If a grammar G is ambiguous, the language L(G) must be inherently ambiguous.",
+    "A context-free language is inherently ambiguous if and only if every context-free grammar that generates it is ambiguous.",
+    "{ a^i b^j c^k : i = j or j = k } is a classic textbook example of an inherently ambiguous context-free language."
+  ],
+  answers: [0, 2, 3],
+  marks: 2,
+  difficulty: 'hard',
+  type: 'concept',
+  explanation: "A is TRUE: this is a standard textbook example of an ambiguous grammar for the equal-a's-and-b's language - a string like 'abab' can be derived in more than one distinct way through this grammar's two symmetric alternatives (aSbS and bSaS interacting with the choice of where each S expands to epsilon), giving genuinely different parse trees for the same string, even though the LANGUAGE itself is not inherently ambiguous (it has other, unambiguous grammars). B is FALSE and is the central conceptual trap of this topic: a grammar being ambiguous only tells you that THIS PARTICULAR grammar has multiple parse trees for some string - it says nothing about whether some OTHER grammar for the same language might be unambiguous; for instance, the classic arithmetic expression grammar E -> E+E | E*E | id is ambiguous, yet the language of such expressions has a well-known unambiguous grammar built using separate precedence levels, so the language is not inherently ambiguous at all. C is TRUE: this is precisely the definition of inherent ambiguity - a CFL is inherently ambiguous exactly when NO unambiguous grammar exists for it, which is logically equivalent to saying every possible grammar generating it is ambiguous. D is TRUE: { a^i b^j c^k : i=j or j=k } is one of the most cited textbook examples of inherent ambiguity - strings where i=j=k simultaneously can be legitimately derived either through the 'i=j' branch of a natural grammar or through the 'j=k' branch, and this overlap in genuinely valid derivations cannot be removed by any clever regrammaring, a fact established by Ogden's lemma (a strengthened pumping lemma) applied to this specific language."
+},
+{
+  id: 'toc-cfl-h5',
+  q: 'Deterministic Context-Free Languages (DCFLs) are known to be closed under exactly one of the following operations in general. Which one?',
+  options: ['Union with another DCFL', 'Reversal', 'Complementation', 'Intersection with another arbitrary DCFL'],
+  answer: 2,
+  marks: 2,
+  difficulty: 'hard',
+  type: 'concept',
+  explanation: "DCFL closure under complementation is the signature closure property that distinguishes DCFL from general CFL. The construction: take a DPDA for the DCFL, first normalize it so that it always reads its entire input before deciding (never accepts or rejects early by looping/getting stuck mid-string, achieved via standard completion techniques that add explicit dead-end transitions for every otherwise-undefined move), and then simply swap which of the two final states (accepting vs non-accepting) is treated as accepting; since the machine is now guaranteed to consume the whole input deterministically every time, this swap correctly computes the complement. None of the other three options hold for DCFL in general. Union: two DCFLs unioned together generically require GUESSING which of the two languages' patterns the input matches, which a single deterministic machine cannot always do (the classic witness is that {a^i b^j c^k : i=j} and {a^i b^j c^k : j=k} are each individually DCFL, but their union is exactly the inherently ambiguous, non-deterministic language {i=j or j=k}, which is not even DCFL). Reversal: reversing a DCFL's strings generally destroys the left-to-right determinism that made the forward direction parseable without guessing (the deterministic 'when to switch from pushing to popping' cues built into the original direction do not survive being read backwards), so DCFL is not closed under reversal in general. Intersection with another arbitrary DCFL: unlike intersection with a REGULAR language (which does preserve determinism, since a DFA contributes no extra stack or guessing), intersecting two DPDAs in general does not yield a single deterministic machine, because coordinating two independent stack disciplines deterministically is not generally possible."
+},
+{
+  id: 'toc-cfl-h6',
+  q: 'Which of the following statements about CFL closure properties are TRUE? (Select ALL that apply)',
+  options: [
+    "CFL is closed under intersection with a regular language, but not under intersection with another arbitrary context-free language.",
+    "Since CFL is closed under union, if CFL were also closed under complementation, then by De Morgan's law (A intersect B = complement of (complement(A) union complement(B))), CFL would have to be closed under intersection too - which it is not, so this proves CFL is NOT closed under complementation.",
+    "The specific witness { a^n b^n c^m : n,m >= 0 } intersect { a^m b^n c^n : n,m >= 0 } = { a^n b^n c^n : n >= 0 } is the standard example proving CFL is not closed under intersection (both operand languages are individually context-free, but their intersection is not).",
+    "Since regular languages are a special case of CFLs, and CFL is closed under intersection with regular languages, it follows that CFL must be closed under intersection with ANY context-free language."
+  ],
+  answers: [0, 1, 2],
+  marks: 2,
+  difficulty: 'hard',
+  type: 'concept',
+  explanation: "A is TRUE: CFL intersect regular stays CFL (run the CFG's PDA and the regular language's DFA in a synchronized product, using only the PDA's single stack, since the DFA side contributes no extra memory), but CFL intersect CFL can escape the class entirely, as the standard counterexample in option C demonstrates. B is TRUE and is the standard textbook derivation for why CFL is not closed under complement: CFL IS closed under union (combine two grammars under a fresh start symbol with S -> S1 | S2), so IF it were also closed under complement, De Morgan's identity would force closure under intersection as a derived consequence - but intersection closure is already known to fail (via C), so by this logical chain, complementation closure must fail too, since assuming it would create a contradiction. C is TRUE: this is exactly the canonical textbook example - { a^n b^n c^m } is CFL via S -> A C, A -> aAb|eps, C -> cC|eps, and { a^m b^n c^n } is CFL by the mirrored construction, but their intersection forces BOTH n=m (from matching the first language's a/b relationship against the second's constraint) in a way that ultimately pins down a^n b^n c^n exactly, which is proven non-context-free by the pumping lemma - so two individually-CFL languages intersect down to a non-CFL, directly disproving closure. D is FALSE and is a logical overreach: the fact that CFL tolerates intersection with the SPECIAL, weaker case of a regular language (which never needs its own stack) does not generalize to intersection with an arbitrary, potentially much more powerful CFL - and indeed C is a direct, explicit counterexample disproving this stronger claim."
+},
+{
+  id: 'toc-cfl-h7',
+  q: "Consider the ambiguous grammar E -> E + E | E * E | id. How many DISTINCT parse trees exist for the string 'id + id + id + id' (using only the + operator, four id's and three +'s)? Enter your numerical answer.",
+  options: [],
+  answer: 5,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'hard',
+  type: 'numerical',
+  explanation: "Since the grammar provides no precedence or associativity information (E -> E+E is used at every step here, with E*E never invoked since there is no '*' in this string), every distinct parse tree corresponds exactly to a distinct way of fully parenthesizing (equivalently, a distinct binary tree shape with the 4 id's as leaves). The number of distinct binary trees with n leaves is the Catalan number C(n-1), where C(0)=1, C(1)=1, C(2)=2, C(3)=5, C(4)=14, and so on (each C(k) counts the ways to split k+1 leaves into a left group and a right group at the top level, recursively). Here n = 4 leaves (four id's), so the count of distinct parse trees is C(3) = 5. Concretely, the five distinct parenthesizations of id+id+id+id are: ((id+id)+id)+id, (id+(id+id))+id, (id+id)+(id+id), id+((id+id)+id), and id+(id+(id+id)) - each corresponds to a genuinely different binary parse tree (even though, since + is associative and commutative in ordinary arithmetic, they would all evaluate to the same numeric result, the GRAMMAR itself, having no associativity annotation, treats each distinct bracketing/tree-shape as a separate, equally valid derivation). This numeric fact - that ambiguity from missing associativity/precedence information grows combinatorially (following the Catalan sequence) with the number of operands - is exactly why real compilers disambiguate expression grammars using layered nonterminals for precedence and left-recursion for associativity, collapsing what would otherwise be Catalan-many parse trees down to exactly one canonical tree per string."
+}
+);
+
+window.GATE_DATA.questions['toc'].topics.find(function(t){return t.id==='toc-hierarchy';}).questions.push(
+{
+  id: 'toc-hierarchy-h1',
+  q: 'Which of the following are TRUE strictness witnesses in the Chomsky hierarchy? (Select ALL that apply)',
+  options: [
+    "{ a^n b^n : n >= 0 } is context-free but not regular, witnessing Regular is a strict (proper) subset of CFL.",
+    "{ a^n b^n c^n : n >= 0 } is context-sensitive but not context-free, witnessing CFL is a strict subset of CSL.",
+    "{ w w : w in {0,1}* } is context-sensitive but not context-free, and is also a valid witness that CFL is a strict subset of CSL.",
+    "Every recursive (decidable) language is context-sensitive, so CSL and REC are actually the same class and no strictness witness is needed."
+  ],
+  answers: [0, 1, 2],
+  marks: 2,
+  difficulty: 'hard',
+  type: 'concept',
+  explanation: "A is TRUE: {a^n b^n} fails the regular pumping lemma (any pumped decomposition breaks the equal-count requirement) yet is generated by the simple CFG S -> aSb | epsilon, making it a textbook witness that Regular is strictly weaker than CFL. B is TRUE: {a^n b^n c^n} is proven non-context-free by the CFL pumping lemma (any single pumping move can keep at most two of the three counts in lockstep), yet it can be generated by a non-contracting (length-nondecreasing) context-sensitive grammar that uses a linear-bounded amount of tape to check all three counts, making it a standard witness that CFL is strictly weaker than CSL. C is TRUE: {ww} similarly fails the CFL pumping lemma (no single stack can verify an exact, unmarked repetition of an arbitrarily long first half), yet a linear-bounded automaton can check the repetition by comparing symbol-by-symbol using only linear tape, so it too is context-sensitive but not context-free - a second valid witness for the same strict containment. D is FALSE and inverts a genuine but different fact: every context-sensitive language IS recursive (an LBA is a restricted, always-halting Turing machine, so its language is always decidable), but the CONTAINMENT goes only one way and is strict - REC strictly contains CSL, since the space-hierarchy theorem guarantees the existence of decidable languages that provably cannot be recognized within linear tape bounds at all, meaning they are recursive but not context-sensitive; so CSL and REC are emphatically not the same class, and a genuine strictness witness (though harder to write down explicitly than A, B, or C) does exist."
+},
+{
+  id: 'toc-hierarchy-h2',
+  q: 'Which of the following statements about identifying grammar types from production shapes are TRUE? (Select ALL that apply)',
+  options: [
+    "The grammar S -> aS | b is right-linear, hence a Type 3 (regular) grammar.",
+    "The grammar S -> aSb | epsilon is also a Type 3 (regular) grammar, since each of its productions has only one nonterminal on the right-hand side.",
+    "A grammar can be classified as Type 2 (context-free) purely by the shape of its productions, even when the language it happens to generate is actually regular.",
+    "Any context-sensitive (Type 1) grammar can always be rewritten so that every production is length non-increasing (right-hand side no longer than the left-hand side)."
+  ],
+  answers: [0, 2],
+  marks: 2,
+  difficulty: 'hard',
+  type: 'concept',
+  explanation: "A is TRUE: every production has the shape 'nonterminal -> terminal(s) followed by at most one nonterminal, at the rightmost position' (aS and b both qualify, with b having zero trailing nonterminals), which is exactly the right-linear form defining Type 3 grammars. B is FALSE and is a classic careless-reading trap: having 'only one nonterminal per right-hand side' is NOT the defining shape of a regular grammar - a Type 3 grammar additionally requires that lone nonterminal to sit consistently at one specific END of the right-hand side (all productions right-linear, or all left-linear), never sandwiched between terminals as in aSb; this grammar is a Type 2 (context-free, specifically linear) grammar only, and indeed the language it generates, {a^n b^n}, is famously NOT regular, confirming its productions genuinely cannot be reshaped into valid Type 3 form. C is TRUE and captures an important nuance: production-shape classification and language-power classification are different questions - a grammar such as S -> AB, A -> aA | a, B -> bB | b is written with fully general context-free production shapes (Type 2 by shape) even though the LANGUAGE it generates, a+b+, is actually regular and could alternatively be generated by some other, genuinely right-linear Type 3 grammar; the Chomsky hierarchy classifies a specific GRAMMAR by its production shapes, which is a distinct (though related) notion from the smallest class containing the language it generates. D is FALSE and states the definition backwards: context-sensitive (Type 1, monotonic) grammars require every production's right-hand side to be AT LEAST as long as its left-hand side (non-contracting), not non-increasing - this length-nondecreasing property is precisely what guarantees any derivation can be simulated within linear tape space, and reversing the inequality would describe something closer to unrestricted contraction, not the Type 1 definition."
+},
+{
+  id: 'toc-hierarchy-h3',
+  q: 'Which of the following statements are TRUE? (Select ALL that apply)',
+  options: [
+    "The acceptance/universal language A_TM = { <M,w> : M accepts w } is recursively enumerable but not recursive, witnessing that REC is a strict subset of RE.",
+    "Every context-free language is also recursive (decidable).",
+    "There exists a language that is recursive (decidable) but not context-sensitive, witnessing that CSL is a strict subset of REC.",
+    "Since every context-sensitive language is decided by some linear-bounded automaton that always halts, it follows that CSL equals REC."
+  ],
+  answers: [0, 1, 2],
+  marks: 2,
+  difficulty: 'hard',
+  type: 'concept',
+  explanation: "A is TRUE: A_TM is semi-decided by simply simulating M on w and accepting if that simulation halts and accepts, but no algorithm can always correctly decide it (the classical diagonalization argument), making it exactly the standard witness that REC is strictly smaller than RE. B is TRUE: any CFG's membership question can be decided in finite time by a parsing algorithm such as CYK (after conversion to Chomsky Normal Form) or Earley's algorithm, both of which always terminate with a correct yes/no answer, so CFL is always a subset of REC - context-freeness never sacrifices decidability. C is TRUE: by the space-hierarchy theorem, there exist decidable languages that provably require more than linear tape/space to decide on any Turing machine, and since context-sensitive languages are, by definition, exactly those decidable within linear space (equivalently, by some LBA), such a language is decidable (hence in REC) but is not context-sensitive - this proves the containment CSL subset-of REC is strict. D is FALSE and is a fallacious 'converse' error: it is true that every LBA computation always halts (LBAs are Turing machines restricted to a tape of size linear in the input, over a finite alphabet, so they have only finitely many configurations and cannot loop forever without repeating a configuration, guaranteeing termination), but this only shows CSL is a SUBSET of REC, not that the two classes coincide; option C already exhibits a concrete decidable language outside CSL, directly contradicting the claimed equality."
+},
+{
+  id: 'toc-hierarchy-h4',
+  q: 'Which of the following production sets defines a Type 1 (context-sensitive) grammar that is NOT context-free (i.e., the language it generates is not a CFL)?',
+  options: [
+    "S -> a S b | a b",
+    "S -> a S B C | a b c, C B -> B C, b B -> b b, b C -> b c, c C -> c c",
+    "S -> A B, A -> a A | a, B -> b B | b",
+    "S -> a A, A -> b B, B -> c"
+  ],
+  answer: 1,
+  marks: 2,
+  difficulty: 'hard',
+  type: 'concept',
+  explanation: "Option B is the standard textbook context-sensitive grammar for { a^n b^n c^n : n >= 1 }: every production is length non-increasing in reverse (each right-hand side is at least as long as its left-hand side, satisfying the Type 1 monotonicity requirement), and the auxiliary rules (CB -> BC, bB -> bb, bC -> bc, cC -> cc) implement a controlled 'sorting' process that lets nonterminal B's and C's placed alongside the initial a-block migrate into the correct final positions and convert into terminal b's and c's only once the counts have been properly set up by the SaSBC-style recursive rule - crucially, the LANGUAGE this generates, a^n b^n c^n, is proven NOT context-free by the standard CFL pumping lemma (any pumping move can keep at most two of the three block-counts synchronized), so this grammar sits properly at Type 1 and strictly above Type 2. Option A, despite superficially resembling a 'nonterminal sandwiched between terminals' pattern, is simply a context-free (indeed linear) grammar generating {a^n b^n : n>=1} - a perfectly ordinary CFL requiring no context-sensitive machinery at all. Option C uses completely ordinary context-free production shapes and generates a+b+, which is not just context-free but fully regular. Option D is a right-linear Type 3 (regular) grammar, generating the single string 'abc' pattern extended trivially - each production has exactly one terminal followed by at most one nonterminal at the rightmost position, the defining shape of a regular grammar."
+},
+{
+  id: 'toc-hierarchy-h5',
+  q: 'Which of the following statements about the relationship between DCFL, CFL, and REG are TRUE? (Select ALL that apply)',
+  options: [
+    "REG is a strict subset of DCFL, and DCFL is a strict subset of CFL (DCFL is a proper intermediate class).",
+    "DCFL equals CFL intersect REC (i.e., a language is DCFL exactly when it is context-free and decidable).",
+    "Every unambiguous context-free language is necessarily a DCFL.",
+    "Every DCFL has an unambiguous grammar."
+  ],
+  answers: [0, 3],
+  marks: 2,
+  difficulty: 'hard',
+  type: 'concept',
+  explanation: "A is TRUE: every regular language is trivially a DCFL (a DFA is a DPDA that simply never touches its stack), and this containment is strict because {a^n b^n} is DCFL (deterministic push-then-pop) but not regular; likewise, every DCFL is a CFL by definition (having SOME deterministic PDA implies having a PDA), and this containment is strict because the unmarked language {w w^R} is CFL (via a nondeterministic PDA that guesses the midpoint) but provably not DCFL (no deterministic PDA can correctly guess the midpoint for every input), so DCFL sits as a genuine, strictly intermediate class. B is FALSE: this proposed characterization is actually vacuous and wrong, because EVERY context-free language is already decidable (CFL is a subset of REC via CYK/Earley parsing, with no exceptions), so 'CFL intersect REC' simply equals CFL itself - the equation would then wrongly claim DCFL = CFL, directly contradicting the strict containment established in A (witnessed by {w w^R}). C is FALSE: having an unambiguous grammar is a weaker condition than being DCFL - the classic counterexample is a language like {a^n b^n} union {a^n b^{2n}}, which can be given an unambiguous grammar (careful construction avoids any string having two derivations) yet is not DCFL, because a deterministic PDA reading the a's has no way to deterministically decide, without unbounded lookahead, which of the two 'b-count' patterns it should commit to matching. D is TRUE: this is a genuine theorem - every DCFL, having a deterministic PDA, can be converted into an equivalent unambiguous grammar (roughly, the deterministic left-to-right parsing choices of the DPDA translate directly into a grammar with no derivation ambiguity), though as C shows, the converse direction does not hold."
+},
+{
+  id: 'toc-hierarchy-h6',
+  q: 'How many of the following 5 statements about the Chomsky hierarchy are TRUE?\n1. REG is a strict (proper) subset of CFL.\n2. CFL is a strict (proper) subset of CSL.\n3. CSL is a strict (proper) subset of REC.\n4. REC is a strict (proper) subset of RE.\n5. RE is a strict (proper) subset of the set of ALL languages over a fixed alphabet Sigma.\nEnter your numerical answer.',
+  options: [],
+  answer: 5,
+  kind: 'nat',
+  marks: 2,
+  difficulty: 'hard',
+  type: 'numerical',
+  explanation: "All five containments are genuine, well-established strict inclusions in the standard Chomsky/computability hierarchy, each with its own classical witness. Statement 1 is TRUE: {a^n b^n} is CFL but fails the regular pumping lemma, so REG is strictly smaller than CFL. Statement 2 is TRUE: {a^n b^n c^n} (or equivalently {ww}) is context-sensitive (checkable within linear tape by an LBA) but fails the CFL pumping lemma, so CFL is strictly smaller than CSL. Statement 3 is TRUE: the space-hierarchy theorem guarantees decidable languages that require strictly more than linear space to decide, so they lie in REC but outside CSL, making the containment strict. Statement 4 is TRUE: the acceptance problem A_TM is recursively enumerable (semi-decidable by direct simulation) but not recursive (undecidable, by the standard diagonalization argument), so REC is strictly smaller than RE. Statement 5 is TRUE: there are only countably many Turing machines (each is a finite string over a finite alphabet), so there are only countably many RE languages, but the set of ALL subsets of Sigma* is uncountable by Cantor's diagonal/power-set argument, so RE must be a strict subset of the full space of languages, with 'most' languages having no describing machine at all. Since every one of the five statements is independently well-established as true, the count of true statements is 5."
+},
+{
+  id: 'toc-hierarchy-h7',
+  q: "A grammar has the productions: S -> A b | a, A -> a A | B a, B -> b. Note that S -> Ab places the nonterminal A immediately BEFORE the terminal b (a left-linear-looking shape), while A -> aA places the nonterminal AFTER the terminal a (a right-linear-looking shape) - the two directions are mixed within the same grammar. By the strict Chomsky definition (which requires a Type 3 grammar's productions to be consistently ALL right-linear or ALL left-linear, never mixed), what is the correct Chomsky type classification of this grammar by its production shapes?",
+  options: ['Type 0 (unrestricted)', 'Type 1 (context-sensitive)', 'Type 2 (context-free)', 'Type 3 (regular)'],
+  answer: 2,
+  marks: 2,
+  difficulty: 'hard',
+  type: 'concept',
+  explanation: "Every individual production here has a perfectly ordinary context-free shape (a single nonterminal on the left, replaced by a string of terminals and at most one nonterminal on the right), so by shape alone the grammar is certainly no more restrictive than Type 2. The tempting mistake is to look at each rule in isolation and note that S -> Ab has its nonterminal on the left of the terminal (looking left-linear) while A -> aA has its nonterminal on the right of the terminal (looking right-linear), and conclude that since every single rule individually has 'only one nonterminal, at one end', the whole grammar must qualify as Type 3. This is incorrect: the formal definition of a Type 3 (regular) grammar requires the ENTIRE grammar to commit to one consistent direction throughout - either every production is right-linear (nonterminal only ever at the rightmost end) or every production is left-linear (nonterminal only ever at the leftmost end); a grammar that freely mixes left-linear and right-linear productions across different rules is not guaranteed to define a regular language and is not classified as Type 3, even though every rule in isolation looks 'linear'. (Mixing left- and right-linear rules can, in general, actually generate non-regular languages, which is precisely why the consistency requirement exists.) Since this grammar mixes both directions, it falls back to being classified as Type 2 (context-free) by its production shapes, correctly reflecting that no valid Type 3 restructuring is guaranteed to exist for it as given."
+}
+);
+
+// ---- THEORY FIGURES (appended) ----
+
+window.GATE_DATA.questions['toc'].topics.find(function(t){return t.id==='toc-regular';}).theory.figs = [
+  { id:'dfa-nfa', caption:'A DFA and an equivalent NFA for strings ending in ab', svg:'<svg viewBox="0 0 300 183" width="100%" style="max-width:420px;height:auto" xmlns="http://www.w3.org/2000/svg"><g font-size="10" text-anchor="middle"><text x="70" y="12">DFA</text><circle cx="30" cy="60" r="16" fill="none" stroke="currentColor"/><text x="30" y="64">q0</text><circle cx="90" cy="60" r="16" fill="none" stroke="currentColor"/><text x="90" y="64">q1</text><circle cx="150" cy="60" r="16" fill="none" stroke="#35d0ba"/><circle cx="150" cy="60" r="12" fill="none" stroke="#35d0ba"/><text x="150" y="64">q2</text><path d="M46 60 L74 60" stroke="currentColor" marker-end="url(#a30)"/><text x="60" y="52">a</text><path d="M106 60 L134 60" stroke="currentColor" marker-end="url(#a30)"/><text x="120" y="52">b</text><path d="M30 44 C 10 20, 50 20, 90 44" stroke="currentColor" fill="none" marker-end="url(#a30)"/><text x="45" y="20">b</text></g><g font-size="10" text-anchor="middle"><text x="230" y="12">NFA</text><circle cx="200" cy="120" r="14" fill="none" stroke="currentColor"/><text x="200" y="124">p0</text><circle cx="250" cy="90" r="14" fill="none" stroke="currentColor"/><text x="250" y="94">p1</text><circle cx="290" cy="120" r="14" fill="none" stroke="#35d0ba"/><text x="290" y="124">p2</text><path d="M212 112 L240 96" stroke="currentColor" marker-end="url(#a30)"/><text x="220" y="98">a</text><path d="M262 92 L278 112" stroke="currentColor" marker-end="url(#a30)"/><text x="278" y="98">b</text><path d="M200 106 C 200 90, 200 90, 200 106" stroke="currentColor" fill="none"/><text text-anchor="start" x="4" y="150" font-size="9">a,b self-loop at p0</text></g><defs><marker id="a30" markerWidth="6" markerHeight="6" refX="4" refY="2" orient="auto"><path d="M0,0 L4,2 L0,4" fill="none" stroke="currentColor"/></marker></defs><text x="4" y="164" font-size="10" text-anchor="start">NFA guesses where "ab" starts; DFA must track it deterministically</text></svg>' },
+  { id:'myhill-nerode', caption:'Myhill-Nerode: strings partitioned by future behaviour', svg:'<svg viewBox="0 0 280 187" width="100%" style="max-width:420px;height:auto" xmlns="http://www.w3.org/2000/svg"><g font-size="10"><rect x="10" y="15" width="80" height="55" fill="none" stroke="#35d0ba"/><text x="50" y="30" text-anchor="middle">class [eps]</text><text x="50" y="45" text-anchor="middle">eps, aa, bb</text><text x="50" y="60" text-anchor="middle">(even a-count)</text><rect x="100" y="15" width="80" height="55" fill="none" stroke="currentColor"/><text x="140" y="30" text-anchor="middle">class [a]</text><text x="140" y="45" text-anchor="middle">a, aaa, ab</text><text x="140" y="60" text-anchor="middle">(odd a-count)</text><rect x="60" y="90" width="150" height="45" fill="none" stroke="currentColor" stroke-dasharray="3 2"/><text x="4" y="151" text-anchor="start">x ~ y iff for all z, xz in L iff yz in L</text><text x="4" y="167" text-anchor="start"># classes = # states of minimal DFA</text></g></svg>' }
+];
+(function(){ var t = window.GATE_DATA.questions['toc'].topics.find(function(t){return t.id==='toc-regular';});
+  t.theory.core = t.theory.core.replace('A DFA is a 5-tuple (Q, Sigma, delta, q0, F)', '[[FIG:dfa-nfa]]\n\nA DFA is a 5-tuple (Q, Sigma, delta, q0, F)'); })();
+(function(){ var t = window.GATE_DATA.questions['toc'].topics.find(function(t){return t.id==='toc-regular';});
+  t.theory.core = t.theory.core.replace('Myhill-Nerode theorem. Define x and y equivalent', '[[FIG:myhill-nerode]]\n\nMyhill-Nerode theorem. Define x and y equivalent'); })();
+
+window.GATE_DATA.questions['toc'].topics.find(function(t){return t.id==='toc-cfl';}).theory.figs = [
+  { id:'parse-tree', caption:'A parse tree for a grammar S -> aSb | ab', svg:'<svg viewBox="0 0 260 160" width="100%" style="max-width:420px;height:auto" xmlns="http://www.w3.org/2000/svg"><g font-size="12" text-anchor="middle"><line x1="130" y1="30" x2="60" y2="60" stroke="currentColor"/><line x1="130" y1="30" x2="130" y2="60" stroke="currentColor"/><line x1="130" y1="30" x2="200" y2="60" stroke="currentColor"/><circle cx="130" cy="20" r="16" fill="none" stroke="currentColor"/><text x="130" y="24">S</text><text x="60" y="75" fill="#35d0ba">a</text><circle cx="130" cy="70" r="16" fill="none" stroke="currentColor"/><text x="130" y="74">S</text><text x="200" y="75" fill="#35d0ba">b</text><line x1="130" y1="86" x2="90" y2="115" stroke="currentColor"/><line x1="130" y1="86" x2="170" y2="115" stroke="currentColor"/><text x="90" y="128" fill="#35d0ba">a</text><text x="170" y="128" fill="#35d0ba">b</text></g><text x="130" y="150" font-size="10" text-anchor="middle">derives aabb -- leaves read left-right give the string</text></svg>' },
+  { id:'pda-stack', caption:'PDA stack while accepting a^n b^n', svg:'<svg viewBox="0 0 300 130" width="100%" style="max-width:420px;height:auto" xmlns="http://www.w3.org/2000/svg"><g font-size="11" text-anchor="middle"><text x="40" y="14">after aa</text><rect x="15" y="20" width="50" height="20" fill="none" stroke="currentColor"/><text x="40" y="34">Z0</text><rect x="15" y="0" width="50" height="20" fill="none" stroke="#35d0ba"/><text x="40" y="14" y2="0">A A</text></g><g font-size="11" text-anchor="middle"><text x="150" y="14">read b: pop</text><rect x="125" y="20" width="50" height="20" fill="none" stroke="currentColor"/><text x="150" y="34">Z0</text><rect x="125" y="0" width="50" height="20" fill="none" stroke="#ec3013"/><text x="150" y="14">A</text></g><g font-size="11" text-anchor="middle"><text x="255" y="14">read b: pop</text><rect x="230" y="20" width="50" height="20" fill="none" stroke="#35d0ba"/><text x="255" y="34">Z0</text></g><text x="4" y="56" font-size="10" text-anchor="start">push A on each a; pop one A per b</text><text x="4" y="71" font-size="10" text-anchor="start">accept when stack returns to just Z0</text><text x="4" y="86" font-size="10" text-anchor="start">(one stack cannot check a 3rd independent count)</text></svg>' }
+];
+(function(){ var t = window.GATE_DATA.questions['toc'].topics.find(function(t){return t.id==='toc-cfl';});
+  t.theory.core = t.theory.core.replace('A CFG has productions A -> alpha', '[[FIG:parse-tree]]\n\nA CFG has productions A -> alpha'); })();
+(function(){ var t = window.GATE_DATA.questions['toc'].topics.find(function(t){return t.id==='toc-cfl';});
+  t.theory.core = t.theory.core.replace('PDAs. A PDA is a finite automaton plus one stack.', '[[FIG:pda-stack]]\n\nPDAs. A PDA is a finite automaton plus one stack.'); })();
+
+window.GATE_DATA.questions['toc'].topics.find(function(t){return t.id==='toc-turing';}).theory.figs = [
+  { id:'tm-tape', caption:'TM tape, head, and one transition', svg:'<svg viewBox="0 0 300 130" width="100%" style="max-width:420px;height:auto" xmlns="http://www.w3.org/2000/svg"><g font-size="12" text-anchor="middle"><rect x="20" y="20" width="30" height="26" fill="none" stroke="currentColor"/><text x="35" y="38">1</text><rect x="50" y="20" width="30" height="26" fill="none" stroke="currentColor"/><text x="65" y="38">0</text><rect x="80" y="20" width="30" height="26" fill="none" stroke="#ec3013"/><text x="95" y="38">1</text><rect x="110" y="20" width="30" height="26" fill="none" stroke="currentColor"/><text x="125" y="38">B</text><path d="M95 12 L95 18 M89 8 L95 18 L101 8" stroke="#ec3013" fill="none"/><text x="95" y="6">head, state q1</text></g><text x="4" y="62" font-size="11" text-anchor="start">delta(q1, 1) = (q2, 0, R)</text><text x="4" y="78" font-size="10" text-anchor="start">write 0, move right, go to q2</text><text x="4" y="93" font-size="10" text-anchor="start">infinite tape, but only finitely many cells ever non-blank</text></svg>' },
+  { id:'rec-re-venn', caption:'Recursive vs RE vs all languages', svg:'<svg viewBox="0 0 280 160" width="100%" style="max-width:420px;height:auto" xmlns="http://www.w3.org/2000/svg"><rect x="10" y="10" width="260" height="140" fill="none" stroke="currentColor"/><text x="20" y="26" font-size="10">ALL languages (uncountable)</text><rect x="40" y="40" width="200" height="100" fill="none" stroke="#35d0ba"/><text x="50" y="55" font-size="10" fill="#35d0ba">RE (countable)</text><rect x="70" y="70" width="140" height="60" fill="none" stroke="#ec3013"/><text x="80" y="85" font-size="10" fill="#ec3013">Recursive</text><text x="90" y="105" font-size="9">A_TM is RE, not</text><text x="90" y="118" font-size="9">recursive: sits in the ring</text><text x="90" y="131" font-size="9">between the two boxes</text></svg>' }
+];
+(function(){ var t = window.GATE_DATA.questions['toc'].topics.find(function(t){return t.id==='toc-turing';});
+  t.theory.core = t.theory.core.replace('TM variants and robustness.', '[[FIG:tm-tape]]\n\nTM variants and robustness.'); })();
+(function(){ var t = window.GATE_DATA.questions['toc'].topics.find(function(t){return t.id==='toc-turing';});
+  t.theory.core = t.theory.core.replace('Recursive versus RE, precisely.', '[[FIG:rec-re-venn]]\n\nRecursive versus RE, precisely.'); })();
+
+window.GATE_DATA.questions['toc'].topics.find(function(t){return t.id==='toc-decidability';}).theory.figs = [
+  { id:'reduction-arrow', caption:'Many-one reduction A <=m B transfers hardness forward', svg:'<svg viewBox="0 0 300 137" width="100%" style="max-width:420px;height:auto" xmlns="http://www.w3.org/2000/svg"><g font-size="12" text-anchor="middle"><rect x="20" y="30" width="90" height="40" fill="none" stroke="#ec3013"/><text x="65" y="54">A (unknown)</text><rect x="190" y="30" width="90" height="40" fill="none" stroke="currentColor"/><text x="235" y="54">B (known)</text><path d="M110 50 L188 50" stroke="#35d0ba" marker-end="url(#a31)"/><text text-anchor="start" x="4" y="86" fill="#35d0ba">f (computable)</text><defs><marker id="a31" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6" fill="none" stroke="#35d0ba"/></marker></defs></g><text x="4" y="102" font-size="11" text-anchor="start">w in A iff f(w) in B</text><text x="4" y="118" font-size="10" text-anchor="start">B decidable -&gt; A decidable. A undecidable -&gt; B undecidable</text></svg>' },
+  { id:'undecidable-map', caption:'Which questions are decidable, by machine class', svg:'<svg viewBox="0 0 280 204" width="100%" style="max-width:420px;height:auto" xmlns="http://www.w3.org/2000/svg"><g font-size="10"><rect x="10" y="10" width="80" height="110" fill="none" stroke="#35d0ba"/><text x="50" y="26" text-anchor="middle">DFA</text><text x="20" y="45">membership</text><text x="20" y="60">emptiness</text><text x="20" y="75">equivalence</text><text text-anchor="start" x="4" y="136">all decidable</text><rect x="100" y="10" width="80" height="110" fill="none" stroke="currentColor"/><text x="140" y="26" text-anchor="middle">CFG</text><text x="110" y="45">membership: yes</text><text x="110" y="60">emptiness: yes</text><text x="110" y="75" fill="#ec3013">equivalence: NO</text><text text-anchor="start" x="4" y="152" fill="#ec3013">ambiguity: NO</text><rect x="190" y="10" width="80" height="110" fill="none" stroke="#ec3013"/><text x="230" y="26" text-anchor="middle">TM</text><text x="200" y="45" fill="#ec3013">membership: NO</text><text x="200" y="60" fill="#ec3013">halting: NO</text><text x="200" y="75" fill="#ec3013">emptiness: NO</text><text text-anchor="start" x="4" y="168">(Rice: almost</text><text text-anchor="start" x="4" y="184">everything undecidable)</text></g></svg>' }
+];
+(function(){ var t = window.GATE_DATA.questions['toc'].topics.find(function(t){return t.id==='toc-decidability';});
+  t.theory.core = t.theory.core.replace('The catalogue, by machine class.', '[[FIG:undecidable-map]]\n\nThe catalogue, by machine class.'); })();
+(function(){ var t = window.GATE_DATA.questions['toc'].topics.find(function(t){return t.id==='toc-decidability';});
+  t.theory.core = t.theory.core.replace('Reductions. A many-one reduction from A to B', '[[FIG:reduction-arrow]]\n\nReductions. A many-one reduction from A to B'); })();
+
+window.GATE_DATA.questions['toc'].topics.find(function(t){return t.id==='toc-hierarchy';}).theory.figs = [
+  { id:'chomsky-rings', caption:'Chomsky hierarchy as nested rings, with example languages', svg:'<svg viewBox="0 0 280 294" width="100%" style="max-width:420px;height:auto" xmlns="http://www.w3.org/2000/svg"><g font-size="10" text-anchor="middle"><circle cx="140" cy="110" r="100" fill="none" stroke="currentColor"/><text text-anchor="start" x="4" y="226" fill="currentColor">Type0 / RE: HALT-like sets</text><circle cx="140" cy="115" r="78" fill="none" stroke="currentColor"/><text text-anchor="start" x="4" y="242" fill="currentColor">Type1 / CSL: a^n b^n c^n</text><circle cx="140" cy="120" r="54" fill="none" stroke="#35d0ba"/><text text-anchor="start" x="4" y="258" fill="#35d0ba">Type2 / CFL: a^n b^n</text><circle cx="140" cy="130" r="28" fill="none" stroke="#ec3013"/><text x="140" y="128" fill="#ec3013">Type3</text><text text-anchor="start" x="4" y="274" fill="#ec3013">regular: a*b*</text></g></svg>' },
+  { id:'containment-chain', caption:'The strict containment chain', svg:'<svg viewBox="0 0 300 90" width="100%" style="max-width:420px;height:auto" xmlns="http://www.w3.org/2000/svg"><g font-size="10" text-anchor="middle"><text x="25" y="20">Reg</text><text x="70" y="20">DCFL</text><text x="115" y="20">CFL</text><text x="160" y="20">CSL</text><text x="200" y="20">REC</text><text x="245" y="20">RE</text><text x="285" y="20">ALL</text><path d="M35 15 L60 15" stroke="currentColor" marker-end="url(#a32)"/><path d="M85 15 L105 15" stroke="currentColor" marker-end="url(#a32)"/><path d="M130 15 L150 15" stroke="currentColor" marker-end="url(#a32)"/><path d="M170 15 L190 15" stroke="currentColor" marker-end="url(#a32)"/><path d="M212 15 L235 15" stroke="currentColor" marker-end="url(#a32)"/><path d="M255 15 L275 15" stroke="currentColor" marker-end="url(#a32)"/><defs><marker id="a32" markerWidth="6" markerHeight="6" refX="4" refY="2" orient="auto"><path d="M0,0 L4,2 L0,4" fill="none" stroke="currentColor"/></marker></defs></g><text x="150" y="45" font-size="10" text-anchor="middle" fill="#35d0ba">every arrow is a STRICT subset (a witness language separates each pair)</text><text x="150" y="65" font-size="10" text-anchor="middle">RE itself is a strict subset of ALL languages (RE is countable, ALL is not)</text></svg>' }
+];
+(function(){ var t = window.GATE_DATA.questions['toc'].topics.find(function(t){return t.id==='toc-hierarchy';});
+  t.theory.core = t.theory.core.replace('Chomsky\'s four types are defined by restrictions', '[[FIG:chomsky-rings]]\n\nChomsky\'s four types are defined by restrictions'); })();
+(function(){ var t = window.GATE_DATA.questions['toc'].topics.find(function(t){return t.id==='toc-hierarchy';});
+  t.theory.core = t.theory.core.replace('The containment chain.', '[[FIG:containment-chain]]\n\nThe containment chain.'); })();
+
+(function(){ var t = window.GATE_DATA.questions['toc'].topics.find(function(t){return t.id==='toc-regular';});
+  t.theory.deep = (t.theory.deep||'') + `
+
+FROM ZERO: FOUNDATIONS
+
+• Alphabet. An alphabet (written Sigma) is just a finite, non-empty set of symbols you agree to use, like {0,1} or {a,b}. Nothing more mystical than the set of letters you are allowed to write with.
+• String. A string (or word) is a finite sequence of symbols from Sigma, written by just juxtaposing them: 011 is a string over {0,1}. The empty string, written epsilon, is the unique string of length 0 - it contains no symbols at all, but it is still a perfectly valid string.
+• Language. A language is simply a SET of strings over some alphabet - nothing about grammar or meaning, purely set membership. L = {0, 00, 000} is a language; so is Sigma* (the set of ALL possible strings over Sigma, including epsilon); so is the empty set {} (a language with zero strings in it).
+• State. A state is a snapshot of "how much of the pattern-so-far has been recognised" - think of it as a labelled box the machine can be sitting in at any instant. A finite automaton has finitely many such boxes, and that finiteness is the entire reason regular languages are limited (no box can count arbitrarily high).
+• Transition. A transition is simply a rule "if you are in box X and you read symbol s, move to box Y". A DFA (deterministic finite automaton) has EXACTLY one transition per state per input symbol - no choices, no gaps (a complete DFA has a transition drawn for every symbol from every state, using a dead state if needed). An NFA (nondeterministic finite automaton) is allowed zero, one, or many transitions for a given state-symbol pair, and may additionally have epsilon-transitions: moves the machine can take WITHOUT consuming any input symbol at all, purely by choice.
+
+EVERY EDGE CASE
+
+GATE TRAP: epsilon (the empty STRING, length 0) is completely different from the empty LANGUAGE {} (a set containing zero strings). A DFA can easily accept the language {epsilon} (just accept at the start state on no further input) while a machine accepting the empty language {} has no accepting state reachable at all - these are two entirely different concepts that examiners deliberately swap in wording.
+GATE TRAP: a dead state (a non-accepting state from which no accepting state is ever reachable, on any input) is still a REAL, necessary state that must be counted in "minimum number of states" questions. Forgetting the dead/trap state and undercounting by one is one of the single most common GATE numerical-answer errors (see Q11 above).
+GATE TRAP: an unreachable state (one the start state can never reach on any input string) must be DELETED before minimizing - unreachable states are never merged with anything, they are simply removed, and failing to prune them first can make the table-filling method give wrong distinguishability results.
+GATE TRAP: epsilon-transitions exist ONLY in NFA definitions (specifically NFA-epsilon); a DFA by definition never has them - if a diagram claims to be a "DFA" but shows an epsilon-labelled arrow, the diagram is self-contradictory and any question built on it should be answered using NFA rules.
+KEY: NFA and DFA are equal in EXPRESSIVE POWER (every NFA has an equivalent DFA and vice versa) but NOT equal in SIZE - subset construction can blow an n-state NFA up to 2^n DFA states, and this bound is tight (achieved, not just an upper limit) for specific witness languages.
+
+WORKED EXAMPLE 1 - full subset construction
+
+Let the NFA have states {q0, q1, q2}, alphabet {a,b}, start q0, accepting {q2}, and transitions: q0 --a--> q0, q0 --a--> q1, q0 --b--> q0, q1 --b--> q2 (this NFA guesses when the "second-to-last-a" pattern a?b starts; it recognises strings ending in ab).
+1. Start set: {q0} (epsilon-closure of the start state; no epsilon moves here so it's just {q0}).
+2. From {q0} on a: NFA moves q0->q0 and q0->q1, so the new DFA state is {q0,q1}. From {q0} on b: only q0->q0, so stay at {q0}.
+3. From {q0,q1} on a: q0 contributes {q0,q1} again (q0->q0, q0->q1); q1 has no a-transition. Union = {q0,q1}. From {q0,q1} on b: q0->q0 and q1->q2, giving {q0,q2}.
+4. From {q0,q2} on a: only q0 contributes, giving {q0,q1} (q2 is dead-end here, contributes nothing). From {q0,q2} on b: q0->q0, q2 has no transition, giving {q0} - but since q2 was in the set, this DFA state {q0,q2} IS accepting (contains q2).
+5. Final DFA states: {q0} (start), {q0,q1}, {q0,q2} (accepting). All three are reachable, and this matches the informal expectation for "ends in ab": 3 states.
+
+WORKED EXAMPLE 2 - table-filling minimization
+
+DFA over {0,1}: states A(start),B,C,D; D is a dead/trap state. F = {C}. Transitions: A-0->B, A-1->A; B-0->B, B-1->C; C-0->B, C-1->A; suppose D never appears reachable in this particular machine (already pruned).
+1. Mark all pairs (X,Y) where exactly one of X,Y is accepting: (A,C), (B,C) get marked distinguishable immediately (C is accepting, A and B are not).
+2. Check the unmarked pair (A,B): on symbol 0, A goes to B and B goes to B - both land in the SAME state, no info yet. On symbol 1, A goes to A and B goes to C - and (A,C) is ALREADY marked distinguishable, so (A,B) must also be marked distinguishable (their 1-successors are distinguishable).
+3. No pairs remain unmarked, so all three states A, B, C are pairwise distinguishable - the DFA is already minimal with 3 states. (If any pair had survived every round unmarked, those two states would be merged into one.)
+
+WORKED EXAMPLE 3 - pumping lemma proof that {a^n b^n : n>=0} is not regular
+
+1. Assume for contradiction that L = {a^n b^n} is regular; let p be its pumping length (guaranteed to exist by the lemma).
+2. Choose w = a^p b^p (this is in L and has length 2p >= p, satisfying the lemma's precondition).
+3. The lemma guarantees a split w = xyz with |xy| <= p, |y| >= 1. Since |xy| <= p and the first p symbols of w are all a's, xy must consist ENTIRELY of a's, so y = a^k for some k >= 1.
+4. Pump with i=2: xy^2z = a^(p+k) b^p. This string has MORE a's than b's (p+k versus p, and k >= 1), so it is NOT in L.
+5. This contradicts the pumping lemma's guarantee that xy^iz must remain in L for every i>=0. Contradiction means the assumption was false: L is not regular. This exact five-step template (assume regular, pick w depending on p, note the forced position of y, choose a convenient i, derive a contradiction) is the one to reuse on every pumping-lemma question.
+
+REMEMBER: the pumping lemma proof ALWAYS gets to CHOOSE w (after p is fixed by the adversary) and gets to CHOOSE i, but has NO control over exactly where xy splits inside w beyond the constraints |xy|<=p and |y|>=1 - the proof must work for every possible legal split the adversary picks, which is why w is chosen so that any valid split is forced into a predictable region (like "all a's" above).`; })();
+
+(function(){ var t = window.GATE_DATA.questions['toc'].topics.find(function(t){return t.id==='toc-cfl';});
+  t.theory.deep = (t.theory.deep||'') + `
+
+FROM ZERO: FOUNDATIONS
+
+• Grammar. A grammar is a set of rewrite RULES for generating strings, built from two kinds of symbols: terminals (the actual alphabet symbols that appear in final strings, e.g. a, b) and non-terminals (placeholder "variable" symbols, conventionally capital letters, that get expanded further). One non-terminal is marked the start symbol.
+• Production. A production is one rewrite rule, written LHS -> RHS, meaning "wherever the LHS non-terminal appears, you may replace it with the RHS string of terminals/non-terminals". A context-FREE production always has exactly ONE non-terminal alone on the left (no surrounding context required to apply it - that is the literal meaning of "context-free").
+• Derivation. A derivation is a sequence of rewriting steps starting from the start symbol and ending at a string of terminals only, applying one production at a time. Term. Leftmost derivation always expands the leftmost non-terminal first; rightmost derivation always expands the rightmost one - both can produce the same final string, just via different orders of expanding the same tree.
+• Parse tree. A parse tree draws the derivation as a tree: the root is the start symbol, each internal node is a non-terminal with its children being the RHS symbols of the production used to expand it, and the leaves read left to right spell out the generated string. One parse tree can correspond to MANY different derivation orders (leftmost, rightmost, or mixed), but each represents the same underlying structure.
+• Pushdown automaton (PDA). A PDA is a finite automaton plus one unbounded stack: at each step it reads an input symbol (or epsilon), looks at the top of the stack, and based on both, moves to a new state and pushes/pops symbols on the stack. The stack is what lets a PDA count/match things a plain finite automaton cannot.
+
+EVERY EDGE CASE
+
+GATE TRAP: unit production (A -> B, a single non-terminal producing a single other non-terminal) and null/epsilon production (A -> epsilon) must both be eliminated before converting a grammar to Chomsky Normal Form (CNF); forgetting to remove them first is the most common CNF-conversion mistake.
+GATE TRAP: left recursion (A -> A alpha | beta) makes a grammar unusable for top-down/recursive-descent or LL parsing (it causes infinite recursion without consuming input) and must be eliminated by rewriting: A -> beta A', A' -> alpha A' | epsilon. Left FACTORING is a completely different fix for a completely different problem - it applies when two productions for the same non-terminal share a common prefix (A -> alpha beta1 | alpha beta2), making the parser unable to decide which to pick by just one lookahead symbol; the fix is A -> alpha A', A' -> beta1 | beta2. Confusing these two distinct techniques (recursion elimination vs. prefix factoring) is a frequent GATE trap.
+GATE TRAP: a grammar is ambiguous if SOME string has two or more distinct parse trees (or, equivalently, two distinct leftmost derivations). A language is inherently ambiguous if EVERY grammar generating it is ambiguous - no rewriting can ever remove the ambiguity. Ambiguity is a property of a GRAMMAR (often fixable by rewriting); inherent ambiguity is a property of the LANGUAGE ITSELF (unfixable). The classic inherently ambiguous language example is {a^i b^j c^k : i=j or j=k}.
+GATE TRAP: DCFL (deterministic context-free languages, accepted by a PDA that never needs to guess/branch) is a STRICT subset of CFL. Crucially, DCFLs are closed under COMPLEMENT, but general CFLs are NOT closed under complement - this asymmetry is a favourite true/false target. {ww^R} (even-length palindromes) is a CFL but is NOT a DCFL, because recognising it requires guessing the exact midpoint.
+KEY: CFL closure summary - closed under union, concatenation, Kleene star, substitution, homomorphism, and intersection WITH A REGULAR language; NOT closed under intersection (of two CFLs), NOT closed under complement, and NOT closed under difference (in general). This is the single most heavily tested closure table in this topic - contrast sharply with regular languages, which ARE closed under all of intersection, complement, and difference.
+
+WORKED EXAMPLE 1 - full FIRST/FOLLOW computation
+
+Grammar: S -> A B, A -> a A | epsilon, B -> b B | c.
+1. FIRST(A): A can derive epsilon directly, so epsilon is in FIRST(A). A -> a A also starts with terminal a, so a is in FIRST(A). FIRST(A) = {a, epsilon}.
+2. FIRST(B): B -> b B gives b; B -> c gives c. FIRST(B) = {b, c} (no epsilon, since B cannot derive the empty string - every production produces at least one terminal).
+3. FIRST(S): S -> A B. Since A can be epsilon, FIRST(S) includes FIRST(A) minus epsilon, PLUS (because A is nullable) FIRST(B) too. FIRST(S) = {a, b, c}.
+4. FOLLOW(S): S is the start symbol, so $ (end marker) is always in FOLLOW(S). FOLLOW(S) = {$}.
+5. FOLLOW(A): A is followed by B in the production S -> A B, so everything in FIRST(B) that isn't epsilon goes into FOLLOW(A): {b, c}. Also, since B can eventually derive down to nothing extra AFTER A in no other rule, and A -> aA has A followed by nothing further at the end of that same production body meaning FOLLOW(A) also inherits FOLLOW(A) itself (self-referential, contributes nothing new) - no epsilon-follow-through beyond B here since B is not nullable. FOLLOW(A) = {b, c}.
+6. FOLLOW(B): B appears at the end of S -> A B, so FOLLOW(B) inherits FOLLOW(S) = {$}. Also B -> bB puts B at the end of its own production, so FOLLOW(B) inherits FOLLOW(B) itself, again contributing nothing new. FOLLOW(B) = {$}.
+
+WORKED EXAMPLE 2 - eliminating left recursion and left factoring together
+
+Grammar: E -> E + T | T, T -> T * F | F, F -> ( E ) | id.
+1. E has direct left recursion (E -> E + T). Rewrite: E -> T E', E' -> + T E' | epsilon.
+2. T has direct left recursion (T -> T * F). Rewrite: T -> F T', T' -> * F T' | epsilon.
+3. F -> ( E ) | id has no left recursion and the two alternatives start with different symbols ( and id, so no left factoring is needed here.
+4. Final LL(1)-ready grammar: E -> T E', E' -> + T E' | epsilon, T -> F T', T' -> * F T' | epsilon, F -> ( E ) | id. This is the textbook expression-grammar transformation GATE draws numericals and derivation questions from.
+
+WORKED EXAMPLE 3 - PDA construction sketch for balanced parentheses
+
+Language: strings of ( and ) that are properly balanced and nested.
+1. Start state q0, single stack symbol Z0 (bottom marker) plus a working symbol X.
+2. On reading (, push X onto the stack regardless of current top (accumulate "open" obligations).
+3. On reading ), pop one X from the stack (this consumes/closes one pending open-paren); if the stack shows only Z0 (empty of X's) when a ) arrives, there is no matching open, so REJECT (this branch simply has no valid transition, causing rejection).
+4. Accept by empty stack (or by reaching Z0 alone) exactly when the entire input has been consumed and every pushed X has been popped - i.e., opens and closes matched up perfectly with correct nesting order, because pops always remove the MOST RECENTLY pushed X first (last-in-first-out), which is exactly what "properly nested" requires.
+
+REMEMBER: CNF (Chomsky Normal Form) requires every production to be either A -> BC (two non-terminals) or A -> a (single terminal), with the sole exception that S -> epsilon is allowed only if S is the start symbol and S does not appear on the right side of any production. Converting to CNF is a strict multi-pass procedure: remove epsilon-productions first, then unit productions, then break long/terminal-mixed bodies into the BC or a shape - skipping a pass or doing them out of order produces an incorrect CNF grammar, a common source of GATE numerical mismatches when counting productions after conversion.`; })();
+
+(function(){ var t = window.GATE_DATA.questions['toc'].topics.find(function(t){return t.id==='toc-turing';});
+  t.theory.deep = (t.theory.deep||'') + `
+
+FROM ZERO: FOUNDATIONS
+
+• Tape. Think of the Turing machine's tape as an infinite strip of cells, each holding one symbol (initially the input string, then blanks _ everywhere else). It is "infinite" only in the sense that it never runs out of room - at any real moment only finitely many cells have been written on.
+• Head. The head is a pointer sitting over one tape cell at a time; it can read the symbol there, optionally overwrite it, and then move one cell Left or Right (or stay, in some variants).
+• Configuration/state transition here. A TM transition rule says: "if current state is q and the symbol under the head is s, then write symbol s', move Left or Right, and go to state q'". Unlike a DFA (which only reads and moves right), a TM READS, WRITES, and moves in BOTH directions - that extra power (unbounded read/write memory) is what makes it more powerful than every earlier automaton model.
+• Halting. A TM run either eventually reaches a designated accept state (and halts, accepting), reaches a reject state (and halts, rejecting), or never halts at all (loops forever) - this three-way outcome, especially the possibility of looping forever with no warning, is the entire reason decidability becomes a hard, non-trivial question for TMs, unlike for DFAs/PDAs which always eventually finish reading the input.
+• Why an "intermediate representation" of computation matters conceptually: a TM is a MODEL used to reason about what is computable in principle, not an actual physical device - it establishes a mathematical ceiling on what any algorithm, in any real programming language, could ever compute (the Church-Turing thesis: anything "effectively computable" by any reasonable model is computable by some TM).
+
+EVERY EDGE CASE
+
+KEY: Recursive (REC, also called decidable): some TM halts on every input, accepting members of L and rejecting non-members. Recursively enumerable (RE, also called semi-decidable or Turing-recognisable): some TM accepts every member of L, but on non-members it may reject OR loop forever - there is no guaranteed halt on non-membership.
+KEY: REC is closed under complement (swap accept/reject roles of the same total machine, still total, still correct). RE is NOT closed under complement in general - if L and its complement are both RE, then L is actually REC (this "RE and co-RE implies REC" fact is one of the highest-yield single sentences in the whole TOC syllabus).
+GATE TRAP: "co-RE" means the COMPLEMENT of the language is RE - it does NOT mean "not RE". A language can be RE, co-RE, both (exactly when it is REC), or neither (e.g. some pathological languages built by diagonalization are neither RE nor co-RE) - do not assume every language falls into a clean RE-or-co-RE dichotomy.
+GATE TRAP: variants of the TM (multi-tape, multi-track, two-way infinite tape, non-deterministic TM) all accept EXACTLY the same class of languages (RE) as the standard single-tape TM - none of them add computational power, only potentially speed (they may be more time-efficient, never more capable of deciding a new language).
+GATE TRAP: an unrestricted/Type-0 grammar (rules of the form alpha -> beta, with alpha containing at least one non-terminal, no shape restriction otherwise) generates EXACTLY the RE languages - this is the direct grammar-side counterpart to the TM-side definition and a common "which class corresponds to which grammar" mapping question.
+KEY: a set is countable if its elements can be listed 1st, 2nd, 3rd, ... (possibly forever) without missing any - the set of all TM descriptions (finite strings over a finite alphabet) is countable, so there are only countably many RE languages, but the set of ALL possible languages over any fixed alphabet is uncountable (Cantor's diagonal argument on the power set of strings) - hence almost all languages are NOT RE, they are not even describable by any algorithm at all.
+
+WORKED EXAMPLE 1 - TM design for {a^n b^n c^n : n >= 0}
+
+1. If the tape is empty (n=0 case), accept immediately (a^0b^0c^0 is the empty string, which trivially satisfies the pattern).
+2. Otherwise repeat: scan right from the left end, find the LEFTMOST unmarked a, mark it (e.g. overwrite with X), then continue scanning right past remaining a's and b's to find the LEFTMOST unmarked b, mark it (overwrite with Y), then continue right to find the leftmost unmarked c, mark it (overwrite with Z).
+3. After marking one a, one b, one c, move the head back to the left end (scan left until off the marked region) and repeat step 2, marking the next unmarked a, b, c triple.
+4. If at any repetition an a is found but no corresponding unmarked b or unmarked c exists before hitting a blank or the wrong symbol, reject. If all a's, b's, c's get marked in lockstep and the tape becomes entirely X's, Y's, Z's with nothing left unmarked, accept. This "mark one of each per pass" technique is the standard way to verify a 1:1:1 count matching that no finite-state or single-stack machine could ever check.
+
+WORKED EXAMPLE 2 - closure argument: REC closed under complement, RE not necessarily
+
+1. Suppose L is REC via total TM M (halts on every input, accepting L, rejecting complement of L). Build M' identical to M but with accept/reject states swapped. M' is still total (halts on the same inputs M did) and accepts exactly the complement of L. So complement of L is REC too - REC is closed under complement. QED for this direction.
+2. Now suppose L is RE via TM N that may loop on non-members. Try the same swap trick: make N' swap accept/reject. But if N loops forever on some non-member w (never reaching either state), N' ALSO loops forever on w - N' still fails to halt on w, so N' does not demonstrate that complement of L is RE (semi-deciding requires accepting all members of the complement, but N' provides no guarantee about the loop cases). This is exactly why the accept/reject-swap trick, which works perfectly for REC, breaks down for RE - the failure mode is the uncontrolled infinite loop.
+
+WORKED EXAMPLE 3 - proving the Halting Problem is RE but not REC (sketch)
+
+1. RE membership: build a universal TM U that, on input <M, w> (encoding of machine M and string w), simulates M running on w step by step. If M halts (accept or reject), U accepts <M,w>. If M never halts, U also never halts. This U is exactly a semi-decider for the Halting Problem - it accepts every halting instance, and never falsely accepts, so Halting Problem is RE.
+2. Not REC (by contradiction): suppose a total decider H existed for the Halting Problem: H(<M,w>) always halts, outputting yes if M halts on w, no otherwise. Construct a new machine D that, on input <M>, runs H(<M,M>) and does the OPPOSITE - if H says M halts on M, D loops forever; if H says M does not halt on M, D halts. Now ask: does D halt on input <D> itself? If it does, then by D's own definition D must loop - contradiction. If it loops, then by D's own definition D must halt - contradiction either way. So no such total H can exist: the Halting Problem is not decidable (not REC), while still being RE (from step 1). This diagonalization pattern (build a machine that contradicts what the assumed decider says about itself) is the master template reused throughout the decidability topic.`; })();
+
+(function(){ var t = window.GATE_DATA.questions['toc'].topics.find(function(t){return t.id==='toc-decidability';});
+  t.theory.deep = (t.theory.deep||'') + `
+
+FROM ZERO: FOUNDATIONS
+
+• Decision problem. A decision problem is any question with a YES/NO answer that must be answered for every possible input in some infinite family (e.g. "does this DFA accept any string at all?", asked for every possible DFA). It is naturally encoded as a language: the set of all input-encodings whose answer is YES.
+• Decidable/undecidable. A decision problem is decidable exactly when its corresponding language is REC (recursive) - some algorithm always halts with the correct yes/no. It is undecidable when no such always-halting algorithm can exist, even in principle, no matter how clever.
+• Reduction. A reduction from problem A to problem B is an algorithm that transforms any instance of A into an instance of B such that "A's instance is a yes-instance" if and only if "B's transformed instance is a yes-instance". Term. If A reduces to B and B is decidable, then A is decidable too (just transform, then use B's decider). Contrapositive, which is how reductions are actually used on GATE: if A is KNOWN undecidable and A reduces to B, then B must ALSO be undecidable (if B were decidable, that would make A decidable too, a contradiction).
+• Property of a language vs. property of a machine. A property of a LANGUAGE only depends on the SET of strings accepted (e.g. "L is empty", "L is finite", "L contains at least one palindrome") - it does not care which particular machine/grammar produced that set. A property of a MACHINE additionally depends on machine-specific structure (e.g. "M has exactly 5 states", "M's transition table has a specific shape") - two different machines can accept the exact same language yet differ wildly in such syntactic properties.
+
+EVERY EDGE CASE
+
+KEY: Rice's theorem says every NON-TRIVIAL property of the LANGUAGE recognised by a Turing machine is undecidable. "Non-trivial" means the property is true for SOME RE languages and false for OTHERS (not universally true or universally false, since a universal property is trivially decidable - always answer the same fixed way).
+GATE TRAP: Rice's theorem applies ONLY to semantic properties of the LANGUAGE a TM recognises (e.g. "L(M) is empty", "L(M) is regular", "L(M) is finite", "L(M) contains the string 001"). It does NOT apply to syntactic/structural properties of the MACHINE'S DESCRIPTION itself (e.g. "M has at least 10 states", "M's transition table has an unused state", "M's description string has even length") - those CAN be decidable, since you can just inspect the machine's code directly without ever running it. Applying Rice's theorem to a machine-structure property is a guaranteed-wrong-answer trap GATE sets deliberately.
+KEY: standard decidability catalogue to MEMORISE cold - for DFAs/NFAs: emptiness, membership (does M accept w), equivalence of two DFAs, and finiteness are all DECIDABLE. For CFGs/PDAs: membership and emptiness are DECIDABLE, but AMBIGUITY of a CFG, equivalence of two CFGs, and "is a CFG inherently ambiguous" are all UNDECIDABLE. For Turing machines: membership (does M accept w) is UNDECIDABLE in general (only semi-decidable/RE), and virtually every non-trivial semantic question about a TM's language (emptiness, finiteness, regularity, equivalence to another TM) is UNDECIDABLE by Rice's theorem.
+GATE TRAP: reduction DIRECTION matters and is the single most common source of lost marks. To prove B is undecidable using a known-undecidable A, you must reduce A to B (transform A-instances into B-instances) - NOT the other way around. Reducing a known-undecidable problem FROM a target problem (i.e. B to A) proves nothing about B's decidability; it is a backwards, useless reduction for this purpose.
+GATE TRAP: the Post Correspondence Problem (PCP) - given pairs of strings (top_i, bottom_i), does some sequence of indices make the concatenated top strings equal the concatenated bottom strings? - is UNDECIDABLE in general, and is the standard tool many decidability proofs (and GATE-adjacent theory courses) reduce FROM to prove ambiguity/equivalence undecidability results for CFGs.
+
+WORKED EXAMPLE 1 - classify five properties as decidable or undecidable
+
+1. "Does DFA M accept string w?" - DECIDABLE: simulate M on w for exactly |w| steps (a DFA always finishes reading the whole string in exactly |w| transitions, no risk of looping), then check the ending state.
+2. "Is L(M) empty for a given PDA M?" - DECIDABLE: convert the PDA's grammar to CNF and check whether the start symbol can derive any terminal string using a bottom-up "which non-terminals are generating" reachability computation (a finite, terminating procedure).
+3. "Is L(M) empty for a given Turing machine M?" - UNDECIDABLE by Rice's theorem: emptiness is a non-trivial semantic property of the language (some RE languages are empty, some are not), so no algorithm can decide it in general for arbitrary TMs.
+4. "Does Turing machine M have exactly 17 states?" - DECIDABLE: this is purely a syntactic property of the machine's description (just count the states listed in the encoding) - Rice's theorem does NOT apply here because it is not a property of the language M recognises.
+5. "Is CFG G ambiguous?" - UNDECIDABLE: this is a classical result proved via reduction from PCP, and it is one of the standard named-undecidable results (alongside CFG-equivalence and CFG-is-Sigma*) worth memorising directly rather than re-deriving.
+
+WORKED EXAMPLE 2 - applying Rice's theorem step by step
+
+Question: is "L(M) is regular" decidable, for M an arbitrary Turing machine?
+1. Identify the property: P = {languages L : L is regular}, restricted to RE languages (since only RE languages are ever L(M) for some TM M).
+2. Check non-triviality: is there an RE language that IS regular? Yes - e.g. Sigma* itself, recognised by a trivial TM. Is there an RE language that is NOT regular? Yes - e.g. {a^n b^n}, which is RE (even REC) but provably not regular. Since the property is true for some and false for other RE languages, it is non-trivial.
+3. By Rice's theorem, any non-trivial property of the RE languages is undecidable when phrased as "given a TM M, does L(M) have property P?" - so "is L(M) regular?" is UNDECIDABLE, full stop, regardless of how clever an algorithm one tries to design.
+
+WORKED EXAMPLE 3 - a correct reduction to show a new problem is undecidable
+
+Claim: "Given a TM M, does M accept at least one string of even length?" is undecidable. Prove it by reducing the (known-undecidable) Halting Problem to it.
+1. Given an arbitrary instance <M, w> of the Halting Problem (does M halt on w?), construct a new machine M' as follows: on any input x, M' first ignores x, simulates M on the FIXED string w; if that simulation halts, M' then accepts x (accepting every input, including even-length ones) - if the simulation never halts, M' also never halts on x.
+2. If M halts on w, then M' accepts EVERY string, including plenty of even-length ones - so "M' accepts at least one even-length string" is YES. If M never halts on w, M' never accepts anything at all (it never finishes the simulation step) - so the answer is NO.
+3. This transformation is computable (just paste M and w into a fixed template) and correctly preserves the yes/no answer, so it is a valid reduction from the Halting Problem to this new problem. Since the Halting Problem is undecidable and reduces TO this new problem, the new problem must be undecidable too (if it were decidable, we could decide the Halting Problem by reducing to it, contradiction).`; })();
+
+(function(){ var t = window.GATE_DATA.questions['toc'].topics.find(function(t){return t.id==='toc-hierarchy';});
+  t.theory.deep = (t.theory.deep||'') + `
+
+FROM ZERO: FOUNDATIONS
+
+• Chomsky hierarchy, plainly. Noam Chomsky classified grammars into four types based purely on what SHAPE their production rules are allowed to take - more restrictive shapes generate smaller, "weaker" language families; fewer restrictions generate larger, more powerful families. It is purely a classification of RULE SHAPES, nothing about meaning.
+• Type-3 (regular). Every production has the shape A -> a or A -> aB (or A -> Ba, consistently one side) - a single non-terminal produces at most one terminal followed by at most one non-terminal. This is exactly what a finite automaton's transitions correspond to.
+• Type-2 (context-free). Every production has EXACTLY one non-terminal alone on the left (A -> alpha, any string alpha on the right) - the non-terminal can be replaced "regardless of context", hence the name. Accepted by pushdown automata.
+• Type-1 (context-sensitive). Every production has the shape alpha A beta -> alpha gamma beta, where gamma is non-empty (the RHS is never shorter than the LHS, except a single allowed S -> epsilon rule) - the replacement of A into gamma is only permitted in the specific surrounding CONTEXT alpha _ beta, hence "context-sensitive". Accepted by linear-bounded automata (a TM restricted to using only the input-length worth of tape).
+• Type-0 (unrestricted/recursively enumerable). No shape restriction at all beyond having at least one non-terminal on the left. Accepted by a general, unrestricted Turing machine.
+• Recursive (REC) languages sit as an extra, important class squeezed strictly between context-sensitive and Type-0/RE - every context-sensitive language is decidable (REC), and every REC language is RE, but REC itself is not one of Chomsky's original four numbered types; it is a machine-based (not grammar-shape-based) classification laid on top of the hierarchy.
+
+EVERY EDGE CASE
+
+KEY: the strict containment chain to memorise cold - Regular subset-of DCFL subset-of CFL subset-of CSL subset-of REC subset-of RE subset-of (the set of ALL languages). Every single inclusion is STRICT (proper) - a witness language exists separating every consecutive pair, and RE itself is a proper subset of all languages (RE is countable, the set of all languages is uncountable).
+GATE TRAP: "L is context-free" and "L is not regular" can BOTH be true statements about the exact same language at the same time (e.g. {a^n b^n}) - being not-regular does not stop a language from still being classified precisely as context-free. Exam options often ask for the TIGHTEST correct classification, and a technically-true-but-looser classification (like just "it's a CFL" when it's actually regular) is the wrong choice if a tighter one is available.
+GATE TRAP: closure properties do NOT transfer uniformly up the hierarchy. Regular languages are closed under intersection AND complement; CFLs are closed under NEITHER in general (only closed under intersection with a REGULAR language specifically); context-sensitive languages ARE closed under intersection and complement (complementation of CSLs was a famously hard open problem, resolved positively - the Immerman-Szelepcsenyi theorem); recursive languages are closed under complement (swap accept/reject on a total TM); RE languages are closed under union and intersection but NOT under complement in general.
+GATE TRAP: every regular language is trivially also context-free, context-sensitive, recursive, and RE (the hierarchy nests upward) - a true/false question asserting "L is regular, therefore L is not a CFL" is simply false; regular is the STRONGEST classification, not a separate, disjoint one.
+KEY: grammar-shape to machine-model to language-family correspondence (memorise the whole row together): Type-3/regular grammar <-> finite automaton <-> regular language; Type-2/CFG <-> pushdown automaton <-> CFL; Type-1/context-sensitive grammar <-> linear-bounded automaton <-> CSL; Type-0/unrestricted grammar <-> Turing machine <-> RE language.
+
+WORKED EXAMPLE 1 - classify {a^n b^n c^n : n >= 0} through the whole hierarchy
+
+1. Is it regular? No - by the Myhill-Nerode/pumping-lemma argument (unboundedly many distinguishable prefixes a^n, since matching against b^nc^n requires remembering n exactly).
+2. Is it context-free? No - it requires matching TWO independent counts simultaneously (n against the b's AND n against the c's), which a single stack (which can only reliably compare ONE pair of counts via push/pop) cannot enforce; this can be proven with the CFL pumping lemma.
+3. Is it context-sensitive? Yes - a linear-bounded automaton (TM restricted to tape length = input length) can mark off one a, one b, one c per pass exactly as in the earlier TM construction, using only the space already on the tape, never needing extra space beyond the input's own length.
+4. Final answer: {a^n b^n c^n} is context-sensitive but not context-free (and hence also not regular). Tightest correct classification: CSL.
+
+WORKED EXAMPLE 2 - classify the language of syntactically valid, balanced-bracket well-formed formulas with equal nesting depth constraint of at most a FIXED constant k
+
+1. Since the nesting depth is bounded by a FIXED constant k (not growing with input length), the automaton only ever needs to track a depth counter from 0 to k - that is a FINITE amount of information (k+1 possible counter values), regardless of how long the input string gets.
+2. A finite automaton CAN track a bounded counter (0 through k) using k+1 states for the depth, since it never needs to count higher than the fixed bound k.
+3. Therefore this restricted, depth-bounded language IS regular - contrast sharply with the UNBOUNDED-depth version (ordinary balanced parentheses with no depth limit), which is a classic non-regular, properly context-free language (it needs the unbounded stack precisely because depth is unbounded). This pair of examples is a favourite GATE contrast: "matched parentheses" alone (unbounded) versus "matched parentheses up to depth 5" (bounded, hence regular) can appear as two separate options in the same question.
+
+WORKED EXAMPLE 3 - is the language {ww : w is in {a,b}*} context-free?
+
+1. Try to design a PDA: to check the second half equals the first half, a machine would need to first read and REMEMBER the entire first half w on the stack, then compare it against the second half.
+2. The problem: a stack is LIFO (last-in-first-out) - popping it while reading the second half would retrieve the first half in REVERSED order, letting you check w against w^R (reverse) easily (that language {w w^R}, even-length palindromes, IS context-free), but NOT w against w again in the same order, since comparison requires reading the remembered first half forwards, not backwards.
+3. This is provably not fixable with any single-stack design; a rigorous CFL pumping lemma argument confirms {ww} is not context-free. It IS, however, context-sensitive (a linear-bounded automaton, with random tape access rather than LIFO-only access, can directly index-compare corresponding positions). So {ww} sits one level higher than {ww^R} in the strict hierarchy - a frequently tested pair precisely because they look superficially similar but classify two levels apart.`; })();
+
+(function(){ var t = window.GATE_DATA.questions['toc'].topics.find(function(t){return t.id==='toc-regular';});
+  t.theory.deep += '\n\nQUICK-RECALL CARDS\n\nKEY: minimal DFA state-counting cheat sheet - "count mod k" needs k states; "contains substring s" needs |s|+1 states; "ends with suffix s" needs |s|+1 states (structure differs slightly but count is the same); independent AND conditions multiply (product construction), and the product is TIGHT only when the two conditions share no dependency.\nKEY: every finite language is regular, no exceptions - regardless of how large or oddly shaped it is, a finite union of singleton-string DFAs (or one big explicit-path DFA) always exists.\nKEY: NFA to DFA never loses expressive power (equal languages) but can cost exponential blow-up in STATE COUNT (2^n worst case, tight bound, not just an upper bound).\nREMEMBER: Myhill-Nerode class count = minimal DFA state count, always exactly equal - this identity is often the fastest route to a numerical answer, faster than actually drawing the DFA.'; })();
+
+(function(){ var t = window.GATE_DATA.questions['toc'].topics.find(function(t){return t.id==='toc-cfl';});
+  t.theory.deep += '\n\nQUICK-RECALL CARDS\n\nKEY: CFL closure cheat sheet - closed under union, concatenation, star, homomorphism, and intersection-with-regular; NOT closed under intersection (CFL with CFL), complement, or set difference in general.\nKEY: DCFL is closed under complement (unlike general CFL) - this single asymmetry is a recurring true/false trap.\nKEY: the three anchor languages to memorise together - {a^n b^n} is a DCFL, {w w^R} is a CFL but not deterministic, {a^n b^n c^n} is not context-free at all.\nREMEMBER: left recursion elimination and left factoring are DIFFERENT fixes for DIFFERENT problems - recursion elimination removes A -> A alpha patterns, factoring removes shared-prefix alternatives; never apply one when the grammar actual problem is the other.'; })();
+
+(function(){ var t = window.GATE_DATA.questions['toc'].topics.find(function(t){return t.id==='toc-turing';});
+  t.theory.deep += '\n\nQUICK-RECALL CARDS\n\nKEY: REC is closed under complement; RE is NOT closed under complement in general; if a language is BOTH RE and co-RE, it is necessarily REC - memorise this chain as one unit.\nKEY: every TM variant (multitape, two-way infinite tape, non-deterministic) recognises exactly RE, no more, no less - variants change speed, never computational power.\nREMEMBER: the halting problem is the canonical RE-but-not-REC language - semi-decidable via direct simulation, undecidable via the diagonalization contradiction argument.'; })();
+
+(function(){ var t = window.GATE_DATA.questions['toc'].topics.find(function(t){return t.id==='toc-decidability';});
+  t.theory.deep += '\n\nQUICK-RECALL CARDS\n\nKEY: Rice\'s theorem applies ONLY to non-trivial semantic properties of the LANGUAGE a TM recognises, never to syntactic properties of the machine description itself (state count, description length, presence of an unused state are all decidable).\nKEY: DFA/NFA decidable set - emptiness, membership, equivalence, finiteness all decidable. CFG decidable set - membership, emptiness decidable; ambiguity, equivalence, inherent-ambiguity all UNDECIDABLE.\nKEY: reduction direction rule - to prove B undecidable, reduce a KNOWN-undecidable A into B (transform A-instances to B-instances); reducing B into A proves nothing about B.\nREMEMBER: PCP (Post Correspondence Problem) is undecidable and is the standard source problem reduced FROM to prove CFG-ambiguity and CFG-equivalence undecidability.'; })();
+
+(function(){ var t = window.GATE_DATA.questions['toc'].topics.find(function(t){return t.id==='toc-hierarchy';});
+  t.theory.deep += '\n\nQUICK-RECALL CARDS\n\nKEY: strict containment chain to recite instantly - Regular < DCFL < CFL < CSL < REC < RE < ALL languages, every inclusion strict, witness language exists for each gap.\nKEY: grammar-machine-language triples - Type-3/finite automaton/regular; Type-2/pushdown automaton/CFL; Type-1/linear-bounded automaton/CSL; Type-0/Turing machine/RE.\nKEY: closure does not transfer uniformly up the hierarchy - regular is closed under intersection and complement, CFL is closed under NEITHER (only intersection-with-regular), CSL is closed under both, REC is closed under complement, RE is closed under union/intersection but not complement.\nREMEMBER: "not regular" and "context-free" can both be true of the same language simultaneously - always report the TIGHTEST correct classification, not just any true one.'; })();
