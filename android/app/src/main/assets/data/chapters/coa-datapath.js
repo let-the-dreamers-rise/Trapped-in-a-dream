@@ -50,6 +50,17 @@ A VERTICAL microinstruction ENCODES its control signals (much like a small "mini
 
 GATE TRAP: describing horizontal versus vertical microinstructions PURELY in terms of "control store SIZE" alone, without mentioning the actual underlying cause (ENCODING and PARALLELISM), misses the real distinguishing feature the exam is testing — horizontal is wide specifically because it is UNENCODED (one bit per signal, enabling full parallelism), and vertical is narrow specifically because it IS encoded (multiple signals share a field, requiring a decoder and sacrificing some parallelism); the size difference is a CONSEQUENCE of the encoding choice, not the defining property itself.
 
+SIZING AN ENCODED FIELD: THE "PLUS ONE FOR NO SIGNAL ACTIVE" CONVENTION
+
+When a vertical microinstruction's mutually-exclusive signal group is sized, the number of encoding bits needed is ⌈log2(k)⌉ for a group of k possible signals ONLY if EXACTLY one signal from that group is always active on every single microinstruction. In practice, many microinstructions need NONE of a given group's signals active at all (that group's control field is simply "idle" for that instruction) — this extra "nothing selected" possibility is itself one more distinct code the field must be able to represent, alongside the k genuine signal choices.
+
+1. WHEN a group's encoded field must ALSO be able to represent "no signal in this group is active" as one of its own distinct patterns, the field must encode (k+1) total possibilities (the k real signals, plus the one idle/no-op code), requiring ⌈log2(k+1)⌉ bits rather than the simpler ⌈log2(k)⌉.
+2. RECOGNISING which convention a specific question intends is essential: if the question's own setup guarantees exactly one signal per group is always selected (no idle option), use ⌈log2(k)⌉ directly; if the setup allows a group to sit entirely idle on some microinstructions (the more realistic, and more commonly intended, case in practice), use ⌈log2(k+1)⌉ instead.
+
+GATE TRAP: applying the simpler ⌈log2(k)⌉ formula to a group that CAN be idle (no signal from that group active at all) undercounts the needed bits by exactly enough to make the "idle" case unrepresentable — always check explicitly whether a control-signal group can ever have nothing selected before choosing between ⌈log2(k)⌉ and ⌈log2(k+1)⌉.
+
+1. Worked example (encoding with the idle-code adjustment, independently verified): a vertical microinstruction has four mutually-exclusive signal groups of sizes 7, 6, 3, and 15, where each group may ALSO have no signal active at all on a given microinstruction. Find the number of encoding bits needed per group. Group of 7: ⌈log2(7+1)⌉=⌈log2(8)⌉=3 bits. Group of 6: ⌈log2(6+1)⌉=⌈log2(7)⌉=⌈2.81⌉=3 bits. Group of 3: ⌈log2(3+1)⌉=⌈log2(4)⌉=2 bits. Group of 15: ⌈log2(15+1)⌉=⌈log2(16)⌉=4 bits. Total: 3+3+2+4=12 bits — each group's count is one bit HIGHER than the simpler ⌈log2(k)⌉ formula would give for groups of 7, 6, and 15 specifically (where k itself is not already one less than a power of 2), directly because the "no signal active" possibility consumes one additional code point in each group's own field.
+
 MICROINSTRUCTION SEQUENCING TECHNIQUES
 
 [[FIG:micro-sequencing-techniques]]

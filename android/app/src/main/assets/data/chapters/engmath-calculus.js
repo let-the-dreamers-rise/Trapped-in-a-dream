@@ -73,6 +73,17 @@ COMPARISON TABLE: Rolle's theorem needs the extra condition f(a)=f(b), which MVT
 
 GATE TRAP: applying Rolle's theorem to a function where f(a)≠f(b) is invalid — only the more general MVT applies in that case, guaranteeing a point matching the AVERAGE slope, which is generally NONZERO, not a point of zero slope; confusing which of the two theorems applies is a frequent, easily avoided error, and the single check that resolves it is simply comparing f(a) and f(b) directly before invoking either theorem.
 
+THE MEAN VALUE THEOREM FOR INTEGRALS
+
+A DISTINCT theorem sharing MVT's name but stated for INTEGRALS rather than derivatives: if f is continuous on [a,b], there EXISTS at least one point c in (a,b) such that f(c) = (1/(b−a)) × ∫[a to b] f(x)dx — the AVERAGE VALUE of f over the interval (the integral divided by the interval's own length) is ACTUALLY ATTAINED by f at some point c inside the interval, not merely approached.
+
+1. WHY this holds: by the Extreme Value Theorem, a continuous f on [a,b] attains some minimum value m and maximum value M on that interval. The integral of f over [a,b] must therefore lie between m(b−a) and M(b−a) (the integral is sandwiched between the rectangle of height m and the rectangle of height M, both of width b−a), so the AVERAGE VALUE (1/(b−a))∫f(x)dx lies between m and M as well. Since f is continuous, the Intermediate Value Theorem guarantees f actually ATTAINS every value between m and M somewhere on the interval — including this specific average value — at some point c.
+2. THIS IS a genuinely SEPARATE theorem from the ordinary (Lagrange) Mean Value Theorem covered above — one is a statement about a DERIVATIVE matching an average RATE of change, the other is a statement about the FUNCTION'S OWN VALUE matching its average VALUE over the interval — and confusing the two, or assuming the derivative-based MVT's hypotheses (differentiability) are needed here (only CONTINUITY is required for the integral version), is a direct source of error.
+
+GATE TRAP: citing "the Mean Value Theorem" without specifying WHICH one (the derivative-slope version, requiring differentiability, or the integral-average-value version, requiring only continuity) risks applying the wrong hypothesis or the wrong conclusion — always confirm from context whether a question's own claim is about a DERIVATIVE matching a secant slope, or a FUNCTION VALUE matching an average integral value, before judging the claim true or false.
+
+1. Worked example (Mean Value Theorem for Integrals, independently verified): confirm the theorem for f(x)=x² on [0,3]. Average value = (1/3)∫[0 to 3]x²dx = (1/3)×[x³/3] from 0 to 3 = (1/3)×9 = 3. Find c in (0,3) with f(c)=3: c²=3, so c=√3≈1.73, which does indeed lie in (0,3), confirming the theorem's guarantee directly for this specific function.
+
 MAXIMA, MINIMA, AND POINTS OF INFLECTION
 
 A CRITICAL POINT of f is a point where f'(x)=0 (or where f' fails to exist). The FIRST DERIVATIVE TEST classifies a critical point by the SIGN CHANGE of f' across it: if f' changes from POSITIVE to negative moving left-to-right through the critical point, it is a LOCAL MAXIMUM (the function was rising, then starts falling); if f' changes from negative to POSITIVE, it is a LOCAL MINIMUM; if f' does NOT change sign at all (stays positive on both sides, or negative on both sides), the critical point is neither a max nor a min — often a point of inflection with a momentarily flat tangent.

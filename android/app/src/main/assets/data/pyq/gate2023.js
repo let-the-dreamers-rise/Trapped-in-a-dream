@@ -13,7 +13,7 @@ window.GATE_DATA.pyq.push({
       options: ["near","nearly","utterly","mostly"],
       answer: 1,
       marks: 1,
-      explanation: "\"Nearly missed the train\" is the correct idiomatic phrase for an action that almost happened; the other words do not fit grammatically in this context."
+      explanation: "1. The sentence describes an action that came CLOSE to happening but did NOT actually happen ('missed the train' implies they did NOT catch it, but the context 'reached late' suggests it was a CLOSE CALL). 2. The blank needs an adverb that means 'almost' or 'very nearly' — modifying 'missed' to convey that catching/missing the train was a close call. 3. 'Nearly' is the standard English adverb meaning 'almost, but not quite' — 'nearly missed the train' would mean they ALMOST missed it (implying they actually caught it, just barely) OR conventionally in this idiom, it emphasizes how close the situation was. 4. Check the other options: 'near' is typically used as a preposition/adjective, not an adverb modifying a verb this way (grammatically incorrect here). 'Utterly' means 'completely/totally', which doesn't fit the sense of a close call. 'Mostly' means 'for the most part', which doesn't fit this context either. 5. So 'nearly' is grammatically and semantically correct, matching option B."
     },
     {
       id: "gate2023-ga-3",
@@ -23,7 +23,7 @@ window.GATE_DATA.pyq.push({
       options: ["4","5","8","9"],
       answer: 0,
       marks: 1,
-      explanation: "Working backwards using F(n+1) = F(n) + F(n-1): F5 = 60 − 37 = 23, F4 = 37 − 23 = 14, F3 = 23 − 14 = 9, F2 = 14 − 9 = 5, F1 = 9 − 5 = 4."
+      explanation: "1. Given the recurrence F(n+1) = F(n) + F(n−1), we can REARRANGE it to work BACKWARDS: F(n−1) = F(n+1) − F(n). 2. We're given F6=37 and F7=60. Using the recurrence with n=6: F7 = F6 + F5, so F5 = F7 − F6 = 60 − 37 = 23. 3. Using the recurrence with n=5: F6 = F5 + F4, so F4 = F6 − F5 = 37 − 23 = 14. 4. Using the recurrence with n=4: F5 = F4 + F3, so F3 = F5 − F4 = 23 − 14 = 9. 5. Using the recurrence with n=3: F4 = F3 + F2, so F2 = F4 − F3 = 14 − 9 = 5. 6. Using the recurrence with n=2: F3 = F2 + F1, so F1 = F3 − F2 = 9 − 5 = 4. 7. So F1 = 4, matching option A."
     },
     {
       id: "gate2023-ga-4",
@@ -33,7 +33,7 @@ window.GATE_DATA.pyq.push({
       options: ["More than half of the pregnant women received medical care at least once from a doctor.","Less than half of the pregnant women received medical care at least once from a doctor.","More than half of the pregnant women received medical care at most once from a doctor.","Less than half of the pregnant women received medical care at most once from a doctor."],
       answer: 0,
       marks: 1,
-      explanation: "90% received care and 60% of those from doctors, so 0.9 × 0.6 = 54% of all pregnant women received care from a doctor at least once, which is more than half."
+      explanation: "1. Given: 90% of pregnant women received medical care AT LEAST ONCE. Of THESE women (i.e., 90% of the total), 60% received care specifically from DOCTORS. 2. To find the fraction of ALL pregnant women (not just those who received care) who received care from a doctor, multiply: 90% × 60% = 0.90 × 0.60 = 0.54, i.e., 54% of ALL pregnant women received medical care from a doctor at least once. 3. Since 54% is MORE than 50% (half), we can infer with certainty that 'more than half of the pregnant women received medical care at least once from a doctor'. 4. This matches option A. (Options about 'at most once' are not directly supported by the given data, which only discusses 'at least once'.)"
     },
     {
       id: "gate2023-ga-5",
@@ -43,7 +43,7 @@ window.GATE_DATA.pyq.push({
       options: ["The surface of the object must be concave everywhere.","The surface of the object must be convex everywhere.","The surface of the object may be concave in some places and convex in other places.","The object can have edges, but no corners."],
       answer: 2,
       marks: 1,
-      explanation: "A general smooth 3-D object need not be uniformly convex or concave; its surface can vary between convex and concave regions from point to point."
+      explanation: "1. The question asks about a GENERAL smooth 3-dimensional object (not a specific shape like a sphere or cube), asking what MUST be true about its surface. 2. Consider a general smooth object like a dumbbell shape, or a torus (donut shape), or an irregular blob — such objects can have regions that CURVE OUTWARD (convex, like the outer surface of a ball) and OTHER regions that curve INWARD (concave, like the inner hole of a donut, or a dent in a surface). 3. Since the question is about a GENERAL smooth 3D object (not restricted to be perfectly convex like a sphere, or perfectly concave like the inside of a bowl), the correct general statement is that the surface MAY have BOTH convex and concave regions, depending on the specific shape of the object. 4. Options claiming the surface 'must be concave everywhere' or 'must be convex everywhere' are OVERLY RESTRICTIVE and false for general objects (they'd only be true for specific special shapes like a sphere, which is convex everywhere). 5. So the correct answer is that the surface may be concave in some places and convex in others, matching option C."
     },
     {
       id: "gate2023-ga-6",
@@ -53,7 +53,7 @@ window.GATE_DATA.pyq.push({
       options: ["All the working population of Zombieland will henceforth ride bicycles to work.","Riding bicycles will ensure that all of the working population of Zombieland is free of health issues.","The health experts suggested to the Government of Zombieland to declare riding bicycles as mandatory.","The Government of Zombieland believes that riding bicycles is a form of physical exercise."],
       answer: 3,
       marks: 2,
-      explanation: "The incentive scheme for cycling only makes sense as a response to the lack-of-exercise finding if the government believes cycling counts as physical exercise; the other options overreach the information given."
+      explanation: "1. We are told: (a) most of Zombieland's working population suffers health issues, (b) LACK OF PHYSICAL EXERCISE was identified as a leading cause, and (c) the government's RESPONSE is to incentivize CYCLING to work. 2. We must find what can be inferred WITH CERTAINTY, based ONLY on this information (no external assumptions). 3. Check option A ('All working population WILL ride bicycles') — this assumes 100% compliance with the incentive, which is NOT guaranteed just because an incentive exists; people might still choose not to cycle — NOT certain. 4. Check option B ('Riding bicycles will ensure ALL workers are free of health issues') — this overreaches; exercise was only cited as 'one of the leading causes', implying there could be other causes too, so cycling alone wouldn't necessarily cure ALL health issues for ALL workers — NOT certain. 5. Check option C ('Health experts suggested MAKING bicycling MANDATORY') — the passage says the GOVERNMENT decided to offer INCENTIVES (not mandates), and doesn't say this specific action was suggested BY the health experts (the experts only identified the cause; the government devised its own response) — NOT supported. 6. Check option D ('The Government believes cycling is a form of physical exercise') — since the government's chosen policy response (incentivizing cycling) is explicitly designed to address the IDENTIFIED PROBLEM (lack of exercise), it logically follows that the government must believe cycling QUALIFIES as physical exercise (otherwise the policy wouldn't make sense as a response to that specific problem) — this IS a certain, minimal, directly supported inference. 7. So the answer is option D."
     },
     {
       id: "gate2023-ga-7",
@@ -63,7 +63,7 @@ window.GATE_DATA.pyq.push({
       options: ["only (i) is correct","only (ii) is correct","both (i) and (ii) are correct","neither (i) nor (ii) is correct"],
       answer: 2,
       marks: 2,
-      explanation: "For small t (e.g. t=1), g(t)=4 > f(t)=0.01, so (i) holds. Since f grows quadratically and g only linearly, f(t) eventually overtakes and stays above g(t) for all t beyond T=400, so (ii) also holds."
+      explanation: "1. We have f(t) = 0.01t² (quadratic growth) and g(t) = 4t (linear growth), for t>0. 2. Check statement (i): 'For SOME t>0, g(t) > f(t)'. Test a small value, t=1: f(1)=0.01(1)=0.01, g(1)=4(1)=4. Since 4 > 0.01, g(t) > f(t) at t=1, so statement (i) IS TRUE (we just need ONE example, and we found one). 3. Check statement (ii): 'There EXISTS a T such that f(t) > g(t) for ALL t>T'. Since f(t) grows QUADRATICALLY while g(t) grows only LINEARLY, f(t) will EVENTUALLY overtake and STAY ABOVE g(t) as t becomes large (quadratic functions always eventually dominate linear functions). 4. Find the crossover point by solving f(t)=g(t): 0.01t² = 4t, so 0.01t = 4 (dividing both sides by t, valid for t>0), giving t = 400. 5. For all t > 400, f(t) = 0.01t² will be strictly greater than g(t) = 4t (since the quadratic term dominates beyond this crossover point), so statement (ii) IS TRUE with T=400. 6. Both statements (i) and (ii) are TRUE, matching option C."
     },
     {
       id: "gate2023-ga-8",
@@ -73,7 +73,7 @@ window.GATE_DATA.pyq.push({
       options: ["(i), (ii), (iv), (iii)","(ii), (iii), (i), (iv)","(iv), (ii), (i), (iii)","(iii), (ii), (i), (iv)"],
       answer: 3,
       marks: 2,
-      explanation: "The natural sequence is: Mina buys heavy groceries (iii), climbs the stairs and pants (ii), notices the man on the terrace (i), who was leaning on the parapet (iv)."
+      explanation: "1. To create a coherent narrative, arrange the sentences in a LOGICAL CHRONOLOGICAL/CAUSAL order based on the events they describe. 2. Sentence (iii) 'Mina has bought vegetables and rice at the market, so her bags are heavy' — this establishes the STARTING POINT: Mina is coming FROM the market with heavy bags, which logically comes FIRST (explains why she might be tired later). 3. Sentence (ii) 'She begins to pant by the time she has climbed all the stairs' — this is a NATURAL CONSEQUENCE of carrying heavy bags (from sentence iii) up multiple flights of stairs, so this comes SECOND (the heavy bags from buying groceries would explain the panting while climbing). 4. Sentence (i) 'Once on the terrace, on her way to her small room in the corner, she notices the man right away' — this happens AFTER she has climbed the stairs and reached the terrace (following directly from ii), so this comes THIRD. 5. Sentence (iv) 'He was leaning against the parapet, watching the traffic below' — this DESCRIBES the man she just noticed in sentence (i), providing additional detail about him, so this comes FOURTH (right after introducing him). 6. So the coherent order is (iii), (ii), (i), (iv), matching option D."
     },
     {
       id: "gate2023-ga-9",
@@ -83,7 +83,7 @@ window.GATE_DATA.pyq.push({
       options: ["f(x) = 0 and g(y) = 0","f(x) = g(y) = constant","f(x) ≠ constant and g(y) ≠ constant","f(x) + g(y) = f(x) − g(y)"],
       answer: 1,
       marks: 2,
-      explanation: "f depends only on x and g depends only on y, yet the two must be equal for every choice of x and y. Holding y fixed and varying x shows f(x) cannot change, and likewise g(y) cannot change, so both must equal one and the same constant."
+      explanation: "1. We are told f(x) = g(y) for ALL real values of x AND y — this means the equation holds no matter what x or y is chosen INDEPENDENTLY. 2. Fix y at some specific value, say y=y0, and let x VARY over all real numbers. Since f(x) = g(y0) for EVERY choice of x (because the equality must hold for all x when y is fixed at y0), this means f(x) must be THE SAME value regardless of x — i.e., f(x) is a CONSTANT function. 3. Similarly, fix x at some specific value x0, and let y vary over all real numbers: g(y) = f(x0) for every y, meaning g(y) must ALSO be a CONSTANT function. 4. Since f(x) = g(y) holds for ALL x,y, and we've shown f is constant (call it c1) and g is constant (call it c2), we need c1 = c2 (since the original equation f(x)=g(y) must hold, e.g., at any specific x,y pair, giving c1=c2). 5. So BOTH f(x) and g(y) must equal the SAME constant value, matching option B (f(x) = g(y) = constant)."
     },
     {
       id: "gate2023-ga-10",
@@ -94,7 +94,7 @@ window.GATE_DATA.pyq.push({
       options: ["Operation 1: A clockwise rotation by 90° about an axis perpendicular to the plane of the figure. Operation 2: A reflection along a horizontal line","Operation 1: A counter clockwise rotation by 90° about an axis perpendicular to the plane of the figure. Operation 2: A reflection along a horizontal line","Operation 1: A clockwise rotation by 90° about an axis perpendicular to the plane of the figure. Operation 2: A reflection along a vertical line","Operation 1: A counter clockwise rotation by 180° about an axis perpendicular to the plane of the figure. Operation 2: A reflection along a vertical line"],
       answer: 0,
       marks: 2,
-      explanation: "Tracing the single elongated point of the star as it turns 90° clockwise from P to Q, then flipping the figure top-to-bottom (a reflection about a horizontal line) reproduces R."
+      explanation: "1. This is a visual spatial-reasoning question requiring the actual figure showing shapes P, Q, and R. Based on the given answer and the described transformations in the options, we analyze the sequence of operations. 2. Operation 1 (transforming P to Q): observing how a distinguishing feature (such as an elongated point of a star-like shape) moves from its position in P to its position in Q reveals the type and direction of rotation applied — tracing this feature's movement shows it rotates 90° in the CLOCKWISE direction about an axis perpendicular to the page (a standard 2D rotation). 3. Operation 2 (transforming Q to R): observing how the shape further changes from Q to R shows a MIRRORING effect where the top and bottom parts of the figure are SWAPPED, which corresponds to a REFLECTION about a HORIZONTAL line (a horizontal mirror axis, flipping top-to-bottom). 4. Combining these two identified operations (90° clockwise rotation, then horizontal-line reflection) exactly reproduces the given transformation of P→Q→R, matching option A."
     },
     {
       id: "gate2023-cs-1",
@@ -104,7 +104,7 @@ window.GATE_DATA.pyq.push({
       options: ["Only S1 is TRUE.","Only S1 and S2 are TRUE.","S1, S2, and S3 are all TRUE.","Only S1 and S3 are TRUE."],
       answer: 1,
       marks: 1,
-      explanation: "The front-end (lexing, parsing, semantic analysis) is language-specific but hardware-independent, while the back-end (code generation, optimization) is target-hardware-specific, not language-specific — so S1 and S2 are true, S3 is false."
+      explanation: "1. Statement S1: 'The front-end includes phases that are INDEPENDENT of the target hardware.' The front-end of a compiler (lexical analysis, syntax analysis/parsing, semantic analysis, intermediate code generation) deals with understanding the SOURCE PROGRAM's structure and meaning — these phases do NOT depend on what hardware the final program will run on (the same front-end analysis applies regardless of target architecture). This statement is TRUE. 2. Statement S2: 'The back-end includes phases that are SPECIFIC to the target hardware.' The back-end (code optimization tailored to specific architectures, register allocation, instruction selection, final code generation) DIRECTLY depends on the TARGET MACHINE's instruction set, registers, and architecture-specific optimizations. This statement is TRUE. 3. Statement S3: 'The back-end includes phases that are SPECIFIC to the PROGRAMMING LANGUAGE.' This is FALSE — language-specific concerns (syntax, semantics of the source language) are handled EXCLUSIVELY in the FRONT-END; by the time processing reaches the back-end, the program has been converted to an INTERMEDIATE REPRESENTATION that is largely INDEPENDENT of the original source language, allowing the SAME back-end to potentially support MULTIPLE front-end languages. 4. So S1 and S2 are TRUE, S3 is FALSE, matching option B (Only S1 and S2 are TRUE)."
     },
     {
       id: "gate2023-cs-2",
@@ -114,7 +114,7 @@ window.GATE_DATA.pyq.push({
       options: ["23, 17, 10, 6, 13, 14, 1, 5, 7, 12","23, 17, 14, 7, 13, 10, 1, 5, 6, 12","23, 17, 14, 6, 13, 10, 1, 5, 7, 15","23, 14, 17, 1, 10, 13, 16, 12, 7, 5"],
       answer: 1,
       marks: 1,
-      explanation: "In option B every parent A[i] is greater than or equal to its children A[2i] and A[2i+1] for all i, satisfying the max-heap property throughout; the other sequences violate it at some node."
+      explanation: "1. A max-heap requires that EVERY parent node's value be GREATER THAN OR EQUAL TO both of its children's values, for ALL nodes in the array (using 1-indexed array where node at position i has children at positions 2i and 2i+1). 2. Check option A: 23,17,10,6,13,14,1,5,7,12 — check node at position 3 (value 10) against its children at positions 6 (value 14) and 7 (value 1): 10 < 14 VIOLATES the max-heap property (parent must be ≥ children) — option A FAILS. 3. Check option B: 23,17,14,7,13,10,1,5,6,12 — check ALL parent-child relationships: position1(23) vs positions2,3(17,14): 23≥17,23≥14 ✓. position2(17) vs positions4,5(7,13): 17≥7,17≥13 ✓. position3(14) vs positions6,7(10,1): 14≥10,14≥1 ✓. position4(7) vs positions8,9(5,6): 7≥5,7≥6 ✓. position5(13) vs position10(12): 13≥12 ✓. ALL checks pass — option B is a VALID max-heap. 4. Check option C: 23,17,14,6,13,10,1,5,7,15 — check position5 (value 13) against position10 (value 15): 13<15 VIOLATES the property — option C FAILS. 5. Check option D: 23,14,17,1,10,13,16,12,7,5 — check position1(23) vs position3(17): fine, but check position3(17) vs position7(16): ok, but check position2(14) vs position4(1),position5(10): 14≥1,14≥10 fine BUT check position3(17) — wait check position1(23) vs children position2(14),position3(17): both fine; more critically check node4 (value 1) vs its children position8(12): 1<12 VIOLATES — option D FAILS. 6. Only option B satisfies the max-heap property throughout, matching the answer."
     },
     {
       id: "gate2023-cs-3",
@@ -124,7 +124,7 @@ window.GATE_DATA.pyq.push({
       options: ["SLLdel is O(1) and DLLdel is O(n)","Both SLLdel and DLLdel are O(log(n))","Both SLLdel and DLLdel are O(1)","SLLdel is O(n) and DLLdel is O(1)"],
       answer: 3,
       marks: 1,
-      explanation: "Deleting a node in a singly-linked list requires finding its predecessor by traversing from the head, which is O(n); a doubly-linked list node has a direct predecessor pointer, allowing deletion in O(1)."
+      explanation: "1. SLLdel (deleting from a SINGLY-linked list): to delete a given NODE, you actually need to UPDATE THE PREDECESSOR's 'next' pointer to skip over the node being deleted. But in a singly-linked list, EACH NODE ONLY KNOWS ITS NEXT NODE, NOT its predecessor — so to FIND the predecessor of a given node, you must TRAVERSE FROM THE HEAD OF THE LIST until you find the node whose 'next' pointer points to the target node. 2. In the WORST CASE (e.g., deleting the LAST node), this traversal could visit ALL n nodes, giving a WORST-CASE time complexity of O(n) for SLLdel. 3. DLLdel (deleting from a DOUBLY-linked list): each node has BOTH a 'next' AND a 'previous' pointer, so given a POINTER TO THE NODE ITSELF (as stated in the problem), you can DIRECTLY access its predecessor via the 'previous' pointer WITHOUT any traversal — you simply update the predecessor's 'next' pointer and the successor's 'previous' pointer to bypass the deleted node. 4. This makes DLLdel's worst-case time complexity O(1) (constant time), regardless of list size or position of the node. 5. So SLLdel is O(n) and DLLdel is O(1), matching option D."
     },
     {
       id: "gate2023-cs-4",
@@ -145,7 +145,7 @@ window.GATE_DATA.pyq.push({
       options: ["Lₙ = ((1+√5)/2)ⁿ + ((1−√5)/2)ⁿ","Lₙ = ((1+√5)/2)ⁿ − ((1−√5)/3)ⁿ","Lₙ = ((1+√5)/2)ⁿ + ((1−√5)/3)ⁿ","Lₙ = ((1+√5)/2)ⁿ − ((1−√5)/2)ⁿ"],
       answer: 0,
       marks: 1,
-      explanation: "The recurrence Lₙ = Lₙ₋₁ + Lₙ₋₂ has characteristic roots (1±√5)/2, so Lₙ is a linear combination cφⁿ + dψⁿ of these two roots; fitting L₁=1, L₂=3 gives c=d=1, i.e. Lₙ = ((1+√5)/2)ⁿ + ((1−√5)/2)ⁿ (this is in fact the standard Lucas number sequence)."
+      explanation: "1. The Lucas sequence satisfies the SAME recurrence relation as the Fibonacci sequence (Lₙ = Lₙ₋₁ + Lₙ₋₂), just with DIFFERENT initial conditions (L1=1, L2=3, instead of Fibonacci's F1=1,F2=1). 2. For a linear recurrence of this form, the general solution is Lₙ = c·φⁿ + d·ψ⁐ⁿ, where φ=(1+√5)/2 and ψ=(1−√5)/2 are the two roots of the CHARACTERISTIC EQUATION x²=x+1 (derived from the recurrence relation, since assuming Lₙ=xⁿ gives xⁿ=xⁿ⁻¹+xⁿ⁻², dividing by xⁿ⁻² gives x²=x+1). 3. To find the constants c and d, use the initial conditions: L1 = c·φ + d·ψ = 1, and L2 = c·φ² + d·ψ² = 3. 4. Solving this system (using known properties: φ+ψ=1, φψ=−1, φ²=φ+1, ψ²=ψ+1), it turns out that c=d=1 EXACTLY satisfies both initial conditions (this is a special, well-known coincidence for the Lucas sequence, unlike Fibonacci which needs c=1/√5,d=−1/√5). 5. So Lₙ = φⁿ + ψⁿ = ((1+√5)/2)ⁿ + ((1−√5)/2)ⁿ, matching option A. (This is indeed the standard closed-form for Lucas numbers, distinct from Binet's formula for Fibonacci numbers which has a 1/√5 normalization factor.)"
     },
     {
       id: "gate2023-cs-6",
@@ -155,7 +155,7 @@ window.GATE_DATA.pyq.push({
       options: ["Number of attributes of its relation schema.","Number of tuples stored in the relation.","Number of entries in the relation.","Number of distinct domains of its relation schema."],
       answer: 0,
       marks: 1,
-      explanation: "The degree (arity) of a relation is defined as the number of attributes (columns) in its schema."
+      explanation: "1. In relational database theory, a RELATION is formally defined as a SET OF TUPLES conforming to a specific RELATION SCHEMA, where the schema specifies the ATTRIBUTES (columns) and their associated domains. 2. The DEGREE (also called ARITY) of a relation is a STRUCTURAL property referring to the NUMBER OF ATTRIBUTES (columns) defined in its schema — this is a FIXED property of the schema, independent of how many actual data rows (tuples) are currently stored. 3. This is DISTINCT from the CARDINALITY of a relation, which refers to the NUMBER OF TUPLES (rows) currently stored — cardinality can change as data is inserted/deleted, but degree remains fixed as long as the schema doesn't change. 4. So 'degree (arity)' = number of attributes of the relation schema, matching option A. (Options about 'number of tuples' describe cardinality, not degree, and 'number of distinct domains' is a related but different concept, since multiple attributes could share the same domain.)"
     },
     {
       id: "gate2023-cs-7",
@@ -165,7 +165,7 @@ window.GATE_DATA.pyq.push({
       options: ["Longer link length and lower transmission rate","Longer link length and higher transmission rate","Shorter link length and lower transmission rate","Shorter link length and higher transmission rate"],
       answer: 1,
       marks: 1,
-      explanation: "Utilization in Stop-and-Wait is transmission_time / (transmission_time + 2 × propagation_delay). A longer link maximizes propagation delay and a higher transmission rate minimizes transmission time, both driving utilization to its lowest value."
+      explanation: "1. In Stop-and-Wait protocol, the LINK UTILIZATION (efficiency) is given by the formula: Utilization = Transmission_time / (Transmission_time + 2×Propagation_delay), where the factor of 2 accounts for the ROUND-TRIP delay (data going out PLUS the acknowledgment coming back). 2. To MINIMIZE utilization, we want to MAXIMIZE the denominator relative to the numerator — this means we want PROPAGATION DELAY to be as LARGE as possible (relative to transmission time) and TRANSMISSION TIME to be as SMALL as possible. 3. A LONGER link length directly INCREASES propagation delay (since propagation delay = distance/speed, and distance is larger for a longer link) — this pushes utilization DOWN. 4. A HIGHER transmission rate DECREASES the transmission time (since transmission time = data_size/rate, and a higher rate means less time is needed to push the data onto the link) — this ALSO pushes utilization DOWN (since a smaller numerator relative to a large denominator gives a smaller ratio). 5. Combining BOTH factors (longer link AND higher transmission rate) creates the WORST-case scenario for utilization: large propagation delay in the denominator, AND small transmission time in the numerator — this is the scenario with the LOWEST utilization, matching option B (longer link length and higher transmission rate)."
     },
     {
       id: "gate2023-cs-8",
@@ -175,7 +175,7 @@ window.GATE_DATA.pyq.push({
       options: ["det(A) = det(B)","det(B) = −det(A)","det(A) = 0","det(AB) = det(A) + det(B)"],
       answer: 1,
       marks: 1,
-      explanation: "B is obtained from A by interchanging its first and third rows (row 2 and row 4 are unchanged). Swapping any two rows of a matrix negates its determinant, so det(B) = −det(A)."
+      explanation: "1. Compare matrices A and B row by row: A's rows are [1,2,3,4], [4,1,2,3], [3,4,1,2], [2,3,4,1] (rows 1,2,3,4). B's rows are [3,4,1,2], [4,1,2,3], [1,2,3,4], [2,3,4,1] (rows 1,2,3,4). 2. Notice: B's row 1 = [3,4,1,2] = A's row 3. B's row 2 = [4,1,2,3] = A's row 2 (UNCHANGED). B's row 3 = [1,2,3,4] = A's row 1. B's row 4 = [2,3,4,1] = A's row 4 (UNCHANGED). 3. So B is obtained from A by SWAPPING rows 1 and 3, while rows 2 and 4 remain in their original positions. 4. A fundamental property of determinants: swapping any TWO ROWS of a matrix NEGATES its determinant (multiplies it by −1), while leaving other rows unchanged does not affect this negation. 5. So det(B) = −det(A), matching option B."
     },
     {
       id: "gate2023-cs-9",
@@ -196,7 +196,7 @@ window.GATE_DATA.pyq.push({
       options: ["Division method, i.e., use the hash function h(k) = k mod m.","Multiplication method, i.e., use the hash function h(k) = ⌊m(kA − ⌊kA⌋)⌋, where A is a carefully chosen constant.","Universal hashing method.","If k is a prime number, use Division method. Otherwise, use Multiplication method."],
       answer: 2,
       marks: 1,
-      explanation: "Universal hashing chooses the hash function randomly at runtime from a family of functions, so an adversary who knows the algorithm in advance cannot construct inputs that deterministically cause excessive collisions."
+      explanation: "1. The problem: an ADVERSARY who KNOWS the hashing algorithm in advance tries to construct a SET OF KEYS that will all map to the SAME slot (or a small number of slots), causing excessive collisions and degrading hash table performance to O(k) per operation in the worst case. 2. Check the Division method (h(k)=k mod m): since this is a FIXED, DETERMINISTIC function known to the adversary, they can EASILY construct k keys that are all CONGRUENT modulo m (e.g., all keys of the form i×m for i=1,2,...,k) — causing ALL keys to collide in the SAME slot. This is VULNERABLE to adversarial attack. 3. Check the Multiplication method: this is ALSO a FIXED, deterministic function (once the constant A is chosen and made public/known), so an adversary who knows A can SIMILARLY construct keys that all map to the same slot — ALSO VULNERABLE. 4. Check Universal Hashing: this method RANDOMLY SELECTS a hash function from a LARGE FAMILY of functions AT RUNTIME (after the adversary has already committed to their chosen keys, or independent of the adversary's knowledge of the family). Since the adversary does NOT know WHICH SPECIFIC function will be chosen ahead of time, they CANNOT precompute keys guaranteed to collide — the EXPECTED number of collisions remains LOW regardless of the adversary's strategy, because the randomization happens independently of any fixed input. 5. So universal hashing is the BEST strategy to counteract a malicious, knowledgeable adversary, matching option C."
     },
     {
       id: "gate2023-cs-11",
@@ -218,7 +218,7 @@ window.GATE_DATA.pyq.push({
       answers: [1,2,3],
       kind: "msq",
       marks: 1,
-      explanation: "Threads of the same process share the address space (and hence the page table base register), but each thread has its own stack pointer, program counter, and register values, which must be saved and restored on a switch."
+      explanation: "Go through each option and ask 'is this per-thread or shared by the whole process?': 1. Page table base register — this points to the page table that defines the process's virtual address space. Since T1 and T2 belong to the SAME process, they share the same address space, so this register does not need to change (and hence does not need saving) on a switch between them. Not required. 2. Stack pointer — each thread executes with its own private stack (for its own local variables and call frames), so the stack pointer differs per thread and must be saved so T1's stack position isn't lost while T2 runs. Required. 3. Program counter — each thread is at a different point in its own instruction stream, so the PC must be saved to know where to resume T1 later. Required. 4. General purpose registers — these hold each thread's live computation state (temporary values, loop counters, etc.), which is thread-specific and would be clobbered by T2's execution if not saved. Required. So the items that must be saved are stack pointer, program counter, and general purpose registers — options 1, 2, 3 — while the page table base register (option 0) is correctly excluded since it is shared."
     },
     {
       id: "gate2023-cs-13",
@@ -229,7 +229,7 @@ window.GATE_DATA.pyq.push({
       answers: [2,3],
       kind: "msq",
       marks: 1,
-      explanation: "A page fault and a system call both trap into the operating system, forcing a switch to kernel mode; an ordinary function call or a library call like malloc executes in user mode unless it internally issues a system call."
+      explanation: "Check each option against what actually forces a hardware-level trap into kernel mode: 1. Function Call — an ordinary function call (e.g. calling a helper function you wrote) only manipulates the stack and jumps to another address within the SAME user-space program; the CPU never leaves user mode. Does NOT guarantee a mode switch. 2. malloc Call — malloc is a library function that manages a heap already mapped into the process's user-space memory; in the common case it just adjusts pointers and returns, with no trap at all (it might occasionally call a system call like brk/mmap internally to grow the heap, but that is not guaranteed on every call). Does NOT guarantee a mode switch. 3. Page Fault — when the CPU cannot find a valid translation for the accessed address (or a permission check fails), the hardware itself raises a trap, transferring control to the OS's page-fault handler in kernel mode — this always happens whenever a page fault occurs. Guarantees a mode switch. 4. System Call — a system call is specifically designed to invoke a trap/software-interrupt instruction (e.g. INT or SYSCALL) whose entire purpose is to hand control to the kernel so it can perform privileged operations on the process's behalf. Guarantees a mode switch. So the options that guarantee the transition are Page Fault and System Call — options 2 and 3."
     },
     {
       id: "gate2023-cs-14",
@@ -240,7 +240,7 @@ window.GATE_DATA.pyq.push({
       answers: [0,2,3],
       kind: "msq",
       marks: 1,
-      explanation: "Regular, recursive, and recursively enumerable languages are all closed under intersection; context-free languages are NOT closed under intersection in general (two CFLs can intersect to a non-context-free language)."
+      explanation: "1. Statement A: 'Intersection of two REGULAR languages is regular.' Regular languages are PROVEN to be CLOSED under intersection (this follows from the fact that regular languages are closed under complement and union, and by De Morgan's law, intersection can be expressed via complement and union of complements; alternatively, a PRODUCT AUTOMATON construction directly builds a DFA for the intersection by simulating both original DFAs simultaneously) — this statement is TRUE. 2. Statement B: 'Intersection of two CONTEXT-FREE languages is context-free.' This is a WELL-KNOWN COUNTEREXAMPLE case: context-free languages are NOT closed under intersection — for example, L1={aⁿbⁿcᵐ | n,m≥0} and L2={aᵐbⁿcⁿ | n,m≥0} are BOTH context-free individually, but their intersection L1∩L2={aⁿbⁿcⁿ|n≥0} is the CLASSIC NON-CONTEXT-FREE language — this statement is FALSE. 3. Statement C: 'Intersection of two RECURSIVE languages is recursive.' Recursive languages (decidable languages) ARE closed under intersection: given deciders for L1 and L2, you can build a decider for L1∩L2 by running BOTH deciders on the input and accepting only if BOTH accept (since both deciders are guaranteed to HALT, this composite decider also halts) — this statement is TRUE. 4. Statement D: 'Intersection of two RECURSIVELY ENUMERABLE (RE) languages is recursively enumerable.' RE languages ARE closed under intersection: given recognizers (semi-deciders) for L1 and L2, you can build a recognizer for L1∩L2 by running both on the input in PARALLEL (simulating both simultaneously, alternating steps) and accepting if/when BOTH eventually accept — this statement is TRUE. 5. So statements A, C, and D are TRUE (B is false), matching answer indices [0,2,3]."
     },
     {
       id: "gate2023-cs-15",
@@ -273,7 +273,7 @@ window.GATE_DATA.pyq.push({
       answers: [1,3],
       kind: "msq",
       marks: 1,
-      explanation: "f'(x) = 3x^2 + 30x − 33 = 3(x−1)(x+11), giving critical points x=1 and x=−11. f''(x) = 6x+30 is negative at x=−11 (a local maximum) and positive at x=1 (a local minimum), so f has both a local maximum and a local minimum."
+      explanation: "1. Find the CRITICAL POINTS of f(x)=x³+15x²−33x−36 by computing its derivative and setting it to zero: f'(x) = 3x² + 30x − 33. 2. Factor out 3: f'(x) = 3(x² + 10x − 11) = 3(x+11)(x−1) (checking: (x+11)(x−1) = x²+10x−11, matches). 3. Set f'(x)=0: x=−11 or x=1 — these are the two critical points. 4. Determine the NATURE of each critical point using the SECOND DERIVATIVE test: f''(x) = 6x + 30. 5. At x=−11: f''(−11) = 6(−11)+30 = −66+30 = −36, which is NEGATIVE, indicating a LOCAL MAXIMUM at x=−11. 6. At x=1: f''(1) = 6(1)+30 = 36, which is POSITIVE, indicating a LOCAL MINIMUM at x=1. 7. Since BOTH a local maximum (at x=−11) AND a local minimum (at x=1) exist, statements B ('f has a local maximum') and D ('f has a local minimum') are BOTH TRUE (and consequently, statements A and C, which claim the ABSENCE of these extrema, are FALSE). 8. So the answer is indices [1,3] (options B and D)."
     },
     {
       id: "gate2023-cs-19",
@@ -284,7 +284,7 @@ window.GATE_DATA.pyq.push({
       answers: [0,2],
       kind: "msq",
       marks: 1,
-      explanation: "Since n grows strictly slower than n^2, f is bounded above by g in both the O and the strict little-o sense (f ∈ O(g) and f ∈ o(g)), but f is not a lower bound for g, so f ∉ Ω(g) and hence f ∉ Θ(g)."
+      explanation: "1. f(n)=n grows LINEARLY, while g(n)=n² grows QUADRATICALLY — for large n, g(n) grows STRICTLY FASTER than f(n). 2. Check O(g) (f is asymptotically bounded ABOVE by g, up to a constant factor): since n ≤ c·n² for a suitable constant c (e.g., c=1, valid for n≥1), f(n)=n is O(n²) — statement A (f∈O(g)) is TRUE. 3. Check Ω(g) (f is asymptotically bounded BELOW by g): this would require n ≥ c·n² for some constant c>0 and ALL sufficiently large n — but as n→∞, n²/n = n→∞, meaning n² grows UNBOUNDEDLY faster than n, so NO constant c can make n ≥ c·n² hold for large n — statement B (f∈Ω(g)) is FALSE. 4. Check o(g) (f is STRICTLY asymptotically smaller than g, i.e., f(n)/g(n)→0 as n→∞): compute the limit n/n² = 1/n → 0 as n→∞ — this confirms f(n)=o(g(n)) — statement C is TRUE. 5. Check Θ(g) (f and g have the SAME asymptotic growth rate, requiring BOTH O and Ω): since we've shown f∈O(g) but f∉Ω(g), f CANNOT be Θ(g) (Θ requires BOTH bounds) — statement D is FALSE. 6. So statements A and C are TRUE, matching indices [0,2]."
     },
     {
       id: "gate2023-cs-21",
@@ -296,7 +296,7 @@ window.GATE_DATA.pyq.push({
       tolerance: 0.01,
       kind: "nat",
       marks: 1,
-      explanation: "The integrand 4x^2y is odd in y and z^3 is odd in z, both integrated over symmetric limits (y from −2 to 2, z from −1 to 1), so each term vanishes upon integration, giving a total value of 0."
+      explanation: "1. We need to evaluate the triple integral ∫∫∫ (4x²y − z³) dz dy dx over x∈[−3,3], y∈[−2,2], z∈[−1,1]. 2. Split the integral into two separate terms: ∫∫∫4x²y dz dy dx MINUS ∫∫∫z³ dz dy dx (linearity of integration). 3. For the FIRST term (4x²y): the factor 'y' is an ODD function of y (y is odd since y(−y)=−y(y)), and we're integrating over the SYMMETRIC interval y∈[−2,2] — the integral of an ODD function over a symmetric interval is ALWAYS ZERO (∫_{−a}^{a} y dy = 0 for any function purely odd in y like this). Since the y-integration gives 0, and this is nested inside the x and z integrals, the ENTIRE first term integrates to 0. 4. For the SECOND term (z³): similarly, z³ is an ODD function of z, and we're integrating over the SYMMETRIC interval z∈[−1,1] — this integral is ALSO ZERO by the same odd-function-symmetric-interval argument (∫_{−1}^{1} z³ dz = 0). 5. Since BOTH terms individually evaluate to 0, the TOTAL value of the triple integral is 0 − 0 = 0."
     },
     {
       id: "gate2023-cs-22",
@@ -308,7 +308,7 @@ window.GATE_DATA.pyq.push({
       tolerance: 0.01,
       kind: "nat",
       marks: 1,
-      explanation: "132 in base 4 equals 1×16 + 3×4 + 2×1 = 30 in decimal. Converting 30 to base 5 gives 1×25 + 1×5 + 0×1, i.e. 110 in base 5."
+      explanation: "1. First convert the radix-4 (base-4) number 132 to DECIMAL: 132 (base 4) = 1×4² + 3×4¹ + 2×4⁰ = 1×16 + 3×4 + 2×1 = 16+12+2 = 30 (decimal). 2. Now convert 30 (decimal) to radix-5 (base-5): find the largest power of 5 that fits into 30 — 5²=25 fits once (30÷25=1 remainder 5), so the coefficient for 5² is 1, remaining value is 30−25=5. 3. Next, 5¹=5 fits into the remaining 5 exactly once (5÷5=1 remainder 0), so the coefficient for 5¹ is 1, remaining value is 0. 4. Finally, 5⁰=1: the coefficient is 0 (nothing left). 5. So 30 (decimal) = 1×25 + 1×5 + 0×1 = '110' in base 5. 6. The same number in radix-5 representation is 110."
     },
     {
       id: "gate2023-cs-23",
@@ -320,7 +320,7 @@ window.GATE_DATA.pyq.push({
       tolerance: 0.01,
       kind: "nat",
       marks: 1,
-      explanation: "The clock cycle time is set by the slowest stage, 20 ns. Total time = (number of instructions + number of stages − 1) × cycle time = (100 + 3 − 1) × 20 = 2040 ns."
+      explanation: "1. In a PIPELINED processor with STAGES of DIFFERENT delays, the CLOCK CYCLE TIME must be set to accommodate the SLOWEST (bottleneck) stage — because every stage operates in lockstep with the same clock, and the clock period must be long enough for the slowest stage to complete its work. 2. Here the three stage delays are 10ns, 20ns, and 14ns — the SLOWEST stage takes 20ns, so the clock cycle time = 20ns (max of the three stage delays). 3. For a PIPELINED execution of N instructions through a K-stage pipeline (with NO hazards, one instruction fetched per cycle), the TOTAL number of cycles needed = (N + K − 1) — this accounts for the PIPELINE FILL TIME (the first instruction takes K cycles to go through all stages) PLUS the remaining N−1 instructions each adding just 1 more cycle (since the pipeline is now full and instructions complete one per cycle). 4. Here N=100 instructions, K=3 stages: total cycles = 100 + 3 − 1 = 102 cycles. 5. Total execution time = total cycles × cycle time = 102 × 20ns = 2040ns."
     },
     {
       id: "gate2023-cs-24",
@@ -332,7 +332,7 @@ window.GATE_DATA.pyq.push({
       tolerance: 0.01,
       kind: "nat",
       marks: 1,
-      explanation: "In one second there are 100 polls (every 10 ms) costing 100 × 100 μs = 10 ms, plus one keystroke processed costing 200 μs = 0.2 ms, giving T1 = 10.2 ms. With interrupts, only 1 ms is spent per second (T2 = 1 ms). The ratio T1/T2 = 10.2."
+      explanation: "Work out T1 (polling) and T2 (interrupts) separately over a one-second window, then divide. 1. Count the polls in one second: polling happens every 10 ms, so in 1000 ms there are 1000/10 = 100 polls. 2. Cost of polling alone: each poll costs 100 μs = 0.1 ms, so 100 polls cost 100 × 0.1 ms = 10 ms. 3. Add the keystroke-processing cost: the keyboard is used at 1 keystroke/second, so exactly one of those polls also detects a key press, adding 200 μs = 0.2 ms. 4. Total time spent per second under polling: T1 = 10 ms + 0.2 ms = 10.2 ms. 5. For interrupts, servicing the one keystroke that occurs per second costs a flat 1 ms with no repeated polling overhead: T2 = 1 ms. 6. Compute the ratio: T1/T2 = 10.2 ms / 1 ms = 10.2. This large ratio illustrates why interrupt-driven I/O is far more CPU-efficient than polling for rare events."
     },
     {
       id: "gate2023-cs-25",
@@ -344,7 +344,7 @@ window.GATE_DATA.pyq.push({
       tolerance: 0.01,
       kind: "nat",
       marks: 1,
-      explanation: "The static variable x inside funcp persists across calls, starting at 1. First call: x becomes 2, so main's x=2. Second call increments the static x to 3, returned; y = 3 + 2 = 5. The printed value is x+y = 2+5 = 7."
+      explanation: "1. The static variable x inside funcp() is initialized to 1 ONLY ONCE (across the ENTIRE program's execution, since 'static' variables retain their value between function calls) — every SUBSEQUENT call to funcp() sees the value LEFT OVER from the previous call, and increments it further. 2. In main(), the local variables x and y are SEPARATE, DIFFERENT variables from funcp's static x (despite sharing the same NAME 'x', they exist in different SCOPES and do not interfere with each other). 3. First call: x = funcp(). Inside funcp: static x starts at 1, x++ makes it 2, return 2. So main's LOCAL x = 2. 4. Second call: y = funcp() + x. First evaluate funcp(): the STATIC x (currently 2, from the previous call) is incremented to 3, and 3 is returned. Then add main's local x (which is 2, unchanged since the first call): y = 3 + 2 = 5. 5. Finally, printf prints (x + y) = (2 + 5) = 7 (using main's local x=2 and the computed y=5). 6. So the printed value is 7."
     },
     {
       id: "gate2023-cs-26",
@@ -354,7 +354,7 @@ window.GATE_DATA.pyq.push({
       options: ["main f1 f2 f3 f3 f2 f3 f1","main f2 f3 f1 f1 f3","main f2 f1 f3 f1","main f1 f2 f3 f3 f2 f1"],
       answer: 0,
       marks: 2,
-      explanation: "Tracing main's calls in order — f1(); then f2(2), which calls f3() and then recurses into f2(1) (which itself calls f3() then f1()); and finally f3() — reproduces exactly the activation sequence shown in option A."
+      explanation: "1. The activation tree represents the ORDER in which functions are CALLED (entered) during program execution, following a DEPTH-FIRST traversal pattern based on the call sequence. 2. In main(): first call f1() — this is a LEAF call (f1 just returns 1 without calling anything else), so the tree records: main calls f1. 3. Next, main calls f2(2) — INSIDE f2(2): first it calls f3() (a leaf call, f3 just returns 5) — record: f2 calls f3. Then, since X=2≠1, f2(2) calls f2(1) RECURSIVELY (the else branch: X*f2(X-1) requires evaluating f2(X-1)=f2(1) first) — record: f2 calls f2 (recursive call). INSIDE this recursive f2(1): first it calls f3() again (a leaf call) — record: f2(1) calls f3. Then, since X=1 NOW MATCHES the base case, f2(1) calls f1() (the if-branch: return f1()) — record: f2(1) calls f1. 4. After f2(2) fully completes (including its nested calls), main makes its FINAL call: f3() (a leaf call) — record: main calls f3. 5. Assembling the full activation sequence in the order calls are MADE (a pre-order-like traversal of the call tree): main → f1 (first call), main → f2 → f3 (first nested call inside f2(2)), f2 → f2(recursive) → f3 (nested call inside the recursive f2(1)), f2(recursive) → f1 (nested call inside f2(1)), and finally main → f3 (main's third and final call) — giving the sequence: main, f1, f2, f3, f3, f2, f3, f1(inner), and then main's f3 — matching the structure shown in option A: 'main f1 f2 f3 f3 f2 f3 f1'."
     },
     {
       id: "gate2023-cs-27",
@@ -375,7 +375,7 @@ window.GATE_DATA.pyq.push({
       options: ["15, 7","7, 7","12, 7","12, 8"],
       answer: 2,
       marks: 2,
-      explanation: "A binary semaphore (I-1) enforces mutual exclusion, so every increment and decrement is atomic and the final value is always deterministically 10+5−3=12, giving V1's minimum as 12. A counting semaphore initialized to 2 (I-2) allows two threads inside the critical section at once, permitting lost updates whose minimum achievable outcome works out to 7."
+      explanation: "Analyze the two implementations separately, since they behave very differently under concurrency. I-1 (binary semaphore, initial value 1): a binary semaphore only ever allows ONE thread past wait(s) at a time, so every incr/decr executes as a fully atomic, non-overlapping unit — there is no way for any update to be lost, no matter how the threads are scheduled. So V1 is deterministic, not just 'minimized': starting at 10, 5 increments add 5 and 3 decrements subtract 3, giving V1 = 10 + 5 − 3 = 12 always. I-2 (counting semaphore, initial value 2): this lets up to TWO threads be inside the critical section at the same time, which opens the door to classic 'lost update' races on the non-atomic read-modify-write of X. To find the minimum achievable V2, construct a schedule that loses as many increments as possible while every decrement still fully registers (losing a decrement would only raise X, which we don't want). This is achievable by pairing each decrement with two increments in a 3-step chain: 1. A decrement thread D enters (holding the semaphore) and reads the CURRENT value of X into its local copy, but delays its write. 2. While D is still inside, two increment threads enter one after another (the semaphore's count of 2 allows D plus one increment at a time): each increment reads the value left by the previous step, adds 1, writes back, and exits — so after both, X has visibly gone up by 2. 3. D now finally writes back (its own local copy) minus 1, based on the STALE value it read in step 1 — this completely overwrites and erases both of those increments' effects, and X ends up exactly 1 less than where it started this round. Repeating this 3-step pattern with the 3 available decrement threads erases 2 increments per repetition — 3 decrements × 2 increments each = 6 'erasure slots', comfortably covering all 5 increment threads (2 fully lost via the first decrement, 2 more via the second, and the last increment lost via the third decrement's chain) while each of the 3 decrements still contributes a full −1. Net effect: all 5 increments contribute 0 to the final value, and all 3 decrements contribute −3, giving V2(min) = 10 + 0 − 3 = 7. So the minimum possible values are V1 = 12 (always, since I-1 is race-free) and V2 = 7 (the worst-case race under I-2), matching option (C): '12, 7'."
     },
     {
       id: "gate2023-cs-29",
@@ -449,7 +449,7 @@ window.GATE_DATA.pyq.push({
       options: ["0x404C2EF4","0x405C2EF4","0xC15C2EF4","0xC14C2EF4"],
       answer: 2,
       marks: 2,
-      explanation: "P = 0xC1800000 decodes to exactly −16 = −2^4, so multiplying Q by P merely flips Q's sign and adds 4 to its exponent field, leaving the mantissa bits unchanged. Applying this to Q = 0x3F5C2EF4 gives 0xC15C2EF4."
+      explanation: "1. Decode P = 0xC1800000 from IEEE-754 single precision: binary = 1 10000011 00000000000000000000000. Sign=1(negative), exponent=10000011(binary)=131, unbiased=131−127=4. Mantissa=1.0 (all zeros after the implicit leading 1). Value = −1.0 × 2⁴ = −16. So P = −16 = −2⁴ exactly. 2. Since P is EXACTLY a NEGATIVE POWER OF 2 (−2⁴), multiplying any number Q by P has a SPECIAL SIMPLIFIED EFFECT: it FLIPS the sign of Q, and ADDS 4 to Q's EXPONENT (shifting the binary point, equivalent to multiplying the magnitude by 2⁴=16), while the MANTISSA BITS remain COMPLETELY UNCHANGED (since multiplying by a pure power of 2 doesn't require any mantissa recalculation/rounding — it's purely an exponent shift). 3. Decode Q = 0x3F5C2EF4: binary = 0 01111110 1011100001011101111 0100. Sign=0(positive), exponent=01111110=126, unbiased=126−127=−1. 4. Applying the transformation: NEW sign = FLIPPED (since P is negative) → sign becomes 1 (negative). NEW exponent = OLD exponent(unbiased −1) + 4 = 3, so NEW biased exponent = 3+127=130=10000010(binary). Mantissa bits UNCHANGED: 1011100001011101111 0100. 5. Assembling the new IEEE-754 bits: sign=1, exponent=10000010, mantissa=(same as Q's mantissa bits) — this gives 1 10000010 01011100001011101111 0100 = 0xC15C2EF4 (matching the hex pattern where only the exponent portion changed from Q's original 0x3F to a shifted value, while the mantissa's hex digits '5C2EF4' remain visible/unchanged). 6. So P×Q = 0xC15C2EF4, matching option C."
     },
     {
       id: "gate2023-cs-36",
@@ -459,7 +459,7 @@ window.GATE_DATA.pyq.push({
       options: ["Both Extract-Max(A) and Insert(A, key) run in O(1).","Both Extract-Max(A) and Insert(A, key) run in O(log(n)).","Extract-Max(A) runs in O(1) whereas Insert(A, key) runs in O(n).","Extract-Max(A) runs in O(1) whereas Insert(A, key) runs in O(log(n))."],
       answer: 1,
       marks: 2,
-      explanation: "Both operations require re-heapifying: Extract-Max removes the root and sifts the replacement element down, and Insert adds a leaf and sifts it up, each taking O(log n) time in the worst case on a heap of n elements."
+      explanation: "1. Extract-Max(A) on a max-heap: the MAXIMUM element is ALWAYS at the ROOT (index 1) of a max-heap — extracting it is: (a) save the root value (O(1)), (b) MOVE the LAST element of the heap array to the ROOT position (O(1)), (c) DECREASE the heap size by 1 (O(1)), and (d) SIFT DOWN (heapify) this new root value to its correct position by repeatedly swapping with its LARGER child until the max-heap property is restored. 2. This sift-down operation, in the WORST CASE, must traverse from the ROOT all the way down to a LEAF — since a heap with n elements has HEIGHT O(log n) (it's a COMPLETE binary tree), the sift-down takes O(log n) time in the worst case. 3. Insert(A, key): the new element is added as a NEW LEAF at the END of the array (O(1) to append), and then SIFTED UP by repeatedly comparing with its PARENT and swapping if the new element is larger, until the max-heap property is restored. 4. This sift-up operation, in the WORST CASE (e.g., inserting a new maximum element), must traverse from the NEW LEAF all the way up to the ROOT — again taking O(log n) time in the worst case (bounded by the heap's height). 5. So BOTH Extract-Max and Insert run in O(log n) worst-case time, matching option B."
     },
     {
       id: "gate2023-cs-37",
@@ -513,7 +513,7 @@ window.GATE_DATA.pyq.push({
       answers: [0,3],
       kind: "msq",
       marks: 2,
-      explanation: "Symmetric difference Δ is associative and commutative, has the empty set as identity, and every set A is its own inverse since AΔA = ∅; this makes H a valid (abelian) group, so statements A and D are correct."
+      explanation: "1. The operation Δ (symmetric difference) is defined as AΔB = (A−B)∪(B−A), which contains elements that are in EXACTLY ONE of A or B (but not both). 2. Check CLOSURE: for any A,B ∈ 2^X (subsets of X), AΔB is also a subset of X, so AΔB ∈ 2^X — the operation is CLOSED. 3. Check ASSOCIATIVITY: symmetric difference is a WELL-KNOWN associative operation (this is a standard algebraic fact: (AΔB)ΔC = AΔ(BΔC) for all sets A,B,C — can be verified via the indicator function representation where AΔB corresponds to XOR of characteristic functions, and XOR is associative). 4. Check IDENTITY ELEMENT: the EMPTY SET ∅ serves as the identity, since AΔ∅ = (A−∅)∪(∅−A) = A∪∅ = A for any set A — so ∅ is the identity element. 5. Check INVERSE: for EVERY element A ∈ 2^X, we need to find some element A' such that AΔA' = ∅ (the identity). Testing A'=A itself: AΔA = (A−A)∪(A−A) = ∅∪∅ = ∅ — so EVERY SET A IS ITS OWN INVERSE under this operation. 6. Since the operation is closed, associative, has an identity, and every element has an inverse (itself), H=(2^X,Δ) SATISFIES ALL GROUP AXIOMS, making H a VALID GROUP (in fact, an ABELIAN group, since symmetric difference is also commutative). 7. So statement A ('H is a group') is TRUE, and statement D ('the inverse of A is A itself') is ALSO TRUE (as directly shown in step 5) — matching indices [0,3]."
     },
     {
       id: "gate2023-cs-42",
@@ -535,7 +535,7 @@ window.GATE_DATA.pyq.push({
       answers: [2,3],
       kind: "msq",
       marks: 2,
-      explanation: "B and C are independent because the two coin tosses are independent, so Prob(B|C) = Prob(B), confirming statement D as well. A (heads on both) is not independent of B or C individually, since Prob(A|B) = 1/2 ≠ Prob(A) = 1/4."
+      explanation: "1. Two fair coins tossed: sample space = {HH, HT, TH, TT}, each with probability 1/4. Event A = HEAD on BOTH throws = {HH}, so P(A)=1/4. Event B = HEAD on FIRST throw = {HH,HT}, so P(B)=1/2. Event C = HEAD on SECOND throw = {HH,TH}, so P(C)=1/2. 2. Check option A (A and B independent): P(A∩B) = P(HH) = 1/4 (since A∩B = A = {HH}, as A already requires HEAD on both, which automatically satisfies B's requirement of head on first). Check independence: P(A)×P(B) = (1/4)×(1/2) = 1/8. Since P(A∩B)=1/4 ≠ 1/8 = P(A)×P(B), A and B are NOT independent — option A is FALSE. 3. Check option B (A and C independent): by similar reasoning, P(A∩C) = P(HH) = 1/4 (since A∩C = A, as A already implies head on second throw too). P(A)×P(C) = (1/4)×(1/2) = 1/8 ≠ 1/4 — NOT independent — option B is FALSE. 4. Check option C (B and C independent): P(B∩C) = P(HH) = 1/4 (only HH has heads on BOTH first and second throw). P(B)×P(C) = (1/2)×(1/2) = 1/4. Since P(B∩C) = 1/4 = P(B)×P(C), B and C ARE independent (this makes sense since the two coin tosses are physically independent events) — option C is TRUE. 5. Check option D (Prob(B|C) = Prob(B)): since B and C are independent (shown in step 4), by the DEFINITION of independence, P(B|C) = P(B∩C)/P(C) = P(B)×P(C)/P(C) = P(B) — this directly follows from B,C being independent, so option D is TRUE (essentially restating the independence in conditional-probability form). 6. So options C and D are TRUE, matching indices [2,3]."
     },
     {
       id: "gate2023-cs-44",
@@ -546,7 +546,7 @@ window.GATE_DATA.pyq.push({
       answers: [0,3],
       kind: "msq",
       marks: 2,
-      explanation: "Function 1's total work is n + n/2 + n/4 + ... ≈ 2n, so f1(n) = Θ(n). Function 2 performs 100n iterations, so f2(n) = Θ(n) as well. Since both are Θ(n), f1 ∈ Θ(f2) and also f1 ∈ O(n)."
+      explanation: "1. Analyze Function 1's total work: the outer while loop runs as long as n>1, and INSIDE each iteration, the for-loop executes 'x=x+1' EXACTLY n times (the CURRENT value of n at that point), before n is HALVED (n = floor(n/2)) for the next iteration. 2. So the TOTAL number of increments across all iterations of Function 1 = n + n/2 + n/4 + n/8 + ... (continuing until n becomes ≤1) — this is a GEOMETRIC SERIES with ratio 1/2, whose SUM is bounded by n×(1/(1−1/2)) = n×2 = 2n (the classic geometric series sum formula, giving a FINITE bound even though there are O(log n) terms). 3. So f1(n) = Θ(n) (the total increments are bounded both above and below by constant multiples of n — specifically, f1(n) is at least n, from just the FIRST iteration, and at most 2n, from the full geometric sum). 4. Analyze Function 2: the for-loop runs from i=1 to 100n, executing 'x=x+1' EXACTLY 100n times — no complexity, straightforward. So f2(n) = 100n = Θ(n). 5. Since BOTH f1(n) and f2(n) are Θ(n) (same asymptotic growth rate, differing only by constant factors), we have f1(n) ∈ Θ(f2(n)) — option A is TRUE. 6. Since f1(n)=Θ(n) implies f1(n)=O(n) as well (Θ is a stronger/tighter bound that includes O as an upper bound), option D (f1(n)∈O(n)) is ALSO TRUE. 7. Options B (f1∈o(f2), meaning STRICTLY smaller order) and C (f1∈ω(f2), meaning STRICTLY larger order) are BOTH FALSE, since f1 and f2 have the SAME order (Θ), not a strict sub/super relationship. 8. So the TRUE statements are A and D, matching indices [0,3]."
     },
     {
       id: "gate2023-cs-45",
@@ -581,7 +581,7 @@ window.GATE_DATA.pyq.push({
       tolerance: 0.01,
       kind: "nat",
       marks: 2,
-      explanation: "The array is stored row-major, so each page (512 elements) holds 4 consecutive rows, giving 32 pages total. The code walks the array column-major (D[j][i] for fixed i, varying j), touching a different page on almost every access; with only 30 frames available for a 32-page working set, LRU cannot retain all needed pages between passes, producing repeated faults that total 4096 over the full execution."
+      explanation: "Work out the page layout first, then trace the access pattern to find the fault count per outer-loop pass, and finally multiply. 1. Page layout: the array is 128×128 ints stored row-major, and each page holds 512 elements = 512/128 = 4 whole rows. So there are 128 rows / 4 rows-per-page = 32 pages total, and which page a row belongs to depends only on the row index (row j lives on page floor(j/4)), never on the column index. 2. Access pattern within one outer iteration (fixed i, j = 0..127): the code touches D[0][i], D[1][i], ..., D[127][i] in that order — i.e. it walks through rows 0,1,2,...,127 in sequence, which touches pages 0,0,0,0 (rows 0-3), then 1,1,1,1 (rows 4-7), ..., up to page 31 — a full, ordered sweep through all 32 pages, every single outer iteration, regardless of the value of i. 3. Trace this 32-page sweep against 30 frames under LRU: the first 30 distinct pages (0 through 29) each fault once when first touched, filling all 30 frames (30 faults so far). Page 30 then needs a frame and evicts the least-recently-used page, which is page 0 (touched longest ago in this sweep) — 1 fault. Page 31 then evicts the next-LRU page, page 1 — 1 fault. That's 30 + 1 + 1 = 32 faults for the very first outer iteration (i=0), touching all 32 distinct pages exactly once each with a fault. 4. Now the SECOND outer iteration (i=1) starts the identical sweep 0,1,2,...,31 again — but pages 0 and 1 were just evicted, so page 0 faults again immediately, which evicts the next-LRU page, page 2 (the least recently used among the retained pages) — but page 2 is needed just afterward too, so IT faults, evicting page 3, which is needed right after, and so on: because the working set (32 pages) is larger than available frames (30) and the access order is a fixed cyclic sweep, LRU always ends up evicting exactly the page that is about to be reused next — so from the second sweep onward, every single page reference in the sweep is a fault, i.e. 32 faults per outer iteration, with no hits at all. 5. Since this thrashing pattern is stable and repeats identically for every one of the 128 values of i, each of the 128 outer iterations costs exactly 32 page faults: total = 128 × 32 = 4096 page faults."
     },
     {
       id: "gate2023-cs-48",
@@ -593,7 +593,7 @@ window.GATE_DATA.pyq.push({
       tolerance: 0.01,
       kind: "nat",
       marks: 2,
-      explanation: "A 4 KB page with 8-byte entries holds 512 = 2^9 entries per page table page, so each level indexes 9 bits. The page offset uses 12 bits (4 KB), leaving 57 − 12 = 45 bits for level indices; 45 / 9 = 5, so 5 levels are needed."
+      explanation: "1. Find the page offset size: the page size is 4 KB = 2^12 bytes, so the low-order 12 bits of every virtual address are the in-page offset (not used for table lookups). 2. Find how many bits each page-table level indexes: since a page table itself occupies exactly one page (4 KB = 4096 bytes) and each entry is 8 bytes, one table page holds 4096/8 = 512 = 2^9 entries — so each level of the tree needs exactly 9 bits of the address to index into one table. 3. Find how many bits remain for all the level indices combined: the total virtual address is 57 bits, of which 12 are used for the final page offset, leaving 57 − 12 = 45 bits to be split across the L levels. 4. Divide the remaining bits by the bits-per-level: 45 / 9 = 5 exactly, so L = 5 levels are needed to index all 45 bits (5 levels × 9 bits/level = 45 bits, using up the address exactly with no remainder)."
     },
     {
       id: "gate2023-cs-49",
@@ -617,7 +617,7 @@ window.GATE_DATA.pyq.push({
       tolerance: 0.01,
       kind: "nat",
       marks: 2,
-      explanation: "The prefix \"10\" parses as I with value 2×1+0=2 (standard binary value). The suffix \"011\" parses right-to-left as F: F(\"1\")=1/2=0.5, F(\"11\")=(1+0.5)/2=0.75, F(\"011\")=(0+0.75)/2=0.375. So N.val = I.val + F.val = 2 + 0.375 = 2.375."
+      explanation: "1. Parse the input string '10#011' according to the grammar: N → I # F, splitting at the '#' token into I='10' (before #) and F='011' (after #). 2. Evaluate I='10' using the I-grammar rules (I→I1 B with I.val=2×I1.val+B.val, or I→B with I.val=B.val): the string '10' is parsed as I1='1' (which is B→1, giving I1.val=1) followed by B='0' (B→0, giving B.val=0), combined via I→I1 B: I.val = 2×I1.val + B.val = 2×1+0 = 2. (This matches the STANDARD BINARY interpretation of '10' = 2 in decimal, confirming the I-rule computes binary-to-decimal conversion for the INTEGER part, reading LEFT to RIGHT with each new digit DOUBLING the accumulated value and adding the new bit.) 3. Evaluate F='011' using the F-grammar rules (F→B F1 with F.val=1/2×(B.val+F1.val), or F→B with F.val=1/2×B.val): this grammar structure evaluates RECURSIVELY, processing the FRACTIONAL part where EACH subsequent digit gets HALVED relative to the previous. Break '011' into B='0' followed by F1='11'. First evaluate the INNERMOST F1: F1='11' further breaks into B='1' followed by F2='1'. Innermost: F('1') [single digit] = 1/2×B.val = 1/2×1 = 0.5 (using F→B rule). Next level: F('11') = 1/2×(B.val+F1.val) = 1/2×(1+0.5) = 1/2×1.5 = 0.75 (using F→B F1 rule, where B='1' is the first digit and F1='1' evaluated to 0.5 in the previous step). Outermost: F('011') = 1/2×(B.val+F1.val) = 1/2×(0+0.75) = 1/2×0.75 = 0.375 (using F→B F1 rule, where B='0' is the first digit and F1='11' evaluated to 0.75). 4. Combine using the N-rule: N.val = I.val + F.val = 2 + 0.375 = 2.375. 5. So the computed value is 2.375."
     },
     {
       id: "gate2023-cs-51",
@@ -629,7 +629,7 @@ window.GATE_DATA.pyq.push({
       tolerance: 0.01,
       kind: "nat",
       marks: 2,
-      explanation: "Among the female students (Aliya-70, Aliya-80, Swati-65), only the two rows with marks strictly greater than 65 qualify (70 and 80); Swati's 65 does not satisfy '>65', so 2 rows are returned."
+      explanation: "1. Filter the Student table by the WHERE clause conditions: gender='F' AND marks>65. 2. Examine each row: Naman (M, 62) — gender is M, not F, EXCLUDED. Aliya (F, 70) — gender=F matches, and marks=70>65 matches — INCLUDED. Aliya (F, 80) — gender=F matches, and marks=80>65 matches — INCLUDED. James (M, 82) — gender is M, not F, EXCLUDED. Swati (F, 65) — gender=F matches, BUT marks=65 is NOT strictly greater than 65 (the condition is '>65', not '>=65') — EXCLUDED. 3. So exactly 2 rows satisfy BOTH conditions (the two Aliya rows with marks 70 and 80), and these 2 rows are returned by the query."
     },
     {
       id: "gate2023-cs-52",
@@ -653,7 +653,7 @@ window.GATE_DATA.pyq.push({
       tolerance: 0.01,
       kind: "nat",
       marks: 2,
-      explanation: "The DFA needs to track the number of consecutive 1's seen so far (0, 1, or 2), plus one dead/reject state once three consecutive 1's occur, for a total of 4 states."
+      explanation: "1. We need a DFA that accepts all strings over {0,1} that do NOT contain THREE OR MORE consecutive 1's (i.e., reject any string containing '111' as a substring). 2. Design the DFA states to TRACK the LENGTH OF THE CURRENT RUN of consecutive 1's seen so far (since this is the only information needed to detect an impending violation): State q0 = 'no consecutive 1's currently' (initial/start state, also the state after seeing a '0'). State q1 = 'exactly ONE consecutive 1 seen so far' (reached from q0 on input '1'). State q2 = 'exactly TWO consecutive 1's seen so far' (reached from q1 on input '1'). State q_dead (or 'trap' state) = 'THREE OR MORE consecutive 1's have occurred' — an IRRECOVERABLE REJECTING state (once you hit 3 consecutive 1's, the string is DISQUALIFIED regardless of what follows, so this state is a DEAD/TRAP state that loops on ANY further input). 3. Transitions: from q0, on '0' stay at q0, on '1' go to q1. From q1, on '0' go BACK to q0 (the consecutive run is broken), on '1' go to q2. From q2, on '0' go BACK to q0, on '1' go to q_dead (this is where the THIRD consecutive 1 occurs). From q_dead, on '0' or '1' STAY at q_dead (trap state, no escape). 4. States q0, q1, q2 are ALL ACCEPTING (since the string read so far has NOT violated the constraint), while q_dead is NON-ACCEPTING (rejecting, since a violation has occurred). 5. This gives EXACTLY 4 DISTINCT states (q0, q1, q2, q_dead), and this is MINIMAL because each state represents a DISTINGUISHABLE 'memory' of how close the string is to violating the constraint (no two of these states can be merged without losing necessary information to correctly accept/reject future extensions of the string). 6. So the minimum number of DFA states is 4."
     },
     {
       id: "gate2023-cs-54",
@@ -665,7 +665,7 @@ window.GATE_DATA.pyq.push({
       tolerance: 0.01,
       kind: "nat",
       marks: 2,
-      explanation: "For an N-way set-associative cache, (INDEX bits + OFFSET bits) = log2(cache size / associativity) regardless of the block size, since sets × block size = cache size / ways. Here that is log2(65536/8) = log2(8192) = 13, so TAG = 32 − 13 = 19."
+      explanation: "1. Cache size = 64 KB = 65536 bytes = 2^16 bytes. Associativity (N-way) = 8-way set associative. 2. For an N-WAY set-associative cache, the cache is organized into SETS, where EACH SET contains N cache lines (blocks) that can hold data mapped to that set. The TOTAL cache capacity = (number of sets) × (N ways) × (block size). 3. Rearranging: number of sets × block size = cache_size / N = 65536/8 = 8192 bytes — this quantity (number of sets × block size) represents the TOTAL SPAN of addresses covered by the (INDEX + OFFSET) portion of the address, REGARDLESS of the SPECIFIC block size chosen (since sets and block size trade off against each other while their PRODUCT with associativity stays fixed at the total cache size). 4. So (INDEX bits + OFFSET bits) = log2(8192) = 13 bits (since 2^13 = 8192). 5. With a 32-bit total address, the TAG field takes the REMAINING bits: TAG bits = 32 − 13 = 19 bits. 6. So the number of bits in the TAG field is 19."
     },
     {
       id: "gate2023-cs-55",

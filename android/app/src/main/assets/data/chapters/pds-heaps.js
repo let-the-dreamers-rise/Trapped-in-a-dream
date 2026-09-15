@@ -185,9 +185,9 @@ insertion (sift-up) costs at most O(log n) swaps, one per level
 
 REMEMBER: Sift-up always starts by placing the element at the next array slot (shape first), then only ever compares upward along a single path to the root (order second). It never touches any node outside that one path, which is exactly why the cost is bounded by the height and nothing worse.
 
-EXTRACTING THE BEST ELEMENT: SIFT-DOWN
+EXTRACTING THE BEST ELEMENT: SIFT-DOWN (ALSO CALLED HEAPIFY)
 
-Removing the root is the whole reason the heap exists, so the operation has to both hand back the maximum and leave a valid heap behind, in O(log n).
+Removing the root is the whole reason the heap exists, so the operation has to both hand back the maximum and leave a valid heap behind, in O(log n). Be ready for this operation under several names: sift-down is also written HEAPIFY, MAX-HEAPIFY or percolate-down, and a question that says "re-heapify the reduced heap" is asking for exactly the sift-down described here. The name changes, the procedure does not.
 
 The maximum is easy to read — it is the root. The hard part is what replaces it, because deleting the root outright would break completeness at the top of the tree, and any of the interior nodes stepping up to fill it would leave a gap somewhere else. The trick: move the last element in the array into the root's position, and shrink the array by one. This costs O(1) and keeps the tree complete, because removing the last slot of a complete tree is always safe — it is precisely the slot completeness says must be filled last, so it is also safe to remove last.
 

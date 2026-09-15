@@ -857,9 +857,22 @@
     // Score every (beat, question) pair, then hand each beat its best free question.
     var pool = (t.questions || []).filter(function (q) { return !LESSON_BACKREF.test(q.q); });
     var pairs = [];
+    // A beat near the START of the chapter is introductory theory a learner has
+    // just met for the first time; a beat near the END comes after everything
+    // earlier has already been built up. Plain word-overlap scoring alone does
+    // not know this — a "hard" question sharing slightly more vocabulary with
+    // the very first theory beat would otherwise win outright, handing a
+    // beginner a question they have no chance of solving right after the intro.
+    // Bias the score toward the difficulty a learner should be ready for at
+    // that point in the lesson, without overriding a genuinely strong semantic
+    // match: the multiplier only softens ties, it never flips a clear winner.
+    var diffRank = { easy: 0, medium: 1, hard: 2 };
+    var totalBeats = beats.length || 1;
     beats.forEach(function (b, bi) {
       var termSet = {};
       b.terms.forEach(function (w) { termSet[w] = true; });
+      var pos = totalBeats > 1 ? bi / (totalBeats - 1) : 0;
+      var wantRank = pos < 0.34 ? 0 : pos < 0.7 ? 1 : 2;
       pool.forEach(function (q, qi) {
         var hit = {}, score = 0, qWords = {};
         lessonWords(q.q + ' ' + (q.explanation || '')).forEach(function (w) {
@@ -873,7 +886,12 @@
           if (b.words[w] && qVocab[w]) marks.push(w);
         });
         marks.sort(function (a, b3) { return b3.length - a.length; });
-        if (score > 0) pairs.push({ bi: bi, qi: qi, score: score, hits: marks });
+        if (score > 0) {
+          var qRank = diffRank[q.difficulty] != null ? diffRank[q.difficulty] : 1;
+          var gap = Math.abs(qRank - wantRank);
+          var weighted = score * (gap === 0 ? 1 : gap === 1 ? 0.82 : 0.6);
+          pairs.push({ bi: bi, qi: qi, score: weighted, hits: marks });
+        }
       });
     });
     pairs.sort(function (a, b2) { return b2.score - a.score; });

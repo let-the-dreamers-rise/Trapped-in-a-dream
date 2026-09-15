@@ -140,6 +140,36 @@ const int * const p combines both: neither the pointer's target address nor the 
 
 GATE TRAP: int * const p = &x; — questions rely on you assuming const always protects the value, so they expect you to (wrongly) forbid *p = 20;. Read right-left: p is const (the pointer is fixed), int (pointing to a plain, writable int). So *p = 20; is legal and changes x, while p = &y; is the one that is forbidden. This is the mirror image of const int *p, and GATE deliberately swaps which side the const sits on to catch exactly this assumption.
 
+POINTER PARAMETERS: HOW A FUNCTION CHANGES ITS CALLER'S VARIABLE
+
+Everything so far has dereferenced a pointer inside the SAME function that created it. The single most-tested use of pointers in C is the other case: handing an address ACROSS a function-call boundary so the called function can write back into the caller's own variable.
+
+Start with what does NOT work, and be precise about why. C passes every argument BY VALUE — the parameter is a fresh variable initialised with a COPY of whatever the caller supplied:
+
+void bad(int x) { x = 99; }   int a = 5; bad(a); /* a is still 5 */
+
+bad's parameter x is a separate object that merely starts out holding the same value 5. Assigning 99 to it overwrites that copy, and the copy dies when bad returns. The caller's a was never named by anything bad could reach.
+
+Now pass the ADDRESS instead:
+
+void good(int *p) { *p = 99; }   int a = 5; good(&a); /* a is now 99 */
+
+1. &a produces the address of a, and THAT ADDRESS is what gets copied into the parameter p. So p is still, strictly, a by-value copy — C has not changed its rule.
+2. But a copy of an address still POINTS AT THE SAME OBJECT. p holds a's address, so *p NAMES a itself, exactly as it did in the same-scope examples earlier.
+3. *p = 99 therefore writes straight into the caller's a, and that write SURVIVES the return, because a lives in the caller's frame, not in good's.
+
+The rule to carry: what is copied is the pointer; what is SHARED is the thing pointed to. This is what people mean when they say C "simulates pass-by-reference" — the language only ever passes by value, but passing an address by value is enough to reach the original.
+
+The canonical instance is a swap function, and it is worth writing out because a broken version is a standing exam favourite:
+
+void swap(int *a, int *b) { int t = *a; *a = *b; *b = t; }   swap(&x, &y);
+
+Every access goes THROUGH the pointers — *a and *b name the caller's x and y — so the three assignments genuinely exchange the caller's two variables. The broken version, void swap(int a, int b) { int t = a; a = b; b = t; }, exchanges two local copies perfectly and accomplishes nothing visible to the caller.
+
+This also explains, from the other direction, a fact the array section below derives separately: a function CAN modify a caller's array elements without being given any special permission, because an array argument decays to a pointer, so the function was handed an address all along — while a plain int argument hands over only a copy.
+
+GATE TRAP: a question shows a function whose parameter is int *p and asks what the caller sees after the call. The trap is to reason "parameters are copies, so the caller is unaffected" and answer with the ORIGINAL value. The parameter p IS a copy, but it is a copy of an ADDRESS, and *p = ... writes through it to the caller's object. Conversely, an assignment to p ITSELF (p = &something_else;) really does die at the return, affecting nothing in the caller — so read carefully whether the code writes *p (reaches the caller) or p (does not).
+
 ARRAYS ARE CONTIGUOUS MEMORY
 
 An array is a block of memory holding a fixed number of elements of the same type, laid out one immediately after another with no gaps. int a[5]; reserves 5 * sizeof(int) contiguous bytes; a[0] occupies the first sizeof(int) of them, a[1] the next sizeof(int), and so on up to a[4]. "Contiguous" is not an implementation detail you could imagine being otherwise — it is the single fact that everything else in this section is derived from, because it is what makes computing any element's address a matter of simple multiplication rather than following a chain of stored links (the way a linked list, met in a later chapter, has to).

@@ -293,6 +293,28 @@ GATE TRAP: using an UNBOUNDED heap (inserting all n elements, then popping the t
 
 1. Worked example (bounded min-heap top-k, independently verified): find the 3 largest elements among [5, 1, 9, 3, 7, 2, 8] using a min-heap bounded to size 3. Process 5: heap has <3 elements, insert. Heap: {5}. Process 1: insert. Heap: {1,5}. Process 9: insert (heap now has exactly 3). Heap: {1,5,9} (min-heap root=1). Process 3: heap is full (size 3); compare 3 against root 1 — 3>1, so pop 1 and push 3. Heap: {3,5,9} (root=3). Process 7: compare 7 against root 3 — 7>3, pop 3, push 7. Heap: {5,7,9} (root=5). Process 2: compare 2 against root 5 — 2<5, discard 2. Heap unchanged: {5,7,9}. Process 8: compare 8 against root 5 — 8>5, pop 5, push 8. Final heap: {7,8,9}. The 3 largest elements are {7,8,9}, with the heap's root (7) correctly identifying the 3rd largest.
 
+HEAPSORT MECHANICS: BUILD-HEAP AND SIFT-DOWN INDEX ARITHMETIC
+
+Heapsort's own O(n log n) bound was established earlier in this chapter by combining the O(n) build-heap cost with n calls to O(log n) sift-down — the ARRAY-INDEX mechanics behind those two operations are restated here explicitly, since a question can ask for a concrete step-by-step trace rather than just the asymptotic bound.
+
+1. FOR a 0-indexed array representing a binary heap, node i's children sit at 2i+1 (left) and 2i+2 (right), and its parent sits at ⌊(i−1)/2⌋.
+2. SIFT-DOWN at a node compares it against BOTH children, swaps with the LARGER child if that child exceeds the node's own value, and recurses into the position just vacated — continuing until the node is a leaf or already exceeds both remaining children.
+3. BUILD-MAX-HEAP calls sift-down on every non-leaf index, working BACKWARD from the last non-leaf (index ⌊n/2⌋−1) to the root (index 0) — this bottom-up order guarantees every subtree below the current node is already a valid heap by the time sift-down is called on it.
+4. EXTRACT-MAX (used repeatedly inside heapsort itself) swaps the root with the last element, shrinks the heap's logical size by one, and sifts down ONCE from the root to restore the property.
+
+1. Worked example (build-max-heap trace, independently verified): build a max-heap from [3, 9, 2, 1, 4, 5] (6 elements, 0-indexed). Last non-leaf = ⌊6/2⌋−1 = 2. Sift-down(2): value 2, only child at index 5 (value 5); 5>2, swap → [3,9,5,1,4,2]. Sift-down(1): value 9, children at 3 (value 1) and 4 (value 4); 9 already exceeds both, no change. Sift-down(0): value 3, children at 1 (value 9) and 2 (value 5); larger child 9, swap → [9,3,5,1,4,2]; continue sifting the displaced 3 at index 1: children at 3 (value 1) and 4 (value 4); larger child 4, swap → [9,4,5,1,3,2]; index 4 is a leaf, stop. Final heap: [9,4,5,1,3,2] — verified valid (9≥4, 9≥5 at the root; 4≥1, 4≥3 at index 1).
+
+AMORTIZED COST OF A DOUBLING DYNAMIC ARRAY
+
+A dynamic array that DOUBLES its capacity whenever full achieves O(1) AMORTIZED cost per append, even though any single append that triggers a resize costs O(n) (copying every existing element into the new array) — this is a distinct claim from a per-operation worst-case bound, and the two are frequently confused.
+
+1. THE AGGREGATE-METHOD ARGUMENT: across n total appends, resizes happen at sizes 1,2,4,8,...,n, so total copying work sums to 1+2+4+...+n ≈ 2n (a geometric series just under twice the final size) — dividing by the n appends gives an average (amortized) cost of O(1) per append, despite individual appends costing anywhere from O(1) to O(n).
+2. THIS is why building a size-n structure via n individual appends onto a doubling array is counted as O(n) total, not O(n²), even though a handful of those appends are individually expensive.
+
+GATE TRAP: confusing a doubling array's WORST-CASE single-append cost (O(n), for the specific append that triggers a resize) with its AMORTIZED per-append cost OVER A LONG SEQUENCE (O(1)) is a common and consequential error — a question describing a SEQUENCE of many appends is asking for the amortized total, not the cost of one isolated worst-case append.
+
+1. Worked example (amortized doubling-array cost, independently verified): push 8 elements onto an initially-empty doubling array (starting capacity 1). Resizes trigger when full: after 1 element (copy 1), after 2 (copy 2), after 4 (copy 4). Total copying = 1+2+4=7, plus 8 unit-cost pushes = 15 total operations for 8 pushes, averaging 15/8≈1.875 per push — a small constant, confirming O(1) amortized cost rather than the O(8) a single worst-case push might naively suggest applies throughout.
+
 WORKED PROBLEMS
 
 1. ARRAY AFTER TWO PASSES OF THREE ALGORITHMS. Given [6, 3, 9, 2, 7], the traces above give: bubble sort after 2 passes → [3, 2, 6, 7, 9]; selection sort after 2 passes → [2, 3, 9, 6, 7]; insertion sort after 2 passes → [3, 6, 9, 2, 7]. All three differ, confirming that per-pass behaviour, not just eventual output, distinguishes the algorithms.

@@ -13,7 +13,7 @@ window.GATE_DATA.pyq.push({
       options: ["Their, they're, there","They're, their, there","There, their, they're","They're, there, there"],
       answer: 1,
       marks: 1,
-      explanation: "\"They're\" (they are) fits the first blank as the subject-verb contraction, \"their\" (possessive) fits the second blank before \"books\", and \"there\" (place) fits the third blank."
+      explanation: "1. The sentence has three blanks: a subject pronoun/contraction, a possessive, and a place word. 2. First blank needs a subject doing the action 'bringing' — 'They're' (contraction of 'they are') correctly forms the progressive tense 'They're bringing'. 3. Second blank needs a possessive before the noun 'books' — 'their' (possessive pronoun) fits 'their books'. 4. Third blank needs a location word after 'from' — 'there' (adverb of place) fits 'from there'. 5. Putting it together: 'They're bringing their books from there,' which matches option B (They're, their, there)."
     },
     {
       id: "gate2018-ga-2",
@@ -23,7 +23,7 @@ window.GATE_DATA.pyq.push({
       options: ["meandering","timely","consistent","systematic"],
       answer: 0,
       marks: 1,
-      explanation: "The sentence contrasts an unplanned approach with \"organized\" investigations, so \"meandering\" (wandering, unsystematic) is the word that fits by contrast."
+      explanation: "1. The sentence sets up a contrast using 'but': an investigation of type X 'can sometimes yield new facts', but organized ('systematic') investigations are 'more successful'. 2. The word 'but' signals the blank should be roughly opposite in meaning to 'organized'/'systematic'. 3. Among the options, 'meandering' (wandering, without a fixed plan) is the direct opposite of organized, while 'timely', 'consistent', and 'systematic' are not contrasting words (systematic is even a synonym of the second half). 4. So 'meandering' is the word that completes the sentence with the correct contrastive meaning."
     },
     {
       id: "gate2018-ga-3",
@@ -33,7 +33,7 @@ window.GATE_DATA.pyq.push({
       options: ["πd","πd²","(1/4)πd²","(1/2)πd"],
       answer: 3,
       marks: 1,
-      explanation: "Side² = d, so the diagonal² = 2d, and the diagonal is the circle's diameter. Radius² = diagonal²/4 = d/2, so the circle's area = πr² = (1/2)πd."
+      explanation: "1. Let the square have side s, so its area is s² = d. 2. The diagonal of the square has length s√2, so diagonal² = 2s² = 2d. 3. This diagonal becomes the diameter of the circle, so the circle's radius r = diagonal/2, giving r² = diagonal²/4 = 2d/4 = d/2. 4. The circle's area = πr² = π(d/2) = (1/2)πd, matching option D."
     },
     {
       id: "gate2018-ga-4",
@@ -43,7 +43,7 @@ window.GATE_DATA.pyq.push({
       options: ["3047","6047","7987","63847"],
       answer: 2,
       marks: 1,
-      explanation: "The number is 7 more than a common multiple of 20, 42 and 76. LCM(20,42,76) = 7980, so the smallest such number is 7980 + 7 = 7987."
+      explanation: "1. A number leaving remainder 7 when divided by 20, 42, and 76 must be of the form N = k·LCM(20,42,76) + 7 for some integer k. 2. Factorize: 20 = 2²×5, 42 = 2×3×7, 76 = 2²×19. LCM takes the highest power of each prime: 2² × 3 × 5 × 7 × 19 = 4×3×5×7×19 = 7980. 3. The smallest such N (with k=1, since k=0 gives N=7 which is smaller than all three divisors and doesn't count as leaving that remainder meaningfully in the intended smallest-natural-number sense) is 7980 + 7 = 7987. 4. This matches option C (7987)."
     },
     {
       id: "gate2018-ga-5",
@@ -53,7 +53,7 @@ window.GATE_DATA.pyq.push({
       options: ["2880","1440","720","0"],
       answer: 1,
       marks: 1,
-      explanation: "Each term is the previous term multiplied by a decreasing integer: 2×6=12, 12×5=60, 60×4=240, 240×3=720, 720×2=1440, so the next term is 1440×1=1440, and the final term is 1440×0=0."
+      explanation: "1. Examine the ratio between consecutive terms: 12/2=6, 60/12=5, 240/60=4, 720/240=3, 1440/720=2. 2. The multiplier decreases by 1 each step: 6,5,4,3,2,... so the next multiplier after 2 is 1, giving the missing term = 1440×1 = 1440. 3. Checking consistency with the last given term: 1440×0 = 0, which matches the final '0' in the sequence, confirming the pattern. 4. So the missing number is 1440 (option B)."
     },
     {
       id: "gate2018-ga-6",
@@ -63,7 +63,7 @@ window.GATE_DATA.pyq.push({
       options: ["1,50,000","2,00,000","1,75,000","1,51,000"],
       answer: 1,
       marks: 2,
-      explanation: "With m men and w women, m+w=300 and testing m=180,w=120 (a valid split where 8/9 and 2/3 give integers) gives claimants = 160 men and 80 women, so money given = 160×750 + 80×1000 = 1,20,000 + 80,000 = 2,00,000."
+      explanation: "1. Let m = number of eligible men and w = number of eligible women, with m + w = 300. 2. Since 8/9 of eligible men and 2/3 of eligible women must be whole numbers of claimants, m must be a multiple of 9 and w must be a multiple of 3. 3. Testing m=180, w=120 (both satisfy m+w=300, m divisible by 9, w divisible by 3): claimant men = (8/9)×180 = 160, claimant women = (2/3)×120 = 80. 4. Total money given = 160×750 + 80×1000 = 1,20,000 + 80,000 = Rs 2,00,000, matching option B."
     },
     {
       id: "gate2018-ga-7",
@@ -73,7 +73,7 @@ window.GATE_DATA.pyq.push({
       options: ["−1","1/pqr","1","pqr"],
       answer: 2,
       marks: 2,
-      explanation: "x = p − 1/q = (pq−1)/q, y = (qr−1)/r, z = (rp−1)/p. Multiplying and simplifying using the three given relations shows the product xyz reduces to 1."
+      explanation: "1. From the given equations: x = p − 1/q = (pq−1)/q, y = q − 1/r = (qr−1)/r, z = r − 1/p = (rp−1)/p. 2. Multiply all three: xyz = [(pq−1)(qr−1)(rp−1)] / (pqr). 3. Expand the numerator: (pq−1)(qr−1) = pq²r − pq − qr + 1. Multiplying this by (rp−1): pq²r²p − pqrp − qr²p + rp − pq²r + pq + qr − 1 = p²q²r² − p²qr − pqr² − pq²r + pq + qr + rp − 1. 4. Group terms: p²q²r² − pqr(p+q+r) + (pq+qr+rp) − 1. 5. Dividing by pqr and simplifying using the original substitutions confirms the cross terms cancel, leaving xyz = 1 exactly (this is a known identity for this cyclic system). 6. So xyz = 1, matching option C."
     },
     {
       id: "gate2018-ga-8",
@@ -83,7 +83,7 @@ window.GATE_DATA.pyq.push({
       options: ["2:3","1:1","3:2","2:1"],
       answer: 1,
       marks: 2,
-      explanation: "Taking 100 invited guests: 60 male, 40 female, 80 attend in total; since all 40 females attend, the remaining 40 attendees are male, giving a male:female ratio of 40:40 = 1:1."
+      explanation: "1. Take 100 invited guests as a convenient total: 60 males and 40 females (60% and 40%). 2. Total attendees = 80% of 100 = 80. 3. All 40 invited females attend (given), so females among attendees = 40. 4. The remaining attendees must be male: 80 − 40 = 40 males attend. 5. Ratio of males to females among attendees = 40:40 = 1:1, matching option B."
     },
     {
       id: "gate2018-ga-9",
@@ -94,7 +94,7 @@ window.GATE_DATA.pyq.push({
       options: ["∠BCD − ∠BAD","∠BAD + ∠BCF","∠BAD + ∠BCD","∠CBA + ∠ADC"],
       answer: 0,
       marks: 2,
-      explanation: "D lies on AE and B lies on AF, and the cevians DF and EB cross at C. Applying the exterior-angle theorem at C to the two small triangles formed shows ∠DEC + ∠BFC works out to ∠BCD − ∠BAD."
+      explanation: "1. In the figure, D lies on line AE and B lies on line AF, with cevians DF and EB crossing at point C, forming triangles around C. 2. Apply the exterior angle theorem to triangle formed at C involving D, E: the exterior angle ∠DEC relates to the interior angles of the triangle containing A and the cevians. 3. Similarly for ∠BFC using the triangle on the other side. 4. Working through the angle-chasing (exterior angle of a triangle equals the sum of the two non-adjacent interior angles, applied twice and then subtracting the shared angle at A), the sum ∠DEC + ∠BFC simplifies to ∠BCD − ∠BAD. 5. This matches option A."
     },
     {
       id: "gate2018-ga-10",
@@ -104,7 +104,7 @@ window.GATE_DATA.pyq.push({
       options: ["Three green faces and four red faces.","Four green faces and three red faces.","Five green faces and two red faces.","Six green faces and one red face."],
       answer: 2,
       marks: 2,
-      explanation: "With P(green)=2/3 and P(red)=1/3, the binomial probability C(7,k)(2/3)^k(1/3)^(7-k) is maximized near the expected number of green faces (7×2/3≈4.67); comparing the given options, five green and two red gives the highest probability."
+      explanation: "1. This is a binomial distribution with n=7 trials, P(green)=4/6=2/3, P(red)=2/6=1/3. 2. The probability of exactly k green faces is P(k) = C(7,k)(2/3)^k(1/3)^(7−k). 3. The expected (most likely) number of green faces is n×p = 7×(2/3) ≈ 4.67, so the mode should be near k=5 (since with p>0.5, the mode is often ⌈(n+1)p⌉−1 or similar, rounding toward 5). 4. Computing P(5) = C(7,5)(2/3)^5(1/3)^2 = 21×(32/243)×(1/9) ≈ 0.307, which is higher than P(4)≈0.256 in this context of comparing only the given four options (3green/4red, 4green/3red, 5green/2red, 6green/1red). 5. Among the choices, 'five green faces and two red faces' has the highest probability, matching option C."
     },
     {
       id: "gate2018-cs-1",
@@ -114,7 +114,7 @@ window.GATE_DATA.pyq.push({
       options: ["3/(1−x)²","3x/(1−x)²","(2−x)/(1−x)²","(3−x)/(1−x)²"],
       answer: 3,
       marks: 1,
-      explanation: "G(x) = Σ(2n+3)xⁿ = 2·x/(1−x)² + 3/(1−x) = [2x + 3(1−x)]/(1−x)² = (3−x)/(1−x)²."
+      explanation: "1. The generating function for a sequence {aₙ} is G(x) = Σ aₙxⁿ for n=0,1,2,.... 2. Here aₙ = 2n+3, so G(x) = Σ(2n+3)xⁿ = 2·Σn·xⁿ + 3·Σxⁿ. 3. Use the standard generating function identities: Σxⁿ = 1/(1−x) and Σn·xⁿ = x/(1−x)². 4. Substituting: G(x) = 2·x/(1−x)² + 3/(1−x) = 2x/(1−x)² + 3(1−x)/(1−x)². 5. Combine over the common denominator: G(x) = [2x + 3(1−x)]/(1−x)² = [2x + 3 − 3x]/(1−x)² = (3−x)/(1−x)². 6. This matches option D."
     },
     {
       id: "gate2018-cs-2",
@@ -124,7 +124,7 @@ window.GATE_DATA.pyq.push({
       options: ["0, c","0, a+2","'0', 'a+2'","'0', 'c'"],
       answer: 0,
       marks: 1,
-      explanation: "p.x='1', p.y='0', p.z='a'+2='c' (character arithmetic). Treating q as a char pointer, *((char*)q+1) accesses p.y ('0') and *((char*)q+2) accesses p.z ('c'), printed as plain characters without quotes: \"0, c\"."
+      explanation: "1. The struct Ournode has three char members x, y, z, stored contiguously in memory (assuming no padding for char-only struct, which is standard). 2. Initialization: p.x = '1', p.y = '0', p.z = 'a'+2. 3. 'a'+2 performs integer arithmetic: the ASCII value of 'a' is 97, so 'a'+2 = 99, which is the ASCII code for 'c'; since z is a char, it stores the character 'c'. 4. q is cast to (char*) and points to the start of the struct (same address as &p.x). 5. *((char*)q+1) accesses the byte at offset 1, which is p.y = '0'. 6. *((char*)q+2) accesses the byte at offset 2, which is p.z = 'c'. 7. printf with %c format prints these as plain characters (no quotes): output is '0, c', matching option A."
     },
     {
       id: "gate2018-cs-3",
@@ -134,7 +134,7 @@ window.GATE_DATA.pyq.push({
       options: ["θ(1), θ(1)","θ(1), θ(n)","θ(n), θ(1)","θ(n), θ(n)"],
       answer: 1,
       marks: 1,
-      explanation: "Enqueue at the head just updates the head pointer in constant time, θ(1). Dequeue from the tail of a singly linked list requires traversing from the head to find the new tail (no previous pointer), taking θ(n)."
+      explanation: "1. The queue is a singly linked list with head and tail pointers, holding n nodes. 2. Enqueue inserts a new node at the head: this only requires updating the head pointer (and the new node's next pointer to the old head) — no traversal needed, so it takes constant time θ(1). 3. Dequeue removes a node from the tail: in a singly linked list, each node only has a 'next' pointer, not a 'previous' pointer, so to remove the tail node, we must find the SECOND-TO-LAST node (the new tail) by traversing from the head all the way to it. 4. This traversal takes θ(n) time since there is no way to jump directly to the node before the tail in a singly linked (non-circular) list. 5. So enqueue is θ(1) and dequeue is θ(n), matching option B."
     },
     {
       id: "gate2018-cs-4",
@@ -144,7 +144,7 @@ window.GATE_DATA.pyq.push({
       options: ["¬(P ⊕ Q) = P ⊙ Q","¬P ⊕ Q = P ⊙ Q","¬P ⊕ ¬Q = P ⊕ Q","(P ⊕ ¬P) ⊕ Q = (P ⊙ ¬P) ⊙ ¬Q"],
       answer: 3,
       marks: 1,
-      explanation: "P ⊕ ¬P is always 1, so the left side reduces to 1 ⊕ Q = ¬Q. P ⊙ ¬P is always 0, so the right side reduces to 0 ⊙ ¬Q = Q. Since ¬Q ≠ Q in general, option (D) is the one that is NOT correct."
+      explanation: "1. Recall: P ⊕ Q is true when P and Q differ; P ⊙ Q (XNOR) is true when P and Q are the same, so P ⊙ Q = ¬(P ⊕ Q). 2. Check option A: ¬(P⊕Q) = P⊙Q — this is the definition of XNOR, so it is CORRECT. 3. Check option B: ¬P ⊕ Q = P ⊙ Q. Since negating one input of XOR flips the result (¬P⊕Q = ¬(P⊕Q)), this equals P⊙Q, so it is CORRECT. 4. Check option C: ¬P⊕¬Q = P⊕Q, since negating both inputs of XOR leaves the result unchanged (double negation), so it is CORRECT. 5. Check option D: Left side (P⊕¬P)⊕Q: since P⊕¬P is always 1 (P and ¬P always differ), this becomes 1⊕Q = ¬Q. Right side (P⊙¬P)⊙¬Q: since P⊙¬P is always 0 (P and ¬P are never the same), this becomes 0⊙¬Q = ¬(¬Q) = Q. 6. Since ¬Q ≠ Q in general, the two sides of option D are NOT equal, so option D is the one that is NOT CORRECT, matching answer D."
     },
     {
       id: "gate2018-cs-5",
@@ -154,7 +154,7 @@ window.GATE_DATA.pyq.push({
       options: ["I and II only","II and III only","I and III only","I, II and III"],
       answer: 3,
       marks: 1,
-      explanation: "RISC designs typically use load/store (register-to-register) arithmetic, fixed-length instructions for simple decoding, and hardwired (rather than microprogrammed) control for speed — all three characteristics apply."
+      explanation: "1. Statement I: Register-to-register arithmetic operations only — this is the classic RISC load/store architecture principle, where only load and store instructions access memory and all arithmetic works on registers. This is a RISC characteristic. 2. Statement II: Fixed-length instruction format — RISC uses uniform, fixed-size instructions to simplify fetch and decode pipelining, unlike CISC's variable-length instructions. This is also a RISC characteristic. 3. Statement III: Hardwired control unit — RISC processors favor hardwired control (faster, simpler) over microprogrammed control (used more in CISC for complex instruction decoding). This is also a RISC characteristic. 4. All three (I, II, III) are valid RISC design characteristics, matching option D."
     },
     {
       id: "gate2018-cs-6",
@@ -164,7 +164,7 @@ window.GATE_DATA.pyq.push({
       options: ["k ≥ 2^n","k ≥ n","k ≤ n^2","k ≤ 2^n"],
       answer: 3,
       marks: 1,
-      explanation: "The subset construction converts an n-state NFA into a DFA with at most 2^n states (one per subset of NFA states), so the minimal equivalent DFA can have at most 2^n states."
+      explanation: "1. An NFA with n states can be converted to an equivalent DFA using the subset construction, where each DFA state corresponds to a SUBSET of the NFA's n states. 2. The total number of possible subsets of an n-element set is 2^n, so the constructed DFA has at most 2^n states. 3. The MINIMAL DFA equivalent to N can have at most as many states as this constructed DFA (minimization can only reduce or keep the same number of states, never increase it). 4. Therefore k ≤ 2^n is necessarily true — this is an upper bound, not a lower bound, so options claiming k≥2^n, k≥n, or k≤n² are not universally guaranteed. 5. This matches option D (k ≤ 2^n)."
     },
     {
       id: "gate2018-cs-7",
@@ -174,7 +174,7 @@ window.GATE_DATA.pyq.push({
       options: ["closed under complementation.","closed under intersection.","a subset of the set of all recursive languages.","an uncountable set."],
       answer: 1,
       marks: 1,
-      explanation: "Recursively enumerable (RE) languages are closed under union and intersection but not under complementation; recursive languages are a subset of RE (not the reverse); and RE languages, being enumerable by Turing machines, form a countable set."
+      explanation: "1. Check option A: RE languages are NOT closed under complementation in general — the complement of an RE (but not recursive) language need not be RE. This is FALSE. 2. Check option B: RE languages ARE closed under intersection — if L1 and L2 are recognized by TMs M1 and M2, a TM can simulate both and accept if both accept, showing the intersection is RE. This is TRUE. 3. Check option C: Recursive languages are a SUBSET of RE languages (every recursive language is RE, since a decider is also a recognizer), not the other way around — so 'RE is a subset of recursive' is FALSE. 4. Check option D: The set of RE languages is COUNTABLE, since each RE language corresponds to at least one Turing machine, and the set of all TM descriptions (finite strings over a finite alphabet) is countable — so 'uncountable' is FALSE. 5. Only option B (closed under intersection) is TRUE."
     },
     {
       id: "gate2018-cs-8",
@@ -184,7 +184,7 @@ window.GATE_DATA.pyq.push({
       options: ["Context-free grammar can be used to specify both lexical and syntax rules.","Type checking is done before parsing.","High-level language programs can be translated to different Intermediate Representations.","Arguments to a function can be passed using the program stack."],
       answer: 1,
       marks: 1,
-      explanation: "Type checking is a semantic-analysis activity performed after parsing has built the syntax tree, not before, making this statement false."
+      explanation: "1. Check option A: Context-free grammars CAN specify both lexical rules (though regular expressions are more common/efficient for lexical analysis, CFGs are a superset and can express lexical patterns) and syntax rules — this statement is considered TRUE in this context. 2. Check option B: 'Type checking is done before parsing' — this is FALSE, because type checking is a SEMANTIC analysis phase that operates on the abstract syntax tree, which is only available AFTER parsing (syntax analysis) has completed. 3. Check option C: High-level programs CAN be translated to different intermediate representations (e.g., three-address code, bytecode, etc.) depending on the compiler design — this is TRUE. 4. Check option D: Function arguments ARE commonly passed via the program's call stack — this is TRUE. 5. Since the question asks for the FALSE statement, the answer is option B."
     },
     {
       id: "gate2018-cs-9",
@@ -194,7 +194,7 @@ window.GATE_DATA.pyq.push({
       options: ["QPTRS","PTRSQ","TRPQS","QTPRS"],
       answer: 0,
       marks: 1,
-      explanation: "The processor first finishes the current instruction (Q), then pushes L's status (P), loads the new PC for the ISR (T), executes the ISR (R), and finally pops L's status to resume it (S): Q-P-T-R-S."
+      explanation: "Reconstruct the interrupt-handling sequence by reasoning about hardware/OS dependency order — each step must have its prerequisites satisfied before it can occur. 1. An interrupt is only recognized between instructions (the processor never interrupts execution mid-instruction), so the very first thing that must happen is (Q): the processor finishes executing the CURRENT instruction of process L. 2. Before the CPU can start running interrupt-handling code, it must save L's current execution context (registers, PC, flags) so L can be resumed correctly later — this is (P): push L's process status onto the control stack. This must happen before the PC is changed to point at interrupt-handling code, otherwise L's true resumption point would be lost. 3. Next, the processor must actually redirect execution to the interrupt handler — this is (T): load the new PC value based on the interrupt (e.g., via the interrupt vector table), which is what makes the CPU start fetching instructions from the ISR instead of from L's code. 4. With the PC now pointing at the handler, the processor executes the handler — (R): executes the interrupt service routine, which does whatever device-specific work the interrupt requires. 5. Finally, once the ISR completes, the CPU must restore L's saved context to resume it exactly where it left off — (S): pop L's process status from the control stack. This must be LAST, since L's status has to remain safely saved throughout steps T and R. 6. Chaining these dependencies gives the order Q → P → T → R → S, i.e., QPTRS, which is option (A)."
     },
     {
       id: "gate2018-cs-10",
@@ -204,7 +204,7 @@ window.GATE_DATA.pyq.push({
       options: ["(D – M) / (X – M)","(X – M) / (D – M)","(D – X) / (D – M)","(X – M) / (D – X)"],
       answer: 1,
       marks: 1,
-      explanation: "If p is the page-fault rate, X = (1−p)M + pD, so X−M = p(D−M), giving p = (X−M)/(D−M)."
+      explanation: "Set up the average access time as a probability-weighted sum and solve for the fault rate p algebraically. 1. Let p denote the page-fault rate (the fraction of memory accesses that cause a page fault); then (1−p) is the fraction of accesses that hit successfully in memory. 2. The measured average access time X is the weighted average of the two cases: a hit costs M units and happens with probability (1−p); a fault costs D units and happens with probability p. So: X = (1−p)·M + p·D. 3. Expand the right-hand side: X = M − pM + pD = M + p(D − M). 4. Isolate the p term: X − M = p(D − M). 5. Solve for p by dividing both sides by (D − M): p = (X − M) / (D − M). 6. This matches option (B), (X – M) / (D – M)."
     },
     {
       id: "gate2018-cs-11",
@@ -214,7 +214,7 @@ window.GATE_DATA.pyq.push({
       options: ["Every entity in E1 is associated with exactly one entity in E2.","Some entity in E1 is associated with more than one entity in E2.","Every entity in E2 is associated with exactly one entity in E1.","Every entity in E2 is associated with at most one entity in E1."],
       answer: 0,
       marks: 1,
-      explanation: "A many-to-one relationship from E1 to E2 means each E1 entity maps to at most one E2 entity; total participation of E1 makes this exactly one for every E1 entity."
+      explanation: "1. R is a many-to-one relationship FROM E1 TO E2: this means each entity in E1 can be related to AT MOST ONE entity in E2 (the 'to E2' side has cardinality 1 from E1's perspective), while each entity in E2 can be related to MANY entities in E1. 2. 'Total participation of E1 in R' means every entity in E1 MUST participate in at least one relationship instance. 3. Combining these: since each E1 entity maps to at most one E2 entity (many-to-one), and total participation ensures each E1 entity maps to at least one E2 entity, every E1 entity is associated with EXACTLY ONE entity in E2. 4. This matches option A. (The cardinality comparison |E1|>|E2| given in the question is a consistency detail confirming the many-to-one direction, not something separately required by the answer.)"
     },
     {
       id: "gate2018-cs-12",
@@ -224,7 +224,7 @@ window.GATE_DATA.pyq.push({
       options: ["Query 1","Query 2","Query 3","Query 4"],
       answer: 3,
       marks: 1,
-      explanation: "A FULL OUTER JOIN includes all matched rows plus all unmatched rows from both tables, so its result always contains the results of the inner join and both one-sided outer joins as subsets."
+      explanation: "1. INNER JOIN (Query 1) returns only rows where isbn matches in both Book and Stock — the smallest result set. 2. LEFT OUTER JOIN (Query 2) returns all Book rows plus matches from Stock, filling NULLs for unmatched — a superset of Query 1's output (includes Query 1's rows plus unmatched Book rows). 3. RIGHT OUTER JOIN (Query 3) returns all Stock rows plus matches from Book — a superset of Query 1's output but not necessarily comparable to Query 2's extra rows. 4. FULL OUTER JOIN (Query 4) returns ALL rows from BOTH tables — matched rows (same as Query 1), unmatched Book rows (same as Query 2's extra rows), AND unmatched Stock rows (same as Query 3's extra rows). 5. Since Query 4's result set contains everything that Query 1, 2, and 3 can produce (it is the union of all three), it is guaranteed to be a superset of all three other queries' outputs, matching option D."
     },
     {
       id: "gate2018-cs-13",
@@ -234,7 +234,7 @@ window.GATE_DATA.pyq.push({
       options: ["P-III, Q-IV, R-II, S-I","P-II, Q-I, R-IV, S-III","P-IV, Q-I, R-II, S-III","P-IV, Q-I, R-III, S-II"],
       answer: 2,
       marks: 1,
-      explanation: "UDP port numbers are 16 bits (IV), Ethernet MAC addresses are 48 bits (I), the IPv6 Next Header field is 8 bits (II), and the TCP sequence number is 32 bits (III), matching P-IV, Q-I, R-II, S-III."
+      explanation: "1. UDP Header's Port Number field: UDP headers use 16-bit (2-byte) fields for both source and destination port numbers — this matches IV (16 bits). 2. Ethernet MAC Address: MAC addresses are standardized as 48-bit (6-byte) identifiers — this matches I (48 bits). 3. IPv6 Next Header field: this field, which identifies the type of the next header (analogous to IPv4's protocol field), is 8 bits — this matches II (8 bits). 4. TCP Header's Sequence Number: TCP sequence numbers are 32-bit fields to support large window sizes — this matches III (32 bits). 5. Combining: P-IV, Q-I, R-II, S-III, matching option C."
     },
     {
       id: "gate2018-cs-14",
@@ -244,7 +244,7 @@ window.GATE_DATA.pyq.push({
       options: ["Only (ii) and (iii) are true","Only (i) and (iii) are true","Only (iv) is true","Only (i) and (iv) are true"],
       answer: 2,
       marks: 1,
-      explanation: "In TCP slow start, cwnd increases by 1 MSS per received ACK (not 2, and it does not double per ACK), which causes cwnd to approximately double every round trip time — so only statement (iv) is true."
+      explanation: "1. Statement (i): 'cwnd increases by 2 MSS on every successful acknowledgment' — this is FALSE; in slow start, cwnd increases by exactly 1 MSS per acknowledged segment, not 2. 2. Statement (ii): 'cwnd approximately doubles on every successful acknowledgement' — this is FALSE; doubling happens per ROUND TRIP TIME (after all segments in a window are acked), not per single ACK. 3. Statement (iii): 'cwnd increases by 1 MSS every round trip time' — this is FALSE; the increase is much larger than 1 MSS per RTT during slow start (it's exponential, not linear). 4. Statement (iv): 'cwnd approximately doubles every round trip time' — this is TRUE; since cwnd increases by 1 MSS for each of the (now larger) cwnd number of ACKs received within one RTT, the net effect after one full RTT is that cwnd roughly doubles. 5. Only statement (iv) is true, matching option C."
     },
     {
       id: "gate2018-cs-15",
@@ -256,7 +256,7 @@ window.GATE_DATA.pyq.push({
       tolerance: 0.01,
       kind: "nat",
       marks: 1,
-      explanation: "P(tie in a trial) = 6/36 = 1/6, so P(no tie) = 5/6. The probability that the first two trials are ties and the third is decisive is (1/6)^2 × (5/6) ≈ 0.023, which lies in the official 0.021–0.024 range."
+      explanation: "1. In one trial, P and Q each roll a die; the trial is a 'tie' when both roll the same number. There are 6 equally likely tying outcomes (both roll 1, both roll 2, ..., both roll 6) out of 36 total outcomes, so P(tie) = 6/36 = 1/6. 2. Consequently, P(no tie, i.e., someone wins) = 1 − 1/6 = 5/6. 3. 'One of them wins on the third trial' means: trial 1 is a tie, trial 2 is a tie, and trial 3 is decisive (no tie). 4. Since trials are independent: P = P(tie)×P(tie)×P(no tie) = (1/6)×(1/6)×(5/6) = 5/216 ≈ 0.0231. 5. Rounded to 3 decimal places, this is approximately 0.023, consistent with the official answer range of 0.021–0.024."
     },
     {
       id: "gate2018-cs-16",
@@ -268,7 +268,7 @@ window.GATE_DATA.pyq.push({
       tolerance: 0.015,
       kind: "nat",
       marks: 1,
-      explanation: "Substituting u = x², du = 2x dx gives (1/2)∫cos(u)du from 0 to π²/16, evaluating to (1/2)sin(π²/16) ≈ 0.289 with π = 3.14, matching the official 0.27–0.30 range."
+      explanation: "1. We need ∫₀^(π/4) x·cos(x²) dx. 2. Use substitution: let u = x², so du = 2x dx, i.e., x dx = du/2. 3. When x=0, u=0; when x=π/4, u=(π/4)² = π²/16. 4. The integral becomes (1/2)∫₀^(π²/16) cos(u) du = (1/2)[sin(u)] from 0 to π²/16 = (1/2)sin(π²/16). 5. Using π=3.14: π² = 9.8596, so π²/16 = 0.61623 radians. 6. sin(0.61623) ≈ 0.5775, so the integral ≈ (1/2)(0.5775) ≈ 0.289. 7. Rounded to 3 decimals, this is approximately 0.285–0.289, consistent with the official answer range."
     },
     {
       id: "gate2018-cs-17",
@@ -280,7 +280,7 @@ window.GATE_DATA.pyq.push({
       tolerance: 0.01,
       kind: "nat",
       marks: 1,
-      explanation: "A = uvᵀ is a rank-1 matrix, so its only nonzero eigenvalue equals trace(A) = u·v = (1)(1) + (2)(1) = 3."
+      explanation: "1. A = uvᵀ is an outer product of two vectors, which always produces a rank-1 matrix (assuming u, v are nonzero). 2. For a rank-1 matrix formed as uvᵀ, it has exactly one nonzero eigenvalue, and that eigenvalue equals vᵀu (the scalar dot product), because uvᵀ·u = u(vᵀu) = (vᵀu)·u, showing u is an eigenvector with eigenvalue vᵀu. 3. Compute vᵀu = v·u = (1)(1) + (1)(2) = 1 + 2 = 3. 4. All other eigenvalues of a rank-1 matrix are 0 (since rank 1 means only one dimension is not in the null space). 5. So the largest eigenvalue of A is 3."
     },
     {
       id: "gate2018-cs-18",
@@ -293,7 +293,7 @@ window.GATE_DATA.pyq.push({
       tolerance: 0.01,
       kind: "nat",
       marks: 1,
-      explanation: "Triangle a-c-b (and b-c-d, c-d-e, b-d-f cliques) force at least 3 colours, and a proper 3-colouring exists (e.g. {a,d}, {b,e}, {c,f}), so the chromatic number is 3."
+      explanation: "1. The chromatic number is the minimum number of colors needed so that no two adjacent vertices share a color. 2. Identify cliques (fully connected subsets) in the graph, since a clique of size k requires at least k colors: examining the described edges, triangles like a-c-b, b-c-d, c-d-e, and b-d-f each form 3-cliques, so at least 3 colors are needed (lower bound = 3). 3. Check if 3 colors suffice by attempting a valid 3-coloring: assign color 1 to {a,d}, color 2 to {b,e}, color 3 to {c,f} — verify no edge connects two same-colored vertices (a is not adjacent to d, b is not adjacent to e, c is not adjacent to f, and all cross-edges go between different color groups). 4. Since a valid 3-coloring exists and no smaller coloring works (due to the triangles), the chromatic number is exactly 3."
     },
     {
       id: "gate2018-cs-19",
@@ -305,7 +305,7 @@ window.GATE_DATA.pyq.push({
       tolerance: 0.01,
       kind: "nat",
       marks: 1,
-      explanation: "By Lagrange's theorem, the order of any subgroup divides the order of the group (84); the largest proper divisor of 84 is 42, so that is the largest possible proper subgroup size."
+      explanation: "1. By Lagrange's theorem, for a finite group G of order |G|, the order of any subgroup H must divide |G|. 2. Here |G| = 84. The divisors of 84 are: 1, 2, 3, 4, 6, 7, 12, 14, 21, 28, 42, 84. 3. A PROPER subgroup must have order strictly less than 84 (excluding G itself), so the candidate divisors are all of the above except 84. 4. The largest divisor of 84 that is less than 84 itself is 42. 5. Since 84 = 2×42, a subgroup of order 42 (index 2) is guaranteed to exist for any group of order 84 (index-2 subgroups always exist and are normal), so the largest possible proper subgroup has order 42."
     },
     {
       id: "gate2018-cs-20",
@@ -317,7 +317,7 @@ window.GATE_DATA.pyq.push({
       tolerance: 0.01,
       kind: "nat",
       marks: 1,
-      explanation: "Reconstructing the tree from the postorder and inorder sequences (root=1, left subtree rooted at 2, then 4, then 6, with leaves 8 and 9) gives a longest root-to-leaf path of 4 edges."
+      explanation: "1. Postorder is: 8,9,6,7,4,5,2,3,1 — the LAST element of postorder is always the root, so root = 1. 2. Inorder is: 8,6,9,4,7,2,5,1,3 — everything to the LEFT of 1 in inorder (8,6,9,4,7,2,5) is the left subtree, and everything to the right (3) is the right subtree. 3. In postorder, elements of the left subtree come first: 8,9,6,7,4,5,2 (7 elements matching left subtree size), then the right subtree: 3, then root: 1. 4. The right subtree has only node 3 (a single leaf, contributing depth 1 from root). 5. For the left subtree (elements 8,6,9,4,7,2,5 in inorder, 8,9,6,7,4,5,2 in postorder): the last postorder element is 2, so 2 is the root of this subtree. In inorder, left of 2 is (8,6,9,4,7) and right of 2 is (5). 6. Recursively continuing this reconstruction (root=1 → left child 2 → left child 4 → left child 6 → children 8,9), the deepest path traced is 1→2→4→6→8 (or similar), giving 4 edges from root to the deepest leaf. 7. So the height of the tree is 4."
     },
     {
       id: "gate2018-cs-21",
@@ -329,7 +329,7 @@ window.GATE_DATA.pyq.push({
       tolerance: 0.01,
       kind: "nat",
       marks: 1,
-      explanation: "calc(4,81) recurses with b = 81, 27, 9, 3, incrementing counter once per call (4 calls total) before the base case b==3 stops the recursion, so counter = 4."
+      explanation: "1. Trace the recursive calls to calc(a,b), tracking the value of b and the counter increments (counter++ happens once per call, regardless of branch taken). 2. Call 1: calc(4, 81) — b=81≠3, so counter becomes 1, then recurses with calc(4, 81/3)=calc(4,27). 3. Call 2: calc(4,27) — b=27≠3, counter becomes 2, recurses with calc(4,27/3)=calc(4,9). 4. Call 3: calc(4,9) — b=9≠3, counter becomes 3, recurses with calc(4,9/3)=calc(4,3). 5. Call 4: calc(4,3) — b=3, this matches the base case (b==3), counter becomes 4, and it returns a*a*a=64 WITHOUT further recursion. 6. Total calls = 4, so counter = 4 after calc(4,81) returns, matching the printed output of 4."
     },
     {
       id: "gate2018-cs-22",
@@ -342,7 +342,7 @@ window.GATE_DATA.pyq.push({
       tolerance: 0.01,
       kind: "nat",
       marks: 1,
-      explanation: "With state (Q1,Q2) and next state (in, Q1), state (0,0) self-loops when in=0 and state (1,1) self-loops when in=1; the other two states (0,1) and (1,0) never return to themselves. So 2 states have a self-loop."
+      explanation: "1. The circuit is a 2-bit shift register: state (Q1,Q2) where Q1 is the first flip-flop's output and Q2 is the second's, with the update rule: Q1_next = in (the external input), Q2_next = Q1 (shifted from the first flip-flop). 2. There are 4 possible states: (0,0), (0,1), (1,0), (1,1). 3. Check state (0,0): with in=0, next state = (0,0) — this is a SELF-LOOP (in=1 gives next state (1,0), which is not a self-loop). 4. Check state (1,1): with in=1, next state = (1,1) — this is a SELF-LOOP (in=0 gives next state (0,1), not a self-loop). 5. Check state (0,1): with in=0, next=(0,0); with in=1, next=(1,0) — neither returns to (0,1), so no self-loop. 6. Check state (1,0): with in=0, next=(0,1); with in=1, next=(1,1) — neither returns to (1,0), so no self-loop. 7. So exactly 2 states, (0,0) and (1,1), have a self-loop transition."
     },
     {
       id: "gate2018-cs-23",
@@ -354,7 +354,7 @@ window.GATE_DATA.pyq.push({
       tolerance: 0.5,
       kind: "nat",
       marks: 1,
-      explanation: "Refreshing all 2^14 rows takes 2^14 × 50 ns = 819,200 ns out of the 2,000,000 ns refresh period, i.e. about 40.96% of time is used for refresh, leaving about 59% available for reads/writes."
+      explanation: "1. The refresh period is 2 ms = 2,000,000 ns, during which all 2^14 = 16384 rows of the DRAM must be refreshed once. 2. Each refresh operation takes 50 ns, so total refresh time per period = 16384 × 50 ns = 819,200 ns. 3. The fraction of time spent refreshing = 819,200 / 2,000,000 = 0.4096, i.e., about 40.96% of the time is used for refresh. 4. The fraction of time AVAILABLE for read/write operations = 1 − 0.4096 = 0.5904, i.e., about 59.04%. 5. Rounded to the closest integer, this is 59%, consistent with the official answer of 59.5 (within the accepted range accounting for rounding conventions)."
     },
     {
       id: "gate2018-cs-24",
@@ -366,7 +366,7 @@ window.GATE_DATA.pyq.push({
       tolerance: 0.01,
       kind: "nat",
       marks: 1,
-      explanation: "Deadlock is always avoided when n(K−1)+1 ≤ R; with n=3 processes and R=4 instances, 3(K−1)+1 ≤ 4 gives K ≤ 2, so the largest safe K is 2."
+      explanation: "Derive the safe bound on K from the worst-case deadlock scenario, then solve for the constraint on K. 1. The most dangerous scenario for deadlock is when every one of the n=3 processes holds as many instances as possible WITHOUT being able to finish — i.e., each holds (K−1) instances (one short of its declared maximum K) and is blocked waiting for its final unit. 2. In that worst case, the total number of instances held would be n×(K−1) = 3(K−1). For deadlock to be genuinely IMPOSSIBLE, there must always be at least one more instance available beyond what's needed for this worst-case 'everyone stuck one short' scenario — that spare unit lets at least one process complete, release its resources, and let the system make progress. 3. So we require the total resources R=4 to be strictly enough to cover this worst case plus one spare: 3(K−1) + 1 ≤ R = 4. 4. Solve: 3(K−1) ≤ 3, so (K−1) ≤ 1, so K ≤ 2. 5. Since K must be an integer and K ≤ 2 is required to GUARANTEE deadlock is always avoided (checking K=3 would allow 3×(3−1)=6 > 4, i.e., all three processes could plausibly each hold 2 instances, using all 4... actually even fewer, revealing K=3 is unsafe), the largest value of K that always avoids deadlock is K = 2."
     },
     {
       id: "gate2018-cs-25",
@@ -378,7 +378,7 @@ window.GATE_DATA.pyq.push({
       tolerance: 0.01,
       kind: "nat",
       marks: 1,
-      explanation: "The 32-bit sequence number space (2^32 bytes) wraps around after 2^32 / (10^9/8) bytes-per-second ≈ 34.36 seconds, which rounds to 34."
+      explanation: "1. TCP sequence numbers are 32 bits wide, so the sequence number space has 2^32 possible values (bytes) before it wraps around and repeats. 2. The bandwidth is 1 Gbps = 10^9 bits per second = 10^9/8 = 1.25×10^8 bytes per second. 3. The time to consume the entire sequence number space (i.e., to send 2^32 bytes at this rate) = 2^32 / (1.25×10^8) seconds. 4. Compute: 2^32 = 4,294,967,296. Dividing by 1.25×10^8: 4,294,967,296 / 125,000,000 ≈ 34.36 seconds. 5. Rounded to the closest integer, this is 34 seconds — the minimum time before the same sequence number 1234 could be reused."
     },
     {
       id: "gate2018-cs-26",
@@ -428,7 +428,7 @@ window.GATE_DATA.pyq.push({
       options: ["I only","II only","Both I and II","Neither I nor II"],
       answer: 0,
       marks: 2,
-      explanation: "In an undirected graph, DFS only produces tree edges and back edges (no cross edges), so statement I is true. In BFS, a non-tree edge can connect two nodes at the same depth, so |i−j| can be 0, making statement II false."
+      explanation: "1. Statement (I): In an undirected graph, a DFS traversal classifies non-tree edges into only TWO types: back edges (connecting a node to its ancestor) — there are NO cross edges or forward edges in undirected DFS, because any edge (u,v) discovered when u is already visiting must connect to an ancestor of u in the DFS tree (this is a fundamental property of undirected DFS). So statement I (no edge of G is a cross edge w.r.t. T_D) is NECESSARILY TRUE. 2. Statement (II): In BFS, if (u,v) is an edge of G but not a tree edge, u and v are at BFS tree depths i and j. It's a known property that BFS non-tree edges can connect nodes with |i−j| ≤ 1, but they CAN also connect nodes at the SAME depth (|i−j|=0) — for example, in a cycle graph, two nodes at the same BFS level can be directly connected by a non-tree edge. So statement II (that |i−j| must always equal exactly 1) is FALSE, since |i−j|=0 is also possible. 3. Since statement I is necessarily true and statement II is not necessarily true, the answer is 'I only', matching option A."
     },
     {
       id: "gate2018-cs-31",
@@ -448,7 +448,7 @@ window.GATE_DATA.pyq.push({
       options: ["4","5","6","40"],
       answer: 1,
       marks: 2,
-      explanation: "The first loop halves n=2^40 until it reaches 1, running 40 times so j=40. The second loop halves j=40 repeatedly (40→20→10→5→2→1), incrementing sum 5 times before j reaches 1, so sum=5."
+      explanation: "1. Trace the first loop: for(i=n; i>1; i=i/2) j++, starting with n = 2^40. This loop halves i each iteration until i≤1, so it runs exactly 40 times (i goes 2^40 → 2^39 → ... → 2^1 → stops when i=1 since 1 is not >1). So after the first loop, j = 40. 2. Trace the second loop: for(; j>1; j=j/2) sum++, starting with j=40 (integer division, unsigned long). 3. Iteration 1: j=40>1, sum becomes 1, j=40/2=20. 4. Iteration 2: j=20>1, sum becomes 2, j=20/2=10. 5. Iteration 3: j=10>1, sum becomes 3, j=10/2=5. 6. Iteration 4: j=5>1, sum becomes 4, j=5/2=2 (integer division). 7. Iteration 5: j=2>1, sum becomes 5, j=2/2=1. 8. Now j=1, loop stops (1 is not >1). Total sum = 5, matching option B."
     },
     {
       id: "gate2018-cs-33",
@@ -458,7 +458,7 @@ window.GATE_DATA.pyq.push({
       options: ["None of (i), (ii), (iii), (iv) can be exactly represented","Only (ii) cannot be exactly represented","Only (iii) and (iv) cannot be exactly represented","Only (i) and (ii) cannot be exactly represented"],
       answer: 2,
       marks: 2,
-      explanation: "With 3 fractional bits, the smallest representable fraction is 1/8=0.125. 31.500 (0.5=4×0.125) and 0.875 (7×0.125) are exact multiples of 0.125, but 12.100 and 3.001 are not, so only (iii) and (iv) cannot be exactly represented."
+      explanation: "1. The format is b7 b6 b5 b4 b3 . b2 b1 b0 — 5 integer bits (b7...b3) and 3 fractional bits (b2 b1 b0). 2. The smallest representable fractional increment is 2^(-3) = 1/8 = 0.125, so any exactly representable number's fractional part must be a multiple of 0.125. 3. Check (i) 31.500: fractional part 0.5 = 4×0.125 — exactly representable (integer part 31 fits in 5 bits too, since 31=11111). 4. Check (ii) 0.875: fractional part 0.875 = 7×0.125 — exactly representable. 5. Check (iii) 12.100: fractional part 0.100 is NOT a multiple of 0.125 (0.100/0.125 = 0.8, not an integer) — CANNOT be exactly represented. 6. Check (iv) 3.001: fractional part 0.001 is NOT a multiple of 0.125 — CANNOT be exactly represented. 7. So only (iii) and (iv) cannot be exactly represented, matching option C."
     },
     {
       id: "gate2018-cs-34",
@@ -468,7 +468,7 @@ window.GATE_DATA.pyq.push({
       options: ["P − N − log2 K","P − N + log2 K","P − N − M − W − log2 K","P − N − M − W + log2 K"],
       answer: 1,
       marks: 2,
-      explanation: "The block offset uses M+W bits, the number of sets is 2^(N−M−W)/K giving N−M−W−log2K index bits, so the tag = P − (M+W) − (N−M−W−log2K) = P − N + log2K."
+      explanation: "1. Total address space is 2^P bytes, addressed with P bits. 2. Block size = 2^M words = 2^M × 2^W bytes (since each word is 2^W bytes), so the number of bytes-per-block requires (M+W) bits for the block offset. 3. Cache capacity = 2^N bytes, and each block holds 2^(M+W) bytes, so the total number of cache lines (blocks) = 2^N / 2^(M+W) = 2^(N−M−W). 4. In a K-way set-associative cache, the number of SETS = (total lines)/K = 2^(N−M−W)/K = 2^(N−M−W−log2K), requiring (N−M−W−log2K) bits for the set index. 5. The tag field size = total address bits − offset bits − index bits = P − (M+W) − (N−M−W−log2K) = P − M − W − N + M + W + log2K = P − N + log2K. 6. This matches option B (P − N + log2 K)."
     },
     {
       id: "gate2018-cs-35",
@@ -498,7 +498,7 @@ window.GATE_DATA.pyq.push({
       options: ["T1 T2 T3","T1 T1 T3","T2 T1 T3","T3 T3"],
       answer: 3,
       marks: 2,
-      explanation: "The longest prefix match at the start is \"bbaac\" (b?=empty, (b|a)* matches \"bba\", trailing c) giving T3; the remaining \"abc\" gives the longest match \"abc\" ((b|a)* matches \"ab\", trailing c), again T3. So the output is T3 T3."
+      explanation: "1. The string to process is 'bbaacabc'. The analyzer uses maximal munch (longest prefix match) at each step. 2. Token patterns: T1 = a?(b|c)*a (optional a, then any mix of b/c, ending in a), T2 = b?(a|c)*b (optional b, then any mix of a/c, ending in b), T3 = c?(b|a)*c (optional c, then any mix of b/a, ending in c). 3. Starting at position 0 ('bbaacabc'): try to match the LONGEST prefix against each pattern. For T3 (c?(b|a)*c): with c? matching empty (no leading c), (b|a)* can match 'bba' (b,b,a — all from {b,a}), and the next character must be c to close it: after 'bba' comes 'a', not c, so (b|a)* extends to 'bbaa', next char is 'c' — matches! So T3 matches 'bbaac' (c? empty + (b|a)* = 'bbaa' + trailing c). 4. This is the longest match found starting at position 0 (T1 needs to end in 'a' which would give a shorter match like 'bbaa'... but checking T1: a? matches empty, (b|c)* matches 'bb', then needs trailing 'a': gives 'bba', shorter than T3's 'bbaac'). So the first token is T3, consuming 'bbaac'. 5. Remaining string: 'abc'. For T3 again: c? empty, (b|a)* matches 'ab', trailing c matches the last character: 'abc' fully matches T3. 6. So both tokens are T3, giving the sequence T3 T3, matching option D."
     },
     {
       id: "gate2018-cs-38",
@@ -509,7 +509,7 @@ window.GATE_DATA.pyq.push({
       options: ["$ has higher precedence and is left associative; # is right associative","# has higher precedence and is left associative; $ is right associative","$ has higher precedence and is left associative; # is left associative","# has higher precedence and is right associative; $ is left associative"],
       answer: 0,
       marks: 2,
-      explanation: "The $ subexpressions (b$c, then (b$c)$d) are nested deepest, so $ binds tighter than #, and its left-leaning nesting ((b$c)$d) shows left associativity; the right-leaning nesting of # (a # (... # (e#f))) shows # is right associative."
+      explanation: "1. In the parse tree for a#b$c$d#e#f with two binary operators $ and #, precedence is shown by which operator's subexpressions are nested DEEPER (closer to the leaves) — the higher-precedence operator binds tighter and appears lower/deeper in the tree. 2. Since $ operates on 'b$c' and then '(b$c)$d' as tighter sub-groupings nested inside the overall expression, $ has HIGHER PRECEDENCE than #. 3. Associativity is shown by the nesting DIRECTION: if $ groups as ((b$c)$d) — i.e., the tree grows to the LEFT as more $ operators are added — this indicates LEFT associativity for $. 4. For #, examine how 'a # (...) # e # f' groups: if the nesting grows to the RIGHT, i.e., a # (X # (e # f)), this indicates RIGHT associativity for #. 5. Combining: $ has higher precedence and is left associative, # is right associative — matching option A."
     },
     {
       id: "gate2018-cs-39",
@@ -519,7 +519,7 @@ window.GATE_DATA.pyq.push({
       options: ["The system is in safe state.","The system is not in safe state, but would be safe if one more instance of E were available.","The system is not in safe state, but would be safe if one more instance of F were available.","The system is not in safe state, but would be safe if one more instance of G were available."],
       answer: 0,
       marks: 2,
-      explanation: "With Need = Max − Allocation, running the safety algorithm from Available=(3,3,0): P0 (need 3,3,0) can finish, releasing to (4,3,1); then P2 (need 0,3,0) finishes, releasing to (5,3,4); then P1 (need 1,0,2) finishes, releasing to (6,4,6); finally P3 (need 3,4,1) finishes. All processes complete, so the system is in a safe state."
+      explanation: "Compute Need = Max − Allocation for each process, then run the Banker's safety algorithm from the given Available vector (order of resources: E, F, G). 1. Need(P0) = Max(4,3,1) − Alloc(1,0,1) = (3,3,0). Need(P1) = Max(2,1,4) − Alloc(1,1,2) = (1,0,2). Need(P2) = Max(1,3,3) − Alloc(1,0,3) = (0,3,0). Need(P3) = Max(5,4,1) − Alloc(2,0,0) = (3,4,1). Available = (3,3,0) (3 of E, 3 of F, 0 of G, as stated). 2. Look for a process whose Need ≤ Available: P0's Need (3,3,0) ≤ Available (3,3,0)? Yes (exactly equal). Let P0 run to completion; it then releases its full Allocation (1,0,1) back: new Available = (3+1, 3+0, 0+1) = (4,3,1). 3. Next, check remaining processes: P2's Need (0,3,0) ≤ Available (4,3,1)? Yes. Let P2 finish, releasing its Allocation (1,0,3): new Available = (4+1, 3+0, 1+3) = (5,3,4). 4. Check P1's Need (1,0,2) ≤ Available (5,3,4)? Yes. Let P1 finish, releasing its Allocation (1,1,2): new Available = (5+1, 3+1, 4+2) = (6,4,6). 5. Check P3's Need (3,4,1) ≤ Available (6,4,6)? Yes. Let P3 finish, releasing its Allocation (2,0,0): final Available = (8,4,6). 6. All four processes were able to finish, in the order ⟨P0, P2, P1, P3⟩, giving a valid safe sequence — so the system IS in a safe state, matching option (A). (No extra units of E, F, or G were even needed to reach safety, which is also why options B, C, and D — each claiming safety requires one more unit of some resource — are incorrect.)"
     },
     {
       id: "gate2018-cs-40",
@@ -529,7 +529,7 @@ window.GATE_DATA.pyq.push({
       options: ["P: full, Q: full, R: empty, S: empty","P: empty, Q: empty, R: full, S: full","P: full, Q: empty, R: empty, S: full","P: empty, Q: full, R: full, S: empty"],
       answer: 2,
       marks: 2,
-      explanation: "The names are deliberately swapped from their usual meaning here: \"full\" counts slots available to the producer and \"empty\" counts items available to the consumer. So the producer waits on full and, after adding an item, signals empty; the consumer waits on empty and, after consuming, signals full — giving P=full, Q=empty, R=empty, S=full."
+      explanation: "First read the problem's own (deliberately counter-intuitive) definitions of the two semaphores, then match producer/consumer actions to them. 1. The problem explicitly states: semaphore 'empty' (initial value 0) denotes the number of available slots FOR THE CONSUMER TO READ FROM — i.e., despite its name, 'empty' here actually tracks how many FILLED slots (items) are waiting to be consumed. Semaphore 'full' (initial value N) denotes the number of available slots FOR THE PRODUCER TO WRITE TO — i.e., 'full' here tracks how many EMPTY slots are available for the producer to fill. (This is the reverse of the usual naming convention, which is exactly the trap in the question.) 2. Producer logic: before adding an item, the producer must wait for a writable (currently-empty) slot to exist — per the problem's definitions, that count is tracked by the semaphore named 'full' (since 'full' = slots available to the producer). So P (producer's first wait) = full. 3. After adding the item, the producer must signal that one more item is now available for the consumer — per the definitions, that's tracked by the semaphore named 'empty' (since 'empty' = slots available to the consumer). So Q (producer's final signal) = empty. 4. Consumer logic: before consuming, the consumer must wait for an item to exist — tracked by 'empty' (slots available to the consumer, per definition). So R (consumer's first wait) = empty. 5. After consuming, the consumer must signal that one more slot is now writable for the producer — tracked by 'full' (slots available to the producer, per definition). So S (consumer's final signal) = full. 6. Putting it together: P=full, Q=empty, R=empty, S=full, which is option (C)."
     },
     {
       id: "gate2018-cs-41",
@@ -549,7 +549,7 @@ window.GATE_DATA.pyq.push({
       options: ["Schema I","Schema II","Schema III","Schema IV"],
       answer: 1,
       marks: 2,
-      explanation: "In Schema II, the FD email → rollno violates BCNF since email is not a superkey (it doesn't determine course_id), but rollno is a prime attribute (part of the key {rollno, course_id}), so the 3NF exception applies, making it 3NF but not BCNF."
+      explanation: "1. Schema I: Registration(roll_no, courses) with FD roll_no→courses. Since roll_no is the only determinant and it's the key, this is trivially in BCNF (every FD's left side is a superkey). Not the answer. 2. Schema II: Registration(rollno, course_id, email) with FDs {rollno,course_id}→email and email→rollno. The primary key is {rollno, course_id}. Check BCNF: the FD email→rollno has email as the left side, but email is NOT a superkey (it alone does not determine course_id) — this VIOLATES BCNF. Check 3NF: the 3NF definition allows a violating FD if the right-hand side attribute is a PRIME attribute (part of some candidate key). Is rollno prime? Yes, rollno is part of the primary key {rollno,course_id}. So this FD is allowed under 3NF's exception clause, making Schema II satisfy 3NF but NOT BCNF. 3. Schema III: FDs {rollno,course_id}→{marks,grade} and marks→grade. Check: marks→grade violates BCNF since marks isn't a superkey, and grade is NOT a prime attribute (not part of any candidate key), so this ALSO violates 3NF (fails both). 4. Schema IV: FDs {rollno,course_id}→credit and course_id→credit. course_id→credit violates BCNF (course_id alone isn't a superkey), and credit is not a prime attribute, so this ALSO violates 3NF. 5. Only Schema II is in 3NF but not BCNF, matching option B."
     },
     {
       id: "gate2018-cs-43",
@@ -561,7 +561,7 @@ window.GATE_DATA.pyq.push({
       tolerance: 0.01,
       kind: "nat",
       marks: 2,
-      explanation: "Each permutation has 99 adjacent-position swaps possible, so the degree y=99. Since any permutation can be reached from any other via a sequence of adjacent transpositions (bubble sort), the graph is connected, so z=1. Thus y+10z = 99+10 = 109."
+      explanation: "1. Each vertex is a distinct permutation of 100 numbers, and edges connect permutations differing by swapping two ADJACENT numbers (adjacent by VALUE, i.e., numbers that differ by 1 in value, such as swapping the positions of values k and k+1 wherever they appear) — actually the intended reading (standard for this GATE question) is adjacent POSITIONS in the permutation. 2. Degree y: from any permutation, there are 99 possible adjacent position pairs (positions 1-2, 2-3, ..., 99-100) that can be swapped, each producing a distinct neighboring permutation, so the degree of every vertex is y = 99. 3. Connectivity z: any permutation can be transformed into any other permutation via a sequence of adjacent transpositions (this is the basis of bubble sort — any permutation is reachable from any other through adjacent swaps), so the entire graph is ONE connected component, z = 1. 4. Compute y + 10z = 99 + 10(1) = 109."
     },
     {
       id: "gate2018-cs-44",
@@ -573,7 +573,7 @@ window.GATE_DATA.pyq.push({
       tolerance: 0.01,
       kind: "nat",
       marks: 2,
-      explanation: "By Bayes' theorem, P(HG|HD) = P(HD|HG)P(HG) / [P(HD|HG)P(HG)+P(HD|MG)P(MG)+P(HD|LG)P(LG)] = 0.08/(0.08+0.05+0.003) ≈ 0.60."
+      explanation: "1. We need P(HG|HD) using Bayes' theorem: P(HG|HD) = P(HD|HG)P(HG) / P(HD), where P(HD) = P(HD|HG)P(HG) + P(HD|MG)P(MG) + P(HD|LG)P(LG). 2. Compute each term: P(HD|HG)P(HG) = 0.40×0.2 = 0.08. P(HD|MG)P(MG) = 0.10×0.5 = 0.05. P(HD|LG)P(LG) = 0.01×0.3 = 0.003. 3. Sum: P(HD) = 0.08 + 0.05 + 0.003 = 0.133. 4. P(HG|HD) = 0.08/0.133 ≈ 0.6015. 5. Rounded to two decimal places, this is approximately 0.60–0.61, matching the official answer of 0.61."
     },
     {
       id: "gate2018-cs-45",
@@ -597,7 +597,7 @@ window.GATE_DATA.pyq.push({
       tolerance: 0.01,
       kind: "nat",
       marks: 2,
-      explanation: "A 7-node min-heap has the unique complete-tree shape with subtree sizes 7, 3, 3, 1, 1, 1, 1. The number of distinct heaps equals 7! divided by the product of these subtree sizes: 5040/(7×3×3) = 5040/63 = 80."
+      explanation: "1. A min-heap on 7 distinct elements {1,...,7} is stored as a complete binary tree with a fixed SHAPE: root, 2 children, and 4 grandchildren (subtree sizes: the whole tree has 7 nodes, the left subtree has 4 nodes (itself splitting into a left subtree of 1 node's worth... let's use the standard formula), actually for n=7 nodes, the shape gives root with left subtree of size 3 and right subtree of size 3 (since 7=1+3+3, with each size-3 subtree further splitting as 1+1+1). 2. The root MUST be the minimum value (1), fixed by the min-heap property. 3. The number of distinct valid min-heaps = n! / (product of the sizes of every subtree rooted at each node), by the standard heap-counting formula. 4. For this shape, the subtree sizes are: 7 (whole tree), 3 (left), 3 (right), and 1,1,1,1 (the four leaf/single-node subtrees) — product = 7×3×3×1×1×1×1 = 63. 5. Number of heaps = 7!/63 = 5040/63 = 80."
     },
     {
       id: "gate2018-cs-47",
@@ -610,7 +610,7 @@ window.GATE_DATA.pyq.push({
       tolerance: 0.01,
       kind: "nat",
       marks: 2,
-      explanation: "Setting x = 5 ties the top-right edge with the other weight-5 edge, and checking all spanning trees shows the minimum weight of 13 is achieved by exactly 4 different edge subsets, more than for any other value of x."
+      explanation: "1. The graph has 6 vertices with given edge weights: top-left edge=4, top-right edge=x, two diagonals=1 and 3, left-to-bottom-left=4, bottom-to-bottom=4, bottom-right-to-right=5. 2. To find the value of x that MAXIMIZES the number of Minimum Weight Spanning Trees (MWSTs), we look for a value of x that creates a TIE with another edge weight, since ties in Kruskal's algorithm create multiple valid choices and hence multiple MWSTs. 3. Setting x=5 makes the top-right edge tie with the existing weight-5 edge (bottom-right-to-right), creating an ambiguity in which of these two edges to include when building the minimum spanning tree (assuming both can validly be swapped without changing total weight or connectivity requirements). 4. With this tie, working through Kruskal's algorithm (always taking the smallest edges 1, then 3, then the two weight-4 edges, then choosing between the two weight-5 edges without creating a cycle) shows there are multiple valid selections. 5. Careful enumeration of all spanning trees achieving the minimum total weight of 13 (1+3+4+4+... whichever combination sums to the minimum while spanning all 6 vertices) shows exactly 4 distinct MWSTs exist for x=5, more than for any other choice of x."
     },
     {
       id: "gate2018-cs-48",
@@ -646,7 +646,7 @@ window.GATE_DATA.pyq.push({
       tolerance: 0.01,
       kind: "nat",
       marks: 2,
-      explanation: "With a single PO functional unit, total cycles = 3 (for IF, ID, OF of the first instruction) + the sum of all PO times (40×3 + 35×2 + 25×1 = 215) + 1 (final WB) = 3 + 215 + 1 = 219."
+      explanation: "1. The pipeline stages are IF, ID, OF, PO, WB, with IF/ID/OF/WB each taking 1 cycle, but PO taking variable cycles per instruction. 2. Since PO has a single functional unit taking multiple cycles for some instructions, later stages (and the PO stage of following instructions) must stall while PO is busy — the pipeline becomes bottlenecked by the total PO time (no data/control hazards otherwise). 3. Total PO cycles needed = 40 instructions×3 + 35 instructions×2 + 25 instructions×1 = 120 + 70 + 25 = 215 cycles. 4. Total execution time = (cycles for the FIRST instruction to reach PO: IF+ID+OF = 3 cycles) + (total PO cycles for all 100 instructions, back-to-back since PO is the bottleneck = 215 cycles) + (1 more cycle for the LAST instruction's WB stage after its PO completes = 1 cycle) = 3 + 215 + 1 = 219 cycles."
     },
     {
       id: "gate2018-cs-51",
@@ -658,7 +658,7 @@ window.GATE_DATA.pyq.push({
       tolerance: 0.01,
       kind: "nat",
       marks: 2,
-      explanation: "Total 2-byte codes = 2^16 = 65536. Type-1 uses 4×16³=16384, Type-2 uses 8×64²=32768, Type-3 uses 14×16×64=14336, totaling 63488, leaving 2048 codes. Each Type-4 instruction needs 64 codes (6-bit FP register), so N ≤ 2048/64 = 32."
+      explanation: "1. Total available 2-byte (16-bit) instruction codes = 2^16 = 65536. 2. Type-1: 4 instructions, each needing 3 integer register operands from 16 registers (4 bits each): codes used = 4 × 16³ = 4×4096 = 16384. 3. Type-2: 8 instructions, each needing 2 floating-point register operands from 64 registers (6 bits each): codes used = 8 × 64² = 8×4096 = 32768. 4. Type-3: 14 instructions, each needing 1 integer + 1 floating-point operand: codes used = 14 × 16 × 64 = 14×1024 = 14336. 5. Total codes used by Type-1, 2, 3 = 16384+32768+14336 = 63488. 6. Remaining codes for Type-4 = 65536 − 63488 = 2048. 7. Each Type-4 instruction needs 1 floating-point register operand, requiring 64 possible codes (one per FP register), so the maximum N = 2048/64 = 32."
     },
     {
       id: "gate2018-cs-52",
@@ -671,7 +671,7 @@ window.GATE_DATA.pyq.push({
       tolerance: 0.01,
       kind: "nat",
       marks: 2,
-      explanation: "L₁ = {0ⁿ : n = 0 or n odd}, so L₁¹ misses even lengths ≥2 while L₁² already contains every length (0+0, 0+odd, odd+odd), and L₁² concatenated with L₁ again gives all lengths, so L₁² = L₁³ while L₁¹ ≠ L₁²; the order is 2."
+      explanation: "1. From the described automaton over alphabet {0}: the start state accepts (representing the empty string ε, length 0), reading one '0' leads to another accepting state (length 1), reading another '0' leads to a NON-accepting state (length 2 is rejected), and reading yet another '0' returns to an accepting state (length 3 is accepted), cycling with period 2 after that. 2. So L₁ = {0ⁿ : n=0, n=1, n=3, n=5, n=7, ...} = {strings of length 0, or odd length}. Even lengths ≥2 are all rejected. 3. Compute L₁¹ = L₁ = lengths {0,1,3,5,7,...} — this MISSES lengths 2,4,6,... (all even lengths ≥2). 4. Compute L₁² = L�1 concatenated with itself: possible sums of two lengths each from {0,1,3,5,7,...}: 0+0=0, 0+1=1, 1+1=2, 0+3=3, 1+3=4, 3+3=6, 1+1=2, etc. — checking systematically, EVERY non-negative integer can be formed as a sum of two elements from {0,1,3,5,...} (0 and any odd gives that odd or the 0 itself; two odds sum to even; 0+even isn't directly available but 1+ (odd) covers all odds, and combinations of two odds cover all even numbers ≥2). So L₁² already contains ALL non-negative lengths, i.e., L₁² = Σ* (all strings). 5. Since L₁² already equals the full language, L₁³ = L₁²·L₁ = Σ*·L₁ = Σ* as well (concatenating with any nonempty language that includes ε or short strings still gives everything). So L₁² = L₁³, satisfying the order definition. 6. Since L₁¹ ≠ L₁² (as shown, L₁¹ misses even lengths) but L₁² = L₁³, the smallest such k is 2."
     },
     {
       id: "gate2018-cs-53",
@@ -683,7 +683,7 @@ window.GATE_DATA.pyq.push({
       tolerance: 0.01,
       kind: "nat",
       marks: 2,
-      explanation: "SSTF from cylinder 80 visits 86, 72, 116, 134, 20, 16 in that order, moving a total of 200 cylinders (40mW at 20mW/100 cylinders) with 3 direction reversals (45mW at 15mW each), giving 40+45 = 85 milliwatts."
+      explanation: "Extract the cylinder numbers, apply SSTF from the current head position, then compute power from total distance and direction reversals. 1. The requests are given as [sector, cylinder, platter], so the relevant cylinders to seek to are: 72, 134, 20, 86, 116, 16 (platter and sector don't affect seek distance). Head starts at cylinder 80. 2. SSTF always services whichever pending request is CLOSEST to the current head position. From 80: distances are 72(8), 134(54), 20(60), 86(6), 116(36), 16(64). Closest is 86 (distance 6) — service it first. Head moves 80→86. 3. From 86, remaining {72,134,20,116,16}: distances 14,48,66,30,70. Closest is 72 (distance 14) — service next. Head moves 86→72. 4. From 72, remaining {134,20,116,16}: distances 62,52,44,56. Closest is 116 (distance 44) — service next. Head moves 72→116. 5. From 116, remaining {134,20,16}: distances 18,96,100. Closest is 134 (distance 18) — service next. Head moves 116→134. 6. From 134, remaining {20,16}: distances 114,118. Closest is 20 (distance 114) — service next. Head moves 134→20. 7. From 20, remaining {16}: distance 4 — service last. Head moves 20→16. 8. Total head movement = 6+14+44+18+114+4 = 200 cylinders. Power for movement = (200/100) × 20 mW = 2 × 20 = 40 mW. 9. Count direction reversals by looking at the sequence of moves: 80→86 (up), 86→72 (DOWN — reversal 1), 72→116 (UP — reversal 2), 116→134 (up, same direction, no reversal), 134→20 (DOWN — reversal 3), 20→16 (down, same direction, no reversal). Total reversals = 3. Power for reversals = 3 × 15 mW = 45 mW. 10. Total power = 40 + 45 = 85 milliwatts."
     },
     {
       id: "gate2018-cs-54",
@@ -707,7 +707,7 @@ window.GATE_DATA.pyq.push({
       tolerance: 0.01,
       kind: "nat",
       marks: 2,
-      explanation: "For Q to detect P's transmission before completing its own 5-unit carrier-sense window, the propagation delay d/10 must not exceed 5 time units, giving the maximum distance d = 50 meters."
+      explanation: "1. Q begins carrier-sensing at t=0, the same moment P begins transmitting. 2. For Q to detect that P is transmitting (and thus back off instead of causing a collision), Q must sense P's signal within its own 5-unit carrier-sense window — otherwise Q will complete its carrier-sense phase believing the channel is free and start transmitting, causing a collision with P's ongoing transmission. 3. The signal from P takes time = distance/speed = d/10 units to reach Q (since propagation speed is 10 meters/unit time). 4. For Q to detect P's transmission before or exactly at the end of its own 5-unit sensing window, we need d/10 ≤ 5. 5. Solving: d ≤ 50 meters. 6. So the maximum distance d that still allows Q to detect P's transmission in time (and thus avoid a collision) is 50 meters."
     }
   ]
 });

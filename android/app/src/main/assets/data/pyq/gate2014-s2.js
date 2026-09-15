@@ -13,7 +13,7 @@ window.GATE_DATA.pyq.push({
       options: ["it was a former British colony","Indian Information Technology professionals have colonized the world","India does not follow any colonial practices","India has helped other countries gain freedom"],
       answer: 0,
       marks: 1,
-      explanation: "A post-colonial country is one that was previously a colony; India was a former British colony."
+      explanation: "1. A \"post-colonial\" country is, by definition, one that WAS a colony of another power and has since gained independence. 2. India was ruled by Britain as a colony until 1947, so it fits this definition directly. 3. Options B, C, and D describe unrelated or backwards claims (India colonizing others, India having no colonial practices, India freeing other countries) that do not match what \"post-colonial\" actually means — only option A correctly identifies the defining historical fact."
     },
     {
       id: "gate2014s2-ga-2",
@@ -23,7 +23,7 @@ window.GATE_DATA.pyq.push({
       options: ["you said","did you say","did you say that","had you said"],
       answer: 1,
       marks: 1,
-      explanation: "The correct question-embedding word order here is 'did you say', matching standard subject-auxiliary inversion."
+      explanation: "1. The sentence is an embedded/indirect question built around \"who was coming to see us this evening,\" but phrased as a question ABOUT a reported statement (\"who did you say...\"). 2. Standard English question formation requires SUBJECT-AUXILIARY INVERSION with the reporting verb: \"did you say\" (auxiliary \"did\" moved before the subject \"you\"), not \"you said\" (no inversion) or \"had you said\" (wrong tense for this context). 3. \"did you say that\" is redundant/ungrammatical here since \"who\" already serves as the object of the embedded clause. 4. The correct completion is \"did you say,\" matching option B."
     },
     {
       id: "gate2014s2-ga-3",
@@ -33,7 +33,7 @@ window.GATE_DATA.pyq.push({
       options: ["1:S, 2:P, 3:Q, 4:R","1:P, 2:Q, 3:R, 4:S","1:Q, 2:R, 3:S, 4:P","1:S, 2:P, 3:R, 4:Q"],
       answer: 0,
       marks: 1,
-      explanation: "Eradicate means destroy utterly (S), distort means misrepresent (P), saturate means soak completely (Q), and utilize means use (R)."
+      explanation: "1. Eradicate means to destroy something utterly/completely — matches S (destroy utterly). 2. Distort means to twist or misrepresent something — matches P (misrepresent). 3. Saturate means to soak something completely, to the point it can absorb no more — matches Q (soak completely). 4. Utilize means simply to use something — matches R (use). 5. The correct matching is 1:S, 2:P, 3:Q, 4:R, matching option A."
     },
     {
       id: "gate2014s2-ga-4",
@@ -43,7 +43,7 @@ window.GATE_DATA.pyq.push({
       options: ["90","100","110","120"],
       answer: 1,
       marks: 1,
-      explanation: "The multiples of 10 from 2 to 198 are 10, 20, ..., 190, an arithmetic sequence whose average is (10+190)/2 = 100."
+      explanation: "1. The multiples of 10 from 2 to 198 are 10, 20, 30, ..., 190 — an arithmetic sequence with first term 10 and last term 190. 2. For an arithmetic sequence, the average equals the average of the first and last terms: (10+190)/2 = 200/2 = 100. 3. The average is 100, matching option B."
     },
     {
       id: "gate2014s2-ga-5",
@@ -53,7 +53,7 @@ window.GATE_DATA.pyq.push({
       options: ["3.464","3.932","4.000","4.444"],
       answer: 2,
       marks: 1,
-      explanation: "Let x = √(12+√(12+√(12+⋯))). Then x² = 12 + x, i.e. x² − x − 12 = 0, giving (x−4)(x+3) = 0. Since x > 0, x = 4.000."
+      explanation: "1. Let x = √(12+√(12+√(12+⋯))) — since the expression under the first square root is the SAME infinite expression as x itself, we can write x = √(12+x). 2. Square both sides: x² = 12+x, rearranging to x²−x−12=0. 3. Factor: (x−4)(x+3)=0, giving x=4 or x=−3. 4. Since x is defined as a square root (a non-negative quantity), reject the negative solution: x=4.000, matching option C."
     },
     {
       id: "gate2014s2-ga-6",
@@ -63,7 +63,7 @@ window.GATE_DATA.pyq.push({
       options: ["Kaliningrad was historically Russian in its ethnic make up","Kaliningrad is a part of Russia despite it not being contiguous with the rest of Russia","Koenigsberg was renamed Kaliningrad, as that was its original Russian name","Poland and Lithuania are on the route from Kaliningrad to the rest of Russia"],
       answer: 1,
       marks: 2,
-      explanation: "Kaliningrad is described as bordered by Poland, Lithuania and the Baltic Sea, meaning it is separated from the rest of Russia — yet it remains Russian territory, i.e. a non-contiguous part of Russia."
+      explanation: "1. Check option A: the passage does NOT say Kaliningrad was historically Russian in ethnicity — it explicitly says the OLD city (Koenigsberg) had a GERMAN majority before the war, contradicting this option. 2. Check option C: the passage says the city was RENAMED to Kaliningrad, but never states this was its \"original Russian name\" — this claim is not supported and is likely false (Kaliningrad is a NEW name given after Russian annexation, not a restored old name). 3. Check option D: the passage describes Poland and Lithuania as BORDERING Kaliningrad (to the south/west and east respectively), not as being literally on a route connecting it to the rest of Russia — this is not directly stated or necessarily true. 4. Check option B: the passage establishes Kaliningrad is Russian territory, and its borders (Baltic Sea, Poland, Lithuania) show it is geographically SEPARATED from the rest of Russia — meaning it is a non-contiguous exclave of Russia, which IS directly supported. 5. Only option B can be validly inferred from the passage's actual stated facts."
     },
     {
       id: "gate2014s2-ga-7",
@@ -83,7 +83,7 @@ window.GATE_DATA.pyq.push({
       options: ["2, 4","2, 14","4, 52","14, 52"],
       answer: 3,
       marks: 2,
-      explanation: "x^2-2x+3=11 (the other case has no real solution) gives x=4 or x=-2; evaluating |-x^3+x^2-x| at these values gives 52 and 14 respectively."
+      explanation: "1. |x²−2x+3|=11 splits into two cases: x²−2x+3=11 OR x²−2x+3=−11. 2. Case 1: x²−2x+3=11 → x²−2x−8=0 → (x−4)(x+2)=0 → x=4 or x=−2 (both real). 3. Case 2: x²−2x+3=−11 → x²−2x+14=0, discriminant = 4−56=−52<0, no real solutions — this case is rejected. 4. Evaluate |−x³+x²−x| at x=4: |−64+16−4|=|−52|=52. At x=−2: |−(−8)+4−(−2)|=|8+4+2|=14. 5. The possible values are 14 and 52, matching option D."
     },
     {
       id: "gate2014s2-ga-9",
@@ -96,7 +96,7 @@ window.GATE_DATA.pyq.push({
       tolerance: 0.01,
       kind: "nat",
       marks: 2,
-      explanation: "Let the 2008 female count be F, so 2008 male = 2.5F. In 2009 the female count doubles to 2F, and the plotted ratio is 3, so male_2009 = 3 × 2F = 6F. The increase over the 2008 male count is (6F − 2.5F)/2.5F = 3.5/2.5 = 140%."
+      explanation: "1. Let the 2008 female student count be F. From the plotted ratio for 2008 (say ratio = 2.5, as read from the graph), the 2008 male count is 2.5F. 2. In 2009, the female count DOUBLES to 2F (given directly in the question). The 2009 ratio (read from the graph, say 3) gives 2009 male count = 3×(2F) = 6F. 3. The percentage increase in male students from 2008 to 2009 = (6F − 2.5F)/2.5F × 100 = (3.5F/2.5F)×100 = 140%. 4. The answer is 140."
     },
     {
       id: "gate2014s2-ga-10",
@@ -106,7 +106,7 @@ window.GATE_DATA.pyq.push({
       options: ["6:22 a.m.","6:27 a.m.","6:38 a.m.","6:45 a.m."],
       answer: 0,
       marks: 2,
-      explanation: "The angle between the hands at H:M is |30H - 5.5M|; at H=6 this is |180-5.5M|, which is closest to 60 degrees near M≈22, i.e. 6:22 a.m."
+      explanation: "1. The angle between the hour and minute hands at time H hours and M minutes is given by the formula |30H − 5.5M| degrees (taking the value mod 360, and the smaller of it or 360 minus it if over 180). 2. For times between 6:00 and 7:00, H=6, so the angle is |180 − 5.5M|. 3. We want this closest to 60 degrees: solve 180−5.5M=60, giving 5.5M=120, so M=120/5.5≈21.8 minutes — very close to 6:22. 4. Checking the other options (6:27, 6:38, 6:45) gives angles noticeably farther from 60 degrees, confirming 6:22 a.m. is the closest, matching option A."
     },
     {
       id: "gate2014s2-cs-1",
@@ -118,7 +118,7 @@ window.GATE_DATA.pyq.push({
       tolerance: 0.05,
       kind: "nat",
       marks: 1,
-      explanation: "P = [C(4,3)C(6,1) + C(4,4)C(6,0)] / C(10,4) = (24+1)/210 ≈ 0.119, so 100p ≈ 11.9."
+      explanation: "1. There are 10 computers total, 4 working and 6 not working. The officials inspect 4 computers at random (without replacement) out of these 10. 2. \"Deemed functional\" requires AT LEAST 3 of the 4 inspected to be working — this means either EXACTLY 3 working (and 1 not working) or EXACTLY 4 working (all 4 inspected are working). 3. Count exactly-3-working: choose 3 of the 4 working computers AND 1 of the 6 non-working ones: C(4,3)×C(6,1) = 4×6 = 24. 4. Count exactly-4-working: choose all 4 of the 4 working computers: C(4,4)×C(6,0) = 1×1 = 1. 5. Total favorable outcomes = 24+1 = 25. Total ways to choose 4 of 10 computers = C(10,4) = 210. 6. p = 25/210 ≈ 0.119, so 100p ≈ 11.9."
     },
     {
       id: "gate2014s2-cs-2",
@@ -130,7 +130,7 @@ window.GATE_DATA.pyq.push({
       tolerance: 0.05,
       kind: "nat",
       marks: 1,
-      explanation: "The word lengths are 3,5,5,3,5,4,3,4,3, summing to 35; dividing by the 9 words gives an expected length of about 3.9."
+      explanation: "1. List each word and its length: The(3), quick(5), brown(5), fox(3), jumps(5), over(4), the(3), lazy(4), dog(3). 2. Sum the lengths: 3+5+5+3+5+4+3+4+3 = 35. 3. There are 9 words total, and each is equally likely to be drawn, so the expected length = (sum of lengths)/(number of words) = 35/9 ≈ 3.888... 4. Rounded to one decimal place, this is 3.9 (the accepted answer of 3.85 reflects GATE's stated tolerance band around this value)."
     },
     {
       id: "gate2014s2-cs-3",
@@ -142,7 +142,7 @@ window.GATE_DATA.pyq.push({
       tolerance: 0.01,
       kind: "nat",
       marks: 1,
-      explanation: "A bipartite graph on 12 vertices has the most edges when the two parts are equal in size (6 and 6), giving 6×6 = 36 edges."
+      explanation: "1. In a bipartite graph, vertices split into two disjoint groups, and edges only connect a vertex in one group to a vertex in the other (never within the same group) — every possible cross-group pair CAN be an edge, giving the maximum edge count as (size of group 1)×(size of group 2). 2. For a fixed total of 12 vertices split into two groups of sizes a and 12−a, the product a×(12−a) is MAXIMIZED when the two groups are as EQUAL as possible (a standard AM-GM-style result: for a fixed sum, the product of two numbers is maximized when they are equal). 3. Splitting 12 into 6 and 6 gives the maximum product: 6×6=36. 4. The maximum number of edges is 36."
     },
     {
       id: "gate2014s2-cs-4",
@@ -154,7 +154,7 @@ window.GATE_DATA.pyq.push({
       tolerance: 0.01,
       kind: "nat",
       marks: 1,
-      explanation: "A is the outer product of a column vector and a row vector, so A is a 3×3 matrix of rank at most 1. A rank-deficient (singular) matrix has determinant 0."
+      explanation: "1. The matrix A is formed as the OUTER PRODUCT of a column vector [2,-4,7]ᵀ and a row vector [1,9,5] — meaning A = column × row, an operation that always produces a matrix whose RANK is at most 1 (every row of A is a scalar multiple of the single row vector [1,9,5]). 2. A 3×3 matrix with rank at most 1 (in this case, rank exactly 1, since neither vector is the zero vector) is RANK-DEFICIENT — it does not have full rank 3. 3. A matrix that is not full rank is SINGULAR, and a singular matrix always has determinant exactly 0. 4. The determinant of A is 0."
     },
     {
       id: "gate2014s2-cs-5",
@@ -164,7 +164,7 @@ window.GATE_DATA.pyq.push({
       options: ["f(0)f(4) < 0","f(0)f(4) > 0","f(0) + f(4) > 0","f(0) + f(4) < 0"],
       answer: 0,
       marks: 1,
-      explanation: "Write f(x) = k(x−1)(x−2)(x−3) for some k ≠ 0. Then f(0) = k(−1)(−2)(−3) = −6k and f(4) = k(3)(2)(1) = 6k, so f(0)f(4) = −36k² < 0 for every non-zero k."
+      explanation: "1. Since f(x) is a degree-3 polynomial with EXACTLY the roots x=1, x=2, x=3, it can be written as f(x)=k(x−1)(x−2)(x−3) for some nonzero constant k (nonzero, since f is a non-zero polynomial). 2. Evaluate f(0) = k(0−1)(0−2)(0−3) = k(−1)(−2)(−3) = k×(−6) = −6k. 3. Evaluate f(4) = k(4−1)(4−2)(4−3) = k(3)(2)(1) = 6k. 4. Compute the product: f(0)×f(4) = (−6k)×(6k) = −36k². 5. Since k≠0, k² is always strictly positive, so −36k² is always strictly NEGATIVE, regardless of the value of k. This means f(0)f(4)<0 MUST be true for every valid f, matching option A."
     },
     {
       id: "gate2014s2-cs-6",
@@ -174,7 +174,7 @@ window.GATE_DATA.pyq.push({
       options: ["2^n","2^(n-1)","2^(2^n)","2^(2^(n-1))"],
       answer: 3,
       marks: 1,
-      explanation: "A self-dual function is completely determined by its values on half of the 2^n input rows (the other half is fixed by duality), giving 2^(2^(n-1)) such functions."
+      explanation: "1. The dual of a Boolean function is formed by swapping every + with . and vice versa (and complementing any constants). A function is SELF-DUAL if it equals its own dual, meaning F(x1,...,xn) = F'(x1',...,xn')' — equivalently, complementing every input AND the output leaves the function's truth table looking the same. 2. This self-duality condition PAIRS UP the 2^n rows of the truth table into 2^(n-1) complementary pairs (each input row paired with its bitwise complement) — self-duality forces the OUTPUT on one row of each pair to be the exact COMPLEMENT of the output on its paired row. 3. This means the function's value on HALF the input space (2^(n-1) rows, one representative from each pair) can be chosen FREELY (2 choices each), and the other half is then AUTOMATICALLY determined by the self-duality constraint. 4. The total count of self-dual functions is therefore 2^(2^(n-1)) — the number of ways to freely choose outputs for the 2^(n-1) representative rows, matching option D."
     },
     {
       id: "gate2014s2-cs-7",
@@ -184,7 +184,7 @@ window.GATE_DATA.pyq.push({
       options: ["k-bit binary up counter.","k-bit binary down counter.","k-bit ring counter.","k-bit Johnson counter."],
       answer: 2,
       marks: 1,
-      explanation: "The decoder activates exactly one of its k output lines at a time, and as the counter increments, this single active line rotates through the k outputs — exactly the behaviour of a ring counter."
+      explanation: "1. An n-bit binary counter cycles through all k=2^n possible bit patterns (0, 1, 2, ..., k-1) in sequence, each differing from the next by an ordinary binary increment. 2. Feeding this counter's output into an n-to-2^n (n-to-k) DECODER means exactly ONE of the k output lines is active at any time — specifically, the output line corresponding to whatever value the counter currently holds. 3. As the counter increments through 0,1,2,...,k-1,0,1,... in sequence, the single active decoder output line moves to the NEXT position each time, then wraps back to the first position after reaching the last — this is EXACTLY the behavior of a k-bit RING COUNTER (a circular shift register with a single active bit that rotates one position per clock cycle). 4. This circuit is equivalent to a k-bit ring counter, matching option C."
     },
     {
       id: "gate2014s2-cs-8",
@@ -196,7 +196,7 @@ window.GATE_DATA.pyq.push({
       tolerance: 0.01,
       kind: "nat",
       marks: 1,
-      explanation: "(123) base 5 = 38 in decimal, so xy + 8 = 38, giving xy = 30; requiring base y > 8 (to allow digit 8) restricts y to 10, 15, or 30 (with x=3, 2, 1), giving 3 solutions."
+      explanation: "1. Convert (123) base 5 to decimal: 1×5²+2×5+3 = 25+10+3=38. 2. The equation (x8) base y = 38 means x×y+8=38, so x×y=30. 3. For \"8\" to be a VALID digit in base y, the base y must satisfy y>8 (a digit must be strictly less than its base). 4. Find factor pairs (x,y) of 30 where y>8: 30=1×30 (y=30,x=1, valid since 30>8), 30=2×15 (y=15,x=2, valid since 15>8), 30=3×10 (y=10,x=3, valid since 10>8), 30=5×6 (y=6, invalid since 6 is not >8), 30=6×5 (y=5, invalid), 30=10×3 (y=3, invalid), 30=15×2 (y=2, invalid), 30=30×1 (y=1, invalid, not even a valid base). 5. Exactly 3 valid (x,y) pairs satisfy y>8: (1,30), (2,15), (3,10) — so there are 3 solutions."
     },
     {
       id: "gate2014s2-cs-9",
@@ -208,7 +208,7 @@ window.GATE_DATA.pyq.push({
       tolerance: 0.01,
       kind: "nat",
       marks: 1,
-      explanation: "Block size = 8×4 = 32 bytes (5 offset bits); number of blocks = 16KB/32B = 512, giving 128 sets (7 index bits); with a 32-bit address, tag width = 32-7-5 = 20 bits."
+      explanation: "1. Block size = 8 words × 4 bytes/word (32-bit words) = 32 bytes, requiring log2(32)=5 bits for the BLOCK OFFSET. 2. Total cache capacity = 16 KB = 16384 bytes. Number of blocks in the cache = 16384/32 = 512 blocks. 3. In a 4-way set-associative cache, each SET holds 4 blocks (ways), so the number of sets = 512/4 = 128 sets, requiring log2(128)=7 bits for the SET INDEX. 4. The physical address space is 4 GB, requiring log2(4×10^9)≈32 bits total for a physical address (standard convention: exactly 32 bits for 4GB). 5. TAG field width = total address bits − index bits − offset bits = 32 − 7 − 5 = 20 bits."
     },
     {
       id: "gate2014s2-cs-10",
@@ -220,7 +220,7 @@ window.GATE_DATA.pyq.push({
       tolerance: 0.01,
       kind: "nat",
       marks: 1,
-      explanation: "func counts the number of bits needed to represent num; since 256 <= 435 < 512, 435 requires 9 bits, so func(435) returns 9."
+      explanation: "1. This function repeatedly right-shifts num by 1 bit and increments count, stopping when num becomes exactly 0 — this counts exactly how many bits are needed to represent num in binary (i.e., ⌊log2(num)⌋+1 for num>0). 2. Convert 435 to binary: 435 = 256+128+32+16+2+1 = 2^8+2^7+2^5+2^4+2^1+2^0, so 435 in binary is 110110011, which has 9 bits. 3. Verify via magnitude: 2^8=256 ≤ 435 < 512=2^9, confirming 435 needs exactly 9 bits to represent. 4. func(435) returns 9."
     },
     {
       id: "gate2014s2-cs-11",
@@ -230,7 +230,7 @@ window.GATE_DATA.pyq.push({
       options: ["p = n * (n-1) * (n-2) / 6;","p = n * (n-1) / 2 * (n-2) / 3;","p = n * (n-1) / 3 * (n-2) / 2;","p = n * (n-1) * (n-2) / 6.0;"],
       answer: 1,
       marks: 1,
-      explanation: "n*(n-1) is always even, so dividing by 2 first keeps every intermediate value an exact integer while keeping intermediate products smaller, avoiding the overflow the other options risk for large n."
+      explanation: "1. \"n choose 3\" = n(n-1)(n-2)/6, and computing this correctly in integer C arithmetic (avoiding overflow and avoiding non-integer intermediate values from integer division) requires care about the ORDER of multiplication and division. 2. Option A, n*(n-1)*(n-2)/6: computes the full product n(n-1)(n-2) FIRST, before dividing — for large n, this product can OVERFLOW the range of an unsigned int well before the division brings it back down to a reasonable size. 3. Option B, n*(n-1)/2*(n-2)/3: since n and (n-1) are CONSECUTIVE integers, exactly one of them is always even, so n*(n-1) is ALWAYS exactly divisible by 2 — dividing by 2 FIRST keeps every intermediate result an exact integer AND keeps the intermediate values smaller (reducing overflow risk) before multiplying by (n-2) and dividing by 3. 4. Option D uses a floating-point divisor (6.0), which converts the whole expression to floating point — this avoids overflow differently but changes the type of p unexpectedly and is not the INTENDED integer-arithmetic-safe approach the question is testing. 5. Option B is the standard, safest way to compute this for large n using only integer arithmetic, matching the answer."
     },
     {
       id: "gate2014s2-cs-12",
@@ -240,7 +240,7 @@ window.GATE_DATA.pyq.push({
       options: ["10, 8, 7, 3, 2, 1, 5","10, 8, 7, 2, 3, 1, 5","10, 8, 7, 1, 2, 3, 5","10, 8, 7, 5, 3, 2, 1"],
       answer: 0,
       marks: 1,
-      explanation: "Inserting 1 as a new leaf causes no violation; inserting 7 next appends it and it bubbles up past its parent 5, giving level order 10, 8, 7, 3, 2, 1, 5."
+      explanation: "1. Starting heap (level order): 10, 8, 5, 3, 2 — as a tree: 10 is root, 8 and 5 are its children, 3 and 2 are children of 8. 2. Insert 1: place it as a new leaf (next available position, child of 5): tree becomes 10/(8,5)/(3,2,1). Since 1 < 5 (its parent), no bubble-up needed. Level order: 10,8,5,3,2,1. 3. Insert 7: place it as a new leaf (next available position, child of 3): tree becomes 10/(8,5)/(3,2,1,7). Since 7 > 3 (its parent), swap them: now 7 is child of 8, 3 moves down. Check again: 7 > 8? No, 7<8, so bubbling stops. Tree is now 10/(8,5)/(7,2,1,3) — wait, re-examine position: 7 replaces 3's position as child of 8, and 3 moves to where 7 was. 4. Final level-order traversal: 10, 8, 7, 3, 2, 1, 5 — reading level by level: root 10; children 8,7 (after the swap moved 7 up to be 8's child, taking priority display before 5 since heap arrays fill left-to-right)... actually verify by the array-based heap: initial array [10,8,5,3,2]. Insert 1: array [10,8,5,3,2,1], index 5's parent is index 2 (5), 1<5 no swap. Insert 7: array [10,8,5,3,2,1,7], index 6's parent is index 2 (5), 7>5 swap: [10,8,7,3,2,1,5], now check index 2's parent index 0 (10), 7<10 stop. 5. Final array (level order): 10, 8, 7, 3, 2, 1, 5, matching option A."
     },
     {
       id: "gate2014s2-cs-13",
@@ -250,7 +250,7 @@ window.GATE_DATA.pyq.push({
       options: ["Θ(n)","Θ(n log n)","Θ(n²)","Θ(log n)"],
       answer: 0,
       marks: 1,
-      explanation: "By the Master theorem with a = 2, b = 2, f(n) = log n: n^(log_b a) = n, and f(n) = log n = O(n^(1−ε)), so this is case 1 of the theorem and T(n) = Θ(n)."
+      explanation: "1. This recurrence T(n)=2T(n/2)+log(n) matches the Master Theorem form T(n)=aT(n/b)+f(n) with a=2, b=2, f(n)=log(n). 2. Compute the comparison exponent: n^(log_b(a)) = n^(log_2(2)) = n^1 = n. 3. Compare f(n)=log(n) against n: log(n) grows STRICTLY SLOWER than n (in fact, log(n) = O(n^(1-ε)) for any ε<1, since n^(1-ε) always eventually dominates any logarithm). 4. This matches MASTER THEOREM CASE 1 (f(n) is polynomially smaller than n^(log_b a)), giving T(n) = Θ(n^(log_b a)) = Θ(n)."
     },
     {
       id: "gate2014s2-cs-14",
@@ -260,7 +260,7 @@ window.GATE_DATA.pyq.push({
       options: ["the shortest path between every pair of vertices.","the shortest path from W to every vertex in the graph.","the shortest paths from W to only those nodes that are leaves of T.","the longest path in the graph."],
       answer: 1,
       marks: 1,
-      explanation: "BFS from a single source in an unweighted graph produces a tree in which the tree path to each vertex is a shortest path from that source to it."
+      explanation: "1. Breadth-First Search (BFS) explores a graph level by level, visiting all vertices at distance 1 from the source before any vertex at distance 2, and so on. 2. The TREE ARCS of a BFS traversal (the edges actually used to first discover each new vertex) form a tree T rooted at the source W, where the UNIQUE path from W to any vertex v within T has exactly as many edges as the SHORTEST path from W to v in the original graph (this is BFS's defining correctness property for unweighted graphs). 3. This holds for EVERY vertex reachable from W, not just the leaves of T, and it specifically gives shortest paths FROM W to other vertices, not between EVERY pair of vertices in the graph (which would require running BFS from every vertex separately). 4. The BFS tree computes the shortest path from W to every vertex in the graph, matching option B."
     },
     {
       id: "gate2014s2-cs-15",
@@ -270,7 +270,7 @@ window.GATE_DATA.pyq.push({
       options: ["Only (I)","Only (II)","Both (I) and (II)","Neither (I) nor (II)"],
       answer: 0,
       marks: 1,
-      explanation: "L1.L2 = {a^m b^n | m,n >= 0}, which is regular (statement I holds), but this is a different set from {a^n b^n | n >= 0} since m and n need not be equal (statement II is false)."
+      explanation: "1. L1={a^n | n≥0} is the set of all strings of a's (including the empty string), and L2={b^n | n≥0} is the set of all strings of b's. 2. The CONCATENATION L1.L2 consists of every string formed by taking ONE string from L1 followed by ONE string from L2 — since m (the count of a's) and n (the count of b's) are chosen INDEPENDENTLY, L1.L2 = {a^m b^n | m≥0, n≥0}, where m and n need NOT be equal. 3. Statement I claims L1.L2 is regular: since both L1 and L2 are individually regular (finite-state recognizable), and regular languages are CLOSED under concatenation, L1.L2 IS regular — statement I is TRUE. 4. Statement II claims L1.L2 = {a^n b^n | n≥0} (equal counts required) — but L1.L2 actually allows m and n to differ freely (e.g. \"aab\" with m=2,n=1 is in L1.L2 but not in {a^n b^n}), so statement II is FALSE. 5. Only statement I is correct, matching option A."
     },
     {
       id: "gate2014s2-cs-16",
@@ -280,7 +280,7 @@ window.GATE_DATA.pyq.push({
       options: ["If A <=m B and B is recursive then A is recursive.","If A <=m B and A is undecidable then B is undecidable.","If A <=m B and B is recursively enumerable then A is recursively enumerable.","If A <=m B and B is not recursively enumerable then A is not recursively enumerable."],
       answer: 3,
       marks: 1,
-      explanation: "A many-one reduction lets A inherit r.e.-ness from B (option C), but the converse does not hold: A can still be (trivially) r.e., e.g. empty, even when B is not r.e., so option D is false."
+      explanation: "1. Recall: A≤m B (A many-one reduces to B) means there is a computable function f such that x∈A iff f(x)∈B — this lets properties of B (decidability, r.e.-ness) transfer DIRECTLY to A in one specific direction. 2. Option A: if A≤m B and B is recursive (decidable), then A is ALSO recursive (decide A by computing f(x) and running B's decider) — TRUE. 3. Option B: if A≤m B and A is undecidable, B must ALSO be undecidable (otherwise, by option A's logic reversed, A would inherit decidability from B, contradicting A being undecidable) — TRUE. 4. Option C: if A≤m B and B is r.e., then A is ALSO r.e. (run f(x) then B's semi-decision procedure) — TRUE. 5. Option D: if A≤m B and B is NOT r.e., this does NOT force A to be not-r.e. — A could still be a TRIVIAL r.e. language (e.g., A=∅, which is always r.e. regardless of what B is) even while reducing to a non-r.e. B; the reduction only transfers properties in the A-inherits-from-B direction for POSITIVE properties (decidable, r.e.), not this reversed/negative claim. 6. Option D is the FALSE statement, matching the answer."
     },
     {
       id: "gate2014s2-cs-17",
@@ -290,7 +290,7 @@ window.GATE_DATA.pyq.push({
       options: ["+ is left associative, while * is right associative","+ is right associative, while * is left associative","Both + and * are right associative","Both + and * are left associative"],
       answer: 1,
       marks: 1,
-      explanation: "T → T * U is left-recursive, so repeated * operations group to the left (left associative). P → Q + P is right-recursive, so repeated + operations group to the right (right associative)."
+      explanation: "1. LEFT ASSOCIATIVITY of an operator is produced by a LEFT-RECURSIVE grammar rule (the operator's own nonterminal appears on the LEFT side of the recursive production), while RIGHT ASSOCIATIVITY comes from a RIGHT-RECURSIVE rule (the nonterminal appears on the RIGHT). 2. Look at the * operator's rule: T → U | T * U — this is LEFT-recursive (T appears on the left of \"T * U\"), so repeated applications of * naturally group to the LEFT, making * LEFT associative. 3. Look at the + operator's rule: P → Q + P | Q — this is RIGHT-recursive (P appears on the right of \"Q + P\"), so repeated applications of + naturally group to the RIGHT, making + RIGHT associative. 4. So + is right associative while * is left associative, matching option B."
     },
     {
       id: "gate2014s2-cs-18",
@@ -300,7 +300,7 @@ window.GATE_DATA.pyq.push({
       options: ["Dynamic memory allocation","Type checking","Symbol table management","Inline expansion"],
       answer: 0,
       marks: 1,
-      explanation: "Dynamic memory allocation happens at run time; type checking, symbol table management, and inline expansion are all compile-time activities."
+      explanation: "1. TYPE CHECKING is performed during the semantic-analysis phase of compilation (compile time) — verifying type consistency before the program ever runs. 2. SYMBOL TABLE MANAGEMENT (tracking declared identifiers, their types and scopes) happens throughout compilation, entirely at compile time. 3. INLINE EXPANSION (replacing a function call with the function's own body directly) is a compile-time OPTIMIZATION performed by the compiler, not something that happens while the program runs. 4. DYNAMIC MEMORY ALLOCATION (such as malloc() actually reserving memory) can only happen while the program EXECUTES, since it depends on runtime conditions (how much memory is available, what size is requested at that moment) — this is NOT a compile-time activity at all. 5. Dynamic memory allocation is the one NOT performed during compilation, matching option A."
     },
     {
       id: "gate2014s2-cs-19",
@@ -310,7 +310,7 @@ window.GATE_DATA.pyq.push({
       options: ["The requirements document also describes how the requirements that are listed in the document are implemented efficiently.","Consistency and completeness of functional requirements are always achieved in practice.","Prototyping is a method of requirements validation.","Requirements review is carried out to find the errors in system design."],
       answer: 2,
       marks: 1,
-      explanation: "Building a prototype and having stakeholders review it is a standard technique used to validate that requirements were captured correctly."
+      explanation: "1. Option A is FALSE: a requirements document specifies WHAT the system should do, not HOW it should be efficiently implemented — implementation details belong to the design phase, not requirements. 2. Option B is FALSE: achieving fully consistent and complete requirements is a well-known, genuinely HARD problem in practice — it is an ideal goal, not something \"always achieved.\" 3. Option D is FALSE: requirements review checks the REQUIREMENTS themselves for errors (ambiguity, conflicts, omissions), not the system DESIGN, which is a later, separate phase. 4. Option C is TRUE: building a working PROTOTYPE and having stakeholders interact with and review it is a standard, well-established technique specifically used to VALIDATE that the captured requirements actually match what users need. 5. Prototyping as requirements validation is the correct answer, matching option C. NOTE -- OUT OF SYLLABUS: this question tests Software Engineering (requirements engineering), which is no longer part of the GATE CS syllabus -- it appears in the 2014 papers but in NONE of the 2016-2025 papers included here. No chapter in this app covers it, and that is deliberate: do not go hunting for the theory and do not spend study time on this topic. The explanation above is self-contained if you are curious."
     },
     {
       id: "gate2014s2-cs-20",
@@ -322,7 +322,7 @@ window.GATE_DATA.pyq.push({
       tolerance: 0.05,
       kind: "nat",
       marks: 1,
-      explanation: "There are 100x10^6/10^3 = 100,000 blocks, requiring 100,000x4 = 4x10^5 bytes of FAT overhead, leaving 100x10^6 - 0.4x10^6 = 99.6x10^6 bytes available for file data."
+      explanation: "1. Total disk size = 100×10^6 bytes, and each data block is 10^3 (1000) bytes, so the number of blocks on the disk = 100×10^6/10^3 = 100,000 blocks. 2. The FAT needs ONE entry per block (to track the chain of blocks belonging to each file), and each entry costs 4 bytes, so total FAT overhead = 100,000 × 4 = 400,000 bytes = 0.4×10^6 bytes. 3. The maximum space available for actual file DATA = total disk size − FAT overhead = 100×10^6 − 0.4×10^6 = 99.6×10^6 bytes. 4. In units of 10^6 bytes, the maximum file size is 99.6."
     },
     {
       id: "gate2014s2-cs-21",
@@ -334,7 +334,7 @@ window.GATE_DATA.pyq.push({
       tolerance: 0.01,
       kind: "nat",
       marks: 1,
-      explanation: "Any superset of the key E is a superkey; with 3 other attributes there are 2^3 = 8 subsets of {F,G,H} that can be added to E."
+      explanation: "1. Since E is already the (candidate) key of R(E,F,G,H), every SUPERSET of {E} is automatically a superkey (adding any extra attributes to an already-unique key keeps it unique). 2. There are 3 OTHER attributes besides E: F, G, H. Each of the 2^3=8 possible SUBSETS of {F,G,H} can be combined with E to form a valid superkey (including the empty subset, giving just {E} itself). 3. The maximum number of superkeys is 2^3 = 8."
     },
     {
       id: "gate2014s2-cs-22",
@@ -346,7 +346,7 @@ window.GATE_DATA.pyq.push({
       tolerance: 0.01,
       kind: "nat",
       marks: 1,
-      explanation: "Rows 2345 and 7853 both have StudentName = Shankar. Row 7853 has StudentAge = 19, so if X (the age of row 2345) were also 19, the pair (Shankar, 19) would repeat and (StudentName, StudentAge) could not be a key. Hence X must not equal 19."
+      explanation: "1. For (StudentName, StudentAge) to serve as a KEY for this table instance, every pair of (StudentName, StudentAge) values across all rows must be UNIQUE — no two rows may share the exact same combination. 2. Scan the table for rows sharing the SAME StudentName: rows with StudentID 2345 and 7853 both have StudentName=\"Shankar\" — these are the only pair sharing a name. 3. Row 7853 has StudentAge=19. For the pair (StudentName, StudentAge) to remain unique across these two rows, row 2345's age (X) must be DIFFERENT from 19 — if X were also 19, both rows would have the identical pair (\"Shankar\", 19), violating uniqueness. 4. Every OTHER pair of rows already has distinct StudentNames (Swati, Ganesh appear only once each in this check, and the two \"Swati\" rows have different ages 19 and 18 already), so no other constraint on X arises. 5. X must not equal 19."
     },
     {
       id: "gate2014s2-cs-23",
@@ -356,7 +356,7 @@ window.GATE_DATA.pyq.push({
       options: ["RIP uses distance vector routing and OSPF uses link state routing","OSPF uses distance vector routing and RIP uses link state routing","Both RIP and OSPF use link state routing","Both RIP and OSPF use distance vector routing"],
       answer: 0,
       marks: 1,
-      explanation: "RIP is a classic distance-vector protocol, while OSPF is a link-state protocol."
+      explanation: "1. RIP (Routing Information Protocol) works by each router exchanging its own computed DISTANCE (hop count) to each destination with its immediate neighbors — this is the defining behavior of a DISTANCE-VECTOR protocol. 2. OSPF (Open Shortest Path First) works by each router FLOODING complete information about its own direct links to the entire network, and every router independently runs Dijkstra's algorithm on the resulting full topology map — this is the defining behavior of a LINK-STATE protocol. 3. RIP uses distance-vector routing and OSPF uses link-state routing, matching option A — the other three options either reverse this pairing or claim both use the same technique, which is factually incorrect."
     },
     {
       id: "gate2014s2-cs-24",
@@ -366,7 +366,7 @@ window.GATE_DATA.pyq.push({
       options: ["connect","bind","listen","accept"],
       answer: 2,
       marks: 1,
-      explanation: "After a socket is created and bound to an address, listen() marks it as passive, i.e. willing to accept incoming connection requests, converting it from an active (client-style) socket to a passive (server-style) one."
+      explanation: "1. The typical server-side socket lifecycle is: socket() creates an unconnected, ACTIVE-style socket; bind() attaches it to a specific local address/port; listen() marks the socket as PASSIVE — meaning it will now wait for and accept incoming connections rather than actively initiating one; accept() then blocks and returns a new socket for each incoming connection. 2. connect() is used by a CLIENT to actively establish a connection to a server — it does not convert anything to passive, it is itself an active operation. 3. bind() only attaches an address, it does not change the active/passive nature of the socket. 4. accept() operates on an ALREADY-passive (listening) socket to accept a specific incoming connection — it does not itself perform the active-to-passive conversion. 5. listen() is specifically the call that converts an unconnected active socket into a passive one, matching option C."
     },
     {
       id: "gate2014s2-cs-26",
@@ -376,7 +376,7 @@ window.GATE_DATA.pyq.push({
       options: ["T1 < T2 < T3","T1 > T2 > T3","T2 = T3, T3 < T1","T1 = T3, T3 > T2"],
       answer: 3,
       marks: 2,
-      explanation: "Store-and-forward time across h=3 links for N equal packets of size s is (N+h-1)x(transmission time per packet). Computing this for 1, 10, and 20 packets gives T1=T3=3300 microseconds and T2=2400 microseconds, so T1=T3 and T3>T2."
+      explanation: "1. Loading the main HTML page requires ONE HTTP request/response pair. Loading the embedded image (a SEPARATE resource, also on server S) requires a SECOND, distinct HTTP request/response pair — so Q needs to send AT LEAST 2 HTTP requests total. 2. However, HTTP supports PERSISTENT connections — a single underlying TCP connection between Q and S can carry MULTIPLE HTTP request/response exchanges in sequence, without needing to open a new TCP connection for each one. 3. So while 2 HTTP requests ARE required, they do NOT each need their OWN separate TCP connection — a single TCP connection to S is sufficient to carry both requests. 4. This matches option B: at least 2 HTTP requests needed, but a single TCP connection suffices."
     },
     {
       id: "gate2014s2-cs-27",
@@ -396,7 +396,7 @@ window.GATE_DATA.pyq.push({
       options: ["Q needs to send at least 2 HTTP requests to S, each necessarily in a separate TCP connection to server S","Q needs to send at least 2 HTTP requests to S, but a single TCP connection to server S is sufficient","A single HTTP request from Q to S is sufficient, and a single TCP connection between Q and S is necessary for this","A single HTTP request from Q to S is sufficient, and this is possible without any TCP connection between Q and S"],
       answer: 1,
       marks: 2,
-      explanation: "Loading the page and its embedded image requires two HTTP requests (one per resource), but HTTP's persistent connections allow a single TCP connection to S to serve both."
+      explanation: "1. With only 3 total buffer blocks and 1 reserved for intermediate results, only 2 blocks are actually available for reading in the two relations during the join — this is an extremely memory-constrained nested-loop join. 2. In a (block) nested-loop join, the OUTER relation is read ONCE, block by block, while the INNER relation must be RE-SCANNED IN FULL for every single block of the outer relation read. 3. Since size(r(R)) < size(s(S)), placing the SMALLER relation r(R) as the OUTER loop minimizes the number of times the (larger) inner relation s(S) must be re-scanned — specifically, s(S) gets re-scanned once per BLOCK of r(R), and since r(R) is smaller, it has fewer blocks, meaning FEWER total re-scans of the large relation s(S). 4. Placing r(R) in the outer loop minimizes total disk block accesses, matching option A."
     },
     {
       id: "gate2014s2-cs-29",
@@ -416,7 +416,7 @@ window.GATE_DATA.pyq.push({
       options: ["relation r(R) is in the outer loop.","relation s(S) is in the outer loop.","join selection factor between r(R) and s(S) is more than 0.5.","join selection factor between r(R) and s(S) is less than 0.5."],
       answer: 0,
       marks: 2,
-      explanation: "With very limited buffer space, disk accesses are minimized by placing the smaller relation r(R) in the outer loop, since the larger inner relation must otherwise be re-scanned once per outer-loop pass."
+      explanation: "1. With only 3 total buffer blocks and 1 reserved for intermediate results, just 2 blocks remain available for reading the two relations during the join. 2. In block nested-loop join, the OUTER relation is read through once block by block, while the INNER relation must be RE-SCANNED IN FULL for every block of the outer relation processed. 3. Since size(r(R)) < size(s(S)), placing the SMALLER relation r(R) in the outer loop means the larger relation s(S) (the inner loop) is re-scanned once per block of r(R) — and since r(R) has fewer blocks, this means FEWER total re-scans of the large relation. 4. Placing r(R) in the outer loop minimizes total disk block accesses, matching option A."
     },
     {
       id: "gate2014s2-cs-31",
@@ -426,7 +426,7 @@ window.GATE_DATA.pyq.push({
       options: ["The producer will be able to add an item to the buffer, but the consumer can never consume it.","The consumer will remove no more than one item from the buffer.","Deadlock occurs if the consumer succeeds in acquiring semaphore s when the buffer is empty.","The starting value for the semaphore n must be 1 and not 0 for deadlock-free operation."],
       answer: 2,
       marks: 2,
-      explanation: "If the consumer acquires s first while the buffer is empty, it then blocks on semWait(n); the producer, which also needs semWait(s) to add an item, is then blocked too since s is held by the consumer — a deadlock."
+      explanation: "Walk through the consumer's code and see what happens when it runs before any item exists. 1. Semaphore s (mutex, initial value 1) protects the buffer; semaphore n (initial value 0) counts items available to consume. 2. Suppose the buffer is empty and the consumer runs first. Its code is: semWait(s); semWait(n); removeFromBuffer(); semSignal(s); consume(). It calls semWait(s) FIRST, successfully acquiring the mutex (s goes from 1 to 0), and only THEN calls semWait(n). 3. Since the buffer is empty, n is still 0, so semWait(n) blocks the consumer — but critically, the consumer is blocked WHILE STILL HOLDING s (it never reached semSignal(s)). 4. Now the producer tries to run: produce(); semWait(s); addToBuffer(); semSignal(s); semSignal(n). To add the item it must first acquire s via semWait(s) — but s is held by the blocked consumer, so the producer also blocks, waiting for s. 5. Deadlock: the consumer is waiting on n, which only the producer can signal (via semSignal(n) after adding an item), but the producer can never even reach that point because it's stuck waiting on s, which only the consumer can release — and the consumer can't release it until it stops waiting on n. Neither can proceed, so this circular wait is a genuine deadlock, confirming option (C). The other options don't hold: since s is correctly used to protect the buffer and n correctly counts items, the producer/consumer CAN normally exchange multiple items (ruling out A and B), and the deadlock arises regardless of n's exact initial value in this particular flawed ordering of semWait(s) then semWait(n) (ruling out D as the root cause)."
     },
     {
       id: "gate2014s2-cs-32",
@@ -438,7 +438,7 @@ window.GATE_DATA.pyq.push({
       tolerance: 0.01,
       kind: "nat",
       marks: 2,
-      explanation: "Tracing the round-robin schedule (50 ms time slices, with A, B, C starting at 0, 5, 10 ms) shows process C accumulates its 200 ms of CPU time and then completes its first I/O burst at time 1000 ms."
+      explanation: "Trace the round-robin CPU schedule in 50 ms slices, tracking how much of each process's tc (CPU burst) has been consumed. 1. t=0: only A is ready, so A runs for a full slice, 0–50. (A has used 50 of its 100 ms tc; remaining 50.) 2. During this slice, B arrives at t=5 and C arrives at t=10, so they join the ready queue behind the not-yet-requeued A. Queue order after A's slice: [B, C, A]. 3. t=50–100: B runs a full slice (B has used 50 of 350 ms; remaining 300). Queue becomes [C, A, B]. 4. t=100–150: C runs a full slice (C has used 50 of 200 ms; remaining 150). Queue becomes [A, B, C]. 5. t=150–200: A runs — but A only needs 50 more ms to finish its tc, so A completes its CPU burst exactly at t=200 (using the full slice) and then leaves for I/O; it does not requeue for CPU. Queue becomes [B, C]. 6. t=200–250: B runs a full slice (B has used 100 of 350; remaining 250). Queue: [C, B]. 7. t=250–300: C runs a full slice (C has used 100 of 200; remaining 100). Queue: [B, C]. 8. t=300–350: B runs (150 of 350 used; remaining 200). Queue: [C, B]. 9. t=350–400: C runs (150 of 200 used; remaining 50). Queue: [B, C]. 10. t=400–450: B runs (200 of 350 used; remaining 150). Queue: [C, B]. 11. t=450–500: C runs — it only needs 50 more ms (150 already used, 200 total), so C completes its CPU burst exactly at t=450+50=500 and immediately starts its I/O operation. 12. C's I/O lasts tio=500 ms, so it completes its first I/O operation at 500+500 = 1000 ms."
     },
     {
       id: "gate2014s2-cs-33",
@@ -448,7 +448,7 @@ window.GATE_DATA.pyq.push({
       options: ["Least-recently-used","First-in-first-out","Last-in-first-out","Most-recently-used"],
       answer: 3,
       marks: 2,
-      explanation: "Because every one of the 100 distinct pages is referenced again after all the others in the cyclic sweep, and the frames initially hold pages that are never re-referenced, evicting the most-recently-used page happens to match the optimal (Belady) choice for this repeating access pattern."
+      explanation: "Compare each candidate policy's behaviour against the optimal (Belady) policy on this specific repeating pattern. 1. Setup: the 20 frames hold pages 101–120 initially, none of which is ever referenced again by the program. The program then references pages 1,2,...,100 in order, and repeats this exact 100-page sweep three times total (so the full reference string is [1..100][1..100][1..100]). 2. Since there are only 20 frames but 100 distinct pages touched in each pass, every one of pages 1–100 will fault on its first access (all 100 misses in pass 1, since none of 1–100 are resident yet). 3. What matters is which page gets evicted first inside pass 1, since that determines whether the SAME page faults again later in the same or a later pass. Consider the moment the 21st distinct page (page 21, say) needs to be loaded: the optimal (OPT) algorithm looks into the FUTURE and evicts whichever resident page will be needed farthest ahead (or never again). At that point, the resident set is {101..120} (never used again) — so OPT evicts one of those 'dead' pages, NOT any of 1..20 which will all be needed again soon (in pass 2). This same logic repeats for pages 22, 23, ..., 100: as long as any of the original dead pages 101–120 remain resident, OPT evicts those instead of evicting a page from 1–100 that will be reused. 4. Now check what MRU (Most Recently Used) does: it always evicts the page that was JUST used. Within the ascending sweep 1,2,...,100, when page 21 needs a frame, the most-recently-used resident page is page 20 (just accessed) — but wait, MRU here effectively ends up cycling through evicting the newest addition in a way that, for this specific monotonically-increasing, cyclically-repeating access pattern, keeps the same 'far future' pages resident longest, matching OPT's choices step for step (both preferentially avoid evicting a page that is about to be needed soonest, which in a strictly ascending sweep is exactly the page most recently touched). 5. LRU, FIFO, and LIFO all behave differently: LRU and FIFO end up evicting pages from 1–100 that will be needed again very soon (causing repeat faults in the very next reference or the next pass), and LIFO's stack-based eviction also mismatches OPT's future-looking choices for this ascending pattern. 6. Because MRU's eviction choices coincide with OPT's for this specific monotonic, cyclically-repeating reference string, MRU produces exactly the same page-fault count as the optimal policy, which is why (D) Most-recently-used is the correct answer."
     },
     {
       id: "gate2014s2-cs-34",
@@ -458,7 +458,7 @@ window.GATE_DATA.pyq.push({
       options: ["X is declared as \"int X[32][32][8]\".","X is declared as \"int X[4][1024][32]\".","X is declared as \"char X[4][32][8]\".","X is declared as \"char X[32][16][2]\"."],
       answer: 0,
       marks: 2,
-      explanation: "From the strides, k's stride of 4 bytes implies the k-dimension is 8 (since 32/4=8), and j's stride of 32 implies the j-dimension is 32 (since 1024/32=32); with 32-bit (4-byte) elements this matches int X[32][32][8]."
+      explanation: "1. The address-computation code computes an offset via t0=i*1024, t1=j*32, t2=k*4, then sums them — this is the standard array-indexing formula for a 3D array X[dim1][dim2][dim3], where each index's multiplier equals (size of one element)×(product of the sizes of all LATER dimensions). 2. k's multiplier is 4 — since k indexes the LAST dimension directly, its multiplier equals the element size itself: element size = 4 bytes, meaning X stores 32-bit (4-byte) elements, consistent with \"int\" (not \"char\", which is 1 byte). 3. j's multiplier is 32 — this equals (element size)×(size of the k-dimension) = 4×(k-dimension size) = 32, so the k-dimension (3rd dimension) size = 32/4 = 8. 4. i's multiplier is 1024 — this equals (element size)×(j-dimension size)×(k-dimension size) = 4×(j-dimension size)×8 = 1024, so the j-dimension (2nd dimension) size = 1024/(4×8) = 32. 5. This gives element type int, with dimensions [?][32][8] — matching X[32][32][8] declared as int, option A (the first dimension's own size doesn't affect the offset formula and can be any value, so 32 is consistent)."
     },
     {
       id: "gate2014s2-cs-35",
@@ -490,7 +490,7 @@ window.GATE_DATA.pyq.push({
       tolerance: 0.01,
       kind: "nat",
       marks: 2,
-      explanation: "The longest common subsequence of A and B has length x = 4 (e.g. \"pqrr\", \"qprr\", \"qpqr\"), and there are y = 3 distinct longest common subsequences of that length, so x + 10y = 4 + 30 = 34."
+      explanation: "1. Find the Longest Common Subsequence (LCS) of A=\"qpqrr\" and B=\"pqprqrp\" using the standard dynamic-programming LCS table, tracking BOTH the length and the count of distinct LCS's of that length at each cell. 2. Building the DP table (matching characters increment diagonally, otherwise take the max of the cell above or to the left, summing counts when both directions tie) gives a final LCS length of x=4 (achievable subsequences of length 4 include \"pqrr\", \"qpqr\", and \"qprr\" — checking each is genuinely a valid common subsequence of both strings). 3. Careful counting of DISTINCT longest common subsequences (avoiding double-counting the same subsequence formed via different alignment paths) gives y=3. 4. Compute x+10y = 4+10(3) = 4+30 = 34."
     },
     {
       id: "gate2014s2-cs-38",
@@ -502,7 +502,7 @@ window.GATE_DATA.pyq.push({
       tolerance: 0.01,
       kind: "nat",
       marks: 2,
-      explanation: "Greedily merging the two currently-smallest sequences first (Huffman-style) — 20&24 (43), then 30&35 (64), then 44&50 (93), then 65&94 (158) — gives the minimum worst-case total of 43+64+93+158 = 358 comparisons."
+      explanation: "1. Merging sorted sequences pairwise, the WORST-CASE comparison count for merging two sequences of lengths p and q is (p+q-1) comparisons. To MINIMIZE the total cost across a whole sequence of merges, always merge the two CURRENTLY SMALLEST sequences first — the same greedy principle behind Huffman coding / optimal merge patterns. 2. Sequences: 20,24,30,35,50. Merge the two smallest (20,24): cost=20+24-1=43, producing a merged sequence of size 44. 3. Remaining sizes: 44,30,35,50. Merge two smallest (30,35): cost=30+35-1=64, producing size 65. 4. Remaining sizes: 44,65,50. Merge two smallest (44,50): cost=44+50-1=93, producing size 94. 5. Remaining sizes: 94,65. Merge these last two: cost=94+65-1=158. 6. Total cost = 43+64+93+158 = 358."
     },
     {
       id: "gate2014s2-cs-39",
@@ -515,7 +515,7 @@ window.GATE_DATA.pyq.push({
       tolerance: 0.01,
       kind: "nat",
       marks: 2,
-      explanation: "Left subtree: maximize (leaf+leaf) − (leaf−leaf) as 2 − (−1) = 3. Right subtree: maximize (leaf−leaf) + (leaf+leaf) as 1 + 2 = 3. The root adds them: 3 + 3 = 6."
+      explanation: "1. Determine the tree's operator structure: examine the LEFT subtree and RIGHT subtree of the root separately, maximizing each independently since the leaves can each be chosen (0 or 1) freely. 2. For the LEFT subtree (structured as (leaf+leaf)−(leaf−leaf)): maximize the addition part by setting both leaves to 1, giving 1+1=2; MINIMIZE the subtracted part (leaf−leaf) by choosing leaves to make it as NEGATIVE as possible, i.e. 0−1=−1, so the subtraction becomes 2−(−1)=3. 3. For the RIGHT subtree (structured as (leaf−leaf)+(leaf+leaf)): maximize (leaf−leaf) by choosing 1−0=1, and maximize (leaf+leaf) by choosing 1+1=2, giving 1+2=3. 4. The root combines the two subtrees by addition: 3+3=6. 5. The maximum possible value is 6."
     },
     {
       id: "gate2014s2-cs-40",
@@ -527,7 +527,7 @@ window.GATE_DATA.pyq.push({
       tolerance: 0.01,
       kind: "nat",
       marks: 2,
-      explanation: "f(q) returns q as soon as |q^2-3| < 0.01, which holds at q = sqrt(3) ≈ 1.73."
+      explanation: "1. The recursive function f(x) keeps calling itself with x/2+1.5/x until |x²−3|<0.01, at which point it returns x directly — so we need f(q)=q, meaning q is already a FIXED POINT of the iteration where the stopping condition is already satisfied on the FIRST check. 2. The stopping condition requires |q²−3|<0.01, i.e. q² is very close to 3 — this points directly at q=√3. 3. Compute √3 ≈ 1.7320508..., which rounds to 1.73 at 2 decimal places. 4. Verify: q²=1.73²=2.9929, and |2.9929−3|=0.0071<0.01, so the stopping condition IS satisfied immediately at q=1.73, confirming f(1.73) returns 1.73 directly without further recursion."
     },
     {
       id: "gate2014s2-cs-41",
@@ -537,7 +537,7 @@ window.GATE_DATA.pyq.push({
       options: ["A queue cannot be implemented using this stack.","A queue can be implemented where ENQUEUE takes a single instruction and DEQUEUE takes a sequence of two instructions.","A queue can be implemented where ENQUEUE takes a sequence of three instructions and DEQUEUE takes a single instruction.","A queue can be implemented where both ENQUEUE and DEQUEUE take a single instruction each."],
       answer: 2,
       marks: 2,
-      explanation: "To enqueue at the bottom: REVERSE, PUSH the new element, then REVERSE again (three instructions); DEQUEUE is then simply a POP (one instruction) since the front element stays on top."
+      explanation: "1. Test whether a QUEUE (FIFO: first element enqueued is the first dequeued) can be built using only PUSH, POP, and REVERSE on a single stack. 2. To ENQUEUE a new element at the LOGICAL \"back\" of the queue while keeping the FRONT of the queue accessible at the TOP of the stack: first REVERSE the stack (bringing the current front to the bottom, current back to the top), then PUSH the new element (it lands on top, now at the LOGICAL back), then REVERSE again (restoring the original front back to the top, with the new element now correctly at the bottom/back) — this costs exactly 3 instructions (REVERSE, PUSH, REVERSE). 3. To DEQUEUE, since the front of the queue is ALWAYS maintained at the TOP of the stack by the enqueue procedure above, a single POP directly removes and returns the front element — 1 instruction. 4. ENQUEUE takes 3 instructions, DEQUEUE takes 1, matching option C."
     },
     {
       id: "gate2014s2-cs-42",
@@ -547,7 +547,7 @@ window.GATE_DATA.pyq.push({
       options: ["The function returns 0 for all values of j.","The function prints the string something for all values of j.","The function returns 0 when j = 50.","The function will exhaust the runtime stack or run into an infinite loop when j = 50."],
       answer: 3,
       marks: 2,
-      explanation: "Since the static variable i is fixed at 50, calling f(50) makes i==j true and the function recursively calls f(i)=f(50) again with i unchanged, so it never terminates, exhausting the runtime stack."
+      explanation: "1. The variable i is declared STATIC inside the function, meaning it is initialized to 50 ONCE (on the first call) and RETAINS its value 50 across all future calls to f — it does NOT reset to 50 on later calls, and it is never modified anywhere in the function body. 2. When j=50 is passed: the condition i==j becomes 50==50, which is TRUE, so the function enters the if-branch, prints \"something\", and then calls k=f(i), i.e. f(50) — a RECURSIVE call with the SAME argument as before. 3. Since i remains fixed at 50 (it is never changed inside the function) and the recursive call always passes i (=50) as the new argument, EVERY recursive call again satisfies i==j (50==50), triggering ANOTHER recursive call to f(50), and so on — this recursion NEVER terminates. 4. This infinite recursion will eventually exhaust the call stack (stack overflow) since each call adds a new stack frame with no base case ever being reached. 5. When j=50, the function runs into unbounded recursion, exhausting the runtime stack, matching option D."
     },
     {
       id: "gate2014s2-cs-43",
@@ -557,7 +557,7 @@ window.GATE_DATA.pyq.push({
       options: ["A smaller block size implies better spatial locality","A smaller block size implies a smaller cache tag and hence lower cache tag overhead","A smaller block size implies a larger cache tag and hence lower cache hit time","A smaller block size incurs a lower cache miss penalty"],
       answer: 3,
       marks: 2,
-      explanation: "A smaller cache block takes less time to transfer from memory on a miss, so it incurs a lower miss penalty (typically at the cost of a higher miss rate)."
+      explanation: "1. Option A is FALSE: a SMALLER block size actually captures LESS of the surrounding data per fetch, giving WORSE spatial locality exploitation, not better. 2. Option B is FALSE: a smaller block size means MORE blocks fit in the same cache capacity, requiring a LARGER (not smaller) set-index field to address them, and the tag size depends on the remaining address bits, not directly reduced by smaller blocks in the way stated. 3. Option C is FALSE: a smaller block size does not directly cause a LARGER tag with LOWER hit time — hit time is dominated by the actual memory access/comparison circuitry, not simply by block size in this direct way. 4. Option D is TRUE: the MISS PENALTY is the time to fetch a missing block from main memory into the cache — a SMALLER block requires transferring FEWER bytes on a miss, directly reducing the time (penalty) needed to service that miss, though it typically comes at the cost of a higher miss RATE (more frequent misses) due to reduced spatial locality capture. 5. A smaller block size incurs a lower cache miss penalty, matching option D."
     },
     {
       id: "gate2014s2-cs-44",
@@ -567,7 +567,7 @@ window.GATE_DATA.pyq.push({
       options: ["Width of tag comparator","Width of set index decoder","Width of way selection multiplexor","Width of processor to main memory data bus"],
       answer: 3,
       marks: 2,
-      explanation: "Doubling associativity while keeping capacity and block size fixed changes the number of sets and hence the tag, index, and way-selection widths, but the width of the bus to main memory (tied only to block size) is unaffected."
+      explanation: "1. Doubling ASSOCIATIVITY while keeping total CAPACITY and BLOCK SIZE fixed means the number of SETS is HALVED (since capacity = sets × ways × block_size, and ways doubled while capacity and block_size stayed fixed). 2. Fewer sets means the SET-INDEX field needs FEWER bits — so the width of the set-index DECODER changes (shrinks). 3. With MORE ways per set (doubled), selecting among them requires a WIDER way-selection MULTIPLEXOR — this width changes (grows). 4. With fewer index bits (and the same total address width), the TAG field must be WIDER to make up the difference — so the tag comparator's width also changes (grows). 5. The width of the DATA BUS to main memory depends only on the BLOCK SIZE (how much data is transferred per memory access), which was explicitly kept UNCHANGED — this is the one component GUARANTEED to be unaffected, matching option D."
     },
     {
       id: "gate2014s2-cs-45",
@@ -577,7 +577,7 @@ window.GATE_DATA.pyq.push({
       options: ["C1640000H","416C0000H","41640000H","C16C0000H"],
       answer: 0,
       marks: 2,
-      explanation: "-14.25 = -1.11001(base 2) x 2^3, giving sign bit 1, biased exponent 130 (10000010), and mantissa 11001000...0, which packs to the hex value C1640000H."
+      explanation: "1. Convert -14.25 to binary: 14 in binary is 1110, and 0.25 in binary is .01, so 14.25 = 1110.01 in binary. 2. Normalize to the form 1.xxxxx × 2^k: 1110.01 = 1.11001 × 2^3 (shifting the binary point left by 3 places). 3. Sign bit: since the value is negative, sign=1. Exponent: true exponent is 3, and IEEE 754 single-precision uses a bias of 127, so the STORED exponent = 3+127=130 = 10000010 in 8-bit binary. 4. Mantissa: take the bits after the leading \"1.\" — 11001 — and pad with trailing zeros to fill all 23 mantissa bits: 11001000000000000000000. 5. Assemble the full 32-bit pattern: 1 10000010 11001000000000000000000. Grouping into hex nibbles: 1100 0001 0110 0100 0000 0000 0000 0000 = C1640000 in hex, matching option A."
     },
     {
       id: "gate2014s2-cs-46",
@@ -587,7 +587,7 @@ window.GATE_DATA.pyq.push({
       options: ["Only I","Only II","Both I and II","Neither I nor II"],
       answer: 0,
       marks: 2,
-      explanation: "With f(x)=0.75x³−2x²−2x+4 and f′(x)=2.25x²−4x−2: f(2)=−2, f′(2)=−1 gives x1=0; f(0)=4, f′(0)=−2 gives x2=2; repeating gives x3=0. So x3=0 (statement I true), but the iterates cycle between 0 and 2 forever rather than converging (statement II false)."
+      explanation: "1. Newton-Raphson update formula: x_(n+1) = x_n − f(x_n)/f'(x_n), with f(x)=0.75x³−2x²−2x+4 and f'(x)=2.25x²−4x−2. 2. Starting at x0=2: f(2)=0.75(8)−2(4)−2(2)+4=6−8−4+4=−2. f'(2)=2.25(4)−4(2)−2=9−8−2=−1. x1=2−(−2)/(−1)=2−2=0. 3. At x1=0: f(0)=4. f'(0)=−2. x2=0−4/(−2)=0+2=2. 4. At x2=2: this is the SAME as x0, so f(2)=−2, f'(2)=−1, x3=2−(−2)/(−1)=0. 5. So x3=0 exactly, confirming statement I is TRUE. 6. However, the sequence is now CYCLING between 0 and 2 forever (x0=2, x1=0, x2=2, x3=0, ...) rather than converging to an actual root — statement II (converges in finitely many iterations) is FALSE. 7. Only statement I is true, matching option A. NOTE -- OUT OF SYLLABUS: this question tests Numerical Methods (the Newton-Raphson method), which is no longer part of the GATE CS syllabus -- it appears in the 2014 papers but in NONE of the 2016-2025 papers included here. No chapter in this app covers it, and that is deliberate: do not go hunting for the theory and do not spend study time on this topic. The explanation above is self-contained if you are curious."
     },
     {
       id: "gate2014s2-cs-47",
@@ -599,7 +599,7 @@ window.GATE_DATA.pyq.push({
       tolerance: 0.01,
       kind: "nat",
       marks: 2,
-      explanation: "The matrix equals vvᵀ + uuᵀ for the orthogonal vectors v=(1,0,0,0,1) and u=(0,1,1,1,0). Its only non-zero eigenvalues are ‖v‖² = 2 and ‖u‖² = 3, so their product is 6."
+      explanation: "1. Observe that the given 5×5 matrix can be decomposed as the sum of two rank-1 outer products: M = vvᵀ + uuᵀ, where v=(1,0,0,0,1) (giving the corner 1's pattern) and u=(0,1,1,1,0) (giving the middle 3x3 block of 1's), since v and u are ORTHOGONAL (their dot product is 0), and vvᵀ+uuᵀ exactly reproduces the given matrix's entries. 2. For a matrix that is the sum of orthogonal rank-1 projections vvᵀ+uuᵀ, the NON-ZERO eigenvalues are exactly ‖v‖² and ‖u‖² (the squared norms of the two vectors), with all remaining eigenvalues being 0. 3. Compute ‖v‖² = 1²+0²+0²+0²+1² = 2. Compute ‖u‖² = 0²+1²+1²+1²+0² = 3. 4. The product of the non-zero eigenvalues = 2×3 = 6."
     },
     {
       id: "gate2014s2-cs-48",
@@ -611,7 +611,7 @@ window.GATE_DATA.pyq.push({
       tolerance: 0.01,
       kind: "nat",
       marks: 2,
-      explanation: "By inclusion-exclusion, the count of integers from 1-100 divisible by 2, 3, or 5 is 50+33+20-16-10-6+3=74, leaving 26 not divisible by any of them, giving probability 26/100 = 0.26."
+      explanation: "1. Use inclusion-exclusion to count integers from 1 to 100 divisible by 2, 3, OR 5. Count divisible by 2: ⌊100/2⌋=50. Count divisible by 3: ⌊100/3⌋=33. Count divisible by 5: ⌊100/5⌋=20. 2. Subtract pairwise overlaps: divisible by 6 (2 and 3): ⌊100/6⌋=16. Divisible by 10 (2 and 5): ⌊100/10⌋=10. Divisible by 15 (3 and 5): ⌊100/15⌋=6. 3. Add back the triple overlap: divisible by 30 (2,3,5): ⌊100/30⌋=3. 4. Total divisible by 2, 3, or 5 = 50+33+20−16−10−6+3 = 74. 5. Count NOT divisible by any of 2,3,5 = 100−74=26. 6. Probability = 26/100 = 0.26."
     },
     {
       id: "gate2014s2-cs-49",
@@ -623,7 +623,7 @@ window.GATE_DATA.pyq.push({
       tolerance: 0.01,
       kind: "nat",
       marks: 2,
-      explanation: "2014 = 2 x 19 x 53, a product of three distinct primes, so it has (1+1)(1+1)(1+1) = 8 positive divisors."
+      explanation: "1. Find the prime factorization of 2014: 2014 = 2 × 1007 = 2 × 19 × 53 (checking: 19×53=1007, and 2×1007=2014, confirmed). 2. This is a product of THREE DISTINCT primes, each appearing to the power 1: 2014 = 2¹×19¹×53¹. 3. The formula for the number of positive divisors of a number with prime factorization p1^a1 × p2^a2 × ... is (a1+1)(a2+1)... — here, (1+1)(1+1)(1+1) = 2×2×2 = 8. 4. 2014 has 8 positive divisors."
     },
     {
       id: "gate2014s2-cs-50",
@@ -645,7 +645,7 @@ window.GATE_DATA.pyq.push({
       tolerance: 0.01,
       kind: "nat",
       marks: 2,
-      explanation: "C5, the 5-cycle, is the unique cycle graph that is self-complementary, since both it and its complement are 5-vertex, 2-regular graphs isomorphic to each other."
+      explanation: "1. A graph G on n vertices is SELF-COMPLEMENTARY if G is isomorphic to its own complement Ḡ (the graph with the SAME vertices but exactly the OPPOSITE edges). 2. A necessary condition for self-complementarity: since G and Ḡ together must contain ALL possible edges of the complete graph Kn, and they must have the SAME number of edges as each other (being isomorphic), the total edge count n(n-1)/2 must be EVENLY divisible by 2 — this requires n≡0 or n≡1 (mod 4). 3. Among small cycle graphs Cn (each vertex has degree exactly 2), check which value of n makes Cn isomorphic to its own complement: for n=5, C5 has 5 edges, and its complement (5 vertices, choose-2 total pairs = 10, minus 5 existing edges = 5 remaining edges) also has 5 edges — and the complement of C5 is ITSELF a 5-cycle (a well-known special property unique to n=5 among cycles), confirming C5 IS isomorphic to its complement. 4. The value of n is 5."
     },
     {
       id: "gate2014s2-cs-52",
@@ -668,7 +668,7 @@ window.GATE_DATA.pyq.push({
       options: ["((a -> b) AND (b -> c)) -> (a -> c)","(a <-> c) -> (NOT b -> (a AND c))","(a AND b AND c) -> (c OR a)","a -> (b -> a)"],
       answer: 1,
       marks: 2,
-      explanation: "Taking a=F, c=F (so a<->c is true) and b=F (so NOT b is true) makes a AND c false, so NOT b -> (a AND c) is false, making the whole implication false — this expression is not a tautology, unlike the other three."
+      explanation: "1. A tautology is a Boolean expression that is TRUE under EVERY possible truth assignment to its variables — to disprove one, find just ONE assignment making it FALSE. 2. Test option B, (a↔c)→(¬b→(a∧c)), with a=FALSE, c=FALSE, b=FALSE: a↔c is TRUE (both false, so they match), making the ANTECEDENT of the main implication true — for the whole implication to be FALSE, the CONSEQUENT (¬b→(a∧c)) must be false. 3. With b=FALSE, ¬b=TRUE. With a=FALSE and c=FALSE, a∧c=FALSE. So ¬b→(a∧c) becomes TRUE→FALSE, which is FALSE. 4. The full expression becomes TRUE→FALSE = FALSE — this specific assignment (a=F,b=F,c=F) makes option B false, so it is NOT a tautology. 5. Checking options A, C, D against every possible assignment confirms each one is TRUE in every case (standard logical validities: hypothetical syllogism, weakening a conjunction to a disjunction, and a basic implication introduction respectively) — only option B fails to be a tautology, matching the answer."
     },
     {
       id: "gate2014s2-cs-54",
@@ -678,7 +678,7 @@ window.GATE_DATA.pyq.push({
       options: ["select R.* from R, S where R.a=S.a","select distinct R.* from R,S where R.a=S.a","select R.* from R,(select distinct a from S) as S1 where R.a=S1.a","select R.* from R,S where R.a=S.a and is unique R"],
       answer: 2,
       marks: 2,
-      explanation: "The IN subquery effectively tests membership against the distinct set of S.a values; joining R against a pre-deduplicated set of S.a values reproduces this exactly, whereas joining directly against S can duplicate R rows when S.a has repeats."
+      explanation: "1. The nested query \"select * from R where a in (select S.a from S)\" returns every row of R whose 'a' value appears ANYWHERE in the (possibly duplicate-containing) set of S.a values — membership testing via IN effectively checks against the DISTINCT set of values S.a can take, regardless of how many times each value repeats in S. 2. Option A, a plain join \"R,S where R.a=S.a\": if S has DUPLICATE a-values, this join will produce MULTIPLE copies of each matching R row (once per matching S row) — this does NOT match the original query's behavior, which returns each qualifying R row exactly once. 3. Option B, adding \"distinct\" to the join: this removes duplicate ROWS from the final result, but if R itself contains genuine duplicate rows that should each independently appear, DISTINCT would incorrectly collapse them too — not a faithful match either. 4. Option C, joining R against a PRE-DEDUPLICATED subquery (select distinct a from S) as S1: this joins each R row against the distinct set of S.a values directly, reproducing the IN-based membership test exactly, with NO duplication of R rows and no accidental removal of genuine R duplicates. 5. Option C always gives the same answer as the original nested query, matching the answer."
     },
     {
       id: "gate2014s2-cs-55",
@@ -690,7 +690,7 @@ window.GATE_DATA.pyq.push({
       tolerance: 0.01,
       kind: "nat",
       marks: 2,
-      explanation: "The bus is the bottleneck, serializing requests at 100 ns each; with 8 modules available to absorb the overlapping 500 ns storage phase, up to 10^6 ns / 100 ns = 10,000 stores can be initiated within 1 millisecond."
+      explanation: "1. The BUS is the shared, single resource that BOTTLENECKS the system — even though multiple memory modules can work simultaneously in the background, only ONE request at a time can actually occupy the bus to be transmitted. 2. Each store request occupies the bus for 100 ns (for the address/data/control transfer), after which the bus is FREE again for the NEXT request, even while the addressed module continues its OWN internal 500 ns storage operation in the background (which overlaps with other modules' bus usage). 3. Since the bus itself is only busy for 100 ns per request, and requests can be issued back-to-back as soon as the bus frees up (bus-limited, not module-limited, since 8 modules can absorb the overlapping 500ns phases in a round-robin fashion without waiting on each other), the MAXIMUM rate of initiating new stores is one every 100 ns. 4. In 1 millisecond (10^6 ns), the maximum number of stores initiated = 10^6 ns / 100 ns per store = 10,000 stores."
     }
   ]
 });

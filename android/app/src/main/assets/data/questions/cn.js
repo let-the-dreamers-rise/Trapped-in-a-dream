@@ -375,16 +375,6 @@ window.GATE_DATA.questions['cn'] = {
           explanation: 'The Address Resolution Protocol maps a known IPv4 address to the unknown MAC (hardware) address. The host broadcasts an ARP request on the LAN saying who has this IP address; every station receives it, but only the owner of that IP replies, unicasting its MAC address back. The result is cached in the ARP table to avoid repeating the exchange. DHCP does nearly the opposite job of assigning IP configuration to a host; DNS maps names to IP addresses at the application layer; and ICMP reports errors and diagnostics. A related one-marker: RARP (and later DHCP) handled the reverse mapping from MAC to IP for diskless stations.'
         },
         {
-          id: 'cn-network-q4',
-          q: 'The correct order of messages in a successful DHCP address acquisition is:',
-          options: ['Request, Offer, Discover, Acknowledge', 'Discover, Offer, Request, Acknowledge', 'Discover, Request, Offer, Acknowledge', 'Offer, Discover, Request, Acknowledge'],
-          answer: 1,
-          marks: 1,
-          difficulty: 'easy',
-          type: 'concept',
-          explanation: 'DHCP follows the DORA sequence. The client, having no address, broadcasts a Discover message to locate servers. Any DHCP server that can serve it broadcasts back an Offer containing a proposed IP address and lease parameters. The client chooses one offer and broadcasts a Request naming that server (broadcast so the other servers know their offers were declined). The chosen server finalizes with an Acknowledge, after which the client may use the address for the lease duration. The exchange runs over UDP (ports 67 and 68) because the client cannot use TCP without an address. Remembering the acronym DORA answers this recurring question immediately.'
-        },
-        {
           id: 'cn-network-q5',
           q: 'The maximum number of usable host addresses in the subnet 200.10.20.0/26 is:',
           options: ['64', '62', '30', '126'],
@@ -1260,16 +1250,6 @@ window.GATE_DATA.questions['cn'].topics.find(function(t){return t.id==='cn-netwo
     difficulty: "easy",
     type: "concept",
     explanation: "The Address Resolution Protocol maps an IP address to a link-layer (MAC) address on the local network. Host A broadcasts an ARP request frame (destination MAC all-1s, meaning every host on the LAN receives and processes it) containing B's IP address and asking who owns it. Every host on the LAN receives this broadcast, but only host B recognizes its own IP address and responds; B's ARP reply is sent as a unicast frame directly back to A's MAC address, containing B's actual MAC address. A then caches this mapping (in its ARP cache/table) for a period of time to avoid repeating this exchange for every subsequent packet to B."
-  },
-  {
-    id: "cn-network-x11",
-    q: "A host powers on and needs to obtain an IP address via DHCP. What is the correct order of the four core DHCP messages exchanged (the 'DORA' sequence)?",
-    options: ["DHCPOFFER, DHCPDISCOVER, DHCPACK, DHCPREQUEST", "DHCPDISCOVER, DHCPOFFER, DHCPREQUEST, DHCPACK", "DHCPREQUEST, DHCPDISCOVER, DHCPOFFER, DHCPACK", "DHCPACK, DHCPREQUEST, DHCPOFFER, DHCPDISCOVER"],
-    answer: 1,
-    marks: 1,
-    difficulty: "medium",
-    type: "concept",
-    explanation: "DHCP configuration follows the well-known DORA sequence. First, the client broadcasts a DHCPDISCOVER message (it has no IP address yet, so this must be a broadcast) looking for any DHCP server. Any listening server responds with a DHCPOFFER, proposing an IP address and lease parameters. The client then broadcasts a DHCPREQUEST explicitly accepting one particular offer (broadcast so any other servers that also offered know their offers were declined). Finally, the chosen server confirms with a DHCPACK, finalizing the lease. This 4-message handshake (Discover, Offer, Request, Acknowledge) is how a host with no prior configuration bootstraps full IP connectivity."
   },
   {
     id: "cn-network-x12",
@@ -2901,12 +2881,12 @@ window.GATE_DATA.questions['cn'].topics.find(function(t){return t.id==='cn-trans
     id: 'cn-transport-h1',
     q: "A TCP Reno sender starts a connection with cwnd = 1 MSS and ssthresh = 16 MSS, MSS = 512 bytes. cwnd doubles every RTT during slow start (capped at ssthresh, after which it switches to linear +1 MSS per RTT congestion avoidance). At the END of RTT 7 a retransmission timeout (RTO) occurs (no triple-dup-ack yet). The sender then restarts slow start from cwnd = 1 with a new ssthresh = (cwnd at the moment of timeout) / 2, rounded down, and again switches to congestion avoidance once cwnd reaches the new ssthresh. At the END of RTT 12 (while in congestion avoidance after the timeout) a triple-duplicate-ACK arrives; the sender halves cwnd (new ssthresh = floor(cwnd/2), cwnd is set to this new ssthresh via fast recovery) and resumes congestion avoidance (+1 MSS per RTT) from RTT 13 onward. What is the TOTAL number of data bytes transmitted by the sender across RTT 1 through RTT 14 inclusive (sum of cwnd, in MSS, over all 14 rounds, times MSS)? (Enter your numerical answer.)",
     options: [],
-    answer: 35840,
+    answer: 50688,
     kind: 'nat',
     marks: 2,
     difficulty: 'hard',
     type: 'numerical',
-    explanation: "Trace cwnd (in MSS) round by round. Slow start doubles until it hits ssthresh = 16: RTT1=1, RTT2=2, RTT3=4, RTT4=8. RTT5 onward, slow start would give 16 which equals ssthresh, so RTT5=9, RTT6=10, RTT7=11 are already in congestion avoidance (once cwnd reaches ssthresh the increase becomes linear, +1 per RTT: 8 to 9, 9 to 10, 10 to 11). A timeout occurs at the end of RTT7 with cwnd = 11, so new ssthresh = floor(11/2) = 5 and cwnd resets to 1. RTT8=1, RTT9=2 (slow start doubling, capped at ssthresh 5), RTT10=4, RTT11=5 (would double to 8 but capped at ssthresh=5, so this is the round where it switches to CA). RTT12 = 5+1 = 6 (congestion avoidance). A triple-dup-ACK arrives at the end of RTT12 with cwnd=6, so new ssthresh = floor(6/2) = 3 and fast recovery sets cwnd = 3 for RTT13. RTT13=3, RTT14 = 3+1 = 4 (congestion avoidance resumes). The full 14-round trace is: 1,2,4,8,9,10,11,1,2,4,5,6,3,4. Summing gives 70 MSS. Total bytes = 70 x 512 = 35,840 bytes. The key traps are correctly identifying which round is the LAST slow-start round (the one that reaches, not exceeds, ssthresh) versus the first congestion-avoidance round, and applying the halving rule using the cwnd value AT the moment of loss detection, not one round before or after."
+    explanation: "Trace cwnd (in MSS) round by round, applying the rule exactly as stated: slow start DOUBLES each RTT but is CAPPED at ssthresh, and once cwnd reaches that cap the growth becomes linear (+1 MSS per RTT). Phase 1 (ssthresh = 16): RTT1=1, RTT2=2, RTT3=4, RTT4=8, and RTT5 doubles 8 to 16, which is exactly the cap, so RTT5=16 is the LAST slow-start round. Congestion avoidance then adds 1 per round: RTT6=17, RTT7=18. A timeout occurs at the END of RTT7, when cwnd = 18, so the new ssthresh = floor(18/2) = 9 and cwnd resets to 1. Phase 2 (ssthresh = 9): RTT8=1, RTT9=2, RTT10=4, RTT11=8; RTT12 would double 8 to 16 but is capped at ssthresh, so RTT12=9 and slow start ends there. A triple-duplicate-ACK arrives at the END of RTT12 with cwnd = 9, so the new ssthresh = floor(9/2) = 4 and fast recovery sets cwnd = 4. Phase 3: RTT13=4, and congestion avoidance resumes, so RTT14 = 4+1 = 5. The full 14-round trace is 1, 2, 4, 8, 16, 17, 18, 1, 2, 4, 8, 9, 4, 5, summing to 99 MSS. Total bytes = 99 x 512 = 50,688 bytes. The traps are: cwnd REACHES the cap rather than stopping one doubling short of it (8 goes to 16, not to 9 - slow start ends AT ssthresh, as the chapter's slow-start rule states), the halving uses the cwnd value AT the moment of loss detection (18 and 9, not the round before), and a timeout collapses cwnd to 1 while a triple-duplicate-ACK only drops it to the new ssthresh."
   },
   {
     id: 'cn-transport-h2',
@@ -3363,6 +3343,26 @@ window.GATE_DATA.questions['cn'].topics.find(function(t){return t.id==='cn-appli
     difficulty: 'hard',
     type: 'numerical',
     explanation: "Add up every stage in sequence, each stage's RTT-count times 30 ms: DNS = 1 x 30 = 30 ms; TCP handshake = 1 x 30 = 30 ms; TLS 1.2 handshake = 2 x 30 = 60 ms; base HTML page request/response = 1 x 30 = 30 ms; pipelined fetch of the 4 remaining objects = 1 x 30 = 30 ms. Total = 30+30+60+30+30 = 180 ms. The trap is treating the TLS handshake as costing just 1 RTT the way the TCP handshake does -- TLS 1.2's full handshake genuinely requires 2 round trips (ClientHello/ServerHello-with-certificate, then the key-exchange-and-finished messages) before the first byte of encrypted application data can be sent, roughly doubling the 'connection setup tax' compared to plain unencrypted HTTP over the same network path; this extra RTT is exactly the overhead that TLS 1.3's redesigned single-round-trip (and 0-RTT resumption) handshake was created to eliminate."
+  },
+      {
+          id: 'cn-application-q17',
+          q: 'The correct order of messages in a successful DHCP address acquisition is:',
+          options: ['Request, Offer, Discover, Acknowledge', 'Discover, Offer, Request, Acknowledge', 'Discover, Request, Offer, Acknowledge', 'Offer, Discover, Request, Acknowledge'],
+          answer: 1,
+          marks: 1,
+          difficulty: 'easy',
+          type: 'concept',
+          explanation: 'DHCP follows the DORA sequence. The client, having no address, broadcasts a Discover message to locate servers. Any DHCP server that can serve it broadcasts back an Offer containing a proposed IP address and lease parameters. The client chooses one offer and broadcasts a Request naming that server (broadcast so the other servers know their offers were declined). The chosen server finalizes with an Acknowledge, after which the client may use the address for the lease duration. The exchange runs over UDP (ports 67 and 68) because the client cannot use TCP without an address. Remembering the acronym DORA answers this recurring question immediately.'
+        },
+      {
+    id: 'cn-application-x16',
+    q: "A host powers on and needs to obtain an IP address via DHCP. What is the correct order of the four core DHCP messages exchanged (the 'DORA' sequence)?",
+    options: ["DHCPOFFER, DHCPDISCOVER, DHCPACK, DHCPREQUEST", "DHCPDISCOVER, DHCPOFFER, DHCPREQUEST, DHCPACK", "DHCPREQUEST, DHCPDISCOVER, DHCPOFFER, DHCPACK", "DHCPACK, DHCPREQUEST, DHCPOFFER, DHCPDISCOVER"],
+    answer: 1,
+    marks: 1,
+    difficulty: "medium",
+    type: "concept",
+    explanation: "DHCP configuration follows the well-known DORA sequence. First, the client broadcasts a DHCPDISCOVER message (it has no IP address yet, so this must be a broadcast) looking for any DHCP server. Any listening server responds with a DHCPOFFER, proposing an IP address and lease parameters. The client then broadcasts a DHCPREQUEST explicitly accepting one particular offer (broadcast so any other servers that also offered know their offers were declined). Finally, the chosen server confirms with a DHCPACK, finalizing the lease. This 4-message handshake (Discover, Offer, Request, Acknowledge) is how a host with no prior configuration bootstraps full IP connectivity."
   }
 );
 

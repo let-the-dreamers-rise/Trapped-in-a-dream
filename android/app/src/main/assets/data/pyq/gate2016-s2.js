@@ -13,7 +13,7 @@ window.GATE_DATA.pyq.push({
       options: ["the security guard at a university","a security guard at the university","a security guard at university","the security guard at the university"],
       answer: 1,
       marks: 1,
-      explanation: "The indefinite article 'a' correctly introduces the profession (security guard) while the definite article 'the' correctly specifies the particular, already-known university."
+      explanation: "1. The profession \"security guard\" is being introduced for the FIRST time in this context (not previously specified), so it needs the INDEFINITE article \"a\" — matching \"a security guard\" (rules out options using \"the security guard\"). 2. \"University\" here refers to a SPECIFIC, particular university (implied by context as an already-known institution), so it needs the DEFINITE article \"the\" — matching \"at the university\" (rules out \"at a university\" and \"at university\" without any article). 3. The correct combination is \"a security guard at the university,\" matching option B."
     },
     {
       id: "gate2016s2-ga-2",
@@ -23,7 +23,7 @@ window.GATE_DATA.pyq.push({
       options: ["put up with","put in with","put down to","put up against"],
       answer: 0,
       marks: 1,
-      explanation: "'Cope with' means to deal with or endure a difficult situation, which is closest in meaning to 'put up with'."
+      explanation: "1. \"Cope with\" means to successfully deal with, manage, or endure a difficult situation or challenge. 2. \"Put up with\" means to tolerate or endure something (often unpleasant) without complaint — this matches the meaning of enduring/managing a difficult situation closely. 3. \"Put in with,\" \"put down to,\" and \"put up against\" are all different idiomatic phrases with unrelated meanings (associating with someone, attributing something to a cause, and pitting against a competitor, respectively) — none match \"cope with.\" 4. \"Put up with\" is the closest match, matching option A."
     },
     {
       id: "gate2016s2-ga-3",
@@ -33,7 +33,7 @@ window.GATE_DATA.pyq.push({
       options: ["mock","deride","praise","jeer"],
       answer: 2,
       marks: 1,
-      explanation: "'Mock', 'deride', and 'jeer' all mean to ridicule someone, while 'praise' means the opposite -- to commend."
+      explanation: "1. Check the meaning of each word: \"mock\" means to ridicule or make fun of someone. \"Deride\" means to express contempt for, or ridicule, someone. \"Jeer\" means to make rude, mocking remarks at someone. 2. These three words (mock, deride, jeer) all share the SAME core meaning: to RIDICULE or mock someone. 3. \"Praise,\" however, means to express APPROVAL or admiration — the OPPOSITE meaning of the other three words. 4. \"Praise\" is the odd one out, matching option C."
     },
     {
       id: "gate2016s2-ga-4",
@@ -43,7 +43,7 @@ window.GATE_DATA.pyq.push({
       options: ["CADBE","JHKIL","XVYWZ","ONPMQ"],
       answer: 3,
       marks: 1,
-      explanation: "CADBE, JHKIL, and XVYWZ are each a fixed rearrangement pattern of five consecutive alphabet letters; ONPMQ does not follow the same consecutive-letter pattern, making it the odd one."
+      explanation: "1. Examine each option for an underlying pattern based on rearranging 5 CONSECUTIVE letters of the alphabet. CADBE: the letters A,B,C,D,E rearranged as C-A-D-B-E — check the pattern (3rd,1st,4th,2nd,5th positions of the consecutive block). JHKIL: the letters H,I,J,K,L rearranged as J-H-K-I-L — SAME positional pattern (3rd,1st,4th,2nd,5th). XVYWZ: the letters V,W,X,Y,Z rearranged as X-V-Y-W-Z — SAME positional pattern again. 2. Check ONPMQ: the letters M,N,O,P,Q rearranged as O-N-P-M-Q — testing the SAME pattern (3rd,1st,4th,2nd,5th of M,N,O,P,Q would give O,M,P,N,Q) — but the actual sequence given is O-N-P-M-Q, which does NOT match this established positional pattern (N and M are swapped relative to the pattern the other three follow). 3. ONPMQ breaks the consistent pattern the other three share, making it the odd one out, matching option D."
     },
     {
       id: "gate2016s2-ga-5",
@@ -53,7 +53,7 @@ window.GATE_DATA.pyq.push({
       options: ["n^4","4^n","2^(2n-1)","4^(n-1)"],
       answer: 1,
       marks: 1,
-      explanation: "α^-n + β^-n = (α^n + β^n)/(αβ)^n, so the ratio (α^n+β^n)/(α^-n+β^-n) simplifies to (αβ)^n = 4^n, since the product of the roots αβ = 4."
+      explanation: "1. For a quadratic with roots α and β, the product of the roots αβ=4 (given). 2. Rewrite α^(-n)+β^(-n) in terms of positive powers: α^(-n)+β^(-n) = 1/α^n + 1/β^n = (β^n+α^n)/(α^n·β^n) = (α^n+β^n)/(αβ)^n. 3. Compute the requested ratio: (α^n+β^n) / (α^(-n)+β^(-n)) = (α^n+β^n) / [(α^n+β^n)/(αβ)^n] = (αβ)^n (the (α^n+β^n) terms cancel directly). 4. Substitute αβ=4: the ratio equals 4^n, matching option B."
     },
     {
       id: "gate2016s2-ga-6",
@@ -63,7 +63,7 @@ window.GATE_DATA.pyq.push({
       options: ["35","45","65","90"],
       answer: 0,
       marks: 2,
-      explanation: "150 - 30 = 120 use at least one platform. |F union W| = |F| + |W| - |F intersect W| gives 120 = 55 + 85 - |F intersect W|, so |F intersect W| = 20. Only-Facebook count = 55 - 20 = 35."
+      explanation: "1. Total faculty = 150. Faculty using NEITHER platform = 30, so faculty using AT LEAST ONE platform = 150−30=120. 2. Use the two-set inclusion-exclusion formula: |F∪W| = |F|+|W|−|F∩W|. Substituting: 120 = 55+85−|F∩W|, giving |F∩W| = 55+85−120 = 20. 3. Faculty connected ONLY through Facebook (Facebook but NOT WhatsApp) = |F|−|F∩W| = 55−20 = 35."
     },
     {
       id: "gate2016s2-ga-7",
@@ -73,7 +73,7 @@ window.GATE_DATA.pyq.push({
       options: ["(i) only","(ii) only","both (i) and (ii)","neither (i) nor (ii)"],
       answer: 3,
       marks: 2,
-      explanation: "The passage only wonders whether the developments are good, without asserting they are bad, so (i) is not supported; it explicitly calls the internet an unintended consequence, so (ii) is also not supported. Neither statement is validly inferred."
+      explanation: "1. Check inference (i), \"the author believes computers are not good for us\": the passage only expresses UNCERTAINTY (\"one is left wondering if these developments are good\") — it never makes a DEFINITIVE negative claim about computers being bad, so (i) is NOT validly supported (wondering is not the same as concluding). 2. Check inference (ii), \"mobile computers and the internet are both intended inventions\": the passage EXPLICITLY states the internet is believed to be an UNINTENDED consequence — this directly CONTRADICTS inference (ii) (which claims BOTH were intended), so (ii) is also NOT supported. 3. Neither inference is validly supported by the passage, matching option D."
     },
     {
       id: "gate2016s2-ga-8",
@@ -83,7 +83,7 @@ window.GATE_DATA.pyq.push({
       options: ["(i) only","(ii) only","both (i) and (ii)","neither (i) nor (ii)"],
       answer: 3,
       marks: 2,
-      explanation: "'All hill-stations have a lake' only requires at least one lake, so Ooty having two lakes does not contradict it being a hill-station, and the statement says nothing about an upper limit on lakes. Neither inference is valid."
+      explanation: "1. \"All hill-stations have a lake\" only asserts that EVERY hill-station has AT LEAST one lake — it says NOTHING about an upper limit on the number of lakes a hill-station could have. 2. Check inference (i), \"Ooty is not a hill-station\": since having TWO lakes is fully CONSISTENT with \"at least one lake\" (two is certainly at least one), Ooty having two lakes does NOT contradict it being a hill-station — inference (i) is NOT supported. 3. Check inference (ii), \"no hill-station can have more than one lake\": the original statement never claims an UPPER bound of exactly one lake — it only establishes a LOWER bound (at least one) — so inference (ii) is also NOT supported (in fact, Ooty having 2 lakes while still potentially being a hill-station directly shows this inference would be FALSE, not just unsupported). 4. Neither inference is validly supported, matching option D."
     },
     {
       id: "gate2016s2-ga-9",
@@ -93,7 +93,7 @@ window.GATE_DATA.pyq.push({
       options: ["21","27","30","36"],
       answer: 2,
       marks: 2,
-      explanation: "The number of rectangles in an m x n grid is C(m+1,2) x C(n+1,2). For 2 x 4, this is C(3,2) x C(5,2) = 3 x 10 = 30."
+      explanation: "1. The general formula for counting ALL rectangles (of every size) in an m×n grid of unit cells is C(m+1,2)×C(n+1,2) — choosing 2 of the (m+1) horizontal grid lines and 2 of the (n+1) vertical grid lines to form each rectangle's boundary. 2. For a 2×4 grid: m=2 rows means m+1=3 horizontal lines, giving C(3,2)=3 ways to choose 2 of them. n=4 columns means n+1=5 vertical lines, giving C(5,2)=10 ways to choose 2 of them. 3. Total rectangles = 3×10 = 30, matching option C."
     },
     {
       id: "gate2016s2-ga-10",
@@ -104,7 +104,7 @@ window.GATE_DATA.pyq.push({
       options: ["f(x) = 1 - |x - 1|","f(x) = 1 + |x - 1|","f(x) = 2 - |x - 1|","f(x) = 2 + |x - 1|"],
       answer: 2,
       marks: 2,
-      explanation: "The graph peaks at (1,2) and is linear (a V-shape flipped, i.e. a tent) on either side, reaching 0 at x=3 and -2 at x=-3. f(x) = 2 - |x-1| gives f(1)=2, f(3)=2-2=0, and f(-3)=2-4=-2, matching all three points, so option (C) is correct."
+      explanation: "1. Since the function peaks at (1,2) and forms a symmetric \"tent\" shape (linear on both sides of the peak, characteristic of an absolute-value function), model it as f(x) = k−|x−1| for some constant k, where the peak occurs at x=1 (where |x-1|=0, giving f(1)=k). 2. Since the peak value given is 2, set k=2: f(x)=2−|x−1|. 3. Verify against the other given points: at x=3, f(3)=2−|3−1|=2−2=0, matching the stated \"reaches 0 at x=3.\" At x=−3, f(−3)=2−|−3−1|=2−4=−2, matching the stated \"passes through (−3,−2).\" 4. All three given points are satisfied by f(x)=2−|x−1|, matching option C."
     },
     {
       id: "gate2016s2-cs-1",
@@ -116,7 +116,7 @@ window.GATE_DATA.pyq.push({
       tolerance: 0.01,
       kind: "nat",
       marks: 1,
-      explanation: "P and (P implies Q) forces both P and Q to be true. (i) false is not implied; (ii) Q is implied; (iii) true is always implied; (iv) P v Q is implied since Q holds; (v) not-Q v P is implied since P holds. That gives 4 implied expressions."
+      explanation: "1. \"P and (P implies Q)\" as a PREMISE forces BOTH P to be TRUE and Q to be TRUE (since P is asserted true directly, and P⇒Q combined with P true forces Q true by modus ponens). 2. Check each expression under these forced truth values (P=true, Q=true): (i) \"false\": this is NEVER true regardless of P,Q — NOT implied. (ii) \"Q\": since Q is forced true, this IS implied. (iii) \"true\": always true regardless — IS implied (trivially). (iv) \"P∨Q\": since P is true, this IS implied. (v) \"¬Q∨P\": since P is true, this disjunction is true regardless of Q — IS implied. 3. Expressions (ii), (iii), (iv), (v) are all implied — that's 4 total implied expressions."
     },
     {
       id: "gate2016s2-cs-2",
@@ -128,7 +128,7 @@ window.GATE_DATA.pyq.push({
       tolerance: 0.01,
       kind: "nat",
       marks: 1,
-      explanation: "f(x) + f(-x) retains only the even-degree terms of f, so f must have a nonzero x^10 term. Its derivative contributes a degree-9 (odd) term to g(x), and g(x) - g(-x) retains only odd-degree terms, keeping that degree-9 term."
+      explanation: "1. f(x)+f(-x): for any term ax^k in f(x), the corresponding term in f(-x) is a(-x)^k = a(-1)^k x^k — if k is EVEN, this ADDS to give 2ax^k (survives); if k is ODD, this gives -ax^k, which CANCELS with the original ax^k (vanishes). So f(x)+f(-x) keeps ONLY the EVEN-degree terms of f(x). 2. Given that f(x)+f(-x) has degree 10, this means f(x) must contain a nonzero x^10 term (the highest surviving even-degree term). 3. Differentiate f(x): g(x)=f'(x). The x^10 term in f(x) becomes (via the power rule) a term proportional to x^9 in g(x) — an ODD-degree term. 4. Now consider g(x)-g(-x): by the SAME even/odd cancellation logic (but reversed — this combination KEEPS the ODD-degree terms and cancels the even ones), the x^9 term from g(x) SURVIVES in g(x)-g(-x) (doubled, not cancelled, since it's odd-degree). 5. The degree of g(x)-g(-x) is 9 (assuming no higher-degree odd term exists in g, which follows since f's highest term was degree 10, giving g's highest term as degree 9)."
     },
     {
       id: "gate2016s2-cs-3",
@@ -140,7 +140,7 @@ window.GATE_DATA.pyq.push({
       tolerance: 0.01,
       kind: "nat",
       marks: 1,
-      explanation: "By the Four Colour Theorem, every planar graph can be vertex-coloured with at most 4 colours, and some planar graphs (e.g. K4) genuinely need 4."
+      explanation: "1. The FOUR COLOUR THEOREM (a famous, proven result in graph theory) states that the vertices of ANY planar graph can always be coloured using AT MOST 4 colours such that no two ADJACENT vertices share the same colour. 2. This bound of 4 is also TIGHT — certain planar graphs (such as K4, the complete graph on 4 vertices, which is planar) genuinely REQUIRE all 4 colours, since every pair of its vertices is adjacent. 3. The minimum number of colours sufficient for ANY planar graph is 4."
     },
     {
       id: "gate2016s2-cs-4",
@@ -162,7 +162,7 @@ window.GATE_DATA.pyq.push({
       tolerance: 0.01,
       kind: "nat",
       marks: 1,
-      explanation: "By total probability with equal priors, P(lasts > 100h) = 0.5(0.7) + 0.5(0.4) = 0.55."
+      explanation: "1. Use the LAW OF TOTAL PROBABILITY: P(lasts>100h) = P(Type1)×P(lasts>100h|Type1) + P(Type2)×P(lasts>100h|Type2). 2. Since the shop has an EQUAL number of each type, P(Type1)=P(Type2)=0.5. 3. Substitute the given conditional probabilities: P(lasts>100h) = 0.5×0.7 + 0.5×0.4 = 0.35+0.20 = 0.55."
     },
     {
       id: "gate2016s2-cs-6",
@@ -174,7 +174,7 @@ window.GATE_DATA.pyq.push({
       tolerance: 0.01,
       kind: "nat",
       marks: 1,
-      explanation: "det(A) = 1 x 2 x 4 = 8, so det(A^-1) = 1/8 = 0.125, and transposing a matrix does not change its determinant."
+      explanation: "1. The DETERMINANT of a matrix equals the PRODUCT of its eigenvalues: det(A) = 1×2×4 = 8. 2. The determinant of the INVERSE of a matrix is the RECIPROCAL of the original determinant: det(A^(-1)) = 1/det(A) = 1/8 = 0.125. 3. TRANSPOSING a matrix does NOT change its determinant (det(A^T)=det(A) always) — so det((A^(-1))^T) = det(A^(-1)) = 0.125."
     },
     {
       id: "gate2016s2-cs-7",
@@ -208,7 +208,7 @@ window.GATE_DATA.pyq.push({
       tolerance: 0.01,
       kind: "nat",
       marks: 1,
-      explanation: "2's complement represents 2^16 distinct integers with a unique zero. Sign-magnitude also has 2^16 bit patterns, but +0 and -0 represent the same integer, giving only 2^16 - 1 distinct integers. So X - Y = 1."
+      explanation: "1. A 16-bit 2's COMPLEMENT representation can represent 2^16 = 65,536 distinct bit patterns, and CRUCIALLY, each distinct bit pattern maps to a UNIQUE integer value (2's complement has exactly ONE representation of zero) — so X = 2^16 = 65,536 distinct integers. 2. A 16-bit SIGN-MAGNITUDE representation also has 2^16 total bit patterns, BUT it has TWO separate patterns (+0 and -0) that both represent the SAME integer value, ZERO — so the number of DISTINCT INTEGER VALUES representable is only 2^16-1 = 65,535, giving Y = 65,535. 3. X-Y = 65,536-65,535 = 1."
     },
     {
       id: "gate2016s2-cs-10",
@@ -220,7 +220,7 @@ window.GATE_DATA.pyq.push({
       tolerance: 0.01,
       kind: "nat",
       marks: 1,
-      explanation: "The opcode needs ceil(log2 40) = 6 bits, and each of the two register operands needs ceil(log2 24) = 5 bits, totalling 6 + 2*5 = 16 bits. That leaves 32 - 16 = 16 bits for the immediate field."
+      explanation: "1. With 40 distinct instructions, the OPCODE field needs ⌈log2(40)⌉ = 6 bits (since 2^5=32<40≤64=2^6). 2. With 24 general-purpose registers, EACH register operand needs ⌈log2(24)⌉ = 5 bits (since 2^4=16<24≤32=2^5), and the instruction has TWO register operands, using 5×2=10 bits total. 3. Total bits used by opcode + two register operands = 6+10 = 16 bits. 4. Remaining bits for the immediate operand field = 32 (total instruction width) − 16 = 16 bits."
     },
     {
       id: "gate2016s2-cs-11",
@@ -232,7 +232,7 @@ window.GATE_DATA.pyq.push({
       tolerance: 0.01,
       kind: "nat",
       marks: 1,
-      explanation: "BFS visits level by level. Levels 0-3 of a binary tree can together contain at most 1+2+4+8 = 15 vertices, and level 4 can contain up to 16 vertices. If t is the last vertex visited at level 4, n = 15 + 16 = 31."
+      explanation: "1. In BFS, all vertices at a given DEPTH (distance from root) are visited BEFORE any vertex at the NEXT depth — so to find the MAXIMUM possible position (n) for a vertex at distance 4, we want to know the MAXIMUM number of vertices that could exist at depths 0 through 4 combined, with our target vertex t being the VERY LAST one visited at depth 4. 2. In a binary tree, level k can hold AT MOST 2^k vertices (each node has at most 2 children). Levels 0 through 3 can together hold at most 1+2+4+8 = 15 vertices (summing 2^0 through 2^3). 3. Level 4 (where t sits) can hold at most 2^4 = 16 vertices. 4. If t is positioned as the VERY LAST vertex visited at level 4 (the 16th vertex of that level), its overall BFS position n = (total vertices in levels 0-3) + (t's position within level 4) = 15+16 = 31."
     },
     {
       id: "gate2016s2-cs-12",
@@ -244,7 +244,7 @@ window.GATE_DATA.pyq.push({
       tolerance: 0.01,
       kind: "nat",
       marks: 1,
-      explanation: "j is passed by value into m; inside f, m becomes 15 and *p (i.e. i) becomes 5+15=20. Back in main, i+j = 20+10 = 30."
+      explanation: "1. main() initializes i=5, j=10, then calls f(&i, j) — passing the ADDRESS of i (a pointer) and the VALUE of j (10, passed BY VALUE into parameter m). 2. Inside f: m=m+5 modifies f's LOCAL copy of m only: m becomes 10+5=15 (this does NOT affect j in main, since m was passed by value). 3. *p=*p+m: since p points to i, this modifies i DIRECTLY (dereferencing through the pointer): i becomes (original i, 5) + (current m, 15) = 5+15=20. 4. Back in main, i is now 20 (modified through the pointer), while j remains UNCHANGED at 10 (only m, a local copy, was ever modified inside f). 5. printf prints i+j = 20+10 = 30."
     },
     {
       id: "gate2016s2-cs-13",
@@ -264,7 +264,7 @@ window.GATE_DATA.pyq.push({
       options: ["Greedy paradigm.","Divide-and-Conquer paradigm.","Dynamic Programming paradigm.","neither Greedy nor Divide-and-Conquer nor Dynamic Programming paradigm."],
       answer: 2,
       marks: 1,
-      explanation: "Floyd-Warshall builds up shortest paths by incrementally allowing more intermediate vertices, reusing previously computed optimal sub-solutions -- the hallmark of dynamic programming."
+      explanation: "1. The FLOYD-WARSHALL algorithm computes all-pairs shortest paths by progressively considering EACH vertex k as a possible INTERMEDIATE point, updating the shortest known distance between every pair (i,j) as: dist[i][j] = min(dist[i][j], dist[i][k]+dist[k][j]). 2. This process BUILDS UP the final answer by REUSING previously-computed OPTIMAL sub-results (the best-known distances using only intermediate vertices 1 through k-1) to compute the NEXT level of results (using intermediate vertices 1 through k) — this reuse of optimal overlapping subproblems is the DEFINING characteristic of DYNAMIC PROGRAMMING. 3. Floyd-Warshall is based on the Dynamic Programming paradigm, matching option C."
     },
     {
       id: "gate2016s2-cs-15",
@@ -286,7 +286,7 @@ window.GATE_DATA.pyq.push({
       tolerance: 0.01,
       kind: "nat",
       marks: 1,
-      explanation: "The regular expression describes all nonempty binary strings. The minimal DFA needs one non-accepting start state (for the empty string) and one accepting state that every 0/1 transition leads into and stays in, so 2 states suffice."
+      explanation: "1. The regular expression (0+1)*(0+1)(0+1)* requires AT LEAST one occurrence of (0+1) (a single 0 or 1) — the surrounding (0+1)* parts allow any additional 0's or 1's before and after. This describes exactly the set of ALL NONEMPTY binary strings. 2. The minimal DFA for \"all nonempty strings over {0,1}\" needs: one NON-ACCEPTING start state q0 (representing the empty string, which should be rejected), and one ACCEPTING state q1 that every input symbol (0 or 1) transitions INTO from q0, and where q1 LOOPS BACK to itself on every further 0 or 1 (since any nonempty string, however long, should be accepted). 3. This requires exactly 2 states: q0 (reject, only for the empty string) and q1 (accept, absorbing state for everything else)."
     },
     {
       id: "gate2016s2-cs-17",
@@ -296,7 +296,7 @@ window.GATE_DATA.pyq.push({
       options: ["Both P and Q are true","P is true and Q is false","P is false and Q is true","Both P and Q are false"],
       answer: 2,
       marks: 1,
-      explanation: "L1 = {a^n b^n} is the classic non-regular language, so P is false. L2 = (ab)*, generated purely by right recursion with no dependency between counts, is regular, so Q is true."
+      explanation: "1. L1 is generated by S1→aS1b|ε, which produces exactly the strings {a^n b^n : n≥0} — this requires MATCHING the count of a's with the count of b's, a classic example REQUIRING unbounded memory (a stack) to verify — this is the standard NON-REGULAR language proved by the pumping lemma. So P (L1 is regular) is FALSE. 2. L2 is generated by S2→abS2|ε, which produces exactly the strings {(ab)^n : n≥0} — this is simply REPEATING the fixed block \"ab\" any number of times, with NO dependency between separately-counted quantities — a finite-state machine can easily track this (a simple 2-state loop alternating expecting 'a' then 'b'). So L2 IS regular, meaning Q is TRUE. 3. P is false and Q is true, matching option C."
     },
     {
       id: "gate2016s2-cs-18",
@@ -316,7 +316,7 @@ window.GATE_DATA.pyq.push({
       options: ["P<->i, Q<->ii, R<->iv, S<->iii","P<->iii, Q<->i, R<->ii, S<->iv","P<->ii, Q<->iii, R<->i, S<->iv","P<->iv, Q<->i, R<->ii, S<->iii"],
       answer: 1,
       marks: 1,
-      explanation: "Lexical analysis uses regular expressions, top-down parsing corresponds to leftmost derivation, semantic analysis performs type checking, and runtime environments use activation records."
+      explanation: "1. LEXICAL ANALYSIS scans the source code and recognizes tokens using patterns defined by REGULAR EXPRESSIONS — matches with (iii). 2. TOP-DOWN PARSING builds a parse tree starting from the root, expanding the LEFTMOST unexpanded nonterminal at each step — this directly corresponds to a LEFTMOST DERIVATION — matches with (i). 3. SEMANTIC ANALYSIS checks the program for meaning-related correctness, most notably TYPE CHECKING (verifying operations are applied to compatible types) — matches with (ii). 4. RUNTIME ENVIRONMENTS manage the memory layout of executing procedures, using ACTIVATION RECORDS (stack frames) to track each call's local data — matches with (iv). 5. The correct matching is P↔iii, Q↔i, R↔ii, S↔iv, matching option B."
     },
     {
       id: "gate2016s2-cs-20",
@@ -326,7 +326,7 @@ window.GATE_DATA.pyq.push({
       options: ["LRU (Least Recently Used)","OPT (Optimal Page Replacement)","MRU (Most Recently Used)","FIFO (First In First Out)"],
       answer: 3,
       marks: 1,
-      explanation: "FIFO page replacement can exhibit Belady's anomaly, where increasing the number of allocated frames can paradoxically increase the number of page faults."
+      explanation: "Recall what a 'stack algorithm' guarantees, and check which listed policy fails to be one. 1. A page replacement algorithm is called a 'stack algorithm' if, for ANY reference string, the set of pages held in memory with k frames is always a SUBSET of the set held with k+1 frames. LRU and OPT are the two textbook examples of stack algorithms — both can be shown to satisfy this nesting property because their eviction choice (least-recently-used, or farthest-future-use respectively) is based on a priority ordering over ALL pages that doesn't change with the number of frames, so a bigger cache always retains everything a smaller cache would plus possibly more. It is a proven theorem that for any stack algorithm, the number of page faults can only decrease or stay the same as more frames are added — it can never increase. 2. FIFO, in contrast, is famously NOT a stack algorithm: it evicts purely based on load-time (arrival order into the cache), and with a different number of frames the whole loading/eviction history diverges non-monotonically, so the resident set with k+1 frames need not contain the resident set with k frames. 3. This lack of the nesting property is exactly what enables Belady's Anomaly: there exist reference strings for which giving FIFO MORE frames actually causes MORE page faults, not fewer — the classic example is the string 1,2,3,4,1,2,5,1,2,3,4,5, which produces 9 faults with 3 frames but 10 faults with 4 frames under FIFO. 4. Since LRU and OPT are provably immune to this anomaly (being stack algorithms) while FIFO demonstrably is not, the answer is (D) FIFO."
     },
     {
       id: "gate2016s2-cs-21",
@@ -336,7 +336,7 @@ window.GATE_DATA.pyq.push({
       options: ["the lengths of the paths from the root to all leaf nodes are all equal.","the lengths of the paths from the root to all leaf nodes differ from each other by at most 1.","the number of children of any two non-leaf sibling nodes differ by at most 1.","the number of records in any two leaf nodes differ by at most 1."],
       answer: 0,
       marks: 1,
-      explanation: "In a B+ tree, all leaf nodes are maintained at exactly the same depth, so every root-to-leaf path has exactly the same length."
+      explanation: "1. A B+ TREE is specifically designed so that ALL its LEAF nodes sit at the EXACT SAME DEPTH (distance from the root) — this is enforced by the tree's own insertion and splitting rules, which always grow the tree UPWARD from the root when a split propagates, rather than allowing any one branch to become deeper than another. 2. This means EVERY root-to-leaf path has the IDENTICAL length, which is EXACTLY what makes the tree BALANCED — no leaf is ever \"deeper\" or \"shallower\" than any other leaf. 3. This matches option A — options B, C, D describe weaker or unrelated balance conditions that do not capture the actual defining property of a B+ tree's balance."
     },
     {
       id: "gate2016s2-cs-22",
@@ -346,7 +346,7 @@ window.GATE_DATA.pyq.push({
       options: ["Topological order","Depth-first order","Breadth-first order","Ascending order of transaction indices"],
       answer: 0,
       marks: 1,
-      explanation: "A schedule is conflict-serializable exactly when its precedence graph is acyclic, and any topological ordering of that acyclic graph gives an equivalent serial schedule."
+      explanation: "1. A schedule S is CONFLICT-SERIALIZABLE if and only if its PRECEDENCE (conflict) GRAPH is ACYCLIC. 2. For an ACYCLIC directed graph, a TOPOLOGICAL ORDERING is guaranteed to exist, and by definition, a topological ordering places every vertex BEFORE all vertices it has an edge TO — meaning every conflict-implied ordering constraint (Ti must execute before Tj, per each edge) is satisfied. 3. Executing the transactions in THIS topological order therefore produces a SERIAL schedule that respects EVERY conflict recorded in the precedence graph, making it EQUIVALENT to the original schedule S. 4. Depth-first order, breadth-first order, or simply ascending transaction-index order do NOT, in general, respect the precedence graph's edges (they could easily violate a required Ti-before-Tj ordering) — only a genuine TOPOLOGICAL ordering is GUARANTEED to work, matching option A."
     },
     {
       id: "gate2016s2-cs-23",
@@ -356,7 +356,7 @@ window.GATE_DATA.pyq.push({
       options: ["Anarkali's public key.","Salim's public key.","Salim's private key.","Anarkali's private key."],
       answer: 0,
       marks: 1,
-      explanation: "A digital signature is created with the signer's private key and verified with the signer's corresponding public key, so Salim needs Anarkali's public key."
+      explanation: "1. A DIGITAL SIGNATURE works by the SENDER (Anarkali) encrypting the message digest with her OWN PRIVATE key — this is what makes the signature UNIQUELY attributable to her (only she possesses that private key). 2. VERIFICATION of a digital signature requires the CORRESPONDING PUBLIC key of the SIGNER — anyone (including Salim, the recipient) can use Anarkali's PUBLIC key to decrypt the signature and confirm it matches the message digest, proving Anarkali (and only Anarkali) could have created it. 3. Salim needs Anarkali's PUBLIC key to verify the signature, matching option A — Salim's own keys and Anarkali's PRIVATE key are all irrelevant to the VERIFICATION step (Anarkali's private key was already used to CREATE the signature, not to verify it)."
     },
     {
       id: "gate2016s2-cs-24",
@@ -366,7 +366,7 @@ window.GATE_DATA.pyq.push({
       options: ["A station stops to sense the channel once it starts transmitting a frame.","The purpose of the jamming signal is to pad the frames that are smaller than the minimum frame size.","A station continues to transmit the packet even after the collision is detected.","The exponential backoff mechanism reduces the probability of collision on retransmissions."],
       answer: 3,
       marks: 1,
-      explanation: "After a collision, Ethernet stations wait for a random backoff interval chosen from an exponentially growing range before retransmitting, which reduces the chance of repeated collisions."
+      explanation: "1. Option A is FALSE: Ethernet stations CONTINUE sensing the channel WHILE transmitting (this is the \"Collision Detection\" part of CSMA/CD — a station must keep listening to detect if a collision occurs during its own transmission). 2. Option B is FALSE: the JAMMING signal's purpose is to ensure ALL stations on the network are aware a collision has occurred (by making the collision long enough to be detected everywhere), NOT to pad short frames up to minimum size (that's a separate, unrelated frame-padding mechanism). 3. Option C is FALSE: upon detecting a collision, an Ethernet station STOPS transmitting the current packet immediately (after sending the jam signal) — it does NOT continue transmitting the original packet. 4. Option D is TRUE: after a collision, EXPONENTIAL BACKOFF has each station wait a RANDOM interval chosen from an EXPONENTIALLY GROWING range before retrying — this directly reduces the probability that colliding stations pick the same retry time again, reducing future collision probability. 5. Option D is correct."
     },
     {
       id: "gate2016s2-cs-25",
@@ -376,7 +376,7 @@ window.GATE_DATA.pyq.push({
       options: ["HTTP GET request, DNS query, TCP SYN","DNS query, HTTP GET request, TCP SYN","DNS query, TCP SYN, HTTP GET request","TCP SYN, DNS query, HTTP GET request"],
       answer: 2,
       marks: 1,
-      explanation: "The host must first resolve the server's domain name with a DNS query, then establish a TCP connection with a SYN, and only then send the HTTP GET request over that connection."
+      explanation: "1. Before ANY communication can occur, the browser must first RESOLVE the server's domain name into an IP address — this requires a DNS QUERY, which must happen FIRST since nothing else can proceed without knowing the destination address. 2. With the IP address known, the host must ESTABLISH a TCP connection to the server — beginning with a TCP SYN packet — this happens SECOND. 3. Only AFTER the TCP connection is established can the browser actually SEND its HTTP GET request over that connection — this happens THIRD, last. 4. The correct sequence is: DNS query, TCP SYN, HTTP GET request, matching option C."
     },
     {
       id: "gate2016s2-cs-26",
@@ -396,7 +396,7 @@ window.GATE_DATA.pyq.push({
       options: ["(forall x p(x) implies forall x q(x)) implies (exists x not-p(x) or forall x q(x))","(exists x p(x) or exists x q(x)) implies exists x (p(x) or q(x))","exists x (p(x) and q(x)) implies (exists x p(x) and exists x q(x))","forall x (p(x) or q(x)) implies (forall x p(x) or forall x q(x))"],
       answer: 3,
       marks: 2,
-      explanation: "Option D is invalid: it is possible for every x to satisfy p(x) or q(x) (alternating between elements) without either p or q holding for all x -- a standard two-element counterexample."
+      explanation: "1. Test option D, ∀x(p(x)∨q(x)) → (∀x p(x)∨∀x q(x)): construct a counterexample with a 2-element domain {1,2}, where p(1)=TRUE, p(2)=FALSE, and q(1)=FALSE, q(2)=TRUE (each element satisfies exactly one of p or q, but never both fully). 2. Check the ANTECEDENT ∀x(p(x)∨q(x)): for x=1, p(1)∨q(1)=TRUE∨FALSE=TRUE. For x=2, p(2)∨q(2)=FALSE∨TRUE=TRUE. So the antecedent IS TRUE (every element satisfies p OR q). 3. Check the CONSEQUENT (∀x p(x)∨∀x q(x)): ∀x p(x) is FALSE (fails at x=2). ∀x q(x) is FALSE (fails at x=1). So the consequent is FALSE∨FALSE=FALSE. 4. The implication becomes TRUE→FALSE, which is FALSE — this specific interpretation makes option D FALSE, proving it is NOT a valid (universally true) formula. 5. Checking options A, B, C confirms each holds under EVERY possible interpretation (standard, provably valid quantifier-distribution identities) — only option D fails, matching the answer."
     },
     {
       id: "gate2016s2-cs-28",
@@ -418,7 +418,7 @@ window.GATE_DATA.pyq.push({
       tolerance: 0.01,
       kind: "nat",
       marks: 2,
-      explanation: "By Fermat's little theorem, 13^16 = 1 (mod 17). Since 99 mod 16 = 3, 13^99 = 13^3 (mod 17). 13^2 = 169 = 16 (mod 17), so 13^3 = 13*16 = 208 = 4 (mod 17)."
+      explanation: "1. By FERMAT'S LITTLE THEOREM, since 17 is prime and 13 is not divisible by 17: 13^16 ≡ 1 (mod 17). 2. Reduce the exponent 99 modulo 16 (the theorem's cycle length): 99 = 6×16+3, so 99 mod 16 = 3. This means 13^99 ≡ 13^(16×6+3) ≡ (13^16)^6 × 13^3 ≡ 1^6 × 13^3 ≡ 13^3 (mod 17). 3. Compute 13^3 mod 17 step by step: 13^2 = 169. 169 mod 17: 17×9=153, 169−153=16, so 13^2 ≡ 16 (mod 17). 4. 13^3 = 13^2 × 13 ≡ 16×13 (mod 17) = 208. 208 mod 17: 17×12=204, 208−204=4, so 13^3 ≡ 4 (mod 17). 5. The value of 13^99 mod 17 is 4."
     },
     {
       id: "gate2016s2-cs-30",
@@ -430,7 +430,7 @@ window.GATE_DATA.pyq.push({
       tolerance: 0.01,
       kind: "nat",
       marks: 2,
-      explanation: "Scheduling the 10 computations optimally across the two 3ns G-units and two 5ns F-units, so that F-units are kept continuously busy once fed, gives a minimum completion time of 28 nanoseconds."
+      explanation: "Schedule the 10 pipelined computations F(G(Xi)) across 2 G-units (3 ns each) and 2 F-units (5 ns each), feeding each F as soon as its G result and an F-unit are both available. 1. t=0: both G-units start, computing G(X1) and G(X2) in parallel; each finishes at t=3. 2. t=3: G(X1) and G(X2) are ready, and both F-units are free, so F-unit 1 starts F(G(X1)) and F-unit 2 starts F(G(X2)); each will finish at t=3+5=8. Simultaneously, the now-free G-units start G(X3) and G(X4), finishing at t=3+3=6. 3. t=6: G(X3), G(X4) are ready, but both F-units are still busy until t=8, so these results simply wait. The G-units, now free, start G(X5) and G(X6), finishing at t=9. 4. t=8: F-units free up (having finished F(G(X1)), F(G(X2))). They immediately take the already-ready G(X3), G(X4) results, finishing F(G(X3)), F(G(X4)) at t=8+5=13. 5. t=9: G(X5), G(X6) become ready; G-units, free since t=9, start G(X7), G(X8), finishing at t=12. 6. t=12: G(X9), G(X10) start (G-units free since t=12, and no more X's remain after this pair), finishing at t=15. 7. t=13: F-units free up again; they take the ready G(X5), G(X6) results (ready since t=9), finishing F(G(X5)), F(G(X6)) at t=13+5=18. 8. t=18: F-units take the ready G(X7), G(X8) results (ready since t=12), finishing at t=18+5=23. 9. t=23: F-units take the last two, G(X9), G(X10) (ready since t=15), finishing at t=23+5=28. 10. No F-unit or G-unit is ever idle waiting for work once the pipeline fills, and this schedule is optimal (any schedule needs at least 5 'rounds' of F-computation since 10 F-computations split across 2 units need ⌈10/2⌉=5 rounds of 5 ns each, plus the initial 3 ns to produce the first G results = 3+25=28 ns lower bound, which this schedule achieves). Minimum completion time = 28 ns."
     },
     {
       id: "gate2016s2-cs-31",
@@ -454,7 +454,7 @@ window.GATE_DATA.pyq.push({
       tolerance: 0.01,
       kind: "nat",
       marks: 2,
-      explanation: "With a 32-byte block size: number of lines = 512KB/32B = 2^14, number of sets = 2^14/8 = 2^11, so offset = 5 bits and index = 11 bits, leaving tag = 40 - 5 - 11 = 24 bits, matching the official key."
+      explanation: "1. Assume the standard cache block size for this well-known question version: 32 bytes per block/line. Total cache capacity = 512 KB. 2. Total number of cache LINES = cache capacity / block size = 512×1024 bytes / 32 bytes = 16,384 = 2^14 lines. 3. In an 8-WAY set-associative cache, each SET holds 8 lines (ways), so the number of SETS = (total lines)/8 = 2^14/8 = 2^11 sets, requiring 11 bits for the SET INDEX. 4. The BLOCK OFFSET (identifying a byte within the 32-byte block) needs log2(32)=5 bits. 5. Physical address width = 40 bits total. TAG field width = total address bits − index bits − offset bits = 40−11−5 = 24 bits."
     },
     {
       id: "gate2016s2-cs-33",
@@ -478,7 +478,7 @@ window.GATE_DATA.pyq.push({
       tolerance: 0.01,
       kind: "nat",
       marks: 2,
-      explanation: "In a min-heap, every ancestor of a node must hold a smaller value. To push 9 as deep as possible, its 8 ancestors on the root path can hold the 8 smallest values 1 through 8, placing 9 at depth 8."
+      explanation: "1. In a MIN-HEAP, every node's value must be SMALLER than or equal to ALL of its descendants' values — equivalently, every node's value must be LARGER than or equal to ALL of its ANCESTORS' values (moving from the root down toward any leaf, values only ever increase or stay level). 2. To push the value 9 as DEEP as possible in the tree, EVERY ANCESTOR of 9 (every node on the path from the root down to 9's position) must have a value SMALLER than 9 — the smallest 8 available integers (1 through 8) can fill exactly this role, one per ancestor level. 3. If 9 has 8 ancestors (one at each level from the root down to depth 7), then 9 itself sits at DEPTH 8 (since the root is depth 0, and 8 ancestors span depths 0 through 7, placing 9 one level deeper, at depth 8). 4. The maximum depth at which 9 can appear is 8."
     },
     {
       id: "gate2016s2-cs-35",
@@ -498,7 +498,7 @@ window.GATE_DATA.pyq.push({
       options: ["+ - 1 6 7 * 2 ^ 5 - 3 4 *","- + 1 * 6 7 ^ 2 - 5 * 3 4","- + 1 * 7 6 ^ 2 - 5 * 4 3","1 7 6 * + 2 5 4 3 * - ^ -"],
       answer: 2,
       marks: 2,
-      explanation: "Building the expression tree from the postfix string gives root '-' with left subtree ((3*4)-5)^2 and right subtree (6*7)+1. Applying root-right-left recursively to both subtrees yields - + 1 * 7 6 ^ 2 - 5 * 4 3, matching option C."
+      explanation: "1. First reconstruct the expression tree from the given POSTFIX (reverse Polish) notation \"3 4 * 5 - 2 ^ 6 7 * 1 + -\" by processing tokens left to right with an operand/operator stack: push 3, push 4, see '*' — pop 4,3, form node(*, left=3,right=4), push this node. Push 5, see '-' — pop 5 and the (3*4) node, form node(-, left=(3*4), right=5), push it. Push 2, see '^' — pop 2 and the ((3*4)-5) node, form node(^, left=((3*4)-5), right=2), push it. Push 6, push 7, see '*' — pop 7,6, form node(*,left=6,right=7), push it. Push 1, see '+' — pop 1 and the (6*7) node, form node(+, left=(6*7), right=1), push it. Finally see '-' — pop the (+) node and the (^) node, form the ROOT node(-, left=((3*4)-5)^2, right=(6*7)+1). 2. Apply NEW-ORDER traversal (root, then RIGHT subtree via New-order, then LEFT subtree via New-order) starting at the root '-': visit '-' first. 3. Recurse into the RIGHT subtree (the '+' node, representing (6*7)+1): visit '+', then its RIGHT subtree (the leaf '1'): visit '1'. Then its LEFT subtree (the '*' node representing 6*7): visit '*', then ITS right subtree (leaf '7'): visit '7', then its left subtree (leaf '6'): visit '6'. This gives, for the right subtree: + 1 * 7 6. 4. Recurse into the LEFT subtree (the '^' node, representing ((3*4)-5)^2): visit '^', then its RIGHT subtree (leaf '2'): visit '2', then its LEFT subtree (the '-' node representing (3*4)-5): visit '-', then ITS right subtree (leaf '5'): visit '5', then its left subtree (the '*' node representing 3*4): visit '*', then right (leaf '4'): visit '4', then left (leaf '3'): visit '3'. This gives, for the left subtree: ^ 2 - 5 * 4 3. 5. Full New-order sequence: - (root) + 1 * 7 6 (right subtree) ^ 2 - 5 * 4 3 (left subtree) = \"- + 1 * 7 6 ^ 2 - 5 * 4 3\", matching option C."
     },
     {
       id: "gate2016s2-cs-37",
@@ -510,7 +510,7 @@ window.GATE_DATA.pyq.push({
       tolerance: 0.01,
       kind: "nat",
       marks: 2,
-      explanation: "The recursion returns the maximum over all consecutive differences a[i]-a[i+1]: (3-5), (5-2), (2-6), (6-4) = -2, 3, -4, 2. The maximum of these is 3."
+      explanation: "1. The function f(p,n) recursively compares p[0]-p[1] (the difference between the FIRST two elements of the CURRENT sub-array pointer p) against the result of recursing on f(p+1, n-1) (the same computation on the sub-array starting ONE element later), returning the MAXIMUM of the two. 2. Unrolling this recursion for a={3,5,2,6,4} (n=5) computes the MAXIMUM over ALL consecutive-pair differences a[i]-a[i+1] for every valid i: (3-5)=-2, (5-2)=3, (2-6)=-4, (6-4)=2. 3. The base case (n≤1) returns 0, which only matters if ALL the computed differences were negative (ensuring the function never returns a negative overall result if 0 is achievable) — but here, some differences ARE positive, so 0 doesn't end up being the maximum anyway. 4. The maximum among {-2,3,-4,2,0} is 3."
     },
     {
       id: "gate2016s2-cs-38",
@@ -522,7 +522,7 @@ window.GATE_DATA.pyq.push({
       tolerance: 0.01,
       kind: "nat",
       marks: 2,
-      explanation: "Applying the standard matrix-chain-multiplication dynamic programming recurrence to dimensions 10,5,20,10,5 gives a minimum of 1500 scalar multiplications, achieved by an optimal parenthesization such as ((A1 A2) A3) A4."
+      explanation: "1. Apply the MATRIX-CHAIN MULTIPLICATION dynamic programming technique: the dimension sequence for A1(10×5), A2(5×20), A3(20×10), A4(10×5) is p=[10,5,20,10,5] (p[0]=10, p[1]=5, p[2]=20, p[3]=10, p[4]=5). 2. Build the DP table m[i][j] = minimum scalar multiplications to compute the product Ai...Aj, using the recurrence m[i][j]=min over all split points k of (m[i][k]+m[k+1][j]+p[i-1]×p[k]×p[j]). 3. Compute all length-2 products first: m[1][2]=p0×p1×p2=10×5×20=1000. m[2][3]=p1×p2×p3=5×20×10=1000. m[3][4]=p2×p3×p4=20×10×5=1000. 4. Compute length-3 products: m[1][3]=min(m[1][1]+m[2][3]+p0p1p3, m[1][2]+m[3][3]+p0p2p3) = min(0+1000+10×5×10, 1000+0+10×20×10) = min(1000+500, 1000+2000) = min(1500,3000)=1500. m[2][4]=min(m[2][2]+m[3][4]+p1p2p4, m[2][3]+m[4][4]+p1p3p4) = min(0+1000+5×20×5, 1000+0+5×10×5) = min(1000+500,1000+250)=min(1500,1250)=1250. 5. Compute the full product m[1][4]: try each split k=1,2,3: k=1: m[1][1]+m[2][4]+p0p1p4 = 0+1250+10×5×5=1250+250=1500. k=2: m[1][2]+m[3][4]+p0p2p4=1000+1000+10×20×5=2000+1000=3000. k=3: m[1][3]+m[4][4]+p0p3p4=1500+0+10×10×5=1500+500=2000. 6. Minimum over all splits = min(1500,3000,2000) = 1500."
     },
     {
       id: "gate2016s2-cs-39",
@@ -557,7 +557,7 @@ window.GATE_DATA.pyq.push({
       options: ["Theta(n^2)","Theta(n + m)","Theta(m^2)","Theta(n^4)"],
       answer: 1,
       marks: 2,
-      explanation: "Using auxiliary storage indexed by vertex to record, for each vertex, a pointer to its most recently seen unmatched adjacency-list entry, each of the 2m entries can be matched to its twin in O(1) amortized time, for a total of Theta(n + m)."
+      explanation: "1. For EACH vertex v in the graph, maintain a pointer/index into its OWN adjacency list, initially pointing to the START (first entry) of that list. 2. Process each edge (u,v) exactly once: when encountering entry [v] in u's adjacency list for the FIRST time, look up v's CURRENT pointer position — if it points to an entry [u] within v's list that has NOT yet been matched, set the twin pointers between these two entries directly (O(1) work), and advance both pointers past the now-matched entries. 3. Since EVERY entry across ALL adjacency lists is visited and matched EXACTLY ONCE (using this auxiliary per-vertex bookkeeping to find each entry's twin in constant time), and there are exactly 2m total entries (2 per edge, m edges) across n vertices' lists, the total work is Θ(n+m) — Θ(n) to initialize per-vertex pointers, plus Θ(m) to process all 2m entries (each in amortized O(1) time). 4. This matches option B."
     },
     {
       id: "gate2016s2-cs-42",
@@ -607,7 +607,7 @@ window.GATE_DATA.pyq.push({
       options: ["Both G1 and G2","Only G1","Only G2","Neither G1 nor G2"],
       answer: 0,
       marks: 2,
-      explanation: "This question tests whether each grammar's production rules correctly derive an array declaration with one or more bracketed dimensions, such as int a[10][3];. Per the official key, both G1 and G2 correctly generate this declaration."
+      explanation: "1. Check grammar G1: D→int L; ; L→id[E; ; E→num] ; E→num][E. Trace a derivation for \"int a[10][3];\": D→int L; →int id[E; (using L→id[E;) →int a[E; then E must produce \"10][3]\" — using E→num][E: E→10][E, then the remaining E→num]: E→10][3] — combining gives \"int a[10][3];\" — this DOES correctly derive the target string. 2. Check grammar G2: D→int L; ; L→id E; ; E→[num] ; E→E[num]. Trace: D→int L; →int id E; (using L→id E;) →int a E; then E must produce \"[10][3]\" — using E→E[num] recursively: E→E[3], and the inner E→[num]: E→[10] — combining gives E=\"[10][3]\", so the full string is \"int a[10][3];\" — this ALSO correctly derives the target string. 3. Both grammars G1 and G2 correctly generate the example declaration, matching option A."
     },
     {
       id: "gate2016s2-cs-47",
@@ -619,7 +619,7 @@ window.GATE_DATA.pyq.push({
       tolerance: 0.05000000000000071,
       kind: "nat",
       marks: 2,
-      explanation: "Simulating SRTF: P1 runs 0-3, P2 runs 3-7 (preempted by P3), P3 runs 7-8 (finishes), P2 resumes 8-10 (finishes), P4 runs 10-13 (finishes, since its remaining 3 is less than P1's remaining 7), P1 resumes 13-20 (finishes). Completion times are P1=20, P2=10, P3=8, P4=13, giving turnaround times 20, 7, 1, 5, whose average is 33/4 = 8.25."
+      explanation: "Simulate SRTF, re-comparing remaining burst times at every arrival. 1. t=0: only P1 (burst 10) is present, so run P1. 2. t=3: P2 arrives (burst 6). P1's remaining time is 10−3=7, more than P2's 6, so PREEMPT and run P2. 3. t=7: P3 arrives (burst 1) while P2 is running. P2's remaining time is now 6−4=2 (it ran from 3 to 7), which is more than P3's fresh burst of 1, so PREEMPT P2 and run P3. 4. P3 needs only 1 ms and no new arrivals occur before it finishes, so it runs 7→8 and completes. 5. t=8: P4 arrives (burst 3) exactly as P3 finishes. Ready processes: P1 (remaining 7), P2 (remaining 2), P4 (remaining 3, fresh). P2 is shortest, so run P2. 6. P2 needs 2 more ms, finishing at t=8+2=10 (no new arrivals in between). 7. t=10: ready processes are P1 (remaining 7) and P4 (remaining 3). P4 is shorter, so run P4; it runs uninterrupted to completion at t=10+3=13. 8. t=13: only P1 remains with 7 ms left; run it to completion at t=13+7=20. 9. Completion times: P1=20, P2=10, P3=8, P4=13. Turnaround = completion − arrival: P1=20−0=20, P2=10−3=7, P3=8−7=1, P4=13−8=5. 10. Average turnaround time = (20+7+1+5)/4 = 33/4 = 8.25 ms."
     },
     {
       id: "gate2016s2-cs-48",
@@ -629,7 +629,7 @@ window.GATE_DATA.pyq.push({
       options: ["This is a correct two-process synchronization solution.","This solution violates mutual exclusion requirement.","This solution violates progress requirement.","This solution violates bounded wait requirement."],
       answer: 2,
       marks: 2,
-      explanation: "This strict-alternation scheme forces the two processes to take turns even if one process does not want to enter its critical section, so a process wanting to re-enter can be blocked unnecessarily while the other is not interested -- a violation of the progress requirement."
+      explanation: "Check each synchronization requirement against a concrete problem scenario for this strict-alternation code. 1. Mutual exclusion: Process 0 can only enter when turn==0, and Process 1 can only enter when turn==1; since turn holds only one value at a time, both processes can never simultaneously pass their respective entry checks, so mutual exclusion IS satisfied (ruling out option B). 2. Bounded waiting: because the two processes must strictly alternate turns, if a process wants to re-enter it will have to wait for at most one execution of the other process's critical section before turn comes back to it — so waiting IS bounded (ruling out option D). 3. Progress: consider this scenario — turn=0, Process 0 executes its critical section and then does 'turn=1' on exit, handing the turn to Process 1. But suppose Process 1 does NOT currently want to enter its critical section (it's busy doing unrelated work, or has already finished for good). Process 0 finishes its remainder section and wants to enter its critical section AGAIN, but must first check 'while (turn==1)' — since turn is stuck at 1 (Process 1 hasn't run to flip it back), Process 0 is forced to BUSY-WAIT indefinitely, even though Process 1 has no interest in entering its own critical section and the critical section itself is completely free. 4. This is precisely a violation of the progress requirement, which demands that if no process is executing in its critical section, and some process wants to enter, that decision cannot be postponed indefinitely by processes that are NOT interested in entering. Here, Process 0 is blocked purely due to the rigid turn-passing scheme, with no genuine contention — so option (C), violates the progress requirement, is correct."
     },
     {
       id: "gate2016s2-cs-49",
@@ -641,7 +641,7 @@ window.GATE_DATA.pyq.push({
       tolerance: 0.01,
       kind: "nat",
       marks: 2,
-      explanation: "With 20 P and only 12 V operations, S must net decrease by 8 overall. If the initial value is 7, an ordering that issues all P operations before any V operation exhausts S after 7 successful P operations and blocks the 8th, so 7 is the largest initial value for which blocking can still occur."
+      explanation: "Work out, for a given initial value S0, whether it's POSSIBLE to schedule all 20 P and 12 V operations so that no P ever blocks — the largest S0 for which blocking is UNAVOIDABLE is the answer. 1. Model the semaphore's value as a running total: start at S0, each P(S) operation subtracts 1 (and must find S ≥ 1 beforehand, else it blocks), each V(S) adds 1 (always succeeds since S is non-negative-counting). Track the running 'excess of P over V so far' at each point in some ordering, call it E (starting at E=0 before any operation). 2. Overall, 20 P's and 12 V's means the NET change to S across the whole execution is 20−12=−8; so by the end, S = S0−8. Since S can never go negative when operations succeed (any P that would take S below 0 instead blocks), consider what happens at S0=8: can we order the 20 P's and 12 V's so the running excess of issued-P-over-issued-V never exceeds 8 at any prefix? Yes — e.g., issue the first 8 P's (excess reaches 8, S=0), then repeatedly alternate one V followed by one P for the remaining 12 P's and all 12 V's (each V brings excess down to 7, each subsequent P brings it back to 8) — the excess never exceeds 8, so S never needs to be negative and NO P ever blocks. So S0=8 permits a completely non-blocking execution. 3. Now consider S0=7: the running excess (#P issued so far − #V issued so far) starts at 0 and changes by +1 for a P, −1 for a V; it must reach a maximum of at least 8 SOMEWHERE by the end (since the final net excess is 20−12=8, and this running quantity changes by only ±1 at each step, by a discrete intermediate-value argument it must pass through every value from 0 up to 8, including 8, at some point, regardless of how the P's and V's are interleaved). 4. The moment this running excess first reaches 8, that means 8 more P's have been issued than V's — but with only S0=7 available initially, that 8th 'excess' P operation cannot find S≥1 (it needs an 8th unit that isn't there) and MUST block, no matter how the operations are ordered. 5. So S0=7 guarantees at least one P will block in EVERY possible ordering, while S0=8 allows a schedule with no blocking at all — making 7 the largest initial value of S for which a P(S) is guaranteed to remain blocked."
     },
     {
       id: "gate2016s2-cs-50",
@@ -676,7 +676,7 @@ window.GATE_DATA.pyq.push({
       tolerance: 0.01,
       kind: "nat",
       marks: 2,
-      explanation: "Per-district totals are Ajmer=20, Bikaner=40, Churu=30, Dungargarh=10, with an overall average of (20+40+30+10)/4=25. Only Bikaner (40) and Churu (30) meet or exceed 25, so the query returns 2 tuples."
+      explanation: "1. Compute the per-district TOTAL capacity by summing rows grouped by district_name: Ajmer: only one row (1,Ajmer,20) → total=20. Bikaner: rows (1,Bikaner,10) and (2,Bikaner,10) and (3,Bikaner,20) → total=10+10+20=40. Churu: rows (1,Churu,10) and (2,Churu,20) → total=10+20=30. Dungargarh: only one row (1,Dungargarh,10) → total=10. 2. Compute the OVERALL AVERAGE of these four district totals: (20+40+30+10)/4 = 100/4 = 25. 3. Select districts whose total capacity is GREATER THAN OR EQUAL TO this average (25): Ajmer (20) — NO (20<25). Bikaner (40) — YES (40≥25). Churu (30) — YES (30≥25). Dungargarh (10) — NO (10<25). 4. Exactly 2 districts (Bikaner and Churu) satisfy the condition, so the query returns 2 tuples."
     },
     {
       id: "gate2016s2-cs-53",
@@ -688,7 +688,7 @@ window.GATE_DATA.pyq.push({
       tolerance: 0.01,
       kind: "nat",
       marks: 2,
-      explanation: "The minimum frame size must take at least one round-trip propagation time to transmit: size = 2 x bandwidth x propagation delay = 2 x 20x10^6 x 40x10^-6 = 1600 bits = 200 bytes."
+      explanation: "1. For CSMA/CD to correctly detect a collision, the TRANSMISSION time of the SMALLEST allowed frame must be AT LEAST as long as the ROUND-TRIP propagation time (the time for a signal to travel to the farthest node and for a collision signal to travel back) — otherwise a station could finish transmitting before even learning a collision occurred. 2. Round-trip propagation time = 2 × (one-way propagation time) = 2×40 microseconds = 80 microseconds. 3. Minimum frame transmission time must equal this round-trip time: 80 microseconds = 80×10^(-6) seconds. 4. Minimum frame size (in bits) = bandwidth × minimum transmission time = 20×10^6 bits/sec × 80×10^(-6) sec = 1600 bits. 5. Convert to bytes: 1600 bits / 8 bits per byte = 200 bytes."
     },
     {
       id: "gate2016s2-cs-54",

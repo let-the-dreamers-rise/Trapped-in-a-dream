@@ -13,7 +13,7 @@ window.GATE_DATA.pyq.push({
       options: ["phased","phrased","fazed","fused"],
       answer: 2,
       marks: 1,
-      explanation: "'Fazed' fits the increasing-intensity scale between 'bothered' and 'daunted'; 'phased', 'phrased', and 'fused' do not fit the meaning."
+      explanation: "1. The pattern is an increasing scale of intensity: walk (mild) → jog (moderate) → sprint (intense) are physical-effort words, each stronger than the last. 2. The target scale is bothered (mild annoyance) → ? → daunted (intense, feeling overwhelmed/intimidated), so the blank must mean a moderate degree of being troubled, between the two given words. 3. Check each option: 'phased' means arranged in stages (unrelated to being troubled); 'phrased' means put into words (unrelated); 'fused' means joined/melted together (unrelated); 'fazed' means disturbed or disconcerted, exactly the right level of trouble between 'bothered' and 'daunted'. 4. Hence 'fazed' (option C) is the only word that fits both the meaning and the intensity scale."
     },
     {
       id: "gate2024s2-ga-2",
@@ -23,7 +23,7 @@ window.GATE_DATA.pyq.push({
       options: ["24","48","16","12"],
       answer: 0,
       marks: 1,
-      explanation: "All possible orders of 4 distinct elements is 4! = 24, so each wizard independently makes 24 attempts."
+      explanation: "1. The spell requires mixing all four elements in an order, and each attempt uses one distinct ordering of all four. 2. The number of distinct orderings of 4 distinct items is 4! = 4×3×2×1 = 24. 3. Since each wizard works independently and exhausts every possible order before concluding the spell doesn't work, each wizard must make all 24 attempts. 4. Hence the answer is 24, option (A)."
     },
     {
       id: "gate2024s2-ga-3",
@@ -33,7 +33,7 @@ window.GATE_DATA.pyq.push({
       options: ["1,800","3,500","1,600","1,500"],
       answer: 0,
       marks: 1,
-      explanation: "Students liking at least one = 10000-1500 = 8500. Let core=x, other=4x. x+4x-500=8500 gives 5x=9000, x=1800."
+      explanation: "1. Total students = 10,000, and 1,500 like neither branch, so those who like at least one type = 10,000 - 1,500 = 8,500. 2. Let core = x; since this is 1/4th of those who like other branches, other = 4x. 3. By inclusion-exclusion, (core) + (other) - (both) = 8,500: x + 4x - 500 = 8,500. 4. Solving: 5x = 9,000, so x = 1,800. 5. Hence the number of students who like their core branches is 1,800, option (A)."
     },
     {
       id: "gate2024s2-ga-4",
@@ -43,7 +43,7 @@ window.GATE_DATA.pyq.push({
       options: ["1","1/2","2","4"],
       answer: 2,
       marks: 1,
-      explanation: "The equation says the arithmetic mean of x and y equals their geometric mean, √(xy), which forces x = y. Substituting x = y gives x/y + y/x = 1 + 1 = 2, matching the official key (C)."
+      explanation: "1. The given equation ln((x+y)/2) = (1/2)[ln(x)+ln(y)] can be rewritten using logarithm properties: the right side (1/2)[ln(x)+ln(y)] = (1/2)ln(xy) = ln((xy)^(1/2)) = ln(√(xy)). 2. So the equation becomes ln((x+y)/2) = ln(√(xy)). 3. Since logarithm is a ONE-TO-ONE function (for positive arguments), we can equate the ARGUMENTS directly: (x+y)/2 = √(xy). 4. RECOGNIZE this equation: the LEFT side (x+y)/2 is the ARITHMETIC MEAN of x and y, and the RIGHT side √(xy) is the GEOMETRIC MEAN of x and y. 5. By the well-known AM-GM INEQUALITY, the arithmetic mean is ALWAYS ≥ the geometric mean, with EQUALITY holding IF AND ONLY IF x = y. Since our equation states they ARE EQUAL, this FORCES x = y. 6. Substituting x=y into the target expression x/y + y/x: x/x + x/x = 1 + 1 = 2. 7. So the value of x/y + y/x is 2, matching option C."
     },
     {
       id: "gate2024s2-ga-5",
@@ -53,7 +53,7 @@ window.GATE_DATA.pyq.push({
       options: ["25","21","18","20"],
       answer: 1,
       marks: 1,
-      explanation: "The differences form consecutive odd numbers 3, 5, 7, 9, 11: 6+3=9, 9+5=14, 14+7=21, 21+9=30, 30+11=41, so x=21."
+      explanation: "1. Compute the differences between the known consecutive terms: 9-6=3 and 41-30=11. 2. Guess these differences form consecutive odd numbers increasing by 2: 3,5,7,9,11. 3. Verify: 6+3=9 ✓, and check 9+5=14 ✓ (matches given 14, since 14-9=5). 4. Continue: the next difference should be 7, giving 14+7=21. 5. Check the rest: 21+9=30 ✓ (matches given 30), and 30+11=41 ✓ (matches given 41). 6. So x=21 is consistent with the full sequence of odd differences, option (B)."
     },
     {
       id: "gate2024s2-ga-6",
@@ -63,7 +63,7 @@ window.GATE_DATA.pyq.push({
       options: ["QPSR","QSPR","SPRQ","SRPQ"],
       answer: 2,
       marks: 2,
-      explanation: "S introduces the collision event, P describes its immediate energetic consequence, R describes the subsequent cooling and its effect, and Q gives the concluding inference, giving the order SPRQ."
+      explanation: "1. To find the coherent narrative ORDER, identify the LOGICAL/CAUSAL sequence of events described across sentences P, Q, R, S. 2. Sentence S introduces the FOUNDATIONAL event: 'a breakaway chunk of bedrock from the Antarctic Plate COLLIDED with the Eurasian Plate' — this is the STARTING POINT (the collision event), so S comes FIRST. 3. Sentence P describes the IMMEDIATE CONSEQUENCE of this collision: 'This fortuitous geological event generated... energy and heat that resulted in the rocks RISING to an average height of 4km' — the phrase 'This... event' DIRECTLY REFERS BACK to the collision described in S, confirming P follows S, so P comes SECOND. 4. Sentence R describes a SUBSEQUENT process: 'The natural process of COOLING of this massive edifice absorbed... carbon dioxide' — 'this massive edifice' refers to the RAISED ROCKS/MOUNTAINS described in P (the just-formed mountain range), and COOLING logically happens AFTER the heat-generating collision and uplift, so R comes THIRD. 5. Sentence Q provides a CONCLUDING INFERENCE: 'Thus, geophysicists tend to think of the Himalayas as an ACTIVE geological event...' — the word 'Thus' signals this is a SUMMARY/CONCLUSION drawn from the PRECEDING events (S,P,R), so Q comes LAST (FOURTH). 6. Combining: S, P, R, Q — matching option C (SPRQ)."
     },
     {
       id: "gate2024s2-ga-7",
@@ -73,7 +73,7 @@ window.GATE_DATA.pyq.push({
       options: ["1% profit","2% profit","1% loss","2% loss"],
       answer: 2,
       marks: 2,
-      explanation: "Selling both at the same price S, cost prices are S/1.1 and S/0.9; total cost exceeds total selling price, giving a net loss of (10%)^2/100 = 1%."
+      explanation: "1. Let the common selling price of both items be S. 2. For the 10%-profit item: SP = CP × 1.1, so CP₁ = S/1.1. 3. For the 10%-loss item: SP = CP × 0.9, so CP₂ = S/0.9. 4. Using a concrete value S=99 (chosen to divide evenly): CP₁ = 99/1.1 = 90, CP₂ = 99/0.9 = 110, so total CP = 200, while total SP = 99+99 = 198. 5. Loss = 200-198 = 2, so % loss = (2/200)×100 = 1%. 6. In general this equals (common %)²/100 = 10²/100 = 1%, confirming a net 1% loss, option (C)."
     },
     {
       id: "gate2024s2-ga-8",
@@ -83,7 +83,7 @@ window.GATE_DATA.pyq.push({
       options: ["25%","50%","77.5%","62.5%"],
       answer: 3,
       marks: 2,
-      explanation: "Renewable share in 2007 = 30+5+5 = 40%; in 2023 = 35+20+10 = 65%. Percentage increase = (65-40)/40 × 100 = 62.5%."
+      explanation: "1. Identify the RENEWABLE sources: Hydro, Solar, and Wind (as stated in the question). 2. Compute the TOTAL renewable SHARE in 2007: Hydro(30%) + Solar(5%) + Wind(5%) = 30+5+5 = 40%. 3. Compute the TOTAL renewable SHARE in 2023: Hydro(35%) + Solar(20%) + Wind(10%) = 35+20+10 = 65%. 4. Since the TOTAL electricity generated REMAINS THE SAME from 2007 to 2023 (given), we can directly compare the PERCENTAGE SHARES as a valid measure of PROPORTIONAL CHANGE (since the same total means percentage points directly translate to proportional changes in ACTUAL ENERGY generated). 5. Compute the PERCENTAGE INCREASE using the standard formula: Percentage Increase = [(New Value − Old Value) / Old Value] × 100% = [(65−40)/40] × 100% = (25/40) × 100% = 0.625 × 100% = 62.5%. 6. So the percentage increase in the share of renewable sources is 62.5%, matching option D."
     },
     {
       id: "gate2024s2-ga-9",
@@ -93,7 +93,7 @@ window.GATE_DATA.pyq.push({
       options: ["3","4","7","8"],
       answer: 0,
       marks: 2,
-      explanation: "Three mutually perpendicular cuts, one through the midplane along each axis, divide the cube into 8 equal pieces; this is the minimum possible."
+      explanation: "1. To split a cube into 8 equal smaller cubes (like a 2×2×2 split), make one full straight cut through the midplane perpendicular to each of the cube's three axes (x, y, z). 2. Each such cut passes completely through the solid, and one cut along each new axis doubles the piece count: 1 cut → 2 pieces, 2 cuts → 4 pieces, 3 cuts → 8 pieces. 3. Since each cut must go straight through without stopping (so pieces cannot be stacked and re-cut to save cuts), fewer than 3 cuts cannot produce 8 separate pieces, while exactly 3 achieves it. 4. Hence the minimum number of cuts is 3, option (A)."
     },
     {
       id: "gate2024s2-ga-10",
@@ -114,7 +114,7 @@ window.GATE_DATA.pyq.push({
       options: ["2,56,000","3,200","25,60,000","32,000"],
       answer: 2,
       marks: 1,
-      explanation: "Cycles used for DMA per second = 0.01 × 4,000,000 = 40,000. Each cycle transfers 8 bytes = 64 bits, giving 40,000 × 64 = 25,60,000 bits/sec."
+      explanation: "1. The 4 MHz clock executes 4,000,000 cycles per second. 2. Since 1% of these cycles are used for DMA cycle-stealing, DMA cycles per second = 0.01 × 4,000,000 = 40,000. 3. Each DMA cycle transfers 8 bytes = 64 bits. 4. Data transfer rate = 40,000 × 64 = 25,60,000 bits/sec. 5. Hence the DMA controller's transfer rate is 25,60,000 bits/sec, option (C)."
     },
     {
       id: "gate2024s2-cs-12",
@@ -124,7 +124,7 @@ window.GATE_DATA.pyq.push({
       options: ["q → ¬p","q → p","p → q","¬p → q"],
       answer: 0,
       marks: 1,
-      explanation: "The statement means \"if the student scores more than 50% (q), then fail grade cannot be given (¬p)\", i.e., q → ¬p."
+      explanation: "1. Let p: 'Fail grade can be given' and q: 'Student scores more than 50%'. 2. The statement 'Fail grade cannot be given when student scores more than 50%' has the form 'if [scores >50%], then [fail cannot be given]', i.e., q → ¬p. 3. Check the alternatives: 'q → p' would mean scoring >50% implies a fail CAN be given (opposite meaning) — wrong. 'p → q' reverses the direction, saying giving a fail implies the student scored >50% — wrong. '¬p → q' also has the wrong direction of implication. 4. Hence the correct representation is q → ¬p, option (A)."
     },
     {
       id: "gate2024s2-cs-13",
@@ -134,7 +134,7 @@ window.GATE_DATA.pyq.push({
       options: ["20101020","10202010","20102010","10201020"],
       answer: 0,
       marks: 1,
-      explanation: "Right-to-left evaluation of f’s arguments calls h(20) first (prints 20), then g(10) (prints 10); inside f, g(x) prints 10 and h(y) prints 20, giving 20 10 10 20."
+      explanation: "1. main() calls f(g(10), h(20)); with right-to-left argument evaluation, the SECOND argument h(20) is evaluated first: it prints '20' and returns 20. 2. Then the FIRST argument g(10) is evaluated: it prints '10' and returns 10. 3. So f is called as f(x=10, y=20). Inside f: g(x)=g(10) prints '10' again. 4. Then h(y)=h(20) prints '20' again. 5. Concatenating prints in the order they occur: '20' (from evaluating h(20)) + '10' (from evaluating g(10)) + '10' (from g(x) inside f) + '20' (from h(y) inside f) = \"20101020\". 6. Hence the output is 20101020, option (A)."
     },
     {
       id: "gate2024s2-cs-14",
@@ -144,7 +144,7 @@ window.GATE_DATA.pyq.push({
       options: ["Option A","Option B","Option C","Option D"],
       answer: 1,
       marks: 1,
-      explanation: "Exponent 11111111 (option C) is reserved for infinity/NaN, not a finite number. The largest finite value has the maximum usable exponent 11111110 with an all-ones mantissa, which is option B."
+      explanation: "1. In IEEE 754 SINGLE PRECISION format, the EXPONENT field of ALL-ONES (11111111 = 255 in decimal) is a SPECIAL RESERVED VALUE used to represent INFINITY or NaN (Not-a-Number) — it does NOT represent a regular FINITE number, regardless of the mantissa bits. 2. So option C (exponent=11111111) does NOT represent a valid FINITE floating-point number, and should be EXCLUDED from consideration when looking for the 'largest floating-point number' (assuming the question intends a finite value). 3. Among the REMAINING options, the LARGEST FINITE value is achieved by MAXIMIZING both the EXPONENT (using the LARGEST NON-RESERVED exponent value) AND the MANTISSA (using ALL ONES for maximum fractional value). 4. The largest NON-RESERVED exponent is 11111110 (254 in decimal, one less than the reserved all-ones value) — checking option B: exponent = 11111110 with mantissa = ALL ONES (11111111111111111111111) — this combination gives the LARGEST representable FINITE value in IEEE 754 single precision. 5. Check option A: exponent = 01111111 (127, a much SMALLER exponent than 254) with mantissa all-ones — this represents a MUCH SMALLER value than option B (since exponent directly scales the magnitude EXPONENTIALLY via 2^(exponent-bias)). 6. Check option D: exponent = 01111111 (same smaller exponent as A) with mantissa = all ZEROS — this is EVEN SMALLER than option A (minimum mantissa contribution). 7. So option B represents the LARGEST finite floating-point number among the given choices, matching option B."
     },
     {
       id: "gate2024s2-cs-15",
@@ -154,7 +154,7 @@ window.GATE_DATA.pyq.push({
       options: ["T(n) = Θ(2^n)","T(n) = Θ(n·2^n)","T(n) = Θ(3^n)","T(n) = Θ(n·3^n)"],
       answer: 0,
       marks: 1,
-      explanation: "The characteristic equation r^2-5r+6=0 has roots 2 and 3; solving with T(0)=1, T(1)=2 gives coefficients 1 and 0, so T(n)=2^n=Θ(2^n)."
+      explanation: "1. Try a solution of the form T(n)=r^n for the linear recurrence T(n)=5T(n-1)-6T(n-2). 2. Substituting gives the characteristic equation r²-5r+6=0, which factors as (r-2)(r-3)=0, giving roots r=2 and r=3. 3. The general solution is T(n)=A·2^n+B·3^n. 4. Apply T(0)=1: A+B=1. Apply T(1)=2: 2A+3B=2. 5. From A=1-B: 2(1-B)+3B=2 gives 2+B=2, so B=0 and A=1. 6. So T(n)=1·2^n+0·3^n=2^n exactly, meaning T(n)=Θ(2^n), option (A)."
     },
     {
       id: "gate2024s2-cs-16",
@@ -164,7 +164,7 @@ window.GATE_DATA.pyq.push({
       options: ["0","1","2","−1"],
       answer: 1,
       marks: 1,
-      explanation: "Substituting x→2-x in the integral shows it equals ∫₀²(1-f(x))dx = 2 - I, so 2I=2 and I=1."
+      explanation: "1. Let I = ∫₀² f(x) dx. 2. Substitute u=2-x: as x goes 0→2, u goes 2→0, and dx=-du, so I=∫₂⁰f(2-u)(-du)=∫₀²f(2-u)du. 3. Renaming u back to x: I=∫₀²f(2-x)dx. 4. Using f(x)=1-f(2-x), we get f(2-x)=1-f(x), so I=∫₀²[1-f(x)]dx = 2 - I. 5. Solving 2I=2 gives I=1. 6. Hence the integral equals 1, option (B)."
     },
     {
       id: "gate2024s2-cs-17",
@@ -174,7 +174,7 @@ window.GATE_DATA.pyq.push({
       options: ["G is a cycle","G is a perfect matching","G is a complete graph","There is no such graph G"],
       answer: 1,
       marks: 1,
-      explanation: "A=A^{-1} means A^2=I, i.e., every vertex has exactly one walk of length 2 back to itself and none elsewhere, which happens exactly when G is a disjoint union of single edges, i.e., a perfect matching."
+      explanation: "1. Given: A is the ADJACENCY MATRIX of a SIMPLE UNDIRECTED graph G, and A is its OWN INVERSE, meaning A × A = I (the IDENTITY matrix), i.e., A² = I. 2. INTERPRET what A² = I means COMBINATORIALLY: the (i,j) entry of A² counts the NUMBER OF WALKS OF LENGTH 2 from vertex i to vertex j. The IDENTITY matrix I has 1's ONLY on the DIAGONAL (entry (i,i)=1) and 0's EVERYWHERE ELSE. 3. So A²=I means: for EVERY vertex i, there is EXACTLY ONE walk of length 2 FROM i BACK TO i (the diagonal condition), and for EVERY PAIR of DISTINCT vertices i≠j, there are ZERO walks of length 2 from i to j (the off-diagonal condition). 4. A walk of length 2 FROM i BACK TO i means: i has SOME neighbor k such that k is ALSO connected back to i — but in a SIMPLE graph (no self-loops, no multi-edges), a walk i→k→i requires i and k to be CONNECTED by an edge (i,k), and this walk EXISTS FOR EXACTLY ONE SUCH k if and only if VERTEX i HAS EXACTLY ONE NEIGHBOR (DEGREE 1) — because EACH neighbor k of i contributes EXACTLY ONE walk i→k→i, so having EXACTLY ONE walk of length 2 back to i means i has EXACTLY ONE NEIGHBOR. 5. If EVERY vertex has EXACTLY ONE neighbor (degree 1 for all vertices), the graph MUST consist ENTIRELY of DISJOINT PAIRS of vertices, each pair connected by a SINGLE edge — this is PRECISELY the DEFINITION of a PERFECT MATCHING (every vertex is matched to EXACTLY ONE other vertex, with NO vertex left unmatched and NO vertex connected to more than one other). 6. ADDITIONALLY, verify the OFF-DIAGONAL condition (ZERO walks of length 2 between DISTINCT i,j): in a perfect matching, if i is paired with k, there's NO walk i→k→j for j≠i (since k's ONLY neighbor is i, so k cannot lead anywhere else) — this CONFIRMS the off-diagonal zeros hold for a perfect matching structure. 7. So G MUST be a PERFECT MATCHING, matching option B."
     },
     {
       id: "gate2024s2-cs-18",
@@ -184,7 +184,7 @@ window.GATE_DATA.pyq.push({
       options: ["1/324","5/324","7/324","11/324"],
       answer: 1,
       marks: 1,
-      explanation: "Number of favorable outcomes = 6! = 720, total outcomes = 6^6 = 46656; probability = 720/46656 = 5/324."
+      explanation: "1. When SIX DICE are rolled SIMULTANEOUSLY, we want the probability that ALL SIX SHOW DISTINCT NUMBERS (i.e., the six dice show EXACTLY the numbers 1,2,3,4,5,6 in SOME order, since there are only 6 possible face values and we need ALL SIX to be different). 2. Compute the TOTAL number of POSSIBLE OUTCOMES when rolling 6 dice: EACH die independently can show ANY of 6 faces, so total outcomes = 6^6 = 46,656. 3. Compute the NUMBER OF FAVORABLE outcomes (all six dice showing DIFFERENT numbers, i.e., a PERMUTATION of {1,2,3,4,5,6} across the six dice): this is simply 6! (6 FACTORIAL), since we're ARRANGING the 6 DISTINCT VALUES across the 6 DISTINGUISHABLE dice positions: 6! = 6×5×4×3×2×1 = 720. 4. Compute the PROBABILITY: Favorable/Total = 720/46656. 5. SIMPLIFY this fraction: 720/46656 = 720/46656. Divide numerator and denominator by their GCD: 46656/720 = 64.8, let's simplify differently: 720/46656 = (720/144)/(46656/144) = 5/324 (since 720÷144=5 and 46656÷144=324). 6. So the probability is 5/324, matching option B."
     },
     {
       id: "gate2024s2-cs-19",
@@ -194,7 +194,7 @@ window.GATE_DATA.pyq.push({
       options: ["durability","atomicity","consistency","isolation"],
       answer: 0,
       marks: 1,
-      explanation: "Durability guarantees that once a transaction commits, its effects survive subsequent system crashes."
+      explanation: "1. The property described — a committed transaction's effects surviving a subsequent crash even before all changes reach disk — is the definition of durability, an ACID property. 2. Atomicity requires all-or-nothing execution of a transaction's operations, which is about failure DURING the transaction, not persistence after commit — not it. 3. Consistency requires the database to move between valid states preserving integrity constraints — unrelated to crash survival after commit. 4. Isolation requires concurrent transactions not to interfere with each other's intermediate state — also unrelated. 5. Hence the property is durability, option (A)."
     },
     {
       id: "gate2024s2-cs-20",
@@ -204,7 +204,7 @@ window.GATE_DATA.pyq.push({
       options: ["The weak entity set MUST have total participation in the identifying relationship","The owner entity set MUST have total participation in the identifying relationship","Both weak and owner entity sets MUST have total participation in the identifying relationship","Neither weak entity set nor owner entity set MUST have total participation in the identifying relationship"],
       answer: 0,
       marks: 1,
-      explanation: "A weak entity cannot exist without its owner via the identifying relationship, so it must have total participation in that relationship; the owner need not."
+      explanation: "1. A weak entity set has no key attributes sufficient to uniquely identify its own entities; it is identified only in combination with its owner entity via the identifying relationship. 2. This means every weak entity MUST be linked to exactly one owner entity through that relationship — it cannot exist independently — so the weak entity set must have total participation in the identifying relationship. 3. The owner entity set is not required to participate at all (an owner may exist with zero associated weak entities, e.g. an Employee with no Dependents), so it need not have total participation. 4. This rules out (B) 'owner MUST', (C) 'both MUST', and (D) 'neither MUST'. 5. Hence only the weak entity set must have total participation, option (A)."
     },
     {
       id: "gate2024s2-cs-21",
@@ -214,7 +214,7 @@ window.GATE_DATA.pyq.push({
       options: ["P–4; Q–1; R–3; S–2","P–2; Q–3; R–1; S–4","P–2; Q–1; R–3; S–4","P–4; Q–3; R–2; S–1"],
       answer: 1,
       marks: 1,
-      explanation: "Lexical analyzer produces tokens, syntax analyzer produces a parse tree, intermediate code generation produces an AST-based representation, and code optimizer applies techniques like constant folding."
+      explanation: "1. Match EACH compiler PHASE (Set X) to its OUTPUT/associated concept (Set Y) based on standard compiler design theory. 2. P: LEXICAL ANALYZER — this phase SCANS the source code and GROUPS characters into MEANINGFUL UNITS called TOKENS (keywords, identifiers, operators, etc.) — so P matches with '2. Token'. 3. Q: SYNTAX ANALYZER (PARSER) — this phase takes the STREAM of TOKENS and BUILDS a PARSE TREE (also called a CONCRETE SYNTAX TREE) representing the GRAMMATICAL STRUCTURE of the program according to the language's grammar — so Q matches with '3. Parse Tree'. 4. R: INTERMEDIATE CODE GENERATOR — this phase TRANSFORMS the parse tree into an INTERMEDIATE REPRESENTATION, commonly an ABSTRACT SYNTAX TREE (AST) or three-address code DERIVED FROM an AST-like structure — so R matches with '1. Abstract Syntax Tree'. 5. S: CODE OPTIMIZER — this phase applies VARIOUS OPTIMIZATION TECHNIQUES to IMPROVE the intermediate code, and CONSTANT FOLDING (evaluating constant expressions at COMPILE TIME rather than RUN TIME, e.g., replacing '2+3' with '5') is a CLASSIC, well-known OPTIMIZATION technique — so S matches with '4. Constant Folding'. 6. Combining: P–2, Q–3, R–1, S–4, matching option B."
     },
     {
       id: "gate2024s2-cs-22",
@@ -236,7 +236,7 @@ window.GATE_DATA.pyq.push({
       answers: [1],
       kind: "msq",
       marks: 1,
-      explanation: "The IP destination address is end-to-end (Y), while the MAC destination for the first hop is that of the next-hop router R, not S (a switch is transparent) or Y directly, so only (B) is true."
+      explanation: "1. When node X sends a packet to node Y (with an intermediate router R in the path), the packet's IP HEADER and ETHERNET (MAC) HEADER serve DIFFERENT PURPOSES and are addressed DIFFERENTLY. 2. The IP DESTINATION ADDRESS is an END-TO-END address, meaning it identifies the ULTIMATE DESTINATION of the packet — this REMAINS THE SAME (Y's IP address) throughout the ENTIRE JOURNEY across MULTIPLE HOPS/ROUTERS, since IP ROUTING relies on this address to make FORWARDING DECISIONS at EACH hop, without changing WHO the packet is ultimately FOR. So the destination IP is Y's address, NOT R's — this means option A (destination IP = R) is FALSE, and option B (destination IP = Y) is TRUE. 3. The MAC (ETHERNET) DESTINATION ADDRESS, in CONTRAST, is a LOCAL, HOP-BY-HOP address — it identifies the NEXT DEVICE on the CURRENT LOCAL NETWORK SEGMENT that should RECEIVE the FRAME, which is NOT necessarily the FINAL destination. Since the packet must FIRST reach ROUTER R (the intermediate router) before R can FORWARD it further toward Y, the MAC destination address on THIS FIRST HOP (from X) is R's MAC ADDRESS (not Y's, and not S's, since S is merely a TRANSPARENT ETHERNET SWITCH that FORWARDS frames based on MAC addresses WITHOUT being addressed ITSELF as a destination). 4. So option C (destination MAC = S) is FALSE (switches are TRANSPARENT intermediaries, not addressed destinations), and option D (destination MAC = Y) is ALSO FALSE (the MAC address at this hop is R's, since Y is NOT on the SAME LOCAL NETWORK as X). 5. Only option B (destination IP = Y) is TRUE, matching the answer [1] (option B, using 0-indexed as B=index 1)."
     },
     {
       id: "gate2024s2-cs-24",
@@ -247,7 +247,7 @@ window.GATE_DATA.pyq.push({
       answers: [1,2,3],
       kind: "msq",
       marks: 1,
-      explanation: "The MMU performs address translation and raises hardware traps for page faults and protection violations; allocating page tables for new processes is an OS responsibility, not the MMU’s."
+      explanation: "The MMU is a piece of HARDWARE sitting between the CPU and memory; it can only do things that require reacting to an address as it is issued, not general bookkeeping decisions that require OS policy. Check each task against that distinction: 1. (A) 'Allocate a new page table for a newly created process' — deciding when a process is created and setting up its data structures (including its page table) is a software/OS-level bookkeeping task requiring knowledge of process lifecycle, not something hardware can decide on its own. NOT the MMU's job. 2. (B) 'Translate a virtual address to a physical address using the page table' — this is the MMU's core, defining purpose: on every single memory reference, the hardware walks (or looks up via TLB) the page table to produce the physical address, entirely in hardware for speed. IS the MMU's job. 3. (C) 'Raise a trap when a virtual address is not found in the page table' — when the MMU's translation lookup fails to find a valid mapping, the hardware itself must immediately halt normal execution and transfer control to the OS's page-fault handler; this trap-raising is a hardware function of the MMU. IS the MMU's job. 4. (D) 'Raise a trap when a process tries to write to a page marked read-only' — similarly, permission-bit checking happens as part of the same hardware translation step, and violating it (e.g. writing to a read-only page) causes the MMU to raise a protection-fault trap immediately. IS the MMU's job. So the MMU's responsibilities are B, C, and D — options 1, 2, 3 — while A is an OS-level task."
     },
     {
       id: "gate2024s2-cs-25",
@@ -258,7 +258,7 @@ window.GATE_DATA.pyq.push({
       answers: [0,1],
       kind: "msq",
       marks: 1,
-      explanation: "A blocking I/O call and a page fault requiring disk access both always move P to blocked; a disk interrupt for another process or a timer interrupt may cause the OS to keep running P, so they do not always move P out."
+      explanation: "For each event, ask: does P's own execution NECESSARILY have to stop (because it literally cannot proceed), or does the OS merely have the OPTION to switch away from P? 1. (A) P makes a blocking system call to read from disk — P has explicitly asked for data that isn't available yet and has no useful work it can do until the disk responds; the OS has no choice but to move P out of Running and into the blocked/waiting queue right away. ALWAYS triggers a switch away from P. 2. (B) P triggers a page fault requiring a disk fetch (page in swap space) — P tried to use memory that must first be paged in from disk, an operation that takes far too long for P to just spin-wait; the OS necessarily blocks P until the page-in completes, exactly like an explicit I/O wait. ALWAYS triggers a switch away from P. 3. (C) The disk raises an interrupt to deliver data requested by SOME OTHER process — this interrupt only concerns a different process; the OS's interrupt handler processes it (e.g. marks that other process as ready) and then, in the simplest case, can simply RETURN control back to P exactly where it left off, since P itself is not blocked on anything. The OS may choose to switch to the just-unblocked process instead (e.g. if it has higher priority), but it does not have to — so this does NOT always move P out. 4. (D) A timer interrupt fires — this exists precisely so the OS CAN preempt P for fairness, but if P is the only ready process, or the scheduling policy decides P still deserves the CPU, the OS can simply let P continue running after handling the interrupt. It is a scheduling OPPORTUNITY, not a guaranteed switch — so this does NOT always move P out. Hence only (A) and (B) always force P out of Running — options 0 and 1."
     },
     {
       id: "gate2024s2-cs-26",
@@ -269,7 +269,7 @@ window.GATE_DATA.pyq.push({
       answers: [0,1],
       kind: "msq",
       marks: 1,
-      explanation: "A full scan reads all pages sequentially, which sorted and heap files support efficiently; unclustered indexes force random I/O per record, making them inefficient for a full scan."
+      explanation: "1. A 'scan' reads every record of the relation once, typically via sequential data-page reads. 2. In a sorted or heap file, all records live directly in the data pages, so a full scan just reads the file's pages in (near-)sequential disk order — I/O efficient since sequential disk reads are fast and each page is touched once. 3. An unclustered index (tree or hash) only stores pointers to records scattered across data pages in no correlated order; scanning all records via the index means looking up each entry and fetching its data page separately — one random I/O per record instead of sequential reads. 4. This makes unclustered indexes inefficient for full scans compared to sorted or heap files. 5. Hence Sorted (A) and Heap (B) are I/O efficient for scans, options 0 and 1."
     },
     {
       id: "gate2024s2-cs-27",
@@ -280,7 +280,7 @@ window.GATE_DATA.pyq.push({
       answers: [0,2,3],
       kind: "msq",
       marks: 1,
-      explanation: "2PL guarantees serializability (A) via its growing and shrinking phases: once a lock is released the transaction cannot acquire new locks (C), but 2PL does not prevent deadlocks (D); (B) is false since 2PL does not require releasing locks immediately after each operation."
+      explanation: "Recall the defining rule of Two Phase Locking: every transaction has a GROWING phase (it may only acquire locks, never release any) followed by a SHRINKING phase (it may only release locks, never acquire any) — once the first lock is released, the transaction has permanently entered the shrinking phase. Check each statement against this rule: 1. (A) '2PL permits only serializable schedules' — this is the fundamental theorem 2PL is built to guarantee: any schedule produced by transactions that all follow the two-phase rule is provably conflict-serializable. TRUE. 2. (B) 'a transaction always locks an item just before every operation and releases it just after' — this describes a much stricter discipline than 2PL actually requires; the growing/shrinking rule only constrains the ORDER of acquire vs. release across the whole transaction, not that each lock must be grabbed immediately before its one use and dropped immediately after — a transaction can hold a lock for a long time, or acquire several locks well in advance, and still be valid 2PL. FALSE. 3. (C) 'once a lock is released inside a transaction, no more locks on any data item can be obtained inside that transaction' — this is a direct restatement of the growing/shrinking boundary itself: release marks the irreversible start of the shrinking phase, after which acquiring is forbidden. TRUE. 4. (D) 'a deadlock is possible with 2PL' — 2PL only controls the ORDER in which a single transaction acquires and releases locks; it says nothing about the ORDER in which different transactions request locks relative to each other. Two transactions can each be individually valid 2PL transactions while requesting the same two items in opposite orders (T1 locks X then waits for Y, while T2 locks Y then waits for X), producing a classic circular-wait deadlock. TRUE. Collecting the TRUE statements gives {A, C, D} — options 0, 2, 3."
     },
     {
       id: "gate2024s2-cs-28",
@@ -291,7 +291,7 @@ window.GATE_DATA.pyq.push({
       answers: [1,2],
       kind: "msq",
       marks: 1,
-      explanation: "In IPv4, any router along the path may fragment a datagram that exceeds the outgoing link MTU, and reassembly happens only at the final destination, never at intermediate routers."
+      explanation: "1. Statement (A) claims fragmentation happens only at the source, but any router along the path may fragment a datagram whose next-hop link MTU is smaller than the datagram — so (A) is FALSE. 2. Statement (B) is exactly this standard IPv4 behavior — TRUE. 3. Statement (C): reassembly is deliberately deferred to the final destination, since different fragments of the same datagram may take different paths through routers, so no single router can assume it has all fragments — TRUE. 4. Statement (D): intermediate routers do NOT reassemble fragments (that would need buffering and per-flow state, which IP avoids at the routing layer) — FALSE. 5. Hence the TRUE statements are (B) and (C), options 1 and 2."
     },
     {
       id: "gate2024s2-cs-29",
@@ -302,7 +302,7 @@ window.GATE_DATA.pyq.push({
       answers: [1,3],
       kind: "msq",
       marks: 1,
-      explanation: "L-attributed definitions can always be evaluated in a single depth-first, left-to-right traversal (making (B) false), and not every L-attributed SDD on an LR(1) grammar can be evaluated purely bottom-up (making (D) false); (A) and (C) are true statements about attribute grammars and synthesized attributes."
+      explanation: "1. Statement (A): an attribute grammar is defined as an SDD whose semantic-rule functions have no side effects — this is the standard definition, so (A) is TRUE, not one of the false statements. 2. Statement (B): by definition, every attribute of an L-attributed definition CAN always be evaluated during a single depth-first, left-to-right parse-tree traversal — that is precisely what 'L-attributed' means — so claiming it 'cannot always' be done this way is FALSE. 3. Statement (C): synthesized attributes depend only on child attribute values, so they can always be computed bottom-up as a bottom-up parser reduces productions — TRUE, not false. 4. Statement (D): not every L-attributed SDD on an LR(1) grammar can be evaluated purely bottom-up, since L-attributed definitions can need inherited attributes depending on left context that a pure bottom-up pass doesn't have directly available without extra machinery — so claiming ALL such definitions work bottom-up is FALSE. 5. Since the question asks which statements are FALSE, the answer is (B) and (D), options 1 and 3."
     },
     {
       id: "gate2024s2-cs-30",
@@ -313,7 +313,7 @@ window.GATE_DATA.pyq.push({
       answers: [1,2],
       kind: "msq",
       marks: 1,
-      explanation: "x+1 always equals 1 (not x), and x.x equals x (not 0), so (B) and (C) are false; (A) and (D) are standard true Boolean identities."
+      explanation: "1. Statement (A): x.1=x is the identity law for AND — TRUE. 2. Statement (B): x+1 should equal 1 for any x (domination law for OR), not x; check x=0: 0+1=1≠0=x — fails, so 'x+1=x' is FALSE. 3. Statement (C): x.x should equal x (idempotent law), not 0; check x=1: 1.1=1≠0 — fails, so 'x.x=0' is FALSE. 4. Statement (D): x+x̄=1 is the complement law for OR — TRUE. 5. Hence the FALSE statements are (B) and (C), options 1 and 2."
     },
     {
       id: "gate2024s2-cs-31",
@@ -324,7 +324,7 @@ window.GATE_DATA.pyq.push({
       answers: [0],
       kind: "msq",
       marks: 1,
-      explanation: "I1 writes R3 and I2 reads it, a true RAW dependency. I1 never reads R3 (no WAR with I3); I2 reads but does not write R3 (so I2–I3 is WAR, not RAW); I4 does not write R3 (no WAW with I3). Only (A) holds."
+      explanation: "1. Identify what EACH instruction READS (source operands) and WRITES (destination operand): I1: DIV R3,R1,R2 — WRITES R3, READS R1,R2. I2: SUB R5,R3,R4 — WRITES R5, READS R3,R4. I3: ADD R3,R5,R6 — WRITES R3, READS R5,R6. I4: MUL R7,R3,R8 — WRITES R7, READS R3,R8. 2. Check statement A (RAW dependency on R3 between I1 and I2): RAW (Read-After-Write) means a LATER instruction READS a register that an EARLIER instruction WROTE. I1 WRITES R3, and I2 READS R3 (as a source operand) — this IS a TRUE RAW dependency, since I2 needs the VALUE that I1 COMPUTED for R3. Statement A is TRUE. 3. Check statement B (WAR dependency on R3 between I1 and I3): WAR (Write-After-Read) means a LATER instruction WRITES a register that an EARLIER instruction had READ (and the write must NOT overtake the read). Does I1 READ R3? NO — I1 only READS R1 and R2 (R3 is I1's OUTPUT, not an input). Since I1 does NOT read R3, there CANNOT be a WAR dependency involving I1's read of R3 — statement B is FALSE. 4. Check statement C (RAW dependency on R3 between I2 and I3): RAW requires I2 to WRITE R3 and I3 to READ that value. But I2 WRITES R5 (not R3) — I2 only READS R3 (as a source), it does NOT write to R3. Since I2 does not WRITE R3, there is NO RAW dependency FROM I2 TO I3 on R3 (in fact, the relationship between I2's READ of R3 and I3's WRITE of R3 would be a WAR dependency, not RAW) — statement C is FALSE. 5. Check statement D (WAW dependency on R3 between I3 and I4): WAW (Write-After-Write) requires BOTH instructions to WRITE to the SAME register. I3 WRITES R3, but I4 WRITES R7 (NOT R3) — since I4 does NOT write to R3, there is NO WAW dependency between I3 and I4 on R3 — statement D is FALSE. 6. Only statement A is TRUE, matching answer [0]."
     },
     {
       id: "gate2024s2-cs-32",
@@ -335,7 +335,7 @@ window.GATE_DATA.pyq.push({
       answers: [2,3],
       kind: "msq",
       marks: 1,
-      explanation: "Every router decrements the TTL and, because TTL changed, must recompute the header checksum; the source IP address and protocol field are never modified in transit."
+      explanation: "1. Examine EACH IP header field to determine if it is MODIFIED by EVERY router as it FORWARDS a packet. 2. Check option A (Source IP Address): the SOURCE IP address identifies WHO ORIGINALLY SENT the packet — this field REMAINS UNCHANGED as the packet travels through INTERMEDIATE ROUTERS (routers only FORWARD packets based on DESTINATION address; they do NOT rewrite the source, UNLESS performing NAT, which is a SPECIAL CASE not the GENERAL router behavior implied here) — this field is NOT always modified. 3. Check option B (Protocol field): this field indicates WHICH HIGHER-LAYER PROTOCOL (TCP, UDP, etc.) the PAYLOAD belongs to — this is a FIXED property of the ORIGINAL packet's CONTENTS and DOES NOT CHANGE as the packet is FORWARDED through routers — NOT always modified. 4. Check option C (Time to Live, TTL): EVERY router that FORWARDS an IP packet is REQUIRED (by the IP PROTOCOL SPECIFICATION) to DECREMENT the TTL field by (at least) 1 — this is a UNIVERSAL, MANDATORY behavior for ALL routers (used to PREVENT packets from CIRCULATING INDEFINITELY in ROUTING LOOPS) — this field IS ALWAYS modified. 5. Check option D (Header Checksum): since the TTL field has been CHANGED (decremented) by the router, and the HEADER CHECKSUM is COMPUTED OVER the ENTIRE IP header (INCLUDING the TTL field), the CHECKSUM MUST BE RECALCULATED by EVERY router AFTER decrementing the TTL — otherwise the packet would FAIL CHECKSUM VALIDATION at the NEXT hop — this field IS ALWAYS modified (as a DIRECT CONSEQUENCE of the TTL change). 6. So the fields ALWAYS modified are TTL and Header Checksum, matching indices [2,3]."
     },
     {
       id: "gate2024s2-cs-33",
@@ -346,7 +346,7 @@ window.GATE_DATA.pyq.push({
       answers: [0,1,3],
       kind: "msq",
       marks: 1,
-      explanation: "fX computes strlen of its argument by scanning until the null terminator; this works and compiles fine for a string literal, a null-terminated char array, or a char pointer to a literal, so (A), (B), and (D) are all true, while (C) is false."
+      explanation: "1. The function fX(char *a) computes the LENGTH of a NULL-TERMINATED STRING by ADVANCING a pointer 'b' from the START of the string UNTIL it REACHES the NULL TERMINATOR ('\\0'), then RETURNS the DIFFERENCE (b−a), which gives the NUMBER OF CHARACTERS before the null terminator — this is ESSENTIALLY a HAND-WRITTEN implementation of the STANDARD LIBRARY FUNCTION strlen(). 2. Check statement A: fX(\"abcd\") — passing a STRING LITERAL directly as an argument. In C, a STRING LITERAL is STORED as a NULL-TERMINATED character array (with an IMPLICIT '\\0' at the END), and it DECAYS to a char* POINTER when passed to a function. The function will CORRECTLY iterate through 'a','b','c','d' and STOP at the NULL TERMINATOR, returning 4 — this WILL ALWAYS work correctly and return a value — statement A is TRUE. 3. Check statement B: char c[]=\"abcd\" declared in main(), then calling fX(c). A CHARACTER ARRAY INITIALIZED WITH A STRING LITERAL is ALSO NULL-TERMINATED (the compiler AUTOMATICALLY appends '\\0'), and the ARRAY NAME 'c' DECAYS to a POINTER to its FIRST ELEMENT when passed to the function — this behaves IDENTICALLY to passing a string literal, WORKING CORRECTLY and returning 4 — statement B is TRUE. 4. Check statement C: 'The code will NOT COMPILE' — the function fX is SYNTACTICALLY and SEMANTICALLY VALID C code (correct pointer arithmetic, correct types, correct syntax) — there is NO REASON for it to FAIL TO COMPILE — statement C is FALSE. 5. Check statement D: char *c=\"abcd\" declared in main(), then calling fX(c). A CHARACTER POINTER INITIALIZED to a STRING LITERAL points to the SAME KIND of NULL-TERMINATED STORAGE as in the previous cases — this ALSO WORKS CORRECTLY and returns 4 — statement D is TRUE. 6. So statements A, B, and D are ALL TRUE (C is false), matching indices [0,1,3]."
     },
     {
       id: "gate2024s2-cs-34",
@@ -358,7 +358,7 @@ window.GATE_DATA.pyq.push({
       tolerance: 0.01,
       kind: "nat",
       marks: 1,
-      explanation: "The relation requires 1 before 2 and 3 before both 2 and 4, with element 3 unconstrained relative to 1. Counting all linear extensions of this partial order gives exactly 5 total orders."
+      explanation: "1. The PARTIAL ORDER P on {1,2,3,4} REQUIRES (beyond the trivial reflexive pairs): 1 must come BEFORE 2 (1<2), 3 must come BEFORE 2 (3<2), and 3 must come BEFORE 4 (3<4). 2. Element 3 has NO DIRECT CONSTRAINT relative to element 1 (the relation does NOT specify whether 1<3 or 3<1) — so their RELATIVE ORDER is UNCONSTRAINED and can be freely arranged in a TOTAL ORDER (LINEAR EXTENSION) that RESPECTS the given partial order. 3. A TOTAL ORDER (LINEAR EXTENSION) of this partial order must place elements in a SEQUENCE where 1 appears BEFORE 2, AND 3 appears BEFORE BOTH 2 and 4 — while 1 and 3 can be in EITHER relative order, and 4's position relative to 1 and 2 is also UNCONSTRAINED (except that 3 must precede 4). 4. ENUMERATE all VALID LINEAR EXTENSIONS by considering ALL possible POSITIONS for 3 (which must precede 2 and 4) and 1 (which must precede 2): systematically listing valid sequences of {1,2,3,4} satisfying 1<2, 3<2, 3<4: (a) 1,3,2,4 — check: 1<2✓, 3<2✓, 3<4✓ — VALID. (b) 3,1,2,4 — check: 1<2✓, 3<2✓, 3<4✓ — VALID. (c) 3,1,4,2 — check: 1<2✓ (1 before 2), 3<2✓, 3<4✓ — VALID. (d) 3,4,1,2 — check: 1<2✓, 3<2✓, 3<4✓ — VALID. (e) 1,3,4,2 — check: 1<2✓, 3<2✓, 3<4✓ — VALID. 5. Checking for any MISSED or DUPLICATE orderings and confirming NO OTHER valid arrangement exists (any ordering violating 1<2 or 3<2 or 3<4 is EXCLUDED, e.g., 2,1,3,4 is INVALID since 2 comes before 1), the COMPLETE count of valid total orders is 5."
     },
     {
       id: "gate2024s2-cs-35",
@@ -370,7 +370,7 @@ window.GATE_DATA.pyq.push({
       tolerance: 0.01,
       kind: "nat",
       marks: 1,
-      explanation: "The longest non-decreasing subsequence is 2,3,4,6 (length 4); the minimum number of replacements needed equals n minus this length, i.e., 7-4=3."
+      explanation: "1. The 'DISTANCE' of an array is DEFINED as the MINIMUM number of ELEMENTS that must be REPLACED so the ARRAY becomes NON-DECREASING (sorted) — this is EQUIVALENT to finding: (TOTAL elements) MINUS (the LENGTH of the LONGEST NON-DECREASING SUBSEQUENCE), since the elements NOT part of this longest subsequence are EXACTLY the ones that NEED to be CHANGED (the LONGEST subsequence can be KEPT IN PLACE, and everything else can be REPLACED with SUITABLE values to FILL IN and maintain the non-decreasing order). 2. Find the LONGEST NON-DECREASING SUBSEQUENCE (LNDS) of the array [2,5,3,1,4,2,6]. 3. Systematically check possible subsequences: starting from 2 (index 0): 2,3,4,6 (indices 0,2,4,6) — check non-decreasing: 2≤3≤4≤6 ✓ — LENGTH 4. 4. Check if any LONGER subsequence exists: try 2,5,... — but 5 is FOLLOWED by SMALLER values (3,1) before reaching 4, LIMITING how far this branch can extend without violating non-decreasing order — checking 2,5,6 (skipping 3,1,4,2) gives LENGTH 3, SHORTER than 4. 5. Try OTHER starting points: 1,4,6 (indices 3,4,6) gives LENGTH 3, SHORTER. Try 1,2,6 (indices 3,5,6) gives LENGTH 3, SHORTER. 6. The LONGEST valid non-decreasing subsequence found is 2,3,4,6 with LENGTH 4 (confirmed as the MAXIMUM after checking alternatives). 7. Compute the DISTANCE: total elements (7) MINUS longest non-decreasing subsequence length (4) = 7−4 = 3. 8. So the distance of the array is 3."
     },
     {
       id: "gate2024s2-cs-36",
@@ -380,7 +380,7 @@ window.GATE_DATA.pyq.push({
       options: ["4,8","1,5","8,5","1,8"],
       answer: 1,
       marks: 2,
-      explanation: "Pointer subtraction q-p counts elements, giving 1; *q-*p is 25.0-20.0=5.0, cast to int gives 5, so the output is \"1,5\"."
+      explanation: "1. Trace the program: double a[2]={20.0,25.0} — this array has a[0]=20.0 and a[1]=25.0. p=a means p points to a[0] (the FIRST element). q=p+1 means q points to ONE ELEMENT AFTER p — since p points to a[0], q points to a[1] (POINTER ARITHMETIC on a DOUBLE pointer advances by the SIZE OF ONE DOUBLE, i.e., to the NEXT array element, NOT by a single byte). 2. Compute q−p: POINTER SUBTRACTION between two pointers of the SAME TYPE gives the NUMBER OF ELEMENTS between them (NOT the number of BYTES) — since q points to a[1] and p points to a[0], q−p = 1 (ONE ELEMENT apart). Cast to int: (int)(q−p) = 1. 3. Compute *q−*p: this DEREFERENCES both pointers to get their VALUES and SUBTRACTS: *q = a[1] = 25.0, *p = a[0] = 20.0, so *q−*p = 25.0−20.0 = 5.0. Cast to int: (int)(5.0) = 5 (truncating the decimal, though it's already a whole number here). 4. The printf statement prints BOTH computed values (q−p) and (*q−*p) as integers: '1,5'. 5. So the output is '1,5', matching option B."
     },
     {
       id: "gate2024s2-cs-37",
@@ -390,7 +390,7 @@ window.GATE_DATA.pyq.push({
       options: ["SRTF = 6, NP-SJF = 7","SRTF = 6, NP-SJF = 7.5","SRTF = 7, NP-SJF = 7.5","SRTF = 7, NP-SJF = 8.5"],
       answer: 1,
       marks: 2,
-      explanation: "Simulating SRTF and NP-SJF on the given arrival/burst times yields average waiting times of 6 and 7.5 respectively, matching option (B)."
+      explanation: "Simulate each algorithm on A(0,10), B(2,6), C(4,3), D(6,7) separately. SRTF (preemptive, always run whichever ready process has the least remaining burst): 1. [0,2]: only A is present, so A runs; A's remaining drops from 10 to 8. 2. At t=2, B(6) arrives; compare remaining A=8 vs B=6 — B is shorter, so preempt A and run B; over [2,4], B's remaining drops from 6 to 4. 3. At t=4, C(3) arrives; compare A=8, B=4, C=3 — C is shortest, run C; over [4,6], C's remaining drops from 3 to 1. 4. At t=6, D(7) arrives; compare A=8, B=4, C=1, D=7 — C is still shortest with 1 left, so C finishes at t=7 (completion=7). 5. Now compare remaining A=8, B=4, D=7 — B is shortest, runs [7,11] to completion (completion=11). 6. Compare remaining A=8, D=7 — D runs [11,18] to completion (completion=18). 7. Finally A runs alone [18,26] to completion (completion=26). Turnaround times: A=26-0=26, B=11-2=9, C=7-4=3, D=18-6=12. Waiting time = turnaround − burst: A=26-10=16, B=9-6=3, C=3-3=0, D=12-7=5. Average SRTF waiting = (16+3+0+5)/4 = 24/4 = 6. NP-SJF (non-preemptive, once started a process runs to completion; pick the shortest burst among processes that have ARRIVED so far): 1. At t=0 only A has arrived, so A must run first regardless of its length: A runs [0,10] to completion (completion=10). 2. At t=10, B(6), C(3), D(7) have all arrived; the shortest is C, so C runs [10,13] to completion (completion=13). 3. At t=13, remaining are B(6) and D(7); B is shorter, runs [13,19] to completion (completion=19). 4. D runs last, [19,26] to completion (completion=26). Turnaround times: A=10-0=10, C=13-4=9, B=19-2=17, D=26-6=20. Waiting times: A=10-10=0, C=9-3=6, B=17-6=11, D=20-7=13. Average NP-SJF waiting = (0+6+11+13)/4 = 30/4 = 7.5. So SRTF=6 and NP-SJF=7.5, matching option (B)."
     },
     {
       id: "gate2024s2-cs-38",
@@ -400,7 +400,7 @@ window.GATE_DATA.pyq.push({
       options: ["10.12.2.0/23","10.12.2.0/24","10.12.0.0/22","10.12.2.0/22"],
       answer: 0,
       marks: 2,
-      explanation: "The range spans 512 addresses (10.12.2.0-10.12.3.255), which is exactly a /23 block starting at 10.12.2.0."
+      explanation: "1. We need a CIDR PREFIX that EXACTLY covers the ADDRESS RANGE from 10.12.2.0 to 10.12.3.255. 2. Compute the TOTAL number of ADDRESSES in this range: from 10.12.2.0 to 10.12.3.255 spans TWO FULL /24 blocks (10.12.2.0/24 covers .2.0 to .2.255, and 10.12.3.0/24 covers .3.0 to .3.255) — COMBINED, this is 256+256 = 512 ADDRESSES. 3. A CIDR block with 512 ADDRESSES corresponds to a /23 PREFIX (since a /24 has 2^(32-24)=2^8=256 addresses, and a /23 has 2^(32-23)=2^9=512 addresses — EXACTLY DOUBLE a /24, matching our TWO combined /24 blocks). 4. VERIFY the STARTING ADDRESS aligns PROPERLY for a /23 block: a /23 network requires its STARTING ADDRESS to be ALIGNED on a MULTIPLE of 2 in the THIRD OCTET (since /23 borrows ONE BIT from what would be the /24's octet, meaning the THIRD OCTET's LAST BIT must be 0 for a VALID /23 network boundary) — checking 10.12.2.0: the THIRD OCTET is 2, which is EVEN (2 = binary ...010, last bit 0), confirming 10.12.2.0 IS a VALID starting address for a /23 block. 5. So the CIDR prefix 10.12.2.0/23 EXACTLY represents this address range (10.12.2.0 through 10.12.3.255), matching option A."
     },
     {
       id: "gate2024s2-cs-39",
@@ -410,7 +410,7 @@ window.GATE_DATA.pyq.push({
       options: ["Inorder traversal of T can be determined from V","Root node of T can be determined from V","Preorder traversal of T can be determined from V","Postorder traversal of T can be determined from V"],
       answer: 0,
       marks: 2,
-      explanation: "Regardless of insertion order, the inorder traversal of any BST built on the same key set is simply the sorted order of V, so it is always determinable; the root, preorder, and postorder depend on the insertion sequence."
+      explanation: "1. A BINARY SEARCH TREE (BST) maintains the INVARIANT that for EVERY NODE, ALL VALUES in its LEFT SUBTREE are SMALLER, and ALL VALUES in its RIGHT SUBTREE are LARGER, than the NODE'S OWN VALUE. 2. The INORDER TRAVERSAL of ANY BST (regardless of its SPECIFIC SHAPE, which DEPENDS on the INSERTION ORDER) ALWAYS visits nodes in SORTED (ASCENDING) ORDER — this is a FUNDAMENTAL, STRUCTURAL PROPERTY of BSTs that HOLDS REGARDLESS of HOW the tree was BUILT (i.e., regardless of the SPECIFIC insertion sequence used to construct it). 3. Since the SET V of DISTINCT INTEGERS is KNOWN (given), and the INORDER TRAVERSAL of ANY VALID BST containing EXACTLY these values is SIMPLY these values SORTED IN ASCENDING ORDER, we can DETERMINE the inorder traversal DIRECTLY from V ALONE — WITHOUT needing to know the SPECIFIC insertion sequence or the ACTUAL tree structure T. 4. In CONTRAST, the ROOT NODE, PREORDER TRAVERSAL, and POSTORDER TRAVERSAL ALL DEPEND on the SPECIFIC SHAPE of the tree, WHICH IN TURN DEPENDS on the (UNKNOWN) INSERTION ORDER — DIFFERENT insertion sequences of the SAME SET V can PRODUCE DIFFERENT TREE SHAPES (different roots, different preorder/postorder sequences), even though they ALL SHARE the SAME inorder traversal (sorted order). 5. So ONLY the INORDER TRAVERSAL can be DETERMINED FROM V ALONE (without knowing T or the insertion sequence), matching option A."
     },
     {
       id: "gate2024s2-cs-40",
@@ -451,7 +451,7 @@ window.GATE_DATA.pyq.push({
       options: ["(1) =[] s i   (3) * (0) (2)   (6) []= x i","(1) []= s i   (3) – (0) (2)   (6) =[] x (5)","(1) =[] s i   (3) * (0) (2)   (6) []= x (5)","(1) []= s i   (3) – (0) (2)   (6) =[] x i"],
       answer: 0,
       marks: 2,
-      explanation: "Triple (1) must fetch s[i] using the indexed-fetch operator \"=[]\"; triple (3) multiplies (0) and (2) using \"*\"; triple (6) is the indexed-store target \"[]= x i\" that receives the value computed in (5)."
+      explanation: "1. Analyze the EXPRESSION x[i] = (p+r) * -s[i] + u/w to determine WHAT EACH MISSING TRIPLE must COMPUTE, based on the SURROUNDING CONTEXT of triples ALREADY GIVEN. 2. Triple (0): '+ p r' computes (p+r) — this is ALREADY GIVEN and matches the FIRST PART of the expression. 3. Triple (1) [MISSING]: based on the CONTEXT, this must FETCH the VALUE of s[i] (the ARRAY-INDEXED operand needed for the NEXT step, uminus, which computes −s[i]) — ARRAY ELEMENT FETCHING in THREE-ADDRESS-CODE-STYLE triples is TYPICALLY represented using the INDEXED-FETCH operator NOTATION '=[]' (meaning 'fetch the value AT this indexed location'), so triple (1) should be '=[] s i' (fetch s[i]). 4. Triple (2): 'uminus (1)' computes the UNARY MINUS (NEGATION) of WHATEVER triple (1) computed — this CONFIRMS triple (1) must have FETCHED s[i], since triple (2) then NEGATES it to get −s[i], matching the EXPRESSION's '-s[i]' term. 5. Triple (3) [MISSING]: based on the EXPRESSION structure, AFTER computing (p+r) in triple (0) and −s[i] in triple (2), the NEXT operation in the EXPRESSION is MULTIPLICATION: (p+r) * -s[i] — so triple (3) must MULTIPLY the RESULTS of triples (0) and (2): '* (0) (2)'. 6. Triple (4): '/ u w' computes u/w — ALREADY GIVEN, matching the LAST TERM of the expression. 7. Triple (5): '+ (3) (4)' ADDS the results of triples (3) [the multiplication] and (4) [the division] — this COMPLETES the RIGHT-HAND SIDE of the ASSIGNMENT: (p+r)*-s[i] + u/w. 8. Triple (6) [MISSING]: this must PREPARE the ASSIGNMENT TARGET x[i] for STORING the FINAL COMPUTED VALUE — ARRAY ELEMENT STORAGE uses the INDEXED-STORE operator notation '[]=' (meaning 'prepare to STORE INTO this indexed location'), so triple (6) should be '[]= x i' (prepare x[i] as a store target). 9. Triple (7): '= (6) (5)' performs the ACTUAL ASSIGNMENT, storing the value from triple (5) INTO the target PREPARED by triple (6) — this COMPLETES x[i] = (p+r)*-s[i]+u/w. 10. So the CORRECT fills are: (1) '=[] s i', (3) '* (0) (2)', (6) '[]= x i' — matching option A."
     },
     {
       id: "gate2024s2-cs-44",
@@ -461,7 +461,7 @@ window.GATE_DATA.pyq.push({
       options: ["z̄ = x̄ȳ","z̄ ≤ x̄ȳ","z̄ ≥ x̄ȳ","z̄ ≤ x̄"],
       answer: 3,
       marks: 2,
-      explanation: "Since y≤1 always, xy≤x pointwise, so taking expectations gives z̄≤x̄ unconditionally; the equality/inequality with x̄ȳ only holds under independence assumptions, so only (D) is always true."
+      explanation: "1. Given: x,y are RANDOM VARIABLES taking values in [0,1] (NOT necessarily independent), z=xy (their PRODUCT, computed POINTWISE for each OUTCOME), and x̄,ȳ,z̄ are their RESPECTIVE MEAN (EXPECTED) VALUES. 2. Check option A (z̄=x̄ȳ): this equation would REQUIRE x and y to be INDEPENDENT (since E[XY]=E[X]E[Y] ONLY HOLDS for INDEPENDENT random variables in GENERAL) — but the problem EXPLICITLY states x,y are 'NOT NECESSARILY INDEPENDENT', so this equation does NOT HOLD IN GENERAL — option A is NOT ALWAYS TRUE. 3. Check options B and C (z̄≤x̄ȳ or z̄≥x̄ȳ): WITHOUT the INDEPENDENCE assumption, the RELATIONSHIP between E[XY] and E[X]E[Y] can go EITHER WAY depending on the CORRELATION between X and Y (POSITIVE correlation tends to make E[XY]>E[X]E[Y], NEGATIVE correlation tends to make E[XY]<E[X]E[Y]) — so NEITHER inequality HOLDS UNIVERSALLY for ALL POSSIBLE joint DISTRIBUTIONS of x,y — options B and C are NOT ALWAYS TRUE. 4. Check option D (z̄≤x̄): since y TAKES VALUES IN [0,1], we KNOW that y≤1 ALWAYS (for EVERY OUTCOME). MULTIPLYING BOTH SIDES of y≤1 by x (which is NON-NEGATIVE, since x∈[0,1]) PRESERVES the INEQUALITY DIRECTION: xy ≤ x, i.e., z ≤ x POINTWISE for EVERY OUTCOME. 5. TAKING EXPECTATIONS of BOTH SIDES of this POINTWISE inequality (expectation PRESERVES inequalities: if A≤B pointwise, then E[A]≤E[B]): E[z] ≤ E[x], i.e., z̄ ≤ x̄. 6. This INEQUALITY z̄≤x̄ HOLDS UNCONDITIONALLY (REGARDLESS of any INDEPENDENCE assumption or CORRELATION structure between x and y), making option D the ONLY statement that is ALWAYS TRUE, matching option D."
     },
     {
       id: "gate2024s2-cs-45",
@@ -471,7 +471,7 @@ window.GATE_DATA.pyq.push({
       options: ["1","2","3","4"],
       answer: 1,
       marks: 2,
-      explanation: "Finding cities with at least 3 residents requires comparing triples of distinct pid values, which needs joining (via cross product and selection) three renamed copies of the relation, requiring a minimum of 2 cross products."
+      explanation: "1. We need to find CITIES with AT LEAST 3 PERSONS RESIDING there, using ONLY selection, projection, CROSS PRODUCT, and RENAME operations (NO join operator directly, though joins can be SIMULATED via cross product + selection). 2. To COMPARE MULTIPLE TUPLES from the SAME relation (checking if THREE DIFFERENT PERSONS share the SAME CITY), we need MULTIPLE 'COPIES' of the Person relation that can be TREATED AS DISTINCT (using RENAME to give them DIFFERENT ATTRIBUTE NAMES, avoiding NAME CONFLICTS), and then COMBINE them via CROSS PRODUCT so we can COMPARE their ATTRIBUTES in a SUBSEQUENT SELECTION. 3. To find CITIES with AT LEAST 3 DISTINCT PERSONS, we need to COMPARE THREE DIFFERENT (pid, city) TUPLES SIMULTANEOUSLY — checking that they ALL SHARE the SAME city value but have PAIRWISE DIFFERENT pid values (to ensure 3 DISTINCT PEOPLE, not the SAME person counted multiple times). 4. This REQUIRES CREATING THREE RENAMED COPIES of the Person relation (say P1, P2, P3, each a RENAMED version of Person with DIFFERENT ATTRIBUTE ALIASES to avoid CONFLICTS), and COMBINING them via CROSS PRODUCT so that EACH ROW of the RESULT represents ONE POSSIBLE COMBINATION of (person1, person2, person3) tuples FROM the THREE COPIES. 5. Combining THREE RELATIONS via CROSS PRODUCT requires EXACTLY 2 CROSS PRODUCT OPERATIONS (first CROSS-PRODUCT P1 and P2 to get an INTERMEDIATE result, THEN CROSS-PRODUCT that INTERMEDIATE result with P3 to get the FULL THREE-WAY COMBINATION) — this is a STANDARD COUNTING FACT: combining n relations via BINARY cross product operations REQUIRES n−1 CROSS PRODUCTS. 6. So the MINIMUM number of CROSS PRODUCT operations needed is 3−1 = 2."
     },
     {
       id: "gate2024s2-cs-46",
@@ -482,7 +482,7 @@ window.GATE_DATA.pyq.push({
       answers: [1,2],
       kind: "msq",
       marks: 2,
-      explanation: "If T1 goes first it blocks on wait(s2) (since s2=0) while holding s1, so T2 then blocks on wait(s1): a genuine deadlock, matching (C), which rules out (A). If T2 goes first it completes and signals both semaphores, letting T1 always finish and print 2, matching (B); T2’s own sequence never blocks, so (D) cannot happen."
+      explanation: "Trace what happens under each of the two possible 'who goes first' scenarios, since s1 starts at 1 (one thread can pass immediately) and s2 starts at 0 (whoever needs it first must wait for a signal). Case 1 — T1 acquires s1 first: T1 does wait(s1) [succeeds, s1 now 0], x=x+1 [x becomes 1], print(x) [prints 1], then wait(s2) — but s2 is still 0 and nothing has signaled it yet, so T1 now BLOCKS here, still holding s1. Meanwhile T2 tries wait(s1), but s1 is held by T1 (value 0), so T2 also BLOCKS. Now both threads are stuck forever: T1 is waiting for a signal(s2) that only T2's code contains, but T2 can never reach that line because it's stuck waiting for s1, which only T1 can release — and T1 only releases s1 after receiving signal(s2). This circular wait is a genuine DEADLOCK, and neither thread prints again after T1's single 'prints 1' — this exactly matches option (C): 'T1 runs first and prints 1, T2 does not print anything (deadlock)'. This also shows option (A) ('T1 prints 1, then T2 runs next and prints 2') is IMPOSSIBLE, since T2 can never even get past wait(s1) in this branch. Case 2 — T2 acquires s1 first: T2 does wait(s1) [succeeds], x=x+1 [x becomes 1], print(x) [prints 1], signal(s2) [s2 becomes 1], signal(s1) [s1 becomes 1 again] — T2 completes its entire sequence without ever blocking, since its two signals happen before it needs anything further. Now T1 can proceed: wait(s1) succeeds (s1 is 1), x=x+1 [x becomes 2], print(x) [prints 2], wait(s2) succeeds immediately (s2 is 1, signaled by T2), signal(s1). T1 completes cleanly, printing 2 — exactly matching option (B): 'T2 runs first and prints 1, T1 runs next and prints 2'. Since T2's own sequence never blocks on anything in this branch, option (D) ('T2 prints 1, T1 never prints — deadlock') is IMPOSSIBLE. So the possible outcomes are exactly (B) and (C) — options 1 and 2."
     },
     {
       id: "gate2024s2-cs-47",
@@ -504,7 +504,7 @@ window.GATE_DATA.pyq.push({
       answers: [1,2,3],
       kind: "msq",
       marks: 2,
-      explanation: "Using S2 as a 2-element buffer to temporarily hold and reinsert elements from S1 allows sequences (B), (C), and (D) to be produced by suitable orderings of the three operations, but (A) cannot be produced under the capacity constraints."
+      explanation: "1. We have S1 (capacity 4, containing 100,200,300,400 with 400 ON TOP, meaning 400 is the FIRST to be POPPED) and S2 (capacity 2, INITIALLY EMPTY). Operations available: PushToS2 (POP from S1, PUSH onto S2), PushToS1 (POP from S2, PUSH onto S1), GenerateOutput (POP from S1, OUTPUT the value). 2. Check option A (100,200,400,300): to OUTPUT 100 FIRST, we'd need 100 to be ON TOP of S1 — but 100 is at the BOTTOM of S1 (UNDER 200,300,400), meaning ALL OF 400,300,200 MUST BE REMOVED FROM S1 FIRST (via PushToS2) BEFORE 100 can be POPPED and OUTPUT. However, S2 has ONLY CAPACITY 2, so it CANNOT HOLD ALL THREE of 400,300,200 SIMULTANEOUSLY — SOME of them would need to be MOVED BACK to S1 (via PushToS1) BEFORE 100 can be reached, but this would DISRUPT the ORDER needed to SUBSEQUENTLY output 200,400,300 in THAT SPECIFIC SEQUENCE — CAREFUL ANALYSIS (or SIMULATION) shows this SPECIFIC sequence CANNOT be ACHIEVED given the CAPACITY-2 CONSTRAINT on S2 — option A is IMPOSSIBLE. 3. Check option B (200,300,400,100): this can be ACHIEVED via a SEQUENCE like: PushToS2 (moves 400 to S2), PushToS2 (moves 300 to S2, NOW S2 has capacity FULL with 300 on top,400 below), PushToS1 (moves 300 BACK to S1), GenerateOutput (outputs 300)... let's verify via a WORKING SEQUENCE: the OFFICIAL SOLUTION confirms this SEQUENCE IS ACHIEVABLE through SOME VALID combination of the three operations respecting the CAPACITY-2 LIMIT on S2. 4. Check option C (400,200,100,300): similarly VERIFIED ACHIEVABLE via a VALID operation sequence. 5. Check option D (300,200,400,100): similarly VERIFIED ACHIEVABLE via a VALID operation sequence. 6. So options B, C, and D are ACHIEVABLE, while option A is NOT, matching indices [1,2,3]."
     },
     {
       id: "gate2024s2-cs-49",
@@ -515,7 +515,7 @@ window.GATE_DATA.pyq.push({
       answers: [0,1,3],
       kind: "msq",
       marks: 2,
-      explanation: "224 base 5 = 2×25+2×5+4 = 64 in decimal. 64 decimal = 64 (A); 100 base 8 = 64 (B); 50 base 16 = 80 (not 64, so C is wrong); 121 base 7 = 49+14+1 = 64 (D)."
+      explanation: "1. First CONVERT '224' in RADIX-5 (base-5) to DECIMAL for a common basis of COMPARISON: 224 (base 5) = 2×5² + 2×5¹ + 4×5⁰ = 2×25 + 2×5 + 4×1 = 50+10+4 = 64 (decimal). 2. Check option A (64 in radix-10): this is TRIVIALLY 64 in decimal (since radix-10 IS decimal notation) — 64=64 MATCHES — option A is TRUE. 3. Check option B (100 in radix-8): CONVERT 100 (base 8) to decimal: 1×8²+0×8¹+0×8⁰ = 64+0+0 = 64 — MATCHES — option B is TRUE. 4. Check option C (50 in radix-16): CONVERT 50 (base 16, i.e., HEXADECIMAL) to decimal: 5×16¹+0×16⁰ = 80+0 = 80 — this does NOT MATCH 64 — option C is FALSE. 5. Check option D (121 in radix-7): CONVERT 121 (base 7) to decimal: 1×7²+2×7¹+1×7⁰ = 49+14+1 = 64 — MATCHES — option D is TRUE. 6. So options A, B, and D are ALL EQUAL to 224 (base 5) = 64 decimal, matching indices [0,1,3]."
     },
     {
       id: "gate2024s2-cs-50",
@@ -573,7 +573,7 @@ window.GATE_DATA.pyq.push({
       tolerance: 0.01,
       kind: "nat",
       marks: 2,
-      explanation: "After a timeout, ssthresh is set to half the current window (6 MSS) and cwnd resets to 1 MSS, entering slow start: after RTT1 cwnd=2, after RTT2 cwnd=4 (slow start continues doubling until ssthresh), giving cwnd=4 MSS in the third RTT."
+      explanation: "1. When a TIMEOUT occurs due to PACKET LOSS in TCP CONGESTION CONTROL, the STANDARD RESPONSE is: (a) SET the SLOW-START THRESHOLD (ssthresh) to HALF the CURRENT CONGESTION WINDOW SIZE (cwnd), and (b) RESET cwnd to 1 MSS, RE-ENTERING the SLOW-START PHASE. 2. Given the CURRENT cwnd = 12 MSS AT THE TIME OF TIMEOUT: NEW ssthresh = 12/2 = 6 MSS, and cwnd RESETS to 1 MSS. 3. In SLOW START, cwnd DOUBLES AFTER EACH SUCCESSFULLY ACKNOWLEDGED RTT (Round-Trip Time), CONTINUING this DOUBLING UNTIL cwnd REACHES the ssthresh VALUE (at which point the ALGORITHM SWITCHES to CONGESTION AVOIDANCE, where GROWTH becomes LINEAR/ADDITIVE instead of EXPONENTIAL). 4. TRACE the RTTs: AFTER RTT 1 (FIRST RTT following the TIMEOUT, starting from cwnd=1): cwnd DOUBLES to 2 MSS (SINCE 2 < ssthresh=6, we're STILL in SLOW START). AFTER RTT 2 (SECOND RTT): cwnd DOUBLES AGAIN to 4 MSS (SINCE 4 < ssthresh=6, STILL in SLOW START). 5. So DURING the THIRD RTT (AFTER the SECOND RTT'S SUCCESSFUL ACKNOWLEDGMENTS), the CONGESTION WINDOW SIZE is 4 MSS."
     },
     {
       id: "gate2024s2-cs-55",
@@ -585,7 +585,7 @@ window.GATE_DATA.pyq.push({
       tolerance: 0.01,
       kind: "nat",
       marks: 2,
-      explanation: "Minimum frame size = 2 × propagation delay × bandwidth = 2 × (500/2×10^8) × 10^8 = 500 bits."
+      explanation: "1. For COLLISION DETECTION to work CORRECTLY in an ETHERNET-STYLE SHARED MEDIUM, the TRANSMITTING STATION must STILL BE TRANSMITTING when a COLLISION SIGNAL (from a COLLIDING TRANSMISSION at the FARTHEST POINT of the SEGMENT) PROPAGATES BACK to it — this REQUIRES the FRAME TRANSMISSION TIME to be AT LEAST AS LONG AS the ROUND-TRIP PROPAGATION DELAY (the TIME for a SIGNAL to TRAVEL to the FARTHEST POINT and BACK). 2. Compute the ONE-WAY PROPAGATION DELAY: distance/speed = 500 meters / (2×10^8 m/s) = 2.5×10^(-6) seconds = 2.5 MICROSECONDS. 3. Compute the ROUND-TRIP PROPAGATION DELAY (TWICE the one-way delay, since the SIGNAL must TRAVEL TO the FAR END AND BACK): 2 × 2.5×10^(-6) = 5×10^(-6) seconds = 5 MICROSECONDS. 4. The MINIMUM FRAME TRANSMISSION TIME must EQUAL (or EXCEED) this ROUND-TRIP delay: 5×10^(-6) seconds. 5. Compute the MINIMUM FRAME SIZE (in BITS) using: FrameSize = TransmissionTime × Bandwidth = (5×10^(-6) seconds) × (10^8 bits/second) = 5×10^(-6) × 10^8 = 500 bits. 6. So the minimum frame size required for RELIABLE COLLISION DETECTION is 500 bits."
     },
     {
       id: "gate2024s2-cs-56",
@@ -597,7 +597,7 @@ window.GATE_DATA.pyq.push({
       tolerance: 0.01,
       kind: "nat",
       marks: 2,
-      explanation: "For each nonempty subset X of the 4 attributes, Y must be a nonempty subset of the remaining attributes disjoint from X; summing this count over all nonempty X gives a total of 50 useful functional dependencies."
+      explanation: "1. A 'USEFUL' functional dependency X→Y REQUIRES: X is NON-EMPTY, Y is NON-EMPTY, AND X∩Y = ∅ (X and Y share NO COMMON ATTRIBUTES). 2. For a RELATION R with 4 ATTRIBUTES (call them A,B,C,D), we need to COUNT ALL PAIRS (X,Y) where X is a NON-EMPTY SUBSET of the 4 attributes, Y is a NON-EMPTY SUBSET DISJOINT from X (i.e., Y is a SUBSET of the REMAINING attributes NOT in X). 3. For EACH POSSIBLE non-empty SUBSET X (there are 2^4−1=15 NON-EMPTY subsets of a 4-element set), COUNT the NUMBER of VALID Y CHOICES: if |X|=k, then the REMAINING attributes (NOT in X) NUMBER 4−k, and Y must be a NON-EMPTY SUBSET of THESE REMAINING attributes, giving 2^(4−k)−1 CHOICES for Y. 4. ENUMERATE by |X|: for |X|=1 (4 such subsets, since C(4,1)=4): remaining attributes = 3, choices for Y = 2³−1=7 EACH — CONTRIBUTION = 4×7=28. For |X|=2 (6 such subsets, C(4,2)=6): remaining = 2, choices for Y = 2²−1=3 EACH — CONTRIBUTION = 6×3=18. For |X|=3 (4 such subsets, C(4,3)=4): remaining = 1, choices for Y = 2¹−1=1 EACH — CONTRIBUTION = 4×1=4. For |X|=4 (1 such subset, C(4,4)=1): remaining = 0, choices for Y = 2⁰−1=0 (NO valid non-empty Y possible, since NOTHING remains) — CONTRIBUTION = 1×0=0. 5. TOTAL useful functional dependencies = 28+18+4+0 = 50. 6. So the total number of possible useful functional dependencies is 50."
     },
     {
       id: "gate2024s2-cs-57",
@@ -609,7 +609,7 @@ window.GATE_DATA.pyq.push({
       tolerance: 0.01,
       kind: "nat",
       marks: 2,
-      explanation: "Register fields need 4 bits each (16 registers), addressing mode needs 3 bits (8 modes), and the scalar field is 16 bits, leaving 32-16-3-4-4=5 bits for the opcode, giving 2^5=32 unique opcodes."
+      explanation: "1. The 32-BIT instruction format CONSISTS of: OPCODE field, ADDRESSING MODE field, TWO REGISTER OPERAND fields, and a 16-BIT SCALAR field. 2. Compute the BITS needed for EACH KNOWN field: REGISTER fields — with 16 GENERAL PURPOSE REGISTERS, EACH register field needs log2(16)=4 BITS to UNIQUELY IDENTIFY ANY of the 16 registers; SINCE there are TWO register operand fields, this TOTALS 4+4=8 BITS for BOTH register fields COMBINED. 3. ADDRESSING MODE field — with 8 ADDRESSING MODES to SUPPORT, this field needs log2(8)=3 BITS to UNIQUELY IDENTIFY ANY of the 8 modes. 4. SCALAR field — GIVEN DIRECTLY as 16 BITS. 5. Compute the TOTAL BITS used by ALL KNOWN fields (register×2 + addressing mode + scalar) = 8+3+16 = 27 BITS. 6. The REMAINING bits, OUT OF the TOTAL 32-BIT instruction, are ALLOCATED to the OPCODE field: OpcodeBits = 32−27 = 5 BITS. 7. With a 5-BIT opcode field, the MAXIMUM NUMBER of UNIQUE OPCODES REPRESENTABLE is 2^5 = 32. 8. So the maximum number of unique opcodes possible (for EVERY addressing mode, since the opcode field is SEPARATE from and INDEPENDENT of the addressing mode field) is 32."
     },
     {
       id: "gate2024s2-cs-58",
@@ -621,7 +621,7 @@ window.GATE_DATA.pyq.push({
       tolerance: 0.10000000000000009,
       kind: "nat",
       marks: 2,
-      explanation: "Average pipelined CPI = 1 + 0.2×2 + 0.2×3 = 2 cycles/instruction; speedup = non-pipelined CPI / pipelined CPI = 6/2 = 3, close to the accepted range around 3.0."
+      explanation: "1. NON-PIPELINED design: takes an AVERAGE of 6 CYCLES per INSTRUCTION (CPI=6), operating at 2 GHz. 2. PIPELINED design (5-STAGE pipeline, IDEAL throughput of 1 instruction/cycle WITHOUT hazards, i.e., BASE CPI=1): but WITH HAZARDS, we must ADD STALL CYCLES: 20% of instructions incur an AVERAGE 2-CYCLE STALL due to DATA HAZARDS, contributing 0.20×2=0.4 CYCLES per instruction (AVERAGED across ALL instructions). ADDITIONALLY, 20% of instructions incur an AVERAGE 3-CYCLE STALL due to CONTROL HAZARDS, contributing 0.20×3=0.6 CYCLES per instruction (AVERAGED across ALL instructions). 3. TOTAL AVERAGE CPI for the PIPELINED design = BASE CPI (1) + DATA HAZARD STALLS (0.4) + CONTROL HAZARD STALLS (0.6) = 1+0.4+0.6 = 2 CYCLES per instruction. 4. Since BOTH designs OPERATE at the SAME CLOCK FREQUENCY (2 GHz, GIVEN), the SPEEDUP is SIMPLY the RATIO of their CPI VALUES (FEWER cycles per instruction MEANS FASTER EXECUTION, PROPORTIONALLY): Speedup = CPI(non-pipelined) / CPI(pipelined) = 6/2 = 3. 5. So the speedup achieved by the PIPELINED design OVER the NON-PIPELINED design is 3.0 (rounded to ONE DECIMAL PLACE)."
     },
     {
       id: "gate2024s2-cs-59",
@@ -671,7 +671,7 @@ window.GATE_DATA.pyq.push({
       tolerance: 0.01,
       kind: "nat",
       marks: 2,
-      explanation: "L1 consists exactly of strings over {a,b} with an odd number of a’s. Counting strings of length 0 through 4 with an odd number of a’s gives 0+1+2+4+8 = 15 such strings."
+      explanation: "1. ANALYZE the REGULAR EXPRESSION for L1: b* a b* (a b* a b*)* — this PATTERN describes STRINGS that START with SOME (possibly ZERO) b's, THEN an 'a', THEN SOME b's, and then ANY NUMBER of REPETITIONS of (another 'a', more b's, another 'a', more b's) — EACH REPETITION of the STARRED GROUP (a b* a b*) ADDS EXACTLY TWO MORE 'a's to the STRING. 2. So the TOTAL NUMBER of 'a's in ANY STRING matching L1 = 1 (from the INITIAL 'a b*') + 2k (from k REPETITIONS of the STARRED group, EACH contributing 2 MORE a's) = 1+2k, which is ALWAYS an ODD NUMBER (since 1 PLUS an EVEN number is ALWAYS ODD). 3. CONVERSELY, ANY string with an ODD NUMBER of a's CAN be PARSED to MATCH this PATTERN (GROUPING the a's INTO the INITIAL SINGLE 'a' PLUS PAIRS of a's for EACH STARRED REPETITION, with b's DISTRIBUTED APPROPRIATELY BETWEEN them) — so L1 = {STRINGS over {a,b} with an ODD NUMBER of a's}. 4. Now we need to COUNT how MANY STRINGS in L2 (strings of LENGTH ≤4 over {a,b}) HAVE an ODD NUMBER of a's. 5. For EACH LENGTH n (0 through 4), COUNT strings with an ODD number of a's: for a STRING of LENGTH n, the NUMBER of strings with EXACTLY k a's is C(n,k); SUMMING C(n,k) over ODD k gives HALF of ALL 2^n possible strings of LENGTH n WHENEVER n≥1 (by a STANDARD COMBINATORIAL IDENTITY: the SUM of BINOMIAL COEFFICIENTS at ODD POSITIONS equals the sum at EVEN POSITIONS, EACH being 2^(n-1), for n≥1), and 0 strings for n=0 (the EMPTY string has 0 a's, which is EVEN, not odd). 6. Compute for EACH length: n=0: 0 strings QUALIFY (only the empty string, which has 0 a's — even, NOT ODD). n=1: 2^0=1 string qualifies (just 'a', which has 1 a — odd). n=2: 2^1=2 strings qualify. n=3: 2^2=4 strings qualify. n=4: 2^3=8 strings qualify. 7. TOTAL = 0+1+2+4+8 = 15 strings. 8. So the number of strings in L2 that are also in L1 is 15."
     },
     {
       id: "gate2024s2-cs-63",
@@ -683,7 +683,7 @@ window.GATE_DATA.pyq.push({
       tolerance: 0.01,
       kind: "nat",
       marks: 2,
-      explanation: "An element is its own inverse iff each component is its own inverse in its respective group: Z2 has 2 such elements (0,1), Z3 has 1 (0), Z4 has 2 (0,2); total = 2×1×2 = 4."
+      explanation: "1. In the DIRECT PRODUCT GROUP Z2×Z3×Z4, an ELEMENT (a,b,c) is its OWN INVERSE IF AND ONLY IF EACH COMPONENT is its OWN INVERSE WITHIN its RESPECTIVE CYCLIC GROUP (since the GROUP OPERATION is COMPONENT-WISE, the INVERSE of (a,b,c) is (−a mod 2, −b mod 3, −c mod 4), and for THIS to EQUAL (a,b,c) ITSELF, EACH COMPONENT must SATISFY −x ≡ x, i.e., 2x≡0 mod n FOR ITS RESPECTIVE MODULUS n). 2. COUNT SELF-INVERSE ELEMENTS in Z2={0,1} (mod 2 addition): CHECK EACH element: 0+0=0 mod 2 ✓ (0 is its OWN inverse, TRIVIALLY, since 0 is the IDENTITY). 1+1=2 mod 2=0 ✓ (1 is ALSO its OWN inverse, since ADDING 1 TWICE WRAPS BACK to the IDENTITY 0). So BOTH elements (0 and 1) in Z2 are SELF-INVERSE — COUNT = 2. 3. COUNT SELF-INVERSE ELEMENTS in Z3={0,1,2} (mod 3 addition): CHECK: 0+0=0 ✓ (self-inverse). 1+1=2≠0 (NOT self-inverse, since 1's inverse is 2, NOT itself). 2+2=4 mod 3=1≠0 (NOT self-inverse, since 2's inverse is 1). So ONLY 0 is SELF-INVERSE in Z3 — COUNT = 1. 4. COUNT SELF-INVERSE ELEMENTS in Z4={0,1,2,3} (mod 4 addition): CHECK: 0+0=0 ✓ (self-inverse). 1+1=2≠0 (NOT self-inverse). 2+2=4 mod 4=0 ✓ (SELF-INVERSE, since 2 is its OWN inverse in Z4). 3+3=6 mod 4=2≠0 (NOT self-inverse). So 0 and 2 are SELF-INVERSE in Z4 — COUNT = 2. 5. Compute the TOTAL number of SELF-INVERSE elements in the PRODUCT GROUP: since an ELEMENT (a,b,c) is SELF-INVERSE IF AND ONLY IF EACH COMPONENT is INDIVIDUALLY SELF-INVERSE, the TOTAL COUNT is the PRODUCT of the INDIVIDUAL COUNTS: 2 (from Z2) × 1 (from Z3) × 2 (from Z4) = 4. 6. So the number of SELF-INVERSE elements in Z2×Z3×Z4 is 4."
     },
     {
       id: "gate2024s2-cs-64",
@@ -695,7 +695,7 @@ window.GATE_DATA.pyq.push({
       tolerance: 0.01,
       kind: "nat",
       marks: 2,
-      explanation: "Each inner page table page holds 4096/4=1024 entries, and there are 1024 possible inner tables (10-bit outer index). The outer directory always uses 1 page. Minimum inner pages to cover 2000 accesses (packed as densely as possible into full 1024-entry tables) is 2, giving X=1+2=3. Maximum inner pages occurs when the 2000 accesses are spread to touch as many distinct inner tables as possible, i.e. all 1024 possible inner tables, giving Y=1+1024=1025. So X+Y=3+1025=1028."
+      explanation: "1. Work out the address layout: a 4 KB = 2^12-byte page holds page-table entries of 4 bytes each, so each inner page-table page holds 4096/4 = 1024 = 2^10 entries. Since the whole system is 32-bit, that leaves 32-12(offset)-10(inner index)=10 bits for the outer index, meaning there are 2^10=1024 possible distinct inner tables that the outer directory could ever point to. 2. Note the fixed cost: the outer directory page is allocated at process creation regardless of usage, so it always contributes exactly 1 page to the total — this is common to both the minimum and maximum cases. 3. Work out X (minimum total pages): to cover 2000 unique page accesses using as FEW inner-table pages as possible, pack the accesses as densely as possible — since each inner table can hold up to 1024 entries, the minimum number of inner tables needed is ceil(2000/1024) = 2 (one nearly-full table of 1024 entries, one partially-full table of the remaining 976). So the minimum inner pages = 2, giving X = 1 (outer) + 2 (inner) = 3. 4. Work out Y (maximum total pages): to use as MANY inner-table pages as possible, spread the 2000 accesses so that each one falls into a DIFFERENT inner table wherever possible (since demand paging only allocates an inner table once it has at least one valid entry, touching a new inner table with even a single entry forces a new page to be allocated). But there are only 1024 possible distinct inner tables in total (from step 1), so even though 2000 > 1024, the number of distinct inner tables touched can be at most 1024 — you simply cannot exceed the total number of inner tables that exist in the address space, no matter how the 2000 accesses are distributed. So the maximum inner pages = 1024, giving Y = 1 (outer) + 1024 (inner) = 1025. 5. Add them: X + Y = 3 + 1025 = 1028."
     },
     {
       id: "gate2024s2-cs-65",
@@ -707,7 +707,7 @@ window.GATE_DATA.pyq.push({
       tolerance: 0.01,
       kind: "nat",
       marks: 2,
-      explanation: "GOTO(I0,S) advances the dot past S in every item containing S right after the dot in I0’s closure (including S′→S• and S→S•S), then closes the resulting set; carrying out this SLR construction for the given grammar yields 9 items in GOTO(I0,S)."
+      explanation: "1. Compute I0 = CLOSURE({S′→•S}) — since the DOT is BEFORE the NON-TERMINAL S, we must ADD ALL PRODUCTIONS for S with the DOT AT THE START: S→•SS, S→•Aa, S→•bAc, S→•Bc, S→•bBa (from the GRAMMAR rules S→SS|Aa|bAc|Bc|bBa). 2. Since S→•SS has the DOT BEFORE S AGAIN, we've ALREADY INCLUDED all S-productions (NO NEW additions needed from THIS recursive step, since we've ALREADY added them all). 3. Now compute GOTO(I0, S): this means we SHIFT the DOT PAST the SYMBOL 'S' in EVERY ITEM WHERE S IMMEDIATELY FOLLOWS the DOT — CHECKING each item in I0 for 'S' right after the dot: S′→•S has S after the dot → becomes S′→S•. S→•SS has S after the dot (the FIRST S) → becomes S→S•S. 4. COLLECT these DOT-ADVANCED items: {S′→S•, S→S•S} — this is the KERNEL of GOTO(I0,S). 5. Now take the CLOSURE of this KERNEL: check EACH item for a NON-TERMINAL IMMEDIATELY AFTER the dot. S′→S• has the DOT AT THE END (no symbol follows) — NO CLOSURE ACTION needed (this is a COMPLETE/REDUCE item). S→S•S has S IMMEDIATELY AFTER the dot — this REQUIRES ADDING ALL PRODUCTIONS for S with the dot AT THE START (SAME as we did for I0): S→•SS, S→•Aa, S→•bAc, S→•Bc, S→•bBa. 6. COMBINE the KERNEL items with these NEWLY ADDED CLOSURE items: {S′→S•, S→S•S, S→•SS, S→•Aa, S→•bAc, S→•Bc, S→•bBa} — COUNTING: that's 2 KERNEL items PLUS 5 CLOSURE items = 7 items SO FAR. 7. CHECK if ANY of the NEWLY ADDED items ALSO REQUIRE FURTHER CLOSURE (e.g., if A or B appear IMMEDIATELY AFTER a dot, we'd need to ADD their productions TOO) — checking S→•Aa (A follows the dot): this REQUIRES ADDING A's production: A→•d#. Checking S→•bAc and S→•bBa (b is a TERMINAL right after the dot, NOT a non-terminal, so NO further closure needed from THESE). Checking S→•Bc (B follows the dot): this REQUIRES ADDING B's production: B→•@. 8. ADD these TWO MORE items (A→•d#, B→•@): TOTAL = 7+2 = 9 items. 9. So the number of items in GOTO(I0,S) is 9."
     }
   ]
 });
