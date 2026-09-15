@@ -104,14 +104,13 @@ window.GATE_DATA.questions['digital'] = {
         },
         {
           id: 'digital-boolean-q10',
-          q: "The minimal sum-of-products expression for f(A, B, C, D) = Σm(0, 2, 5, 7, 8, 10, 13, 15) contains how many literals in total?",
-          options: ["4", "6", "8", "16"],
+          q: "The minimal sum-of-products expression for f(A, B, C, D) = Σm(0, 4, 6, 7, 10, 12, 13, 14) contains how many literals in total?",
+          options: ["12", "8", "10", "6"],
           answer: 0,
           marks: 2,
           difficulty: 'hard',
           type: 'numerical',
-          explanation: "Group the minterms by the values of B and D. Minterms 0 (0000), 2 (0010), 8 (1000), 10 (1010) all have B = 0, D = 0 with A and C taking every combination — that is the 4-cell group B'D'. Minterms 5 (0101), 7 (0111), 13 (1101), 15 (1111) all have B = 1, D = 1 — the group BD. So the minimal SOP is f = B'D' + BD (the XNOR of B and D), with 2 product terms and 2 + 2 = 4 literals. On the K-map, B'D' shows up as the four corner cells of the CD-columns arrangement plus wrap cells, so missing the wrap-around adjacency is the main risk. Option 8 corresponds to leaving the function as four 2-cell groups of 3 literals... which is not maximal grouping; option 16 corresponds to raw minterms with no simplification; option 6 has no valid grouping that produces it."
-        },
+          explanation: "Find the prime implicants, then choose a minimum cover and count the literals in it (a literal is one appearance of a variable, complemented or not). Writing each minterm as ABCD: 0=0000, 4=0100, 6=0110, 7=0111, 10=1010, 12=1100, 13=1101, 14=1110. Combining adjacent minterms gives five prime implicants: A'C'D' (covering 0 and 4), A'BC (6, 7), ACD' (10, 14), ABC' (12, 13), and BD' (4, 6, 12, 14). Now cover all eight minterms minimally. Minterm 0 appears ONLY in A'C'D', minterm 7 only in A'BC, minterm 10 only in ACD', and minterm 13 only in ABC' -- so all four of those are ESSENTIAL prime implicants and must be included. Once they are in, check what remains: A'C'D' brings 4, A'BC brings 6, ACD' brings 14, ABC' brings 12, so minterms 4, 6, 12 and 14 are already covered. Everything is covered, and BD' -- despite being a perfectly valid prime implicant with only 2 literals -- is REDUNDANT and must be left out. The minimal SOP is A'C'D' + A'BC + ACD' + ABC', which is 4 terms of 3 literals each, giving 12 literals in total. The lesson worth carrying away is that a prime implicant being small does not make it useful: BD' is the cheapest implicant on the map yet contributes nothing, because every minterm it covers is already claimed by an essential term."},
         {
           id: 'digital-boolean-q11',
           q: "By De Morgan's law, the complement of (P + Q'R) is:",
@@ -1038,14 +1037,14 @@ window.GATE_DATA.questions['digital'].topics.find(function(t){return t.id==='dig
 },
 {
   id: 'digital-boolean-y4',
-  q: "What is the minimum number of literals required in the minimal sum-of-products (SOP) expression for the 4-variable Boolean function f(A,B,C,D) = Σm(0,2,8,10)? (Enter your numerical answer.)",
+  q: "What is the minimum number of literals required in the minimal sum-of-products (SOP) expression for the 4-variable Boolean function f(A,B,C,D) = Σm(1,3,9,11)? (Enter your numerical answer.)",
   options: [],
   answer: 2,
   kind: 'nat',
   marks: 2,
   difficulty: 'medium',
   type: 'numerical',
-  explanation: "List the minterms in binary (order A,B,C,D): m0=0000, m2=0010, m8=1000, m10=1010. In every one of these four minterms, B=0 and D=0, while A and C independently range over all four combinations {00,01,10,11} — meaning this set is exactly 'all rows where B=0 and D=0', regardless of A and C. This is a valid K-map grouping of size 4 (a quad), so the minimal SOP reduces to the single term B'D'. Counting literals in B'D' gives exactly 2 literals (B' and D'), so the minimum literal count is 2."
+  explanation: "List the minterms in binary (order A,B,C,D): m1=0001, m3=0011, m9=1001, m11=1011. Compare them column by column to see which variables stay fixed and which vary. B is 0 in all four and D is 1 in all four, while A and C independently range over all four combinations {00,01,10,11} — meaning this set is exactly 'all rows where B=0 and D=1', regardless of A and C. A variable that changes across the group cannot appear in the simplified term, so A and C both drop out. This is a valid K-map grouping of size 4 (a quad), so the minimal SOP reduces to the single term B'D. Counting literals in B'D gives exactly 2 literals (B' and D), so the minimum literal count is 2. The general rule this illustrates: a group of 2^k cells on a 4-variable map eliminates k variables, leaving 4 − k literals — here k = 2, so 4 − 2 = 2 literals."
 },
 {
   id: 'digital-boolean-y5',
@@ -1900,15 +1899,14 @@ window.GATE_DATA.questions['digital'].topics.find(function(t){return t.id==='dig
 },
 {
   id: 'digital-boolean-f2',
-  q: "For the K-map of f(A, B, C, D) = Σm(0, 1, 2, 5, 7, 8, 9, 10, 13, 15) shown below, the total number of prime implicants is:",
-  figure: '<svg viewBox="0 0 380 270" width="100%" style="max-width:380px;height:auto" xmlns="http://www.w3.org/2000/svg"><g font-size="13" fill="currentColor" text-anchor="middle"><text x="20" y="30" font-size="11" text-anchor="start">AB/CD</text><text x="105" y="30">00</text><text x="175" y="30">01</text><text x="245" y="30">11</text><text x="315" y="30">10</text><text x="30" y="80">00</text><text x="30" y="130">01</text><text x="30" y="180">11</text><text x="30" y="230">10</text></g><path d="M70 50L70 250M140 50L140 250M210 50L210 250M280 50L280 250M350 50L350 250M70 50L350 50M70 100L350 100M70 150L350 150M70 200L350 200M70 250L350 250" stroke="currentColor" stroke-width="1.5" fill="none"/><g font-size="15" fill="currentColor" text-anchor="middle"><text x="105" y="81">1</text><text x="175" y="81">1</text><text x="245" y="81">0</text><text x="315" y="81">1</text><text x="105" y="131">0</text><text x="175" y="131">1</text><text x="245" y="131">1</text><text x="315" y="131">0</text><text x="105" y="181">0</text><text x="175" y="181">1</text><text x="245" y="181">1</text><text x="315" y="181">0</text><text x="105" y="231">1</text><text x="175" y="231">1</text><text x="245" y="231">0</text><text x="315" y="231">1</text></g></svg>',
-  options: ["2", "3", "4", "5"],
+  q: "For the K-map of f(A, B, C, D) = Σm(0, 1, 4, 5, 6, 7, 9, 11, 14, 15) shown below, the total number of prime implicants is:",
+  figure: '<svg viewBox="0 0 380 270" width="100%" style="max-width:380px;height:auto" xmlns="http://www.w3.org/2000/svg"><g font-size="13" fill="currentColor" text-anchor="middle"><text x="20" y="30" font-size="11" text-anchor="start">AB/CD</text><text x="105" y="30">00</text><text x="175" y="30">01</text><text x="245" y="30">11</text><text x="315" y="30">10</text><text x="30" y="80">00</text><text x="30" y="130">01</text><text x="30" y="180">11</text><text x="30" y="230">10</text></g><path d="M70 50L70 250M140 50L140 250M210 50L210 250M280 50L280 250M350 50L350 250M70 50L350 50M70 100L350 100M70 150L350 150M70 200L350 200M70 250L350 250" stroke="currentColor" stroke-width="1.5" fill="none"/><g font-size="15" fill="currentColor" text-anchor="middle"><text x="105" y="81">1</text><text x="175" y="81">1</text><text x="245" y="81">0</text><text x="315" y="81">0</text><text x="105" y="131">1</text><text x="175" y="131">1</text><text x="245" y="131">1</text><text x="315" y="131">1</text><text x="105" y="181">0</text><text x="175" y="181">0</text><text x="245" y="181">1</text><text x="315" y="181">1</text><text x="105" y="231">0</text><text x="175" y="231">1</text><text x="245" y="231">1</text><text x="315" y="231">0</text></g></svg>',
+  options: ["4", "5", "6", "7"],
   answer: 2,
   marks: 2,
   difficulty: 'hard',
   type: 'pyq-style',
-  explanation: "Grouping the 1-cells: the two full corner/edge columns CD=00 combined with rows AB=00,10 (minterms 0,1,8,9, since column 00 and 01 together with rows 00 and 10 wrap) give B'C' covering {0,1,8,9}. The pattern B'D' covers columns CD=00 and 10 in rows AB=00,10, i.e. {0,2,8,10}. The pattern C'D covers column CD=01 in rows AB=00,01 (using the wrap on D fixed at 1, C fixed at 0), i.e. {1,5,9,13}. The pattern BD covers column CD=01 and 11 in rows AB=01,11, i.e. {5,7,13,15}. Careful Quine-McCluskey reduction confirms exactly four maximal groups (prime implicants): B'C', B'D', C'D and BD — no larger rectangle covers any of them, and none is a subset of another. Of these, B'D' and BD are essential (each is the only PI covering minterms 2,10 and 7,15 respectively), while B'C' and C'D are non-essential alternatives for covering the remaining minterms 1 and 9. The total prime implicant count is therefore 4."
-},
+  explanation: "A PRIME IMPLICANT is a group of 1-cells that is as large as possible -- it cannot be merged into any bigger valid group. Count every such maximal group, not merely the ones a minimal cover happens to use. Writing the minterms as ABCD: 0=0000, 1=0001, 4=0100, 5=0101, 6=0110, 7=0111, 9=1001, 11=1011, 14=1110, 15=1111. The maximal groups are: A'C' covering {0,1,4,5} (a group of 4: A=0, C=0); A'B covering {4,5,6,7} (a group of 4: A=0, B=1); BC covering {6,7,14,15} (a group of 4: B=1, C=1); B'C'D covering {1,9} (a group of 2); AB'D covering {9,11} (a group of 2); and ACD covering {11,15} (a group of 2). That is 6 prime implicants in total. Note that the MINIMAL cover needs only three of them -- A'C' + BC + AB'D, which is 7 literals -- because A'C' and BC are essential (minterm 0 lies only in A'C', minterm 14 only in BC) and AB'D is then needed to pick up 9 and 11. The question, however, asks for the number of PRIME implicants, which counts all 6 maximal groups including the three that the minimal solution discards. Confusing 'prime implicants' with 'prime implicants used in the minimal expression' is exactly the trap here; the second number is 3, the first is 6."},
 {
   id: 'digital-boolean-f3',
   q: "For the K-map of f(A, B, C, D) = Σm(1, 5, 6, 7, 11, 12, 13, 15) shown below, how many of its prime implicants are essential prime implicants?",
